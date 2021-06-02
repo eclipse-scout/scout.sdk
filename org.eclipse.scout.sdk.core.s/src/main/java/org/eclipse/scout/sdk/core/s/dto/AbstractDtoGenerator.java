@@ -213,12 +213,11 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
   }
 
   protected static String getRowDataName(String base) {
-    var rowDataSuffix = "RowData";
     if (Strings.isBlank(base)) {
-      return rowDataSuffix;
+      return ISdkConstants.SUFFIX_ROW_DATA;
     }
 
-    var result = new StringBuilder(base.length() + rowDataSuffix.length());
+    var result = new StringBuilder(base.length() + ISdkConstants.SUFFIX_ROW_DATA.length());
     var suffixes = new String[]{"PageData", "FieldData", ISdkConstants.SUFFIX_DTO};
     Arrays.stream(suffixes)
         .filter(base::endsWith)
@@ -228,7 +227,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
       // has none of the suffixes
       result.append(base);
     }
-    return result.append(rowDataSuffix).toString();
+    return result.append(ISdkConstants.SUFFIX_ROW_DATA).toString();
   }
 
   protected static String removeFieldSuffix(String fieldName) {
@@ -443,7 +442,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
   @SuppressWarnings("squid:UnusedPrivateMethod") // used as method-reference
   private void addPropertyDto(PropertyBean desc) {
     var lowerCaseBeanName = Introspector.decapitalize(desc.name());
-    var upperCaseBeanName = Strings.ensureStartWithUpperCase(desc.name()).toString();
+    var upperCaseBeanName = Strings.capitalize(desc.name()).toString();
     var propName = upperCaseBeanName + ISdkConstants.SUFFIX_DTO_PROPERTY;
     var propDataType = desc.type().reference();
     var propDataTypeBoxed = JavaTypes.boxPrimitive(propDataType);

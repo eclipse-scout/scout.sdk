@@ -146,7 +146,11 @@ public interface IScoutAbstractApi {
 
   interface AbstractForm extends IClassNameSupplier {
     String getConfiguredTitleMethodName();
+
+    String setHandlerMethodName();
+
     String startInternalExclusiveMethodName();
+
     String startInternalMethodName();
   }
 
@@ -159,8 +163,12 @@ public interface IScoutAbstractApi {
 
   interface AbstractFormField extends IClassNameSupplier {
     String getConfiguredLabelMethodName();
+
     String getConfiguredGridHMethodName();
+
     String getConfiguredLabelVisibleMethodName();
+
+    String getConfiguredMandatoryMethodName();
   }
 
   AbstractFormFieldData AbstractFormFieldData();
@@ -172,6 +180,7 @@ public interface IScoutAbstractApi {
 
   interface AbstractFormHandler extends IClassNameSupplier {
     String execStoreMethodName();
+
     String execLoadMethodName();
   }
 
@@ -258,18 +267,21 @@ public interface IScoutAbstractApi {
 
   interface AbstractPageWithTable extends IClassNameSupplier {
     String importPageDataMethodName();
+
     String execLoadDataMethodName();
   }
 
   AbstractPermission AbstractPermission();
 
   interface AbstractPermission extends IClassNameSupplier {
+    String getAccessCheckFailedMessageMethodName();
   }
 
   AbstractPropertyData AbstractPropertyData();
 
   interface AbstractPropertyData extends IClassNameSupplier {
     String getValueMethodName();
+
     String setValueMethodName();
   }
 
@@ -304,7 +316,16 @@ public interface IScoutAbstractApi {
 
   interface AbstractColumn extends IClassNameSupplier {
     String getConfiguredHeaderTextMethodName();
+
     String getConfiguredWidthMethodName();
+
+    String getConfiguredDisplayableMethodName();
+
+    String getConfiguredPrimaryKeyMethodName();
+
+    String getSelectedValueMethodName();
+
+    String getSelectedValuesMethodName();
   }
 
   AbstractStringColumn AbstractStringColumn();
@@ -342,7 +363,9 @@ public interface IScoutAbstractApi {
 
   interface AbstractTableFieldBeanData extends IClassNameSupplier {
     String rowAtMethodName();
+
     String setRowsMethodName();
+
     String createRowMethodName();
   }
 
@@ -394,6 +417,7 @@ public interface IScoutAbstractApi {
   AbstractTreeNode AbstractTreeNode();
 
   interface AbstractTreeNode extends IClassNameSupplier {
+    String getConfiguredLeafMethodName();
   }
 
   AbstractValueField AbstractValueField();
@@ -404,13 +428,18 @@ public interface IScoutAbstractApi {
   AbstractValueFieldData AbstractValueFieldData();
 
   interface AbstractValueFieldData extends IClassNameSupplier {
+    String getValueMethodName();
+
+    String setValueMethodName();
   }
 
   AbstractWebServiceClient AbstractWebServiceClient();
 
   interface AbstractWebServiceClient extends IClassNameSupplier {
     String getConfiguredEndpointUrlPropertyMethodName();
+
     String execInstallHandlersMethodName();
+
     String newInvocationContextMethodName();
   }
 
@@ -423,6 +452,7 @@ public interface IScoutAbstractApi {
 
   interface AbstractNumberField extends IClassNameSupplier {
     String getConfiguredMinValueMethodName();
+
     String getConfiguredMaxValueMethodName();
   }
 
@@ -430,8 +460,15 @@ public interface IScoutAbstractApi {
 
   interface AbstractAction extends IClassNameSupplier {
     String execActionMethodName();
+
+    String execInitActionMethodName();
+
     String getConfiguredKeyStrokeMethodName();
+
     String getConfiguredTextMethodName();
+
     String combineKeyStrokesMethodName();
+
+    String setVisibleGrantedMethodName();
   }
 }

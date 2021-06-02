@@ -38,6 +38,7 @@ public class TestingEnvironmentExtension extends AbstractContextExtension<Testin
   protected TestingEnvironment annotationToContext(ExtendWithTestingEnvironment annotation) {
     return new TestingEnvironment(createJavaEnvironmentUsingBuilder(annotation.primary().value()).get().wrap(),
         annotation.flushToDisk(),
+        annotation.assertNoCompileErrors(),
         createJavaEnvironmentUsingBuilder(annotation.dto().value()).get().wrap());
   }
 

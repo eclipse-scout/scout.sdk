@@ -14,6 +14,10 @@ import formdata.shared.services.pages.BaseTablePageData;
 @Data(BaseTablePageData.class)
 public class MyTablePage0 extends AbstractPageWithTable<Table> {
 @Override
+protected boolean getConfiguredLeaf() {
+return true;
+}
+@Override
 protected void execLoadData(SearchFilter filter) {
 importPageData(BEANS.get(IMyPageService0.class).getTestTableData(filter));
 }

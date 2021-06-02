@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,7 +44,10 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
     m_finishTask
         .withOperation(FormNewOperation::new)
         .withMapper(this::mapPageToOperation)
-        .withUiAction((op, d) -> d.asyncExec(() -> S2eUiUtils.openInEditor(op.getCreatedForm(), false)));
+        .withUiAction((op, d) -> {
+          var type = op.getCreatedForm().result();
+          d.asyncExec(() -> S2eUiUtils.openInEditor(type, false));
+        });
   }
 
   @Override
@@ -65,7 +68,7 @@ public class FormNewWizard extends AbstractWizard implements INewWizard {
     }
     op.setCreateFormData(page.isCreateFormData());
     op.setCreatePermissions(page.isCreatePermissions());
-    op.setCreateService(page.isCreateService());
+    op.setCreateOrAppendService(page.isCreateService());
     op.setFormName(page.getIcuName());
 
     IJavaProject serverProject;

@@ -10,9 +10,10 @@
  */
 package org.eclipse.scout.sdk.core.s.form;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.stream.IntStream;
+import java.util.function.Consumer;
 
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
@@ -30,9 +31,9 @@ import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.s.builder.java.body.IScoutMethodBodyBuilder;
-import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
@@ -41,6 +42,7 @@ import org.eclipse.scout.sdk.core.s.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.core.s.testcase.TestGenerator;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
@@ -52,6 +54,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
   // in
   private String m_formName;
+  private FinalValue<String> m_baseName = new FinalValue<>();
   private IClasspathEntry m_clientSourceFolder;
   private IClasspathEntry m_sharedSourceFolder;
   private IClasspathEntry m_serverSourceFolder;
@@ -62,22 +65,47 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   private String m_superType;
   private String m_serverSession;
   private boolean m_createFormData;
-  private boolean m_createService;
+  private boolean m_createOrAppendService;
   private boolean m_createPermissions;
+  private List<String> m_attributes; // optional
+  private ServiceNewOperation m_serviceNewOperation; // optional
 
   // out
-  private IType m_createdForm;
-  private IType m_createdFormData;
-  private IType m_createdServiceInterface;
-  private IType m_createdServiceImpl;
-  private IType m_createdReadPermission;
-  private IType m_createdUpdatePermission;
-  private IType m_createdCreatePermission;
-  private IType m_createdFormTest;
-  private IType m_createdServiceTest;
+  private IFuture<IType> m_createdForm;
+  private String m_createdFormFqn;
+
+  private IFuture<IType> m_createdFormData;
+  private String m_createdFormDataFqn;
+
+  private IFuture<IType> m_createdServiceInterface;
+  private String m_serviceInterfaceFqn;
+
+  private IFuture<IType> m_createdServiceImpl;
+  private String m_serviceImplFqn;
+
+  private IFuture<IType> m_createdReadPermission;
+  private String m_createdReadPermissionFqn;
+
+  private IFuture<IType> m_createdUpdatePermission;
+  private String m_createdUpdatePermissionFqn;
+
+  private IFuture<IType> m_createdCreatePermission;
+  private String m_createdCreatePermissionFqn;
+
+  private IFuture<IType> m_createdFormTest;
+  private String m_createdFormTestFqn;
+
+  private IFuture<IType> m_createdServiceTest;
+  private String m_serviceTestFqn;
 
   @Override
   public void accept(IEnvironment env, IProgress progress) {
+    validateOperation();
+    prepareProgress(progress);
+    executeOperation(env, progress);
+  }
+
+  protected void validateOperation() {
     Ensure.notBlank(getFormName(), "No form name provided");
     Ensure.notNull(getClientSourceFolder(), "No client source folder provided");
     if (isCreateService()) {
@@ -91,15 +119,15 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     }
     Ensure.notBlank(getClientPackage(), "No package provided");
     Ensure.notNull(getSuperType(), "Super type does not exist");
+  }
 
+  protected void prepareProgress(IProgress progress) {
     progress.init(getTotalWork(), toString());
+  }
 
+  protected void executeOperation(IEnvironment env, IProgress progress) {
     // calc names
     var sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getClientPackage());
-    var baseName = getFormName();
-    if (baseName.endsWith(ISdkConstants.SUFFIX_FORM)) {
-      baseName = baseName.substring(0, baseName.length() - ISdkConstants.SUFFIX_FORM.length());
-    }
 
     // DTO
     if (isCreateFormData()) {
@@ -108,18 +136,12 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
     // permissions
     if (isCreatePermissions()) {
-      var permissionBaseName = baseName + ISdkConstants.SUFFIX_PERMISSION;
-      setCreatedReadPermission(createReadPermission(permissionBaseName, sharedPackage, env, progress.newChild(1)));
-      setCreatedUpdatePermission(createUpdatePermission(permissionBaseName, sharedPackage, env, progress.newChild(1)));
-      setCreatedCreatePermission(createCreatePermission(permissionBaseName, sharedPackage, env, progress.newChild(1)));
+      createPermissions(sharedPackage, getBaseName() + ISdkConstants.SUFFIX_PERMISSION, env, progress);
     }
 
     // Service
-    if (isCreateService()) {
-      createService(sharedPackage, baseName, env, progress.newChild(2));
-
-      // service test
-      setCreatedServiceTest(createServiceTest(env, progress.newChild(1)));
+    if (isCreateOrAppendService()) {
+      createOrAppendService(sharedPackage, env, progress);
     }
 
     // form
@@ -148,18 +170,36 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     return result;
   }
 
+  protected String getBaseName() {
+    return m_baseName.computeIfAbsentAndGet(this::calcFormBaseName);
+  }
+
+  protected String calcFormBaseName() {
+    var name = getFormName();
+    if (name.endsWith(ISdkConstants.SUFFIX_FORM)) {
+      name = name.substring(0, name.length() - ISdkConstants.SUFFIX_FORM.length());
+    }
+    return name;
+  }
+
+  public String getServiceBaseName() {
+    return getBaseName();
+  }
+
   protected void updateFormData(IEnvironment env, IProgress progress) {
-    var formDataGenerator = DtoGeneratorFactory.createFormDataGenerator(getCreatedForm(), getFormDataSourceFolder().javaEnvironment());
-    env.writeCompilationUnit(formDataGenerator.get(), getFormDataSourceFolder(), progress);
+    // the DtoGeneratorFactory parses the @FormData-Annotation and uses the given formData-IType, therefore the formData needs to be created already
+    getCreatedFormData().result();
+    var formDataGenerator = DtoGeneratorFactory.createFormDataGenerator(getCreatedForm().result(), getFormDataSourceFolder().javaEnvironment());
+    env.writeCompilationUnitAsync(formDataGenerator.get(), getFormDataSourceFolder(), progress);
   }
 
   protected TestGenerator<?> createFormTestBuilder(IScoutVariousApi scoutApi) {
     TestGenerator<?> testBuilder = new TestGenerator<>()
-        .withElementName(getCreatedForm().elementName() + ISdkConstants.SUFFIX_TEST)
+        .withElementName(JavaTypes.simpleName(getCreatedFormFqn()) + ISdkConstants.SUFFIX_TEST)
         .withPackageName(getClientPackage())
         .withRunner(scoutApi.ClientTestRunner().fqn())
         .asClientTest(true);
-    if (isCreateService() && isCreateFormData()) {
+    if (isCreateOrAppendService() && isCreateFormData()) {
       // prepare mock
       addMock(testBuilder);
     }
@@ -172,7 +212,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
         .withField(FieldGenerator.create()
             .withElementName(mockVarName)
             .asPrivate()
-            .withDataType(getCreatedServiceInterface().name())
+            .withDataType(getServiceInterfaceFqn())
             .withAnnotation(ScoutAnnotationGenerator.createBeanMock()))
         .withMethod(MethodGenerator.create()
             .withElementName("setup")
@@ -181,7 +221,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
             .withAnnotation(ScoutAnnotationGenerator.createBefore())
             .withBody(b -> {
               var varName = "answer";
-              var formDataName = getCreatedFormData().name();
+              var formDataName = getCreatedFormDataFqn();
               b.ref(formDataName).space().append(varName).equalSign().appendNew().ref(formDataName).parenthesisOpen().parenthesisClose().semicolon().nl();
               appendMockSource(b, varName, mockVarName, FormGenerator.SERVICE_PREPARE_CREATE_METHOD_NAME);
               appendMockSource(b, varName, mockVarName, FormGenerator.SERVICE_CREATE_METHOD_NAME);
@@ -196,60 +236,74 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
         .dot().append("thenReturn").parenthesisOpen().append(formDataVarName).parenthesisClose().semicolon().nl();
   }
 
-  protected IType createFormTest(IEnvironment env, IProgress progress) {
+  protected IFuture<IType> createFormTest(IEnvironment env, IProgress progress) {
     var testSourceFolder = getClientTestSourceFolder();
     if (testSourceFolder == null) {
       return null;
     }
     var scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
     var formTestBuilder = createFormTestBuilder(scoutApi);
-    return env.writeCompilationUnit(formTestBuilder, testSourceFolder, progress);
+
+    setCreatedFormTestFqn(formTestBuilder.fullyQualifiedName());
+    return env.writeCompilationUnitAsync(formTestBuilder, testSourceFolder, progress);
   }
 
-  protected IType createServiceTest(IEnvironment env, IProgress progress) {
-    var testSourceFolder = getServerTestSourceFolder();
-    if (testSourceFolder == null) {
-      return null;
+  protected void createOrAppendService(String sharedPackage, IEnvironment env, IProgress progress) {
+    if (isCreateService()) {
+      createService(sharedPackage, getServiceBaseName(), env, progress.newChild(3));
     }
-    var scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
-    var serverPackage = ScoutTier.Client.convert(ScoutTier.Server, getClientPackage());
-    var baseName = getCreatedServiceImpl().elementName();
-    var elementName = baseName + ISdkConstants.SUFFIX_TEST;
+    else if (isAppendService()) {
+      var op = getServiceNewOperation();
+      addServiceMethods(op);
 
-    var existingServiceTest = testSourceFolder.javaEnvironment().findType(serverPackage + JavaTypes.C_DOT + elementName);
-    if (existingServiceTest.isPresent()) {
-      // service test class already exists
-      return existingServiceTest.get();
-    }
+      var svcName = op.getServiceName() + ISdkConstants.SUFFIX_SERVICE;
+      var serverPackage = ScoutTier.Shared.convert(ScoutTier.Server, op.getSharedPackage());
+      setServiceInterfaceFqn(sharedPackage + JavaTypes.C_DOT + "I" + svcName);
+      setServiceImplFqn(serverPackage + JavaTypes.C_DOT + svcName);
 
-    TestGenerator<?> testBuilder = new TestGenerator<>()
-        .withElementName(elementName)
-        .withPackageName(serverPackage)
-        .withRunner(scoutApi.ServerTestRunner().fqn())
-        .asClientTest(false);
-    if (getServerSession() != null) {
-      testBuilder.withSession(getServerSession());
+      if (op.isCreateTest()) {
+        setServiceTestFqn(getServiceImplFqn() + ISdkConstants.SUFFIX_TEST);
+      }
     }
-    return env.writeCompilationUnit(testBuilder, testSourceFolder, progress);
   }
 
   protected void createService(String sharedPackage, String baseName, IEnvironment env, IProgress progress) {
     var serviceNewOperation = new ServiceNewOperation();
-    serviceNewOperation.setServiceName(baseName);
-    serviceNewOperation.setSharedPackage(sharedPackage);
-    serviceNewOperation.setSharedSourceFolder(getSharedSourceFolder());
-    serviceNewOperation.setServerSourceFolder(getServerSourceFolder());
+    prepareServiceOperation(serviceNewOperation, sharedPackage, baseName);
 
     // add service methods
-    serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_PREPARE_CREATE_METHOD_NAME));
-    serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_CREATE_METHOD_NAME));
-    serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_LOAD_METHOD_NAME));
-    serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_STORE_METHOD_NAME));
+    addServiceMethods(serviceNewOperation);
 
     serviceNewOperation.accept(env, progress);
 
     setCreatedServiceImpl(serviceNewOperation.getCreatedServiceImpl());
+    setServiceImplFqn(serviceNewOperation.getCreatedServiceImplFqn());
+
     setCreatedServiceInterface(serviceNewOperation.getCreatedServiceInterface());
+    setServiceInterfaceFqn(serviceNewOperation.getCreatedServiceInterfaceFqn());
+
+    setCreatedServiceTest(serviceNewOperation.getCreatedServiceTest());
+    setServiceTestFqn(serviceNewOperation.getCreatedServiceTestFqn());
+  }
+
+  protected void prepareServiceOperation(ServiceNewOperation serviceNewOperation, String sharedPackage, String baseName) {
+    serviceNewOperation.setServiceName(baseName);
+    serviceNewOperation.setSharedPackage(sharedPackage);
+    serviceNewOperation.setSharedSourceFolder(getSharedSourceFolder());
+    serviceNewOperation.setServerSourceFolder(getServerSourceFolder());
+    if (getServerTestSourceFolder() == null) {
+      return;
+    }
+    serviceNewOperation.setTestSourceFolder(getServerTestSourceFolder());
+    serviceNewOperation.setServerSession(getServerSession());
+    serviceNewOperation.setCreateTest(true);
+  }
+
+  protected void addServiceMethods(ServiceNewOperation serviceNewOperation) {
+    serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_PREPARE_CREATE_METHOD_NAME));
+    serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_CREATE_METHOD_NAME));
+    serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_LOAD_METHOD_NAME));
+    serviceNewOperation.addMethod(createServiceMethod(FormGenerator.SERVICE_STORE_METHOD_NAME));
   }
 
   protected IMethodGenerator<?, ?> createServiceMethod(String name) {
@@ -263,13 +317,13 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
             var methodName = b.surroundingMethod().elementName().orElse(null);
             String permissionFqn;
             if (FormGenerator.SERVICE_LOAD_METHOD_NAME.equals(methodName)) {
-              permissionFqn = getCreatedReadPermission().name();
+              permissionFqn = getCreatedReadPermissionFqn();
             }
             else if (FormGenerator.SERVICE_STORE_METHOD_NAME.equals(methodName)) {
-              permissionFqn = getCreatedUpdatePermission().name();
+              permissionFqn = getCreatedUpdatePermissionFqn();
             }
             else {
-              permissionFqn = getCreatedCreatePermission().name();
+              permissionFqn = getCreatedCreatePermissionFqn();
             }
             createPermissionCheckSource(b, permissionFqn);
           }
@@ -277,10 +331,10 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
           createServiceMethodBody(b);
         });
     if (isCreateFormData()) {
-      methodBuilder.withReturnType(getCreatedFormData().name());
+      methodBuilder.withReturnType(getCreatedFormDataFqn());
       methodBuilder.withParameter(MethodParameterGenerator.create()
           .withElementName("formData")
-          .withDataType(getCreatedFormData().name()));
+          .withDataType(getCreatedFormDataFqn()));
     }
     else {
       methodBuilder.withReturnType(JavaTypes._void);
@@ -314,36 +368,49 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
         .flatMap(IMethodParameterGenerator::elementName);
   }
 
-  protected IType createFormData(String sharedPackage, IEnvironment env, IProgress progress) {
+  protected IFuture<IType> createFormData(String sharedPackage, IEnvironment env, IProgress progress) {
     var formDataGenerator = PrimaryTypeGenerator.create()
         .withElementName(getFormName() + ISdkConstants.SUFFIX_DTO)
         .withPackageName(sharedPackage)
         .withSuperClassFrom(IScoutApi.class, api -> api.AbstractFormData().fqn());
-    return env.writeCompilationUnit(formDataGenerator, getFormDataSourceFolder(), progress);
+
+    setCreatedFormDataFqn(formDataGenerator.fullyQualifiedName());
+    return env.writeCompilationUnitAsync(formDataGenerator, getFormDataSourceFolder(), progress);
   }
 
-  protected IType createPermission(String permissionName, String sharedPackage, IEnvironment env, IProgress progress) {
+  protected void createPermissions(String sharedPackage, String permissionBaseName, IEnvironment env, IProgress progress) {
+    setCreatedReadPermission(createReadPermission(permissionBaseName, sharedPackage, env, progress.newChild(1)));
+    setCreatedUpdatePermission(createUpdatePermission(permissionBaseName, sharedPackage, env, progress.newChild(1)));
+    setCreatedCreatePermission(createCreatePermission(permissionBaseName, sharedPackage, env, progress.newChild(1)));
+  }
+
+  protected IFuture<IType> createPermission(String permissionName, String sharedPackage, Consumer<String> fqnConsumer, IEnvironment env, IProgress progress) {
     PermissionGenerator<?> psb = new PermissionGenerator<>()
         .withElementName(permissionName)
         .withPackageName(sharedPackage);
-    return env.writeCompilationUnit(psb, getSharedSourceFolder(), progress);
+    if (fqnConsumer != null) {
+      fqnConsumer.accept(psb.fullyQualifiedName());
+    }
+    return env.writeCompilationUnitAsync(psb, getSharedSourceFolder(), progress);
   }
 
-  protected IType createCreatePermission(String permissionBaseName, String sharedPackage, IEnvironment env, IProgress progress) {
-    return createPermission("Create" + permissionBaseName, sharedPackage, env, progress);
+  protected IFuture<IType> createCreatePermission(String permissionBaseName, String sharedPackage, IEnvironment env, IProgress progress) {
+    return createPermission("Create" + permissionBaseName, sharedPackage, this::setCreatedCreatePermissionFqn, env, progress);
   }
 
-  protected IType createReadPermission(String permissionBaseName, String sharedPackage, IEnvironment env, IProgress progress) {
-    return createPermission("Read" + permissionBaseName, sharedPackage, env, progress);
+  protected IFuture<IType> createReadPermission(String permissionBaseName, String sharedPackage, IEnvironment env, IProgress progress) {
+    return createPermission("Read" + permissionBaseName, sharedPackage, this::setCreatedReadPermissionFqn, env, progress);
   }
 
-  protected IType createUpdatePermission(String permissionBaseName, String sharedPackage, IEnvironment env, IProgress progress) {
-    return createPermission("Update" + permissionBaseName, sharedPackage, env, progress);
+  protected IFuture<IType> createUpdatePermission(String permissionBaseName, String sharedPackage, IEnvironment env, IProgress progress) {
+    return createPermission("Update" + permissionBaseName, sharedPackage, this::setCreatedUpdatePermissionFqn, env, progress);
   }
 
-  protected IType createForm(IEnvironment env, IProgress progress) {
+  protected IFuture<IType> createForm(IEnvironment env, IProgress progress) {
     var formBuilder = createFormBuilder();
-    return env.writeCompilationUnit(formBuilder, getClientSourceFolder(), progress);
+
+    setCreatedFormFqn(formBuilder.fullyQualifiedName());
+    return env.writeCompilationUnitAsync(formBuilder, getClientSourceFolder(), progress);
   }
 
   protected FormGenerator<?> createFormBuilderInstance() {
@@ -354,23 +421,17 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     var formBuilder = createFormBuilderInstance()
         .withSuperClass(getSuperType())
         .withElementName(getFormName())
-        .withPackageName(getClientPackage());
+        .withPackageName(getClientPackage())
+        .withFormFields(getAttributes());
     if (isCreateFormData()) {
-      formBuilder.withFormData(getCreatedFormData().name());
+      formBuilder.withFormData(getCreatedFormDataFqn());
     }
-    if (isCreateService()) {
-      formBuilder.withServiceInterface(getCreatedServiceInterface().name());
+    if (isCreateOrAppendService()) {
+      formBuilder.withServiceInterface(getServiceInterfaceFqn());
     }
     if (isCreatePermissions()) {
-      formBuilder.withPermissionUpdate(getCreatedUpdatePermission().name());
-      formBuilder.withPermissionCreate(getCreatedCreatePermission().name());
-    }
-
-    // @ClassId
-    if (ClassIds.isAutomaticallyCreateClassIdAnnotation()) {
-      var fqn = getClientPackage() + JavaTypes.C_DOT + getFormName();
-      var classIds = IntStream.range(0, FormGenerator.NUM_CLASS_IDS).mapToObj(i -> ClassIds.next(fqn)).toArray(String[]::new);
-      formBuilder.withClassIdValues(classIds);
+      formBuilder.withPermissionUpdate(getCreatedUpdatePermissionFqn());
+      formBuilder.withPermissionCreate(getCreatedCreatePermissionFqn());
     }
     return formBuilder;
   }
@@ -380,6 +441,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   public void setFormName(String formName) {
+    m_baseName = new FinalValue<>();
     m_formName = formName;
   }
 
@@ -431,12 +493,20 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     m_createFormData = createFormData;
   }
 
-  public boolean isCreateService() {
-    return m_createService;
+  public boolean isCreateOrAppendService() {
+    return m_createOrAppendService;
   }
 
-  public void setCreateService(boolean createService) {
-    m_createService = createService;
+  public void setCreateOrAppendService(boolean createOrAppendService) {
+    m_createOrAppendService = createOrAppendService;
+  }
+
+  public boolean isCreateService() {
+    return isCreateOrAppendService() && getServiceNewOperation() == null;
+  }
+
+  public boolean isAppendService() {
+    return isCreateOrAppendService() && getServiceNewOperation() != null;
   }
 
   public boolean isCreatePermissions() {
@@ -447,60 +517,132 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     m_createPermissions = createPermissions;
   }
 
-  public IType getCreatedForm() {
+  public List<String> getAttributes() {
+    return m_attributes;
+  }
+
+  public void setAttributes(List<String> attributes) {
+    m_attributes = attributes;
+  }
+
+  public ServiceNewOperation getServiceNewOperation() {
+    return m_serviceNewOperation;
+  }
+
+  public void setServiceNewOperation(ServiceNewOperation serviceNewOperation) {
+    m_serviceNewOperation = serviceNewOperation;
+  }
+
+  public IFuture<IType> getCreatedForm() {
     return m_createdForm;
   }
 
-  protected void setCreatedForm(IType createdForm) {
+  protected void setCreatedForm(IFuture<IType> createdForm) {
     m_createdForm = createdForm;
   }
 
-  public IType getCreatedFormData() {
+  public String getCreatedFormFqn() {
+    return m_createdFormFqn;
+  }
+
+  protected void setCreatedFormFqn(String createdFormFqn) {
+    m_createdFormFqn = createdFormFqn;
+  }
+
+  public IFuture<IType> getCreatedFormData() {
     return m_createdFormData;
   }
 
-  protected void setCreatedFormData(IType createdFormData) {
+  protected void setCreatedFormData(IFuture<IType> createdFormData) {
     m_createdFormData = createdFormData;
   }
 
-  public IType getCreatedServiceInterface() {
+  public String getCreatedFormDataFqn() {
+    return m_createdFormDataFqn;
+  }
+
+  protected void setCreatedFormDataFqn(String createdFormDataFqn) {
+    m_createdFormDataFqn = createdFormDataFqn;
+  }
+
+  public IFuture<IType> getCreatedServiceInterface() {
     return m_createdServiceInterface;
   }
 
-  protected void setCreatedServiceInterface(IType createdServiceInterface) {
+  protected void setCreatedServiceInterface(IFuture<IType> createdServiceInterface) {
     m_createdServiceInterface = createdServiceInterface;
   }
 
-  public IType getCreatedServiceImpl() {
+  public String getServiceInterfaceFqn() {
+    return m_serviceInterfaceFqn;
+  }
+
+  protected void setServiceInterfaceFqn(String serviceInterfaceFqn) {
+    m_serviceInterfaceFqn = serviceInterfaceFqn;
+  }
+
+  public IFuture<IType> getCreatedServiceImpl() {
     return m_createdServiceImpl;
   }
 
-  protected void setCreatedServiceImpl(IType createdServiceImpl) {
+  protected void setCreatedServiceImpl(IFuture<IType> createdServiceImpl) {
     m_createdServiceImpl = createdServiceImpl;
   }
 
-  public IType getCreatedReadPermission() {
+  public String getServiceImplFqn() {
+    return m_serviceImplFqn;
+  }
+
+  protected void setServiceImplFqn(String serviceImplFqn) {
+    m_serviceImplFqn = serviceImplFqn;
+  }
+
+  public IFuture<IType> getCreatedReadPermission() {
     return m_createdReadPermission;
   }
 
-  protected void setCreatedReadPermission(IType createdReadPermission) {
+  protected void setCreatedReadPermission(IFuture<IType> createdReadPermission) {
     m_createdReadPermission = createdReadPermission;
   }
 
-  public IType getCreatedUpdatePermission() {
+  public String getCreatedReadPermissionFqn() {
+    return m_createdReadPermissionFqn;
+  }
+
+  protected void setCreatedReadPermissionFqn(String createdReadPermissionFqn) {
+    m_createdReadPermissionFqn = createdReadPermissionFqn;
+  }
+
+  public IFuture<IType> getCreatedUpdatePermission() {
     return m_createdUpdatePermission;
   }
 
-  protected void setCreatedUpdatePermission(IType createdUpdatePermission) {
+  protected void setCreatedUpdatePermission(IFuture<IType> createdUpdatePermission) {
     m_createdUpdatePermission = createdUpdatePermission;
   }
 
-  public IType getCreatedCreatePermission() {
+  public String getCreatedUpdatePermissionFqn() {
+    return m_createdUpdatePermissionFqn;
+  }
+
+  protected void setCreatedUpdatePermissionFqn(String createdUpdatePermissionFqn) {
+    m_createdUpdatePermissionFqn = createdUpdatePermissionFqn;
+  }
+
+  public IFuture<IType> getCreatedCreatePermission() {
     return m_createdCreatePermission;
   }
 
-  protected void setCreatedCreatePermission(IType createdCreatePermission) {
+  protected void setCreatedCreatePermission(IFuture<IType> createdCreatePermission) {
     m_createdCreatePermission = createdCreatePermission;
+  }
+
+  public String getCreatedCreatePermissionFqn() {
+    return m_createdCreatePermissionFqn;
+  }
+
+  protected void setCreatedCreatePermissionFqn(String createdCreatePermissionFqn) {
+    m_createdCreatePermissionFqn = createdCreatePermissionFqn;
   }
 
   public IClasspathEntry getFormDataSourceFolder() {
@@ -527,20 +669,36 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     m_serverTestSourceFolder = serverTestSourceFolder;
   }
 
-  public IType getCreatedFormTest() {
+  public IFuture<IType> getCreatedFormTest() {
     return m_createdFormTest;
   }
 
-  protected void setCreatedFormTest(IType createdFormTest) {
+  protected void setCreatedFormTest(IFuture<IType> createdFormTest) {
     m_createdFormTest = createdFormTest;
   }
 
-  public IType getCreatedServiceTest() {
+  public String getCreatedFormTestFqn() {
+    return m_createdFormTestFqn;
+  }
+
+  protected void setCreatedFormTestFqn(String createdFormTestFqn) {
+    m_createdFormTestFqn = createdFormTestFqn;
+  }
+
+  public IFuture<IType> getCreatedServiceTest() {
     return m_createdServiceTest;
   }
 
-  protected void setCreatedServiceTest(IType createdServiceTest) {
+  protected void setCreatedServiceTest(IFuture<IType> createdServiceTest) {
     m_createdServiceTest = createdServiceTest;
+  }
+
+  public String getServiceTestFqn() {
+    return m_serviceTestFqn;
+  }
+
+  protected void setServiceTestFqn(String serviceTestFqn) {
+    m_serviceTestFqn = serviceTestFqn;
   }
 
   public String getServerSession() {

@@ -17,8 +17,12 @@ import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.MethodBodyBuilder;
+import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
+import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
+import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  * <h3>{@link ScoutMethodBodyBuilder}</h3>
@@ -105,5 +109,22 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
   public TYPE appendDoNodeGet(CharSequence nodeName) {
     return append(nodeName).parenthesisOpen().parenthesisClose().dot()
         .appendFrom(IScoutApi.class, api -> api.DoNode().getMethodName()).parenthesisOpen().parenthesisClose();
+  }
+
+  @Override
+  public TYPE appendFormSetHandler(CharSequence formVariableName, CharSequence handlerSimpleName) {
+    return append(formVariableName).dot().appendFrom(IScoutApi.class, api -> api.AbstractForm().setHandlerMethodName()).parenthesisOpen().append(formVariableName).dot().appendNew().append(handlerSimpleName).parenthesisOpen()
+        .parenthesisClose().parenthesisClose().semicolon();
+  }
+
+  @Override
+  public TYPE appendThrowVetoException(CharSequence nlsKeyName, ISourceGenerator<IExpressionBuilder<?>> varArg) {
+    var throwVeto = appendTodo("verify translation").appendThrow().appendNew().refClassFrom(IScoutApi.class, IScoutApi::VetoException).parenthesisOpen().refClassFrom(IScoutApi.class, IScoutApi::TEXTS).dot()
+        .appendFrom(IScoutApi.class, api -> api.TEXTS().getMethodName()).parenthesisOpen().stringLiteral(nlsKeyName);
+    if (varArg != null) {
+      throwVeto.append(JavaTypes.C_COMMA).append(varArg.generalize(ExpressionBuilder::create));
+    }
+    throwVeto.parenthesisClose().parenthesisClose().semicolon();
+    return throwVeto;
   }
 }

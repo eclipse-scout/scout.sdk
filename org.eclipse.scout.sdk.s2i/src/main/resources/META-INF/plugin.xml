@@ -39,14 +39,26 @@
           </li>
           <li>@ClassId validation inspections (missing, duplicates)</li>
           <li>Project creation support</li>
+          <li>Element creation support (e.g. Entity, Form, Page, Lookup Call, Code Type)</li>
         </ul>
         </p>
   ]]></description>
 
   <change-notes><![CDATA[
+        <b>May 25, 2021</b><br>
+        Adds actions to create several Scout elements like:<br>
         <ul>
-          <li>Adds support for Scout 22</li>
+          <li>Entity</li>
+          <li>Form</li>
+          <li>Page</li>
+          <li>Lookup Call</li>
+          <li>Code Type</li>
         </ul>
+        <b>March 13, 2021</b><br>
+        Adds Scout project creation support<br>
+        Adds an action to update DataObject convenience methods<br>
+        Support for Scout 22<br>
+        ...
   ]]></change-notes>
 
   <!-- please see https://jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
@@ -75,6 +87,8 @@
                     serviceImplementation="org.eclipse.scout.sdk.s2i.dataobject.DataObjectManagerImpl"/>
     <projectService serviceInterface="org.eclipse.scout.sdk.s2i.classid.ClassIdCache"
                     serviceImplementation="org.eclipse.scout.sdk.s2i.classid.ClassIdCacheImplementor"/>
+    <applicationService serviceInterface="org.eclipse.scout.sdk.s2i.element.ElementCreationManager"
+                        serviceImplementation="org.eclipse.scout.sdk.s2i.element.ElementCreationManagerImplementor"/>
     <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackCache"/>
     <applicationService serviceImplementation="org.eclipse.scout.sdk.s2i.settings.ScoutCodeFoldingSettings"/>
     <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
@@ -124,6 +138,22 @@
               class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInFileMenu">
         <keyboard-shortcut keymap="$default" first-keystroke="control alt shift O"/>
       </action>
+    </group>
+
+    <group id="org.eclipse.scout.sdk.s2i.ScoutElementActionGroup"
+           class="org.eclipse.scout.sdk.s2i.element.ScoutElementActionGroup"
+           popup="true">
+      <add-to-group group-id="NewGroup" anchor="last"/>
+      <action id="org.eclipse.scout.sdk.s2i.CreateEntityAction"
+              class="org.eclipse.scout.sdk.s2i.entity.CreateEntityAction"/>
+      <action id="org.eclipse.scout.sdk.s2i.CreateFormAction"
+              class="org.eclipse.scout.sdk.s2i.form.CreateFormAction"/>
+      <action id="org.eclipse.scout.sdk.s2i.CreatePageAction"
+              class="org.eclipse.scout.sdk.s2i.page.CreatePageAction"/>
+      <action id="org.eclipse.scout.sdk.s2i.CreateLookupCallAction"
+              class="org.eclipse.scout.sdk.s2i.lookupcall.CreateLookupCallAction"/>
+      <action id="org.eclipse.scout.sdk.s2i.CreateCodeTypeAction"
+              class="org.eclipse.scout.sdk.s2i.codetype.CreateCodeTypeAction"/>
     </group>
   </actions>
 

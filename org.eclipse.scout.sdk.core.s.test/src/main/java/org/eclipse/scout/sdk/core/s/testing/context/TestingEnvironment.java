@@ -60,18 +60,20 @@ import org.eclipse.scout.sdk.core.util.Ensure;
  *
  * @since 7.0.0
  */
-public class TestingEnvironment extends AbstractEnvironment implements AutoCloseable {
+public class TestingEnvironment extends AbstractEnvironment {
 
   private final boolean m_flushResourcesToDisk;
+  private final boolean m_assertNoCompileErrors;
   private final Map<String, IType> m_dtoCache;
   private final IJavaEnvironment m_dtoEnv;
   private final IJavaEnvironment m_env;
   private final Collection<JavaEnvironmentSpi> m_javaEnvironments;
 
-  protected TestingEnvironment(IJavaEnvironment env, boolean flushResourcesToDisk, IJavaEnvironment dtoEnv) {
+  protected TestingEnvironment(IJavaEnvironment env, boolean flushResourcesToDisk, boolean assertNoCompileErrors, IJavaEnvironment dtoEnv) {
     m_dtoCache = new HashMap<>();
     m_javaEnvironments = new ArrayList<>();
     m_flushResourcesToDisk = flushResourcesToDisk;
+    m_assertNoCompileErrors = assertNoCompileErrors;
     m_env = env;
     m_dtoEnv = dtoEnv;
 
@@ -117,7 +119,9 @@ public class TestingEnvironment extends AbstractEnvironment implements AutoClose
     }
     else {
       updateAndValidateDtoFor(result);
-      assertNoCompileErrors(result);
+      if (isAssertNoCompileErrors()) {
+        assertNoCompileErrors(result);
+      }
     }
 
     Throwable err = null;
@@ -185,7 +189,9 @@ public class TestingEnvironment extends AbstractEnvironment implements AutoClose
         .forEach(IFuture::result);
 
     // validate created DTO
-    assertNoCompileErrors(dto);
+    if (isAssertNoCompileErrors()) {
+      assertNoCompileErrors(dto);
+    }
     m_dtoCache.remove(modelType.elementName());
   }
 
@@ -249,8 +255,13 @@ public class TestingEnvironment extends AbstractEnvironment implements AutoClose
     return m_flushResourcesToDisk;
   }
 
+  public boolean isAssertNoCompileErrors() {
+    return m_assertNoCompileErrors;
+  }
+
   @Override
   public void close() {
+    super.close();
     var iterator = javaEnvironments().iterator();
     while (iterator.hasNext()) {
       var javaEnv = iterator.next();

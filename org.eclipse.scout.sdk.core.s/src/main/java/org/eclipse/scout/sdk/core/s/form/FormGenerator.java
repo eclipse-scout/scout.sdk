@@ -10,11 +10,16 @@
  */
 package org.eclipse.scout.sdk.core.s.form;
 
+import static org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator.createOrder;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
@@ -25,9 +30,9 @@ import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
-import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -46,40 +51,45 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
   public static final String SERVICE_CREATE_METHOD_NAME = "create";
   public static final String NEW_HANDLER_NAME = "New" + ISdkConstants.SUFFIX_FORM_HANDLER;
 
-  public static final int NUM_CLASS_IDS = 5;
+  private final AtomicInteger m_nextFieldGetterSortCode = new AtomicInteger(200);
 
   private String m_formData;
   private String m_serviceIfc;
   private String m_updatePermission;
   private String m_createPermission;
-  private String[] m_classIdValues;
+  private List<String> m_formFields;
 
   @Override
   protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
+    var mainBox = createMainBox();
     mainType
         .withAnnotation(formData()
             .map(dto -> ScoutAnnotationGenerator.createFormData(dto, SdkCommand.CREATE, null))
             .orElse(null))
-        .withAnnotation(classIdGenerator(0).orElse(null))
-        .withMethod(createGetConfiguredTitle(), 10)
-        .withType(createMainBox(), 20)
-        .withType(createHandler(NEW_HANDLER_NAME), 50)
-        .withType(createHandler(MODIFY_HANDLER_NAME), 60);
+        .withAnnotation(classIdGenerator(fullyQualifiedName()))
+        .withMethod(createGetConfiguredTitle(), 100)
+        .withType(mainBox, 2000)
+        .withType(createHandler(NEW_HANDLER_NAME), 5000)
+        .withType(createHandler(MODIFY_HANDLER_NAME), 6000);
+
+    withFieldGetter(mainBox.fullyQualifiedName());
+    appendGroupBox(mainBox);
+    appendButtons(mainBox);
 
     var startModify = createStartMethod("startModify", MODIFY_HANDLER_NAME);
     var startNew = createStartMethod("startNew", NEW_HANDLER_NAME);
     if (startModify != null) {
-      mainType.withMethod(startModify, 30);
+      mainType.withMethod(startModify, 3000);
     }
     if (startNew != null) {
-      mainType.withMethod(startNew, 40);
+      mainType.withMethod(startNew, 4000);
     }
   }
 
   protected IMethodGenerator<?, ?> createGetConfiguredTitle() {
     var nlsKeyName = elementName().orElseThrow(() -> newFail("Form has no name."));
     if (nlsKeyName.endsWith(ISdkConstants.SUFFIX_FORM)) {
-      nlsKeyName = Strings.ensureStartWithUpperCase(nlsKeyName.substring(0, nlsKeyName.length() - ISdkConstants.SUFFIX_FORM.length())).toString();
+      nlsKeyName = Strings.capitalize(nlsKeyName.substring(0, nlsKeyName.length() - ISdkConstants.SUFFIX_FORM.length())).toString();
     }
     return ScoutMethodGenerator.createNlsMethodFrom(IScoutApi.class, api -> api.AbstractForm().getConfiguredTitleMethodName(), nlsKeyName);
   }
@@ -102,50 +112,80 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
   }
 
   protected ITypeGenerator<? extends ITypeGenerator<?>> createMainBox() {
-    var groupBoxName = "GroupBox";
-    var okButtonName = "Ok" + ISdkConstants.SUFFIX_BUTTON;
-    var cancelButtonName = "Cancel" + ISdkConstants.SUFFIX_BUTTON;
-    var mainBoxName = "MainBox";
-
-    var mainBox = TypeGenerator.create()
+    return TypeGenerator.create()
         .asPublic()
-        .withAnnotation(ScoutAnnotationGenerator.createOrder(ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP))
-        .withAnnotation(classIdGenerator(1).orElse(null))
-        .withElementName(mainBoxName)
+        .withAnnotation(createOrder(ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP))
+        .withAnnotation(classIdGenerator(fullyQualifiedName()))
+        .withElementName("MainBox")
         .withSuperClassFrom(IScoutApi.class, api -> api.AbstractGroupBox().fqn())
-        .withType(TypeGenerator.create()
-            .asPublic()
-            .withElementName(groupBoxName)
-            .withAnnotation(ScoutAnnotationGenerator.createOrder(ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP))
-            .withAnnotation(classIdGenerator(4).orElse(null))
-            .withSuperClassFrom(IScoutApi.class, api -> api.AbstractGroupBox().fqn()), 100)
-        .withType(TypeGenerator.create()
-            .asPublic()
-            .withElementName(okButtonName)
-            .withAnnotation(ScoutAnnotationGenerator.createOrder(2 * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP))
-            .withAnnotation(classIdGenerator(2).orElse(null))
-            .withSuperClassFrom(IScoutApi.class, api -> api.AbstractOkButton().fqn()), 200)
-        .withType(TypeGenerator.create()
-            .asPublic()
-            .withElementName(cancelButtonName)
-            .withAnnotation(ScoutAnnotationGenerator.createOrder(3 * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP))
-            .withAnnotation(classIdGenerator(3).orElse(null))
-            .withSuperClassFrom(IScoutApi.class, api -> api.AbstractCancelButton().fqn()), 300)
         .setDeclaringFullyQualifiedName(fullyQualifiedName());
+  }
 
-    // form field getters
-    withMethod(ScoutMethodGenerator.createFieldGetter(mainBox
-        .fullyQualifiedName()), 12)
-            .withMethod(ScoutMethodGenerator.createFieldGetter(mainBox
-                .type(groupBoxName).get()
-                .fullyQualifiedName()), 14)
-            .withMethod(ScoutMethodGenerator.createFieldGetter(mainBox
-                .type(okButtonName).get()
-                .fullyQualifiedName()), 16)
-            .withMethod(ScoutMethodGenerator.createFieldGetter(mainBox
-                .type(cancelButtonName).get()
-                .fullyQualifiedName()), 18);
-    return mainBox;
+  protected void appendGroupBox(ITypeGenerator<?> parent) {
+    var groupBox = createGroupBox(parent.fullyQualifiedName());
+    parent.withType(groupBox, 100);
+    withFieldGetter(groupBox.fullyQualifiedName());
+
+    var index = new AtomicInteger(1);
+    Strings.capitalize(formFields())
+        .forEach(formField -> appendFormField(formField, groupBox, index.getAndIncrement() * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP));
+  }
+
+  protected ITypeGenerator<? extends ITypeGenerator<?>> createGroupBox(String declaringFqn) {
+    return TypeGenerator.create()
+        .asPublic()
+        .withElementName("GroupBox")
+        .withAnnotation(createOrder(ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP))
+        .withAnnotation(classIdGenerator(fullyQualifiedName()))
+        .withSuperClassFrom(IScoutApi.class, api -> api.AbstractGroupBox().fqn())
+        .setDeclaringFullyQualifiedName(declaringFqn);
+  }
+
+  protected void appendFormField(CharSequence formField, ITypeGenerator<?> parent, double order) {
+    var field = createFormField(formField, parent.fullyQualifiedName(), order);
+    parent.withType(field);
+    withFieldGetter(field.fullyQualifiedName());
+  }
+
+  protected ITypeGenerator<? extends ITypeGenerator<?>> createFormField(CharSequence formField, String declaringFqn, double order) {
+    return TypeGenerator.create()
+        .asPublic()
+        .withElementName(formField + ISdkConstants.SUFFIX_FORM_FIELD)
+        .withSuperClassFrom(IScoutApi.class, api -> api.AbstractStringField().fqn())
+        .withAnnotation(createOrder(order))
+        .withAnnotation(classIdGenerator(fullyQualifiedName()))
+        .withMethod(ScoutMethodGenerator.createNlsMethodFrom(IScoutApi.class, api -> api.AbstractFormField().getConfiguredLabelMethodName(), formField))
+        .withMethod(ScoutMethodGenerator.createGetConfiguredMandatory(true))
+        .withMethod(ScoutMethodGenerator.createGetConfiguredMaxLength(60))
+        .setDeclaringFullyQualifiedName(declaringFqn);
+  }
+
+  protected void appendButtons(ITypeGenerator<?> parent) {
+    var okButton = createOkButton(parent.fullyQualifiedName(), 2 * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP);
+    var cancelButton = createCancelButton(parent.fullyQualifiedName(), 3 * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP);
+    parent
+        .withType(okButton, 200)
+        .withType(cancelButton, 300);
+    withFieldGetter(okButton.fullyQualifiedName());
+    withFieldGetter(cancelButton.fullyQualifiedName());
+  }
+
+  protected ITypeGenerator<? extends ITypeGenerator<?>> createOkButton(String declaringFqn, double order) {
+    return createButtonFrom("Ok" + ISdkConstants.SUFFIX_BUTTON, declaringFqn, IScoutApi.class, api -> api.AbstractOkButton().fqn(), order);
+  }
+
+  protected ITypeGenerator<? extends ITypeGenerator<?>> createCancelButton(String declaringFqn, double order) {
+    return createButtonFrom("Cancel" + ISdkConstants.SUFFIX_BUTTON, declaringFqn, IScoutApi.class, api -> api.AbstractCancelButton().fqn(), order);
+  }
+
+  protected <API extends IApiSpecification> ITypeGenerator<? extends ITypeGenerator<?>> createButtonFrom(String buttonName, String declaringFqn, Class<API> apiDefinition, Function<API, String> superClassSupplier, double order) {
+    return TypeGenerator.create()
+        .asPublic()
+        .withElementName(buttonName)
+        .withAnnotation(createOrder(order))
+        .withAnnotation(classIdGenerator(fullyQualifiedName()))
+        .withSuperClassFrom(apiDefinition, superClassSupplier)
+        .setDeclaringFullyQualifiedName(declaringFqn);
   }
 
   protected ITypeGenerator<? extends ITypeGenerator<?>> createHandler(String name) {
@@ -158,14 +198,18 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
             .asProtected()
             .withReturnType(JavaTypes._void)
             .withElementNameFrom(IScoutApi.class, api -> api.AbstractFormHandler().execLoadMethodName())
-            .withBody(b -> createHandlerMethodBodyGenerator(isModify, true).generate(b))
+            .withBody(b -> createHandlerMethodBody(b, isModify, true))
             .withAnnotation(AnnotationGenerator.createOverride()))
         .withMethod(MethodGenerator.create()
             .asProtected()
             .withReturnType(JavaTypes._void)
             .withElementNameFrom(IScoutApi.class, api -> api.AbstractFormHandler().execStoreMethodName())
-            .withBody(b -> createHandlerMethodBodyGenerator(isModify, false).generate(b))
+            .withBody(b -> createHandlerMethodBody(b, isModify, false))
             .withAnnotation(AnnotationGenerator.createOverride()));
+  }
+
+  protected void createHandlerMethodBody(IMethodBodyBuilder<?> b, boolean isModify, boolean isLoad) {
+    createHandlerMethodBodyGenerator(isModify, isLoad).generate(b);
   }
 
   /**
@@ -183,6 +227,20 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
       return handlerMethodBodyGenerator.withPermission(permissionUpdate().orElse(null));
     }
     return handlerMethodBodyGenerator.withPermission(permissionCreate().orElse(null));
+  }
+
+  protected static IAnnotationGenerator<?> classIdGenerator(String fqn) {
+    return Strings.notBlank(ClassIds.nextIfEnabled(fqn))
+        .map(ScoutAnnotationGenerator::createClassId)
+        .orElse(null);
+  }
+
+  protected void withFieldGetter(String fqn) {
+    withMethod(ScoutMethodGenerator.createFieldGetter(fqn), getNextFieldGetterSortCode());
+  }
+
+  protected int getNextFieldGetterSortCode() {
+    return m_nextFieldGetterSortCode.getAndAdd(10);
   }
 
   public Optional<String> formData() {
@@ -221,20 +279,12 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
     return thisInstance();
   }
 
-  public String[] classIdValues() {
-    return m_classIdValues;
+  public List<String> formFields() {
+    return m_formFields;
   }
 
-  protected Optional<IAnnotationGenerator<?>> classIdGenerator(int index) {
-    if (m_classIdValues == null || index >= m_classIdValues.length) {
-      return Optional.empty();
-    }
-    return Optional.of(ScoutAnnotationGenerator.createClassId(m_classIdValues[index]));
-  }
-
-  public TYPE withClassIdValues(String[] classIdValues) {
-    Ensure.same(Ensure.notNull(classIdValues).length, NUM_CLASS_IDS);
-    m_classIdValues = Arrays.copyOf(classIdValues, classIdValues.length);
+  public TYPE withFormFields(List<String> formFields) {
+    m_formFields = formFields;
     return thisInstance();
   }
 }

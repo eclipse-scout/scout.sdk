@@ -8,7 +8,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
-import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.text.TEXTS;
 import org.eclipse.scout.sdk.core.s.test.client.MyForm.MainBox.CancelButton;
 import org.eclipse.scout.sdk.core.s.test.client.MyForm.MainBox.GroupBox;
@@ -17,7 +16,6 @@ import org.eclipse.scout.sdk.core.s.test.shared.IMyFormService;
 import org.eclipse.scout.sdk.core.s.test.shared.MyFormData;
 import org.eclipse.scout.sdk.core.s.test.shared.MyPermission;
 
-@ClassId("whatever0")
 @FormData(value = MyFormData.class, sdkCommand = FormData.SdkCommand.CREATE)
 public class MyForm extends AbstractForm {
 @Override
@@ -38,20 +36,16 @@ public CancelButton getCancelButton() {
 return getFieldByClass(CancelButton.class);
 }
 @Order(1000)
-@ClassId("whatever1")
 public class MainBox extends AbstractGroupBox {
 @Order(1000)
-@ClassId("whatever4")
 public class GroupBox extends AbstractGroupBox {
 
 }
 @Order(2000)
-@ClassId("whatever2")
 public class OkButton extends AbstractOkButton {
 
 }
 @Order(3000)
-@ClassId("whatever3")
 public class CancelButton extends AbstractCancelButton {
 
 }
@@ -65,39 +59,37 @@ startInternal(new NewHandler());
 public class NewHandler extends AbstractFormHandler {
 @Override
 protected void execLoad() {
-IMyFormService service = BEANS.get(IMyFormService.class);
 MyFormData formData = new MyFormData();
 exportFormData(formData);
-formData = service.prepareCreate(formData);
+formData = BEANS.get(IMyFormService.class).prepareCreate(formData);
 importFormData(formData);
 
 setEnabledPermission(new MyPermission());
 }
 @Override
 protected void execStore() {
-IMyFormService service = BEANS.get(IMyFormService.class);
 MyFormData formData = new MyFormData();
 exportFormData(formData);
-service.create(formData);
+formData = BEANS.get(IMyFormService.class).create(formData);
+importFormData(formData);
 }
 }
 public class ModifyHandler extends AbstractFormHandler {
 @Override
 protected void execLoad() {
-IMyFormService service = BEANS.get(IMyFormService.class);
 MyFormData formData = new MyFormData();
 exportFormData(formData);
-formData = service.load(formData);
+formData = BEANS.get(IMyFormService.class).load(formData);
 importFormData(formData);
 
 setEnabledPermission(new MyPermission());
 }
 @Override
 protected void execStore() {
-IMyFormService service = BEANS.get(IMyFormService.class);
 MyFormData formData = new MyFormData();
 exportFormData(formData);
-service.store(formData);
+formData = BEANS.get(IMyFormService.class).store(formData);
+importFormData(formData);
 }
 }
 }

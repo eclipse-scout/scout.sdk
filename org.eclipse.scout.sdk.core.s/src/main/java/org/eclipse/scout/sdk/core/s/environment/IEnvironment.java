@@ -35,7 +35,7 @@ import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
  *
  * @since 7.0.0
  */
-public interface IEnvironment {
+public interface IEnvironment extends AutoCloseable {
 
   /**
    * Tries to find an {@link IJavaEnvironment} at the location of the specified root {@link Path}.
@@ -125,9 +125,6 @@ public interface IEnvironment {
    * calling thread must wait for the async write operation to complete to ensure its result is registered in the
    * transaction before committing it!</li>
    * <li>The resulting {@link IFuture} can be used to wait for the write operation to complete.<br>
-   * <b>Important:</b> It must be ensured that for async write operations the corresponding {@link IEnvironment} has not
-   * yet been closed. Therefore at some point it must be waited for the {@link IFuture futures} to complete before the
-   * {@link IEnvironment} will be closed.</li>
    * </ul>
    *
    * @param generator
@@ -174,9 +171,6 @@ public interface IEnvironment {
    * calling thread must wait for the async write operation to complete to ensure its result is registered in the
    * transaction before committing it!</li>
    * <li>The resulting {@link IFuture} can be used to wait for the write operation to complete.<br>
-   * <b>Important:</b> It must be ensured that for async write operations the corresponding {@link IEnvironment} has not
-   * yet been closed. Therefore at some point it must be waited for the {@link IFuture futures} to complete before the
-   * {@link IEnvironment} will be closed.</li>
    * </ul>
    * 
    * @param newSource
@@ -222,9 +216,6 @@ public interface IEnvironment {
    * calling thread must wait for the async write operation to complete to ensure its result is registered in the
    * transaction before committing it!</li>
    * <li>The resulting {@link IFuture} can be used to wait for the write operation to complete.<br>
-   * <b>Important:</b> It must be ensured that for async write operations the corresponding {@link IEnvironment} has not
-   * yet been closed. Therefore at some point it must be waited for the {@link IFuture futures} to complete before the
-   * {@link IEnvironment} will be closed.</li>
    * </ul>
    *
    * @param source
@@ -307,9 +298,6 @@ public interface IEnvironment {
    * calling thread must wait for the async write operation to complete to ensure its result is registered in the
    * transaction before committing it!</li>
    * <li>The resulting {@link IFuture} can be used to wait for the write operation to complete.<br>
-   * <b>Important:</b> It must be ensured that for async write operations the corresponding {@link IEnvironment} has not
-   * yet been closed. Therefore at some point it must be waited for the {@link IFuture futures} to complete before the
-   * {@link IEnvironment} will be closed.</li>
    * </ul>
    *
    * @param generator
@@ -339,9 +327,6 @@ public interface IEnvironment {
    * calling thread must wait for the async write operation to complete to ensure its result is registered in the
    * transaction before committing it!</li>
    * <li>The resulting {@link IFuture} can be used to wait for the write operation to complete.<br>
-   * <b>Important:</b> It must be ensured that for async write operations the corresponding {@link IEnvironment} has not
-   * yet been closed. Therefore at some point it must be waited for the {@link IFuture futures} to complete before the
-   * {@link IEnvironment} will be closed.</li>
    * </ul>
    *
    * @param content

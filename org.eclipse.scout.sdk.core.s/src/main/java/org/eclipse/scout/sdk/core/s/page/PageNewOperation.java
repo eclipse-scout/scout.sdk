@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.s.page;
 
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
@@ -25,11 +26,12 @@ import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
+import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.service.ServiceNewOperation;
-import org.eclipse.scout.sdk.core.s.testcase.TestGenerator;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -41,6 +43,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   // in
   private String m_pageName;
+  private FinalValue<String> m_baseName = new FinalValue<>();
   private IClasspathEntry m_clientSourceFolder;
   private IClasspathEntry m_pageDataSourceFolder;
   private IClasspathEntry m_sharedSourceFolder;
@@ -50,93 +53,140 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   private String m_superType;
   private String m_serverSession;
   private boolean m_createAbstractPage;
+  private boolean m_pageWithTable;
+  private boolean m_createPageData;
+  private boolean m_createOrAppendService;
+  private ServiceNewOperation m_serviceNewOperation; // optional
 
   // out
-  private IType m_createdAbstractPage;
-  private IType m_createdPage;
-  private IType m_createdPageData;
-  private IType m_createdAbstractPageData;
-  private IType m_createdServiceIfc;
-  private IType m_createdServiceImpl;
-  private IType m_createdServiceTest;
+  private IFuture<IType> m_createdAbstractPage;
+  private String m_createdAbstractPageFqn;
+
+  private IFuture<IType> m_createdPage;
+  private String m_createdPageFqn;
+
+  private IFuture<IType> m_createdPageData;
+  private String m_createdPageDataFqn;
+
+  private IFuture<IType> m_createdAbstractPageData;
+  private String m_createdAbstractPageDataFqn;
+
+  private IFuture<IType> m_createdServiceIfc;
+  private String m_serviceIfcFqn;
+
+  private IFuture<IType> m_createdServiceImpl;
+  private String m_serviceImplFqn;
+
+  private IFuture<IType> m_createdServiceTest;
+  private String m_serviceTestFqn;
 
   private String m_dataFetchMethodName;
 
   @Override
   public void accept(IEnvironment env, IProgress progress) {
+    validateOperation();
+    prepareOperation();
+    prepareProgress(progress);
+    executeOperation(env, progress);
+  }
+
+  protected void validateOperation() {
     Ensure.notBlank(getPageName(), "No page name provided");
     Ensure.notNull(getClientSourceFolder(), "No client source folder provided");
     Ensure.notBlank(getPackage(), "No package name provided");
     Ensure.notNull(getSuperType(), "No supertype provided");
-
-    progress.init(10, toString());
-
-    var sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getPackage());
-    var isPageWithTable = isPageWithTable();
-    var isCreatePageData = isPageWithTable && getPageDataSourceFolder() != null;
-
-    if (isCreatePageData) {
-      if (isCreateAbstractPage()) {
-        setCreatedAbstractPageData(createPageData(ISdkConstants.PREFIX_ABSTRACT + getPageName(), sharedPackage, env, progress.newChild(1)));
-      }
-      setCreatedPageData(createPageData(getPageName(), sharedPackage, env, progress.newChild(1)));
-    }
-
-    var isCreateService = isCreatePageData && getSharedSourceFolder() != null && getServerSourceFolder() != null;
-    if (isCreateService) {
-      createService(sharedPackage, calcServiceBaseName(), env, progress.newChild(2));
-    }
-    progress.setWorkRemaining(6);
-
-    if (isCreateAbstractPage()) {
-      setCreatedAbstractPage(createAbstractPage(isPageWithTable, env, progress.newChild(2)));
-      setSuperType(getCreatedAbstractPage().reference());
-    }
-    progress.setWorkRemaining(4);
-
-    setCreatedPage(createPage(isPageWithTable, env, progress.newChild(1)));
-
-    if (isCreateService) {
-      setCreatedServiceTest(createServiceTest(env, progress.newChild(1)));
-    }
-
-    // run DTO update because the pageData has been created as empty java file
-    if (isCreatePageData) {
-      updatePageDatas(env, progress.newChild(2));
-    }
-    progress.setWorkRemaining(0);
   }
 
-  protected boolean isPageWithTable() {
+  protected void prepareOperation() {
+    setPageWithTable(calculatePageWithTable());
+    setCreatePageData(isPageWithTable() && getPageDataSourceFolder() != null);
+    setCreateOrAppendService(isCreatePageData() && getSharedSourceFolder() != null && getServerSourceFolder() != null);
+  }
+
+  protected void prepareProgress(IProgress progress) {
+    progress.init(getTotalWork(), toString());
+  }
+
+  protected void executeOperation(IEnvironment env, IProgress progress) {
+    var sharedPackage = ScoutTier.Client.convert(ScoutTier.Shared, getPackage());
+
+    if (isCreatePageData()) {
+      if (isCreateAbstractPage()) {
+        setCreatedAbstractPageData(createPageData(ISdkConstants.PREFIX_ABSTRACT + getPageName(), sharedPackage, this::setCreatedAbstractPageDataFqn, env, progress.newChild(1)));
+      }
+      setCreatedPageData(createPageData(getPageName(), sharedPackage, this::setCreatedPageDataFqn, env, progress.newChild(1)));
+    }
+
+    if (isCreateOrAppendService()) {
+      createOrAppendService(sharedPackage, env, progress);
+    }
+
+    if (isCreateAbstractPage()) {
+      setCreatedAbstractPage(createAbstractPage(isPageWithTable(), env, progress.newChild(1)));
+      setSuperType(getCreatedAbstractPageFqn());
+    }
+
+    setCreatedPage(createPage(isPageWithTable(), env, progress.newChild(1)));
+
+    // run DTO update because the pageData has been created as empty java file
+    if (isCreatePageData()) {
+      updatePageDatas(env, progress.newChild(2));
+    }
+  }
+
+  protected int getTotalWork() {
+    var result = 1; // page
+    if (isCreateAbstractPage()) {
+      result += 1;// abstract page
+    }
+    if (isCreatePageData()) {
+      if (isCreateAbstractPage()) {
+        result += 1; // abstract pageData
+      }
+      result += 1; // pageData
+      result += 2; // update pageDatas
+    }
+    if (isCreateService()) {
+      result += 3;// ifc, impl, test
+    }
+    return result;
+  }
+
+  protected boolean calculatePageWithTable() {
     return getClientSourceFolder()
         .javaEnvironment()
         .findType(JavaTypes.erasure(getSuperType()))
-        .map(PageNewOperation::isPageWithTable)
+        .map(PageNewOperation::calculatePageWithTable)
         .orElse(false);
   }
 
-  protected static boolean isPageWithTable(IType type) {
+  protected static boolean calculatePageWithTable(IType type) {
     var scoutApi = type.javaEnvironment().requireApi(IScoutApi.class);
     return type.isInstanceOf(scoutApi.IPageWithTable());
   }
 
   protected void updatePageDatas(IEnvironment env, IProgress progress) {
     if (isCreateAbstractPage()) {
-      var abstractPageDataGenerator = DtoGeneratorFactory.createPageDataGenerator(getCreatedAbstractPage(), getPageDataSourceFolder().javaEnvironment());
-      env.writeCompilationUnit(abstractPageDataGenerator.get(), getPageDataSourceFolder(), progress.newChild(1));
+      // the DtoGeneratorFactory parses the @Data-Annotation and uses the given pageData-IType, therefore the pageData needs to be created already
+      getCreatedAbstractPageData().result();
+      var abstractPageDataGenerator = DtoGeneratorFactory.createPageDataGenerator(getCreatedAbstractPage().result(), getPageDataSourceFolder().javaEnvironment());
+      env.writeCompilationUnitAsync(abstractPageDataGenerator.get(), getPageDataSourceFolder(), progress.newChild(1));
     }
-    var pageDataGenerator = DtoGeneratorFactory.createPageDataGenerator(getCreatedPage(), getPageDataSourceFolder().javaEnvironment());
-    env.writeCompilationUnit(pageDataGenerator.get(), getPageDataSourceFolder(), progress.newChild(1));
+    // the DtoGeneratorFactory parses the @Data-Annotation and uses the given pageData-IType, therefore the pageData needs to be created already
+    getCreatedPageData().result();
+    var pageDataGenerator = DtoGeneratorFactory.createPageDataGenerator(getCreatedPage().result(), getPageDataSourceFolder().javaEnvironment());
+    env.writeCompilationUnitAsync(pageDataGenerator.get(), getPageDataSourceFolder(), progress.newChild(1));
   }
 
-  protected IType createAbstractPage(boolean isPageWithTable, IEnvironment env, IProgress progress) {
+  protected IFuture<IType> createAbstractPage(boolean isPageWithTable, IEnvironment env, IProgress progress) {
     var pageBuilder = createPageBuilder(isPageWithTable, true);
-    return env.writeCompilationUnit(pageBuilder, getClientSourceFolder(), progress);
+
+    setCreatedAbstractPageFqn(pageBuilder.fullyQualifiedName());
+    return env.writeCompilationUnitAsync(pageBuilder, getClientSourceFolder(), progress);
   }
 
-  protected String calcServiceMethodName() {
-    var name = calcPageBaseName();
-    return "get" + name + "TableData";
+  protected String getBaseName() {
+    return m_baseName.computeIfAbsentAndGet(this::calcPageBaseName);
   }
 
   protected String calcPageBaseName() {
@@ -152,57 +202,59 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     return name;
   }
 
-  protected String calcServiceBaseName() {
-    return calcPageBaseName();
+  public String getServiceBaseName() {
+    return getBaseName();
   }
 
-  protected IType createServiceTest(IEnvironment env, IProgress progress) {
-    var testSourceFolder = getTestSourceFolder();
-    if (testSourceFolder == null) {
-      return null;
+  protected String getServiceMethodName() {
+    var name = getBaseName();
+    return "get" + name + "TableData";
+  }
+
+  protected void createOrAppendService(String sharedPackage, IEnvironment env, IProgress progress) {
+    if (isCreateService()) {
+      createService(sharedPackage, getServiceBaseName(), env, progress.newChild(3));
     }
+    else if (isAppendService()) {
+      var op = getServiceNewOperation();
+      addServiceMethods(op);
 
-    var serverPackage = JavaTypes.qualifier(getCreatedServiceImpl().name());
-    var baseName = getCreatedServiceImpl().elementName();
-    var elementName = baseName + ISdkConstants.SUFFIX_TEST;
+      var svcName = op.getServiceName() + ISdkConstants.SUFFIX_SERVICE;
+      var serverPackage = ScoutTier.Shared.convert(ScoutTier.Server, op.getSharedPackage());
+      setServiceIfcFqn(sharedPackage + JavaTypes.C_DOT + "I" + svcName);
+      setServiceImplFqn(serverPackage + JavaTypes.C_DOT + svcName);
 
-    var existingServiceTest = testSourceFolder.javaEnvironment().findType(serverPackage + JavaTypes.C_DOT + elementName);
-    if (existingServiceTest.isPresent()) {
-      // service test class already exists
-      return existingServiceTest.get();
+      if (op.isCreateTest()) {
+        setServiceTestFqn(getServiceImplFqn() + ISdkConstants.SUFFIX_TEST);
+      }
     }
-
-    var scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);
-    TestGenerator<?> testBuilder = new TestGenerator<>()
-        .withElementName(elementName)
-        .withPackageName(serverPackage)
-        .withRunner(scoutApi.ServerTestRunner().fqn())
-        .asClientTest(false);
-    if (Strings.hasText(getServerSession())) {
-      testBuilder.withSession(getServerSession());
-    }
-
-    return env.writeCompilationUnit(testBuilder, testSourceFolder, progress);
   }
 
   protected void createService(String sharedPackage, String baseName, IEnvironment env, IProgress progress) {
     var serviceNewOperation = createServiceOperation();
-    serviceNewOperation.setServiceName(baseName);
-    serviceNewOperation.setSharedPackage(sharedPackage);
-    serviceNewOperation.setSharedSourceFolder(getSharedSourceFolder());
-    serviceNewOperation.setServerSourceFolder(getServerSourceFolder());
-    serviceNewOperation.addMethod(createServiceMethod());
+    prepareServiceOperation(serviceNewOperation, sharedPackage, baseName);
+    addServiceMethods(serviceNewOperation);
     serviceNewOperation.accept(env, progress);
 
     setCreatedServiceImpl(serviceNewOperation.getCreatedServiceImpl());
+    setServiceImplFqn(serviceNewOperation.getCreatedServiceImplFqn());
+
     setCreatedServiceIfc(serviceNewOperation.getCreatedServiceInterface());
+    setServiceIfcFqn(serviceNewOperation.getCreatedServiceInterfaceFqn());
+
+    setCreatedServiceTest(serviceNewOperation.getCreatedServiceTest());
+    setServiceTestFqn(serviceNewOperation.getCreatedServiceTestFqn());
+  }
+
+  protected void addServiceMethods(ServiceNewOperation serviceNewOperation) {
+    serviceNewOperation.addMethod(createServiceMethod());
   }
 
   protected IMethodGenerator<?, ?> createServiceMethod() {
-    setDataFetchMethodName(calcServiceMethodName());
+    setDataFetchMethodName(getServiceMethodName());
     return MethodGenerator.create()
         .asPublic()
-        .withReturnType(getCreatedPageData().name())
+        .withReturnType(getCreatedPageDataFqn())
         .withElementName(getDataFetchMethodName())
         .withParameter(MethodParameterGenerator.create()
             .withElementName("filter")
@@ -210,50 +262,72 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withBody(b -> {
           var varName = "pageData";
-          b.ref(getCreatedPageData()).space().append(varName).equalSign().appendNew().ref(getCreatedPageData()).parenthesisOpen().parenthesisClose().semicolon().nl()
+          b.ref(getCreatedPageDataFqn()).space().append(varName).equalSign().appendNew().ref(getCreatedPageDataFqn()).parenthesisOpen().parenthesisClose().semicolon().nl()
               .appendTodo("fill " + varName + '.')
               .returnClause().append(varName).semicolon();
         });
   }
 
-  protected static ServiceNewOperation createServiceOperation() {
+  protected ServiceNewOperation createServiceOperation() {
     return new ServiceNewOperation();
   }
 
+  protected void prepareServiceOperation(ServiceNewOperation serviceNewOperation, String sharedPackage, String baseName) {
+    serviceNewOperation.setServiceName(baseName);
+    serviceNewOperation.setSharedPackage(sharedPackage);
+    serviceNewOperation.setSharedSourceFolder(getSharedSourceFolder());
+    serviceNewOperation.setServerSourceFolder(getServerSourceFolder());
+    if (getTestSourceFolder() == null) {
+      return;
+    }
+    serviceNewOperation.setTestSourceFolder(getTestSourceFolder());
+    serviceNewOperation.setServerSession(getServerSession());
+    serviceNewOperation.setCreateTest(true);
+  }
+
   protected PageGenerator<?> createPageBuilder(boolean isPageWithTable, boolean isAbstractPage) {
+    var generator = createPageGenerator();
+    preparePageGenerator(generator, isPageWithTable, isAbstractPage);
+    return generator;
+  }
+
+  protected PageGenerator<?> createPageGenerator() {
+    return new PageGenerator<>();
+  }
+
+  protected void preparePageGenerator(PageGenerator<?> generator, boolean isPageWithTable, boolean isAbstractPage) {
     var name = getPageName();
     if (isAbstractPage) {
       name = ISdkConstants.PREFIX_ABSTRACT + name;
     }
     var fqn = getPackage() + JavaTypes.C_DOT + name;
-    PageGenerator<?> pageBuilder = new PageGenerator<>()
+
+    generator
         .withElementName(name)
         .withPackageName(getPackage())
         .withFlags(isAbstractPage ? Flags.AccAbstract : Flags.AccPublic)
         .withNlsMethod(isCreateAbstractPage() == isAbstractPage)
+        .withLeafMethod(isPageWithTable && isCreateAbstractPage() == isAbstractPage)
         .withClassIdValue(ClassIds.nextIfEnabled(fqn))
         .withTableClassIdValue(ClassIds.nextIfEnabled(fqn))
         .withDataFetchMethodName(getDataFetchMethodName())
         .asPageWithTable(isPageWithTable)
         .withSuperClass(getSuperType());
 
-    var dto = getCreatedPageData();
+    var dtoFqn = getCreatedPageDataFqn();
     if (isAbstractPage) {
-      dto = getCreatedAbstractPageData();
+      dtoFqn = getCreatedAbstractPageDataFqn();
     }
-    if (dto != null) {
-      pageBuilder.withPageData(dto.name());
+    generator.withPageData(dtoFqn);
+    if (!isAbstractPage && Strings.hasText(getServiceIfcFqn())) {
+      generator.withPageServiceInterface(getServiceIfcFqn());
     }
-    if (!isAbstractPage && getCreatedServiceIfc() != null) {
-      pageBuilder.withPageServiceInterface(getCreatedServiceIfc().name());
-    }
-    return pageBuilder;
   }
 
-  protected IType createPage(boolean isPageWithTable, IEnvironment env, IProgress progress) {
+  protected IFuture<IType> createPage(boolean isPageWithTable, IEnvironment env, IProgress progress) {
     var pageBuilder = createPageBuilder(isPageWithTable, false);
     if (isCreateAbstractPage() && isPageWithTable) {
-      var superTypeFqn = getCreatedAbstractPage().name()
+      var superTypeFqn = getCreatedAbstractPageFqn()
           + JavaTypes.C_GENERIC_START
           + pageBuilder.fullyQualifiedName()
           + JavaTypes.C_DOLLAR
@@ -264,24 +338,37 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
       pageBuilder.withTableSuperType(superTypeFqn);
     }
 
-    return env.writeCompilationUnit(pageBuilder, getClientSourceFolder(), progress);
+    setCreatedPageFqn(pageBuilder.fullyQualifiedName());
+    return env.writeCompilationUnitAsync(pageBuilder, getClientSourceFolder(), progress);
   }
 
-  protected IType createPageData(String pageName, String sharedPackage, IEnvironment env, IProgress progress) {
+  protected IFuture<IType> createPageData(String pageName, String sharedPackage, Consumer<String> fqnConsumer, IEnvironment env, IProgress progress) {
     var pageDataGenerator = PrimaryTypeGenerator.create()
         .withElementName(pageName + ISdkConstants.SUFFIX_DTO)
         .withPackageName(sharedPackage)
         .asPublic()
         .withSuperClassFrom(IScoutApi.class, api -> api.AbstractTablePageData().fqn());
-    return env.writeCompilationUnit(pageDataGenerator, getPageDataSourceFolder(), progress);
+
+    if (fqnConsumer != null) {
+      fqnConsumer.accept(pageDataGenerator.fullyQualifiedName());
+    }
+    return env.writeCompilationUnitAsync(pageDataGenerator, getPageDataSourceFolder(), progress);
   }
 
-  public IType getCreatedPage() {
+  public IFuture<IType> getCreatedPage() {
     return m_createdPage;
   }
 
-  protected void setCreatedPage(IType page) {
+  protected void setCreatedPage(IFuture<IType> page) {
     m_createdPage = page;
+  }
+
+  public String getCreatedPageFqn() {
+    return m_createdPageFqn;
+  }
+
+  protected void setCreatedPageFqn(String createdPageFqn) {
+    m_createdPageFqn = createdPageFqn;
   }
 
   public String getPageName() {
@@ -289,6 +376,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   public void setPageName(String pageName) {
+    m_baseName = new FinalValue<>();
     m_pageName = pageName;
   }
 
@@ -324,12 +412,20 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     m_sharedSourceFolder = sharedSourceFolder;
   }
 
-  public IType getCreatedPageData() {
+  public IFuture<IType> getCreatedPageData() {
     return m_createdPageData;
   }
 
-  protected void setCreatedPageData(IType createdPageData) {
+  protected void setCreatedPageData(IFuture<IType> createdPageData) {
     m_createdPageData = createdPageData;
+  }
+
+  public String getCreatedPageDataFqn() {
+    return m_createdPageDataFqn;
+  }
+
+  protected void setCreatedPageDataFqn(String createdPageDataFqn) {
+    m_createdPageDataFqn = createdPageDataFqn;
   }
 
   public IClasspathEntry getServerSourceFolder() {
@@ -340,20 +436,36 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     m_serverSourceFolder = serverSourceFolder;
   }
 
-  public IType getCreatedServiceIfc() {
+  public IFuture<IType> getCreatedServiceIfc() {
     return m_createdServiceIfc;
   }
 
-  protected void setCreatedServiceIfc(IType createdServiceIfc) {
+  protected void setCreatedServiceIfc(IFuture<IType> createdServiceIfc) {
     m_createdServiceIfc = createdServiceIfc;
   }
 
-  public IType getCreatedServiceImpl() {
+  public String getServiceIfcFqn() {
+    return m_serviceIfcFqn;
+  }
+
+  protected void setServiceIfcFqn(String serviceIfcFqn) {
+    m_serviceIfcFqn = serviceIfcFqn;
+  }
+
+  public IFuture<IType> getCreatedServiceImpl() {
     return m_createdServiceImpl;
   }
 
-  protected void setCreatedServiceImpl(IType createdServiceImpl) {
+  protected void setCreatedServiceImpl(IFuture<IType> createdServiceImpl) {
     m_createdServiceImpl = createdServiceImpl;
+  }
+
+  public String getServiceImplFqn() {
+    return m_serviceImplFqn;
+  }
+
+  protected void setServiceImplFqn(String serviceImplFqn) {
+    m_serviceImplFqn = serviceImplFqn;
   }
 
   public IClasspathEntry getPageDataSourceFolder() {
@@ -372,12 +484,20 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     m_testSourceFolder = testSourceFolder;
   }
 
-  public IType getCreatedServiceTest() {
+  public IFuture<IType> getCreatedServiceTest() {
     return m_createdServiceTest;
   }
 
-  protected void setCreatedServiceTest(IType createdServiceTest) {
+  protected void setCreatedServiceTest(IFuture<IType> createdServiceTest) {
     m_createdServiceTest = createdServiceTest;
+  }
+
+  public String getServiceTestFqn() {
+    return m_serviceTestFqn;
+  }
+
+  protected void setServiceTestFqn(String serviceTestFqn) {
+    m_serviceTestFqn = serviceTestFqn;
   }
 
   protected String getDataFetchMethodName() {
@@ -396,20 +516,76 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
     m_createAbstractPage = createAbstractPage;
   }
 
-  public IType getCreatedAbstractPage() {
+  public boolean isPageWithTable() {
+    return m_pageWithTable;
+  }
+
+  protected void setPageWithTable(boolean pageWithTable) {
+    m_pageWithTable = pageWithTable;
+  }
+
+  public boolean isCreatePageData() {
+    return m_createPageData;
+  }
+
+  protected void setCreatePageData(boolean createPageData) {
+    m_createPageData = createPageData;
+  }
+
+  public boolean isCreateOrAppendService() {
+    return m_createOrAppendService;
+  }
+
+  protected void setCreateOrAppendService(boolean createOrAppendService) {
+    m_createOrAppendService = createOrAppendService;
+  }
+
+  public boolean isCreateService() {
+    return isCreateOrAppendService() && getServiceNewOperation() == null;
+  }
+
+  public boolean isAppendService() {
+    return isCreateOrAppendService() && getServiceNewOperation() != null;
+  }
+
+  public ServiceNewOperation getServiceNewOperation() {
+    return m_serviceNewOperation;
+  }
+
+  public void setServiceNewOperation(ServiceNewOperation serviceNewOperation) {
+    m_serviceNewOperation = serviceNewOperation;
+  }
+
+  public IFuture<IType> getCreatedAbstractPage() {
     return m_createdAbstractPage;
   }
 
-  protected void setCreatedAbstractPage(IType createdAbstractPage) {
+  protected void setCreatedAbstractPage(IFuture<IType> createdAbstractPage) {
     m_createdAbstractPage = createdAbstractPage;
   }
 
-  public IType getCreatedAbstractPageData() {
+  public String getCreatedAbstractPageFqn() {
+    return m_createdAbstractPageFqn;
+  }
+
+  protected void setCreatedAbstractPageFqn(String createdAbstractPageFqn) {
+    m_createdAbstractPageFqn = createdAbstractPageFqn;
+  }
+
+  public IFuture<IType> getCreatedAbstractPageData() {
     return m_createdAbstractPageData;
   }
 
-  protected void setCreatedAbstractPageData(IType createdAbstractPageData) {
+  protected void setCreatedAbstractPageData(IFuture<IType> createdAbstractPageData) {
     m_createdAbstractPageData = createdAbstractPageData;
+  }
+
+  public String getCreatedAbstractPageDataFqn() {
+    return m_createdAbstractPageDataFqn;
+  }
+
+  protected void setCreatedAbstractPageDataFqn(String createdAbstractPageDataFqn) {
+    m_createdAbstractPageDataFqn = createdAbstractPageDataFqn;
   }
 
   public String getServerSession() {

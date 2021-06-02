@@ -369,11 +369,6 @@ public final class TranslationStores {
       SdkLog.warning("{} contains no languages! Please check the configuration.", s);
       return false;
     }
-
-    if (s.size() < 1) {
-      SdkLog.debug("{} does not contain any translations.", s);
-      return false;
-    }
     return true;
   }
 
