@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.Strings
 import org.jetbrains.jps.model.java.JavaSourceRootType
 import java.util.*
-import kotlin.streams.asSequence
 
 class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, val scoutTierOfModule: (Module) -> ScoutTier? = { S2iScoutTier.valueOf(it) }, val findClasspathEntry: (VirtualFile?) -> IClasspathEntry?) {
 
@@ -39,9 +38,9 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, v
 
     private val m_sharedGeneratedSourceFolder = FinalValue<IClasspathEntry?>()
 
-    private val m_clientTestSourceFolder = FinalValue<IClasspathEntry?>()
-    private val m_sharedTestSourceFolder = FinalValue<IClasspathEntry?>()
-    private val m_serverTestSourceFolder = FinalValue<IClasspathEntry?>()
+    private val m_clientTestSourceFolderPair = FinalValue<Pair<SourceFolder, IClasspathEntry>?>()
+    private val m_sharedTestSourceFolderPair = FinalValue<Pair<SourceFolder, IClasspathEntry>?>()
+    private val m_serverTestSourceFolderPair = FinalValue<Pair<SourceFolder, IClasspathEntry>?>()
 
     private val m_clientMainTestSourceFolder = FinalValue<IClasspathEntry?>()
     private val m_sharedMainTestSourceFolder = FinalValue<IClasspathEntry?>()
@@ -122,88 +121,60 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, v
         }
 
         /**
-         * Finds the closest test [IClasspathEntry] in the given [project] that is a [scoutTier] for the given [sourceFolder].
+         * Finds the closest test pair of [SourceFolder] and [IClasspathEntry] in the given [project] that is a [scoutTier] for the given [sourceFolder].
          */
-        fun findTestSourceFolder(project: Project, scoutTier: ScoutTier, sourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): IClasspathEntry? {
+        fun findTestSourceFolderPair(project: Project, scoutTier: ScoutTier, sourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): Pair<SourceFolder, IClasspathEntry>? {
             if (sourceFolder == null) {
                 return null
             }
-            val closestDependent = findClosestDependentSourceFolder(project, scoutTier, true, sourceFolder, scoutTierOfModule, findClasspathEntry)?.second
-            if (closestDependent != null) {
-                return closestDependent
-            }
             val myScoutTierOfModule = scoutTierOfModule ?: { S2iScoutTier.valueOf(it) }
-            if (myScoutTierOfModule(sourceFolder.contentEntry.rootModel.module) != scoutTier) {
-                return null
+            if (myScoutTierOfModule(sourceFolder.contentEntry.rootModel.module) == scoutTier) {
+                findTestSourceFolderPair(sourceFolder)?.let { findClasspathEntry(it.file) }?.let { return sourceFolder to it }
             }
-            return findTestSourceFolder(findClasspathEntry(sourceFolder.file))
+            return findClosestDependentSourceFolder(project, scoutTier, true, sourceFolder, scoutTierOfModule, findClasspathEntry)
         }
 
         /**
-         * Finds the closest test [IClasspathEntry] in the given [project] that is a [ScoutTier.Client] for the given [clientSourceFolder].
+         * Finds the closest test pair of [SourceFolder] and [IClasspathEntry] in the given [project] that is a [ScoutTier.Client] for the given [clientSourceFolder].
          */
-        fun findClientTestSourceFolder(project: Project, clientSourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): IClasspathEntry? {
-            return findTestSourceFolder(project, ScoutTier.Client, clientSourceFolder, scoutTierOfModule, findClasspathEntry)
+        fun findClientTestSourceFolderPair(project: Project, clientSourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): Pair<SourceFolder, IClasspathEntry>? {
+            return findTestSourceFolderPair(project, ScoutTier.Client, clientSourceFolder, scoutTierOfModule, findClasspathEntry)
         }
 
         /**
-         * Finds the closest test [IClasspathEntry] in the given [project] that is a [ScoutTier.Shared] for the given [sharedSourceFolder].
+         * Finds the closest test pair of [SourceFolder] and [IClasspathEntry] in the given [project] that is a [ScoutTier.Shared] for the given [sharedSourceFolder].
          */
-        fun findSharedTestSourceFolder(project: Project, sharedSourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): IClasspathEntry? {
-            return findTestSourceFolder(project, ScoutTier.Shared, sharedSourceFolder, scoutTierOfModule, findClasspathEntry)
+        fun findSharedTestSourceFolderPair(project: Project, sharedSourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): Pair<SourceFolder, IClasspathEntry>? {
+            return findTestSourceFolderPair(project, ScoutTier.Shared, sharedSourceFolder, scoutTierOfModule, findClasspathEntry)
         }
 
         /**
-         * Finds the closest test [IClasspathEntry] in the given [project] that is a [ScoutTier.Server] for the given [serverSourceFolder].
+         * Finds the closest test pair of [SourceFolder] and [IClasspathEntry] in the given [project] that is a [ScoutTier.Server] for the given [serverSourceFolder].
          */
-        fun findServerTestSourceFolder(project: Project, serverSourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): IClasspathEntry? {
-            return findTestSourceFolder(project, ScoutTier.Server, serverSourceFolder, scoutTierOfModule, findClasspathEntry)
+        fun findServerTestSourceFolderPair(project: Project, serverSourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): Pair<SourceFolder, IClasspathEntry>? {
+            return findTestSourceFolderPair(project, ScoutTier.Server, serverSourceFolder, scoutTierOfModule, findClasspathEntry)
         }
-
-        /**
-         * Finds the src/main/java [IClasspathEntry] for the given [sourceFolder].
-         */
-        fun findMainSourceFolder(sourceFolder: IClasspathEntry?): IClasspathEntry? = findSourceFolder(sourceFolder) { isMainSourceFolder(it) }
 
         /**
          * Finds the src/main/java [SourceFolder] for the given [sourceFolder].
          */
         fun findMainSourceFolder(sourceFolder: SourceFolder?): SourceFolder? = findSourceFolder(sourceFolder) { isMainSourceFolder(it) }
 
-        fun isMainSourceFolder(sourceFolder: IClasspathEntry?): Boolean = sourceFolderEndsWith(sourceFolder, ISourceFolders.MAIN_JAVA_SOURCE_FOLDER)
-
-        fun isMainSourceFolder(sourceFolder: SourceFolder?): Boolean = sourceFolderEndsWith(sourceFolder, ISourceFolders.MAIN_JAVA_SOURCE_FOLDER)
+        fun isMainSourceFolder(sourceFolder: SourceFolder?): Boolean = sourceFolderEndsWith(sourceFolder, ISourceFolders.MAIN_JAVA_SOURCE_FOLDER) && sourceFolder?.rootType is JavaSourceRootType && !sourceFolder.isTestSource
 
         /**
-         * Finds the src/generated/java [IClasspathEntry] for the given [sourceFolder].
+         * Finds the src/generated/java [SourceFolder] for the given [sourceFolder].
          */
-        fun findGeneratedSourceFolder(sourceFolder: IClasspathEntry?): IClasspathEntry? = findSourceFolder(sourceFolder) { isGeneratedSourceFolder(it) }
+        fun findGeneratedSourceFolder(sourceFolder: SourceFolder?): SourceFolder? = findSourceFolder(sourceFolder) { isGeneratedSourceFolder(it) }
 
-        fun isGeneratedSourceFolder(sourceFolder: IClasspathEntry?): Boolean = sourceFolderEndsWith(sourceFolder, IScoutSourceFolders.GENERATED_SOURCE_FOLDER)
-
-        fun isGeneratedSourceFolder(sourceFolder: SourceFolder?): Boolean = sourceFolderEndsWith(sourceFolder, IScoutSourceFolders.GENERATED_SOURCE_FOLDER)
+        fun isGeneratedSourceFolder(sourceFolder: SourceFolder?): Boolean = sourceFolderEndsWith(sourceFolder, IScoutSourceFolders.GENERATED_SOURCE_FOLDER) && sourceFolder?.rootType is JavaSourceRootType && !sourceFolder.isTestSource
 
         /**
-         * Finds the src/test/java [IClasspathEntry] for the given [sourceFolder].
+         * Finds the src/test/java [SourceFolder] for the given [sourceFolder].
          */
-        fun findTestSourceFolder(sourceFolder: IClasspathEntry?): IClasspathEntry? = findSourceFolder(sourceFolder) { isTestSourceFolder(it) }
+        fun findTestSourceFolderPair(sourceFolder: SourceFolder?): SourceFolder? = findSourceFolder(sourceFolder) { isTestSourceFolder(it) }
 
-        fun isTestSourceFolder(sourceFolder: IClasspathEntry?): Boolean = sourceFolderEndsWith(sourceFolder, ISourceFolders.TEST_JAVA_SOURCE_FOLDER)
-
-        /**
-         * Finds the [IClasspathEntry] that matches the given [sourceFolderCondition] in the java environment of the given [sourceFolder].
-         */
-        private fun findSourceFolder(sourceFolder: IClasspathEntry?, sourceFolderCondition: (IClasspathEntry) -> Boolean): IClasspathEntry? {
-            if (sourceFolder == null) {
-                return null
-            }
-            if (sourceFolderCondition(sourceFolder)) {
-                return sourceFolder
-            }
-            return sourceFolder.javaEnvironment().sourceFolders()
-                    .asSequence()
-                    .firstOrNull { sourceFolderCondition(it) }
-        }
+        fun isTestSourceFolder(sourceFolder: SourceFolder?): Boolean = sourceFolderEndsWith(sourceFolder, ISourceFolders.TEST_JAVA_SOURCE_FOLDER) && sourceFolder?.rootType is JavaSourceRootType && sourceFolder.isTestSource
 
         /**
          * Finds the [SourceFolder] that matches the given [sourceFolderCondition] in the module of the given [sourceFolder].
@@ -224,13 +195,6 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, v
                     .map { fileIndex.getSourceFolder(it) }
                     .filterNotNull()
                     .firstOrNull { sourceFolderCondition(it) }
-        }
-
-        private fun sourceFolderEndsWith(sourceFolder: IClasspathEntry?, suffix: String): Boolean {
-            if (sourceFolder == null) {
-                return false
-            }
-            return sourceFolder.path().endsWith(suffix)
         }
 
         private fun sourceFolderEndsWith(sourceFolder: SourceFolder?, suffix: String): Boolean {
@@ -278,34 +242,40 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, v
 
     private fun mainSourceFolderPair(): Pair<SourceFolder, IClasspathEntry>? {
         val mainSourceFolder = findMainSourceFolder(sourceFolder) ?: return null
-        return findMainSourceFolder(classpathEntry())?.let { mainSourceFolder to it }
+        return findClasspathEntry(mainSourceFolder.file)?.let { mainSourceFolder to it }
     }
 
     fun sharedGeneratedSourceFolder(): IClasspathEntry? = m_sharedGeneratedSourceFolder.computeIfAbsentAndGet {
-        findGeneratedSourceFolder(sharedSourceFolder())
+        findGeneratedSourceFolder(sharedSourceFolderPair()?.first)?.file?.let { return@computeIfAbsentAndGet findClasspathEntry(it) }
     }
 
-    fun clientTestSourceFolder(): IClasspathEntry? = m_clientTestSourceFolder.computeIfAbsentAndGet {
-        findClientTestSourceFolder(project, clientSourceFolderPair()?.first, scoutTierOfModule, findClasspathEntry)
+    fun clientTestSourceFolder(): IClasspathEntry? = clientTestSourceFolderPair()?.second
+
+    private fun clientTestSourceFolderPair(): Pair<SourceFolder, IClasspathEntry>? = m_clientTestSourceFolderPair.computeIfAbsentAndGet {
+        findClientTestSourceFolderPair(project, clientSourceFolderPair()?.first, scoutTierOfModule, findClasspathEntry)
     }
 
-    fun sharedTestSourceFolder(): IClasspathEntry? = m_sharedTestSourceFolder.computeIfAbsentAndGet {
-        findSharedTestSourceFolder(project, sharedSourceFolderPair()?.first, scoutTierOfModule, findClasspathEntry)
+    fun sharedTestSourceFolder(): IClasspathEntry? = sharedTestSourceFolderPair()?.second
+
+    private fun sharedTestSourceFolderPair(): Pair<SourceFolder, IClasspathEntry>? = m_sharedTestSourceFolderPair.computeIfAbsentAndGet {
+        findSharedTestSourceFolderPair(project, sharedSourceFolderPair()?.first, scoutTierOfModule, findClasspathEntry)
     }
 
-    fun serverTestSourceFolder(): IClasspathEntry? = m_serverTestSourceFolder.computeIfAbsentAndGet {
-        findServerTestSourceFolder(project, serverSourceFolderPair()?.first, scoutTierOfModule, findClasspathEntry)
+    fun serverTestSourceFolder(): IClasspathEntry? = serverTestSourceFolderPair()?.second
+
+    private fun serverTestSourceFolderPair(): Pair<SourceFolder, IClasspathEntry>? = m_serverTestSourceFolderPair.computeIfAbsentAndGet {
+        findServerTestSourceFolderPair(project, serverSourceFolderPair()?.first, scoutTierOfModule, findClasspathEntry)
     }
 
     fun clientMainTestSourceFolder(): IClasspathEntry? = m_clientMainTestSourceFolder.computeIfAbsentAndGet {
-        findMainSourceFolder(clientTestSourceFolder())
+        findMainSourceFolder(clientTestSourceFolderPair()?.first)?.file?.let { return@computeIfAbsentAndGet findClasspathEntry(it) }
     }
 
     fun sharedMainTestSourceFolder(): IClasspathEntry? = m_sharedMainTestSourceFolder.computeIfAbsentAndGet {
-        findMainSourceFolder(sharedTestSourceFolder())
+        findMainSourceFolder(sharedTestSourceFolderPair()?.first)?.file?.let { return@computeIfAbsentAndGet findClasspathEntry(it) }
     }
 
     fun serverMainTestSourceFolder(): IClasspathEntry? = m_serverMainTestSourceFolder.computeIfAbsentAndGet {
-        findMainSourceFolder(serverTestSourceFolder())
+        findMainSourceFolder(serverTestSourceFolderPair()?.first)?.file?.let { return@computeIfAbsentAndGet findClasspathEntry(it) }
     }
 }

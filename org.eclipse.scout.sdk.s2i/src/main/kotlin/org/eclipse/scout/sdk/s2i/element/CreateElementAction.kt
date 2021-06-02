@@ -32,6 +32,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
+import org.eclipse.scout.sdk.core.util.Strings.capitalize
 import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.util.SourceFolderHelper
@@ -128,10 +129,11 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
             var pkg = fileIndex.getPackageNameByDirectory(dir.virtualFile)
             val lastIndexOf = name.lastIndexOf(".")
             if (lastIndexOf > 0) pkg += "." + name.substring(0, lastIndexOf)
+            val elementName = capitalize(name.substring(lastIndexOf + 1, name.length)).toString()
 
             val op = sourceFolderHelper.classpathEntry()?.javaEnvironment()?.let {
                 EclipseScoutBundle.elementCreationManager()
-                        .createOperation(operationClass(), name.substring(lastIndexOf + 1, name.length), pkg, sourceFolderHelper, it)
+                        .createOperation(operationClass(), elementName, pkg, sourceFolderHelper, it)
             } ?: return@callInIdeaEnvironment null
             op.accept(env, progress)
             return@callInIdeaEnvironment psiClassToOpen(op)

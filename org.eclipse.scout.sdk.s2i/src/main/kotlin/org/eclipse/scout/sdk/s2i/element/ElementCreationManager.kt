@@ -50,4 +50,6 @@ interface ElementCreationManager {
             return operationStrategy as OperationStrategy<OP>
         }
     }
+
+    fun elementNameWithSuffix(elementName: String, suffix: String?) = if (suffix?.let { elementName.endsWith(it) } == true) elementName else elementName.plus(suffix)
 }

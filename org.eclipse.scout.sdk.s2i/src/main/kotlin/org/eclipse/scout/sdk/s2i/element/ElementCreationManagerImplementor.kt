@@ -65,7 +65,7 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                 FormNewOperation()
             }
             override var prepareOperationFuncList: MutableList<(FormNewOperation, String, String?, SourceFolderHelper) -> Unit> = mutableListOf({ op, elementName, pkg, sourceFolderHelper ->
-                op.formName = elementName.plus(ISdkConstants.SUFFIX_FORM)
+                op.formName = elementNameWithSuffix(elementName, ISdkConstants.SUFFIX_FORM)
                 op.clientPackage = sourceFolderHelper.tier()!!.convert(ScoutTier.Client, pkg)
 
                 op.clientSourceFolder = sourceFolderHelper.clientSourceFolder()
@@ -96,7 +96,7 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                 PageNewOperation()
             }
             override var prepareOperationFuncList: MutableList<(PageNewOperation, String, String?, SourceFolderHelper) -> Unit> = mutableListOf({ op, elementName, pkg, sourceFolderHelper ->
-                op.pageName = elementName.plus(ISdkConstants.SUFFIX_PAGE_WITH_TABLE)
+                op.pageName = elementNameWithSuffix(elementName, ISdkConstants.SUFFIX_PAGE_WITH_TABLE)
                 op.`package` = sourceFolderHelper.tier()!!.convert(ScoutTier.Client, pkg)
 
                 op.clientSourceFolder = sourceFolderHelper.clientSourceFolder()
@@ -124,14 +124,14 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                 LookupCallNewOperation()
             }
             override var prepareOperationFuncList: MutableList<(LookupCallNewOperation, String, String?, SourceFolderHelper) -> Unit> = mutableListOf({ op, elementName, pkg, sourceFolderHelper ->
-                op.lookupCallName = elementName.plus(ISdkConstants.SUFFIX_LOOKUP_CALL)
+                op.lookupCallName = elementNameWithSuffix(elementName, ISdkConstants.SUFFIX_LOOKUP_CALL)
                 op.`package` = sourceFolderHelper.tier()!!.convert(ScoutTier.Shared, pkg)
                 op.keyType = Long::class.javaObjectType.name
 
                 op.sharedSourceFolder = sourceFolderHelper.sharedSourceFolder()
                 op.serverSourceFolder = sourceFolderHelper.serverSourceFolder()
 
-                op.testSourceFolder = sourceFolderHelper.clientTestSourceFolder()
+                op.testSourceFolder = sourceFolderHelper.serverTestSourceFolder()
 
                 sourceFolderHelper.sharedSourceFolder()?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
                     op.superType = it.LookupCall().fqn()
@@ -151,7 +151,7 @@ class ElementCreationManagerImplementor : ElementCreationManager {
             }
             override var prepareOperationFuncList: MutableList<(CodeTypeNewOperation, String, String?, SourceFolderHelper) -> Unit> = mutableListOf({ op, elementName, pkg, sourceFolderHelper ->
                 val idDataType = JavaTypes.Long
-                op.codeTypeName = elementName.plus(ISdkConstants.SUFFIX_CODE_TYPE)
+                op.codeTypeName = elementNameWithSuffix(elementName, ISdkConstants.SUFFIX_CODE_TYPE)
                 op.`package` = sourceFolderHelper.tier()!!.convert(ScoutTier.Shared, pkg)
                 op.codeTypeIdDataType = idDataType
 
