@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2i
 
 import com.intellij.AbstractBundle
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.ui.IconManager
 import com.intellij.util.IconUtil
@@ -35,25 +34,25 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
 
     @Nls
     fun message(@PropertyKey(resourceBundle = RESOURCE_BUNDLE) key: String, vararg params: Any): String =
-            getMessage(key, *params)
+        getMessage(key, *params)
 
     fun derivedResourceManager(project: Project): DerivedResourceManager =
-            ServiceManager.getService(project, DerivedResourceManager::class.java)
+        project.getService(DerivedResourceManager::class.java)
 
     fun dataObjectManager(project: Project): DataObjectManager =
-            ServiceManager.getService(project, DataObjectManager::class.java)
+        project.getService(DataObjectManager::class.java)
 
     fun autoCreateClassIdListener(project: Project): AutoCreateClassIdListener =
-            ServiceManager.getService(project, AutoCreateClassIdListener::class.java)
+        project.getService(AutoCreateClassIdListener::class.java)
 
     fun classIdCache(project: Project): ClassIdCache =
-            ServiceManager.getService(project, ClassIdCache::class.java)
+        project.getService(ClassIdCache::class.java)
 
     fun translationStoreStackCache(project: Project): TranslationStoreStackCache =
-            ServiceManager.getService(project, TranslationStoreStackCache::class.java)
+        project.getService(TranslationStoreStackCache::class.java)
 
     fun jsModuleCache(project: Project): JsModuleCacheImplementor =
-            ServiceManager.getService(project, JsModuleCacheImplementor::class.java)
+        project.getService(JsModuleCacheImplementor::class.java)
 
     fun elementCreationManager(): ElementCreationManager =
             ServiceManager.getService(ElementCreationManager::class.java)
