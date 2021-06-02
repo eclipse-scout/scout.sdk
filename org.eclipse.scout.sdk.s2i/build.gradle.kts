@@ -9,9 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 
-import org.jetbrains.intellij.tasks.PatchPluginXmlTask
-import org.jetbrains.intellij.tasks.PrepareSandboxTask
-import org.jetbrains.intellij.tasks.RunPluginVerifierTask
 import org.jetbrains.intellij.tasks.RunPluginVerifierTask.FailureLevel
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.Clock
@@ -25,7 +22,7 @@ val scoutSdkPluginVersion = scoutSdkVersion.replace("-SNAPSHOT", "." + timestamp
 val kotlinVersion = "1.4"
 val javaVersion = JavaVersion.VERSION_11
 val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "22.0-SNAPSHOT")
-val intellijVersion = projectPropertyOr("intellij_version", "IU-2021.1.1") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
+val intellijVersion = projectPropertyOr("intellij_version", "IU-2021.1.2") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
 
 fun timestamp(): String {
     val now = now(Clock.systemUTC())
@@ -49,7 +46,7 @@ plugins {
     id("java")
     id("maven-publish")
     id("idea")
-    id("org.jetbrains.intellij") version "0.7.3"
+    id("org.jetbrains.intellij") version "1.0"
     kotlin("jvm") version "1.4.32"
     id("net.linguica.maven-settings") version "0.5" // for maven settings
 }
@@ -73,25 +70,6 @@ dependencies {
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", scoutSdkVersion)
 }
 
-// See https://github.com/JetBrains/gradle-intellij-plugin/
-intellij {
-    version = intellijVersion
-    downloadSources = true
-
-    setPlugins("java", "maven", "copyright", "properties", "CSS", "JavaScriptLanguage")
-    updateSinceUntilBuild = false
-
-    tasks.withType<PatchPluginXmlTask> {
-        version(scoutSdkPluginVersion)
-    }
-
-    tasks.withType<RunPluginVerifierTask> {
-        setIdeVersions(listOf("IU-2021.1"))
-        setSubsystemsToCheck("without-android")
-        failureLevel = FailureLevel.ALL
-    }
-}
-
 allprojects {
     configure<JavaPluginConvention> {
         sourceCompatibility = javaVersion
@@ -99,36 +77,56 @@ allprojects {
     }
 }
 
-tasks.withType<PrepareSandboxTask> {
-    // prepareSandbox Task may copy duplicate libraries from transitive dependencies.
-    // See https://intellij-support.jetbrains.com/hc/en-us/community/posts/360009478700-Kotlin-Getting-Copying-or-archiving-duplicate-paths-deprecation-warnings-when-building-plugin
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    version.set(intellijVersion)
+    downloadSources.set(true)
+    plugins.set(listOf("java", "maven", "copyright", "properties", "CSS", "JavaScriptLanguage"))
+    updateSinceUntilBuild.set(false)
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    sourceCompatibility = javaVersion.toString()
-    targetCompatibility = javaVersion.toString()
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-        jvmTarget = javaVersion.toString()
-        apiVersion = kotlinVersion
-        languageVersion = kotlinVersion
+tasks {
+    patchPluginXml {
+        version.set(scoutSdkPluginVersion)
     }
-}
 
-tasks.withType<Test> {
-    // see com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
-    // this Property allows AbstractTestCaseWithRunningClasspathModule to access all libraries of the running user classpath
-    systemProperty("NO_FS_ROOTS_ACCESS_CHECK", project.findProperty("NO_FS_ROOTS_ACCESS_CHECK") ?: "true")
-    systemProperty("file.encoding", "utf-8")
-    ignoreFailures = true
-}
+    runPluginVerifier {
+        ideVersions.set(listOf("IU-2021.1", "IU-2021.2"))
+        subsystemsToCheck.set("without-android")
+        failureLevel.set(FailureLevel.ALL)
+    }
 
-tasks.jar {
-    from("about.html")
-    from("epl-v10.html")
+    prepareSandbox {
+        // prepareSandbox Task may copy duplicate libraries from transitive dependencies.
+        // See https://intellij-support.jetbrains.com/hc/en-us/community/posts/360009478700-Kotlin-Getting-Copying-or-archiving-duplicate-paths-deprecation-warnings-when-building-plugin
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+
+    withType<JavaCompile>().configureEach {
+        sourceCompatibility = javaVersion.toString()
+        targetCompatibility = javaVersion.toString()
+    }
+
+    withType<KotlinCompile>().configureEach {
+        kotlinOptions {
+            jvmTarget = javaVersion.toString()
+            apiVersion = kotlinVersion
+            languageVersion = kotlinVersion
+        }
+    }
+
+    withType<Test> {
+        // see com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
+        // this Property allows AbstractTestCaseWithRunningClasspathModule to access all libraries of the running user classpath
+        systemProperty("NO_FS_ROOTS_ACCESS_CHECK", project.findProperty("NO_FS_ROOTS_ACCESS_CHECK") ?: "true")
+        systemProperty("file.encoding", "utf-8")
+        ignoreFailures = true
+    }
+
+    jar {
+        from("about.html")
+        from("epl-v10.html")
+    }
 }
 
 publishing {
