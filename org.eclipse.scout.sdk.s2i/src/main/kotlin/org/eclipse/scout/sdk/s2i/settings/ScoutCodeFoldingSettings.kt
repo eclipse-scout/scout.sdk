@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,8 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2i.settings
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.util.xmlb.XmlSerializerUtil
@@ -21,7 +21,7 @@ class ScoutCodeFoldingSettings : PersistentStateComponent<ScoutCodeFoldingSettin
     private var m_collapseTranslations = true
 
     companion object {
-        fun getInstance(): ScoutCodeFoldingSettings = ServiceManager.getService(ScoutCodeFoldingSettings::class.java)
+        fun getInstance(): ScoutCodeFoldingSettings = ApplicationManager.getApplication().getService(ScoutCodeFoldingSettings::class.java)
     }
 
     fun isCollapseTranslations(): Boolean {
