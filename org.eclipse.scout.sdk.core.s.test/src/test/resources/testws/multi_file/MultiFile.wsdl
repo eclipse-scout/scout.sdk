@@ -1,48 +1,44 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <wsdl:definitions
-  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-  xmlns:web="http://www.eclipse.org/scout/webservices"
-  xmlns:cor="http://www.eclipse.org/scout/webservices/scout"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  name="ScoutWebservices"
-  targetNamespace="http://www.eclipse.org/scout/webservices/bindings"
-  xsi:schemaLocation="http://schemas.xmlsoap.org/wsdl/wsdl11.xsd">
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:web="https://www.eclipse.org/scout/webservices"
+    name="ScoutWebservices"
+    targetNamespace="https://www.eclipse.org/scout/webservices/bindings">
 
-   <wsdl:import namespace="http://www.eclipse.org/scout/webservices" location="second%20a/MultiFileServices.wsdl"/>
+  <wsdl:import namespace="https://www.eclipse.org/scout/webservices" location="second%20a/MultiFileServices.wsdl"/>
 
-   <wsdl:binding name="scoutQueryBinding" type="web:scoutQueryInterface2">
-      <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
-      <wsdl:operation name="operation01">
-         <soap:operation soapAction="http://www.eclipse.org/scout/webservices/operation01" style="rpc"/>
-         <wsdl:input>
-            <soap:body use="literal" namespace="http://www.eclipse.org/scout/webservices"/>
-         </wsdl:input>
-         <wsdl:output>
-            <soap:body use="literal" namespace="http://www.eclipse.org/scout/webservices"/>
-         </wsdl:output>
-         <wsdl:fault name="errorOrWarning">
-            <soap:fault name="errorOrWarning" use="literal"/>
-         </wsdl:fault>
-      </wsdl:operation>
-      <wsdl:operation name="operation02">
-         <soap:operation soapAction="http://www.eclipse.org/scout/webservices/operation02" style="rpc"/>
-         <wsdl:input>
-            <soap:body use="literal" namespace="http://www.eclipse.org/scout/webservices"/>
-         </wsdl:input>
-         <wsdl:output>
-            <soap:body use="literal" namespace="http://www.eclipse.org/scout/webservices"/>
-         </wsdl:output>
-         <wsdl:fault name="errorOrWarning">
-            <soap:fault name="errorOrWarning" use="literal"/>
-         </wsdl:fault>
-      </wsdl:operation>
-   </wsdl:binding>
+  <wsdl:binding name="scoutQueryBinding" type="web:scoutQueryInterface2">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="operation01">
+      <soap:operation soapAction="https://www.eclipse.org/scout/webservices/operation01" style="rpc"/>
+      <wsdl:input>
+        <soap:body use="literal" namespace="https://www.eclipse.org/scout/webservices"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" namespace="https://www.eclipse.org/scout/webservices"/>
+      </wsdl:output>
+      <wsdl:fault name="errorOrWarning">
+        <soap:fault name="errorOrWarning" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="operation02">
+      <soap:operation soapAction="https://www.eclipse.org/scout/webservices/operation02" style="rpc"/>
+      <wsdl:input>
+        <soap:body use="literal" namespace="https://www.eclipse.org/scout/webservices"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" namespace="https://www.eclipse.org/scout/webservices"/>
+      </wsdl:output>
+      <wsdl:fault name="errorOrWarning">
+        <soap:fault name="errorOrWarning" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
 
-   <wsdl:service xmlns:bind="http://www.eclipse.org/scout/webservices/bindings" name="scoutQuery">
-      <wsdl:port name="scoutQueryPort" binding="bind:scoutQueryBinding">
-         <soap:address location="http://localhost:8080/dummy"/>
-      </wsdl:port>
-   </wsdl:service>
+  <wsdl:service xmlns:bind="https://www.eclipse.org/scout/webservices/bindings" name="scoutQuery">
+    <wsdl:port name="scoutQueryPort" binding="bind:scoutQueryBinding">
+      <soap:address location="http://localhost:8080/dummy"/>
+    </wsdl:port>
+  </wsdl:service>
 </wsdl:definitions>

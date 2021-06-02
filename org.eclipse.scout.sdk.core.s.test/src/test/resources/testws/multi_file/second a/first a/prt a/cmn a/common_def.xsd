@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns="http://www.eclipse.org/schema/common"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  targetNamespace="http://www.eclipse.org/schema/common"
-  elementFormDefault="unqualified"
-  attributeFormDefault="unqualified">
+<xs:schema
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="https://www.eclipse.org/schema/common"
+    targetNamespace="https://www.eclipse.org/schema/common">
 
-  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd" />
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="https://www.w3.org/2009/01/xml.xsd"/>
 
   <xs:simpleType name="CodeTypeType">
     <xs:restriction base="xs:string">
-      <xs:pattern value="[0-9]{8,12}" />
+      <xs:pattern value="[0-9]{8,12}"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>

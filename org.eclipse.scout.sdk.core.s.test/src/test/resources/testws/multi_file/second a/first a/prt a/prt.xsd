@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns="http://www.eclipse.org/schema/common"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:rcmn="http://www.eclipse.org/schema/common"
-  targetNamespace="http://www.eclipse.org/schema/common"
-  elementFormDefault="unqualified"
-  attributeFormDefault="unqualified">
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns="https://www.eclipse.org/schema/common"
+    xmlns:rcmn="https://www.eclipse.org/schema/common"
+    targetNamespace="https://www.eclipse.org/schema/common">
 
-  <xs:include schemaLocation="cmn%20a/common_def.xsd" />
+  <xs:include schemaLocation="cmn%20a/common_def.xsd"/>
 
   <xs:complexType name="ReturnDetailType">
     <xs:sequence>
@@ -26,8 +23,8 @@
   </xs:complexType>
   <xs:simpleType name="ReturnCodeType">
     <xs:restriction base="xs:int">
-      <xs:minInclusive value="0" />
-      <xs:maxInclusive value="2" />
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="2"/>
     </xs:restriction>
   </xs:simpleType>
 </xs:schema>
