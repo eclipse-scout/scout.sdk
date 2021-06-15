@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,8 +14,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.member.IMemberGenerator;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.spi.MemberSpi;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 
 /**
  * <h3>{@link IMember}</h3> Represents Java elements that are members.
@@ -67,7 +67,9 @@ public interface IMember extends IAnnotatable {
   Optional<IType> declaringType();
 
   /**
-   * Gets the java doc source for this {@link IMember}.
+   * Gets the java doc source range for this {@link IMember}.
+   * <p>
+   * It starts with '/**' and ends with '&#42;/' including these start and end delimiters.
    *
    * @return The {@link ISourceRange} for the java doc of this {@link IMember}.
    */

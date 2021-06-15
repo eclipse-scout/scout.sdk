@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,20 +39,82 @@ public interface IJavaElementCommentBuilder<TYPE extends IJavaElementCommentBuil
   TYPE appendDefaultElementComment();
 
   /**
-   * Appends a link reference to the {@link CharSequence} specified. No leading or trailing space is appended.
+   * Appends a link reference to the {@link CharSequence} specified. No leading or trailing space is appended. Imports
+   * are created as necessary.<br>
+   * <br>
+   * Sample output:
+   * 
+   * <pre>
+   * {&#64;link MyClass#myMethod(int, Collection)}
+   * </pre>
    *
    * @param ref
-   *          The reference for which a link should be added.
+   *          The reference for which a link should be added. <br>
+   *          Examples:
+   *          <ul>
+   *          <li>{@code "java.util.List#addAll(int, java.util.Collection)"}</li>
+   *          <li>{@code "#myMethod(org.eclipse.scout.MyClass)"}</li>
+   *          <li>{@code "org.eclipse.scout.MyClass"}</li>
+   *          </ul>
    * @return A reference to this object.
    */
   TYPE appendLink(CharSequence ref);
 
   /**
-   * Appends a linkto the {@link IType} specified. No leading or trailing space is appended.
+   * Appends a link reference to the {@link CharSequence} specified. No leading or trailing space is appended. Imports
+   * are created as necessary.<br>
+   * <br>
+   * Sample output:
+   * 
+   * <pre>
+   * {&#64;link MyClass#myMethod(int, Collection) myLabel}
+   * </pre>
+   * 
+   * @param ref
+   *          The reference for which a link should be added. <br>
+   *          Examples:
+   *          <ul>
+   *          <li>{@code "java.util.List#addAll(int, java.util.Collection)"}</li>
+   *          <li>{@code "#myMethod(org.eclipse.scout.MyClass)"}</li>
+   *          <li>{@code "org.eclipse.scout.MyClass"}</li>
+   *          </ul>
+   * @param label
+   *          An optional label which may be appended to the link.
+   * @return A reference to this object.
+   */
+  TYPE appendLink(CharSequence ref, CharSequence label);
+
+  /**
+   * Appends a link to the {@link IType} specified. No leading or trailing space is appended. Imports are created as
+   * necessary.<br>
+   * <br>
+   * Sample output:
+   * 
+   * <pre>
+   * {&#64;link MyClass[]}
+   * </pre>
    *
    * @param ref
    *          The {@link IType} to which a JavaDoc link should be added.
    * @return A reference to this object.
    */
   TYPE appendLink(IType ref);
+
+  /**
+   * Appends a link to the {@link IType} specified. No leading or trailing space is appended. Imports are created as
+   * necessary.<br>
+   * <br>
+   * Sample output:
+   * 
+   * <pre>
+   * {&#64;link MyClass[] myLabel}
+   * </pre>
+   * 
+   * @param ref
+   *          The {@link IType} to which a JavaDoc link should be added.
+   * @param label
+   *          An optional label which may be appended to the link.
+   * @return A reference to this object.
+   */
+  TYPE appendLink(IType ref, CharSequence label);
 }
