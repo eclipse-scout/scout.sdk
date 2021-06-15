@@ -34,8 +34,8 @@ public class DataObjectNodeTest {
   @Test
   public void testDataObjectNodeKindValueOf(IJavaEnvironment env) {
     var scoutApi = env.requireApi(IScoutApi.class);
-    assertEquals(DataObjectNodeKind.DO_LIST, valueOf(env.requireType(scoutApi.DoList())).get());
-    assertEquals(DataObjectNodeKind.DO_VALUE, valueOf(env.requireType(scoutApi.DoValue())).get());
+    assertEquals(DataObjectNodeKind.LIST, valueOf(env.requireType(scoutApi.DoList())).get());
+    assertEquals(DataObjectNodeKind.VALUE, valueOf(env.requireType(scoutApi.DoValue())).get());
     assertFalse(valueOf(env.requireType(Long.class.getName())).isPresent());
     assertFalse(valueOf((IType) null).isPresent());
 
@@ -47,18 +47,20 @@ public class DataObjectNodeTest {
   public void testGetters(IJavaEnvironment env) {
     var name = "myName";
     var dataType = env.requireType(String.class.getName());
-    var node1 = new DataObjectNode(DataObjectNodeKind.DO_VALUE, name, dataType, true);
-    var node2 = new DataObjectNode(DataObjectNodeKind.DO_LIST, name, dataType, false);
+    var node1 = new DataObjectNode(DataObjectNodeKind.VALUE, name, dataType, true, true);
+    var node2 = new DataObjectNode(DataObjectNodeKind.LIST, name, dataType, false, false);
 
-    assertSame(DataObjectNodeKind.DO_VALUE, node1.kind());
+    assertSame(DataObjectNodeKind.VALUE, node1.kind());
     assertSame(name, node1.name());
     assertSame(dataType, node1.dataType());
     assertTrue(node1.isInherited());
+    assertTrue(node1.hasJavaDoc());
 
-    assertSame(DataObjectNodeKind.DO_LIST, node2.kind());
+    assertSame(DataObjectNodeKind.LIST, node2.kind());
     assertSame(name, node2.name());
     assertSame(dataType, node2.dataType());
     assertFalse(node2.isInherited());
+    assertFalse(node2.hasJavaDoc());
   }
 
   @Test
@@ -66,9 +68,9 @@ public class DataObjectNodeTest {
   public void testHashCodeEqualsToString(IJavaEnvironment env) {
     var name = "myName";
     var dataType = env.requireType(String.class.getName());
-    var node1 = new DataObjectNode(DataObjectNodeKind.DO_VALUE, name, dataType, true);
-    var node2 = new DataObjectNode(DataObjectNodeKind.DO_LIST, name, dataType, false);
-    var node3 = new DataObjectNode(DataObjectNodeKind.DO_VALUE, "otherName", dataType, true);
+    var node1 = new DataObjectNode(DataObjectNodeKind.VALUE, name, dataType, true, false);
+    var node2 = new DataObjectNode(DataObjectNodeKind.LIST, name, dataType, false, true);
+    var node3 = new DataObjectNode(DataObjectNodeKind.VALUE, "otherName", dataType, true, true);
 
     assertFalse(node1.equals(null));
     assertFalse(node1.equals(""));
@@ -77,6 +79,6 @@ public class DataObjectNodeTest {
     assertNotEquals(node1.hashCode(), node2.hashCode());
     assertNotEquals(node1, node3);
 
-    assertEquals(DataObjectNode.class.getSimpleName() + " [name='myName', kind=DO_VALUE, dataType='java.lang.String', inherited=true]", node1.toString());
+    assertEquals(DataObjectNode.class.getSimpleName() + " [name='myName', kind=VALUE, dataType='java.lang.String', inherited=true, hasJavaDoc=false]", node1.toString());
   }
 }

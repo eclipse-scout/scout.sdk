@@ -60,6 +60,10 @@ public class DoConvenienceMethodsUpdateOperationTest {
 
     testApiOfChildDo(assertNoCompileErrors(childDo));
     testApiOfSampleDo(assertNoCompileErrors(sampleDo));
+
+    // validate that the "withEnabled" method has a JavaDoc pointing to the original JavaDoc of the attribute
+    assertEquals("/**\n* See {@link #enabled()}.\n*/", childDo.methods().withName("withEnabled").first().get()
+        .javaDoc().get().asCharSequence().toString());
   }
 
   @Test

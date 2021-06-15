@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
@@ -30,6 +31,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
+import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
@@ -38,6 +40,7 @@ import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode.DataObjectNodeKind;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -200,19 +203,29 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
   }
 
   protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsFor(DataObjectNode node, IType owner) {
-    switch (node.kind()) {
-      case DO_VALUE:
-        return buildMethodGeneratorsForValue(node, owner);
-      case DO_LIST:
-        return buildMethodGeneratorsForList(node, owner);
-      default:
-        throw newFail("DataObject node type '{}' of '{}' is not supported yet.", node.kind(), node);
+    Stream<IMethodGenerator<?, ?>> methodGenerators;
+    if (node.kind() == DataObjectNodeKind.VALUE) {
+      methodGenerators = buildMethodGeneratorsForValue(node, owner);
     }
+    else {
+      methodGenerators = buildMethodGeneratorsForCollection(node, owner);
+    }
+
+    if (!node.hasJavaDoc()) {
+      return methodGenerators;
+    }
+    return methodGenerators.peek(g -> g.withComment(b -> appendJavaDocLink(b, node.name())));
+  }
+
+  protected void appendJavaDocLink(IJavaElementCommentBuilder<?> b, String name) {
+    b.appendJavaDocStart().nl()
+        .append("* See ").appendLink("#" + name + "()").append('.').nl()
+        .appendBlockCommentEnd().nl();
   }
 
   protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsForValue(DataObjectNode node, IType owner) {
     var dataTypeRef = node.dataType().reference();
-    var chainedSetter = ScoutMethodGenerator.createDoNodeSetter(node.name(), dataTypeRef, owner);
+    var chainedSetter = ScoutMethodGenerator.createDoValueSetter(node.name(), dataTypeRef, owner);
     if (node.isInherited()) {
       // for inherited nodes: only overwrite (and narrow) the chained setter
       return Stream.of(chainedSetter);
@@ -226,22 +239,37 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     return Stream.of(chainedSetter, valueGetter);
   }
 
-  protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsForList(DataObjectNode node, IType owner) {
+  protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsForCollection(DataObjectNode node, IType owner) {
     var dataTypeRef = node.dataType().reference();
-    var chainedSetterCollection = ScoutMethodGenerator.createDoListSetterCollection(node.name(), dataTypeRef, owner);
-    var chainedSetterArray = ScoutMethodGenerator.createDoListSetterArray(node.name(), dataTypeRef, owner);
+    var chainedSetterCollection = ScoutMethodGenerator.createDoCollectionSetterCollection(node.name(), dataTypeRef, owner);
+    var chainedSetterArray = ScoutMethodGenerator.createDoCollectionSetterVarargs(node.name(), dataTypeRef, owner);
     if (node.isInherited()) {
       // for inherited nodes: only overwrite (and narrow) the chained setter
       return Stream.of(chainedSetterCollection, chainedSetterArray);
     }
 
-    var listGetterReturnTypeReference = List.class.getName() + JavaTypes.C_GENERIC_START + dataTypeRef + JavaTypes.C_GENERIC_END;
-    var listGetter = ScoutMethodGenerator.createDoNodeGetter(node.name(), listGetterReturnTypeReference, owner);
-    if (implementedInSuperClass(listGetter, owner)) {
+    String getterCollectionFqn;
+    switch (node.kind()) {
+      case LIST:
+        getterCollectionFqn = List.class.getName();
+        break;
+      case SET:
+        getterCollectionFqn = Set.class.getName();
+        break;
+      case COLLECTION:
+        getterCollectionFqn = Collection.class.getName();
+        break;
+      default:
+        throw newFail("Unsupported DoNode kind of '{}' on '{}'.", node, owner.name());
+    }
+
+    var collectionGetterReturnTypeReference = getterCollectionFqn + JavaTypes.C_GENERIC_START + dataTypeRef + JavaTypes.C_GENERIC_END;
+    var collectionGetter = ScoutMethodGenerator.createDoNodeGetter(node.name(), collectionGetterReturnTypeReference, owner);
+    if (implementedInSuperClass(collectionGetter, owner)) {
       // the method already exists in the super class. no need to override the getter
       return Stream.of(chainedSetterCollection, chainedSetterArray);
     }
-    return Stream.of(chainedSetterCollection, chainedSetterArray, listGetter);
+    return Stream.of(chainedSetterCollection, chainedSetterArray, collectionGetter);
   }
 
   protected String convenienceMethodsMarker() {

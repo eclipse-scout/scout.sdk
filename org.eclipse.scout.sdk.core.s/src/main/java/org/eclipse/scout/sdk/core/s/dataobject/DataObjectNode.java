@@ -16,6 +16,7 @@ import java.util.StringJoiner;
 
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutDoCollectionApi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
@@ -27,36 +28,48 @@ public class DataObjectNode {
    * The Node type
    */
   public enum DataObjectNodeKind {
-    DO_VALUE,
-    DO_LIST;
+    VALUE,
+    LIST,
+    SET,
+    COLLECTION;
 
     /**
      * Parses the given {@link IType} to the {@link DataObjectNodeKind}.<br>
-     * If it is the {@code DoValue} type, {@link #DO_VALUE} is returned.<br>
-     * If it is the {@code DoList} type, {@link #DO_LIST} is returned.<br>
+     * If it is the {@code DoValue} type, {@link #VALUE} is returned.<br>
+     * If it is the {@code DoList} type, {@link #LIST} is returned.<br>
+     * If it is the {@code DoSet} type, {@link #SET} is returned.<br>
+     * If it is the {@code DoCollection} type, {@link #COLLECTION} is returned.<br>
      * Otherwise an empty optional is returned.
      * 
-     * @param t
+     * @param type
      *          The {@link IType} to check or {@code null}.
      * @return An {@link Optional} holding the parsed value or an empty one if it cannot be parsed.
      */
-    public static Optional<DataObjectNodeKind> valueOf(IType t) {
-      if (t == null) {
-        return Optional.empty();
-      }
+    public static Optional<DataObjectNodeKind> valueOf(IType type) {
+      return Optional.ofNullable(type)
+          .flatMap(t -> t.javaEnvironment()
+              .api(IScoutApi.class)
+              .flatMap(api -> detectDoNodeKind(api, t)));
+    }
 
-      var optScoutApi = t.javaEnvironment().api(IScoutApi.class);
-      if (optScoutApi.isEmpty()) {
-        return Optional.empty();
-      }
-
-      var scoutApi = optScoutApi.get();
+    static Optional<DataObjectNodeKind> detectDoNodeKind(IScoutApi scoutApi, IType t) {
       var name = t.name();
       if (scoutApi.DoValue().fqn().equals(name)) {
-        return Optional.of(DO_VALUE);
+        return Optional.of(VALUE);
       }
       if (scoutApi.DoList().fqn().equals(name)) {
-        return Optional.of(DO_LIST);
+        return Optional.of(LIST);
+      }
+      return scoutApi.api(IScoutDoCollectionApi.class)
+          .flatMap(a -> detectDoCollection(a, name));
+    }
+
+    static Optional<DataObjectNodeKind> detectDoCollection(IScoutDoCollectionApi extendedApi, String name) {
+      if (extendedApi.DoSet().fqn().equals(name)) {
+        return Optional.of(SET);
+      }
+      if (extendedApi.DoCollection().fqn().equals(name)) {
+        return Optional.of(COLLECTION);
       }
       return Optional.empty();
     }
@@ -66,16 +79,18 @@ public class DataObjectNode {
   private final String m_name;
   private final IType m_dataType;
   private final boolean m_inherited;
+  private final boolean m_hasJavaDoc;
 
-  public DataObjectNode(DataObjectNodeKind kind, String name, IType dataType, boolean inherited) {
+  public DataObjectNode(DataObjectNodeKind kind, String name, IType dataType, boolean inherited, boolean hasJavaDoc) {
     m_kind = Ensure.notNull(kind);
     m_name = Ensure.notBlank(name);
     m_dataType = Ensure.notNull(dataType);
     m_inherited = inherited;
+    m_hasJavaDoc = hasJavaDoc;
   }
 
   /**
-   * @return {@link DataObjectNodeKind#DO_VALUE} or {@link DataObjectNodeKind#DO_LIST}. Is never {@code null}.
+   * @return One of the {@link DataObjectNodeKind} values. Is never {@code null}.
    */
   public DataObjectNodeKind kind() {
     return m_kind;
@@ -89,8 +104,9 @@ public class DataObjectNode {
   }
 
   /**
-   * @return The data type of the node. Is never {@code null}. If the node is of kind {@link DataObjectNodeKind#DO_LIST}
-   *         this data type represents the list element type.
+   * @return The data type of the node. Is never {@code null}. If the node is of kind {@link DataObjectNodeKind#LIST},
+   *         {@link DataObjectNodeKind#SET} or {@link DataObjectNodeKind#COLLECTION} this data type represents the list
+   *         element type.
    */
   public IType dataType() {
     return m_dataType;
@@ -103,6 +119,13 @@ public class DataObjectNode {
     return m_inherited;
   }
 
+  /**
+   * @return {@code true} if this node has a JavaDoc
+   */
+  public boolean hasJavaDoc() {
+    return m_hasJavaDoc;
+  }
+
   @Override
   public String toString() {
     return new StringJoiner(", ", DataObjectNode.class.getSimpleName() + " [", "]")
@@ -110,6 +133,7 @@ public class DataObjectNode {
         .add("kind=" + m_kind)
         .add("dataType='" + m_dataType + "'")
         .add("inherited=" + m_inherited)
+        .add("hasJavaDoc=" + m_hasJavaDoc)
         .toString();
   }
 
@@ -124,6 +148,7 @@ public class DataObjectNode {
 
     var that = (DataObjectNode) o;
     return m_inherited == that.m_inherited
+        && m_hasJavaDoc == that.m_hasJavaDoc
         && m_kind == that.m_kind
         && Objects.equals(m_dataType, that.m_dataType)
         && Objects.equals(m_name, that.m_name);
@@ -135,6 +160,7 @@ public class DataObjectNode {
     result = 31 * result + m_name.hashCode();
     result = 31 * result + m_dataType.hashCode();
     result = 31 * result + (m_inherited ? 1 : 0);
+    result = 31 * result + (m_hasJavaDoc ? 1 : 0);
     return result;
   }
 }

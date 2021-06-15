@@ -4405,11 +4405,11 @@ public interface Scout10Api extends IScoutApi {
     public String fqn() {
       return "org.eclipse.scout.rt.dataobject.DoList";
     }
+  }
 
-    @Override
-    public String updateAllMethodName() {
-      return "updateAll";
-    }
+  @Override
+  default String DoUpdateAllMethodName() {
+    return "updateAll";
   }
 
   IScoutVariousApi.DoNode DO_NODE = new DoNode();

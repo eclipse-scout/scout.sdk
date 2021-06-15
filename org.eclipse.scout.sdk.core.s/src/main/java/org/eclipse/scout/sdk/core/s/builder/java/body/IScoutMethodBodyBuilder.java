@@ -79,7 +79,7 @@ public interface IScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TY
    *          The source to pass to the updateAll method
    * @return this builder
    */
-  TYPE appendDoNodeUpdateAll(CharSequence nodeName, CharSequence value);
+  TYPE appendDoCollectionUpdateAll(CharSequence nodeName, CharSequence value);
 
   /**
    * Appends a get call to a DoNode like {@code nodeName().get()} without a trailing semicolon.
