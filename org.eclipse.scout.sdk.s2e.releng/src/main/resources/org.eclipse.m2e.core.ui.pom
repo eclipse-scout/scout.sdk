@@ -87,6 +87,11 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.filebuffers</artifactId>
+      <version>${org.eclipse.core.filebuffers}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.ui</artifactId>
       <version>${org.eclipse.ui}</version>
     </dependency>

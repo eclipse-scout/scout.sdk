@@ -46,6 +46,11 @@
       <version>${org.eclipse.core.resources}</version>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.filesystem</artifactId>
+      <version>${org.eclipse.core.filesystem}</version>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.m2e.archetype.common</artifactId>
       <version>${org.eclipse.m2e.archetype.common}</version>

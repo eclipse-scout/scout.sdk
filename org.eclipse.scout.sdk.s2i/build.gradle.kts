@@ -65,13 +65,13 @@ dependencies {
     api("org.apache.poi", "poi-ooxml", "4.1.2")
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    testImplementation("org.mockito", "mockito-core", "3.10.0")
+    testImplementation("org.mockito", "mockito-core", "3.11.1")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", scoutSdkVersion)
 }
 
 allprojects {
-    configure<JavaPluginConvention> {
+    java {
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
     }
