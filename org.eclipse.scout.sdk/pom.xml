@@ -158,6 +158,8 @@
     <org.eclipse.ui.workbench>3.122.200</org.eclipse.ui.workbench>
     <org.eclipse.ui>3.119.0</org.eclipse.ui>
     <org.eclipse.urischeme>1.1.400</org.eclipse.urischeme>
+    <org.eclipse.equinox.simpleconfigurator.manipulator>2.2.0</org.eclipse.equinox.simpleconfigurator.manipulator>
+    <org.eclipse.equinox.frameworkadmin>2.2.0</org.eclipse.equinox.frameworkadmin>
 
     <icu4j>69.1</icu4j>
     <ecj>3.26.0</ecj>
@@ -251,479 +253,320 @@
       </dependency>
 
       <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>ecj</artifactId>
-        <version>${ecj}</version>
-      </dependency>
-
-      <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.commands</artifactId>
         <version>${org.eclipse.core.commands}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.common</artifactId>
         <version>${org.eclipse.equinox.common}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.preferences</artifactId>
         <version>${org.eclipse.equinox.preferences}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.registry</artifactId>
         <version>${org.eclipse.equinox.registry}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.security</artifactId>
         <version>${org.eclipse.equinox.security}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.compare</artifactId>
         <version>${org.eclipse.compare}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.expressions</artifactId>
         <version>${org.eclipse.core.expressions}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.filesystem</artifactId>
         <version>${org.eclipse.core.filesystem}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.variables</artifactId>
         <version>${org.eclipse.core.variables}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.resources</artifactId>
         <version>${org.eclipse.core.resources}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.runtime</artifactId>
         <version>${org.eclipse.core.runtime}</version>
       </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.core.manipulation</artifactId>
-        <version>${org.eclipse.jdt.core.manipulation}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.core</artifactId>
-        <version>${org.eclipse.jdt.core}</version>
-      </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.databinding.observable</artifactId>
         <version>${org.eclipse.core.databinding.observable}</version>
       </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.junit.runtime</artifactId>
-        <version>${org.eclipse.jdt.junit.runtime}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.junit.core</artifactId>
-        <version>${org.eclipse.jdt.junit.core}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.debug</artifactId>
-        <version>${org.eclipse.jdt.debug}</version>
-      </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.jobs</artifactId>
         <version>${org.eclipse.core.jobs}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.core.contexts</artifactId>
         <version>${org.eclipse.e4.core.contexts}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.contenttype</artifactId>
         <version>${org.eclipse.core.contenttype}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.app</artifactId>
         <version>${org.eclipse.equinox.app}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.text</artifactId>
         <version>${org.eclipse.text}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.filebuffers</artifactId>
         <version>${org.eclipse.core.filebuffers}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.jface</artifactId>
         <version>${org.eclipse.jface}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.help</artifactId>
         <version>${org.eclipse.help}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.jface.databinding</artifactId>
         <version>${org.eclipse.jface.databinding}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.databinding</artifactId>
         <version>${org.eclipse.core.databinding}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.workbench.swt</artifactId>
         <version>${org.eclipse.e4.ui.workbench.swt}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.dialogs</artifactId>
         <version>${org.eclipse.e4.ui.dialogs}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.di</artifactId>
         <version>${org.eclipse.e4.ui.di}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.services</artifactId>
         <version>${org.eclipse.e4.ui.services}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.css.swt.theme</artifactId>
         <version>${org.eclipse.e4.ui.css.swt.theme}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.bindings</artifactId>
         <version>${org.eclipse.e4.ui.bindings}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.workbench.addons.swt</artifactId>
         <version>${org.eclipse.e4.ui.workbench.addons.swt}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.workbench.renderers.swt</artifactId>
         <version>${org.eclipse.e4.ui.workbench.renderers.swt}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.compare.core</artifactId>
         <version>${org.eclipse.compare.core}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.team.ui</artifactId>
         <version>${org.eclipse.team.ui}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.team.core</artifactId>
         <version>${org.eclipse.team.core}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ui.workbench.texteditor</artifactId>
         <version>${org.eclipse.ui.workbench.texteditor}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.p2.engine</artifactId>
         <version>${org.eclipse.equinox.p2.engine}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.p2.metadata</artifactId>
         <version>${org.eclipse.equinox.p2.metadata}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.core.services</artifactId>
         <version>${org.eclipse.e4.core.services}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.workbench</artifactId>
         <version>${org.eclipse.e4.ui.workbench}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.emf.xpath</artifactId>
         <version>${org.eclipse.e4.emf.xpath}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.ide</artifactId>
         <version>${org.eclipse.e4.ui.ide}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.model.workbench</artifactId>
         <version>${org.eclipse.e4.ui.model.workbench}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.core.di</artifactId>
         <version>${org.eclipse.e4.core.di}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.core.di.extensions</artifactId>
         <version>${org.eclipse.e4.core.di.extensions}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ui.views</artifactId>
         <version>${org.eclipse.ui.views}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.css.core</artifactId>
         <version>${org.eclipse.e4.ui.css.core}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.css.swt</artifactId>
         <version>${org.eclipse.e4.ui.css.swt}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ui.navigator</artifactId>
         <version>${org.eclipse.ui.navigator}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ui.navigator.resources</artifactId>
         <version>${org.eclipse.ui.navigator.resources}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ui.views.properties.tabbed</artifactId>
         <version>${org.eclipse.ui.views.properties.tabbed}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.osgi</artifactId>
         <version>${org.eclipse.osgi}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.databinding.property</artifactId>
         <version>${org.eclipse.core.databinding.property}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.core.commands</artifactId>
         <version>${org.eclipse.e4.core.commands}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.core.di.annotations</artifactId>
         <version>${org.eclipse.e4.core.di.annotations}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.widgets</artifactId>
         <version>${org.eclipse.e4.ui.widgets}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.ui.workbench3</artifactId>
         <version>${org.eclipse.e4.ui.workbench3}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.bidi</artifactId>
         <version>${org.eclipse.equinox.bidi}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.p2.core</artifactId>
         <version>${org.eclipse.equinox.p2.core}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.osgi.services</artifactId>
         <version>${org.eclipse.osgi.services}</version>
       </dependency>
-
-      <dependency>
-        <groupId>com.ibm.icu</groupId>
-        <artifactId>icu4j</artifactId>
-        <version>${icu4j}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.emf</groupId>
-        <artifactId>org.eclipse.emf.ecore</artifactId>
-        <version>${org.eclipse.emf.ecore}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.emf</groupId>
-        <artifactId>org.eclipse.emf.common</artifactId>
-        <version>${org.eclipse.emf.common}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.emf</groupId>
-        <artifactId>org.eclipse.emf.ecore.change</artifactId>
-        <version>${org.eclipse.emf.ecore.change}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.emf</groupId>
-        <artifactId>org.eclipse.emf.ecore.xmi</artifactId>
-        <version>${org.eclipse.emf.ecore.xmi}</version>
-      </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ui.forms</artifactId>
         <version>${org.eclipse.ui.forms}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.debug.core</artifactId>
         <version>${org.eclipse.debug.core}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.debug.ui</artifactId>
         <version>${org.eclipse.debug.ui}</version>
       </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.junit</artifactId>
-        <version>${org.eclipse.jdt.junit}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.debug.ui</artifactId>
-        <version>${org.eclipse.jdt.debug.ui}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.launching</artifactId>
-        <version>${org.eclipse.jdt.launching}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.jdt</groupId>
-        <artifactId>org.eclipse.jdt.ui</artifactId>
-        <version>${org.eclipse.jdt.ui}</version>
-      </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.jface.text</artifactId>
         <version>${org.eclipse.jface.text}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
         <version>${org.eclipse.ltk.core.refactoring}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.swt</artifactId>
@@ -754,11 +597,112 @@
         <artifactId>org.eclipse.swt.cocoa.macosx.x86_64</artifactId>
         <version>${org.eclipse.swt}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ltk.ui.refactoring</artifactId>
         <version>${org.eclipse.ltk.ui.refactoring}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.search</artifactId>
+        <version>${org.eclipse.search}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.ui.console</artifactId>
+        <version>${org.eclipse.ui.console}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.ui.editors</artifactId>
+        <version>${org.eclipse.ui.editors}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.ui.ide</artifactId>
+        <version>${org.eclipse.ui.ide}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.ui.workbench</artifactId>
+        <version>${org.eclipse.ui.workbench}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.ui</artifactId>
+        <version>${org.eclipse.ui}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.urischeme</artifactId>
+        <version>${org.eclipse.urischeme}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.equinox.simpleconfigurator.manipulator</artifactId>
+        <version>${org.eclipse.equinox.simpleconfigurator.manipulator}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.equinox.frameworkadmin</artifactId>
+        <version>${org.eclipse.equinox.frameworkadmin}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>ecj</artifactId>
+        <version>${ecj}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.core.manipulation</artifactId>
+        <version>${org.eclipse.jdt.core.manipulation}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.core</artifactId>
+        <version>${org.eclipse.jdt.core}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.junit.runtime</artifactId>
+        <version>${org.eclipse.jdt.junit.runtime}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.junit.core</artifactId>
+        <version>${org.eclipse.jdt.junit.core}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.debug</artifactId>
+        <version>${org.eclipse.jdt.debug}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.junit</artifactId>
+        <version>${org.eclipse.jdt.junit}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.debug.ui</artifactId>
+        <version>${org.eclipse.jdt.debug.ui}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.launching</artifactId>
+        <version>${org.eclipse.jdt.launching}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jdt</groupId>
+        <artifactId>org.eclipse.jdt.ui</artifactId>
+        <version>${org.eclipse.jdt.ui}</version>
       </dependency>
 
       <dependency>
@@ -766,13 +710,11 @@
         <artifactId>org.eclipse.m2e.core</artifactId>
         <version>${org.eclipse.m2e.core}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.m2e.core.ui</artifactId>
         <version>${org.eclipse.m2e.core.ui}</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.m2e.archetype.common</artifactId>
@@ -780,45 +722,30 @@
       </dependency>
 
       <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.search</artifactId>
-        <version>${org.eclipse.search}</version>
+        <groupId>com.ibm.icu</groupId>
+        <artifactId>icu4j</artifactId>
+        <version>${icu4j}</version>
       </dependency>
 
       <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.ui.console</artifactId>
-        <version>${org.eclipse.ui.console}</version>
+        <groupId>org.eclipse.emf</groupId>
+        <artifactId>org.eclipse.emf.ecore</artifactId>
+        <version>${org.eclipse.emf.ecore}</version>
       </dependency>
-
       <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.ui.editors</artifactId>
-        <version>${org.eclipse.ui.editors}</version>
+        <groupId>org.eclipse.emf</groupId>
+        <artifactId>org.eclipse.emf.common</artifactId>
+        <version>${org.eclipse.emf.common}</version>
       </dependency>
-
       <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.ui.ide</artifactId>
-        <version>${org.eclipse.ui.ide}</version>
+        <groupId>org.eclipse.emf</groupId>
+        <artifactId>org.eclipse.emf.ecore.change</artifactId>
+        <version>${org.eclipse.emf.ecore.change}</version>
       </dependency>
-
       <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.ui.workbench</artifactId>
-        <version>${org.eclipse.ui.workbench}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.ui</artifactId>
-        <version>${org.eclipse.ui}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.platform</groupId>
-        <artifactId>org.eclipse.urischeme</artifactId>
-        <version>${org.eclipse.urischeme}</version>
+        <groupId>org.eclipse.emf</groupId>
+        <artifactId>org.eclipse.emf.ecore.xmi</artifactId>
+        <version>${org.eclipse.emf.ecore.xmi}</version>
       </dependency>
 
       <dependency>
