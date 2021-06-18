@@ -536,14 +536,6 @@
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.e4.core.di</artifactId>
         <version>${org.eclipse.e4.core.di}</version>
-        <exclusions>
-          <exclusion>
-            <!-- Because of Bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=572267 -->
-            <!-- Can be removed as soon as a fixed artifact is available -->
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
 
       <dependency>

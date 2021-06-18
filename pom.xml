@@ -21,6 +21,8 @@
   <modules>
     <module>org.eclipse.scout.sdk</module>
     <module>updatesite-maven-plugin</module>
+    <!--<module>org.eclipse.scout.sdk.p2</module>-->
+    <!--<module>org.eclipse.scout.sdk.s2e.releng</module>-->
   </modules>
 
   <build>
@@ -36,37 +38,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>default</id>
-      <activation>
-        <property>
-          <name>!p2</name>
-        </property>
-      </activation>
-      <modules>
-        <module>org.eclipse.scout.sdk</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>p2-build</id>
-      <activation>
-        <property>
-          <name>p2</name>
-        </property>
-      </activation>
-      <modules>
-        <module>org.eclipse.scout.sdk.p2</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>releng-build</id>
-      <modules>
-        <module>org.eclipse.scout.sdk.s2e.releng</module>
-      </modules>
-    </profile>
-  </profiles>
 </project>
