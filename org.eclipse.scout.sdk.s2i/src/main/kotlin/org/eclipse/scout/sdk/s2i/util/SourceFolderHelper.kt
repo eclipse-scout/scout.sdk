@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.core.s.util.ScoutTier
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.Strings
 import org.jetbrains.jps.model.java.JavaSourceRootType
-import java.util.*
 
 class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, val scoutTierOfModule: (Module) -> ScoutTier? = { S2iScoutTier.valueOf(it) }, val findClasspathEntry: (VirtualFile?) -> IClasspathEntry?) {
 
@@ -50,7 +49,14 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, v
         /**
          * Finds the closest dependency pair of [SourceFolder] and [IClasspathEntry] to the given [sourceFolder]. See [findClosestSourceFolder].
          */
-        fun findClosestSourceFolderDependency(project: Project, scoutTier: ScoutTier, test: Boolean, sourceFolder: SourceFolder, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): Pair<SourceFolder, IClasspathEntry>? {
+        fun findClosestSourceFolderDependency(
+            project: Project,
+            scoutTier: ScoutTier,
+            test: Boolean,
+            sourceFolder: SourceFolder,
+            scoutTierOfModule: ((Module) -> ScoutTier?)? = null,
+            findClasspathEntry: (VirtualFile?) -> IClasspathEntry?
+        ): Pair<SourceFolder, IClasspathEntry>? {
             val module = sourceFolder.contentEntry.rootModel.module
             val dependencies = ModuleRootManager.getInstance(module).dependencies
 
@@ -60,7 +66,14 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, v
         /**
          * Finds the closest dependency pair of [SourceFolder] and [IClasspathEntry] to the given [sourceFolder]. See [findClosestSourceFolder].
          */
-        fun findClosestDependentSourceFolder(project: Project, scoutTier: ScoutTier, test: Boolean, sourceFolder: SourceFolder, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): Pair<SourceFolder, IClasspathEntry>? {
+        fun findClosestDependentSourceFolder(
+            project: Project,
+            scoutTier: ScoutTier,
+            test: Boolean,
+            sourceFolder: SourceFolder,
+            scoutTierOfModule: ((Module) -> ScoutTier?)? = null,
+            findClasspathEntry: (VirtualFile?) -> IClasspathEntry?
+        ): Pair<SourceFolder, IClasspathEntry>? {
             val module = sourceFolder.contentEntry.rootModel.module
             val dependentModules = ModuleManager.getInstance(project).getModuleDependentModules(module)
 
@@ -72,20 +85,28 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, v
          * @param scoutTier which [ScoutTier] to look for
          * @param test weather to look for test source folders or not
          */
-        fun findClosestSourceFolder(project: Project, scoutTier: ScoutTier, test: Boolean, reference: Module, modules: Sequence<Module>, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): Pair<SourceFolder, IClasspathEntry>? {
+        fun findClosestSourceFolder(
+            project: Project,
+            scoutTier: ScoutTier,
+            test: Boolean,
+            reference: Module,
+            modules: Sequence<Module>,
+            scoutTierOfModule: ((Module) -> ScoutTier?)? = null,
+            findClasspathEntry: (VirtualFile?) -> IClasspathEntry?
+        ): Pair<SourceFolder, IClasspathEntry>? {
             val fileIndex = ProjectFileIndex.getInstance(project)
             val myScoutTierOfModule = scoutTierOfModule ?: { S2iScoutTier.valueOf(it) }
 
             val sourceFolder = modules.asSequence()
-                    .flatMap {
-                        ModuleRootManager.getInstance(it).sourceRoots.asSequence()
-                    }
-                    .mapNotNull { fileIndex.getSourceFolder(it) }
-                    .filter { it.rootType is JavaSourceRootType && it.isTestSource == test }
-                    .filter { !isGeneratedSourceFolder(it) }
-                    .map { it to Strings.levenshteinDistance(it.contentEntry.rootModel.module.name, reference.name) }
-                    .sortedBy { it.second }
-                    .firstOrNull { (sf, _) -> myScoutTierOfModule(sf.contentEntry.rootModel.module) == scoutTier }?.first ?: return null
+                .flatMap {
+                    ModuleRootManager.getInstance(it).sourceRoots.asSequence()
+                }
+                .mapNotNull { fileIndex.getSourceFolder(it) }
+                .filter { it.rootType is JavaSourceRootType && it.isTestSource == test }
+                .filter { !isGeneratedSourceFolder(it) }
+                .map { it to Strings.levenshteinDistance(it.contentEntry.rootModel.module.name, reference.name) }
+                .sortedBy { it.second }
+                .firstOrNull { (sf, _) -> myScoutTierOfModule(sf.contentEntry.rootModel.module) == scoutTier }?.first ?: return null
 
             return findClasspathEntry(sourceFolder.file)?.let { sourceFolder to it }
         }
@@ -103,7 +124,12 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, v
         /**
          * Finds the closest pair of [SourceFolder] and [IClasspathEntry] in the given [project] that is a [ScoutTier.Shared] for the given [clientOrServerSourceFolder].
          */
-        fun findSharedSourceFolderPair(project: Project, clientOrServerSourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): Pair<SourceFolder, IClasspathEntry>? {
+        fun findSharedSourceFolderPair(
+            project: Project,
+            clientOrServerSourceFolder: SourceFolder?,
+            scoutTierOfModule: ((Module) -> ScoutTier?)? = null,
+            findClasspathEntry: (VirtualFile?) -> IClasspathEntry?
+        ): Pair<SourceFolder, IClasspathEntry>? {
             if (clientOrServerSourceFolder == null) {
                 return null
             }
@@ -123,7 +149,13 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, v
         /**
          * Finds the closest test pair of [SourceFolder] and [IClasspathEntry] in the given [project] that is a [scoutTier] for the given [sourceFolder].
          */
-        fun findTestSourceFolderPair(project: Project, scoutTier: ScoutTier, sourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): Pair<SourceFolder, IClasspathEntry>? {
+        fun findTestSourceFolderPair(
+            project: Project,
+            scoutTier: ScoutTier,
+            sourceFolder: SourceFolder?,
+            scoutTierOfModule: ((Module) -> ScoutTier?)? = null,
+            findClasspathEntry: (VirtualFile?) -> IClasspathEntry?
+        ): Pair<SourceFolder, IClasspathEntry>? {
             if (sourceFolder == null) {
                 return null
             }
@@ -137,21 +169,36 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, v
         /**
          * Finds the closest test pair of [SourceFolder] and [IClasspathEntry] in the given [project] that is a [ScoutTier.Client] for the given [clientSourceFolder].
          */
-        fun findClientTestSourceFolderPair(project: Project, clientSourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): Pair<SourceFolder, IClasspathEntry>? {
+        fun findClientTestSourceFolderPair(
+            project: Project,
+            clientSourceFolder: SourceFolder?,
+            scoutTierOfModule: ((Module) -> ScoutTier?)? = null,
+            findClasspathEntry: (VirtualFile?) -> IClasspathEntry?
+        ): Pair<SourceFolder, IClasspathEntry>? {
             return findTestSourceFolderPair(project, ScoutTier.Client, clientSourceFolder, scoutTierOfModule, findClasspathEntry)
         }
 
         /**
          * Finds the closest test pair of [SourceFolder] and [IClasspathEntry] in the given [project] that is a [ScoutTier.Shared] for the given [sharedSourceFolder].
          */
-        fun findSharedTestSourceFolderPair(project: Project, sharedSourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): Pair<SourceFolder, IClasspathEntry>? {
+        fun findSharedTestSourceFolderPair(
+            project: Project,
+            sharedSourceFolder: SourceFolder?,
+            scoutTierOfModule: ((Module) -> ScoutTier?)? = null,
+            findClasspathEntry: (VirtualFile?) -> IClasspathEntry?
+        ): Pair<SourceFolder, IClasspathEntry>? {
             return findTestSourceFolderPair(project, ScoutTier.Shared, sharedSourceFolder, scoutTierOfModule, findClasspathEntry)
         }
 
         /**
          * Finds the closest test pair of [SourceFolder] and [IClasspathEntry] in the given [project] that is a [ScoutTier.Server] for the given [serverSourceFolder].
          */
-        fun findServerTestSourceFolderPair(project: Project, serverSourceFolder: SourceFolder?, scoutTierOfModule: ((Module) -> ScoutTier?)? = null, findClasspathEntry: (VirtualFile?) -> IClasspathEntry?): Pair<SourceFolder, IClasspathEntry>? {
+        fun findServerTestSourceFolderPair(
+            project: Project,
+            serverSourceFolder: SourceFolder?,
+            scoutTierOfModule: ((Module) -> ScoutTier?)? = null,
+            findClasspathEntry: (VirtualFile?) -> IClasspathEntry?
+        ): Pair<SourceFolder, IClasspathEntry>? {
             return findTestSourceFolderPair(project, ScoutTier.Server, serverSourceFolder, scoutTierOfModule, findClasspathEntry)
         }
 
@@ -192,9 +239,9 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, v
             val sourceRoots = ModuleRootManager.getInstance(module)?.sourceRoots ?: return null
 
             return sourceRoots.asSequence()
-                    .map { fileIndex.getSourceFolder(it) }
-                    .filterNotNull()
-                    .firstOrNull { sourceFolderCondition(it) }
+                .map { fileIndex.getSourceFolder(it) }
+                .filterNotNull()
+                .firstOrNull { sourceFolderCondition(it) }
         }
 
         private fun sourceFolderEndsWith(sourceFolder: SourceFolder?, suffix: String): Boolean {

@@ -33,10 +33,9 @@ import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
 import org.eclipse.scout.sdk.core.util.Strings.capitalize
-import org.eclipse.scout.sdk.s2i.*
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.util.SourceFolderHelper
-import java.util.*
 import java.util.function.BiConsumer
 
 abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val text: String, val description: String) : AnAction(text, description, null) {
@@ -133,7 +132,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
 
             val op = sourceFolderHelper.classpathEntry()?.javaEnvironment()?.let {
                 EclipseScoutBundle.elementCreationManager()
-                        .createOperation(operationClass(), elementName, pkg, sourceFolderHelper, it)
+                    .createOperation(operationClass(), elementName, pkg, sourceFolderHelper, it)
             } ?: return@callInIdeaEnvironment null
             op.accept(env, progress)
             return@callInIdeaEnvironment psiClassToOpen(op)
