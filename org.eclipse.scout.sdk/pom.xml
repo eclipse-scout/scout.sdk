@@ -293,6 +293,10 @@
     <org.eclipse.core.filebuffers>3.6.400</org.eclipse.core.filebuffers>
     <org.eclipse.core.databinding>1.7.100</org.eclipse.core.databinding>
     <org.eclipse.core.databinding.observable>1.6.300</org.eclipse.core.databinding.observable>
+    <org.eclipse.core.databinding.property>1.6.300</org.eclipse.core.databinding.property>
+    <icu4j>63.1</icu4j>
+    <org.eclipse.equinox.simpleconfigurator.manipulator>2.1.200</org.eclipse.equinox.simpleconfigurator.manipulator>
+    <org.eclipse.equinox.frameworkadmin>2.1.100</org.eclipse.equinox.frameworkadmin>
 
     <maven.model.dependency.version>3.5.3</maven.model.dependency.version>
   </properties>
@@ -909,6 +913,26 @@
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.core.databinding.observable</artifactId>
         <version>${org.eclipse.core.databinding.observable}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.core.databinding.property</artifactId>
+        <version>${org.eclipse.core.databinding.property}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.ibm.icu</groupId>
+        <artifactId>icu4j</artifactId>
+        <version>${icu4j}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.equinox.simpleconfigurator.manipulator</artifactId>
+        <version>${org.eclipse.equinox.simpleconfigurator.manipulator}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.equinox.frameworkadmin</artifactId>
+        <version>${org.eclipse.equinox.frameworkadmin}</version>
       </dependency>
 
 
