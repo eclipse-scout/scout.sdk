@@ -64,9 +64,7 @@
   <!-- please see https://jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
   <idea-version since-build="211.6693.111"/>
 
-  <depends>com.intellij.modules.platform</depends>
-  <depends>com.intellij.modules.lang</depends>
-  <depends>com.intellij.modules.java</depends>
+  <depends>com.intellij.java</depends>
   <depends>org.jetbrains.idea.maven</depends>
   <depends>com.intellij.copyright</depends>
   <depends>com.intellij.properties</depends>

@@ -15,17 +15,17 @@ import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.observable.properties.GraphPropertyImpl.Companion.graphProperty
-import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.layout.panel
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper.*
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
+import org.eclipse.scout.sdk.s2i.util.CompatibilityHelper
 
 open class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: ScoutModuleBuilder) : ModuleWizardStep() {
 
-    private val m_propertyGraph = PropertyGraph()
+    private val m_propertyGraph = CompatibilityHelper.newPropertyGraph()
     private val m_groupIdProperty = m_propertyGraph.graphProperty(::defaultGroupId)
     private val m_artifactIdProperty = m_propertyGraph.graphProperty(::defaultArtifactId)
     private val m_displayNameProperty = m_propertyGraph.graphProperty(::defaultDisplayName)
@@ -37,19 +37,19 @@ open class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: 
             titledRow(message("project.name")) {
                 row(message("group.id")) {
                     textField(m_groupIdProperty, 32)
-                            .withValidationOnApply { validateGroupId(it) }
-                            .withValidationOnInput { validateGroupId(it) }
-                            .focused()
+                        .withValidationOnApply { validateGroupId(it) }
+                        .withValidationOnInput { validateGroupId(it) }
+                        .focused()
                 }
                 row(message("artifact.id")) {
                     textField(m_artifactIdProperty, 32)
-                            .withValidationOnApply { validateArtifactId(it) }
-                            .withValidationOnInput { validateArtifactId(it) }
+                        .withValidationOnApply { validateArtifactId(it) }
+                        .withValidationOnInput { validateArtifactId(it) }
                 }
                 row(message("display.name")) {
                     textField(m_displayNameProperty, 32)
-                            .withValidationOnApply { validateDisplayName(it) }
-                            .withValidationOnInput { validateDisplayName(it) }
+                        .withValidationOnApply { validateDisplayName(it) }
+                        .withValidationOnInput { validateDisplayName(it) }
                 }
             }
             titledRow(message("ui.lang")) {
@@ -103,8 +103,8 @@ open class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: 
     protected open fun defaultDisplayName() = "My Application"
 
     override fun validate() = m_contentPanel.validateCallbacks.asSequence()
-            .mapNotNull { it() }
-            .all { it.okEnabled }
+        .mapNotNull { it() }
+        .all { it.okEnabled }
 
     override fun getComponent() = m_contentPanel
 

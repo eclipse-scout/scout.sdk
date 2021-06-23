@@ -81,7 +81,7 @@ allprojects {
 intellij {
     version.set(intellijVersion)
     downloadSources.set(true)
-    plugins.set(listOf("java", "maven", "copyright", "properties", "CSS", "JavaScriptLanguage"))
+    plugins.set(listOf("java", "maven", "copyright", "properties", "JavaScriptLanguage"))
     updateSinceUntilBuild.set(false)
 }
 
@@ -91,7 +91,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IU-2021.1"/*, "IU-2021.2"*/))
+        ideVersions.set(listOf("IU-2021.1", "IU-2021.2"))
         subsystemsToCheck.set("without-android")
         failureLevel.set(FailureLevel.ALL)
     }

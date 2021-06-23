@@ -362,19 +362,6 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css-openapi:ideaIU-IU-211.7442.40-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css:ideaIU-IU-211.7442.40-withSources" level="project" />
-    <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-211.7442.40-withSources">
-        <CLASSES>
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2021.1.2/3cf5faf99cea57c9ecadffc4acf65b6e5c414b05/ideaIU-2021.1.2/plugins/CSS/lib/resources_en.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2021.1.2/b34f606e2ec0d732c18f4073622fec4a01fe05fa/ideaIC-2021.1.2-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:completion-ranking-js-0.1.2:ideaIU-IU-211.7442.40-withSources" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:completion-ranking-typescript-0.2.2:ideaIU-IU-211.7442.40-withSources" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:javascript-featuresTrainer:ideaIU-IU-211.7442.40-withSources" level="project" />
@@ -395,6 +382,19 @@
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:semver4j-2.2.0:ideaIU-IU-211.7442.40-withSources" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:repository-search:ideaIU-IU-211.7442.40-withSources" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-model:ideaIU-IU-211.7442.40-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css-openapi:ideaIU-IU-211.7442.40-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css:ideaIU-IU-211.7442.40-withSources" level="project" />
+    <orderEntry type="module-library" scope="PROVIDED">
+      <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-211.7442.40-withSources">
+        <CLASSES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIU/2021.1.2/3cf5faf99cea57c9ecadffc4acf65b6e5c414b05/ideaIU-2021.1.2/plugins/CSS/lib/resources_en.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/ideaIC/2021.1.2/b34f606e2ec0d732c18f4073622fec4a01fe05fa/ideaIC-2021.1.2-sources.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:platform-images:ideaIU-IU-211.7442.40-withSources" level="project" />
     <orderEntry type="module-library" scope="PROVIDED">
       <library name="Gradle: unzipped.com.jetbrains.plugins:resources_en:ideaIU-IU-211.7442.40-withSources">
@@ -413,7 +413,7 @@
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.4.32" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.jetbrains:annotations:21.0.0" level="project" />
     <orderEntry type="library" name="Gradle: wsdl4j:wsdl4j:1.6.2" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse.jdt:ecj:3.25.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse.jdt:ecj:3.26.0" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.poi:poi:4.1.2" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.poi:poi-ooxml-schemas:4.1.2" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.commons:commons-compress:1.19" level="project" />
@@ -434,10 +434,10 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.security:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.junit.jupiter:junit-jupiter-engine:5.7.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.junit.jupiter:junit-jupiter-params:5.7.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.junit.jupiter:junit-jupiter-api:5.7.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.junit.platform:junit-platform-launcher:1.7.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.junit.jupiter:junit-jupiter-engine:5.7.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.junit.jupiter:junit-jupiter-params:5.7.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.junit.jupiter:junit-jupiter-api:5.7.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.junit.platform:junit-platform-launcher:1.7.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: jakarta.annotation:jakarta.annotation-api:1.3.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.http-client:google-http-client-apache-v2:1.38.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.http-client:google-http-client:1.38.0" level="project" />
@@ -446,8 +446,8 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.quartz-scheduler:quartz:2.3.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.30" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:slf4j-api:1.7.30" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.junit.platform:junit-platform-engine:1.7.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.junit.platform:junit-platform-commons:1.7.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.junit.platform:junit-platform-engine:1.7.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.junit.platform:junit-platform-commons:1.7.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.apiguardian:apiguardian-api:1.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.opentest4j:opentest4j:1.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.apache.httpcomponents:httpcore:4.4.13" level="project" />
