@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.sdk.core.log.MessageFormatter;
@@ -53,11 +54,11 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
   }
 
   static IApiSpecification create(Collection<Class<? extends IApiSpecification>> apiClasses, ApiVersion version) {
-    Predicate<ApiVersion> versionFilter = version == null || version == ApiVersion.LATEST ? v -> true : v -> v.compareTo(version) <= 0;
+    var firstNewerSpecConsumed = new AtomicBoolean();
     var root = apiClasses.stream()
         .map(ApiSpecification::associateWithLevel)
-        .filter(e -> versionFilter.test(e.getKey()))
         .sorted(Entry.comparingByKey())
+        .filter(e -> accept(e.getKey(), version, firstNewerSpecConsumed))
         .map(Entry::getValue)
         .reduce(null, ApiSpecification::wrapWith, Ensure::failOnDuplicates);
     if (root == null) {
@@ -67,8 +68,22 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
     return root.apiImplementation();
   }
 
+  static boolean accept(Comparable<ApiVersion> spec, ApiVersion request, AtomicBoolean firstNewerSpecConsumed) {
+    if (request == null || request == ApiVersion.LATEST) {
+      return true; // request is the latest version. Accept all specs (all are older)
+    }
+    if (spec.compareTo(request) < 0) {
+      return true; // older spec: accept all
+    }
+    if (firstNewerSpecConsumed.get()) {
+      return false; // skip all after the first newer api spec
+    }
+    firstNewerSpecConsumed.set(true); // in the sorted list of apis the current (or the next newer one) has been reached. To not include any more subsequent apis.
+    return true;
+  }
+
   static Entry<ApiVersion, Class<? extends IApiSpecification>> associateWithLevel(Class<? extends IApiSpecification> definition) {
-    return new SimpleEntry<>(ApiVersion.requireApiLevelOf(definition), definition);
+    return new SimpleEntry<>(ApiVersion.requireMaxApiLevelOf(definition), definition);
   }
 
   static ApiSpecification wrapWith(ApiSpecification nested, Class<? extends IApiSpecification> wrapperInterface) {
@@ -88,8 +103,8 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
   }
 
   @Override
-  public ApiVersion level() {
-    return m_level.computeIfAbsentAndGet(() -> ApiVersion.requireApiLevelOf(apiInterface()));
+  public ApiVersion maxLevel() {
+    return m_level.computeIfAbsentAndGet(() -> ApiVersion.requireMaxApiLevelOf(apiInterface()));
   }
 
   @Override
@@ -103,14 +118,14 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
         case "equals":
           return proxy == args[0];
         case "toString":
-          return MessageFormatter.arrayFormat("ApiSpecification [version={}, class={}]", level().asString(), apiInterface().getName()).message();
+          return MessageFormatter.arrayFormat("ApiSpecification [maxLevel={}, class={}]", maxLevel().asString(), apiInterface().getName()).message();
       }
     }
     if (method.getDeclaringClass() == IApiSpecification.class) {
       var methodName = method.getName();
       switch (methodName) {
-        case "level":
-          return level();
+        case "maxLevel":
+          return maxLevel();
         case "api":
           return api((Class<? extends IApiSpecification>) args[0]);
         case "requireApi":

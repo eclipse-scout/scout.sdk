@@ -8,22 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.core.fixture.apidef;
+package org.eclipse.scout.sdk.core.s.apidef;
 
-import org.eclipse.scout.sdk.core.apidef.MaxApiLevel;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 
-@MaxApiLevel(12)
-public interface Java11Api extends IJavaApi, ICustomApi {
-  String VALUE = "11";
-  int INT = 11;
+public interface IScoutDoCollectionApi extends IApiSpecification {
 
-  @Override
-  default String method() {
-    return VALUE;
+  DoSet DoSet();
+
+  interface DoSet extends IClassNameSupplier {
   }
 
-  @Override
-  default int customMethod() {
-    return INT;
+  DoCollection DoCollection();
+
+  interface DoCollection extends IClassNameSupplier {
   }
 }

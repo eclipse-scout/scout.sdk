@@ -23,6 +23,9 @@ public abstract class BaseDo extends DoEntity {
     return doList("versions");
   }
 
+  /**
+   * JavaDoc for enabled node
+   */
   public DoValue<Boolean> enabled() {
     return doValue("enabled");
   }

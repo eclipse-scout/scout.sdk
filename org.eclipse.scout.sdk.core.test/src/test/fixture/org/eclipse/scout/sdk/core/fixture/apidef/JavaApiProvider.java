@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.fixture.apidef;
 
-import static org.eclipse.scout.sdk.core.apidef.ApiVersion.requireApiLevelOf;
+import static org.eclipse.scout.sdk.core.apidef.ApiVersion.requireMaxApiLevelOf;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +30,6 @@ public class JavaApiProvider implements IApiProvider {
   @Override
   public Optional<ApiVersion> version(IJavaEnvironment context) {
     // for testing: always return version 11
-    return Optional.of(requireApiLevelOf(Java11Api.class));
+    return Optional.of(requireMaxApiLevelOf(Java11Api.class));
   }
 }

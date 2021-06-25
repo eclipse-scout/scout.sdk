@@ -122,10 +122,11 @@ public class DataObjectModel {
     }
 
     var declaringType = method.declaringType().orElse(null);
+    var hasJavaDoc = method.javaDoc().isPresent();
     var isInherited = declaringType != source
         || method.superMethods().withSelf(false).stream()
             .anyMatch(sm -> !Flags.isAbstract(sm.flags()) && !Flags.isInterface(sm.flags()));
-    return Optional.of(new DataObjectNode(optKind.get(), method.elementName(), optDoValue.get(), isInherited));
+    return Optional.of(new DataObjectNode(optKind.get(), method.elementName(), optDoValue.get(), isInherited, hasJavaDoc));
   }
 
   protected static Optional<IType> parseValueType(IType returnType) {

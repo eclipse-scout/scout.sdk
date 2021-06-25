@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,9 +52,9 @@ public class ApiVersionTest {
   }
 
   @Test
-  public void testApiVersionOf() {
-    Assertions.assertEquals("13", ApiVersion.requireApiLevelOf(Java13Api.class).asString());
-    Assertions.assertEquals(ApiVersion.class.getSimpleName() + " 8", ApiVersion.requireApiLevelOf(Java8Api.class).toString());
+  public void testMaxApiLevelOf() {
+    Assertions.assertEquals("13", ApiVersion.requireMaxApiLevelOf(Java13Api.class).asString());
+    Assertions.assertEquals(ApiVersion.class.getSimpleName() + " 10", ApiVersion.requireMaxApiLevelOf(Java8Api.class).toString());
   }
 
   @Test
@@ -87,13 +87,16 @@ public class ApiVersionTest {
     var c = new ApiVersion(11, 2, 3);
     var d = new ApiVersion(10, 1, 1);
     var e = new ApiVersion(10);
+    var f = new ApiVersion("-SNAPSHOT", 10, 2);
+    var g = new ApiVersion(10, 2);
 
     assertEquals(0, a.compareTo(a));
     assertEquals(0, a.compareTo(e));
 
     assertTrue(a.compareTo(null) > 0);
-    assertTrue(a.compareTo(b) < 0);
+    assertTrue(a.compareTo(b) > 0);
     assertTrue(d.compareTo(b) > 0);
     assertTrue(c.compareTo(a) > 0);
+    assertTrue(f.compareTo(g) < 0); // required that a 10.2 api spec will be used for a runtime 10.2-SNAPSHOT
   }
 }

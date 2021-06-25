@@ -464,6 +464,7 @@ When generating source code the created code must always match a certain API (e.
 Therefore, a generator needs to know the e.g. class- and method names of the API to build the correct source.
 As APIs may change over time, a mechanism is required to generate source code for different API versions.
 This is where API definitions may come in handy.
+
 An API definition holds all necessary information (like names of classes, methods, annotation elements or any other API dependent information) for each version of the API that needs to be supported.
 <<img-apidef>> illustrates the API definition classes (left-hand side) including a sample Java API definition (right-hand side).
 
@@ -488,7 +489,7 @@ It gets the `JavaApiProvider` and calls the `version` method.
 . The `Api` class now knows that the `IJavaApi` is available and uses version `8`.
 It then asks the provider for all known `IApiSpecification` classes which results in `Java8Api` and `Java9Api`.
 . It creates an instance of the `ApiSpecification` class and passes the version and the two known specifications.
-. The `ApiSpecification` reads the `ApiLevel` annotation of the two specification classes and discards all which have a level higher than the version requested.
+. The `ApiSpecification` reads the `MaxApiLevel` annotation of the two specification classes and discards all which have a level higher than the version requested.
 Only the `Java8Api` specification remains.
 . Using this specification the `ApiSpecification` creates a dynamic proxy for `IJavaApi` delegating all method calls to the `Java8Api` and returns this proxy.
 . The original caller now gets an instance of `IJavaApi` which internally is bound to the `Java8Api`.

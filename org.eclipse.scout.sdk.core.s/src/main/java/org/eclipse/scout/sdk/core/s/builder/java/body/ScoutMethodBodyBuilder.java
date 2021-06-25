@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
@@ -100,8 +101,8 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
   }
 
   @Override
-  public TYPE appendDoNodeUpdateAll(CharSequence nodeName, CharSequence value) {
-    return append(nodeName).parenthesisOpen().parenthesisClose().dot().appendFrom(IScoutApi.class, api -> api.DoList().updateAllMethodName())
+  public TYPE appendDoCollectionUpdateAll(CharSequence nodeName, CharSequence value) {
+    return append(nodeName).parenthesisOpen().parenthesisClose().dot().appendFrom(IScoutApi.class, IScoutVariousApi::DoUpdateAllMethodName)
         .parenthesisOpen().append(value).parenthesisClose().semicolon();
   }
 

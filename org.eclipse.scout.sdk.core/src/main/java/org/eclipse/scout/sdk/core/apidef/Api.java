@@ -135,7 +135,7 @@ public final class Api {
    * @return The newest supported major version for the given API.
    */
   public static int latestMajorVersion(Class<? extends IApiSpecification> api) {
-    return latest(api).level().segments()[0];
+    return latest(api).maxLevel().segments()[0];
   }
 
   /**
@@ -253,7 +253,7 @@ public final class Api {
     var apiDefinitions = getProvider(api).knownApis();
     var definition = Ensure.notNull(ApiSpecification.create(apiDefinitions, version), "No known API supports version {}. Available APIs: {}", version, apiDefinitions);
     if (SdkLog.isDebugEnabled()) {
-      SdkLog.debug("Creating API definition '{}' level '{}'.", api.getSimpleName(), definition.level().asString());
+      SdkLog.debug("Creating API definition '{}' supporting up to level '{}' (including).", api.getSimpleName(), definition.maxLevel().asString());
     }
     return definition;
   }
@@ -271,7 +271,7 @@ public final class Api {
   public static <API extends IApiSpecification> Stream<API> allKnown(Class<API> api) {
     return getProvider(api)
         .knownApis().stream()
-        .map(ApiVersion::requireApiLevelOf)
+        .map(ApiVersion::requireMaxApiLevelOf)
         .sorted(Comparator.reverseOrder()) // newest version first
         .map(version -> create(api, version));
   }

@@ -125,7 +125,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
   }
 
   /**
-   * Creates a DoNode chained setter method of the form:
+   * Creates a DoValue chained setter method of the form:
    *
    * <pre>
    * &#64;Generated
@@ -145,13 +145,13 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    *          The {@link IType} in which the method will be added.
    * @return The created {@link IScoutMethodGenerator}.
    */
-  public static IScoutMethodGenerator<?, ?> createDoNodeSetter(String name, String dataTypeReference, IType owner) {
-    return createDoNodeSetter(name, dataTypeReference, buildReturnTypeReferenceFor(owner))
+  public static IScoutMethodGenerator<?, ?> createDoValueSetter(String name, String dataTypeReference, IType owner) {
+    return createDoValueSetter(name, dataTypeReference, buildReturnTypeReferenceFor(owner))
         .withOverrideIfNecessary(true, owner);
   }
 
   /**
-   * Creates a DoNode chained setter method of the form:
+   * Creates a DoValue chained setter method of the form:
    *
    * <pre>
    * &#64;Generated
@@ -169,7 +169,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    *          The data type reference of the method return type.
    * @return The created {@link IScoutMethodGenerator}.
    */
-  public static IScoutMethodGenerator<?, ?> createDoNodeSetter(String name, String dataTypeReference, String returnTypeReference) {
+  public static IScoutMethodGenerator<?, ?> createDoValueSetter(String name, String dataTypeReference, String returnTypeReference) {
     return create()
         .asPublic()
         .withReturnType(returnTypeReference)
@@ -182,7 +182,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
   }
 
   /**
-   * Creates a DoList chained setter for collection values of the form:
+   * Creates a collection DO chained setter for collection values of the form:
    *
    * <pre>
    * &#64;Generated
@@ -197,12 +197,12 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    * @param name
    *          The DoNode name used for the method name without the "with" prefix.
    * @param dataTypeReference
-   *          The data type reference of a single DoList element.
+   *          The data type reference of a single collection DO element.
    * @param owner
    *          The {@link IType} in which the method will be added.
    * @return The created {@link IScoutMethodGenerator}.
    */
-  public static IScoutMethodGenerator<?, ?> createDoListSetterCollection(String name, CharSequence dataTypeReference, IType owner) {
+  public static IScoutMethodGenerator<?, ?> createDoCollectionSetterCollection(String name, CharSequence dataTypeReference, IType owner) {
     var methodName = PropertyBean.CHAINED_SETTER_PREFIX + capitalize(name);
     var paramDataType = computeDoNodeCollectionSetterParameterDataType(owner, methodName, dataTypeReference);
     return create()
@@ -213,12 +213,12 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
             .withElementName(name)
             .withDataType(paramDataType))
         .withAnnotation(createDoConvenienceMethodsGenerated())
-        .withBody(b -> b.appendDoNodeUpdateAll(name, name).nl().returnClause().appendThis().semicolon())
+        .withBody(b -> b.appendDoCollectionUpdateAll(name, name).nl().returnClause().appendThis().semicolon())
         .withOverrideIfNecessary(true, owner);
   }
 
   /**
-   * Creates a DoList chained setter for varargs values of the form:
+   * Creates a collection DO chained setter for varargs values of the form:
    *
    * <pre>
    * &#64;Generated
@@ -233,13 +233,13 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    * @param name
    *          The DoNode name used for the method name without the "with" prefix.
    * @param dataTypeReference
-   *          The data type reference of a single DoList element.
+   *          The data type reference of a single collection DO element.
    * @param owner
    *          The {@link IType} in which the method will be added.
    * @return The created {@link IScoutMethodGenerator}.
    */
-  public static IScoutMethodGenerator<?, ?> createDoListSetterArray(String name, String dataTypeReference, IType owner) {
-    var generator = createDoListSetterCollection(name, dataTypeReference, owner);
+  public static IScoutMethodGenerator<?, ?> createDoCollectionSetterVarargs(String name, String dataTypeReference, IType owner) {
+    var generator = createDoCollectionSetterCollection(name, dataTypeReference, owner);
     generator.parameters().findAny().get().withDataType(dataTypeReference).asVarargs();
     return generator;
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -117,10 +117,7 @@ public class CommentBuilder<TYPE extends ICommentBuilder<TYPE>> extends SourceBu
     try (var inputReader = new BufferedReader(new StringReader(comment))) {
       var line = inputReader.readLine();
       while (line != null) {
-        if (REGEX_COMMENT_PATTERN1.matcher(line).matches() || REGEX_COMMENT_PATTERN2.matcher(line).matches()) {
-          line = inputReader.readLine();
-        }
-        else {
+        if (!REGEX_COMMENT_PATTERN1.matcher(line).matches() && !REGEX_COMMENT_PATTERN2.matcher(line).matches()) {
           if (REGEX_COMMENT_PATTERN3.matcher(line).matches()) {
             append(line);
           }
@@ -128,8 +125,8 @@ public class CommentBuilder<TYPE extends ICommentBuilder<TYPE>> extends SourceBu
             append("* ").append(line);
           }
           nl();
-          line = inputReader.readLine();
         }
+        line = inputReader.readLine();
       }
     }
     catch (IOException e) {

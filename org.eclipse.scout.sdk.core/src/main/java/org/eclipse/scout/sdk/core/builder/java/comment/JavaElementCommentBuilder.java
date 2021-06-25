@@ -11,8 +11,10 @@
 package org.eclipse.scout.sdk.core.builder.java.comment;
 
 import java.util.Optional;
+import java.util.StringTokenizer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
@@ -21,6 +23,7 @@ import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGene
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.imports.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -34,6 +37,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<TYPE>> extends CommentBuilder<TYPE> implements IJavaElementCommentBuilder<TYPE> {
 
   private static volatile IDefaultElementCommentGeneratorSpi commentGeneratorSpi;
+  private static final Pattern LINK_REFERENCE_PATTERN = Pattern.compile("([\\w.\\[\\]]+)?(?:#([\\w]+)\\(([\\w\\s,.\\[\\]]*)\\))?");
 
   private final Supplier<ISourceGenerator<ICommentBuilder<?>>> m_defaultCommentGeneratorSupplier;
   private final FinalValue<ISourceGenerator<ICommentBuilder<?>>> m_defaultElementCommentGenerator;
@@ -158,18 +162,28 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
 
   @Override
   public TYPE appendLink(IType ref) {
+    return appendLink(ref, null);
+  }
+
+  @Override
+  public TYPE appendLink(IType ref, CharSequence label) {
     if (ref == null) {
-      return appendLink(null, true);
+      return appendLink(null, label, true);
     }
-    return appendLink(ref.reference(), !ref.isArray() && !ref.isPrimitive() && !ref.isWildcardType() && !ref.isVoid());
+    return appendLink(ref.reference(), label, !ref.isArray() && !ref.isPrimitive() && !ref.isWildcardType() && !ref.isVoid());
   }
 
   @Override
   public TYPE appendLink(CharSequence ref) {
-    return appendLink(ref, true);
+    return appendLink(ref, null);
   }
 
-  protected TYPE appendLink(CharSequence ref, boolean useLink) {
+  @Override
+  public TYPE appendLink(CharSequence ref, CharSequence label) {
+    return appendLink(ref, label, true);
+  }
+
+  protected TYPE appendLink(CharSequence ref, CharSequence label, boolean useLink) {
     if (useLink) {
       append("{@link");
     }
@@ -178,15 +192,53 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
         append(' ');
       }
       if (m_context != null) {
-        append(m_context.validator().useReference(ref));
+        appendLinkReference(m_context.validator(), ref);
       }
       else {
         append(ref);
       }
     }
     if (useLink) {
+      if (Strings.hasText(label)) {
+        if (!Strings.startsWith(label, " ")) {
+          append(' ');
+        }
+        append(label);
+      }
       append('}');
     }
     return thisInstance();
+  }
+
+  protected void appendLinkReference(IImportValidator validator, CharSequence ref) {
+    var m = LINK_REFERENCE_PATTERN.matcher(ref);
+    if (!m.matches()) {
+      append(ref); // cannot parse as reference
+      return;
+    }
+    var className = m.group(1);
+    var member = m.group(2);
+    var args = m.group(3);
+    if (Strings.hasText(className)) {
+      append(validator.useReference(className));
+    }
+    if (Strings.hasText(member)) {
+      append('#').append(member).append('(');
+      appendArgumentNames(validator, args);
+      append(')');
+    }
+  }
+
+  protected void appendArgumentNames(IImportValidator validator, String args) {
+    if (!Strings.hasText(args)) {
+      return;
+    }
+    var arguments = new StringTokenizer(args, ",");
+    var arg = arguments.nextToken().trim();
+    append(validator.useReference(arg));
+    while (arguments.hasMoreTokens()) {
+      arg = arguments.nextToken().trim();
+      append(", ").append(validator.useReference(arg));
+    }
   }
 }

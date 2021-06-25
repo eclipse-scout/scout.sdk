@@ -268,8 +268,9 @@ public interface IScoutVariousApi {
   DoList DoList();
 
   interface DoList extends IClassNameSupplier {
-    String updateAllMethodName();
   }
+
+  String DoUpdateAllMethodName();
 
   DoNode DoNode();
 
