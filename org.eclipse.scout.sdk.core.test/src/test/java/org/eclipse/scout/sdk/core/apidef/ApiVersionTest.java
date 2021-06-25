@@ -87,6 +87,8 @@ public class ApiVersionTest {
     var c = new ApiVersion(11, 2, 3);
     var d = new ApiVersion(10, 1, 1);
     var e = new ApiVersion(10);
+    var f = new ApiVersion("-SNAPSHOT", 10, 2);
+    var g = new ApiVersion(10, 2);
 
     assertEquals(0, a.compareTo(a));
     assertEquals(0, a.compareTo(e));
@@ -95,5 +97,6 @@ public class ApiVersionTest {
     assertTrue(a.compareTo(b) > 0);
     assertTrue(d.compareTo(b) > 0);
     assertTrue(c.compareTo(a) > 0);
+    assertTrue(f.compareTo(g) < 0); // required that a 10.2 api spec will be used for a runtime 10.2-SNAPSHOT
   }
 }

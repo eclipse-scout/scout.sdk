@@ -50,7 +50,7 @@ public class ApiSpecificationTest {
     assertEquals("401", createTestApiDefinition(new ApiVersion(null, 4, 3)).myVersion());
     assertEquals("401", createTestApiDefinition(new ApiVersion(null, 4, 2)).myVersion());
     assertEquals("4", createTestApiDefinition(new ApiVersion(snapshotSuffix, 4, 4)).myVersion());
-    assertEquals("4", createTestApiDefinition(new ApiVersion(snapshotSuffix, 4, 3)).myVersion());
+    assertEquals("401", createTestApiDefinition(new ApiVersion(snapshotSuffix, 4, 3)).myVersion()); // important so that for an RT 4.3-SNAPSHOT the 4.3 API is used
     assertEquals("401", createTestApiDefinition(new ApiVersion(snapshotSuffix, 4, 2)).myVersion());
 
     assertEquals("4", createTestApiDefinition(new ApiVersion(null, 4)).myVersion());

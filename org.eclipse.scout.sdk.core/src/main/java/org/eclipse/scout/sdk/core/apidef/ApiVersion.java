@@ -185,7 +185,7 @@ public class ApiVersion implements Comparable<ApiVersion> {
         return dif;
       }
     }
-    return Comparator.nullsFirst(String::compareTo).compare(suffix(), o.suffix());
+    return Comparator.nullsLast(String::compareTo).compare(suffix(), o.suffix());
   }
 
   private static int positionValue(int[] arr, int index) {
