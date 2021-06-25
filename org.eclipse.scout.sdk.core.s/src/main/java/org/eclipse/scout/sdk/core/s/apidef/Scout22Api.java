@@ -10,9 +10,9 @@
  */
 package org.eclipse.scout.sdk.core.s.apidef;
 
-import org.eclipse.scout.sdk.core.apidef.ApiLevel;
+import org.eclipse.scout.sdk.core.apidef.MaxApiLevel;
 
-@ApiLevel(22)
+@MaxApiLevel(22)
 @SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
 public interface Scout22Api extends IScoutApi, IScoutChartApi, IScoutDoCollectionApi {
 

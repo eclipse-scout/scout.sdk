@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,8 +17,9 @@ import java.util.Optional;
  * <p>
  * Typically an API specification consists of a sub interface to {@link IApiSpecification} defining the API
  * elements.<br>
- * Specific versions of such an API specification are sub interfaces to that specification holding an {@link ApiLevel}
- * annotation indicating the API version of it. On these level the elements are implemented using default methods.
+ * Specific versions of such an API specification are sub interfaces to that specification holding an
+ * {@link MaxApiLevel} annotation indicating the latest (newest) API version for which it may be used. On these level
+ * the elements are implemented using default methods.
  * </p>
  * <p>
  * <b>Example</b> (all classes below are interfaces):
@@ -28,7 +29,7 @@ import java.util.Optional;
  *                   |
  *              IMyLibraryApi
  *               |         |
- *     &#64;ApiLevel(1)        @ApiLevel(2) 
+ *   &#64;MaxApiLevel(2)      @MaxApiLevel(4) 
  *     MyLibrary1Api       MyLibrary2Api
  * </pre>
  * </p>
@@ -36,12 +37,13 @@ import java.util.Optional;
 public interface IApiSpecification {
 
   /**
-   * Gets the API level version.<br>
-   * Typically this is provided by the {@link ApiLevel} annotation on a specific API interface class.
+   * Gets the maximum API level version this specification supports.<br>
+   * Typically this is provided by the {@link MaxApiLevel} annotation on a specific API interface class.<br>
+   * If an API is annotated with "{@code @MaxApiLevel(14)}", this API can be used for all runtime versions < 14.x.x
    * 
-   * @return The API level version. Never returns {@code null}.
+   * @return The maximum API level version. Never returns {@code null}.
    */
-  ApiVersion level();
+  ApiVersion maxLevel();
 
   /**
    * Tries to find the given API within this {@link IApiSpecification}. This is only successful if this API is

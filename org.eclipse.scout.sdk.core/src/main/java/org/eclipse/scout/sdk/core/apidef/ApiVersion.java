@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,35 +55,35 @@ public class ApiVersion implements Comparable<ApiVersion> {
   }
 
   /**
-   * Parses the value of an {@link ApiLevel} annotation on the given class.
+   * Parses the value of an {@link MaxApiLevel} annotation on the given class.
    * 
    * @param clazz
-   *          The class whose {@link ApiLevel} annotation should be parsed.
+   *          The class whose {@link MaxApiLevel} annotation should be parsed.
    * @return An {@link Optional} with the {@link ApiVersion} of the given class or an empty {@link Optional} if the
    *         given class is {@code null} or the annotation does not exist.
-   * @see #requireApiLevelOf(Class)
+   * @see #requireMaxApiLevelOf(Class)
    */
-  public static Optional<ApiVersion> apiLevelOf(Class<?> clazz) {
+  public static Optional<ApiVersion> maxApiLevelOf(Class<?> clazz) {
     return Optional.ofNullable(clazz)
-        .map(c -> c.getAnnotation(ApiLevel.class))
-        .map(ApiLevel::value)
+        .map(c -> c.getAnnotation(MaxApiLevel.class))
+        .map(MaxApiLevel::value)
         .map(ApiVersion::new);
   }
 
   /**
-   * Parses the value of an {@link ApiLevel} annotation on the given class. This method fails if the given class does
-   * not have an {@link ApiLevel} annotation.
+   * Parses the value of an {@link MaxApiLevel} annotation on the given class. This method fails if the given class does
+   * not have an {@link MaxApiLevel} annotation.
    *
    * @param clazz
-   *          The class whose {@link ApiLevel} annotation should be parsed.
+   *          The class whose {@link MaxApiLevel} annotation should be parsed.
    * @return The {@link ApiVersion} value of the annotation.
    * @throws IllegalArgumentException
-   *           if the clazz is {@code null} or the clazz does not have the {@link ApiLevel} annotation.
-   * @see #apiLevelOf(Class)
+   *           if the clazz is {@code null} or the clazz does not have the {@link MaxApiLevel} annotation.
+   * @see #maxApiLevelOf(Class)
    */
-  public static ApiVersion requireApiLevelOf(Class<?> clazz) {
-    return apiLevelOf(clazz)
-        .orElseThrow(() -> Ensure.newFail("{} is missing required annotation '{}'.", clazz, ApiLevel.class.getName()));
+  public static ApiVersion requireMaxApiLevelOf(Class<?> clazz) {
+    return maxApiLevelOf(clazz)
+        .orElseThrow(() -> Ensure.newFail("{} is missing required annotation '{}'.", clazz, MaxApiLevel.class.getName()));
   }
 
   /**
@@ -113,7 +113,8 @@ public class ApiVersion implements Comparable<ApiVersion> {
   }
 
   /**
-   * @return The suffix {@link String} or {@code null} if this {@link ApiVersion} has no suffix.
+   * @return The suffix {@link String} or {@code null} if this {@link ApiVersion} has no suffix. The suffix is the whole
+   *         part after the maximal three number sections (e.g. {@code "-SNAPSHOT"}).
    */
   public String suffix() {
     return m_suffix;
@@ -189,7 +190,7 @@ public class ApiVersion implements Comparable<ApiVersion> {
 
   private static int positionValue(int[] arr, int index) {
     if (index >= arr.length) {
-      return 0;
+      return Integer.MAX_VALUE;
     }
     return arr[index];
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,7 @@ public class ScoutApiTest {
 
   @Test
   public void testLatest() {
-    assertNotNull(ScoutApi.latest().level().asString());
+    assertNotNull(ScoutApi.latest().maxLevel().asString());
   }
 
   @Test
@@ -61,7 +61,7 @@ public class ScoutApiTest {
   }
 
   private static void assertApiContainsData(IScoutApi api) {
-    assertTrue(api.level().segments().length > 0);
+    assertTrue(api.maxLevel().segments().length > 0);
     assertEquals(Scout10Api.DATA_ANNOTATION.fqn(), api.Data().fqn());
   }
 }
