@@ -19,8 +19,12 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoList;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IgnoreConvenienceMethodGeneration;
+import org.eclipse.scout.rt.dataobject.ValueFormat;
 
 public class SampleDo extends DoEntity implements DataObjectTestInterface {
+  @Override
+  @Deprecated
+  @ValueFormat(pattern = "test-pattern")
   public DoValue<Boolean> enabled() {
     return doValue("enabled");
   }

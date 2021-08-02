@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutDoCollectionApi;
@@ -76,14 +77,14 @@ public class DataObjectNode {
   }
 
   private final DataObjectNodeKind m_kind;
-  private final String m_name;
+  private final IMethod m_method;
   private final IType m_dataType;
   private final boolean m_inherited;
   private final boolean m_hasJavaDoc;
 
-  public DataObjectNode(DataObjectNodeKind kind, String name, IType dataType, boolean inherited, boolean hasJavaDoc) {
+  public DataObjectNode(DataObjectNodeKind kind, IMethod method, IType dataType, boolean inherited, boolean hasJavaDoc) {
     m_kind = Ensure.notNull(kind);
-    m_name = Ensure.notBlank(name);
+    m_method = Ensure.notNull(method);
     m_dataType = Ensure.notNull(dataType);
     m_inherited = inherited;
     m_hasJavaDoc = hasJavaDoc;
@@ -97,10 +98,17 @@ public class DataObjectNode {
   }
 
   /**
+   * @return The {@link IMethod} defining the DataObject node. Is never {@code null}.
+   */
+  public IMethod method() {
+    return m_method;
+  }
+
+  /**
    * @return The node name. Is never {@code null}.
    */
   public String name() {
-    return m_name;
+    return m_method.elementName();
   }
 
   /**
@@ -129,11 +137,11 @@ public class DataObjectNode {
   @Override
   public String toString() {
     return new StringJoiner(", ", DataObjectNode.class.getSimpleName() + " [", "]")
-        .add("name='" + m_name + "'")
-        .add("kind=" + m_kind)
-        .add("dataType='" + m_dataType + "'")
-        .add("inherited=" + m_inherited)
-        .add("hasJavaDoc=" + m_hasJavaDoc)
+        .add("name='" + name() + "'")
+        .add("kind=" + kind())
+        .add("dataType='" + dataType() + "'")
+        .add("inherited=" + isInherited())
+        .add("hasJavaDoc=" + hasJavaDoc())
         .toString();
   }
 
@@ -151,13 +159,13 @@ public class DataObjectNode {
         && m_hasJavaDoc == that.m_hasJavaDoc
         && m_kind == that.m_kind
         && Objects.equals(m_dataType, that.m_dataType)
-        && Objects.equals(m_name, that.m_name);
+        && Objects.equals(m_method, that.m_method);
   }
 
   @Override
   public int hashCode() {
     var result = m_kind.hashCode();
-    result = 31 * result + m_name.hashCode();
+    result = 31 * result + m_method.hashCode();
     result = 31 * result + m_dataType.hashCode();
     result = 31 * result + (m_inherited ? 1 : 0);
     result = 31 * result + (m_hasJavaDoc ? 1 : 0);

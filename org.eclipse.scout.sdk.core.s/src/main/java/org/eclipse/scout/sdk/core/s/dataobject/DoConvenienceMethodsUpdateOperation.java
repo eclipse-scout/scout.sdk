@@ -32,12 +32,14 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
+import org.eclipse.scout.sdk.core.generator.IAnnotatableGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
+import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode.DataObjectNodeKind;
@@ -210,11 +212,23 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     else {
       methodGenerators = buildMethodGeneratorsForCollection(node, owner);
     }
-
+    methodGenerators = methodGenerators.peek(g -> copyAnnotations(node.method(), g));
     if (!node.hasJavaDoc()) {
       return methodGenerators;
     }
     return methodGenerators.peek(g -> g.withComment(b -> appendJavaDocLink(b, node.name())));
+  }
+
+  protected void copyAnnotations(IAnnotatable source, IAnnotatableGenerator<?> target) {
+    source.annotations().stream()
+        .filter(a -> !isAnnotationIgnoredForCopy(a))
+        .map(IAnnotation::toWorkingCopy)
+        .forEach(target::withAnnotation);
+  }
+
+  protected boolean isAnnotationIgnoredForCopy(IAnnotation a) {
+    var annotationFqn = a.type().name();
+    return Override.class.getName().equals(annotationFqn);
   }
 
   protected void appendJavaDocLink(IJavaElementCommentBuilder<?> b, String name) {

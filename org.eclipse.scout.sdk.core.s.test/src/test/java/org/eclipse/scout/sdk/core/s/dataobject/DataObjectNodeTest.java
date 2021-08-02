@@ -16,8 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
@@ -44,20 +47,24 @@ public class DataObjectNodeTest {
   }
 
   @Test
-  public void testGetters(IJavaEnvironment env) {
+  public void testGetters() {
     var name = "myName";
-    var dataType = env.requireType(String.class.getName());
-    var node1 = new DataObjectNode(DataObjectNodeKind.VALUE, name, dataType, true, true);
-    var node2 = new DataObjectNode(DataObjectNodeKind.LIST, name, dataType, false, false);
+    var dataType = mock(IType.class);
+    var method = mock(IMethod.class);
+    when(method.elementName()).thenReturn(name);
+    var node1 = new DataObjectNode(DataObjectNodeKind.VALUE, method, dataType, true, true);
+    var node2 = new DataObjectNode(DataObjectNodeKind.LIST, method, dataType, false, false);
 
     assertSame(DataObjectNodeKind.VALUE, node1.kind());
-    assertSame(name, node1.name());
+    assertEquals(name, node1.name());
+    assertSame(method, node1.method());
     assertSame(dataType, node1.dataType());
     assertTrue(node1.isInherited());
     assertTrue(node1.hasJavaDoc());
 
     assertSame(DataObjectNodeKind.LIST, node2.kind());
-    assertSame(name, node2.name());
+    assertEquals(name, node2.name());
+    assertSame(method, node2.method());
     assertSame(dataType, node2.dataType());
     assertFalse(node2.isInherited());
     assertFalse(node2.hasJavaDoc());
@@ -67,10 +74,17 @@ public class DataObjectNodeTest {
   @SuppressWarnings({"SimplifiableJUnitAssertion", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
   public void testHashCodeEqualsToString(IJavaEnvironment env) {
     var name = "myName";
-    var dataType = env.requireType(String.class.getName());
-    var node1 = new DataObjectNode(DataObjectNodeKind.VALUE, name, dataType, true, false);
-    var node2 = new DataObjectNode(DataObjectNodeKind.LIST, name, dataType, false, true);
-    var node3 = new DataObjectNode(DataObjectNodeKind.VALUE, "otherName", dataType, true, true);
+    var otherName = "otherName";
+    var dataType = mock(IType.class);
+    when(dataType.toString()).thenReturn(String.class.getName());
+    var method1 = mock(IMethod.class);
+    when(method1.elementName()).thenReturn(name);
+    var method2 = mock(IMethod.class);
+    when(method2.elementName()).thenReturn(otherName);
+
+    var node1 = new DataObjectNode(DataObjectNodeKind.VALUE, method1, dataType, true, false);
+    var node2 = new DataObjectNode(DataObjectNodeKind.LIST, method1, dataType, false, true);
+    var node3 = new DataObjectNode(DataObjectNodeKind.VALUE, method2, dataType, true, true);
 
     assertFalse(node1.equals(null));
     assertFalse(node1.equals(""));
