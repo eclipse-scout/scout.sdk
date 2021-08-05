@@ -15,17 +15,17 @@ import com.intellij.ide.util.projectWizard.WizardContext
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.observable.properties.GraphPropertyImpl.Companion.graphProperty
-import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.layout.panel
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper.*
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityHelper
 
 open class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: ScoutModuleBuilder) : ModuleWizardStep() {
 
-    private val m_propertyGraph = PropertyGraph()
+    private val m_propertyGraph = CompatibilityHelper.newPropertyGraph()
     private val m_groupIdProperty = m_propertyGraph.graphProperty(::defaultGroupId)
     private val m_artifactIdProperty = m_propertyGraph.graphProperty(::defaultArtifactId)
     private val m_displayNameProperty = m_propertyGraph.graphProperty(::defaultDisplayName)

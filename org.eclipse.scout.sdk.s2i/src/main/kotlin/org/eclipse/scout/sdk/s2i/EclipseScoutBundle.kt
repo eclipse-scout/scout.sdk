@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2i
 
 import com.intellij.AbstractBundle
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import com.intellij.ui.IconManager
 import com.intellij.util.IconUtil
@@ -55,7 +56,7 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
         project.getService(JsModuleCacheImplementor::class.java)
 
     fun elementCreationManager(): ElementCreationManager =
-            ServiceManager.getService(ElementCreationManager::class.java)
+            ApplicationManager.getApplication().getService(ElementCreationManager::class.java)
 
     fun scoutIcon(size: Int) = IconUtil.scale(ScoutIcon, null, size / ScoutIcon.iconWidth.toFloat())
 

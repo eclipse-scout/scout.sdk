@@ -15,6 +15,7 @@ import com.intellij.find.impl.RegExHelpPopup
 import com.intellij.notification.NotificationGroup
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager
@@ -25,6 +26,23 @@ import java.awt.Component
  * Holds all API version dependent logic.
  */
 object CompatibilityHelper {
+
+    /**
+     * Constructor changed with IJ 2020.2 & 2021.2
+     * Can be removed if the minimal supported IJ version is >= 2021.2
+     */
+    private val NEW_PROPERTY_GRAPH = CompatibilityMethodCaller<PropertyGraph>()
+            .withCandidate(PropertyGraph::class.java, CompatibilityMethodCaller.CONSTRUCTOR_NAME, String::class.java, Boolean::class.java) {
+                it.invokeStatic(null, true) // >= IJ 2021.2
+            }
+            .withCandidate(PropertyGraph::class.java, CompatibilityMethodCaller.CONSTRUCTOR_NAME, String::class.java) {
+                it.invokeStatic(null) // <= 2021.1 && >= 2020.2
+            }
+            .withCandidate(PropertyGraph::class.java, CompatibilityMethodCaller.CONSTRUCTOR_NAME) {
+                it.invokeStatic() // <= IJ 2020.1
+            }
+
+    fun newPropertyGraph() = NEW_PROPERTY_GRAPH.invoke()
 
     /**
      * createRegExLink() method changed with IJ 2021.1
