@@ -26,7 +26,6 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
@@ -449,7 +448,7 @@ public final class JavaTypes {
     var paramTypeNames = method.getParameters().stream()
         .map(MethodParameterSpi::getDataType)
         .map(TypeSpi::getName)
-        .collect(Collectors.toList());
+        .collect(toList());
     return JavaTypes.createMethodIdentifier(method.getElementName(), paramTypeNames);
   }
 

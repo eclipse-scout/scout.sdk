@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.dataobject;
 
+import static java.util.stream.Collectors.joining;
 import static org.eclipse.scout.sdk.core.s.dataobject.DataObjectModel.wrap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -17,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
@@ -60,7 +60,7 @@ public class DataObjectModelTest {
     var model = wrap(env.requireType(SampleDo.class.getName())).get();
     var nodeNames = model.nodes().stream()
         .map(DataObjectNode::name)
-        .collect(Collectors.joining(","));
+        .collect(joining(","));
     assertEquals("enabled,versions", nodeNames);
   }
 }

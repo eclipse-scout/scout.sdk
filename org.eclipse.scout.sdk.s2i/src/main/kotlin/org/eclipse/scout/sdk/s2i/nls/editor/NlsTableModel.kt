@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -163,7 +163,7 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
             } else {
                 // Run in EDT. This is necessary e.g. for reload events which might come from a worker thread.
                 // Do not wait here for the events to be handled (deadlock)
-                ApplicationManager.getApplication().invokeLater {
+                application.invokeLater {
                     handleEvents(allEvents)
                 }
             }

@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.core.s.nls;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
@@ -198,6 +200,40 @@ public final class TranslationStores {
   public static Optional<TranslationStoreStack> createStack(Stream<ITranslationStore> stores) {
     return Optional.of(new TranslationStoreStack(stores))
         .filter(stack -> stack.allStores().count() > 0);
+  }
+
+  /**
+   * An implicit override of a translation happens if stores share the same bean {@code @Order} value and have common
+   * translation keys. This results in an implicit override of a translation based on the fully qualified name of the
+   * service. As this is not refactoring safe each service that overwrites other keys should have an explicit unique
+   * order to ensure a stable override.
+   *
+   * @return A {@link Stream} returning {@link Set sets} of {@link ITranslationStore TranslationStores} that share the
+   *         same {@code @Order} annotation value and have common translation keys.
+   */
+  public static Stream<Set<ITranslationStore>> havingImplicitOverrides(Collection<ITranslationStore> allStores) {
+    return allStores.stream()
+        .distinct()
+        .collect(groupingBy(s -> s.service().order(), toList()))
+        .values().stream()
+        .filter(group -> group.size() > 1)
+        .map(TranslationStores::storesWithCommonKeys)
+        .filter(group -> !group.isEmpty());
+  }
+
+  static Set<ITranslationStore> storesWithCommonKeys(List<ITranslationStore> group) {
+    var result = new HashSet<ITranslationStore>(group.size());
+    for (var i = 0; i < group.size(); i++) {
+      var storeToCheck = group.get(i);
+      for (var j = i + 1; j < group.size(); j++) {
+        var storeToCompare = group.get(j);
+        if (storeToCheck.keys().anyMatch(storeToCompare::containsKey)) {
+          result.add(storeToCheck);
+          result.add(storeToCompare);
+        }
+      }
+    }
+    return result;
   }
 
   /**
