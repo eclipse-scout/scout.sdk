@@ -46,7 +46,7 @@ plugins {
     id("java")
     id("maven-publish")
     id("idea")
-    id("org.jetbrains.intellij") version "1.0"
+    id("org.jetbrains.intellij") version "1.1.4"
     kotlin("jvm") version "1.4.32"
     id("net.linguica.maven-settings") version "0.5" // for maven settings
 }
@@ -65,7 +65,7 @@ dependencies {
     api("org.apache.poi", "poi-ooxml", "4.1.2")
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    testImplementation("org.mockito", "mockito-core", "3.11.1")
+    testImplementation("org.mockito", "mockito-core", "3.11.2")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", scoutSdkVersion)
 }
@@ -91,15 +91,9 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IU-2021.1", "IU-2021.2"))
+        ideVersions.set(listOf("IU-2021.2"))
         subsystemsToCheck.set("without-android")
         failureLevel.set(FailureLevel.ALL)
-    }
-
-    prepareSandbox {
-        // prepareSandbox Task may copy duplicate libraries from transitive dependencies.
-        // See https://intellij-support.jetbrains.com/hc/en-us/community/posts/360009478700-Kotlin-Getting-Copying-or-archiving-duplicate-paths-deprecation-warnings-when-building-plugin
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
 
     withType<JavaCompile>().configureEach {
