@@ -109,7 +109,7 @@ public class DataObjectModel {
     }
     var returnType = method.requireReturnType();
 
-    // kind (DoValue/DoList)
+    // kind (DoValue/DoList/DoSet/DoCollection)
     var optKind = DataObjectNodeKind.valueOf(returnType);
     if (optKind.isEmpty()) {
       return Optional.empty();
@@ -123,10 +123,12 @@ public class DataObjectModel {
 
     var declaringType = method.declaringType().orElse(null);
     var hasJavaDoc = method.javaDoc().isPresent();
-    var isInherited = declaringType != source
-        || method.superMethods().withSelf(false).stream()
-            .anyMatch(sm -> !Flags.isAbstract(sm.flags()) && !Flags.isInterface(sm.flags()));
-    return Optional.of(new DataObjectNode(optKind.get(), method.elementName(), optDoValue.get(), isInherited, hasJavaDoc));
+    var isInherited = declaringType != source || isImplementedInSuperHierarchy(method);
+    return Optional.of(new DataObjectNode(optKind.get(), method, optDoValue.get(), isInherited, hasJavaDoc));
+  }
+
+  protected static boolean isImplementedInSuperHierarchy(IMethod method) {
+    return method.superMethods().withSelf(false).stream().anyMatch(sm -> !Flags.isAbstract(sm.flags()) && !Flags.isInterface(sm.flags()));
   }
 
   protected static Optional<IType> parseValueType(IType returnType) {

@@ -12,7 +12,11 @@ package dataobject;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.dataobject.DoValue;
+
 public interface DataObjectTestInterface {
+  DoValue<Boolean> enabled();
+
   List<Long> getVersions();
 
   Boolean isEnabled();

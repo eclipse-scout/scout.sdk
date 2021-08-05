@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,15 +29,11 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -45,6 +41,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope;
@@ -74,13 +71,21 @@ public class TranslationStoreStack {
     m_eventBuffer = new ArrayList<>();
     m_listeners = new EventListenerList();
 
-    var comparator = new P_TranslationStoreComparator();
     m_stores = stores
-        .sorted(comparator)
+        .sorted(new TranslationStoreComparator())
         .collect(toCollection(ArrayDeque::new));
-    if (!comparator.duplicateOrders().isEmpty()) {
-      SdkLog.warning("There are TextProviderServices with the same @Order value: {}", comparator.duplicateOrders());
-    }
+
+    TranslationStores.havingImplicitOverrides(m_stores).forEach(TranslationStoreStack::logImplicitOverrides);
+  }
+
+  protected static void logImplicitOverrides(Collection<ITranslationStore> storesWithImplicitOverrides) {
+    var names = storesWithImplicitOverrides.stream()
+        .map(ITranslationStore::service)
+        .map(TextProviderService::type)
+        .map(IType::name)
+        .collect(joining(", ", "[", "]"));
+    SdkLog.warning("There are TextProviderServices with common keys and the same @Order value: {}. " +
+        "To ensure a stable override of translations each service should have a unique @Order value!", names);
   }
 
   /**
@@ -679,49 +684,6 @@ public class TranslationStoreStack {
     var listeners = m_listeners.get(ITranslationStoreStackListener.class);
     for (var l : listeners) {
       l.stackChanged(Stream.of(event));
-    }
-  }
-
-  @SuppressWarnings({"squid:S2063", "ComparatorNotSerializable"}) // Comparators should be "Serializable". Not necessary here because translation stores are not.
-  private static final class P_TranslationStoreComparator implements Comparator<ITranslationStore> {
-
-    private final Set<String> m_duplicateOrders;
-
-    private P_TranslationStoreComparator() {
-      m_duplicateOrders = new HashSet<>();
-    }
-
-    @Override
-    public int compare(ITranslationStore o1, ITranslationStore o2) {
-      if (o1 == o2) {
-        return 0;
-      }
-
-      var compare = Double.compare(o1.service().order(), o2.service().order());
-      if (compare != 0) {
-        return compare;
-      }
-
-      var o1Fqn = o1.service().type().name();
-      var o2Fqn = o2.service().type().name();
-      rememberDuplicateOrder(o1Fqn, o2Fqn);
-
-      compare = Boolean.compare(o2.isEditable(), o1.isEditable());
-      if (compare != 0) {
-        // prefer source types
-        return compare;
-      }
-      return o1Fqn.compareTo(o2Fqn);
-    }
-
-    private Set<String> duplicateOrders() {
-      return m_duplicateOrders;
-    }
-
-    private void rememberDuplicateOrder(String o1Fqn, String o2Fqn) {
-      var duplicateOrdersFqn = new String[]{o1Fqn, o2Fqn};
-      Arrays.sort(duplicateOrdersFqn);
-      m_duplicateOrders.add(Arrays.toString(duplicateOrdersFqn));
     }
   }
 
