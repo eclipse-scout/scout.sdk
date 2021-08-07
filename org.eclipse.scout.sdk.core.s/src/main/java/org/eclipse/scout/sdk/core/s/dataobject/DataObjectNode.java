@@ -146,6 +146,7 @@ public class DataObjectNode {
   }
 
   @Override
+  @SuppressWarnings("squid:S1067") // Reduce the number of conditional operators
   public boolean equals(Object o) {
     if (this == o) {
       return true;

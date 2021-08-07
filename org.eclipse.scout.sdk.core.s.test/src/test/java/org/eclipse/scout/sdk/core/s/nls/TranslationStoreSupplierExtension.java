@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -151,7 +151,6 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
         readOnlyProps.setProperty(TRANSLATION_KEY_1, KEY_1_VAL_OVERRIDDEN);
         var out = new ByteArrayOutputStream();
         readOnlyProps.store(out, "");
-        //noinspection resource
         translationFiles.add(new ReadOnlyTranslationFile(() -> new ByteArrayInputStream(out.toByteArray()), Language.LANGUAGE_DEFAULT));
         when(txtSvc.order()).thenReturn(10000.0);
       }

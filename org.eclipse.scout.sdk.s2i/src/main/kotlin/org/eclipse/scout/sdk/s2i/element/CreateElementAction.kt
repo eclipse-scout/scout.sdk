@@ -36,6 +36,7 @@ import org.eclipse.scout.sdk.core.util.Strings.capitalize
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.util.SourceFolderHelper
+import java.util.*
 import java.util.function.BiConsumer
 
 abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val text: String, val description: String) : AnAction(text, description, null) {
@@ -98,7 +99,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
         var errorMessage: String? = null
         val psiNameHelper = PsiNameHelper.getInstance(dir.project)
         val level = PsiUtil.getLanguageLevel(dir)
-        if (!psiNameHelper.isQualifiedName(name) || !psiNameHelper.isQualifiedName(name.toLowerCase()) || name.contains("$")) {
+        if (!psiNameHelper.isQualifiedName(name) || !psiNameHelper.isQualifiedName(name.lowercase(Locale.US)) || name.contains("$")) {
             errorMessage = EclipseScoutBundle.message("invalid.java.qualified.name")
         }
         val shortName = StringUtil.getShortName(name)

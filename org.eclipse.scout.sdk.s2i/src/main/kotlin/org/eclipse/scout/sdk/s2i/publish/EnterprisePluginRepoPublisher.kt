@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -181,8 +181,8 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
     }
 
     fun findPluginXml(stream: ZipInputStream, entry: ZipEntry): PluginXmlDescriptor? {
-        val name = entry.name.toLowerCase()
-        if (name == PLUGIN_DESCRIPTOR_PATH.toLowerCase()) {
+        val name = entry.name.lowercase(Locale.US)
+        if (name == PLUGIN_DESCRIPTOR_PATH.lowercase(Locale.US)) {
             return parsePluginXml(stream)
         }
         if (name.endsWith(".jar") || name.endsWith(".zip")) {
