@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2i
 import com.intellij.analysis.AnalysisScope
 import com.intellij.analysis.AnalysisUIOptions
 import com.intellij.analysis.BaseAnalysisActionDialog
+import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.lang.properties.psi.PropertiesFile
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -282,6 +283,7 @@ fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, in
     options.isRecursiveSearch = true
     options.scope = scope
     options.searchPattern = "@$annotation( )\nclass \$Class\$ {}"
+    options.fileType = JavaFileType.INSTANCE
 
     val constraint = MatchVariableConstraint()
     constraint.name = "Class"
