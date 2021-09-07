@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
@@ -107,6 +108,10 @@ public class DataObjectModel {
     if (hasParameters || isIgnored(method)) {
       return Optional.empty();
     }
+    if (method.annotations().withManagedWrapper(GeneratedAnnotation.class).existsAny()) {
+      return Optional.empty();
+    }
+
     var returnType = method.requireReturnType();
 
     // kind (DoValue/DoList/DoSet/DoCollection)

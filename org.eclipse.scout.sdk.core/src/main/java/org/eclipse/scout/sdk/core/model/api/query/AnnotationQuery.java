@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -79,8 +79,15 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
 
   @SuppressWarnings("TypeMayBeWeakened")
   protected static Function<IType, Optional<? extends IAnnotatable>> getMethodLookup(MethodSpi method) {
-    var methodId = method.wrap().identifier();
-    return level -> level.methods().withMethodIdentifier(methodId).first();
+    var m = method.wrap();
+    var declaringType = m.declaringType().orElse(null);
+    return level -> {
+      if (declaringType == level) {
+        // if the level is the class of the start method: directly return the method without computing an identifier (better performance for queries without super types) 
+        return Optional.of(m);
+      }
+      return level.methods().withMethodIdentifier(m.identifier()).first();
+    };
   }
 
   protected IType getType() {
