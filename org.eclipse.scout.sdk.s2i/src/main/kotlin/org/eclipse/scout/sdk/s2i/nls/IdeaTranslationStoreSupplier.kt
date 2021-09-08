@@ -93,13 +93,14 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
 
     private fun resolveSubClasses(module: Module, fqn: String, javaEnv: IJavaEnvironment): Sequence<TypeMapping> = computeInReadAction(module.project) {
         val moduleScope = module.getModuleWithDependenciesAndLibrariesScope(false)
-        module.project.findTypesByName(fqn, moduleScope)
+        val project = module.project
+        project.findTypesByName(fqn, moduleScope)
                 .flatMap { it.newSubTypeHierarchy(moduleScope, checkDeep = true, includeAnonymous = false, includeRoot = false).asSequence() }
                 .filter { !it.isEnum }
                 .filter { it.hasModifierProperty(PsiModifier.PUBLIC) }
                 .filter { !it.hasModifierProperty(PsiModifier.ABSTRACT) }
                 .filter { it.canNavigateToSource() }
-                .map { TypeMapping(it.toScoutType(javaEnv), it) }
+                .map { TypeMapping(it.toScoutType(javaEnv), it, project) }
                 .filter { it.scoutType != null }
     }
 
@@ -155,11 +156,11 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
         return ReadOnlyTranslationFile({ file.inputStream }, language, file)
     }
 
-    private data class TypeMapping(val scoutType: IType?, val psiClass: PsiClass) {
+    private data class TypeMapping(val scoutType: IType?, val psiClass: PsiClass, val project: Project) {
         init {
             if (scoutType == null) {
                 // warn if a class cannot be found. This may happen if e.g. the packages are wrong configured.
-                val fqn = computeInReadAction(psiClass.project) { psiClass.qualifiedName }
+                val fqn = computeInReadAction(project) { psiClass.qualifiedName }
                 SdkLog.warning("Unable to resolve class '{}'.", fqn)
             }
         }

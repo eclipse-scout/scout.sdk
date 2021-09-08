@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.s2i.derived
 
-import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
@@ -25,10 +24,9 @@ import org.eclipse.scout.sdk.s2i.toIdea
 import org.eclipse.scout.sdk.s2i.toScoutType
 import java.util.*
 
-
 open class DerivedResourceInputWithIdea(val type: PsiClass, private val name: String? = type.name) : IDerivedResourceInput {
 
-    override fun getSourceType(env: IEnvironment): Optional<IType> = computeInReadAction(project(), true) {
+    override fun getSourceType(env: IEnvironment): Optional<IType> = computeInReadAction(env.toIdea().project, true) {
         try {
             Optional.ofNullable(type.toScoutType(env.toIdea(), false))
         } catch (e: MissingTypeException) {
@@ -41,8 +39,6 @@ open class DerivedResourceInputWithIdea(val type: PsiClass, private val name: St
             Optional.ofNullable(t.resolvePsi()
                     ?.resolveSourceRoot()
                     ?.let { env.toIdea().findClasspathEntry(it) })
-
-    protected fun project(): Project = type.project
 
     override fun toString() = name ?: "Unknown"
 }

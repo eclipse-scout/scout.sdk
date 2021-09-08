@@ -77,7 +77,7 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
         }
 
         val project = module.project
-        val editor = prepareAndGetEditor(psiFile) // must be executed before opening the dialog so that a potential running template can be finished
+        val editor = prepareAndGetEditor(psiFile, project) // must be executed before opening the dialog so that a potential running template can be finished
         if (stores.size == 1) {
             openDialog(project, stores[0], stack)
             return
@@ -91,9 +91,8 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
         }
     }
 
-    private fun prepareAndGetEditor(psiFile: PsiFile): Editor? {
+    private fun prepareAndGetEditor(psiFile: PsiFile, project: Project): Editor? {
         if (!psiFile.isPhysical) return null
-        val project = psiFile.project
         val fileEditorManager = FileEditorManager.getInstance(project)
         val fileEditor = fileEditorManager.getSelectedEditor(psiFile.virtualFile) as? TextEditor ?: return null
         val editor = fileEditor.editor

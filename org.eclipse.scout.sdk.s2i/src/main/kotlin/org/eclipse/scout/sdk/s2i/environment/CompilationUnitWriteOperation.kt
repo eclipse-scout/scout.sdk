@@ -54,7 +54,7 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
 
         formattedSource = formatAndOptimizeImports(newPsi, progress)
 
-        TransactionManager.current().register(FileWriter(cuInfo.targetFile(), formattedSource, newPsi.project))
+        TransactionManager.current().register(FileWriter(cuInfo.targetFile(), formattedSource, project))
     }
 
     protected fun formatAndOptimizeImports(psi: PsiFile, progress: IdeaProgress): String = computeInReadAction(project) {

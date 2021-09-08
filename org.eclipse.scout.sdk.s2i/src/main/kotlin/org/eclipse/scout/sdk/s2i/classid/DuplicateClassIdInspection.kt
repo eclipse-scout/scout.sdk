@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,8 +48,9 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
 
     protected fun createProblemFor(duplicates: Collection<String>, clazz: PsiClass, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {
         val scoutApi = ApiHelper.scoutApiFor(clazz) ?: return null
-        val annotation = ClassIdAnnotation.of(clazz, scoutApi) ?: return null
-        val myName = computeInReadAction(clazz.project) { clazz.qualifiedName }
+        val project = clazz.project
+        val annotation = ClassIdAnnotation.of(clazz, project, scoutApi) ?: return null
+        val myName = computeInReadAction(project) { clazz.qualifiedName }
         val othersWithSameValue = duplicates
                 .filter { d -> d != myName }
                 .joinToString()
