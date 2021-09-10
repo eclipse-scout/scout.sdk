@@ -16,6 +16,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 
 import java.io.BufferedInputStream;
@@ -604,11 +605,9 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   }
 
   public Set<IType> getAllPortTypes() {
-    Set<IType> result = new LinkedHashSet<>();
-    for (var portTypesByService : m_portTypes.values()) {
-      result.addAll(portTypesByService);
-    }
-    return result;
+    return m_portTypes.values().stream()
+        .flatMap(Collection::stream)
+        .collect(toCollection(LinkedHashSet::new));
   }
 
   public Set<IType> getWebServices() {

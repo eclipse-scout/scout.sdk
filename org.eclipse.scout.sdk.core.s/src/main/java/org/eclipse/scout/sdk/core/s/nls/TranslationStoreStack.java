@@ -402,7 +402,7 @@ public class TranslationStoreStack {
    *           the {@link Language#LANGUAGE_DEFAULT}.
    */
   public synchronized Optional<ITranslationEntry> updateTranslation(ITranslation newTranslation) {
-    Ensure.isTrue(validateTranslation(newTranslation) == TranslationValidator.OK);
+    Ensure.isTrue(validateTranslation(newTranslation) == TranslationValidator.OK, "Translation validation failed. Ensure a valid key and default text is available.");
     return firstEditableStoreWithKey(newTranslation.key())
         .map(store -> updateTranslationInternal(newTranslation, store));
   }

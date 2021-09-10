@@ -413,7 +413,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
                     .save(null as VirtualFile? /* cast required for IJ 2020.3 compatibility (overloads) */, null)
                     ?.file ?: return
             val tableData = m_table.visibleData()
-            OperationTask(message("export.translations"), project) { doExport(tableData, file) }.schedule<Unit>()
+            OperationTask(message("export.translations"), project) { doExport(tableData, file) }.schedule()
         }
 
         private fun doExport(tableData: List<List<String>>, file: File) {

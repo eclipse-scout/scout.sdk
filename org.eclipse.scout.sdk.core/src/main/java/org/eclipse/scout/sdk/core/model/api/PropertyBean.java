@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link PropertyBean}</h3><br>
@@ -108,8 +109,8 @@ public class PropertyBean {
    * @return "is" if the return type is {@code boolean}. "get" otherwise. Note: {@code java.lang.Boolean} does also
    *         return "get" to ensure bean specification compliance.
    */
-  public static String getterPrefixFor(String returnType) {
-    if (JavaTypes._boolean.equals(returnType)) {
+  public static String getterPrefixFor(CharSequence returnType) {
+    if (Strings.equals(JavaTypes._boolean, returnType)) {
       return GETTER_BOOL_PREFIX;
     }
     return GETTER_PREFIX;

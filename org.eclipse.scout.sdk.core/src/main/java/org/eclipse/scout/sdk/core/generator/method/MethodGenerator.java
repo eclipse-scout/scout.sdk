@@ -454,7 +454,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     var methodParamTypes = m_parameters.stream()
         .map(param -> param.reference(context, !includeTypeArguments))
         .collect(toList());
-    return JavaTypes.createMethodIdentifier(elementName().orElseThrow(() -> newFail("Cannot calculate method identifier because the method name is missing.")),
+    return JavaTypes.createMethodIdentifier(elementName(context).orElseThrow(() -> newFail("Cannot calculate method identifier because the method name is missing.")),
         methodParamTypes);
   }
 

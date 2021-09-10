@@ -199,7 +199,7 @@ public final class TranslationStores {
    */
   public static Optional<TranslationStoreStack> createStack(Stream<ITranslationStore> stores) {
     return Optional.of(new TranslationStoreStack(stores))
-        .filter(stack -> stack.allStores().count() > 0);
+        .filter(stack -> stack.allStores().findAny().isPresent());
   }
 
   /**

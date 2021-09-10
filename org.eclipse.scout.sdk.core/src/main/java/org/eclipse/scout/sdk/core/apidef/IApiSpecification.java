@@ -39,7 +39,7 @@ public interface IApiSpecification {
   /**
    * Gets the maximum API level version this specification supports.<br>
    * Typically this is provided by the {@link MaxApiLevel} annotation on a specific API interface class.<br>
-   * If an API is annotated with "{@code @MaxApiLevel(14)}", this API can be used for all runtime versions < 14.x.x
+   * If an API is annotated with "{@code @MaxApiLevel(14)}", this API can be used for all runtime versions <= 14.x.x
    * 
    * @return The maximum API level version. Never returns {@code null}.
    */

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.apidef;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
 
+@SuppressWarnings({"squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // method naming conventions
 public interface IScoutDoCollectionApi extends IApiSpecification {
 
   DoSet DoSet();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -123,7 +123,7 @@ public final class WebModuleTranslationStores {
     }
     return TranslationStores.forModule(modulePath, env, progress, DependencyScope.JAVA) // only calculate the visible text services once for each module.
         .<ITranslationStore> map(store -> new FilteredTranslationStore(store, keysOfContributor))
-        .filter(store -> store.entries().count() > 0) // ignore stores that are not mentioned in the contributors
+        .filter(store -> store.entries().findAny().isPresent()) // ignore stores that are not mentioned in the contributors
         .peek(store -> SdkLog.debug("Translation store '{}' found in module '{}' (referenced from accessible UiTextContributor).", store, modulePath));
   }
 

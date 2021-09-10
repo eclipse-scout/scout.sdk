@@ -15,6 +15,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.io.InputStream;
@@ -395,10 +396,9 @@ public class ParsedWsdl {
       return;
     }
 
-    Collection<SchemaReference> references = new ArrayList<>();
-    for (var is : imports.values()) {
-      references.addAll(is);
-    }
+    Collection<SchemaReference> references = imports.values().stream()
+        .flatMap(Collection::stream)
+        .collect(toList());
     references.addAll(includes);
     if (references.isEmpty()) {
       return;

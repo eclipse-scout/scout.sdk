@@ -126,18 +126,22 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
 
         val text = aValue.toString()
         val toUpdate = translationForRow(rowIndex)
-        if (KEY_COLUMN_INDEX == columnIndex) {
-            val newKey = text.trim()
-            if (newKey == toUpdate.key()) {
-                // no save necessary
-                return
+        try {
+            if (KEY_COLUMN_INDEX == columnIndex) {
+                val newKey = text.trim()
+                if (newKey == toUpdate.key()) {
+                    // no save necessary
+                    return
+                }
+                stack.changeKey(toUpdate.key(), newKey)
+            } else {
+                val lang = languageForColumn(columnIndex)
+                val updated = Translation(toUpdate)
+                updated.putText(lang, text)
+                stack.updateTranslation(updated)
             }
-            stack.changeKey(toUpdate.key(), newKey)
-        } else {
-            val lang = languageForColumn(columnIndex)
-            val updated = Translation(toUpdate)
-            updated.putText(lang, text)
-            stack.updateTranslation(updated)
+        } catch (e: RuntimeException) {
+            SdkLog.error("Unable to save value.", e)
         }
     }
 
