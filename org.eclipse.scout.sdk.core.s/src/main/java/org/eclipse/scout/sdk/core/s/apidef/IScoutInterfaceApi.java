@@ -10,7 +10,11 @@
  */
 package org.eclipse.scout.sdk.core.s.apidef;
 
+import java.util.stream.Stream;
+
 import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
+import org.eclipse.scout.sdk.core.model.api.IType;
 
 @SuppressWarnings({"squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // method naming conventions
 public interface IScoutInterfaceApi {
@@ -153,6 +157,28 @@ public interface IScoutInterfaceApi {
   IDoEntity IDoEntity();
 
   interface IDoEntity extends IClassNameSupplier {
+    /**
+     * Computes the getter prefix for a DoNode attribute. This is "get" for most objects and (depending on Scout
+     * version) "is" for boolean types.
+     * 
+     * @param dataTypeRef
+     *          The datatype reference of the attribute. This is the type parameter value of the DoNode.
+     * @return The prefix to use for this type.
+     */
+    String computeGetterPrefixFor(CharSequence dataTypeRef);
+
+    /**
+     * Gets some additional getter {@link IMethodGenerator IMethodGenerators} for the given data object attribute.
+     * 
+     * @param name
+     *          The name of attribute. This is the name of the method returning the DoNode.
+     * @param dataTypeRef
+     *          The datatype reference of the attribute. This is the type parameter value of the DoNode.
+     * @param ownerType
+     *          The {@link IType} that contains the attribute and will hold the created getters
+     * @return A {@link Stream} returning any additional getters.
+     */
+    Stream<IMethodGenerator<?, ?>> getAdditionalDoNodeGetters(CharSequence name, CharSequence dataTypeRef, IType ownerType);
   }
 
   IDateField IDateField();

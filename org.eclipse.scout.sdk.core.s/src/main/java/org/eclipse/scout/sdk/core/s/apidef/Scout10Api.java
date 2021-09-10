@@ -10,7 +10,14 @@
  */
 package org.eclipse.scout.sdk.core.s.apidef;
 
+import java.util.stream.Stream;
+
 import org.eclipse.scout.sdk.core.apidef.MaxApiLevel;
+import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.PropertyBean;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 @MaxApiLevel(10)
 @SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
@@ -871,6 +878,21 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.dataobject.IDoEntity";
+    }
+
+    @Override
+    public String computeGetterPrefixFor(CharSequence dataTypeRef) {
+      // for DOs the "is" prefix is used for boxed booleans (java.lang.Boolean)
+      // because there is no getter with a primitive boolean
+      if (Strings.equals(JavaTypes.Boolean, dataTypeRef)) {
+        return PropertyBean.GETTER_BOOL_PREFIX;
+      }
+      return PropertyBean.GETTER_PREFIX;
+    }
+
+    @Override
+    public Stream<IMethodGenerator<?, ?>> getAdditionalDoNodeGetters(CharSequence name, CharSequence dataTypeRef, IType ownerType) {
+      return Stream.empty();
     }
   }
 

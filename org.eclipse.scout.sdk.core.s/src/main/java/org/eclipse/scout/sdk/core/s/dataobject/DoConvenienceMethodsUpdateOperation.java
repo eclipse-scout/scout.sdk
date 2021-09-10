@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode.DataObjectNodeKind;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
@@ -246,11 +247,12 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     }
 
     var valueGetter = ScoutMethodGenerator.createDoNodeGetter(node.name(), dataTypeRef, owner);
-    if (implementedInSuperClass(valueGetter, owner)) {
-      // the method already exists in the super class. no need to override
-      return Stream.of(chainedSetter);
-    }
-    return Stream.of(chainedSetter, valueGetter);
+    var additionalGetters = owner.javaEnvironment().requireApi(IScoutApi.class)
+        .IDoEntity().getAdditionalDoNodeGetters(node.name(), dataTypeRef, owner);
+    var allMissingGetters = Stream.concat(Stream.of(valueGetter), additionalGetters)
+        .filter(gen -> !implementedInSuperClass(gen, owner)); // skip getters already existing in the super class. no need to override
+    return Stream.concat(Stream.of(chainedSetter), allMissingGetters);
+
   }
 
   protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsForCollection(DataObjectNode node, IType owner) {
