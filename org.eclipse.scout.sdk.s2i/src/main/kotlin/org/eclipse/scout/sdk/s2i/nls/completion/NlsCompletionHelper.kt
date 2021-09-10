@@ -27,17 +27,12 @@ import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
 import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
-import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
-import org.eclipse.scout.sdk.s2i.environment.TransactionManager
-import org.eclipse.scout.sdk.s2i.environment.TransactionMember
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationSpec
 import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
 import org.eclipse.scout.sdk.s2i.nls.inspection.AddMissingTranslationQuickFix
-import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import org.eclipse.scout.sdk.s2i.resolveProperty
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
-import java.nio.file.Path
 import java.util.stream.Collectors.toList
 
 object NlsCompletionHelper {
@@ -69,7 +64,7 @@ object NlsCompletionHelper {
                 ?: return null
         val builder = LookupElementBuilder.create(NewTranslationLookupObject(psiElement, key), message("new.translation") + "...")
                 .withCaseSensitivity(false)
-                .withInsertHandler { _, element -> openTranslationNewDialog(element, translationSpec) }
+                .withInsertHandler { _, element -> openTranslationNewDialog(element) }
                 .withLookupStrings(listOf(translationSpec.decorateTranslationKey(key)))
                 .withIcon(AllIcons.General.Add)
         builder.withAutoCompletionPolicy(AutoCompletionPolicy.NEVER_AUTOCOMPLETE)
@@ -81,18 +76,10 @@ object NlsCompletionHelper {
             arrayOf(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED + ';', CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED),
             arrayOf("", "")).toString()
 
-    private fun openTranslationNewDialog(element: LookupElement, translationSpec: TranslationLanguageSpec) {
+    private fun openTranslationNewDialog(element: LookupElement) {
         val lookupObj = element.getObject() as NewTranslationLookupObject
         AddMissingTranslationQuickFix(lookupObj.key)
-                .withSaveTask { createdNlsEntry, _, _ -> updateTranslationKey(lookupObj.key, createdNlsEntry, translationSpec) }
                 .applyFix(lookupObj.psiElement)
-    }
-
-    private fun updateTranslationKey(existingKey: String, createdNlsEntry: ITranslationEntry, translationSpec: TranslationLanguageSpec) {
-        val createdKey = createdNlsEntry.key()
-        if (createdKey == existingKey) return
-        val path = translationSpec.element.containingFile.virtualFile.resolveLocalPath() ?: return
-        TransactionManager.current().register(UpdateTranslationKeyMember(path, createdKey, translationSpec))
     }
 
     private fun createExistingTranslationLookupElement(translation: ITranslationEntry, module: Module, translationSpec: TranslationLanguageSpec, psiManager: PsiManager): LookupElementBuilder {
@@ -111,11 +98,11 @@ object NlsCompletionHelper {
         insertTranslationKey(lookupObj.translationEntry.key(), translationSpec, currentCaret)
     }
 
-    private fun insertTranslationKey(nlsKey: String, translationSpec: TranslationLanguageSpec, caret: Caret?) {
+    private fun insertTranslationKey(nlsKey: String, translationSpec: TranslationLanguageSpec, caret: Caret) {
         val newElement = translationSpec.createNewLiteral(nlsKey)
         WriteAction.run<RuntimeException> {
             val inserted = translationSpec.element.replace(newElement)
-            caret?.moveToOffset(inserted.endOffset)
+            caret.moveToOffset(inserted.endOffset)
         }
     }
 
@@ -133,15 +120,6 @@ object NlsCompletionHelper {
         translation.bestText(requestedLanguage).ifPresent { presentation.appendTailText("=$it", true) }
 
         presentation.typeText = store.service().type().elementName().removeSuffix(ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE)
-    }
-
-    private class UpdateTranslationKeyMember(val path: Path, val createdKey: String, val translationSpec: TranslationLanguageSpec) : TransactionMember {
-        override fun file() = path
-
-        override fun commit(progress: IdeaProgress): Boolean {
-            insertTranslationKey(createdKey, translationSpec, null)
-            return true
-        }
     }
 
     data class NewTranslationLookupObject(val psiElement: PsiElement, val key: String)
