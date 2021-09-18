@@ -12,10 +12,11 @@ package org.eclipse.scout.sdk.core.model.ecj;
 
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingsToTypes;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.classScopeOf;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.declaringTypeOf;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
@@ -75,6 +76,14 @@ public class BindingTypeParameterWithEcj extends AbstractJavaElementWithEcj<ITyp
     return m_name.computeIfAbsentAndGet(() -> new String(m_binding.sourceName()));
   }
 
+  protected static ReferenceBinding getSuperClassBinding(BindingTypeParameterWithEcj tp) {
+    return tp.m_binding.superclass();
+  }
+
+  protected static ReferenceBinding[] getSuperInterfaceBindings(BindingTypeParameterWithEcj tp) {
+    return tp.m_binding.superInterfaces();
+  }
+
   @Override
   @SuppressWarnings("null")
   public List<TypeSpi> getBounds() {
@@ -82,11 +91,9 @@ public class BindingTypeParameterWithEcj extends AbstractJavaElementWithEcj<ITyp
       ReferenceBinding superclass;
       ReferenceBinding[] superInterfaces;
       var javaEnv = javaEnvWithEcj();
-      Function<BindingTypeParameterWithEcj, ReferenceBinding> superClassFunc = tp -> tp.m_binding.superclass();
-      Function<BindingTypeParameterWithEcj, ReferenceBinding[]> superInterfacesFunc = tp -> tp.m_binding.superInterfaces();
       synchronized (javaEnv.lock()) {
-        superclass = superClassFunc.apply(this);
-        superInterfaces = superInterfacesFunc.apply(this);
+        superclass = getSuperClassBinding(this);
+        superInterfaces = getSuperInterfaceBindings(this);
       }
 
       var hasSuperClass = superclass != null && !CharOperation.equals(superclass.compoundName, TypeConstants.JAVA_LANG_OBJECT);
@@ -101,13 +108,13 @@ public class BindingTypeParameterWithEcj extends AbstractJavaElementWithEcj<ITyp
 
       List<TypeSpi> bounds = new ArrayList<>(size);
       if (hasSuperClass) {
-        var t = bindingToType(javaEnv, superclass, () -> withNewElement(superClassFunc));
+        var t = bindingToType(javaEnv, superclass, () -> withNewElement(BindingTypeParameterWithEcj::getSuperClassBinding));
         if (t != null) {
           bounds.add(t);
         }
       }
       if (hasSuperInterfaces) {
-        bounds.addAll(bindingsToTypes(javaEnv, superInterfaces, () -> withNewElement(superInterfacesFunc)));
+        bounds.addAll(bindingsToTypes(javaEnv, superInterfaces, () -> withNewElement(BindingTypeParameterWithEcj::getSuperInterfaceBindings)));
       }
       return bounds;
     });
@@ -121,7 +128,7 @@ public class BindingTypeParameterWithEcj extends AbstractJavaElementWithEcj<ITyp
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      var classScope = SpiWithEcjUtils.classScopeOf(this);
+      var classScope = classScopeOf(this);
       if (classScope == null) {
         return null;
       }
@@ -129,7 +136,7 @@ public class BindingTypeParameterWithEcj extends AbstractJavaElementWithEcj<ITyp
       if (decl == null) {
         return null;
       }
-      var cu = SpiWithEcjUtils.declaringTypeOf(this).getCompilationUnit();
+      var cu = declaringTypeOf(this).getCompilationUnit();
       return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
     });
   }

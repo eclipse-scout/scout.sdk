@@ -13,13 +13,13 @@ package org.eclipse.scout.sdk.core.model.ecj;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createSourceRange;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ast.CompilationUnitDeclaration;
@@ -69,19 +69,20 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
     m_containingClasspathFolder = new FinalValue<>();
   }
 
+  protected static TypeBinding findBindingBySimpleName(String simpleName, DeclarationCompilationUnitWithEcj cu) {
+    var t = ((AbstractTypeWithEcj) cu.findTypeBySimpleName(simpleName));
+    if (t == null) {
+      return null;
+    }
+    return t.getInternalBinding();
+  }
+
   protected TypeSpi findTypeBySimpleNameInternal(String simpleName, Scope scopeForTypeLookup) {
     var type = scopeForTypeLookup.getType(simpleName.toCharArray());
     if (type instanceof MissingTypeBinding || type instanceof ProblemReferenceBinding) {
       return null;
     }
-    Function<DeclarationCompilationUnitWithEcj, TypeBinding> innerTypeFunc = cu -> {
-      var t = ((AbstractTypeWithEcj) cu.findTypeBySimpleName(simpleName));
-      if (t == null) {
-        return null;
-      }
-      return t.getInternalBinding();
-    };
-    return bindingToType(javaEnvWithEcj(), type, () -> withNewElement(innerTypeFunc));
+    return bindingToType(javaEnvWithEcj(), type, () -> withNewElement((DeclarationCompilationUnitWithEcj x) -> findBindingBySimpleName(simpleName, x)));
   }
 
   @Override
@@ -245,7 +246,7 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
 
   @Override
   public ISourceRange getSource() {
-    return m_source.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createSourceRange(m_astNode, this, javaEnvWithEcj()));
+    return m_source.computeIfAbsentAndGet(() -> createSourceRange(m_astNode, this, javaEnvWithEcj()));
   }
 
   @Override
@@ -253,7 +254,7 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
       var doc = m_astNode.javadoc;
       if (doc != null) {
-        return SpiWithEcjUtils.createSourceRange(doc, this, javaEnvWithEcj());
+        return createSourceRange(doc, this, javaEnvWithEcj());
       }
       if (m_astNode.currentPackage != null && m_astNode.currentPackage.declarationSourceStart > 0) {
         return javaEnvWithEcj().getSource(this, 0, m_astNode.currentPackage.declarationSourceStart - 1);

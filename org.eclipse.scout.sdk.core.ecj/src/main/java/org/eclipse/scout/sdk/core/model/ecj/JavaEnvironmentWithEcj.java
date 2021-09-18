@@ -17,6 +17,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.eclipse.scout.sdk.core.log.SdkLog.onTrace;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.sourceMethodOf;
 import static org.eclipse.scout.sdk.core.util.Ensure.fail;
 
 import java.nio.CharBuffer;
@@ -172,16 +173,17 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     return result;
   }
 
+  protected TypeBinding getArrayTypeBinding(TypeNameDescriptor desc) {
+    var elementType = resolveAsType(desc);
+    if (elementType == null) {
+      return null;
+    }
+    var elementTypeBinding = ((AbstractTypeWithEcj) elementType).getInternalBinding();
+    return getCompiler().lookupEnvironment.createArrayType(elementTypeBinding, desc.getArrayDimension());
+  }
+
   protected TypeSpi resolveAsArray(TypeNameDescriptor desc) {
-    Supplier<TypeBinding> arrayTypeBindingSupplier = () -> {
-      var elementType = resolveAsType(desc);
-      if (elementType == null) {
-        return null;
-      }
-      var elementTypeBinding = ((AbstractTypeWithEcj) elementType).getInternalBinding();
-      return getCompiler().lookupEnvironment.createArrayType(elementTypeBinding, desc.getArrayDimension());
-    };
-    return bindingToType(this, arrayTypeBindingSupplier.get(), arrayTypeBindingSupplier);
+    return bindingToType(this, getArrayTypeBinding(desc), () -> getArrayTypeBinding(desc));
   }
 
   protected TypeBinding lookupTypeBinding(String fqn) {
@@ -705,7 +707,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     Map<String, MemberValuePair> defaultValues = new LinkedHashMap<>(valueMethods.length);
     for (var mb : valueMethods) {
       var name = new String(mb.selector);
-      var md0 = Ensure.notNull(SpiWithEcjUtils.sourceMethodOf(mb), "binding is binary. Source method could not be found.");
+      var md0 = Ensure.notNull(sourceMethodOf(mb), "binding is binary. Source method could not be found.");
       if (md0 instanceof AnnotationMethodDeclaration) {
         var md = (AnnotationMethodDeclaration) md0;
         if (md.defaultValue != null) {

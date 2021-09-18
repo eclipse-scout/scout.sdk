@@ -14,11 +14,16 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingsToTypes;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createDeclarationAnnotations;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createSourceRange;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.getTypeFlags;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.hasDeprecatedAnnotation;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.qualifiedNameOf;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.toTypeParameterSpi;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ast.TypeDeclaration;
@@ -130,7 +135,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
 
   @Override
   public String getName() {
-    return m_fqn.computeIfAbsentAndGet(() -> SpiWithEcjUtils.qualifiedNameOf(isAnonymous() ? CharOperation.NO_CHAR : m_astNode.binding.qualifiedPackageName(), m_astNode.binding.qualifiedSourceName()));
+    return m_fqn.computeIfAbsentAndGet(() -> qualifiedNameOf(isAnonymous() ? CharOperation.NO_CHAR : m_astNode.binding.qualifiedPackageName(), m_astNode.binding.qualifiedSourceName()));
   }
 
   @Override
@@ -151,7 +156,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
 
   @Override
   public List<DeclarationAnnotationWithEcj> getAnnotations() {
-    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createDeclarationAnnotations(javaEnvWithEcj(), this, m_astNode.annotations));
+    return m_annotations.computeIfAbsentAndGet(() -> createDeclarationAnnotations(javaEnvWithEcj(), this, m_astNode.annotations));
   }
 
   @Override
@@ -195,40 +200,38 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
     });
   }
 
+  protected static TypeBinding getSuperClassBinding(DeclarationTypeWithEcj decl) {
+    if (decl.m_astNode.superclass == null) {
+      return null;
+    }
+    return decl.m_astNode.superclass.resolvedType;
+  }
+
   @Override
   public TypeSpi getSuperClass() {
-    return m_superType.computeIfAbsentAndGet(() -> {
-      Function<DeclarationTypeWithEcj, TypeBinding> superClassFunction = decl -> {
-        if (decl.m_astNode.superclass == null) {
-          return null;
-        }
-        return decl.m_astNode.superclass.resolvedType;
-      };
-      return bindingToType(javaEnvWithEcj(), superClassFunction.apply(this), () -> withNewElement(superClassFunction));
-    });
+    return m_superType.computeIfAbsentAndGet(() -> bindingToType(javaEnvWithEcj(), getSuperClassBinding(this), () -> withNewElement(DeclarationTypeWithEcj::getSuperClassBinding)));
+  }
+
+  protected static TypeBinding[] getSuperInterfaceBindings(DeclarationTypeWithEcj d) {
+    var interfaces = d.m_astNode.superInterfaces;
+    if (interfaces == null) {
+      return Binding.NO_TYPES;
+    }
+    return Arrays.stream(interfaces)
+        .map(i -> i.resolvedType)
+        .filter(Objects::nonNull)
+        .toArray(TypeBinding[]::new);
   }
 
   @Override
   public List<TypeSpi> getSuperInterfaces() {
-    return m_superInterfaces.computeIfAbsentAndGet(() -> {
-      Function<DeclarationTypeWithEcj, TypeBinding[]> superInterfaceFunction = d -> {
-        var interfaces = d.m_astNode.superInterfaces;
-        if (interfaces == null) {
-          return Binding.NO_TYPES;
-        }
-        return Arrays.stream(interfaces)
-            .map(i -> i.resolvedType)
-            .filter(Objects::nonNull)
-            .toArray(TypeBinding[]::new);
-      };
-      return bindingsToTypes(javaEnvWithEcj(), superInterfaceFunction.apply(this), () -> withNewElement(superInterfaceFunction));
-    });
+    return m_superInterfaces.computeIfAbsentAndGet(() -> bindingsToTypes(javaEnvWithEcj(), getSuperInterfaceBindings(this), () -> withNewElement(DeclarationTypeWithEcj::getSuperInterfaceBindings)));
   }
 
   @Override
   public int getFlags() {
     if (m_flags < 0) {
-      m_flags = SpiWithEcjUtils.getTypeFlags(m_astNode.modifiers, m_astNode.allocation, SpiWithEcjUtils.hasDeprecatedAnnotation(getAnnotations()));
+      m_flags = getTypeFlags(m_astNode.modifiers, m_astNode.allocation, hasDeprecatedAnnotation(getAnnotations()));
     }
     return m_flags;
   }
@@ -240,7 +243,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
 
   @Override
   public List<TypeParameterSpi> getTypeParameters() {
-    return m_typeParameters.computeIfAbsentAndGet(() -> SpiWithEcjUtils.toTypeParameterSpi(m_astNode.typeParameters, this, javaEnvWithEcj()));
+    return m_typeParameters.computeIfAbsentAndGet(() -> toTypeParameterSpi(m_astNode.typeParameters, this, javaEnvWithEcj()));
   }
 
   @Override
@@ -281,7 +284,7 @@ public class DeclarationTypeWithEcj extends AbstractTypeWithEcj {
 
   @Override
   public ISourceRange getJavaDoc() {
-    return m_javaDocSource.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createSourceRange(m_astNode.javadoc, m_cu, javaEnvWithEcj()));
+    return m_javaDocSource.computeIfAbsentAndGet(() -> createSourceRange(m_astNode.javadoc, m_cu, javaEnvWithEcj()));
   }
 
   @Override

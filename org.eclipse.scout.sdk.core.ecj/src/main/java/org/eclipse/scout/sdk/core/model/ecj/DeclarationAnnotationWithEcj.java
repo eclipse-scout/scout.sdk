@@ -12,9 +12,11 @@ package org.eclipse.scout.sdk.core.model.ecj;
 
 import static org.eclipse.scout.sdk.core.model.ecj.BindingAnnotationWithEcj.buildAnnotationElementMap;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.classScopeOf;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.declaringTypeOf;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.findNewAnnotationIn;
 
 import java.util.Map;
-import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.ast.Annotation;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
@@ -50,7 +52,7 @@ public class DeclarationAnnotationWithEcj extends AbstractJavaElementWithEcj<IAn
 
   @Override
   public AnnotationSpi internalFindNewElement() {
-    return SpiWithEcjUtils.findNewAnnotationIn(getOwner(), getElementName());
+    return findNewAnnotationIn(getOwner(), getElementName());
   }
 
   @Override
@@ -62,12 +64,13 @@ public class DeclarationAnnotationWithEcj extends AbstractJavaElementWithEcj<IAn
     return m_astNode;
   }
 
+  protected static TypeBinding getAnnotationTypeBinding(DeclarationAnnotationWithEcj a) {
+    return a.m_astNode.type.resolveType(classScopeOf(a.getOwner()));
+  }
+
   @Override
   public TypeSpi getType() {
-    return m_type.computeIfAbsentAndGet(() -> {
-      Function<DeclarationAnnotationWithEcj, TypeBinding> annotationTypeFunction = a -> a.m_astNode.type.resolveType(SpiWithEcjUtils.classScopeOf(a.getOwner()));
-      return bindingToType(javaEnvWithEcj(), annotationTypeFunction.apply(this), () -> withNewElement(annotationTypeFunction));
-    });
+    return m_type.computeIfAbsentAndGet(() -> bindingToType(javaEnvWithEcj(), getAnnotationTypeBinding(this), () -> withNewElement(DeclarationAnnotationWithEcj::getAnnotationTypeBinding)));
   }
 
   @Override
@@ -92,7 +95,7 @@ public class DeclarationAnnotationWithEcj extends AbstractJavaElementWithEcj<IAn
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      var cu = SpiWithEcjUtils.declaringTypeOf(this).getCompilationUnit();
+      var cu = declaringTypeOf(this).getCompilationUnit();
       var decl = m_astNode;
       return javaEnvWithEcj().getSource(cu, decl.sourceStart, decl.declarationSourceEnd);
     });

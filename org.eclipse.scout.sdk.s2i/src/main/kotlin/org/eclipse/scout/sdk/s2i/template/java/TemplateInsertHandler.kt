@@ -46,6 +46,7 @@ import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 /**
  * Handler that inserts a selected [TemplateDescriptor].
  */
+@Suppress("TestOnlyProblems")
 class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scoutApi: IScoutApi, val prefix: CharSequence) : InsertHandler<LookupElement> {
 
     private lateinit var m_engine: TemplateEngine

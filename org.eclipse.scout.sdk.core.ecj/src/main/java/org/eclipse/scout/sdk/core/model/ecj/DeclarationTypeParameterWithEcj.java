@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.core.model.ecj;
 
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingsToTypes;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.declaringTypeOf;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.memberScopeOf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -120,12 +122,12 @@ public class DeclarationTypeParameterWithEcj extends AbstractJavaElementWithEcj<
   }
 
   protected TypeBinding resolveType(DeclarationTypeParameterWithEcj parameter) {
-    var scope = SpiWithEcjUtils.memberScopeOf(parameter);
+    var scope = memberScopeOf(parameter);
     return ensureResolvedType(scope, parameter.m_astNode.type);
   }
 
   protected TypeBinding[] resolveBounds(DeclarationTypeParameterWithEcj parameter) {
-    var scope = SpiWithEcjUtils.memberScopeOf(parameter);
+    var scope = memberScopeOf(parameter);
     return Arrays.stream(parameter.m_astNode.bounds)
         .map(b -> ensureResolvedType(scope, b))
         .toArray(TypeBinding[]::new);
@@ -144,7 +146,7 @@ public class DeclarationTypeParameterWithEcj extends AbstractJavaElementWithEcj<
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      var cu = SpiWithEcjUtils.declaringTypeOf(this).getCompilationUnit();
+      var cu = declaringTypeOf(this).getCompilationUnit();
       var decl = m_astNode;
       return javaEnvWithEcj().getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
     });

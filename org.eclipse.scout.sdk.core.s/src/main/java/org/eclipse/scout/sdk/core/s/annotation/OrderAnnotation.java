@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,7 +68,7 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
    * @return the new order value that should be used.
    */
   public static double getNewViewOrderValue(IType declaringType, CharSequence orderDefinitionType, int pos) {
-    var siblings = findSiblings(declaringType, pos, orderDefinitionType);
+    var siblings = findSiblingsAfterPos(declaringType, pos, orderDefinitionType);
     var orderValueBefore = getOrderAnnotationValue(siblings[0]);
     var orderValueAfter = getOrderAnnotationValue(siblings[1]);
     return getNewViewOrderValue(orderValueBefore, orderValueAfter);
@@ -133,13 +133,15 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
     return OrderAnnotation.valueOf(sibling, false);
   }
 
-  static IType[] findSiblings(IType declaringType, int pos, CharSequence orderDefinitionType) {
-    Iterable<IType> i = declaringType.innerTypes()
+  static Iterable<IType> getOrderedInnerTypes(IType declaringType, CharSequence orderDefinitionType) {
+    return declaringType.innerTypes()
         .withInstanceOf(orderDefinitionType).stream()
         .filter(candidate -> !isAbstract(candidate.flags()))::iterator;
+  }
 
+  static IType[] findSiblingsAfterPos(IType declaringType, int pos, CharSequence orderDefinitionType) {
     IType prev = null;
-    for (var t : i) {
+    for (var t : getOrderedInnerTypes(declaringType, orderDefinitionType)) {
       if (t.source().get().start() > pos) {
         return new IType[]{prev, t};
       }

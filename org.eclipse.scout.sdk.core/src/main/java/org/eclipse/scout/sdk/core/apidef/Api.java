@@ -39,7 +39,9 @@ import org.eclipse.scout.sdk.core.util.SdkException;
 @SuppressWarnings("SynchronizationOnStaticField")
 public final class Api {
 
+  @SuppressWarnings("StaticCollection")
   private static final Map<Class<? extends IApiSpecification>, IApiProvider> REGISTRY = new HashMap<>();
+  @SuppressWarnings("StaticCollection")
   private static final Map<Entry<Class<? extends IApiSpecification>, ApiVersion>, IApiSpecification> API_CACHE = new HashMap<>();
 
   private Api() {

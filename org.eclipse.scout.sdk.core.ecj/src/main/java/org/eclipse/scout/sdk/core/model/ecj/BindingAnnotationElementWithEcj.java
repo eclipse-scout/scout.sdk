@@ -10,7 +10,9 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
-import java.util.function.Function;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.findAnnotationValueDeclaration;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.findNewAnnotationElementIn;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.resolveCompiledValue;
 
 import org.eclipse.jdt.internal.compiler.ast.Expression;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
@@ -54,7 +56,7 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
 
   @Override
   public AnnotationElementSpi internalFindNewElement() {
-    return SpiWithEcjUtils.findNewAnnotationElementIn(getDeclaringAnnotation(), getElementName());
+    return findNewAnnotationElementIn(getDeclaringAnnotation(), getElementName());
   }
 
   @Override
@@ -71,12 +73,15 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
     return m_name;
   }
 
+  protected static Object getAnnotationElementValue(BindingAnnotationElementWithEcj a) {
+    return a.m_binding.getValue();
+  }
+
   @Override
   public IMetaValue getMetaValue() {
     return m_value.computeIfAbsentAndGet(() -> {
-      Function<BindingAnnotationElementWithEcj, Object> valueFunction = a -> a.m_binding.getValue();
-      var value = valueFunction.apply(this);
-      var metaVal = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), value, () -> withNewElement(valueFunction));
+      var value = getAnnotationElementValue(this);
+      var metaVal = resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), value, () -> withNewElement(BindingAnnotationElementWithEcj::getAnnotationElementValue));
       if (metaVal != null) {
         return metaVal;
       }
@@ -95,7 +100,7 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
   }
 
   MemberValuePair memberValuePair() {
-    return m_memberValuePair.computeIfAbsentAndGet(() -> SpiWithEcjUtils.findAnnotationValueDeclaration(this));
+    return m_memberValuePair.computeIfAbsentAndGet(() -> findAnnotationValueDeclaration(this));
   }
 
   @Override

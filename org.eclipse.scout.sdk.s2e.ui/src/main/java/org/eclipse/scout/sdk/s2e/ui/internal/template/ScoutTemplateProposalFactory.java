@@ -87,6 +87,7 @@ import org.eclipse.swt.widgets.Display;
  */
 public final class ScoutTemplateProposalFactory {
 
+  @SuppressWarnings("StaticCollection")
   private static final Collection<BiConsumer<Map<String, TemplateProposalDescriptor>, ScoutModelHierarchy>> TEMPLATE_PARTICIPANTS = new HashSet<>();
 
   public static synchronized void registerTemplateParticipant(BiConsumer<Map<String, TemplateProposalDescriptor>, ScoutModelHierarchy> participant) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,10 +44,10 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class TranslationKeysQuery implements IFileQuery {
 
-  private static final Set<String> acceptedFileExtensions = DependencyScope.supportedFileExtensions().keySet();
   private static final String LITERAL_DELIMITER = "['`\"]";
   private static final Pattern TRANSLATION_LITERAL_PATTERN = Pattern.compile(LITERAL_DELIMITER + '(' + ITranslation.KEY_REGEX.pattern() + ')' + LITERAL_DELIMITER);
 
+  private final Set<String> m_acceptedFileExtensions = DependencyScope.supportedFileExtensions().keySet();
   private final Map<Path, Set<FileQueryMatch>> m_result = new HashMap<>();
   private final String m_name;
 
@@ -61,7 +61,7 @@ public class TranslationKeysQuery implements IFileQuery {
 
   @Override
   public void searchIn(FileQueryInput input) {
-    if (!acceptedFileExtensions.contains(input.fileExtension())) {
+    if (!m_acceptedFileExtensions.contains(input.fileExtension())) {
       return;
     }
 

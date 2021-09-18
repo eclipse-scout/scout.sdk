@@ -11,13 +11,15 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.declaringTypeOf;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.findAnnotationDeclaration;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.findNewAnnotationIn;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.ast.Annotation;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
@@ -56,7 +58,7 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
 
   @Override
   public AnnotationSpi internalFindNewElement() {
-    return SpiWithEcjUtils.findNewAnnotationIn(getOwner(), getElementName());
+    return findNewAnnotationIn(getOwner(), getElementName());
   }
 
   @Override
@@ -68,12 +70,13 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
     return m_binding;
   }
 
+  protected static ReferenceBinding getBindingAnnotationType(BindingAnnotationWithEcj a) {
+    return a.m_binding.getAnnotationType();
+  }
+
   @Override
   public TypeSpi getType() {
-    return m_type.computeIfAbsentAndGet(() -> {
-      Function<BindingAnnotationWithEcj, ReferenceBinding> annotationTypeFunction = a -> a.m_binding.getAnnotationType();
-      return bindingToType(javaEnvWithEcj(), annotationTypeFunction.apply(this), () -> withNewElement(annotationTypeFunction));
-    });
+    return m_type.computeIfAbsentAndGet(() -> bindingToType(javaEnvWithEcj(), getBindingAnnotationType(this), () -> withNewElement(BindingAnnotationWithEcj::getBindingAnnotationType)));
   }
 
   private static <T> Map<T, Integer> buildPositionsMap(Collection<T> collection) {
@@ -189,7 +192,7 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
   }
 
   Annotation annotationDeclaration() {
-    return m_annotationDeclaration.computeIfAbsentAndGet(() -> SpiWithEcjUtils.findAnnotationDeclaration(this));
+    return m_annotationDeclaration.computeIfAbsentAndGet(() -> findAnnotationDeclaration(this));
   }
 
   @Override
@@ -199,7 +202,7 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
       if (decl == null) {
         return null;
       }
-      var cu = SpiWithEcjUtils.declaringTypeOf(this).getCompilationUnit();
+      var cu = declaringTypeOf(this).getCompilationUnit();
       return javaEnvWithEcj().getSource(cu, decl.sourceStart, decl.declarationSourceEnd);
     });
   }

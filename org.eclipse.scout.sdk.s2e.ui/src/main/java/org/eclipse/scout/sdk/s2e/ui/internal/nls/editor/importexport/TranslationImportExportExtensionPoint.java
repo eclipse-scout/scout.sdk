@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractImportExportWizard;
 
 /**
- * <h4>ExportExtensionPojnts</h4>
+ * <h4>ExportExtensionPoints</h4>
  *
  * @since 1.1.0 (11.11.2010)
  */
@@ -30,7 +30,9 @@ public final class TranslationImportExportExtensionPoint {
   public static final String EXTENSION_POINT_ID_NLS_EXPORTER = "nlsExporter";
   public static final String EXTENSION_POINT_ID_NLS_IMPORTER = "nlsImporter";
 
+  @SuppressWarnings("StaticCollection")
   private static volatile List<TranslationImportExportWizardExtension> importers;
+  @SuppressWarnings("StaticCollection")
   private static volatile List<TranslationImportExportWizardExtension> exporters;
 
   private TranslationImportExportExtensionPoint() {

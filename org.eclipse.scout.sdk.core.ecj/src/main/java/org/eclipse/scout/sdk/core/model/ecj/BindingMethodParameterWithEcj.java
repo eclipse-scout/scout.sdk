@@ -11,9 +11,11 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createBindingAnnotations;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.sourceMethodOf;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.lookup.AnnotationBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
@@ -76,12 +78,13 @@ public class BindingMethodParameterWithEcj extends AbstractJavaElementWithEcj<IM
     return m_nameAsString.computeIfAbsentAndGet(() -> new String(m_name));
   }
 
+  protected static TypeBinding getParameterType(BindingMethodParameterWithEcj mp) {
+    return mp.m_binding;
+  }
+
   @Override
   public TypeSpi getDataType() {
-    return m_dataType.computeIfAbsentAndGet(() -> {
-      Function<BindingMethodParameterWithEcj, TypeBinding> dataTypeFunc = mp -> mp.m_binding;
-      return SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), dataTypeFunc.apply(this), () -> withNewElement(dataTypeFunc));
-    });
+    return m_dataType.computeIfAbsentAndGet(() -> bindingToType(javaEnvWithEcj(), getParameterType(this), () -> withNewElement(BindingMethodParameterWithEcj::getParameterType)));
   }
 
   @Override
@@ -112,13 +115,13 @@ public class BindingMethodParameterWithEcj extends AbstractJavaElementWithEcj<IM
     if (annotations == null || m_index >= annotations.length) {
       return emptyList();
     }
-    return SpiWithEcjUtils.createBindingAnnotations(this, annotations[m_index]);
+    return createBindingAnnotations(this, annotations[m_index]);
   }
 
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      var declMethod = SpiWithEcjUtils.sourceMethodOf(m_declaringMethod);
+      var declMethod = sourceMethodOf(m_declaringMethod);
       if (declMethod != null) {
         var cu = m_declaringMethod.getDeclaringType().getCompilationUnit();
         var decl = declMethod.arguments[m_index];

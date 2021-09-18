@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,6 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.core.model.ecj;
+
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.nvl;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.sourceMethodOf;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -39,7 +42,7 @@ final class SourcePositionComparators {
     }
 
     static int getSourcePosition(TypeBinding rb) {
-      var tb = SpiWithEcjUtils.nvl(rb.original(), rb);
+      var tb = nvl(rb.original(), rb);
       if (!(tb instanceof SourceTypeBinding)) {
         return UNKNOWN_SOURCE_POS;
       }
@@ -69,8 +72,8 @@ final class SourcePositionComparators {
     }
 
     static int getSourcePosition(MethodBinding mb) {
-      var methodBinding = SpiWithEcjUtils.nvl(mb.original(), mb);
-      var decl = SpiWithEcjUtils.sourceMethodOf(methodBinding);
+      var methodBinding = nvl(mb.original(), mb);
+      var decl = sourceMethodOf(methodBinding);
       if (decl == null) {
         return UNKNOWN_SOURCE_POS;
       }
@@ -94,7 +97,7 @@ final class SourcePositionComparators {
     }
 
     static int getSourcePosition(FieldBinding fb) {
-      var fieldBinding = SpiWithEcjUtils.nvl(fb.original(), fb);
+      var fieldBinding = nvl(fb.original(), fb);
       var decl = fieldBinding.sourceField();
       if (decl == null) {
         return UNKNOWN_SOURCE_POS;

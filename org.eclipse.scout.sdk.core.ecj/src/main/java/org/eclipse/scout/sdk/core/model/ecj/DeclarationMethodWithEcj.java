@@ -14,6 +14,12 @@ import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingsToTypes;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createDeclarationAnnotations;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createSourceRange;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.findNewMethodIn;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.getMethodFlags;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.hasDeprecatedAnnotation;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.toTypeParameterSpi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +78,7 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
 
   @Override
   public MethodSpi internalFindNewElement() {
-    return SpiWithEcjUtils.findNewMethodIn(getDeclaringType(), getMethodId());
+    return findNewMethodIn(getDeclaringType(), getMethodId());
   }
 
   @Override
@@ -116,13 +122,13 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
 
   @Override
   public List<DeclarationAnnotationWithEcj> getAnnotations() {
-    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createDeclarationAnnotations(javaEnvWithEcj(), this, m_astNode.annotations));
+    return m_annotations.computeIfAbsentAndGet(() -> createDeclarationAnnotations(javaEnvWithEcj(), this, m_astNode.annotations));
   }
 
   @Override
   public int getFlags() {
     if (m_flags < 0) {
-      m_flags = SpiWithEcjUtils.getMethodFlags(m_astNode.modifiers, isVarArgs(), SpiWithEcjUtils.hasDeprecatedAnnotation(getAnnotations()));
+      m_flags = getMethodFlags(m_astNode.modifiers, isVarArgs(), hasDeprecatedAnnotation(getAnnotations()));
     }
     return m_flags;
   }
@@ -194,7 +200,7 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
 
   @Override
   public List<TypeParameterSpi> getTypeParameters() {
-    return m_typeParameters.computeIfAbsentAndGet(() -> SpiWithEcjUtils.toTypeParameterSpi(m_astNode.typeParameters(), this, javaEnvWithEcj()));
+    return m_typeParameters.computeIfAbsentAndGet(() -> toTypeParameterSpi(m_astNode.typeParameters(), this, javaEnvWithEcj()));
   }
 
   @Override
@@ -215,11 +221,11 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
 
   @Override
   public ISourceRange getJavaDoc() {
-    return m_javaDocSource.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createSourceRange(m_astNode.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj()));
+    return m_javaDocSource.computeIfAbsentAndGet(() -> createSourceRange(m_astNode.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj()));
   }
 
   @Override
   public ISourceRange getSourceOfDeclaration() {
-    return SpiWithEcjUtils.createSourceRange(m_astNode, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
+    return createSourceRange(m_astNode, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
   }
 }

@@ -55,8 +55,10 @@ public final class TranslationStores {
       .filter(scope -> scope != DependencyScope.ALL)
       .toArray(DependencyScope[]::new);
 
+  @SuppressWarnings("StaticCollection")
   private static final Set<ITranslationStoreSupplier> SUPPLIERS = new HashSet<>();
 
+  @SuppressWarnings("StaticCollection")
   private static final Map<String /*npm dependency name*/, Set<String> /* UiTextContributor FQNs */> UI_TEXT_CONTRIBUTORS = new HashMap<>();
   static {
     ScoutApi.allKnown()
@@ -199,7 +201,7 @@ public final class TranslationStores {
    */
   public static Optional<TranslationStoreStack> createStack(Stream<ITranslationStore> stores) {
     return Optional.of(new TranslationStoreStack(stores))
-        .filter(stack -> stack.allStores().count() > 0);
+        .filter(stack -> stack.allStores().findAny().isPresent());
   }
 
   /**
@@ -427,6 +429,7 @@ public final class TranslationStores {
      */
     ALL;
 
+    @SuppressWarnings("StaticCollection")
     private static final Map<String, DependencyScope> FILE_TYPE_MAPPING = new HashMap<>(3);
     static {
       FILE_TYPE_MAPPING.put(JavaTypes.JAVA_FILE_EXTENSION, DependencyScope.JAVA);

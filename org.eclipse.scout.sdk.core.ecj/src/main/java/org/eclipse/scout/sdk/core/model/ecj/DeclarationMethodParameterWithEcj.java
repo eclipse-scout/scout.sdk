@@ -11,10 +11,12 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createDeclarationAnnotations;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.getMethodFlags;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.hasDeprecatedAnnotation;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.resolveTypeOfArgument;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.ast.Argument;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
@@ -84,14 +86,11 @@ public class DeclarationMethodParameterWithEcj extends AbstractJavaElementWithEc
 
   @Override
   public TypeSpi getDataType() {
-    return m_dataType.computeIfAbsentAndGet(() -> {
-      Function<DeclarationMethodParameterWithEcj, TypeBinding> dataTypeFunc = this::resolveParameterType;
-      return bindingToType(javaEnvWithEcj(), dataTypeFunc.apply(this), () -> withNewElement(dataTypeFunc));
-    });
+    return m_dataType.computeIfAbsentAndGet(() -> bindingToType(javaEnvWithEcj(), resolveParameterType(this), () -> withNewElement(DeclarationMethodParameterWithEcj::resolveParameterType)));
   }
 
-  protected TypeBinding resolveParameterType(DeclarationMethodParameterWithEcj methodParam) {
-    return resolveTypeOfArgument(methodParam.m_astNode, methodParam.getDeclaringMethod().getInternalMethodDeclaration().scope, javaEnvWithEcj());
+  protected static TypeBinding resolveParameterType(DeclarationMethodParameterWithEcj methodParam) {
+    return resolveTypeOfArgument(methodParam.m_astNode, methodParam.getDeclaringMethod().getInternalMethodDeclaration().scope, methodParam.javaEnvWithEcj());
   }
 
   @Override
@@ -102,14 +101,14 @@ public class DeclarationMethodParameterWithEcj extends AbstractJavaElementWithEc
   @Override
   public int getFlags() {
     if (m_flags < 0) {
-      m_flags = SpiWithEcjUtils.getMethodFlags(m_astNode.modifiers, false, SpiWithEcjUtils.hasDeprecatedAnnotation(getAnnotations()));
+      m_flags = getMethodFlags(m_astNode.modifiers, false, hasDeprecatedAnnotation(getAnnotations()));
     }
     return m_flags;
   }
 
   @Override
   public List<DeclarationAnnotationWithEcj> getAnnotations() {
-    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createDeclarationAnnotations(javaEnvWithEcj(), this, m_astNode.annotations));
+    return m_annotations.computeIfAbsentAndGet(() -> createDeclarationAnnotations(javaEnvWithEcj(), this, m_astNode.annotations));
   }
 
   @Override

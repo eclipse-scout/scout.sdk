@@ -17,7 +17,6 @@ import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import java.beans.Introspector;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
@@ -425,15 +424,17 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     return m_modelType;
   }
 
-  protected TYPE withPropertyDtos() {
-    var scoutApi = scoutApi();
+  protected static boolean hasDtoAnnotation(IAnnotatable method, IScoutAnnotationApi scoutApi) {
     var formDataFqn = scoutApi.FormData().fqn();
     var data = scoutApi.Data().fqn();
-    Predicate<IMethod> hasDtoAnnotation = method -> method.annotations().withName(formDataFqn).existsAny() || method.annotations().withName(data).existsAny();
+    return method.annotations().withName(formDataFqn).existsAny() || method.annotations().withName(data).existsAny();
+  }
 
+  protected TYPE withPropertyDtos() {
+    var scoutApi = scoutApi();
     PropertyBean.of(modelType())
         .filter(bean -> bean.readMethod().isPresent() && bean.writeMethod().isPresent())
-        .filter(bean -> hasDtoAnnotation.test(bean.readMethod().get()) || hasDtoAnnotation.test(bean.writeMethod().get()))
+        .filter(bean -> hasDtoAnnotation(bean.readMethod().get(), scoutApi) || hasDtoAnnotation(bean.writeMethod().get(), scoutApi))
         .sorted(comparing(PropertyBean::name).thenComparing(PropertyBean::toString))
         .forEach(this::addPropertyDto);
     return thisInstance();

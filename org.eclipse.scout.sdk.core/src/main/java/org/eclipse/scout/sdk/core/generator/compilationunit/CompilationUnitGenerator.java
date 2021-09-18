@@ -155,12 +155,9 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
   }
 
   protected StringBuilder buildTypeSource(IBuilderContext context) {
-    ISourceGenerator<ISourceBuilder<?>> typeGenerator =
-        builder -> builder.append(
-            m_types.stream()
-                .sorted()
-                .map(SortedMemberEntry::generator),
-            context.lineDelimiter(), context.lineDelimiter() + context.lineDelimiter(), null);
+    var typeGenerator = (ISourceGenerator<ISourceBuilder<?>>) builder -> builder.append(
+        m_types.stream().sorted().map(SortedMemberEntry::generator),
+        context.lineDelimiter(), context.lineDelimiter() + context.lineDelimiter(), null);
     return typeGenerator.toSource(identity(), context);
   }
 

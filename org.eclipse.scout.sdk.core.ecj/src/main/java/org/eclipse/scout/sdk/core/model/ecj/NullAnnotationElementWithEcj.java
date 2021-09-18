@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.findNewAnnotationElementIn;
+
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
@@ -40,7 +42,7 @@ public class NullAnnotationElementWithEcj extends AbstractJavaElementWithEcj<IAn
 
   @Override
   public AnnotationElementSpi internalFindNewElement() {
-    return SpiWithEcjUtils.findNewAnnotationElementIn(getDeclaringAnnotation(), getElementName());
+    return findNewAnnotationElementIn(getDeclaringAnnotation(), getElementName());
   }
 
   @Override

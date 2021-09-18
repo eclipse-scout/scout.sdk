@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.uiTextContributorMappings;
@@ -24,7 +25,6 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
@@ -42,21 +42,18 @@ public final class WebModuleTranslationStores {
 
   static Stream<ITranslationStore> allForNodeModule(Path modulePath, IEnvironment env, IProgress progress) {
     progress.init(20, "Resolve translation stores visible in npm and UiTextContributor dependencies of module '{}'.", modulePath);
-
-    // translations supplied by UiTextContributors (Scout classic case)
-    Supplier<Stream<ITranslationStore>> uiTextContributorResolver = () -> resolveStoresReferencedInUiTextContributors(modulePath, env, progress.newChild(10));
-
-    // translation stores from Java classpath of a corresponding backend module (ScoutJS case)
-    Supplier<Stream<ITranslationStore>> scoutJsBackendModuleResolver = () -> resolveStoresFromScoutJsBackend(modulePath, env, progress.newChild(10));
-
-    return Stream.of(uiTextContributorResolver, scoutJsBackendModuleResolver).flatMap(Supplier::get);
+    return Stream.of(
+        resolveStoresReferencedInUiTextContributors(modulePath, env, progress.newChild(10)), // translations supplied by UiTextContributors (Scout classic case)
+        resolveStoresFromScoutJsBackend(modulePath, env, progress.newChild(10))) // translation stores from Java classpath of a corresponding backend module (ScoutJS case)
+        .flatMap(identity());
   }
 
   static Stream<ITranslationStore> resolveStoresReferencedInUiTextContributors(Path modulePath, IEnvironment env, IProgress progress) {
-    Supplier<Stream<IType>> javaUiTextContributorResolver = () -> resolveTextContributorsReferencedInPom(modulePath, env, progress);
-    Supplier<Stream<IType>> nodeUiTextContributorResolver = () -> resolveTextContributorsReferencedInPackageJson(modulePath, env);
-    var textContributorsByModule = Stream.of(javaUiTextContributorResolver, nodeUiTextContributorResolver)
-        .flatMap(Supplier::get)
+    var textContributorTypes = Stream.of(
+        resolveTextContributorsReferencedInPom(modulePath, env, progress),
+        resolveTextContributorsReferencedInPackageJson(modulePath, env));
+    var textContributorsByModule = textContributorTypes
+        .flatMap(identity())
         .filter(firstBy(IType::name))
         .map(type -> createUiTextContributor(type, progress))
         .collect(groupingBy(c -> moduleOfContributor(c, env)));
@@ -123,7 +120,7 @@ public final class WebModuleTranslationStores {
     }
     return TranslationStores.forModule(modulePath, env, progress, DependencyScope.JAVA) // only calculate the visible text services once for each module.
         .<ITranslationStore> map(store -> new FilteredTranslationStore(store, keysOfContributor))
-        .filter(store -> store.entries().count() > 0) // ignore stores that are not mentioned in the contributors
+        .filter(store -> store.entries().findAny().isPresent()) // ignore stores that are not mentioned in the contributors
         .peek(store -> SdkLog.debug("Translation store '{}' found in module '{}' (referenced from accessible UiTextContributor).", store, modulePath));
   }
 

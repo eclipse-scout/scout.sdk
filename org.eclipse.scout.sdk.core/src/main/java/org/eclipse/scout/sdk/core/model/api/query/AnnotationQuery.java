@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -206,13 +206,16 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
     return fqn.isPresent() && fqn.get().equals(a.name());
   }
 
+  private static Spliterator<IAnnotation> getAnnotationsSpliterator(@SuppressWarnings("TypeMayBeWeakened") IAnnotatable o) {
+    return new WrappingSpliterator<>(o.unwrap().getAnnotations());
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   protected Stream<T> createStream() {
-    Function<IAnnotatable, Spliterator<IAnnotation>> toAnnotations = o -> new WrappingSpliterator<>(o.unwrap().getAnnotations());
     var levelSpliteratorProvider = lookupOwnerOnLevel().andThen(
         owner -> owner
-            .map(toAnnotations)
+            .map(AnnotationQuery::getAnnotationsSpliterator)
             .orElse(null));
     var result = new HierarchicalStreamBuilder<IAnnotation>()
         .withSuperClasses(isIncludeSuperClasses())

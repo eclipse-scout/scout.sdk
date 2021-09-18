@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -60,13 +60,13 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class MissingTranslationQuery implements IFileQuery {
 
-  private static final Set<String> JAVA_TEXTS_FILE_NAMES = ScoutApi.allKnown()
+  public static final String JS_TEXTS_FILE_NAME = "texts.js";
+
+  private final Set<String> m_javaTextsFileName = ScoutApi.allKnown()
       .map(IScoutVariousApi::TEXTS)
       .map(IClassNameSupplier::simpleName)
       .map(name -> name + JavaTypes.JAVA_FILE_SUFFIX)
       .collect(toSet());
-  public static final String JS_TEXTS_FILE_NAME = "texts.js";
-
   private final Map<String, List<AbstractTranslationPattern>> m_searchPatterns;
   private final Map<CompositeObject, Optional<Set<String>>> m_keysByModuleCache;
   private final Map<Path, Set<FileQueryMatch>> m_matches;
@@ -105,7 +105,7 @@ public class MissingTranslationQuery implements IFileQuery {
       return false;
     }
     var fileNameAsString = fileName.toString();
-    return !JAVA_TEXTS_FILE_NAMES.contains(fileNameAsString);
+    return !m_javaTextsFileName.contains(fileNameAsString);
   }
 
   protected static boolean pathContainsSegment(Iterable<Path> path, String name) {

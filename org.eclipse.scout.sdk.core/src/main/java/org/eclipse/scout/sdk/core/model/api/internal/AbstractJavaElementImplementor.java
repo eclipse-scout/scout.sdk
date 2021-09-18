@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -110,7 +110,7 @@ public abstract class AbstractJavaElementImplementor<SPI extends JavaElementSpi>
   @Override
   public TreeVisitResult visit(IBreadthFirstJavaElementVisitor visitor) {
     Ensure.notNull(visitor);
-    IBreadthFirstVisitor<IJavaElement> v = (element, level, index) -> element.unwrap().acceptLevelOrder(visitor, level, index);
+    var v = (IBreadthFirstVisitor<IJavaElement>) (element, level, index) -> element.unwrap().acceptLevelOrder(visitor, level, index);
     return TreeTraversals.create(v, IJavaElement::children).traverse(this);
   }
 

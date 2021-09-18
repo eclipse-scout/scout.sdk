@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.wsdl.Service;
@@ -45,6 +46,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
@@ -188,19 +190,20 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
     }
   }
 
+  protected boolean isWebServiceClient(IType element) {
+    try {
+      var superTypeHierarchy = getSuperTypeHierarchy(element);
+      return JdtUtils.hierarchyContains(superTypeHierarchy, getScoutApi().AbstractWebServiceClient().fqn());
+    }
+    catch (SdkException e) {
+      SdkLog.warning("Unable to check if element '{}' is a web service client.", element.getFullyQualifiedName(), e);
+      return false;
+    }
+  }
+
   protected void loadWebServiceClient() {
-    Predicate<IType> webServiceClientsFilter = element -> {
-      try {
-        var superTypeHierarchy = getSuperTypeHierarchy(element);
-        return JdtUtils.hierarchyContains(superTypeHierarchy, getScoutApi().AbstractWebServiceClient().fqn());
-      }
-      catch (SdkException e) {
-        SdkLog.warning("Unable to check if element '{}' is a web service client.", element.getFullyQualifiedName(), e);
-        return false;
-      }
-    };
     visitPortTypes(portType -> {
-      var webServiceClient = getPortTypeChildClass(portType, webServiceClientsFilter);
+      var webServiceClient = getPortTypeChildClass(portType, this::isWebServiceClient);
       if (JdtUtils.exists(webServiceClient)) {
         m_webServiceClients.put(portType, webServiceClient);
       }
@@ -219,11 +222,13 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
         .orElse(null);
   }
 
+  protected boolean isPortType(IAnnotatable element) {
+    return JdtUtils.exists(JdtUtils.getAnnotation(element, getScoutApi().WebService().fqn()));
+  }
+
   protected void loadEntryPoint() {
-    var webServiceFqn = getScoutApi().WebService().fqn();
-    Predicate<IType> portTypeFilter = element -> JdtUtils.exists(JdtUtils.getAnnotation(element, webServiceFqn));
     visitPortTypes(portType -> {
-      var entryPoint = getPortTypeChildClass(portType, portTypeFilter);
+      var entryPoint = getPortTypeChildClass(portType, this::isPortType);
       if (JdtUtils.exists(entryPoint)) {
         m_entryPoints.put(portType, entryPoint);
       }
@@ -366,26 +371,25 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
     return null;
   }
 
+  protected boolean isWebServiceImpl(IType element) {
+    if (JdtUtils.exists(JdtUtils.getAnnotation(element, getScoutApi().WebService().fqn()))) {
+      return false; // exclude entry points
+    }
+
+    // exclude web service clients
+    try {
+      var superTypeHierarchy = getSuperTypeHierarchy(element);
+      return !JdtUtils.hierarchyContains(superTypeHierarchy, getScoutApi().AbstractWebServiceClient().fqn());
+    }
+    catch (SdkException e) {
+      SdkLog.warning("Unable to check if element '{}' is a web service client.", element.getFullyQualifiedName(), e);
+      return false;
+    }
+  }
+
   protected void loadServiceImplementations() {
-    var webServiceFqn = getScoutApi().WebService().fqn();
-    Predicate<IType> serviceImplFilter = element -> {
-      if (JdtUtils.exists(JdtUtils.getAnnotation(element, webServiceFqn))) {
-        return false; // exclude entry points
-      }
-
-      // exclude web service clients
-      try {
-        var superTypeHierarchy = getSuperTypeHierarchy(element);
-        return !JdtUtils.hierarchyContains(superTypeHierarchy, getScoutApi().AbstractWebServiceClient().fqn());
-      }
-      catch (SdkException e) {
-        SdkLog.warning("Unable to check if element '{}' is a web service client.", element.getFullyQualifiedName(), e);
-        return false;
-      }
-    };
-
     visitPortTypes(portType -> {
-      var serviceImpl = getPortTypeChildClass(portType, serviceImplFilter);
+      var serviceImpl = getPortTypeChildClass(portType, this::isWebServiceImpl);
       if (JdtUtils.exists(serviceImpl)) {
         m_serviceImplementations.put(portType, serviceImpl);
       }
@@ -604,11 +608,9 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
   }
 
   public Set<IType> getAllPortTypes() {
-    Set<IType> result = new LinkedHashSet<>();
-    for (var portTypesByService : m_portTypes.values()) {
-      result.addAll(portTypesByService);
-    }
-    return result;
+    return m_portTypes.values().stream()
+        .flatMap(Collection::stream)
+        .collect(Collectors.toCollection(LinkedHashSet::new));
   }
 
   public Set<IType> getWebServices() {

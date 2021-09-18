@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.model.api.query;
 
 import java.util.Spliterator;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -137,15 +136,18 @@ public class FieldQuery extends AbstractQuery<IField> implements Predicate<IFiel
     return flags < 0 || (f.flags() & m_flags) == m_flags;
   }
 
+  protected static Spliterator<IField> getFieldsSpliterator(@SuppressWarnings("TypeMayBeWeakened") IType level) {
+    return new WrappingSpliterator<>(level.unwrap().getFields());
+  }
+
   @Override
   protected Stream<IField> createStream() {
-    Function<IType, Spliterator<IField>> levelSpliteratorProvider = level -> new WrappingSpliterator<>(level.unwrap().getFields());
 
     return new HierarchicalStreamBuilder<IField>()
         .withSuperClasses(isIncludeSuperClasses())
         .withSuperInterfaces(isIncludeSuperInterfaces())
         .withStartType(true)
-        .build(getType(), levelSpliteratorProvider)
+        .build(getType(), FieldQuery::getFieldsSpliterator)
         .filter(this);
   }
 }

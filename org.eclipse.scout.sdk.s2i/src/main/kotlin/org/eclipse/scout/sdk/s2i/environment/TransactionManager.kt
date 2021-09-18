@@ -108,7 +108,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
          */
         private fun <T> computeInWriteAction(project: Project, name: String? = null, callable: () -> T): T? {
             val result = FinalValue<T>()
-            // repeat outside the write lock to release the UI thread between retries (prevent freezes)
+            // repeat outside write lock to release the UI thread between retries (prevent freezes)
             repeatUntilPassesWithIndex(project) {
                 ApplicationManager.getApplication().invokeAndWait {
                     // this is executed in the UI thread! keep short to prevent freezes!
@@ -250,7 +250,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
     /**
      * @return The number of [TransactionMember] instances available in this manager
      */
-    fun size(): Int = m_size // do not use m_members.flatMap().size() here because this would require synchronization. Then the size() method could not longer be called from commitAllAsync -> deadlock!
+    fun size(): Int = m_size // do not use m_members.flatMap().size() here because this would require synchronization. Then the size() method could no longer be called from commitAllAsync -> deadlock!
 
     internal fun members() = synchronized(this) {
         m_members.values.flatten()
@@ -310,7 +310,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
             }
             val success = commitAllMembers(documentMappings, documentManager, progress)
             if (success) {
-                // here the documents of the new files have been added. therefore don't use "initialDocuments" variable
+                // here the documents of the new files have been added. Therefore, don't use "initialDocuments" variable
                 documentMappings.values.mapNotNull { it?.second }.forEach { commitDocument(it, documentManager, psiDocumentManager) }
             }
             return success

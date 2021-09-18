@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,6 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import javax.wsdl.WSDLException;
 import javax.xml.xpath.XPathExpressionException;
@@ -274,8 +273,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     });
 
     // existing server project to add the web service dependency
-    Predicate<IJavaProject> serverProjectsFilter = WebServiceNewWizardPage::isServerProject;
-    m_serverProjectField = FieldToolkit.createProjectProposalField(projectGroupBox, "Add new Project to", serverProjectsFilter, labelWidth);
+    m_serverProjectField = FieldToolkit.createProjectProposalField(projectGroupBox, "Add new Project to", WebServiceNewWizardPage::isServerProject, labelWidth);
     m_serverProjectField.acceptProposal(getServerProject());
     m_serverProjectField.addProposalListener(proposal -> {
       var jp = (IJavaProject) proposal;
@@ -305,8 +303,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     });
 
     // existing jaxws project
-    Predicate<IJavaProject> jaxwsProjectsFilter = WebServiceNewWizardPage::isJaxWsProject;
-    m_existingJaxWsProjectField = FieldToolkit.createProjectProposalField(projectGroupBox, "Web Service Project", jaxwsProjectsFilter, labelWidth);
+    m_existingJaxWsProjectField = FieldToolkit.createProjectProposalField(projectGroupBox, "Web Service Project", WebServiceNewWizardPage::isJaxWsProject, labelWidth);
     m_existingJaxWsProjectField.acceptProposal(getExistingJaxWsProject());
     m_existingJaxWsProjectField.addProposalListener(proposal -> {
       var javaProject = (IJavaProject) proposal;

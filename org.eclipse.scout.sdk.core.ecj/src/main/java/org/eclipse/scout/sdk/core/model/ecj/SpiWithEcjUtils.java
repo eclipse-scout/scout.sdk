@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
@@ -127,15 +126,20 @@ public final class SpiWithEcjUtils {
       return emptyList();
     }
 
-    BiFunction<TypeBinding[], char[], TypeBinding> selector = (newBindings, key) -> newBindings == null ? null
-        : Arrays.stream(newBindings)
-            .filter(b -> Strings.equals(b.signableName(), key))
-            .findAny().orElse(null);
-
     return Arrays.stream(bindings)
-        .map(binding -> bindingToType(env, binding, declaringType, () -> selector.apply(newElementLookupStrategy.get(), binding.signableName())))
+        .map(binding -> bindingToType(env, binding, declaringType, () -> findBindingWithKey(newElementLookupStrategy.get(), binding.signableName())))
         .filter(Objects::nonNull)
         .collect(toList());
+  }
+
+  static TypeBinding findBindingWithKey(TypeBinding[] newBindings, char[] key) {
+    if (newBindings == null) {
+      return null;
+    }
+    return Arrays.stream(newBindings)
+        .filter(b -> Strings.equals(b.signableName(), key))
+        .findAny()
+        .orElse(null);
   }
 
   //public only for junit testing purposes

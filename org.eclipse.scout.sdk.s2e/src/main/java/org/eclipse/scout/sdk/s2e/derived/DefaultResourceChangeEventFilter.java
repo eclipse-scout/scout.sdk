@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -96,21 +96,26 @@ public class DefaultResourceChangeEventFilter implements Predicate<IResourceChan
     var jobFqn = curJob.getClass().getName().replace('$', '.');
     var jobName = curJob.getName();
 
-    Predicate<String> excludedClassNamePrefixes = className -> getExcludedJobClassNamePrefixes().stream().anyMatch(className::startsWith);
-    Predicate<String> excludedJobNames = name -> getExcludedJobNames().stream().anyMatch(name::equals);
-
     if ("org.eclipse.core.internal.jobs.ThreadJob".equals(jobFqn)) {
       // for thread jobs: check current stack trace
       var stackTrace = Thread.currentThread().getStackTrace();
       return Arrays.stream(stackTrace)
           .map(StackTraceElement::getClassName)
-          .noneMatch(excludedClassNamePrefixes);
+          .noneMatch(this::isClassNameExcluded);
     }
     if (jobFqn.startsWith("org.eclipse.core.runtime.jobs.Job.")) {
       // for Job factory methods: check job name
-      return !excludedJobNames.test(jobName);
+      return !isJobNameExcluded(jobName);
     }
-    return !excludedClassNamePrefixes.test(jobFqn) && !excludedJobNames.test(jobName);
+    return !isClassNameExcluded(jobFqn) && !isJobNameExcluded(jobName);
+  }
+
+  protected boolean isJobNameExcluded(String name) {
+    return getExcludedJobNames().stream().anyMatch(name::equals);
+  }
+
+  protected boolean isClassNameExcluded(String className) {
+    return getExcludedJobClassNamePrefixes().stream().anyMatch(className::startsWith);
   }
 
   /**

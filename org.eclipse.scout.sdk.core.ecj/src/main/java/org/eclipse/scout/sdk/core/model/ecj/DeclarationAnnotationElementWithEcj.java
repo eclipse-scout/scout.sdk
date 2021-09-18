@@ -10,9 +10,10 @@
  */
 package org.eclipse.scout.sdk.core.model.ecj;
 
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.classScopeOf;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.compileExpression;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.findNewAnnotationElementIn;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.resolveCompiledValue;
-
-import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
@@ -51,7 +52,7 @@ public class DeclarationAnnotationElementWithEcj extends AbstractJavaElementWith
 
   @Override
   public AnnotationElementSpi internalFindNewElement() {
-    return SpiWithEcjUtils.findNewAnnotationElementIn(getDeclaringAnnotation(), getElementName());
+    return findNewAnnotationElementIn(getDeclaringAnnotation(), getElementName());
   }
 
   @Override
@@ -67,9 +68,8 @@ public class DeclarationAnnotationElementWithEcj extends AbstractJavaElementWith
   @Override
   public IMetaValue getMetaValue() {
     return m_value.computeIfAbsentAndGet(() -> {
-      Function<DeclarationAnnotationElementWithEcj, Object> valueFunc = this::resolveExpressionOf;
-      var compiledValue = valueFunc.apply(this);
-      var value = resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), compiledValue, () -> withNewElement(valueFunc));
+      var compiledValue = resolveExpressionOf(this);
+      var value = resolveCompiledValue(javaEnvWithEcj(), m_declaringAnnotation.getOwner(), compiledValue, () -> withNewElement(DeclarationAnnotationElementWithEcj::resolveExpressionOf));
       if (value != null) {
         return value;
       }
@@ -78,9 +78,9 @@ public class DeclarationAnnotationElementWithEcj extends AbstractJavaElementWith
     });
   }
 
-  protected Object resolveExpressionOf(DeclarationAnnotationElementWithEcj element) {
-    var scope = SpiWithEcjUtils.classScopeOf(element.getDeclaringAnnotation().getOwner());
-    return SpiWithEcjUtils.compileExpression(element.m_astNode.value, scope, javaEnvWithEcj());
+  protected static Object resolveExpressionOf(DeclarationAnnotationElementWithEcj element) {
+    var scope = classScopeOf(element.getDeclaringAnnotation().getOwner());
+    return compileExpression(element.m_astNode.value, scope, element.javaEnvWithEcj());
   }
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
@@ -204,7 +203,6 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
       return null;
     }
 
-    Supplier<String> defaultSuperClass = () -> scoutApi.AbstractTableRowData().fqn();
     var superTypeOfSurroundingTableBeanGenerator = declaringGenerator()
         .map(jeg -> (ITypeGenerator<?>) jeg)
         .flatMap(ITypeGenerator::superClass)
@@ -212,7 +210,7 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
         .get();
     if (superTypeOfSurroundingTableBeanGenerator.equals(scoutApi.AbstractTablePageData().fqn())
         || superTypeOfSurroundingTableBeanGenerator.equals(scoutApi.AbstractTableFieldBeanData().fqn())) {
-      return defaultSuperClass.get();
+      return defaultSuperClass();
     }
 
     // use the row data in the super page data.
@@ -221,7 +219,11 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
             .withInstanceOf(scoutApi.AbstractTableRowData())
             .first())
         .map(IType::reference)
-        .orElseGet(defaultSuperClass);
+        .orElseGet(this::defaultSuperClass);
+  }
+
+  protected String defaultSuperClass() {
+    return scoutApi().AbstractTableRowData().fqn();
   }
 
   /**

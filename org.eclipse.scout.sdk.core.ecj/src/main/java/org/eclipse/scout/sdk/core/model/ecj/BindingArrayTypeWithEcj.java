@@ -13,10 +13,10 @@ package org.eclipse.scout.sdk.core.model.ecj;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createBindingAnnotations;
 import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.eclipse.jdt.internal.compiler.lookup.ArrayBinding;
@@ -88,12 +88,13 @@ public class BindingArrayTypeWithEcj extends AbstractTypeWithEcj {
     return m_arrayDimension;
   }
 
+  private static TypeBinding getLeafComponentTypeBinding(BindingArrayTypeWithEcj t) {
+    return t.m_binding.leafComponentType();
+  }
+
   @Override
   public TypeSpi getLeafComponentType() {
-    return m_leafComponentType.computeIfAbsentAndGet(() -> {
-      Function<BindingArrayTypeWithEcj, TypeBinding> leafComponentTypeFunction = t -> t.m_binding.leafComponentType();
-      return bindingToType(javaEnvWithEcj(), leafComponentTypeFunction.apply(this), () -> withNewElement(leafComponentTypeFunction));
-    });
+    return m_leafComponentType.computeIfAbsentAndGet(() -> bindingToType(javaEnvWithEcj(), getLeafComponentTypeBinding(this), () -> this.withNewElement(BindingArrayTypeWithEcj::getLeafComponentTypeBinding)));
   }
 
   @Override
@@ -184,7 +185,7 @@ public class BindingArrayTypeWithEcj extends AbstractTypeWithEcj {
 
   @Override
   public List<BindingAnnotationWithEcj> getAnnotations() {
-    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createBindingAnnotations(this, m_binding));
+    return m_annotations.computeIfAbsentAndGet(() -> createBindingAnnotations(this, m_binding));
   }
 
   @Override

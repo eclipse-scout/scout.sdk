@@ -13,10 +13,17 @@ package org.eclipse.scout.sdk.core.model.ecj;
 import static java.util.Collections.emptyList;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingsToTypes;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createBindingAnnotations;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createSourceRange;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createTypeParameters;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.findNewMethodIn;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.getMethodFlags;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.hasDeprecatedAnnotation;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.nvl;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.sourceMethodOf;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
 import org.eclipse.jdt.internal.compiler.lookup.MethodBinding;
@@ -73,7 +80,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
 
   @Override
   public MethodSpi internalFindNewElement() {
-    return SpiWithEcjUtils.findNewMethodIn(getDeclaringType(), getMethodId());
+    return findNewMethodIn(getDeclaringType(), getMethodId());
   }
 
   @Override
@@ -92,13 +99,13 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
 
   @Override
   public List<BindingAnnotationWithEcj> getAnnotations() {
-    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createBindingAnnotations(this, SpiWithEcjUtils.nvl(m_binding.original(), m_binding)));
+    return m_annotations.computeIfAbsentAndGet(() -> createBindingAnnotations(this, nvl(m_binding.original(), m_binding)));
   }
 
   @Override
   public int getFlags() {
     if (m_flags < 0) {
-      m_flags = SpiWithEcjUtils.getMethodFlags(m_binding.modifiers, false, SpiWithEcjUtils.hasDeprecatedAnnotation(getAnnotations()));
+      m_flags = getMethodFlags(m_binding.modifiers, false, hasDeprecatedAnnotation(getAnnotations()));
     }
     return m_flags;
   }
@@ -113,12 +120,17 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
     });
   }
 
+  protected static ReferenceBinding[] getExceptionBindings(BindingMethodWithEcj m) {
+    return m.m_binding.thrownExceptions;
+  }
+
   @Override
   public List<TypeSpi> getExceptionTypes() {
-    return m_exceptions.computeIfAbsentAndGet(() -> {
-      Function<BindingMethodWithEcj, ReferenceBinding[]> exceptionFunc = m -> m.m_binding.thrownExceptions;
-      return bindingsToTypes(javaEnvWithEcj(), exceptionFunc.apply(this), () -> withNewElement(exceptionFunc));
-    });
+    return m_exceptions.computeIfAbsentAndGet(() -> bindingsToTypes(javaEnvWithEcj(), getExceptionBindings(this), () -> withNewElement(BindingMethodWithEcj::getExceptionBindings)));
+  }
+
+  protected static TypeBinding getReturnTypeBinding(BindingMethodWithEcj m) {
+    return m.m_binding.returnType;
   }
 
   @Override
@@ -127,8 +139,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
       if (isConstructor()) {
         return null;
       }
-      Function<BindingMethodWithEcj, TypeBinding> returnTypeFun = m -> m.m_binding.returnType;
-      return bindingToType(javaEnvWithEcj(), returnTypeFun.apply(this), () -> withNewElement(returnTypeFun));
+      return bindingToType(javaEnvWithEcj(), getReturnTypeBinding(this), () -> withNewElement(BindingMethodWithEcj::getReturnTypeBinding));
     });
   }
 
@@ -184,7 +195,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
 
   protected TypeVariableBinding[] getTypeVariables() {
     //ask this or the actualType since we do not distinguish between the virtual parameterized type with arguments and the effective parameterized type with parameters
-    return SpiWithEcjUtils.nvl(m_binding.original(), m_binding).typeVariables();
+    return nvl(m_binding.original(), m_binding).typeVariables();
   }
 
   @Override
@@ -195,7 +206,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
 
   @Override
   public List<TypeParameterSpi> getTypeParameters() {
-    return m_typeParameters.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createTypeParameters(this, getTypeVariables()));
+    return m_typeParameters.computeIfAbsentAndGet(() -> createTypeParameters(this, getTypeVariables()));
   }
 
   @Override
@@ -211,7 +222,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   @Override
   public ISourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
-      var decl = SpiWithEcjUtils.sourceMethodOf(m_binding);
+      var decl = sourceMethodOf(m_binding);
       if (decl == null) {
         return null;
       }
@@ -222,7 +233,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   @Override
   public ISourceRange getSourceOfBody() {
     return m_bodySource.computeIfAbsentAndGet(() -> {
-      var decl = SpiWithEcjUtils.sourceMethodOf(m_binding);
+      var decl = sourceMethodOf(m_binding);
       if (decl == null) {
         return null;
       }
@@ -233,16 +244,16 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   @Override
   public ISourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
-      var decl = SpiWithEcjUtils.sourceMethodOf(m_binding);
+      var decl = sourceMethodOf(m_binding);
       if (decl == null) {
         return null;
       }
-      return SpiWithEcjUtils.createSourceRange(decl.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
+      return createSourceRange(decl.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
     });
   }
 
   @Override
   public ISourceRange getSourceOfDeclaration() {
-    return SpiWithEcjUtils.createSourceRange(SpiWithEcjUtils.sourceMethodOf(m_binding), m_declaringType.getCompilationUnit(), javaEnvWithEcj());
+    return createSourceRange(sourceMethodOf(m_binding), m_declaringType.getCompilationUnit(), javaEnvWithEcj());
   }
 }

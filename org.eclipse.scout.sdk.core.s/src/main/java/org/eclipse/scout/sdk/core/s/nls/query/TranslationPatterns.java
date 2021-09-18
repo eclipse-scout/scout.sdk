@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,6 +38,7 @@ public final class TranslationPatterns {
 
   public static final String IGNORE_MARKER = "NO-NLS-CHECK";
 
+  @SuppressWarnings("StaticCollection")
   private static final Map<Class<? extends AbstractTranslationPattern>, AbstractTranslationPattern> PATTERN_MAP = new HashMap<>();
   static {
     Stream.of(JavaTextsGetPattern.INSTANCE, JsSessionTextPattern.INSTANCE, JsonTextKeyPattern.INSTANCE, HtmlScoutMessagePattern.INSTANCE)

@@ -11,9 +11,15 @@
 package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.compileExpression;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createBindingAnnotations;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createSourceRange;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.getTypeFlags;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.hasDeprecatedAnnotation;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.resolveCompiledValue;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
 import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
@@ -88,22 +94,23 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   @Override
   public int getFlags() {
     if (m_flags < 0) {
-      m_flags = SpiWithEcjUtils.getTypeFlags(m_binding.modifiers, null, SpiWithEcjUtils.hasDeprecatedAnnotation(getAnnotations()));
+      m_flags = getTypeFlags(m_binding.modifiers, null, hasDeprecatedAnnotation(getAnnotations()));
     }
     return m_flags;
   }
 
+  protected static TypeBinding getFieldType(BindingFieldWithEcj f) {
+    return f.m_binding.type;
+  }
+
   @Override
   public TypeSpi getDataType() {
-    return m_type.computeIfAbsentAndGet(() -> {
-      Function<BindingFieldWithEcj, TypeBinding> dataTypeFunc = f -> f.m_binding.type;
-      return SpiWithEcjUtils.bindingToType(javaEnvWithEcj(), dataTypeFunc.apply(this), () -> withNewElement(dataTypeFunc));
-    });
+    return m_type.computeIfAbsentAndGet(() -> bindingToType(javaEnvWithEcj(), getFieldType(this), () -> withNewElement(BindingFieldWithEcj::getFieldType)));
   }
 
   @Override
   public List<BindingAnnotationWithEcj> getAnnotations() {
-    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createBindingAnnotations(this, m_binding));
+    return m_annotations.computeIfAbsentAndGet(() -> createBindingAnnotations(this, m_binding));
   }
 
   @Override
@@ -111,15 +118,18 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
     return m_name.computeIfAbsentAndGet(() -> new String(m_binding.name));
   }
 
+  protected static Object getFieldValue(BindingFieldWithEcj f) {
+    return f.m_binding.constant();
+  }
+
   @Override
   public IMetaValue getConstantValue() {
     return m_constRef.computeIfAbsentAndGet(() -> {
-      Function<BindingFieldWithEcj, Object> constantFunction = f -> f.m_binding.constant();
-      var resolvedValue = SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, constantFunction.apply(this), () -> withNewElement(constantFunction));
+      var resolvedValue = resolveCompiledValue(javaEnvWithEcj(), this, getFieldValue(this), () -> withNewElement(BindingFieldWithEcj::getFieldValue));
       if (resolvedValue != null) {
         return resolvedValue;
       }
-      return SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, resolveExpressionOf(this), () -> withNewElement(this::resolveExpressionOf));
+      return resolveCompiledValue(javaEnvWithEcj(), this, resolveExpressionOf(this), () -> withNewElement(this::resolveExpressionOf));
     });
   }
 
@@ -129,7 +139,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
     if (refBinding instanceof SourceTypeBinding) {
       var stb = (SourceTypeBinding) refBinding;
       var initEx = stb.scope.referenceContext.declarationOf(origBinding).initialization;
-      return SpiWithEcjUtils.compileExpression(initEx, stb.scope, javaEnvWithEcj());
+      return compileExpression(initEx, stb.scope, javaEnvWithEcj());
     }
     return null;
   }
@@ -162,7 +172,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
       if (decl == null) {
         return null;
       }
-      return SpiWithEcjUtils.createSourceRange(decl.initialization, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
+      return createSourceRange(decl.initialization, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
     });
   }
 
@@ -173,7 +183,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
       if (decl == null) {
         return null;
       }
-      return SpiWithEcjUtils.createSourceRange(decl.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
+      return createSourceRange(decl.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
     });
   }
 }

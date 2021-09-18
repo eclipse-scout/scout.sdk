@@ -47,6 +47,7 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
     override fun runActivity(project: Project) {
         SdkConsole.setConsoleSpi(this)
         if (isRunningInSandbox()) {
+            @Suppress("UnstableApiUsage")
             m_textLog.setLevel(org.apache.log4j.Level.DEBUG)
         }
     }

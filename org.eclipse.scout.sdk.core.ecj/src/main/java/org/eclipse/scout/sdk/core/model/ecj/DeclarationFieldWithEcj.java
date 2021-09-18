@@ -12,10 +12,15 @@ package org.eclipse.scout.sdk.core.model.ecj;
 
 import static java.util.Collections.emptyList;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.classScopeOf;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.compileExpression;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createDeclarationAnnotations;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.createSourceRange;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.getTypeFlags;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.hasDeprecatedAnnotation;
+import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.resolveCompiledValue;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ast.FieldDeclaration;
@@ -86,12 +91,23 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
     return m_declaringType;
   }
 
+  protected static Object computeConstantValue(DeclarationFieldWithEcj f) {
+    return compileExpression(f.m_astNode.initialization, null, f.javaEnvWithEcj());
+  }
+
   @Override
   public IMetaValue getConstantValue() {
-    return m_constRef.computeIfAbsentAndGet(() -> {
-      Function<DeclarationFieldWithEcj, Object> constantValueFunc = f -> compileExpression(f.m_astNode.initialization, null, javaEnvWithEcj());
-      return SpiWithEcjUtils.resolveCompiledValue(javaEnvWithEcj(), this, constantValueFunc.apply(this), () -> withNewElement(constantValueFunc));
-    });
+    return m_constRef.computeIfAbsentAndGet(() -> resolveCompiledValue(javaEnvWithEcj(), this, computeConstantValue(this), () -> withNewElement(DeclarationFieldWithEcj::computeConstantValue)));
+  }
+
+  protected static TypeBinding getDataTypeBinding(DeclarationFieldWithEcj fd) {
+    var tb = fd.m_astNode.type.resolvedType;
+    if (tb != null) {
+      return tb;
+    }
+    synchronized (fd.javaEnvWithEcj().lock()) {
+      return fd.m_astNode.type.resolveType(classScopeOf(fd));
+    }
   }
 
   @Override
@@ -101,29 +117,19 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
         // static { } section
         return javaEnvWithEcj().createVoidType();
       }
-
-      Function<DeclarationFieldWithEcj, TypeBinding> dataTypeFunc = fd -> {
-        var tb = fd.m_astNode.type.resolvedType;
-        if (tb != null) {
-          return tb;
-        }
-        synchronized (javaEnvWithEcj().lock()) {
-          return fd.m_astNode.type.resolveType(SpiWithEcjUtils.classScopeOf(fd));
-        }
-      };
-      return bindingToType(javaEnvWithEcj(), dataTypeFunc.apply(this), () -> withNewElement(dataTypeFunc));
+      return bindingToType(javaEnvWithEcj(), getDataTypeBinding(this), () -> withNewElement(DeclarationFieldWithEcj::getDataTypeBinding));
     });
   }
 
   @Override
   public List<DeclarationAnnotationWithEcj> getAnnotations() {
-    return m_annotations.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createDeclarationAnnotations(javaEnvWithEcj(), this, m_astNode.annotations));
+    return m_annotations.computeIfAbsentAndGet(() -> createDeclarationAnnotations(javaEnvWithEcj(), this, m_astNode.annotations));
   }
 
   @Override
   public int getFlags() {
     if (m_flags < 0) {
-      m_flags = SpiWithEcjUtils.getTypeFlags(m_astNode.modifiers, null, SpiWithEcjUtils.hasDeprecatedAnnotation(getAnnotations()));
+      m_flags = getTypeFlags(m_astNode.modifiers, null, hasDeprecatedAnnotation(getAnnotations()));
     }
     return m_flags;
   }
@@ -156,12 +162,12 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
         // static initializer
         return javaEnvWithEcj().getSource(cu, m_astNode.declarationSourceStart, m_astNode.declarationSourceEnd);
       }
-      return SpiWithEcjUtils.createSourceRange(m_astNode.initialization, cu, javaEnvWithEcj());
+      return createSourceRange(m_astNode.initialization, cu, javaEnvWithEcj());
     });
   }
 
   @Override
   public ISourceRange getJavaDoc() {
-    return m_javaDocSource.computeIfAbsentAndGet(() -> SpiWithEcjUtils.createSourceRange(m_astNode.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj()));
+    return m_javaDocSource.computeIfAbsentAndGet(() -> createSourceRange(m_astNode.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj()));
   }
 }
