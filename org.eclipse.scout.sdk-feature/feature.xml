@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-
-    Copyright (c) 2015 BSI Business Systems Integration AG.
-    All rights reserved. This program and the accompanying materials
-    are made available under the terms of the Eclipse Public License v1.0
-    which accompanies this distribution, and is available at
-    https://www.eclipse.org/legal/epl-v10.html
-
-    Contributors:
-        BSI Business Systems Integration AG - initial API and implementation
-
--->
+  ~ Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+  ~ All rights reserved. This program and the accompanying materials
+  ~ are made available under the terms of the Eclipse Public License v1.0
+  ~ which accompanies this distribution, and is available at
+  ~ https://www.eclipse.org/legal/epl-v10.html
+  ~
+  ~ Contributors:
+  ~     BSI Business Systems Integration AG - initial API and implementation
+  -->
 <feature
       id="org.eclipse.scout.sdk-feature"
       label="%featureName"
@@ -33,14 +31,14 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="https://download.eclipse.org/releases/2021-06/"/>
-      <discovery label="%updateSiteName" url="https://download.eclipse.org/releases/2021-06/"/>
+      <update label="%updateSiteName" url="https://download.eclipse.org/releases/2021-09/"/>
+      <discovery label="%updateSiteName" url="https://download.eclipse.org/releases/2021-09/"/>
    </url>
 
    <requires>
-      <import feature="org.eclipse.platform" version="4.15.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.jdt" version="3.18.300" match="greaterOrEqual"/>
-      <import feature="org.eclipse.m2e.feature" version="1.15.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.platform" version="4.21.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.jdt" version="3.18.900" match="greaterOrEqual"/>
+      <import feature="org.eclipse.m2e.feature" version="1.18.0" match="greaterOrEqual"/>
       <import plugin="javax.wsdl" version="1.6.2" match="greaterOrEqual"/> <!-- Is included in the p2 update site via category.xml -->
    </requires>
 

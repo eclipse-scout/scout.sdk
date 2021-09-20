@@ -13,16 +13,16 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.ecj" />
-    <orderEntry type="library" name="Maven: org.eclipse.jdt:ecj:3.26.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jdt:ecj:3.27.0" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.7.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apiguardian:apiguardian-api:1.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-commons:1.7.2" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-launcher:1.7.2" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-engine:1.7.2" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.7.2" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-params:5.7.2" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-commons:1.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apiguardian:apiguardian-api:1.1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-launcher:1.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-engine:1.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-params:5.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.mockito:mockito-core:3.12.4" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy:1.11.13" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy-agent:1.11.13" level="project" />

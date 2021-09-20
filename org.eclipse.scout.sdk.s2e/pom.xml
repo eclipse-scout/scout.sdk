@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+  ~ Copyright (c) 2010-2021 BSI Business Systems Integration AG.
   ~ All rights reserved. This program and the accompanying materials
   ~ are made available under the terms of the Eclipse Public License v1.0
   ~ which accompanies this distribution, and is available at
@@ -128,15 +128,15 @@
               *
             </Import-Package>
             <Require-Bundle>
-              org.eclipse.core.runtime;bundle-version="[3.17.100,4)";visibility:=reexport,
-              org.eclipse.core.resources;bundle-version="[3.13.700,4)";visibility:=reexport,
-              org.eclipse.jdt.core;bundle-version="[3.21,4)";visibility:=reexport,
-              org.eclipse.jdt.core.manipulation;bundle-version="[1.13.100,2)";visibility:=reexport,
-              org.eclipse.jdt.launching;bundle-version="[3.17,4)";visibility:=reexport,
-              org.eclipse.text;bundle-version="[3.10.100,4)";visibility:=reexport,
-              org.eclipse.m2e.maven.runtime;bundle-version="[1.15,2)";visibility:=reexport,
-              org.eclipse.m2e.archetype.common;bundle-version="[1.15,2)";visibility:=reexport,
-              org.eclipse.m2e.core;bundle-version="[1.15,2)";visibility:=reexport
+              org.eclipse.core.runtime;bundle-version="[3.23,4)";visibility:=reexport,
+              org.eclipse.core.resources;bundle-version="[3.15.100,4)";visibility:=reexport,
+              org.eclipse.jdt.core;bundle-version="[3.27,4)";visibility:=reexport,
+              org.eclipse.jdt.core.manipulation;bundle-version="[1.15,2)";visibility:=reexport,
+              org.eclipse.jdt.launching;bundle-version="[3.19.300,4)";visibility:=reexport,
+              org.eclipse.text;bundle-version="[3.12,4)";visibility:=reexport,
+              org.eclipse.m2e.maven.runtime;bundle-version="[1.18,2)";visibility:=reexport,
+              org.eclipse.m2e.archetype.common;bundle-version="[1.18,2)";visibility:=reexport,
+              org.eclipse.m2e.core;bundle-version="[1.18,2)";visibility:=reexport
             </Require-Bundle>
 
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.S2ESdkActivator</Bundle-Activator>

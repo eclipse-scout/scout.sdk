@@ -17,14 +17,14 @@
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.ecj" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s.test" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.7.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apiguardian:apiguardian-api:1.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-commons:1.7.2" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-launcher:1.7.2" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-engine:1.7.2" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.7.2" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-params:5.7.2" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-commons:1.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apiguardian:apiguardian-api:1.1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-launcher:1.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-engine:1.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-params:5.8.0" level="project" />
     <orderEntry type="library" name="Maven: org.mockito:mockito-core:3.12.4" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy:1.11.13" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy-agent:1.11.13" level="project" />
@@ -122,29 +122,29 @@
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.ui.html:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.client:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.shared:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core:3.26.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.resources:3.15.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.runtime:3.22.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.osgi:3.16.300" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core:3.27.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.resources:3.15.100" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.runtime:3.23.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.osgi:3.17.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.common:3.15.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.jobs:3.11.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.registry:3.10.200" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.preferences:3.8.200" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.contenttype:3.7.1000" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.app:1.5.100" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.filesystem:1.9.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.jobs:3.12.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.registry:3.11.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.preferences:3.9.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.contenttype:3.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.app:1.6.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.filesystem:1.9.100" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.text:3.12.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.commands:3.10.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface.text:3.18.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.swt:3.116.100" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface:3.22.200" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core.manipulation:1.14.400" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.ltk.core.refactoring:3.11.400" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.expressions:3.7.100" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.launching:3.19.200" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.debug.core:3.18.100" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.debug:3.17.200" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.core.variables:3.5.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.commands:3.10.100" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface.text:3.18.100" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.swt:3.117.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface:3.23.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core.manipulation:1.15.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.ltk.core.refactoring:3.12.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.expressions:3.8.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.launching:3.19.300" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.debug.core:3.18.200" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.debug:3.18.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.core.variables:3.5.100" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.core.filebuffers:3.7.0" level="project" />
   </component>
 </module>

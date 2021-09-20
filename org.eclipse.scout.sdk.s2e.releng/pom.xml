@@ -32,13 +32,13 @@
         - In org.eclipse.scout.sdk.s2e.releng/, execute
           mvn clean deploy
     3b. For deploying releases (to be used by Tycho releases):
-        - Prerequisite: 1. you need to have GPG properly set up, see https://central.sonatype.org/pages/working-with-pgp-signatures.html
+        - Prerequisite: 1. you need to have GPG properly set up, see https://central.sonatype.org/publish/requirements/gpg/
                         2. if not already present: you need to add the server with id 'forge-releases' into your settings.xml including the corresponding credentials (e.g. oss sonatype username/password)
         - Make sure that ${org.eclipse.m2e.core}, ${org.eclipse.m2e.core.ui}, ${org.eclipse.m2e.archetype.common},... in the parent POM don't have a '-SNAPSHOT' suffix
         3b.1 For full deploy: In org.eclipse.scout.sdk.s2e.releng/, execute
-             mvn clean deploy -Pdeploy-releases -Dgpg.passphrase=<your_passphrase>
+             mvn clean deploy -P deploy-releases
         3b.2 For single additional deps: In org.eclipse.scout.sdk.s2e.releng/, execute
-             mvn clean deploy -Pdeploy-releases-addNewDeps -Dgpg.passphrase=<your_passphrase>
+             mvn clean deploy -P deploy-releases-addNewDeps
         - Login to https://oss.sonatype.org: Close and release staged artifacts into repository 'Releases'
   -->
   <properties>
@@ -62,7 +62,7 @@
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
-          <version>1.6.6</version>
+          <version>1.6.7</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -114,8 +114,8 @@
           <includeOptional>false</includeOptional>
           <source>
             <repository>
-              <id>eclipse_2021_06</id>
-              <url>https://download.eclipse.org/releases/2021-06/</url>
+              <id>eclipse_2021_09</id>
+              <url>https://download.eclipse.org/releases/2021-09/</url>
               <layout>p2</layout>
             </repository>
           </source>

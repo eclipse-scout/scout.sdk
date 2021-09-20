@@ -307,7 +307,7 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
         return shared;
       }
 
-      var parser = ASTParser.newParser(AST.JLS_Latest);
+      var parser = ASTParser.newParser(AST.getJLSLatest());
       parser.setKind(ASTParser.K_COMPILATION_UNIT);
       parser.setSource(m_icu);
       parser.setResolveBindings(true);
