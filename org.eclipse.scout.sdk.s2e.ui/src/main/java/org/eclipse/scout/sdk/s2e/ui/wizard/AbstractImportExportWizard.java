@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.s2e.ui.wizard;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 
 /**
  * <h4>AbstractImportExportWizard</h4>
@@ -20,13 +20,13 @@ import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
  */
 public abstract class AbstractImportExportWizard extends Wizard {
 
-  private TranslationStoreStack m_nlsProject;
+  private TranslationManager m_nlsProject;
 
-  public void setNlsProject(TranslationStoreStack nlsProject) {
+  public void setNlsProject(TranslationManager nlsProject) {
     m_nlsProject = nlsProject;
   }
 
-  public TranslationStoreStack getNlsProject() {
+  public TranslationManager getNlsProject() {
     return m_nlsProject;
   }
 }

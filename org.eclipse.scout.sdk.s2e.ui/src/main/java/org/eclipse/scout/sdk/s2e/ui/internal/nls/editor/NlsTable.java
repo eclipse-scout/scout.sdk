@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor;
 
-import static java.util.function.Predicate.isEqual;
 import static org.eclipse.scout.sdk.core.util.Ensure.notNull;
 
 import java.util.Optional;
@@ -103,25 +102,14 @@ public class NlsTable extends Composite {
   private void handleTextUpdate(NlsTableCell cell, String newText) {
     if (cell.column() == NlsTableController.INDEX_COLUMN_KEYS) {
       // update key
-      m_controller.stack().changeKey(cell.entry().key(), newText);
+      m_controller.translationManager().changeKey(cell.translation().key(), newText);
     }
     else {
       // update translation
-      var stack = m_controller.stack();
-      stack.setChanging(true);
-      try {
-        var updatedTranslation = new Translation(cell.entry());
-        var language = cell.language().get();
-        if (cell.store().languages().noneMatch(isEqual(language))) {
-          // language does not yet exist for that store: create it
-          stack.addNewLanguage(language, cell.entry().store());
-        }
-        updatedTranslation.putText(language, newText);
-        stack.updateTranslation(updatedTranslation);
-      }
-      finally {
-        stack.setChanging(false);
-      }
+      var updatedTranslation = new Translation(cell.translation());
+      var language = cell.language().get();
+      updatedTranslation.putText(language, newText);
+      m_controller.translationManager().setTranslation(updatedTranslation);
     }
   }
 

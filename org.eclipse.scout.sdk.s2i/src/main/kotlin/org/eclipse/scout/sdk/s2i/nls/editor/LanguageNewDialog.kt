@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,13 +16,13 @@ import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.Language
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import java.util.*
 import javax.swing.JComponent
 
-class LanguageNewDialog(val project: Project, val store: ITranslationStore, val stack: TranslationStoreStack) : DialogWrapper(project, true, IdeModalityType.PROJECT) {
+class LanguageNewDialog(val project: Project, val store: ITranslationStore, val translationManager: TranslationManager) : DialogWrapper(project, true, IdeModalityType.PROJECT) {
 
     private var m_comboBox: ComboBox<Language>? = null
 
@@ -59,7 +59,7 @@ class LanguageNewDialog(val project: Project, val store: ITranslationStore, val 
     private fun doOk() {
         val selectedItem = languagesBox().selectedItem
         if (selectedItem is Language && Strings.hasText(selectedItem.displayName())) {
-            stack.addNewLanguage(selectedItem, store)
+            translationManager.addNewLanguage(selectedItem, store)
         }
     }
 

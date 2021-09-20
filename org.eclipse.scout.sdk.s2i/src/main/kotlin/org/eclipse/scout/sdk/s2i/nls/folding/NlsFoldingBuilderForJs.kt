@@ -14,13 +14,13 @@ import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.lang.javascript.psi.*
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.JsonTextKeyPattern
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationSpec
 
 class NlsFoldingBuilderForJs : AbstractNlsFoldingBuilder() {
 
-    override fun buildFoldRegions(root: PsiElement, stack: TranslationStoreStack): List<FoldingDescriptor> {
+    override fun buildFoldRegions(root: PsiElement, manager: TranslationManager): List<FoldingDescriptor> {
         val folds = ArrayList<FoldingDescriptor>()
         root.accept(object : JSRecursiveWalkingElementVisitor() {
             override fun visitJSLiteralExpression(expression: JSLiteralExpression) {
@@ -33,7 +33,7 @@ class NlsFoldingBuilderForJs : AbstractNlsFoldingBuilder() {
 
             private fun visitElement(element: JSElement) {
                 val translationKey = element.translationSpec()?.resolveTranslationKey() ?: return
-                createFoldingDescriptor(translationKey, element, stack)?.let { folds.add(it) }
+                createFoldingDescriptor(translationKey, element, manager)?.let { folds.add(it) }
             }
         })
         return folds
@@ -41,9 +41,9 @@ class NlsFoldingBuilderForJs : AbstractNlsFoldingBuilder() {
 
     override fun textPrefixAndSuffix() = "'"
 
-    private fun createFoldingDescriptor(key: String, element: PsiElement, stack: TranslationStoreStack): FoldingDescriptor? {
+    private fun createFoldingDescriptor(key: String, element: PsiElement, manager: TranslationManager): FoldingDescriptor? {
         val isJsonTextKey = element is JSLiteralExpression && element.stringValue?.startsWith(JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX) == true
         val psiElement = if (isJsonTextKey) element else PsiTreeUtil.getParentOfType(element, JSCallExpression::class.java) ?: return null
-        return createFoldingDescriptor(psiElement, key, stack)
+        return createFoldingDescriptor(psiElement, key, manager)
     }
 }

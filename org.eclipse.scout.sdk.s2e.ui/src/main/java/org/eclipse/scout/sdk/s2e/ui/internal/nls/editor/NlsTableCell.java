@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,8 @@ package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor;
 
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
-import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.Language;
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
@@ -25,10 +24,10 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 public class NlsTableCell {
 
   private final int m_column;
-  private final ITranslationEntry m_entry;
+  private final IStackedTranslation m_entry;
   private final Language m_language;
 
-  public NlsTableCell(int column, ITranslationEntry entry, Language language) {
+  public NlsTableCell(int column, IStackedTranslation entry, Language language) {
     m_column = column;
     m_entry = Ensure.notNull(entry);
     m_language = language;
@@ -38,7 +37,7 @@ public class NlsTableCell {
     return m_column;
   }
 
-  public ITranslationEntry entry() {
+  public IStackedTranslation translation() {
     return m_entry;
   }
 
@@ -48,16 +47,12 @@ public class NlsTableCell {
 
   public String text() {
     if (column() == NlsTableController.INDEX_COLUMN_KEYS) {
-      return entry().key();
+      return translation().key();
     }
     if (m_language != null) {
-      return entry().text(m_language).orElse(null);
+      return translation().text(m_language).orElse(null);
     }
     return null;
-  }
-
-  public ITranslationStore store() {
-    return entry().store();
   }
 
   @Override

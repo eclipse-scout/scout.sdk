@@ -10,11 +10,9 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
+import static org.eclipse.scout.sdk.core.s.nls.TranslationTestsHelper.createStore;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
 public class TranslationStoreComparatorTest {
@@ -23,7 +21,7 @@ public class TranslationStoreComparatorTest {
   public void testTrivial() {
     var s1 = createStore("test.Class", 100);
     var s2 = createStore("test.Class", 100);
-    var comparator = new TranslationStoreComparator();
+    var comparator = TranslationStoreComparator.INSTANCE;
     assertEquals(0, comparator.compare(s1, s1));
     assertEquals(0, comparator.compare(s1, s2));
     assertEquals(0, comparator.compare(null, null));
@@ -35,7 +33,7 @@ public class TranslationStoreComparatorTest {
   public void testWithDifferentOrder() {
     var s1 = createStore("test.Class1", 100);
     var s2 = createStore("test.Class2", 200);
-    var comparator = new TranslationStoreComparator();
+    var comparator = TranslationStoreComparator.INSTANCE;
     assertEquals(-1, comparator.compare(s1, s2));
     assertEquals(1, comparator.compare(s2, s1));
   }
@@ -44,21 +42,8 @@ public class TranslationStoreComparatorTest {
   public void testWithDifferentName() {
     var s1 = createStore("test.Class1", 100);
     var s2 = createStore("test.Class2", 100);
-    var comparator = new TranslationStoreComparator();
+    var comparator = TranslationStoreComparator.INSTANCE;
     assertEquals(-1, comparator.compare(s1, s2));
     assertEquals(1, comparator.compare(s2, s1));
-  }
-
-  private static ITranslationStore createStore(String fqn, double order) {
-    var serviceType = mock(IType.class);
-    when(serviceType.name()).thenReturn(fqn);
-
-    var textService = mock(TextProviderService.class);
-    when(textService.order()).thenReturn(order);
-    when(textService.type()).thenReturn(serviceType);
-
-    var store = mock(ITranslationStore.class);
-    when(store.service()).thenReturn(textService);
-    return store;
   }
 }

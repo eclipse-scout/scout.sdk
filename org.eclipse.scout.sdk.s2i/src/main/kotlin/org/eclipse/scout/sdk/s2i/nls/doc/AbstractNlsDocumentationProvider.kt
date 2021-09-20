@@ -17,12 +17,14 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
+import org.eclipse.scout.sdk.core.s.ISdkConstants
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.util.Strings.escapeHtml
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationDependencyScope
-import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
+import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader.createManager
 import org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionHelper
+import java.util.stream.Collectors.joining
 
 abstract class AbstractNlsDocumentationProvider : AbstractDocumentationProvider() {
 
@@ -37,8 +39,8 @@ abstract class AbstractNlsDocumentationProvider : AbstractDocumentationProvider(
         } else {
             translationKeyOf(element) to element.translationDependencyScope()
         }
-        val stack = createStack(module, dependencyScope) ?: return null
-        val translation = stack.translation(key).orElse(null) ?: return null
+        val manager = createManager(module, dependencyScope) ?: return null
+        val translation = manager.translation(key).orElse(null) ?: return null
         return generateDoc(translation)
     }
 
@@ -48,10 +50,13 @@ abstract class AbstractNlsDocumentationProvider : AbstractDocumentationProvider(
         return translationLookupObject?.element
     }
 
-    private fun generateDoc(translation: ITranslationEntry): String {
+    private fun generateDoc(translation: IStackedTranslation): String {
+        val storeNames = translation.stores()
+                .map { it.service().type().elementName().removeSuffix(ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE) }
+                .collect(joining(", "))
         val doc = StringBuilder()
                 .append(DocumentationMarkup.CONTENT_START)
-                .append(escapeHtml("'${translation.key()}' defined in '${translation.store().service().type().elementName()}'"))
+                .append(escapeHtml("'${translation.key()}' defined in [$storeNames]"))
                 .append(DocumentationMarkup.CONTENT_END)
                 .append("<font size='1'>&nbsp;</font>")
                 .append(DocumentationMarkup.SECTIONS_START)

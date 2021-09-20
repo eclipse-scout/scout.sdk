@@ -13,12 +13,12 @@ package org.eclipse.scout.sdk.s2i.nls.folding
 import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationSpec
 
 class NlsFoldingBuilderForJava : AbstractNlsFoldingBuilder() {
 
-    override fun buildFoldRegions(root: PsiElement, stack: TranslationStoreStack): List<FoldingDescriptor> {
+    override fun buildFoldRegions(root: PsiElement, manager: TranslationManager): List<FoldingDescriptor> {
         val folds = ArrayList<FoldingDescriptor>()
         root.accept(object : JavaRecursiveElementWalkingVisitor() {
             override fun visitLiteralExpression(expression: PsiLiteralExpression) {
@@ -38,15 +38,15 @@ class NlsFoldingBuilderForJava : AbstractNlsFoldingBuilder() {
 
             private fun visitElement(expression: PsiExpression) {
                 val translationKey = expression.translationSpec()?.resolveTranslationKey() ?: return
-                createFoldingDescriptor(translationKey, expression, stack)?.let { folds.add(it) }
+                createFoldingDescriptor(translationKey, expression, manager)?.let { folds.add(it) }
             }
         })
         return folds
     }
 
-    private fun createFoldingDescriptor(key: String, literal: PsiExpression, stack: TranslationStoreStack): FoldingDescriptor? {
+    private fun createFoldingDescriptor(key: String, literal: PsiExpression, manager: TranslationManager): FoldingDescriptor? {
         val methodCall = PsiTreeUtil.getParentOfType(literal, PsiMethodCallExpression::class.java) ?: return null
         val element = if (methodCall.methodExpression.qualifierExpression is PsiReferenceExpression) methodCall else literal
-        return createFoldingDescriptor(element, key, stack)
+        return createFoldingDescriptor(element, key, manager)
     }
 }

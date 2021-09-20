@@ -14,6 +14,7 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.currentWorkingCopyManager;
 import static org.eclipse.scout.sdk.s2e.environment.WorkingCopyManager.runWithWorkingCopyManager;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
@@ -28,7 +29,9 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
@@ -205,6 +208,31 @@ public class EclipseEnvironment extends AbstractEnvironment {
     Ensure.notBlank(fqn);
     return JdtUtils.resolveJdtTypes(fqn).stream()
         .map(this::toScoutType);
+  }
+
+  @Override
+  public void deleteIfExists(Path file) {
+    IResource toDelete;
+    if (Files.isRegularFile(file)) {
+      toDelete = pathToWorkspaceFile(file);
+    }
+    else {
+      var containers = ResourcesPlugin.getWorkspace().getRoot().findContainersForLocationURI(file.toUri());
+      if (containers.length < 1) {
+        return;
+      }
+      toDelete = containers[0];
+    }
+
+    if (!toDelete.exists()) {
+      return;
+    }
+    try {
+      toDelete.delete(true, null);
+    }
+    catch (CoreException e) {
+      throw new SdkException("Unable to delete '{}'.", file, e);
+    }
   }
 
   protected JavaEnvironmentWithJdt getOrCreateEnv(IJavaProject jdtProject) {

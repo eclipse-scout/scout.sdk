@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,10 +21,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.nls.ITranslationStoreStackListener;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope;
+import org.eclipse.scout.sdk.core.s.nls.ITranslationManagerListener;
+import org.eclipse.scout.sdk.core.s.nls.Translations;
+import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -42,7 +42,7 @@ public class NlsEditor extends EditorPart {
   private Path m_path;
   private NlsTablePage m_nlsTablePage;
 
-  private ITranslationStoreStackListener m_listener;
+  private ITranslationManagerListener m_listener;
 
   @Override
   public void init(IEditorSite site, IEditorInput input) {
@@ -60,7 +60,7 @@ public class NlsEditor extends EditorPart {
     if (m_nlsTablePage == null) {
       return false;
     }
-    return m_nlsTablePage.stack().isDirty();
+    return m_nlsTablePage.translationManager().isDirty();
   }
 
   @Override
@@ -79,7 +79,7 @@ public class NlsEditor extends EditorPart {
       new ProgressMonitorDialog(parent.getShell()).run(true, true, monitor -> loadAndCreateContentAsync(parent, path(), monitor));
     }
     catch (InvocationTargetException | InterruptedException e) {
-      SdkLog.error("Error while creating the translation store stack for path '{}'.", path(), e);
+      SdkLog.error("Error while loading the translations for path '{}'.", path(), e);
     }
   }
 
@@ -87,7 +87,7 @@ public class NlsEditor extends EditorPart {
   public void dispose() {
     super.dispose();
     if (m_nlsTablePage != null && m_listener != null) {
-      m_nlsTablePage.stack().removeListener(m_listener);
+      m_nlsTablePage.translationManager().removeListener(m_listener);
     }
   }
 
@@ -97,27 +97,27 @@ public class NlsEditor extends EditorPart {
       progress.init(1000, "Loading translation editor...");
 
       try {
-        TranslationStores.createStack(modulePath, e, progress.newChild(1000), DependencyScope.ALL)
-            .ifPresent(stack -> {
+        Translations.createManager(modulePath, e, progress.newChild(1000), DependencyScope.ALL)
+            .ifPresent(manager -> {
               progress.monitor().setTaskName("Creating table...");
-              parent.getDisplay().syncExec(() -> createPageAsync(stack, parent));
+              parent.getDisplay().syncExec(() -> createPageAsync(manager, parent));
             });
       }
       catch (OperationCanceledException ex) {
-        SdkLog.debug("Creating translations stack has been canceled.", ex);
+        SdkLog.debug("Translation manager creation has been canceled.", ex);
       }
       catch (RuntimeException ex) {
-        SdkLog.error("Error loading translations stack.", ex);
+        SdkLog.error("Error loading translation manager.", ex);
       }
     }).awaitDoneThrowingOnErrorOrCancel();
   }
 
-  private void createPageAsync(TranslationStoreStack stack, Composite parent) {
+  private void createPageAsync(TranslationManager manager, Composite parent) {
     parent.setRedraw(false);
     try {
-      m_nlsTablePage = new NlsTablePage(parent, stack);
+      m_nlsTablePage = new NlsTablePage(parent, manager);
       m_listener = events -> parent.getDisplay().asyncExec(() -> firePropertyChange(PROP_DIRTY));
-      stack.addListener(m_listener);
+      manager.addListener(m_listener);
     }
     finally {
       parent.setRedraw(true);
@@ -134,7 +134,7 @@ public class NlsEditor extends EditorPart {
       return;
     }
 
-    runInEclipseEnvironment((env, progress) -> m_nlsTablePage.stack().flush(env, progress));
+    runInEclipseEnvironment((env, progress) -> m_nlsTablePage.translationManager().flush(env, progress));
   }
 
   @Override

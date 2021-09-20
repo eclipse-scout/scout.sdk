@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -265,47 +265,6 @@ public final class Ensure {
     if (a != b) {
       fail(msg, msgArgs);
     }
-  }
-
-  /**
-   * Ensures that both parameters have the same value.
-   *
-   * @param a
-   *          the value to be tested.
-   * @param b
-   *          the value to be tested against.
-   * @return a if it is the same as b
-   * @throws IllegalArgumentException
-   *           if a is not same as b.
-   */
-  public static int same(int a, int b) {
-    return sameInt(a, b, "Values are not the same: [{}, {}].", a, b);
-  }
-
-  /**
-   * Ensures that both parameters have the same value.
-   *
-   * @param a
-   *          the value to be tested.
-   * @param b
-   *          the value to be tested against.
-   * @param msg
-   *          message if the assertion fails.
-   * @param msgArgs
-   *          The arguments to be placed into the formatting anchors of the given message. See {@link MessageFormatter}.
-   * @return a if it is the same as b
-   * @throws IllegalArgumentException
-   *           if a is not same as b.
-   */
-  public static int same(int a, int b, CharSequence msg, Object... msgArgs) {
-    return sameInt(a, b, msg, msgArgs);
-  }
-
-  private static int sameInt(int a, int b, CharSequence msg, Object... msgArgs) {
-    if (a != b) {
-      fail(msg, msgArgs);
-    }
-    return a;
   }
 
   /**

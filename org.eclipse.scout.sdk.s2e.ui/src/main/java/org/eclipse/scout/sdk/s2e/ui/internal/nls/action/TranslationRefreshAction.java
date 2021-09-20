@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEcli
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.internal.nls.editor.NlsTable;
@@ -26,10 +26,10 @@ import org.eclipse.swt.widgets.MessageBox;
  */
 public class TranslationRefreshAction extends Action {
 
-  private final TranslationStoreStack m_nlsProject;
+  private final TranslationManager m_nlsProject;
   private final NlsTable m_table;
 
-  public TranslationRefreshAction(TranslationStoreStack project, NlsTable table) {
+  public TranslationRefreshAction(TranslationManager project, NlsTable table) {
     super("Refresh Translations");
     m_nlsProject = project;
     m_table = table;

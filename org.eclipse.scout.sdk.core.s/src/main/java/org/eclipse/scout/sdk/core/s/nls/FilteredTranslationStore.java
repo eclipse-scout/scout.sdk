@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.s.nls;
 
 import static java.util.stream.Collectors.toMap;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack.toEditableStore;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -42,9 +41,8 @@ public class FilteredTranslationStore implements IEditableTranslationStore {
     m_keysFilter = new HashSet<>(Ensure.notNull(availableKeysFilter));
   }
 
-  @Override
-  public ITranslationEntry addNewTranslation(ITranslation newTranslation) {
-    return toEditableStore(m_store).addNewTranslation(newTranslation);
+  private static IEditableTranslationStore toEditableStore(ITranslationStore store) {
+    return (IEditableTranslationStore) store;
   }
 
   @Override
@@ -73,8 +71,8 @@ public class FilteredTranslationStore implements IEditableTranslationStore {
   }
 
   @Override
-  public ITranslationEntry updateTranslation(ITranslation template) {
-    return toEditableStore(m_store).updateTranslation(template);
+  public ITranslationEntry setTranslation(ITranslation template) {
+    return toEditableStore(m_store).setTranslation(template);
   }
 
   @Override
@@ -112,7 +110,7 @@ public class FilteredTranslationStore implements IEditableTranslationStore {
   @Override
   public Stream<Language> languages() {
     return entries()
-        .flatMap(e -> e.texts().keySet().stream())
+        .flatMap(ITranslation::languages)
         .distinct();
   }
 

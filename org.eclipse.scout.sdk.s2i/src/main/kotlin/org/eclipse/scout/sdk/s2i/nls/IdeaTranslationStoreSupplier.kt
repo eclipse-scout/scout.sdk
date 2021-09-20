@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStoreSupplier
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores
+import org.eclipse.scout.sdk.core.s.nls.Translations
 import org.eclipse.scout.sdk.core.s.nls.properties.*
 import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.parseLanguageFromFileName
 import org.eclipse.scout.sdk.s2i.*
@@ -59,7 +59,7 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
      * Executed on [Project] open
      */
     override fun runActivity(project: Project) {
-        TranslationStores.registerStoreSupplier(this)
+        Translations.registerStoreSupplier(this)
     }
 
     protected fun findJavaTranslationStoresVisibleIn(module: Module, env: IdeaEnvironment, progress: IdeaProgress): Stream<ITranslationStore> {

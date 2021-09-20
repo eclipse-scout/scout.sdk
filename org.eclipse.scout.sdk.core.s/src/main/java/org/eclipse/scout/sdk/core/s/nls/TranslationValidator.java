@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,8 @@ import static java.util.Collections.singleton;
 
 import java.util.Collection;
 
-import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -24,62 +25,75 @@ public final class TranslationValidator {
 
   public static final int OK = 0;
 
-  public static final int DEFAULT_TRANSLATION_MISSING_ERROR = 1;
-  public static final int DEFAULT_TRANSLATION_EMPTY_ERROR = 2;
+  public static final int KEY_OVERRIDES_OTHER_STORE_WARNING = 100;
+  public static final int KEY_IS_OVERRIDDEN_BY_OTHER_STORE_WARNING = 200;
+  public static final int KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING = 300;
+  public static final int TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING = 400;
 
-  public static final int KEY_EMPTY_ERROR = 3;
-  public static final int KEY_ALREADY_EXISTS_ERROR = 4;
-  public static final int KEY_OVERRIDES_OTHER_STORE_WARNING = 5;
-  public static final int KEY_IS_OVERRIDDEN_BY_OTHER_STORE_WARNING = 6;
-  public static final int KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING = 7;
-  public static final int KEY_INVALID_ERROR = 8;
+  public static final int KEY_ALREADY_EXISTS_ERROR = 40000;
+  public static final int DEFAULT_TRANSLATION_MISSING_ERROR = 50000;
+  public static final int KEY_EMPTY_ERROR = 70000;
+  public static final int KEY_INVALID_ERROR = 80000;
 
   private TranslationValidator() {
   }
 
   /**
-   * Checks if the given {@link ITranslation} is valid.
-   * 
-   * @param toValidate
-   *          The {@link ITranslation} to validate. Must not be {@code null}.
-   * @return {@link #KEY_EMPTY_ERROR}, {@link #KEY_INVALID_ERROR}, {@link #DEFAULT_TRANSLATION_MISSING_ERROR},
-   *         {@link #DEFAULT_TRANSLATION_EMPTY_ERROR} or {@link #OK}.
-   */
-  public static int validateTranslation(ITranslation toValidate) {
-    Ensure.notNull(toValidate, "A translation must be specified.");
-    var result = validateKey(toValidate.key());
-    if (result != OK) {
-      return result;
-    }
-    return validateDefaultText(toValidate);
-  }
-
-  /**
    * Checks if the given {@link ITranslation} contains a valid value for the default language.
    *
-   * @param translation
-   *          The {@link ITranslation} to validate
-   * @return {@link #DEFAULT_TRANSLATION_MISSING_ERROR} if there is no default language,
-   *         {@link #DEFAULT_TRANSLATION_EMPTY_ERROR} if the default text is empty or {@link #OK}.
+   * @param newText
+   *          The new text for the default language
+   * @param current
+   *          An optional currently existing {@link IStackedTranslation}. If provided it is used to detect if there is
+   *          another store with higher order available that provides a default language text. In that case it is
+   *          accepted that the current value is empty.
+   * @return {@link #DEFAULT_TRANSLATION_MISSING_ERROR} if there is no default language or
+   *         {@link #TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING} if there is an inherited one that will become
+   *         active or {@link #OK}.
    */
-  public static int validateDefaultText(ITranslation translation) {
-    return Ensure.notNull(translation).text(Language.LANGUAGE_DEFAULT)
-        .map(TranslationValidator::validateDefaultText)
-        .orElse(DEFAULT_TRANSLATION_MISSING_ERROR);
+  public static int validateDefaultText(CharSequence newText, IStackedTranslation current) {
+    if (Strings.hasText(newText)) {
+      return OK; // if there is a new text it is always ok
+    }
+
+    // if the new text is empty its only allowed if there is another store providing a default text
+    if (isOverriding(current, Language.LANGUAGE_DEFAULT)) {
+      return TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING;
+    }
+    return DEFAULT_TRANSLATION_MISSING_ERROR;
   }
 
   /**
-   * Checks if the given {@link CharSequence} is a valid value for a default language text entry.
-   *
-   * @param defaultTranslation
-   *          The text for the default language.
-   * @return {@link #DEFAULT_TRANSLATION_EMPTY_ERROR} if the default text is empty or {@link #OK}.
+   * Checks if the text given would be replaced with a currently overridden one when removed.
+   * 
+   * @param newText
+   *          The new text.
+   * @param current
+   *          An optional currently existing {@link IStackedTranslation}. If provided it is used to detect if there is
+   *          another store with higher order available that provides a text for the language given.
+   * @param language
+   *          The language for which to check
+   * @return {@link #TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING} or {@link #OK}.
    */
-  public static int validateDefaultText(CharSequence defaultTranslation) {
-    if (Strings.isBlank(defaultTranslation)) {
-      return DEFAULT_TRANSLATION_EMPTY_ERROR;
+  public static int validateText(CharSequence newText, IStackedTranslation current, Language language) {
+    if (Strings.hasText(newText)) {
+      return OK; // if there is a new text it is always ok
+    }
+
+    if (isOverriding(current, language)) {
+      return TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING;
     }
     return OK;
+  }
+
+  private static boolean isOverriding(IStackedTranslation current, Language language) {
+    if (current == null || language == null) {
+      return false;
+    }
+    return current.entry(language)
+        .map(ITranslationEntry::store)
+        .filter(s -> current.isOverriding(language, s))
+        .isPresent();
   }
 
   /**
@@ -91,7 +105,8 @@ public final class TranslationValidator {
     return result != OK
         && result != KEY_OVERRIDES_OTHER_STORE_WARNING
         && result != KEY_IS_OVERRIDDEN_BY_OTHER_STORE_WARNING
-        && result != KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING;
+        && result != KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING
+        && result != TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING;
   }
 
   /**
@@ -106,11 +121,11 @@ public final class TranslationValidator {
   }
 
   /**
-   * Checks if the given key is valid in the context of the {@link TranslationStoreStack stack} and
+   * Checks if the given key is valid in the context of the {@link TranslationManager manager} and
    * {@link ITranslationStore store} specified.
    *
-   * @param stack
-   *          The {@link TranslationStoreStack stack} in which the key would be stored. Must not be {@code null}.
+   * @param manager
+   *          The {@link TranslationManager manager} in which the key would be stored. Must not be {@code null}.
    * @param target
    *          The target {@link ITranslationStore store} in which the key would be stored. Must not be {@code null}.
    * @param keyToValidate
@@ -119,62 +134,61 @@ public final class TranslationValidator {
    *         {@link #KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING}, {@link #KEY_OVERRIDES_OTHER_STORE_WARNING},
    *         {@link #KEY_IS_OVERRIDDEN_BY_OTHER_STORE_WARNING}, {@link #KEY_INVALID_ERROR} or {@link #OK}.
    */
-  public static int validateKey(TranslationStoreStack stack, ITranslationStore target, String keyToValidate) {
-    return validateKey(stack, target, keyToValidate, null);
+  public static int validateKey(TranslationManager manager, ITranslationStore target, String keyToValidate) {
+    return validateKey(manager, target, keyToValidate, null);
   }
 
   /**
-   * Checks if the given key is valid in the context of the {@link TranslationStoreStack stack} and
+   * Checks if the given key is valid in the context of the {@link TranslationManager manager} and
    * {@link ITranslationStore store} specified.
    *
-   * @param stack
-   *          The {@link TranslationStoreStack stack} in which the key would be stored.
+   * @param manager
+   *          The {@link TranslationManager manager} in which the key would be stored.
    * @param target
    *          The target {@link ITranslationStore store} in which the key would be stored.
    * @param keyToValidate
    *          The key to validate
    * @param acceptedKeys
-   *          An optional {@link Collection} of keys for which the given stack and store should be ignored in
+   *          An optional {@link Collection} of keys for which the given manager and store should be ignored in
    *          validation.
    * @return {@link #KEY_EMPTY_ERROR}, {@link #KEY_ALREADY_EXISTS_ERROR},
    *         {@link #KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING}, {@link #KEY_OVERRIDES_OTHER_STORE_WARNING},
    *         {@link #KEY_IS_OVERRIDDEN_BY_OTHER_STORE_WARNING}, {@link #KEY_INVALID_ERROR} or {@link #OK}.
    */
-  public static int validateKey(TranslationStoreStack stack, ITranslationStore target, String keyToValidate, Collection<String> acceptedKeys) {
+  public static int validateKey(TranslationManager manager, ITranslationStore target, String keyToValidate, Collection<String> acceptedKeys) {
     if (Strings.isBlank(keyToValidate)) {
       return KEY_EMPTY_ERROR;
     }
 
-    if (acceptedKeys == null || !acceptedKeys.contains(keyToValidate)) {
-      if (target.containsKey(keyToValidate)) {
-        return KEY_ALREADY_EXISTS_ERROR;
-      }
-
-      // the stores that are overridden by me
-      var numStoresWithKeyOverridden = stack.allStores()
-          .filter(store -> store.containsKey(keyToValidate))
-          .filter(store -> store.service().order() > target.service().order())
-          .count();
-
-      // the stores that override me
-      var numStoresOverridingKey = stack.allStores()
-          .filter(store -> store.containsKey(keyToValidate))
-          .filter(store -> store.service().order() < target.service().order())
-          .count();
-
-      if (numStoresWithKeyOverridden > 0 && numStoresOverridingKey > 0) {
-        return KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING;
-      }
-      if (numStoresWithKeyOverridden > 0) {
-        return KEY_OVERRIDES_OTHER_STORE_WARNING;
-      }
-      if (numStoresOverridingKey > 0) {
-        return KEY_IS_OVERRIDDEN_BY_OTHER_STORE_WARNING;
-      }
-    }
-
     if (!ITranslation.KEY_REGEX.matcher(keyToValidate).matches()) {
       return KEY_INVALID_ERROR;
+    }
+
+    if (acceptedKeys != null && acceptedKeys.contains(keyToValidate)) {
+      return OK;
+    }
+
+    if (target.containsKey(keyToValidate)) {
+      return KEY_ALREADY_EXISTS_ERROR;
+    }
+
+    var hasStoresWithKeyOverridden = manager.allStores()
+        .filter(store -> store.containsKey(keyToValidate))
+        .anyMatch(store -> store.service().order() > target.service().order());
+
+    // the stores that override me
+    var hasStoresOverridingKey = manager.allStores()
+        .filter(store -> store.containsKey(keyToValidate))
+        .anyMatch(store -> store.service().order() < target.service().order());
+
+    if (hasStoresWithKeyOverridden && hasStoresOverridingKey) {
+      return KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING;
+    }
+    if (hasStoresWithKeyOverridden) {
+      return KEY_OVERRIDES_OTHER_STORE_WARNING;
+    }
+    if (hasStoresOverridingKey) {
+      return KEY_IS_OVERRIDDEN_BY_OTHER_STORE_WARNING;
     }
 
     return OK;

@@ -199,6 +199,18 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
         return SdkFuture.completed(null)
     }
 
+    override fun deleteIfExists(file: Path) {
+        val toDelete = file.toVirtualFile() ?: return
+        TransactionManager.current().register(object : TransactionMember {
+            override fun file() = file
+
+            override fun commit(progress: IdeaProgress): Boolean {
+                toDelete.delete(this@IdeaEnvironment)
+                return true
+            }
+        })
+    }
+
     override fun doWriteCompilationUnit(code: CharSequence, cuInfo: CompilationUnitInfoWithClasspath, progress: IProgress?, sync: Boolean): IFuture<IType?> {
         val writer = CompilationUnitWriteOperation(project, code, cuInfo)
         val supplier = { registerCompilationUnit(writer.formattedSource /* use formatted source! better performance in array equals of JavaEnvironmentWithEcj.isLoadedInCompiler */, cuInfo) }

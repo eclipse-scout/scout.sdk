@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,14 +11,15 @@
 package org.eclipse.scout.sdk.s2i.nls.editor
 
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.ValidationInfo
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
 import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.Translation
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
+import kotlin.streams.toList
 
-class TranslationEditDialog(project: Project, val translation: ITranslationEntry, stack: TranslationStoreStack, initialLanguageShown: Language? = null) : AbstractTranslationDialog(project, translation.store(), stack, translation.key(), initialLanguageShown) {
+class TranslationEditDialog(project: Project, val translation: IStackedTranslation, manager: TranslationManager, initialLanguageShown: Language? = null)
+    : AbstractTranslationDialog(project, translation.languagesOfAllStores().toList(), manager, translation.key(), initialLanguageShown) {
 
     init {
         title = EclipseScoutBundle.message("edit.translation.x", translation.key())
@@ -26,9 +27,7 @@ class TranslationEditDialog(project: Project, val translation: ITranslationEntry
         keyTextField().isEnabled = false
     }
 
-    override fun validateKeyField(): ValidationInfo? = null
-
     override fun doSave(result: Translation) {
-        stack.updateTranslation(result).orElse(null)
+        translationManager.setTranslation(result)
     }
 }

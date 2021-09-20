@@ -22,9 +22,9 @@
 		.st8 {font-size:0.83333em;font-weight:normal}
 		.st9 {marker-end:url(#mrkr5-58);stroke:#5b9bd5;stroke-linecap:butt;stroke-width:1}
 		.st10 {fill:#5b9bd5;fill-opacity:1;stroke:#5b9bd5;stroke-opacity:1;stroke-width:0.28409090909091}
-		.st11 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
+		.st11 {fill:#ffffff;stroke:none;stroke-linecap:butt}
 		.st12 {fill:#5b9bd5;font-family:Franklin Gothic Book;font-size:0.666664em}
-		.st13 {fill:#ffffff;stroke:none;stroke-linecap:butt}
+		.st13 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
 		.st14 {fill:none;stroke:#e65802;stroke-linecap:butt;stroke-width:2.25}
 		.st15 {fill:#e65802;font-family:Franklin Gothic Book;font-size:1.00001em}
 		.st16 {fill:#e65802;stroke:none;stroke-linecap:butt;stroke-width:1.25}
@@ -372,7 +372,7 @@
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
 			<v:textRect cx="18.8504" cy="436.953" width="40" height="17.6036"/>
 			<path d="M0 436.91 L38.64 436.91" class="st9"/>
-			<rect v:rectContext="textBkgnd" x="6.30351" y="432.153" width="25.0939" height="9.59985" class="st11"/>
+			<rect v:rectContext="textBkgnd" x="6.30351" y="432.153" width="25.0939" height="9.59985" class="st13"/>
 			<text x="6.3" y="439.35" class="st12" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>creates</text>		</g>
 		<g id="shape499-68" v:mID="499" v:groupContext="shape" v:layerMember="0" transform="translate(1088.8,-136.673)">
@@ -520,9 +520,9 @@
 				<v:newlineChar/>
 				<tspan
 						x="13.47" dy="2.46em" class="st8">Method Body</tspan></text>		</g>
-		<g id="shape512-99" v:mID="512" v:groupContext="shape" transform="translate(892.843,-263.037)">
+		<g id="shape512-99" v:mID="512" v:groupContext="shape" transform="translate(873.37,-263.037)">
 			<title>Round Corner Rectangle.512</title>
-			<desc>NLS Translation TranslationStore StoreStack Queries</desc>
+			<desc>NLS Translation TranslationStore TranslationManager Queries</desc>
 			<v:userDefs>
 				<v:ud v:nameU="CTypeTopLeftSnip" v:prompt="" v:val="VT0(0):5"/>
 				<v:ud v:nameU="CTypeTopRightSnip" v:prompt="" v:val="VT0(0):5"/>
@@ -536,27 +536,28 @@
 				<v:ud v:nameU="BotLeftOffset" v:prompt="" v:val="VT0(0.15748031496063):24"/>
 				<v:ud v:nameU="BotRightOffset" v:prompt="" v:val="VT0(0.15748031496063):24"/>
 				<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
-				<v:ud v:nameU="TopLeftOffset" v:prompt="" v:val="VT0(0.11468674996435):1"/>
-				<v:ud v:nameU="TopRightOffset" v:prompt="" v:val="VT0(0.11468674996435):1"/>
-				<v:ud v:nameU="BotLeftOffset" v:prompt="" v:val="VT0(0.11468674996435):1"/>
-				<v:ud v:nameU="BotRightOffset" v:prompt="" v:val="VT0(0.11468674996435):1"/>
+				<v:ud v:nameU="TopLeftOffset" v:prompt="" v:val="VT0(0.14173228772178):1"/>
+				<v:ud v:nameU="TopRightOffset" v:prompt="" v:val="VT0(0.14173228772178):1"/>
+				<v:ud v:nameU="BotLeftOffset" v:prompt="" v:val="VT0(0.14173228772178):1"/>
+				<v:ud v:nameU="BotRightOffset" v:prompt="" v:val="VT0(0.14173228772178):1"/>
 				<v:ud v:nameU="visNavOrder" v:val="VT0(16000):26"/>
 			</v:userDefs>
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197" v:verticalAlign="0"/>
-			<v:textRect cx="41.2872" cy="402.709" width="82.58" height="82.5745"/>
-			<path d="M8.26 444 L74.32 444 A8.25731 8.25731 -180 0 0 82.57 435.74 L82.57 369.68 A8.25731 8.25731 -180 0 0 74.32 361.42
-						 L8.26 361.42 A8.25731 8.25731 -180 0 0 -0 369.68 L0 435.74 A8.25731 8.25731 -180 0 0 8.26 444 Z"
+			<v:textRect cx="51.0236" cy="402.709" width="102.05" height="82.5745"/>
+			<path d="M10.2 444 L91.84 444 A10.2046 10.2046 -180 0 0 102.05 433.79 L102.05 371.63 A10.2046 10.2046 -180 0 0 91.84
+						 361.42 L10.2 361.42 A10.2046 10.2046 -180 0 0 -0 371.63 L0 433.79 A10.2046 10.2046 -180 0 0 10.2 444 Z"
 						class="st16"/>
-			<text x="30.98" y="376.22" class="st7" v:langID="2055"><v:paragraph v:horizAlign="1"/>
+			<text x="40.72" y="376.22" class="st7" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>NLS
 				<v:newlineChar/>
 				<v:lf/>
 				<tspan
-						x="17.75" dy="2.46em" class="st8">Translation<v:lf/></tspan>
-				<tspan x="6.52" dy="1.2em" class="st8">TranslationStore<v:lf/></tspan>
+						x="27.49" dy="2.46em" class="st8">Translation<v:lf/></tspan>
+				<tspan x="16.26" dy="1.2em" class="st8">TranslationStore<v:lf/></tspan>
 				<tspan
-						x="18.19" dy="1.2em" class="st8">StoreStack<v:newlineChar/></tspan>
-				<tspan x="25.11" dy="1.2em" class="st8">Queries</tspan></text>		</g>
+						x="8.73" dy="1.2em" class="st8">TranslationManager<v:newlineChar/></tspan>
+				<tspan x="34.84" dy="1.2em"
+							 class="st8">Queries</tspan></text>		</g>
 		<g id="shape513-106" v:mID="513" v:groupContext="shape" transform="translate(668.742,-263.037)">
 			<title>Round Corner Rectangle.513</title>
 			<desc>Model Annotations Scout Project Creation JaxWs ...</desc>
@@ -615,7 +616,7 @@
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
 			<v:textRect cx="21.2598" cy="436.91" width="40" height="17.6036"/>
 			<path d="M0 436.91 L36.36 436.91" class="st17"/>
-			<rect v:rectContext="textBkgnd" x="15.4473" y="432.11" width="11.6249" height="9.59985" class="st11"/>
+			<rect v:rectContext="textBkgnd" x="15.4473" y="432.11" width="11.6249" height="9.59985" class="st13"/>
 			<text x="15.45" y="439.31" class="st19" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>fills</text>		</g>
 		<g id="shape521-128" v:mID="521" v:groupContext="shape" transform="translate(548.084,-263.037)">
@@ -664,7 +665,7 @@
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
 			<v:textRect cx="19.1945" cy="436.91" width="40" height="17.6036"/>
 			<path d="M0 436.91 L31.92 436.91" class="st20"/>
-			<rect v:rectContext="textBkgnd" x="11.2355" y="432.11" width="15.9178" height="9.59985" class="st11"/>
+			<rect v:rectContext="textBkgnd" x="11.2355" y="432.11" width="15.9178" height="9.59985" class="st13"/>
 			<text x="11.24" y="439.31" class="st22" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>uses</text>		</g>
 		<g id="shape524-143" v:mID="524" v:groupContext="shape" v:layerMember="0" transform="translate(589.371,-352.698)">
@@ -674,10 +675,10 @@
 				<v:ud v:nameU="visNavOrder" v:val="VT0(26000):26"/>
 			</v:userDefs>
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
-			<v:textRect cx="173.844" cy="441.183" width="40" height="17.6036"/>
-			<path d="M0 451.08 L0 441.18 L344.76 441.18 L344.76 444.92" class="st17"/>
-			<rect v:rectContext="textBkgnd" x="165.885" y="436.384" width="15.9178" height="9.59985" class="st11"/>
-			<text x="165.89" y="443.58" class="st19" v:langID="2055"><v:paragraph v:horizAlign="1"/>
+			<v:textRect cx="168.937" cy="441.183" width="40" height="17.6036"/>
+			<path d="M0 451.08 L0 441.18 L335.02 441.18 L335.02 444.92" class="st17"/>
+			<rect v:rectContext="textBkgnd" x="160.978" y="436.384" width="15.9178" height="9.59985" class="st11"/>
+			<text x="160.98" y="443.58" class="st19" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>uses</text>		</g>
 		<g id="shape525-150" v:mID="525" v:groupContext="shape" v:layerMember="0" transform="translate(589.371,-352.698)">
 			<title>Dynamic connector.525</title>
@@ -688,7 +689,7 @@
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
 			<v:textRect cx="234.726" cy="432.68" width="40" height="17.6036"/>
 			<path d="M0 451.08 L0 432.68 L465.42 432.68 L465.42 444.92" class="st17"/>
-			<rect v:rectContext="textBkgnd" x="226.767" y="427.88" width="15.9178" height="9.59985" class="st11"/>
+			<rect v:rectContext="textBkgnd" x="226.767" y="427.88" width="15.9178" height="9.59985" class="st13"/>
 			<text x="226.77" y="435.08" class="st19" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>uses</text>		</g>
 		<g id="shape528-157" v:mID="528" v:groupContext="shape" v:layerMember="0" transform="translate(738.724,-263.037)">
@@ -700,7 +701,7 @@
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
 			<v:textRect cx="7.08661" cy="483.479" width="40" height="17.6036"/>
 			<path d="M7.09 444 L7.09 520.08" class="st17"/>
-			<rect v:rectContext="textBkgnd" x="-0.87237" y="478.679" width="15.9178" height="9.59985" class="st11"/>
+			<rect v:rectContext="textBkgnd" x="-0.87237" y="478.679" width="15.9178" height="9.59985" class="st13"/>
 			<text x="-0.87" y="485.88" class="st19" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>uses</text>		</g>
 		<g id="shape529-164" v:mID="529" v:groupContext="shape" v:layerMember="0" transform="translate(1047.7,-263.037)">
@@ -712,7 +713,7 @@
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
 			<v:textRect cx="7.08661" cy="485.448" width="40" height="17.6036"/>
 			<path d="M7.09 444 L7.09 520.08" class="st17"/>
-			<rect v:rectContext="textBkgnd" x="-0.87237" y="480.649" width="15.9178" height="9.59985" class="st11"/>
+			<rect v:rectContext="textBkgnd" x="-0.87237" y="480.649" width="15.9178" height="9.59985" class="st13"/>
 			<text x="-0.87" y="487.85" class="st19" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>uses</text>		</g>
 		<g id="shape531-171" v:mID="531" v:groupContext="shape" v:layerMember="0" transform="translate(548.084,-306.358)">
@@ -729,18 +730,18 @@
 			</v:userDefs>
 			<path d="M0 444 L-36 444 L-36 425.76 L-51.23 425.76" class="st17"/>
 		</g>
-		<g id="shape533-181" v:mID="533" v:groupContext="shape" v:layerMember="0" transform="translate(892.843,-304.325)">
+		<g id="shape533-181" v:mID="533" v:groupContext="shape" v:layerMember="0" transform="translate(873.37,-304.325)">
 			<title>Dynamic connector.533</title>
 			<desc>uses</desc>
 			<v:userDefs>
 				<v:ud v:nameU="visNavOrder" v:val="VT0(35000):26"/>
 			</v:userDefs>
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
-			<v:textRect cx="-183.725" cy="495.619" width="40" height="17.6036"/>
-			<path d="M0 444 L-33.96 444 L-33.96 495.62 L-144.67 495.62 A2.3622 2.3622 -180 0 0 -149.39 495.62 L-301.11 495.62 A2.3622
-						 2.3622 -180 0 0 -305.83 495.62 L-366.15 495.62 L-366.15 482.45 L-395.99 482.45" class="st17"/>
-			<rect v:rectContext="textBkgnd" x="-191.684" y="490.82" width="15.9178" height="9.59985" class="st11"/>
-			<text x="-191.68" y="498.02" class="st19" v:langID="2055"><v:paragraph v:horizAlign="1"/>
+			<v:textRect cx="-173.911" cy="495.619" width="40" height="17.6036"/>
+			<path d="M0 444 L-14.49 444 L-14.49 495.62 L-125.2 495.62 A2.3622 2.3622 -180 0 0 -129.92 495.62 L-281.64 495.62 A2.3622
+						 2.3622 -180 0 0 -286.36 495.62 L-346.68 495.62 L-346.68 482.45 L-376.52 482.45" class="st17"/>
+			<rect v:rectContext="textBkgnd" x="-181.87" y="490.82" width="15.9178" height="9.59985" class="st13"/>
+			<text x="-181.87" y="498.02" class="st19" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>uses</text>		</g>
 		<g id="shape536-188" v:mID="536" v:groupContext="shape" v:layerMember="0" transform="translate(548.084,-304.325)">
 			<title>Dynamic connector.536</title>
@@ -1429,7 +1430,7 @@
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
 			<v:textRect cx="178.421" cy="444.018" width="40" height="17.6036"/>
 			<path d="M0 444 L372.93 444 L372.93 402.83" class="st30"/>
-			<rect v:rectContext="textBkgnd" x="170.462" y="439.218" width="15.9178" height="9.59985" class="st11"/>
+			<rect v:rectContext="textBkgnd" x="170.462" y="439.218" width="15.9178" height="9.59985" class="st13"/>
 			<text x="170.46" y="446.42" class="st32" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>uses</text>		</g>
 		<g id="shape659-344" v:mID="659" v:groupContext="shape" v:layerMember="0" transform="translate(134.945,-250.714)">
@@ -1439,11 +1440,11 @@
 				<v:ud v:nameU="visNavOrder" v:val="VT0(87000):26"/>
 			</v:userDefs>
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
-			<v:textRect cx="438.52" cy="459.534" width="40" height="17.6036"/>
+			<v:textRect cx="433.263" cy="459.534" width="40" height="17.6036"/>
 			<path d="M0 442.15 L0 459.45 L452.06 459.45 A2.3622 2.3622 0 1 1 456.79 459.45 L608.5 459.45 A2.3622 2.3622 0 1 1 613.23
-						 459.45 L799.19 459.45 L799.19 437.83" class="st30"/>
-			<rect v:rectContext="textBkgnd" x="430.561" y="454.734" width="15.9178" height="9.59985" class="st11"/>
-			<text x="430.56" y="461.93" class="st32" v:langID="2055"><v:paragraph v:horizAlign="1"/>
+						 459.45 L789.45 459.45 L789.45 437.83" class="st30"/>
+			<rect v:rectContext="textBkgnd" x="425.304" y="454.734" width="15.9178" height="9.59985" class="st11"/>
+			<text x="425.3" y="461.93" class="st32" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>uses</text>		</g>
 		<g id="group662-351" transform="translate(-131.614,404.896) rotate(-90)" v:mID="662" v:groupContext="group">
 			<v:userDefs>
@@ -1682,7 +1683,7 @@
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
 			<v:textRect cx="63.5177" cy="437.477" width="40" height="17.6036"/>
 			<path d="M0 436.91 L141.95 436.91" class="st30"/>
-			<rect v:rectContext="textBkgnd" x="50.2501" y="432.677" width="26.5353" height="9.59985" class="st11"/>
+			<rect v:rectContext="textBkgnd" x="50.2501" y="432.677" width="26.5353" height="9.59985" class="st13"/>
 			<text x="50.25" y="439.88" class="st32" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>extends</text>		</g>
 		<g id="shape676-402" v:mID="676" v:groupContext="shape" v:layerMember="0" transform="translate(60.5354,-322.565)">
@@ -1694,7 +1695,7 @@
 			<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
 			<v:textRect cx="-22.5354" cy="513.09" width="40" height="17.6036"/>
 			<path d="M-7.09 444 L-21.97 444 L-21.97 610.05 L-13.25 610.05" class="st30"/>
-			<rect v:rectContext="textBkgnd" x="-35.0823" y="508.29" width="25.0939" height="9.59985" class="st11"/>
+			<rect v:rectContext="textBkgnd" x="-35.0823" y="508.29" width="25.0939" height="9.59985" class="st13"/>
 			<text x="-35.08" y="515.49" class="st32" v:langID="2055"><v:paragraph v:horizAlign="1"/>
 				<v:tabList/>creates</text>		</g>
 		<g id="shape679-409" v:mID="679" v:groupContext="shape" transform="translate(665.907,-39.1004)">

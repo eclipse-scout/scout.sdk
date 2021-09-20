@@ -12,8 +12,18 @@ package org.eclipse.scout.sdk.core.s.nls;
 
 import java.util.Comparator;
 
+/**
+ * Comparator naturally sorting {@link ITranslationStore} instances by its @Order annotation (low order come first =
+ * ascending). This means the most important {@link ITranslationStore} is at the first position in the sorted
+ * collection.
+ */
 @SuppressWarnings({"squid:S2063", "ComparatorNotSerializable"}) // Comparators should be "Serializable". Not necessary here because translation stores are not.
-public class TranslationStoreComparator implements Comparator<ITranslationStore> {
+public final class TranslationStoreComparator implements Comparator<ITranslationStore> {
+
+  public static final Comparator<ITranslationStore> INSTANCE = new TranslationStoreComparator();
+
+  private TranslationStoreComparator() {
+  }
 
   @Override
   public int compare(ITranslationStore o1, ITranslationStore o2) {

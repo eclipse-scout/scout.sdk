@@ -14,7 +14,7 @@ import com.intellij.lang.Language
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.lang.xml.XMLLanguage
 import com.intellij.psi.PsiElement
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope
+import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope
 
 abstract class TranslationLanguageSpec(val element: PsiElement, val translationDependencyScope: DependencyScope, val stringDelimiter: CharSequence,
                                        protected val translationKeyResolver: (PsiElement) -> String?) {

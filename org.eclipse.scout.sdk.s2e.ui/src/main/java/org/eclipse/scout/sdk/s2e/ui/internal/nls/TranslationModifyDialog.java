@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,11 +10,13 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls;
 
+import java.util.stream.Collectors;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.window.Window;
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
 import org.eclipse.scout.sdk.core.s.nls.Language;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractWizardPage;
 import org.eclipse.swt.widgets.Shell;
 
@@ -23,9 +25,8 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class TranslationModifyDialog extends AbstractTranslationDialog {
 
-  public TranslationModifyDialog(Shell parentShell, TranslationStoreStack project, ITranslationEntry row) {
-    super(parentShell, "Modify Entry", row, project, false);
-    setSelectedStore(row.store());
+  public TranslationModifyDialog(Shell parentShell, TranslationManager project, IStackedTranslation translation) {
+    super(parentShell, "Modify Entry", translation, project, translation.languagesOfAllStores().collect(Collectors.toList()), false);
   }
 
   @Override

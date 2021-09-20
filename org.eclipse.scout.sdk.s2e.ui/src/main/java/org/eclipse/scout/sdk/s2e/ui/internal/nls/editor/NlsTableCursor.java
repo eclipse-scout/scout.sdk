@@ -11,7 +11,10 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor;
 
 import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.isForbidden;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateKey;
+import static org.eclipse.scout.sdk.s2e.ui.internal.nls.editor.NlsTableController.translationOfRow;
 
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +23,8 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.sdk.core.s.nls.Language;
+import org.eclipse.scout.sdk.core.s.nls.TranslationValidator;
 import org.eclipse.scout.sdk.core.util.EventListenerList;
 import org.eclipse.scout.sdk.s2e.ui.internal.nls.TranslationInputValidator;
 import org.eclipse.swt.SWT;
@@ -110,13 +115,16 @@ public class NlsTableCursor {
     m_cursor.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        var row = ((TableCursor) e.getSource()).getRow();
-        var entry = NlsTableController.entryOfRow(row);
+        var cursor = (TableCursor) e.getSource();
+        var row = cursor.getRow();
+        var entry = translationOfRow(row);
         if (entry == null) {
           return;
         }
 
-        if (entry.store().isEditable()) {
+        var col = cursor.getColumn();
+        var editable = col == NlsTableController.INDEX_COLUMN_KEYS ? entry.hasOnlyEditableStores() : entry.hasEditableStores();
+        if (editable) {
           getCursor().setForeground(getColor(COLOR_FOREGROUND));
           getCursor().setBackground(getColor(COLOR_BACKGROUND));
         }
@@ -142,7 +150,7 @@ public class NlsTableCursor {
 
     var column = getCursor().getColumn();
     var lang = m_controller.languageOfColumn(column);
-    return Optional.of(new NlsTableCell(column, NlsTableController.entryOfRow(row), lang));
+    return Optional.of(new NlsTableCell(column, translationOfRow(row), lang));
   }
 
   public void setVisible(boolean visible) {
@@ -203,7 +211,8 @@ public class NlsTableCursor {
     }
 
     var cell = selection.get();
-    if (!cell.store().isEditable()) {
+    var isEditable = cell.column() == NlsTableController.INDEX_COLUMN_KEYS ? cell.translation().hasOnlyEditableStores() : cell.translation().hasEditableStores();
+    if (!isEditable) {
       return;
     }
     if (cell.column() == NlsTableController.INDEX_COLUMN_REF_COUNT) {
@@ -215,9 +224,19 @@ public class NlsTableCursor {
 
   private IStatus validateEditingText() {
     var selectedColumn = getCursor().getColumn();
+    var editingText = m_editingText.getText();
     if (selectedColumn == NlsTableController.INDEX_COLUMN_KEYS) {
-      var storeOfSelectedRow = getSelection().get().store();
-      return TranslationInputValidator.validateNlsKey(m_controller.stack(), storeOfSelectedRow, m_editingText.getText());
+      var validationResult = getSelection().get().translation().stores()
+          .mapToInt(store -> validateKey(m_controller.translationManager(), store, editingText, Collections.singleton(editingText)))
+          .max().orElse(TranslationValidator.OK);
+      return TranslationInputValidator.toStatus(validationResult);
+    }
+    var isDefaultLang = getSelection()
+        .flatMap(NlsTableCell::language)
+        .filter(Language.LANGUAGE_DEFAULT::equals)
+        .isPresent();
+    if (isDefaultLang) {
+      return TranslationInputValidator.validateDefaultTranslation(editingText);
     }
     return Status.OK_STATUS;
   }
@@ -225,10 +244,10 @@ public class NlsTableCursor {
   private String getEditableTextContent(String inputText, boolean isKeyColumn) {
     if (inputText == null) {
       if (isKeyColumn) {
-        return NlsTableController.entryOfRow(getCursor().getRow()).key();
+        return translationOfRow(getCursor().getRow()).key();
       }
       var lang = m_controller.languageOfColumn(getCursor().getColumn());
-      return NlsTableController.entryOfRow(getCursor().getRow()).text(lang).orElse("");
+      return translationOfRow(getCursor().getRow()).text(lang).orElse("");
     }
     return inputText;
   }
@@ -243,14 +262,7 @@ public class NlsTableCursor {
     var input = getEditableTextContent(defaultText, isKeyColumn);
     m_editingText = new TableTextEditor(getCursor(), isKeyColumn ? SWT.NONE : SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
     m_editingText.setText(input);
-    m_editingText.addModifyListener(e -> {
-      if (isForbidden(validateEditingText().getCode())) {
-        m_editingText.setForeground(m_editingText.getDisplay().getSystemColor(SWT.COLOR_RED));
-      }
-      else {
-        m_editingText.setForeground(null);
-      }
-    });
+    m_editingText.addModifyListener(e -> m_editingText.setErrorStatus(validateEditingText()));
     if (defaultText != null) {
       m_editingText.setSelection(input.length());
     }

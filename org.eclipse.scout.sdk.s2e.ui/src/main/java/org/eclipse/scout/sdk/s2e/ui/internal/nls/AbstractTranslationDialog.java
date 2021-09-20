@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.nls;
 
 import static java.util.stream.Collectors.toCollection;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -31,7 +32,7 @@ import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
@@ -65,10 +66,11 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
   protected static final String DIALOG_SETTINGS_Y = "dialogSettingsY";
 
   private final Translation m_nlsEntry;
-  private final TranslationStoreStack m_nlsProject;
+  private final TranslationManager m_nlsProject;
   private final boolean m_showProjectList;
   private final String m_title;
   private final Map<Language, TextField> m_translationFields;
+  private final Set<Language> m_languages;
   private final Display m_display;
 
   private boolean m_keyToClipboard;
@@ -80,15 +82,25 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
   private Composite m_fixDialogArea;
   private Button m_copyKeyToClipboard;
 
-  protected AbstractTranslationDialog(Shell parentShell, String title, ITranslation row, TranslationStoreStack project, boolean showProjectList) {
+  protected AbstractTranslationDialog(Shell parentShell, String title, ITranslation row, TranslationManager project, Collection<Language> languages, boolean showProjectList) {
     super(parentShell);
     m_display = parentShell.getDisplay();
     m_nlsProject = Ensure.notNull(project);
     m_title = Ensure.notNull(title);
     m_nlsEntry = new Translation(row);
     m_store = project.primaryEditableStore().orElse(null);
+    if (languages == null) {
+      m_languages = null;
+    }
+    else {
+      m_languages = new TreeSet<>(languages);
+    }
     m_translationFields = new HashMap<>();
     m_showProjectList = showProjectList && project.allEditableStores().count() > 1;
+  }
+
+  protected AbstractTranslationDialog(Shell parentShell, String title, ITranslation row, TranslationManager project, boolean showProjectList) {
+    this(parentShell, title, row, project, null /* computed based on selected store */, showProjectList);
   }
 
   @Override
@@ -180,11 +192,12 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
         translationGroup.getItem(translationGroup.getSelectionIndex()).getControl().setFocus();
       }
     });
-    Set<Language> languages = getSelectedStore()
-        .map(ITranslationStore::languages)
-        .orElseGet(Stream::empty)
-        .collect(toCollection(TreeSet::new));
     m_translationFields.clear();
+    var languages = m_languages != null ? m_languages
+        : Optional.ofNullable(m_store)
+            .map(ITranslationStore::languages)
+            .orElseGet(Stream::empty)
+            .collect(toCollection(TreeSet::new));
     for (var l : languages) {
       var txtFieldContainer = new Composite(translationGroup, SWT.NONE);
       var tabItem = new TabItem(translationGroup, SWT.NULL);
@@ -377,7 +390,7 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
     m_store = store;
   }
 
-  public TranslationStoreStack getNlsProject() {
+  public TranslationManager getNlsProject() {
     return m_nlsProject;
   }
 

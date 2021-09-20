@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,18 +20,20 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.components.JBLabel
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores
+import com.intellij.ui.components.JBPanel
+import org.eclipse.scout.sdk.core.s.nls.Translations
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
-import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader
+import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader
 import java.awt.BorderLayout
 import java.awt.Graphics
 import java.beans.PropertyChangeListener
-import javax.swing.JPanel
 
 class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserDataHolderBase(), FileEditor {
 
-    private val m_root: JPanel = object : JPanel(BorderLayout()) {
+    private val m_root = RootPanel()
+
+    inner class RootPanel : JBPanel<RootPanel>(BorderLayout()) {
         private var m_first = true
 
         override fun paint(g: Graphics) {
@@ -40,25 +42,26 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
                 // do not schedule directly. instead schedule after this paint. otherwise there might be ArrayIndexOutOfBoundsExceptions in swing.
                 ApplicationManager.getApplication().invokeLater {
                     FileDocumentManager.getInstance().saveAllDocuments() // ensures all changes are visible to the loader.
-                    TranslationStoreStackLoader.createModalLoader(vFile, project, TranslationStores.DependencyScope.ALL)
+                    TranslationManagerLoader.createModalLoader(vFile, project, Translations.DependencyScope.ALL)
                             .withErrorHandler { onLoadError(it) }
-                            .withStackCreatedHandler { onStackCreated(it) }
+                            .withManagerCreatedHandler { onManagerCreated(it) }
                             .queue()
                 }
             }
             super.paint(g)
         }
     }
+
     private var m_content: NlsEditorContent? = null
 
-    private fun onStackCreated(result: TranslationStoreStackLoader.TranslationStoreStackLoaderResult?) {
+    private fun onManagerCreated(result: TranslationManagerLoader.TranslationManagerLoaderResult?) {
         if (result?.primaryStore == null) {
             ApplicationManager.getApplication().invokeLater { m_root.add(JBLabel(message("no.translations.found"))) }
             return
         }
 
         ApplicationManager.getApplication().invokeLater {
-            val content = NlsEditorContent(project, result.stack, result.primaryStore)
+            val content = NlsEditorContent(project, result.manager, result.primaryStore)
             m_content = content
             m_root.add(content)
             content.textFilterField().requestFocus()

@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.Language
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores
+import org.eclipse.scout.sdk.core.s.nls.Translations
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationKeysQuery
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput
 import org.eclipse.scout.sdk.s2i.*
@@ -124,7 +124,7 @@ open class UnusedTranslationInspection : GlobalInspectionTool() {
             .flatMap { it.newSubTypeHierarchy(scope, true, includeAnonymous = false, includeRoot = false).asSequence() }
             .filter { it.name?.endsWith(ISdkConstants.SUFFIX_PERMISSION_TEXT_PROVIDER_SERVICE) == false }
             .mapNotNull { it.toScoutType(env, false) }
-            .mapNotNull { TranslationStores.create(it, progress).orElse(null) }
+            .mapNotNull { Translations.createStore(it, progress).orElse(null) }
             .filter { it.isEditable }
             .flatMap { store -> store.keys().asSequence().map { it to store } }
             .toMap(HashMap<String, ITranslationStore>())

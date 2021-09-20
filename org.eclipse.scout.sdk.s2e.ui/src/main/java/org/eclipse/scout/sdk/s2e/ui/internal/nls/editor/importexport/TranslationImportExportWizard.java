@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor.importexport;
 import java.util.List;
 
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 
@@ -24,12 +24,12 @@ import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
  */
 public class TranslationImportExportWizard extends Wizard {
 
-  private final TranslationStoreStack m_project;
+  private final TranslationManager m_project;
   private final String m_title;
   private final String m_description;
   private final List<TranslationImportExportWizardExtension> m_extensions;
 
-  public TranslationImportExportWizard(String title, String description, TranslationStoreStack project, List<TranslationImportExportWizardExtension> extensions) {
+  public TranslationImportExportWizard(String title, String description, TranslationManager project, List<TranslationImportExportWizardExtension> extensions) {
     m_title = title;
     m_description = description;
     m_project = project;

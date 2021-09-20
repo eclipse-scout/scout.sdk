@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.JavaProjectContentProvider;
@@ -152,13 +152,13 @@ public final class FieldToolkit {
     return proposalField;
   }
 
-  public static ProposalTextField createTranslationStoreProposalField(Composite parent, String label, TranslationStoreStack stack) {
-    return createTranslationStoreProposalField(parent, label, stack, TextField.DEFAULT_LABEL_WIDTH);
+  public static ProposalTextField createTranslationStoreProposalField(Composite parent, String label, TranslationManager manager) {
+    return createTranslationStoreProposalField(parent, label, manager, TextField.DEFAULT_LABEL_WIDTH);
   }
 
-  public static ProposalTextField createTranslationStoreProposalField(Composite parent, String label, TranslationStoreStack stack, int labelWidth) {
+  public static ProposalTextField createTranslationStoreProposalField(Composite parent, String label, TranslationManager manager, int labelWidth) {
     var proposalField = createProposalField(parent, label, TextField.TYPE_LABEL, labelWidth);
-    var provider = new TranslationStoreContentProvider(stack);
+    var provider = new TranslationStoreContentProvider(manager);
     proposalField.setContentProvider(provider);
     proposalField.setLabelProvider(provider);
     proposalField.setProposalDescriptionProvider(provider);

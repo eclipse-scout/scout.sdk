@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -101,50 +101,40 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
 
   @Override
   public ITranslationEntry changeKey(String oldKey, String newKey) {
-    setDirty(true);
+    throwIfReadOnly();
     var removed = (TranslationEntry) removeTranslation(oldKey);
     if (removed == null) {
       SdkLog.warning("Cannot update key '{}' to '{}' because it could not be found.", oldKey, newKey);
       return null;
     }
+    setDirty(true);
     removed.setKey(newKey);
     addTranslationEntry(removed);
     return removed;
   }
 
   @Override
-  public ITranslationEntry updateTranslation(ITranslation newEntry) {
-    var key = newEntry.key();
-    var entryToModify = (TranslationEntry) get(key).get();
-    setDirty(true);
+  public ITranslationEntry setTranslation(ITranslation newEntry) {
+    throwIfReadOnly();
 
     ensureAllLanguagesExist(newEntry);
+    setDirty(true);
 
-    // remove translation from all properties files
-    for (var l : entryToModify.texts().keySet()) {
-      translationFiles().get(l).removeTranslation(key);
+    var entryToModify = m_translations.get(newEntry.key());
+    if (entryToModify == null) {
+      return addNewTranslation(newEntry);
     }
-    // update instance
-    entryToModify.setTexts(newEntry.texts());
-
-    // add to new properties files
-    for (var newTranslations : entryToModify.texts().entrySet()) {
-      translationFiles().get(newTranslations.getKey()).setTranslation(key, newTranslations.getValue());
-    }
-    return entryToModify;
+    return updateTranslation(entryToModify, newEntry);
   }
 
   protected void ensureAllLanguagesExist(ITranslation translation) {
-    translation.texts().keySet().stream()
+    translation.languages()
         .filter(lang -> languages().noneMatch(existing -> existing.equals(lang)))
         .forEach(this::addNewLanguage);
   }
 
-  @Override
-  public ITranslationEntry addNewTranslation(ITranslation newTranslation) {
-    throwIfReadOnly();
+  protected ITranslationEntry addNewTranslation(ITranslation newTranslation) {
     var newEntry = new TranslationEntry(newTranslation, this);
-    ensureAllLanguagesExist(newEntry);
     setDirty(true);
     addTranslationEntry(newEntry);
     return newEntry;
@@ -153,6 +143,24 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
   protected void addTranslationEntry(TranslationEntry entryToAdd) {
     m_translations.put(entryToAdd.key(), entryToAdd);
     entryToAdd.texts().forEach((key, value) -> updateTextInFile(key, entryToAdd.key(), value));
+  }
+
+  protected ITranslationEntry updateTranslation(ITranslation existingTranslation, ITranslation newTranslation) {
+    var key = newTranslation.key();
+
+    // remove existing texts from all files
+    existingTranslation.languages()
+        .forEach(l -> translationFiles().get(l).removeTranslation(key));
+
+    // add new entry
+    var newEntry = new TranslationEntry(newTranslation, this);
+    addTranslationEntry(newEntry);
+
+    // add new texts to files
+    for (var newTranslations : newEntry.texts().entrySet()) {
+      translationFiles().get(newTranslations.getKey()).setTranslation(key, newTranslations.getValue());
+    }
+    return newEntry;
   }
 
   @Override

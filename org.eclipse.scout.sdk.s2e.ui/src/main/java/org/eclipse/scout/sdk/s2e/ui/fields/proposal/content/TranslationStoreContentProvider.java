@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
@@ -32,11 +32,11 @@ import org.eclipse.swt.graphics.Image;
  */
 public class TranslationStoreContentProvider extends AbstractContentProviderAdapter {
 
-  private final TranslationStoreStack m_stack;
+  private final TranslationManager m_manager;
   private final Map<org.eclipse.scout.sdk.core.model.api.IType, IType> m_jdtTypeCache;
 
-  public TranslationStoreContentProvider(TranslationStoreStack stack) {
-    m_stack = Ensure.notNull(stack);
+  public TranslationStoreContentProvider(TranslationManager manager) {
+    m_manager = Ensure.notNull(manager);
     m_jdtTypeCache = new HashMap<>();
   }
 
@@ -73,7 +73,7 @@ public class TranslationStoreContentProvider extends AbstractContentProviderAdap
 
   @Override
   protected Collection<?> loadProposals(IProgressMonitor monitor) {
-    return m_stack.allEditableStores()
+    return m_manager.allEditableStores()
         .collect(toList());
   }
 }

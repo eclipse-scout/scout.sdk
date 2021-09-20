@@ -37,9 +37,9 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextArea
 import com.intellij.util.ui.JBDimension
 import com.intellij.util.ui.PositionTracker
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator.*
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.nls.editor.NlsTableModel.Companion.KEY_COLUMN_INDEX
@@ -60,10 +60,12 @@ import javax.swing.table.TableCellRenderer
 import javax.swing.table.TableRowSorter
 import javax.swing.text.DefaultEditorKit
 
-class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() {
+class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
 
-    private val m_model: NlsTableModel = NlsTableModel(stack, project)
-    private val m_table: TablePreservingSelection = TablePreservingSelection(m_model, { index -> m_model.translationForRow(index) }, { row -> m_model.rowForTranslation(row as ITranslationEntry) })
+    private val m_model: NlsTableModel = NlsTableModel(manager, project)
+    private val m_table: TablePreservingSelection = TablePreservingSelection(m_model,
+            { index -> m_model.translationForRow(index) },
+            { row -> m_model.rowForTranslation(row as IStackedTranslation) })
     private val m_tableSorterFilter = TableRowSorter(m_model)
     private val m_cellMargin = Insets(1, 4, 2, 2)
     private val m_editStartEvent = EventObject(this)
@@ -74,7 +76,10 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
 
     init {
         m_table.tableColumnsChangedCallback = { adjustView() }
-        m_table.tableChangedCallback = { adjustRowHeights(it) }
+        m_table.tableChangedCallback = {
+            adjustRowHeights(it)
+            m_tableSorterFilter.sort() // re-apply filter as the filtered rows might have changed
+        }
         m_table.columnWidthSupplier = { if (it.modelIndex == KEY_COLUMN_INDEX) 250 else 350 }
         m_table.fillsViewportHeight = true
         m_table.autoResizeMode = JTable.AUTO_RESIZE_OFF
@@ -92,7 +97,7 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
             override fun invokePopup(comp: Component?, x: Int, y: Int) {
                 val selectedTranslations = selectedTranslations()
                 if (selectedTranslations.size > 1) {
-                    val hasReadOnlyRows = selectedTranslations.map { it.store() }.any { !it.isEditable }
+                    val hasReadOnlyRows = selectedTranslations.any { !it.hasEditableStores() }
                     // ActionPopupMenuImpl show a 'Nothing here' menu if all menu items are invisible
                     // Currently this is the case if it is a multi-selection and includes read-only stores
                     // in that case don't show the popup
@@ -113,6 +118,9 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
         m_table.rowSorter = m_tableSorterFilter
         m_tableSorterFilter.sortKeys = listOf(RowSorter.SortKey(0, SortOrder.ASCENDING), RowSorter.SortKey(1, SortOrder.ASCENDING))
         border = null
+
+        setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
+        setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS)
         setViewportView(m_table)
     }
 
@@ -136,9 +144,7 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
         val fontHeight = fontHeight()
         (event.firstRow..event.lastRow).forEach {
             val viewIndex = m_table.convertRowIndexToView(it)
-            if (viewIndex >= 0) {
-                adjustRowHeight(viewIndex, fontHeight, null)
-            }
+            adjustRowHeight(viewIndex, fontHeight, null)
         }
     }
 
@@ -146,15 +152,14 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
         val fontHeight = fontHeight()
         for (i in 0 until m_model.rowCount) {
             val viewIndex = m_table.convertRowIndexToView(i)
-            if (viewIndex >= 0) {
-                adjustRowHeight(viewIndex, fontHeight)
-            }
+            adjustRowHeight(viewIndex, fontHeight)
         }
     }
 
     private fun fontHeight() = getFontMetrics(m_table.font).height
 
     private fun adjustRowHeight(rowIndex: Int, fontHeight: Int, additionalText: String? = null): Int {
+        if (rowIndex < 0 || rowIndex >= m_table.rowCount) return -1
         val rowsRequired = maxLinesForRow(rowIndex, additionalText)
         val height = (rowsRequired * fontHeight) + 6
         m_table.setRowHeight(rowIndex, height)
@@ -163,10 +168,7 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
 
     private fun adjustEditingRowHeight(additionalText: String? = null): Int {
         val editingRowIndexView = m_table.editingRow
-        if (editingRowIndexView >= 0) {
-            return adjustRowHeight(editingRowIndexView, fontHeight(), additionalText)
-        }
-        return -1
+        return adjustRowHeight(editingRowIndexView, fontHeight(), additionalText)
     }
 
     private fun maxLinesForRow(rowIndex: Int, additionalText: String? = null): Int {
@@ -211,7 +213,7 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
         return data
     }
 
-    fun selectTranslation(translation: ITranslationEntry) {
+    fun selectTranslation(translation: IStackedTranslation) {
         val modelRow = m_model.rowForTranslation(translation)
         if (modelRow < 0) {
             return
@@ -225,7 +227,7 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
         m_table.scrollToSelection()
     }
 
-    fun setFilter(newFilter: Predicate<ITranslationEntry>?) {
+    fun setFilter(newFilter: Predicate<IStackedTranslation>?) {
         val filter = object : RowFilter<NlsTableModel, Int>() {
             override fun include(entry: Entry<out NlsTableModel, out Int>): Boolean {
                 return newFilter?.test(m_model.translationForRow(entry.identifier)) ?: true
@@ -310,7 +312,9 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
                         background = alternateColor
                     }
                 }
-                if (m_model.translationForRow(m_table.convertRowIndexToModel(row)).store().isEditable) {
+                val translationForRow = m_model.translationForRow(m_table.convertRowIndexToModel(row))
+                val isCellEditable = if (column == KEY_COLUMN_INDEX) translationForRow.hasOnlyEditableStores() else translationForRow.hasEditableStores()
+                if (isCellEditable) {
                     txt.foreground = table.foreground
                 } else {
                     txt.foreground = UIManager.getColor("Button.disabledText")
@@ -332,7 +336,7 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
         }
     }
 
-    private inner class MultiLineTextCellEditor(supportMultiLine: Boolean) : AbstractCellEditor(), TableCellEditor {
+    private inner class MultiLineTextCellEditor(val supportMultiLine: Boolean) : AbstractCellEditor(), TableCellEditor {
 
         private val m_cellContentPanel = JBPanel<JBPanel<*>>()
         private val m_txt = TextAreaWithContentSize(m_table.font)
@@ -346,25 +350,12 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
             m_txt.margin = Insets(m_cellMargin.top - borderWidth, m_cellMargin.left - borderWidth, m_cellMargin.bottom, m_cellMargin.right)
             m_txt.document.addDocumentListener(object : DocumentAdapter() {
                 override fun textChanged(e: DocumentEvent) {
-                    if (supportMultiLine) {
-                        adjustEditingRowHeight(m_txt.text)
-                    }
-                    val editingRowViewIndex = m_table.editingRow
-                    val editingColumnViewIndex = m_table.editingColumn
-                    if (editingRowViewIndex >= 0 && editingColumnViewIndex >= 0) {
-                        validateEdit(m_txt.text, editingRowViewIndex, editingColumnViewIndex)
-                    }
+                    onTextChanged()
                 }
             })
             m_txt.addKeyListener(object : KeyAdapter() {
                 override fun keyPressed(e: KeyEvent) {
-                    if (supportMultiLine && e.keyCode == KeyEvent.VK_ENTER && (e.isAltDown || e.isAltGraphDown)) {
-                        m_txt.insert(System.lineSeparator(), m_txt.caretPosition)
-                        e.consume()
-                    } else if (e.keyCode == KeyEvent.VK_ENTER || e.keyCode == KeyEvent.VK_TAB) {
-                        stopCellEditing()
-                        e.consume()
-                    }
+                    onKeyPressed(e)
                 }
             })
             if (!supportMultiLine) {
@@ -379,6 +370,41 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
                 val newLineHelpButton = createButton(NewLineAction(m_txt))
                 m_cellContentPanel.add(newLineHelpButton, GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.FIRST_LINE_END,
                         GridBagConstraints.NONE, Insets(0, 0, 0, 0), 0, 0))
+            }
+        }
+
+        private fun onKeyPressed(e: KeyEvent) {
+            // alt+enter: add new line
+            if (supportMultiLine && e.keyCode == KeyEvent.VK_ENTER && (e.isAltDown || e.isAltGraphDown)) {
+                m_txt.insert(System.lineSeparator(), m_txt.caretPosition)
+                e.consume()
+                return
+            }
+
+            // enter or tab: finish editing
+            if (e.keyCode == KeyEvent.VK_ENTER || e.keyCode == KeyEvent.VK_TAB) {
+                stopCellEditing()
+                e.consume()
+                if (e.keyCode == KeyEvent.VK_TAB) moveSelectionOneRightIfPossible()
+            }
+        }
+
+        private fun moveSelectionOneRightIfPossible() {
+            val selectedColumns = m_table.columnModel.selectionModel.selectedIndices
+            if (selectedColumns.size == 1 && selectedColumns[0] < m_table.columnCount - 1) {
+                val nextIndex = selectedColumns[0] + 1
+                m_table.columnModel.selectionModel.setSelectionInterval(nextIndex, nextIndex)
+            }
+        }
+
+        private fun onTextChanged() {
+            if (supportMultiLine) {
+                adjustEditingRowHeight(m_txt.text)
+            }
+            val editingRowViewIndex = m_table.editingRow
+            val editingColumnViewIndex = m_table.editingColumn
+            if (editingRowViewIndex >= 0 && editingColumnViewIndex >= 0) {
+                validateEdit(m_txt.text, editingRowViewIndex, editingColumnViewIndex)
             }
         }
 
@@ -404,12 +430,12 @@ class NlsTable(stack: TranslationStoreStack, project: Project) : JBScrollPane() 
             val msg = when (result) {
                 OK -> ""
                 DEFAULT_TRANSLATION_MISSING_ERROR -> message("default.text.mandatory")
-                DEFAULT_TRANSLATION_EMPTY_ERROR -> message("default.text.mandatory")
                 KEY_EMPTY_ERROR -> message("please.specify.key")
                 KEY_ALREADY_EXISTS_ERROR -> message("key.already.exists")
                 KEY_OVERRIDES_OTHER_STORE_WARNING -> message("key.would.override")
                 KEY_IS_OVERRIDDEN_BY_OTHER_STORE_WARNING -> message("key.would.be.overridden")
                 KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING -> message("key.overrides.and.is.overridden")
+                TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING -> message("text.replaced.with.inherited")
                 else -> message("key.contains.invalid.chars")
             }
 

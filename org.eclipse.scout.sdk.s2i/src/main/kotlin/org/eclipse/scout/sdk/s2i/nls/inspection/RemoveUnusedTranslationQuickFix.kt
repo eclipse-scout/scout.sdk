@@ -16,7 +16,7 @@ import com.intellij.openapi.project.Project
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores
+import org.eclipse.scout.sdk.core.s.nls.Translations
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironmentSync
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
@@ -42,9 +42,9 @@ class RemoveUnusedTranslationQuickFix(val key: String, val store: ITranslationSt
     }
 
     private fun removeTranslation(env: IEnvironment, progress: IProgress) {
-        val singleStoreStack = TranslationStores.createStack(Stream.of(store)).orElse(null) ?: return
-        singleStoreStack.reload(progress) // in case the filesystem changed since the inspection was executed
-        singleStoreStack.removeTranslations(Stream.of(key))
-        singleStoreStack.flush(env, progress)
+        val singleStoreManager = Translations.createManager(Stream.of(store)).orElse(null) ?: return
+        singleStoreManager.reload(progress) // in case the filesystem changed since the inspection was executed
+        singleStoreManager.removeTranslations(Stream.of(key))
+        singleStoreManager.flush(env, progress)
     }
 }

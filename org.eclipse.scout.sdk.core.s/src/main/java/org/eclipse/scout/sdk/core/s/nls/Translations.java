@@ -39,6 +39,7 @@ import org.eclipse.scout.sdk.core.s.apidef.IScoutChartApi;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -46,9 +47,9 @@ import org.eclipse.scout.sdk.core.util.Strings;
 /**
  * Main access for Scout translation related data.
  */
-public final class TranslationStores {
+public final class Translations {
 
-  private TranslationStores() {
+  private Translations() {
   }
 
   private static final DependencyScope[] ALL_SCOPES = Arrays.stream(DependencyScope.values())
@@ -60,7 +61,7 @@ public final class TranslationStores {
   private static final Map<String /*npm dependency name*/, Set<String> /* UiTextContributor FQNs */> UI_TEXT_CONTRIBUTORS = new HashMap<>();
   static {
     ScoutApi.allKnown()
-        .map(TranslationStores::getPredefinedTextContributorMappings)
+        .map(Translations::getPredefinedTextContributorMappings)
         .map(Map::entrySet)
         .flatMap(Collection::stream)
         .distinct()
@@ -141,65 +142,64 @@ public final class TranslationStores {
   }
 
   /**
-   * Creates a {@link TranslationStoreStack} for a Java/JavaScript module.<br>
-   * The {@link TranslationStoreStack} contains all {@link ITranslationStore}s of the module in the correct order
-   * according to the @Order annotation of the corresponding Scout TextProviderService. It also handles translation
-   * overriding and modifications to the {@link ITranslationStore}s.
+   * Creates a {@link TranslationManager} for a Java/JavaScript module.<br>
+   * The {@link TranslationManager} contains all {@link ITranslationStore}s of the module in the correct order according
+   * to the @Order annotation of the corresponding Scout TextProviderService. It also handles translation overriding and
+   * modifications to the {@link ITranslationStore}s.
    *
    * @param modulePath
-   *          The modulePath for which the stack (containing all accessible stores) should be returned. Points to the
+   *          The modulePath for which the manager (containing all accessible stores) should be returned. Points to the
    *          root folder of the Java/JavaScript module (the folder that contains the pom.xml/package.json). Must not be
    *          {@code null}.
    * @param scope
    *          The {@link DependencyScope} to consider when resolving the visible {@link ITranslationStore} instances.
-   *          The resulting {@link TranslationStoreStack} contains the stores as found according to the scope given. If
+   *          The resulting {@link TranslationManager} contains the stores as found according to the scope given. If
    *          {@code null}, all scopes are searched.
    * @param env
    *          The {@link IEnvironment} of the request. Must not be {@code null}.
    * @param progress
    *          The {@link IProgress} monitor. Must not be {@code null}.
-   * @return A new {@link TranslationStoreStack} for the specified {@link Path}.
-   * @see TranslationStoreStack
+   * @return A new {@link TranslationManager} for the specified {@link Path}.
+   * @see TranslationManager
    */
-  public static Optional<TranslationStoreStack> createStack(Path modulePath, IEnvironment env, IProgress progress, DependencyScope scope) {
-    return createStack(forModule(modulePath, env, progress, scope));
+  public static Optional<TranslationManager> createManager(Path modulePath, IEnvironment env, IProgress progress, DependencyScope scope) {
+    return createManager(storesForModule(modulePath, env, progress, scope));
   }
 
   /**
-   * Creates a {@link TranslationStoreStack} for a Java/JavaScript module.<br>
-   * The {@link TranslationStoreStack} contains all {@link ITranslationStore}s of the module in the correct order
-   * according to the @Order annotation of the corresponding Scout TextProviderService. It also handles translation
-   * overriding and modifications to the {@link ITranslationStore}s.
+   * Creates a {@link TranslationManager} for a Java/JavaScript module.<br>
+   * The {@link TranslationManager} contains all {@link ITranslationStore}s of the module in the correct order according
+   * to the @Order annotation of the corresponding Scout TextProviderService. It also handles translation overriding and
+   * modifications to the {@link ITranslationStore}s.
    *
    * @param modulePath
-   *          The modulePath for which the stack (containing all accessible stores) should be returned. Points to the
+   *          The modulePath for which the manager (containing all accessible stores) should be returned. Points to the
    *          root folder of the Java/JavaScript module (the folder that contains the pom.xml/package.json). Must not be
    *          {@code null}.
    * @param scopes
    *          The {@link DependencyScope scopes} to consider when resolving the visible {@link ITranslationStore}
-   *          instances. The resulting {@link TranslationStoreStack} contains the stores as found according to the
-   *          scopes given. If {@code null}, all scopes are searched.
+   *          instances. The resulting {@link TranslationManager} contains the stores as found according to the scopes
+   *          given. If {@code null}, all scopes are searched.
    * @param env
    *          The {@link IEnvironment} of the request. Must not be {@code null}.
    * @param progress
    *          The {@link IProgress} monitor. Must not be {@code null}.
-   * @return A new {@link TranslationStoreStack} for the specified {@link Path}.
-   * @see TranslationStoreStack
+   * @return A new {@link TranslationManager} for the specified {@link Path}.
+   * @see TranslationManager
    */
-  public static Optional<TranslationStoreStack> createStack(Path modulePath, IEnvironment env, IProgress progress, DependencyScope... scopes) {
-    return createStack(forModule(modulePath, env, progress, scopes));
+  public static Optional<TranslationManager> createManager(Path modulePath, IEnvironment env, IProgress progress, DependencyScope... scopes) {
+    return createManager(storesForModule(modulePath, env, progress, scopes));
   }
 
   /**
-   * Creates a {@link TranslationStoreStack} for the {@link ITranslationStore stores} given.
-   * 
+   * Creates a {@link TranslationManager} for the {@link ITranslationStore stores} given.
+   *
    * @param stores
-   *          The {@link ITranslationStore} instances that should be added to the stack. Must not be {@code null}.
-   * @return A {@link TranslationStoreStack} if the {@link Stream} given contains any stores.
+   *          The {@link ITranslationStore} instances that should be added to the manager. Must not be {@code null}.
+   * @return A {@link TranslationManager} if the {@link Stream} given contains any stores.
    */
-  public static Optional<TranslationStoreStack> createStack(Stream<ITranslationStore> stores) {
-    return Optional.of(new TranslationStoreStack(stores))
-        .filter(stack -> stack.allStores().findAny().isPresent());
+  public static Optional<TranslationManager> createManager(Stream<ITranslationStore> stores) {
+    return TranslationManager.create(stores);
   }
 
   /**
@@ -208,16 +208,16 @@ public final class TranslationStores {
    * service. As this is not refactoring safe each service that overwrites other keys should have an explicit unique
    * order to ensure a stable override.
    *
-   * @return A {@link Stream} returning {@link Set sets} of {@link ITranslationStore TranslationStores} that share the
-   *         same {@code @Order} annotation value and have common translation keys.
+   * @return A {@link Stream} returning {@link Set sets} of {@link ITranslationStore Translations} that share the same
+   *         {@code @Order} annotation value and have common translation keys.
    */
-  public static Stream<Set<ITranslationStore>> havingImplicitOverrides(Collection<ITranslationStore> allStores) {
-    return allStores.stream()
+  public static Stream<Set<ITranslationStore>> storesHavingImplicitOverrides(Stream<ITranslationStore> allStores) {
+    return allStores
         .distinct()
         .collect(groupingBy(s -> s.service().order(), toList()))
         .values().stream()
         .filter(group -> group.size() > 1)
-        .map(TranslationStores::storesWithCommonKeys)
+        .map(Translations::storesWithCommonKeys)
         .filter(group -> !group.isEmpty());
   }
 
@@ -252,7 +252,7 @@ public final class TranslationStores {
    * @return All {@link ITranslationStore} instances accessible in the module given according to the requested
    *         {@link DependencyScope scopes}.
    */
-  public static Stream<ITranslationStore> forModule(Path modulePath, IEnvironment env, IProgress progress, DependencyScope... scopes) {
+  public static Stream<ITranslationStore> storesForModule(Path modulePath, IEnvironment env, IProgress progress, DependencyScope... scopes) {
     return combineSameStores(computeStoresForModule(modulePath, env, progress, scopes));
   }
 
@@ -272,7 +272,7 @@ public final class TranslationStores {
    * @return All {@link ITranslationStore} instances accessible in the module given according to the requested
    *         {@link DependencyScope}.
    */
-  public static Stream<ITranslationStore> forModule(Path modulePath, IEnvironment env, IProgress progress, DependencyScope scope) {
+  public static Stream<ITranslationStore> storesForModule(Path modulePath, IEnvironment env, IProgress progress, DependencyScope scope) {
     return combineSameStores(computeStoresForModule(modulePath, env, progress, scope));
   }
 
@@ -320,7 +320,7 @@ public final class TranslationStores {
     progress.init(suppliers.size() * ticksBySupplier, "Search translation stores for Java module at '{}'.", modulePath);
     return suppliers.stream()
         .flatMap(supplier -> supplier.visibleStoresForJavaModule(modulePath, env, progress.newChild(ticksBySupplier)))
-        .filter(TranslationStores::isContentAvailable);
+        .filter(Translations::isContentAvailable);
   }
 
   /**
@@ -339,11 +339,11 @@ public final class TranslationStores {
   static Stream<ITranslationStore> forNodeModule(Path modulePath, IEnvironment env, IProgress progress) {
     SdkLog.debug("Search translation stores for Node module at '{}'.", modulePath);
     return WebModuleTranslationStores.allForNodeModule(modulePath, env, progress)
-        .filter(TranslationStores::isContentAvailable);
+        .filter(Translations::isContentAvailable);
   }
 
   static Stream<ITranslationStore> combineSameStores(Stream<ITranslationStore> stores) {
-    return stores.collect(toMap(s -> s.service().type().name(), identity(), TranslationStores::mergeStores))
+    return stores.collect(toMap(s -> s.service().type().name(), identity(), Translations::mergeStores))
         .values()
         .stream();
   }
@@ -357,7 +357,7 @@ public final class TranslationStores {
    *          The {@link IProgress} monitor. Must not be {@code null}.
    * @return An {@link Optional} holding the store if it could be parsed for the {@link IType} given.
    */
-  public static Optional<? extends ITranslationStore> create(IType textService, IProgress progress) {
+  public static Optional<? extends ITranslationStore> createStore(IType textService, IProgress progress) {
     Ensure.notNull(textService);
     Ensure.notNull(progress);
 

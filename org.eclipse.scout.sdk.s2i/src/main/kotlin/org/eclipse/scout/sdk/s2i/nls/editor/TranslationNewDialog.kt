@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,22 +11,37 @@
 package org.eclipse.scout.sdk.s2i.nls.editor
 
 import com.intellij.openapi.project.Project
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
+import com.intellij.openapi.ui.ValidationInfo
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.Translation
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
+import org.eclipse.scout.sdk.core.s.nls.TranslationValidator
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
+import kotlin.streams.toList
 
-class TranslationNewDialog(project: Project, store: ITranslationStore, stack: TranslationStoreStack, initialKey: String? = null) : AbstractTranslationDialog(project, store, stack, initialKey) {
+class TranslationNewDialog(project: Project, val store: ITranslationStore, manager: TranslationManager, initialKey: String? = null)
+    : AbstractTranslationDialog(project, store.languages().toList(), manager, initialKey) {
 
-    private var m_createdTranslation: ITranslationEntry? = null
+    private var m_createdTranslation: IStackedTranslation? = null
 
     init {
         title = EclipseScoutBundle.message("create.new.translation.in.x", store.service().type().elementName())
     }
 
     override fun doSave(result: Translation) {
-        m_createdTranslation = stack.addNewTranslation(result, store)
+        m_createdTranslation = translationManager.setTranslation(result, store)
+    }
+
+    override fun validateValues(): MutableList<ValidationInfo?> {
+        val result = super.validateValues()
+        result.add(validateKeyField())
+        return result
+    }
+
+    private fun validateKeyField(): ValidationInfo? {
+        val key = keyTextField().text ?: ""
+        return toValidationInfo(TranslationValidator.validateKey(translationManager, store, key))
     }
 
     fun createdTranslation() = m_createdTranslation

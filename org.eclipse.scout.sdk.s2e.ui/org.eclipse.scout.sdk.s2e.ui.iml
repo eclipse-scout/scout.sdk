@@ -46,8 +46,8 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.e4.ui.dialogs:1.2.100" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.e4.ui.widgets:1.2.800" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.urischeme:1.1.200" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: net.java.dev.jna:jna:5.8.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: net.java.dev.jna:jna-platform:5.8.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.java.dev.jna:jna:5.9.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: net.java.dev.jna:jna-platform:5.9.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.e4.ui.di:1.2.900" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.e4.ui.css.swt.theme:0.13.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.e4.ui.bindings:0.13.0" level="project" />

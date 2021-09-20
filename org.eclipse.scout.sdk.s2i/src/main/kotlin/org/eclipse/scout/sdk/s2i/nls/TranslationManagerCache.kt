@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,28 +20,28 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.messages.MessageBusConnection
 import org.eclipse.scout.sdk.core.s.ISdkConstants
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope
+import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile
 import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.core.util.TtlCache
-import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
+import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader.createManager
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
-class TranslationStoreStackCache(val project: Project) : Disposable {
+class TranslationManagerCache(val project: Project) : Disposable {
 
     companion object {
         private const val TEXT_SERVICE_FILE_SUFFIX = ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE + JavaTypes.JAVA_FILE_SUFFIX
 
         /**
-         * @return a cache key to be used for a [TranslationStoreStack].
+         * @return a cache key to be used for a [TranslationManager].
          */
         fun createCacheKey(modulePath: Path, scope: DependencyScope?) = modulePath to scope
 
     }
 
-    private val m_cache = TtlCache<Pair<Path, DependencyScope?>, TranslationStoreStack>(1, TimeUnit.HOURS, AppExecutorUtil.getAppScheduledExecutorService())
+    private val m_cache = TtlCache<Pair<Path, DependencyScope?>, TranslationManager>(1, TimeUnit.HOURS, AppExecutorUtil.getAppScheduledExecutorService())
     private var m_busConnection: MessageBusConnection? = null
 
     init {
@@ -52,25 +52,25 @@ class TranslationStoreStackCache(val project: Project) : Disposable {
     /**
      * @param modulePath The [Path] to the root of the module (the directory where the pom.xml of the module can be found).
      * @param scope An optional [DependencyScope] for which the cache should be created. If it is null, [DependencyScope.ALL] is used.
-     * @return The [TranslationStoreStack] for the module and scope given or null if no stack can be created for the module given (e.g. if it is no Scout module).
+     * @return The [TranslationManager] for the module and scope given or null if no manager can be created for the module given (e.g. if it is no Scout module).
      */
-    fun getOrCreateStack(modulePath: Path, scope: DependencyScope?): TranslationStoreStack? =
+    fun getOrCreateManager(modulePath: Path, scope: DependencyScope?): TranslationManager? =
             m_cache.computeIfAbsent(createCacheKey(modulePath, scope)) {
-                createStack(project, modulePath, scope, false)
+                createManager(project, modulePath, scope, false)
             }
 
     /**
-     * Puts the stack given into the cache. An existing entry may be replaced.
+     * Puts the manager given into the cache. An existing entry may be replaced.
      * @param modulePath The [Path] to the root of the module (the directory where the pom.xml of the module can be found).
      * @param scope An optional [DependencyScope] for which the cache should be created. If it is null, [DependencyScope.ALL] is used.
-     * @param stack The [TranslationStoreStack] to store.
-     * @return the previous [TranslationStoreStack] associated with the path and scope, or null if there was no mapping before.
+     * @param manager The [TranslationManager] to store.
+     * @return the previous [TranslationManager] associated with the path and scope, or null if there was no mapping before.
      */
-    fun putStack(modulePath: Path, scope: DependencyScope?, stack: TranslationStoreStack?): TranslationStoreStack? =
-            m_cache.put(createCacheKey(modulePath, scope), stack)
+    fun putManager(modulePath: Path, scope: DependencyScope?, manager: TranslationManager?): TranslationManager? =
+            m_cache.put(createCacheKey(modulePath, scope), manager)
 
     /**
-     * Removes all stacks from the cache.
+     * Removes all managers from the cache.
      */
     fun clear() = m_cache.clear()
 

@@ -88,7 +88,7 @@
                     serviceImplementation="org.eclipse.scout.sdk.s2i.classid.ClassIdCacheImplementor"/>
     <applicationService serviceInterface="org.eclipse.scout.sdk.s2i.element.ElementCreationManager"
                         serviceImplementation="org.eclipse.scout.sdk.s2i.element.ElementCreationManagerImplementor"/>
-    <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackCache"/>
+    <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.nls.TranslationManagerCache"/>
     <applicationService serviceImplementation="org.eclipse.scout.sdk.s2i.settings.ScoutCodeFoldingSettings"/>
     <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
                          instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>

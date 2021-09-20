@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.core.s.nls;
+package org.eclipse.scout.sdk.core.s.nls.manager;
 
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
@@ -16,18 +16,21 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+import org.eclipse.scout.sdk.core.s.nls.ITranslationManagerListener;
+import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
+import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
- * <h3>{@link TranslationStoreStackEvent}</h3>
+ * <h3>{@link TranslationManagerEvent}</h3>
  * <p>
- * Describes an event of a {@link TranslationStoreStack}.
+ * Describes an event of a {@link TranslationManager}.
  * <p>
- * Use {@link TranslationStoreStack#addListener(ITranslationStoreStackListener)} to register an observer.
+ * Use {@link TranslationManager#addListener(ITranslationManagerListener)} to register an observer.
  *
  * @since 7.0.0
  */
-public final class TranslationStoreStackEvent {
+public final class TranslationManagerEvent {
 
   /**
    * Event type describing a new translation with a new key.
@@ -50,70 +53,70 @@ public final class TranslationStoreStackEvent {
    */
   public static final int TYPE_NEW_LANGUAGE = 1 << 5;
   /**
-   * Event type describing that all changes of the stack have been flushed to the {@link ITranslationStore}s.
+   * Event type describing that all changes of the manager have been flushed to the {@link ITranslationStore}s.
    */
   public static final int TYPE_FLUSH = 1 << 6;
   /**
-   * Event type describing that the content of the stack has been reloaded from the {@link ITranslationStore}s. All
+   * Event type describing that the content of the manager has been reloaded from the {@link ITranslationStore}s. All
    * changes applied are discarded.
    */
   public static final int TYPE_RELOAD = 1 << 7;
 
-  private final TranslationStoreStack m_stack;
+  private final TranslationManager m_manager;
   private final int m_type;
-  private final ITranslationEntry m_entry;
+  private final IStackedTranslation m_entry;
   private final String m_key;
   private final Language m_language;
 
-  private TranslationStoreStackEvent(TranslationStoreStack source, int type, ITranslationEntry entry, String key) {
+  private TranslationManagerEvent(TranslationManager source, int type, IStackedTranslation entry, String key) {
     m_type = type;
-    m_stack = source;
+    m_manager = source;
     m_entry = entry;
     m_key = key;
     m_language = null;
   }
 
-  private TranslationStoreStackEvent(TranslationStoreStack source, int type, Language lang) {
+  private TranslationManagerEvent(TranslationManager source, int type, Language lang) {
     m_type = type;
-    m_stack = source;
+    m_manager = source;
     m_language = lang;
     m_entry = null;
     m_key = null;
   }
 
-  public static TranslationStoreStackEvent createChangeKeyEvent(TranslationStoreStack source, ITranslationEntry newEntry, String oldKey) {
-    return new TranslationStoreStackEvent(source, TYPE_KEY_CHANGED, newEntry, oldKey);
+  public static TranslationManagerEvent createChangeKeyEvent(TranslationManager source, IStackedTranslation newEntry, String oldKey) {
+    return new TranslationManagerEvent(source, TYPE_KEY_CHANGED, newEntry, oldKey);
   }
 
-  public static TranslationStoreStackEvent createRemoveTranslationEvent(TranslationStoreStack source, ITranslationEntry removedEntry) {
-    return new TranslationStoreStackEvent(source, TYPE_REMOVE_TRANSLATION, removedEntry, removedEntry.key());
+  public static TranslationManagerEvent createRemoveTranslationEvent(TranslationManager source, IStackedTranslation removedEntry) {
+    return new TranslationManagerEvent(source, TYPE_REMOVE_TRANSLATION, removedEntry, removedEntry.key());
   }
 
-  public static TranslationStoreStackEvent createUpdateTranslationEvent(TranslationStoreStack source, ITranslationEntry updatedEntry) {
-    return new TranslationStoreStackEvent(source, TYPE_UPDATE_TRANSLATION, updatedEntry, updatedEntry.key());
+  public static TranslationManagerEvent createUpdateTranslationEvent(TranslationManager source, IStackedTranslation updatedEntry) {
+    return new TranslationManagerEvent(source, TYPE_UPDATE_TRANSLATION, updatedEntry, updatedEntry.key());
   }
 
-  public static TranslationStoreStackEvent createAddTranslationEvent(TranslationStoreStack source, ITranslationEntry newEntry) {
-    return new TranslationStoreStackEvent(source, TYPE_NEW_TRANSLATION, newEntry, newEntry.key());
+  public static TranslationManagerEvent createAddTranslationEvent(TranslationManager source, IStackedTranslation newEntry) {
+    return new TranslationManagerEvent(source, TYPE_NEW_TRANSLATION, newEntry, newEntry.key());
   }
 
-  public static TranslationStoreStackEvent createAddLanguageEvent(TranslationStoreStack source, Language newLanguage) {
-    return new TranslationStoreStackEvent(source, TYPE_NEW_LANGUAGE, newLanguage);
+  public static TranslationManagerEvent createAddLanguageEvent(TranslationManager source, Language newLanguage) {
+    return new TranslationManagerEvent(source, TYPE_NEW_LANGUAGE, newLanguage);
   }
 
-  public static TranslationStoreStackEvent createFlushEvent(TranslationStoreStack source) {
-    return new TranslationStoreStackEvent(source, TYPE_FLUSH, null);
+  public static TranslationManagerEvent createFlushEvent(TranslationManager source) {
+    return new TranslationManagerEvent(source, TYPE_FLUSH, null);
   }
 
-  public static TranslationStoreStackEvent createReloadEvent(TranslationStoreStack source) {
-    return new TranslationStoreStackEvent(source, TYPE_RELOAD, null);
+  public static TranslationManagerEvent createReloadEvent(TranslationManager source) {
+    return new TranslationManagerEvent(source, TYPE_RELOAD, null);
   }
 
   /**
-   * @return The {@link TranslationStoreStack} that is the origin of the event.
+   * @return The {@link TranslationManager} that is the origin of the event.
    */
-  public TranslationStoreStack source() {
-    return m_stack;
+  public TranslationManager source() {
+    return m_manager;
   }
 
   /**
@@ -135,28 +138,28 @@ public final class TranslationStoreStackEvent {
   /**
    * @return
    *         <ul>
-   *         <li>For {@link #TYPE_KEY_CHANGED}: The {@link ITranslationEntry} that changed. This entry already returns
+   *         <li>For {@link #TYPE_KEY_CHANGED}: The {@link IStackedTranslation} that changed. This entry already returns
    *         the new key. The old key can be obtained using {@link #key()}.</li>
-   *         <li>For {@link #TYPE_REMOVE_TRANSLATION}: The {@link ITranslationEntry} that has been removed.</li>
-   *         <li>For {@link #TYPE_UPDATE_TRANSLATION}: The {@link ITranslationEntry} that has been updated.</li>
-   *         <li>For {@link #TYPE_NEW_TRANSLATION}: The new {@link ITranslationEntry} that was added.</li>
+   *         <li>For {@link #TYPE_REMOVE_TRANSLATION}: The {@link IStackedTranslation} that has been removed.</li>
+   *         <li>For {@link #TYPE_UPDATE_TRANSLATION}: The {@link IStackedTranslation} that has been updated.</li>
+   *         <li>For {@link #TYPE_NEW_TRANSLATION}: The new {@link IStackedTranslation} that was added.</li>
    *         <li>For all other events: An empty {@link Optional}</li>
    *         </ul>
    */
-  public Optional<ITranslationEntry> entry() {
+  public Optional<IStackedTranslation> translation() {
     return Optional.ofNullable(m_entry);
   }
 
   /**
    * @return
    *         <ul>
-   *         <li>For {@link #TYPE_KEY_CHANGED}: The old key of the entry. The modified {@link ITranslationEntry} holding
-   *         the new key can be obtained using {@link #entry()}.</li>
-   *         <li>For {@link #TYPE_REMOVE_TRANSLATION}: The key of the {@link ITranslationEntry} that has been
+   *         <li>For {@link #TYPE_KEY_CHANGED}: The old key of the entry. The modified {@link IStackedTranslation}
+   *         holding the new key can be obtained using {@link #translation()}.</li>
+   *         <li>For {@link #TYPE_REMOVE_TRANSLATION}: The key of the {@link IStackedTranslation} that has been
    *         removed.</li>
-   *         <li>For {@link #TYPE_UPDATE_TRANSLATION}: The key of the {@link ITranslationEntry} that has been
+   *         <li>For {@link #TYPE_UPDATE_TRANSLATION}: The key of the {@link IStackedTranslation} that has been
    *         updated.</li>
-   *         <li>For {@link #TYPE_NEW_TRANSLATION}: The key of the new {@link ITranslationEntry} that was added.</li>
+   *         <li>For {@link #TYPE_NEW_TRANSLATION}: The key of the new {@link IStackedTranslation} that was added.</li>
    *         <li>For all other events: An empty {@link Optional}</li>
    *         </ul>
    */
@@ -195,7 +198,7 @@ public final class TranslationStoreStackEvent {
 
   @Override
   public String toString() {
-    var joiner = new StringJoiner(", ", TranslationStoreStackEvent.class.getSimpleName() + " [", "]")
+    var joiner = new StringJoiner(", ", TranslationManagerEvent.class.getSimpleName() + " [", "]")
         .add("type=" + typeName(m_type));
     if (Strings.hasText(m_key)) {
       joiner.add("key=" + m_key);
@@ -216,7 +219,7 @@ public final class TranslationStoreStackEvent {
     result = prime * result + ((m_entry == null) ? 0 : m_entry.hashCode());
     result = prime * result + ((m_key == null) ? 0 : m_key.hashCode());
     result = prime * result + ((m_language == null) ? 0 : m_language.hashCode());
-    result = prime * result + m_stack.hashCode();
+    result = prime * result + m_manager.hashCode();
     result = prime * result + m_type;
     return result;
   }
@@ -230,11 +233,11 @@ public final class TranslationStoreStackEvent {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    var other = (TranslationStoreStackEvent) obj;
+    var other = (TranslationManagerEvent) obj;
     return m_type == other.m_type
         && Objects.equals(m_key, other.m_key)
         && Objects.equals(m_entry, other.m_entry)
         && Objects.equals(m_language, other.m_language)
-        && Objects.equals(m_stack, other.m_stack);
+        && Objects.equals(m_manager, other.m_manager);
   }
 }

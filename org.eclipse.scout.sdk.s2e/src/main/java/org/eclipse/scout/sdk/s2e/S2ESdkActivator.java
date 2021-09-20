@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.s2e;
 
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStoreSupplier;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores;
+import org.eclipse.scout.sdk.core.s.nls.Translations;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.s2e.derived.DerivedResourceManager;
 import org.eclipse.scout.sdk.s2e.derived.DtoDerivedResourceHandlerFactory;
@@ -40,7 +40,7 @@ public class S2ESdkActivator extends Plugin {
     m_derivedResourceManager.addDerivedResourceHandlerFactory(new DtoDerivedResourceHandlerFactory());
 
     m_nlsSupplier = new EclipseTranslationStoreSupplier();
-    TranslationStores.registerStoreSupplier(m_nlsSupplier);
+    Translations.registerStoreSupplier(m_nlsSupplier);
 
     // maven runner
     MavenRunner.set(new M2eMavenRunner());
@@ -50,7 +50,7 @@ public class S2ESdkActivator extends Plugin {
   public void stop(BundleContext context) throws Exception {
     MavenRunner.set(null);
 
-    TranslationStores.removeStoreSupplier(m_nlsSupplier);
+    Translations.removeStoreSupplier(m_nlsSupplier);
     m_nlsSupplier = null;
 
     m_derivedResourceManager.dispose();

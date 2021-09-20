@@ -33,7 +33,11 @@ import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.s.nls.*
+import org.eclipse.scout.sdk.core.s.nls.ITranslationImportInfo
+import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
+import org.eclipse.scout.sdk.core.s.nls.Language
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.OperationTask
@@ -45,10 +49,7 @@ import org.eclipse.scout.sdk.s2i.ui.IndexedFocusTraversalPolicy
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
 import org.eclipse.scout.sdk.s2i.util.Xlsx
 import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityHelper
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import java.awt.Insets
-import java.awt.Point
+import java.awt.*
 import java.io.File
 import java.text.NumberFormat
 import java.util.concurrent.TimeUnit
@@ -59,12 +60,12 @@ import javax.swing.JComponent
 import javax.swing.event.DocumentEvent
 import kotlin.streams.toList
 
-class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, val primaryStore: ITranslationStore) : JBPanel<NlsEditorContent>(GridBagLayout()) {
+class NlsEditorContent(val project: Project, val translationManager: TranslationManager, val primaryStore: ITranslationStore) : JBPanel<NlsEditorContent>(GridBagLayout()) {
 
-    private val m_table = NlsTable(stack, project)
+    private val m_table = NlsTable(translationManager, project)
     private val m_textFilter = TextFieldWithMaxLen(maxLength = 2000)
     private val m_regexHelpButton = CompatibilityHelper.createRegExLink("<html><body><b>?</b></body></html>", this)
-    private val m_hideReadOnly = JBCheckBox(message("hide.readonly.rows"), true)
+    private val m_hideReadOnly = JBCheckBox(message("hide.dependency.rows"), true)
     private val m_hideInherited = JBCheckBox(message("hide.inherited.rows"), true)
 
     private var m_searchPattern: Predicate<String>? = null
@@ -120,14 +121,14 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         m_table.setFilter { acceptTranslation(it) }
     }
 
-    private fun acceptTranslation(candidate: ITranslationEntry): Boolean {
+    private fun acceptTranslation(candidate: IStackedTranslation): Boolean {
         val isHideReadOnlyRows = m_hideReadOnly.isSelected
-        if (isHideReadOnlyRows && !candidate.store().isEditable) {
+        if (isHideReadOnlyRows && !candidate.hasEditableStores()) {
             return false
         }
 
         val isHideInheritedRows = m_hideInherited.isSelected
-        if (isHideInheritedRows && candidate.store() != primaryStore) {
+        if (isHideInheritedRows && !candidate.stores().anyMatch { it == primaryStore }) {
             return false
         }
 
@@ -174,7 +175,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         result.add(TranslationEditAction())
         result.add(TranslationNewAction())
         result.add(TranslationRemoveAction())
-        if (stack.allEditableStores().count() > 1) {
+        if (translationManager.allEditableStores().count() > 1) {
             result.add(TranslationNewActionGroup())
         }
         result.addSeparator()
@@ -208,20 +209,19 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         override fun update(e: AnActionEvent) {
             val selectedTranslations = m_table.selectedTranslations()
             e.presentation.isEnabled = selectedTranslations.size == 1
-                    && selectedTranslations[0].store().isEditable
+                    && selectedTranslations[0].hasEditableStores()
             e.presentation.isVisible = !hideWhenDisabled || e.presentation.isEnabled
         }
 
         override fun actionPerformed(e: AnActionEvent) {
             val translation = m_table.selectedTranslations().firstOrNull() ?: return
             val language = m_table.selectedLanguages().firstOrNull()
-            val dialog = TranslationEditDialog(project, translation, stack, language)
+            val dialog = TranslationEditDialog(project, translation, translationManager, language)
             dialog.showAndGet()
         }
     }
 
     private inner class TranslationNewAction : DumbAwareAction(message("create.new.translation.in.x", primaryStore.service().type().elementName()), null, AllIcons.General.Add) {
-
         override fun update(e: AnActionEvent) {
             e.presentation.isEnabled = primaryStore.isEditable
         }
@@ -229,13 +229,12 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         override fun actionPerformed(e: AnActionEvent) = TranslationNewDialogOpenAction(primaryStore).actionPerformed(e)
     }
 
-    private inner class TranslationNewActionGroup : AbstractEditableStoresAction(message("create.new.translation.in.service"), message("create.new.translation.in"), AllIcons.CodeStyle.AddNewSectionRule, {
-        TranslationNewDialogOpenAction(it)
-    })
+    private inner class TranslationNewActionGroup : AbstractStoresAction(message("create.new.translation.in.service"), message("create.new.translation.in"),
+            AllIcons.CodeStyle.AddNewSectionRule, translationManager.allEditableStores().toList(), { TranslationNewDialogOpenAction(it) })
 
     private inner class TranslationNewDialogOpenAction(private val store: ITranslationStore) : DumbAwareAction(store.service().type().elementName()) {
         override fun actionPerformed(e: AnActionEvent) {
-            val dialog = TranslationNewDialog(project, store, stack)
+            val dialog = TranslationNewDialog(project, store, translationManager)
             val ok = dialog.showAndGet()
             if (ok) {
                 val createdTranslation = dialog.createdTranslation() ?: return
@@ -247,7 +246,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
     private inner class TranslationRemoveAction(val hideWhenDisabled: Boolean = false) : DumbAwareAction(message("remove.selected.rows"), null, AllIcons.General.Remove) {
         override fun update(e: AnActionEvent) {
             val selectedTranslations = m_table.selectedTranslations()
-            e.presentation.isEnabled = selectedTranslations.isNotEmpty() && selectedTranslations.map { it.store() }.all { it.isEditable }
+            e.presentation.isEnabled = selectedTranslations.isNotEmpty() && selectedTranslations.all { it.hasOnlyEditableStores() }
             e.presentation.isVisible = !hideWhenDisabled || e.presentation.isEnabled
             if (selectedTranslations.size > 1) {
                 e.presentation.text = message("remove.selected.rows")
@@ -260,7 +259,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
             val toDelete = m_table.selectedTranslations()
                     .map { it.key() }
                     .stream()
-            stack.removeTranslations(toDelete)
+            translationManager.removeTranslations(toDelete)
         }
     }
 
@@ -277,41 +276,48 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
             }
             val selectedTranslation = selection[0]
             val selectedLanguages = m_table.selectedLanguages()
-            if (selectedLanguages.size == 1) {
-                val textLocateAction = TranslationTextLocateAction(selectedTranslation, selectedLanguages[0])
-                if (e.isFromActionToolbar) {
-                    // open chooser: jump to service or property?
-                    val group = DefaultActionGroup(listOf(TranslationServiceLocateAction(selectedTranslation), textLocateAction))
-                    val popup = JBPopupFactory.getInstance().createActionGroupPopup(templatePresentation.text, group, e.dataContext, JBPopupFactory.ActionSelectionAid.NUMBERING, false)
-                    popup.showUnderneathOf(e.inputEvent.component)
-                } else {
-                    textLocateAction.actionPerformed(e)
-                }
-            } else {
-                TranslationServiceLocateAction(selectedTranslation).actionPerformed(e)
+            var stores = selectedLanguages
+                    .mapNotNull { selectedTranslation.entry(it).orElse(null) }
+                    .map { it.store() }
+                    .toList()
+            if (stores.isEmpty()) {
+                stores = selectedTranslation.stores().toList()
             }
+
+            val servicesLocateAction = if (stores.size == 1) TranslationServiceLocateAction(stores[0]) else TranslationServicesLocateAction(stores)
+            if (selectedLanguages.size != 1 || !selectedTranslation.text(selectedLanguages[0]).isPresent) {
+                servicesLocateAction.actionPerformed(e)
+                return
+            }
+
+            val textLocateAction = TranslationTextLocateAction(selectedTranslation, selectedLanguages[0])
+            val group = DefaultActionGroup(listOf(servicesLocateAction, textLocateAction))
+            val popup = JBPopupFactory.getInstance().createActionGroupPopup(templatePresentation.text, group, e.dataContext, JBPopupFactory.ActionSelectionAid.NUMBERING, false)
+            popup.showUnderneathOf(e.inputEvent.component)
         }
     }
 
-    private inner class TranslationTextLocateAction(val translation: ITranslationEntry, val language: Language) : DumbAwareAction(message("jump.to.property"), null, AllIcons.Nodes.ResourceBundle) {
+    private inner class TranslationTextLocateAction(val translation: IStackedTranslation, val language: Language) : DumbAwareAction(message("jump.to.property"), null, AllIcons.Nodes.ResourceBundle) {
         override fun actionPerformed(e: AnActionEvent) {
             translation.resolveProperty(language, project)?.navigate(true)
         }
     }
 
-    private inner class TranslationServiceLocateAction(val translation: ITranslationEntry) : DumbAwareAction(message("jump.to.text.service"), null, AllIcons.Nodes.Services) {
+    private inner class TranslationServicesLocateAction(stores: List<ITranslationStore>) : AbstractStoresAction(message("jump.to.text.service"), message("choose.text.service"),
+            AllIcons.Nodes.Services, stores, { TranslationServiceLocateAction(it) })
+
+    private inner class TranslationServiceLocateAction(private val store: ITranslationStore) : DumbAwareAction(store.service().type().elementName(), null, AllIcons.Nodes.Services) {
         override fun actionPerformed(e: AnActionEvent) {
-            translation.store().service().type().resolvePsi()?.navigate(true)
+            store.service().type().resolvePsi()?.navigate(true)
         }
     }
 
     private inner class LanguageNewAction : DumbAwareAction(message("add.new.language"), null, AllIcons.ToolbarDecorator.AddLink) {
-
         override fun update(e: AnActionEvent) {
             e.presentation.isEnabled = primaryStore.isEditable
         }
 
-        override fun actionPerformed(e: AnActionEvent) = LanguageNewDialog(project, primaryStore, stack).show()
+        override fun actionPerformed(e: AnActionEvent) = LanguageNewDialog(project, primaryStore, translationManager).show()
     }
 
     private inner class ReloadAction : DumbAwareAction(message("reload.from.filesystem"), null, AllIcons.Actions.Refresh) {
@@ -319,7 +325,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
             FileDocumentManager.getInstance().saveAllDocuments()
             object : Task.Modal(project, message("loading.translations"), true) {
                 override fun run(indicator: ProgressIndicator) {
-                    stack.reload(indicator.toScoutProgress())
+                    translationManager.reload(indicator.toScoutProgress())
                 }
             }.queue()
         }
@@ -348,7 +354,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
                     showBalloon(message("file.no.valid.content"), MessageType.ERROR)
                     return
                 }
-                handleResult(stack.importTranslations(data, NlsTableModel.KEY_COLUMN_HEADER_NAME, primaryStore))
+                handleResult(translationManager.importTranslations(data, NlsTableModel.KEY_COLUMN_HEADER_NAME, primaryStore))
             } catch (e: RuntimeException) {
                 SdkLog.error("Unable to import xlsx file '{}'.", vFile, e)
                 showBalloon(message("error.importing.translations"), MessageType.ERROR)
@@ -420,6 +426,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
             try {
                 Xlsx.write(tableData, message("nls.export.sheet.name"), file)
                 showBalloon(message("table.data.successfully.exported"), MessageType.INFO)
+                if (Desktop.isDesktopSupported()) Desktop.getDesktop().open(file)
             } catch (e: Exception) {
                 SdkLog.warning("Unable to export to xlsx file '{}'.", file, e)
                 showBalloon(message("error.exporting.translations"), MessageType.ERROR)
@@ -427,18 +434,17 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
         }
     }
 
-    private abstract inner class AbstractEditableStoresAction(text: String, val groupTitle: String, icon: Icon?, val task: (ITranslationStore) -> AnAction) : DumbAwareAction(text, null, icon) {
+    private abstract class AbstractStoresAction(text: String, val groupTitle: String, icon: Icon?, val stores: List<ITranslationStore>, val task: (ITranslationStore) -> AnAction) : DumbAwareAction(text, null, icon) {
         override fun actionPerformed(e: AnActionEvent) {
-            val stores = stack.allEditableStores().toList()
-            if (stores.isEmpty()) {
-                return
-            }
-            if (stores.size == 1) {
-                stores[0]?.let { task(it).actionPerformed(e) }
+            if (stores.isEmpty()) return
+
+            val storesWithoutDuplicates = stores.distinct()
+            if (storesWithoutDuplicates.size == 1) {
+                task(storesWithoutDuplicates[0]).actionPerformed(e)
             } else {
-                val popupActions = stores.map { task(it) }
+                val popupActions = storesWithoutDuplicates.map { task(it) }
                 val group = DefaultActionGroup(popupActions)
-                val popup = JBPopupFactory.getInstance().createActionGroupPopup(groupTitle, group, e.dataContext, JBPopupFactory.ActionSelectionAid.ALPHA_NUMBERING, false)
+                val popup = JBPopupFactory.getInstance().createActionGroupPopup(groupTitle, group, e.dataContext, JBPopupFactory.ActionSelectionAid.NUMBERING, false)
                 popup.showUnderneathOf(e.inputEvent.component)
             }
         }
@@ -472,7 +478,7 @@ class NlsEditorContent(val project: Project, val stack: TranslationStoreStack, v
             readOnlyLayout.gridy = 0
             readOnlyLayout.insets = Insets(0, 24, 0, 0)
             m_hideReadOnly.addActionListener { filterChanged() }
-            m_hideReadOnly.toolTipText = message("hide.readonly.rows.desc")
+            m_hideReadOnly.toolTipText = message("hide.dependency.rows.desc")
             m_hideReadOnly.isFocusable = true
             add(m_hideReadOnly, readOnlyLayout)
 

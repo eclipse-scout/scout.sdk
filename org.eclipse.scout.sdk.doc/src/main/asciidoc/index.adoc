@@ -581,6 +581,48 @@ By default, a random UUID provider is registered but others may be added.
 Such classes can discover and load Scout text provider services in a given scope.
 Use `TranslationStores#registerStoreSupplier` to add a supplier.
 
+==== Translations API
+
+The `core.s` module contains support to parse and modify Scout texts (NLS).
+The following picture shows the main classes and its associations.
+
+[#img-nls]
+.The most important classes of the NLS API.
+image::nls.svg[NLS API]
+
+The API consists of 4 main groups:
+
+. In blue the highest layer (the one usually used from a programmer perspective) providing high level APIs to read and modify Scout translations.
+. In orange the persistence layer describing (but not implementing) generic stores in which texts may be saved.
+. In green an implementation of the persistence layer saving texts in `.properties` files (as used by Scout at the moment).
+It would also be possible to exchange this implementation in case Scout stores texts differently in the future or to provide an additional implementation that e.g. uses a database.
+. In grey common, layer independent classes.
+
+Next the different classes are described in more detail.
+It starts in the lower left corner.
+
+* *Translations*: Is the main entry point which provides static factory methods to obtain other instances.
+The most important method is `createManager` which creates a `org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager` instance for a Scout module.
+* *TranslationManager*: This class provides several methods to read and modify Scout texts that are visible in the context of a Scout module.
+It may respect texts available through Java dependencies (pom.xml) as well as Node dependencies (package.json).
+* *Language*: Represents a single text language. E.g.
+English (`en`) or British English (`en_GB`).
+There is also a `default` language used as fallback.
+* *ITranslation*: Represents a text key and the corresponding texts for several languages.
+* *ITranslationEntry*: A special translation that holds all texts for a key in all languages that exist in a single `TextProviderService`.
+* *IStackedTranslation*: A composite translation that contains all `ITranslationEntry` instances from all services that contain texts for the key.
+It handles overrides if different services contain texts for the same language.
+The texts returned by such instances only represent the "winning" texts according to override rules.
+* *ITranslationStore*: Represents a text storage that contains texts for several languages and keys.
+It is always bound to a Scout `TextProviderService` as all texts in Scout come from a `org.eclipse.scout.rt.platform.text.ITextProviderService`.
+* *TextProviderService*: Represents the Scout `TextProviderService` giving access to its `@Order` annotation value and its defining class.
+* *IEditableTranslationStore*: A special storage for texts that supports modifications.
+
+The other classes (shown in green) represent the current storage implementation using Java `.properties` files.
+Typically these classes are not used directly.
+The `PropertiesTranslationStore` holds all `.properties` files of a `TextProviderService` and updates them accordingly.
+The `EditableTranslationFile` represents a `.properties` file on the local file system which can be updated while the `ReadOnlyTranslationFile` belongs to `.properties` files in binary archives (e.g. a `.jar` file) that cannot be modified.
+
 === Testing
 
 Tests are written using https://junit.org/junit5/[JUnit 5].

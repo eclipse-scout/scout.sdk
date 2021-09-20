@@ -12,26 +12,24 @@ package org.eclipse.scout.sdk.core.s.nls;
 
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.isContentAvailable;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.registerStoreSupplier;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.removeStoreSupplier;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.storeSuppliers;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationTestsHelper.createStore;
+import static org.eclipse.scout.sdk.core.s.nls.Translations.isContentAvailable;
+import static org.eclipse.scout.sdk.core.s.nls.Translations.registerStoreSupplier;
+import static org.eclipse.scout.sdk.core.s.nls.Translations.removeStoreSupplier;
+import static org.eclipse.scout.sdk.core.s.nls.Translations.storeSuppliers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.junit.jupiter.api.Test;
 
-public class TranslationStoresTest {
+public class TranslationsTest {
   @Test
   public void testRegisterStoreSupplier() {
     var supplier = mock(ITranslationStoreSupplier.class);
@@ -83,11 +81,11 @@ public class TranslationStoresTest {
     var s7 = createStore("test.Class7", 200, "a", "c");
     var s8 = createStore("test.Class8", 200, "v", "z");
 
-    var implicitOverrides = TranslationStores.havingImplicitOverrides(List.of(s1, s2, s3, s4, s5, s6, s7, s8));
+    var implicitOverrides = Translations.storesHavingImplicitOverrides(Stream.of(s1, s2, s3, s4, s5, s6, s7, s8));
     var implicitOverrideNames = getImplicitOverrideNames(implicitOverrides);
     assertEquals(Set.of("test.Class1,test.Class2,test.Class4", "test.Class5,test.Class7"), implicitOverrideNames);
 
-    assertEquals(0, TranslationStores.havingImplicitOverrides(List.of(s1, s3)).count());
+    assertEquals(0, Translations.storesHavingImplicitOverrides(Stream.of(s1, s3)).count());
   }
 
   private static Set<String> getImplicitOverrideNames(Stream<Set<ITranslationStore>> implicitOverrides) {
@@ -98,24 +96,5 @@ public class TranslationStoresTest {
         .sorted()
         .collect(joining(",")))
         .collect(toSet());
-  }
-
-  private static ITranslationStore createStore(String fqn, double order, String... keys) {
-    var serviceType = mock(IType.class);
-    when(serviceType.name()).thenReturn(fqn);
-
-    var textService = mock(TextProviderService.class);
-    when(textService.order()).thenReturn(order);
-    when(textService.type()).thenReturn(serviceType);
-
-    var store = mock(ITranslationStore.class);
-    when(store.service()).thenReturn(textService);
-    when(store.keys()).thenAnswer(a -> Stream.of(keys));
-    when(store.containsKey(anyString())).thenAnswer(a -> containsKey(a.getArgument(0), keys));
-    return store;
-  }
-
-  private static boolean containsKey(String key, String... keys) {
-    return Arrays.asList(keys).contains(key);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor.importexport;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.internal.IWorkbenchGraphicConstants;
 import org.eclipse.ui.internal.WorkbenchImages;
@@ -24,9 +24,9 @@ import org.eclipse.ui.internal.WorkbenchImages;
 public class TranslationImportAction extends Action {
 
   private final Shell m_parentShell;
-  private final TranslationStoreStack m_nlsProject;
+  private final TranslationManager m_nlsProject;
 
-  public TranslationImportAction(TranslationStoreStack nlsProject, Shell parentShell) {
+  public TranslationImportAction(TranslationManager nlsProject, Shell parentShell) {
     super("Import Translations...");
     m_nlsProject = nlsProject;
     m_parentShell = parentShell;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,14 +48,14 @@ public class FilteredTranslationStoreTest {
 
     var toAdd = new Translation(addedKey);
     toAdd.putText(Language.LANGUAGE_DEFAULT, "test");
-    store.addNewTranslation(toAdd);
+    store.setTranslation(toAdd);
 
     var newLangKey = "newLang";
     var toAddDifferentLang = new Translation(newLangKey);
     toAddDifferentLang.putText(Language.LANGUAGE_DEFAULT, "test2");
     var langDe = Language.parseThrowingOnError("de");
     toAddDifferentLang.putText(langDe, "test2");
-    store.addNewTranslation(toAddDifferentLang);
+    store.setTranslation(toAddDifferentLang);
 
     assertEquals(2, store.languages().count()); // unchanged language because the one added above is not in the filter
     assertEquals(3, store.keys().count());
@@ -90,7 +90,7 @@ public class FilteredTranslationStoreTest {
     store.changeKey(changedKey, notExistingKey);
     assertTrue(store.containsKey(notExistingKey));
 
-    store.updateTranslation(toAddDifferentLang);
+    store.setTranslation(toAddDifferentLang);
     assertFalse(store.containsKey(changedKey));
     assertNotNull(store.service());
     store.reload(new NullProgress());

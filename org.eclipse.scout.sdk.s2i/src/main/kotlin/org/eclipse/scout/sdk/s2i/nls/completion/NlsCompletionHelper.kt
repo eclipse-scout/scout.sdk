@@ -23,13 +23,14 @@ import com.intellij.psi.PsiManager
 import com.intellij.refactoring.suggested.endOffset
 import com.intellij.refactoring.suggested.startOffset
 import org.eclipse.scout.sdk.core.s.ISdkConstants
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
 import org.eclipse.scout.sdk.core.s.nls.Language
+import org.eclipse.scout.sdk.core.s.nls.TranslationStoreComparator
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationSpec
-import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
+import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader.createManager
 import org.eclipse.scout.sdk.s2i.nls.inspection.AddMissingTranslationQuickFix
 import org.eclipse.scout.sdk.s2i.resolveProperty
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
@@ -48,9 +49,9 @@ object NlsCompletionHelper {
         val psiFile = psiElement.containingFile.originalFile
         val element = psiFile.findElementAt(psiElement.startOffset)?.parent ?: return emptyList()
         val translationSpec = element.translationSpec() ?: return emptyList()
-        val stack = createStack(module, translationSpec.translationDependencyScope, true) ?: return emptyList()
+        val manager = createManager(module, translationSpec.translationDependencyScope, true) ?: return emptyList()
         val psiManager = PsiManager.getInstance(module.project)
-        val elements = stack.allEntries()
+        val elements = manager.allTranslations()
                 .map { createExistingTranslationLookupElement(it, module, translationSpec, psiManager) }
                 .collect(toList())
         createNewTranslationLookupElement(element, translationSpec)?.let { elements.add(0, it) }
@@ -82,7 +83,7 @@ object NlsCompletionHelper {
                 .applyFix(lookupObj.psiElement)
     }
 
-    private fun createExistingTranslationLookupElement(translation: ITranslationEntry, module: Module, translationSpec: TranslationLanguageSpec, psiManager: PsiManager): LookupElementBuilder {
+    private fun createExistingTranslationLookupElement(translation: IStackedTranslation, module: Module, translationSpec: TranslationLanguageSpec, psiManager: PsiManager): LookupElementBuilder {
         val prop = translation.resolveProperty(Language.LANGUAGE_DEFAULT, psiManager)?.psiElement
         val lookupElement = LookupElementBuilder.create(TranslationLookupObject(translation, prop, module), translationSpec.decorateTranslationKey(translation.key()))
                 .withCaseSensitivity(true)
@@ -95,7 +96,7 @@ object NlsCompletionHelper {
     private fun insertTranslationKey(context: InsertionContext, element: LookupElement, translationSpec: TranslationLanguageSpec) {
         val currentCaret = context.editor.caretModel.currentCaret
         val lookupObj = element.getObject() as TranslationLookupObject
-        insertTranslationKey(lookupObj.translationEntry.key(), translationSpec, currentCaret)
+        insertTranslationKey(lookupObj.translation.key(), translationSpec, currentCaret)
     }
 
     private fun insertTranslationKey(nlsKey: String, translationSpec: TranslationLanguageSpec, caret: Caret) {
@@ -108,21 +109,22 @@ object NlsCompletionHelper {
 
     private fun renderLookupElement(element: LookupElement, presentation: LookupElementPresentation) {
         val lookupObj = element.getObject() as TranslationLookupObject
-        val translation = lookupObj.translationEntry
-        val store = translation.store()
-        val isReadOnly = !store.isEditable
+        val translation = lookupObj.translation
+        val language = ScoutSettings.getTranslationLanguage(lookupObj.module.project)
+        val isInProject = translation.hasEditableStores()
+        val primaryStoreName = translation.stores()
+                .min(TranslationStoreComparator.INSTANCE).orElse(null)
+                ?.service()?.type()?.elementName()
+                ?.removeSuffix(ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE)
 
         presentation.itemText = translation.key()
-        presentation.isItemTextItalic = isReadOnly
+        presentation.isItemTextItalic = !isInProject
         presentation.icon = AllIcons.Nodes.ResourceBundle
-
-        val requestedLanguage = ScoutSettings.getTranslationLanguage(lookupObj.module.project)
-        translation.bestText(requestedLanguage).ifPresent { presentation.appendTailText("=$it", true) }
-
-        presentation.typeText = store.service().type().elementName().removeSuffix(ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE)
+        translation.bestText(language).ifPresent { presentation.appendTailText("=$it", true) }
+        presentation.typeText = primaryStoreName
     }
 
     data class NewTranslationLookupObject(val psiElement: PsiElement, val key: String)
 
-    data class TranslationLookupObject(val translationEntry: ITranslationEntry, val element: PsiElement?, val module: Module)
+    data class TranslationLookupObject(val translation: IStackedTranslation, val element: PsiElement?, val module: Module)
 }

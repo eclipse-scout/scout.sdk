@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -18,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -47,6 +50,7 @@ public class TranslationEntryTest {
     assertFalse(template3.text(Language.LANGUAGE_DEFAULT).isPresent());
 
     var b = new TranslationEntry(template2, store);
+    assertEquals(List.of(Language.LANGUAGE_DEFAULT), b.languages().sorted().collect(toList()));
     var c = new TranslationEntry("key", store2);
     //noinspection ResultOfObjectAllocationIgnored
     assertThrows(IllegalArgumentException.class, () -> new TranslationEntry("", store));

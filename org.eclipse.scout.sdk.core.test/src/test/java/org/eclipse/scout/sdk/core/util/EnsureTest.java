@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,12 +48,6 @@ public class EnsureTest {
   public void testIsTrue() {
     Ensure.isTrue(true);
     assertEquals("a22b", assertThrows(IllegalArgumentException.class, () -> Ensure.isTrue(false, "a{}b", 22)).getMessage());
-  }
-
-  @Test
-  public void testSameInt() {
-    Ensure.same(11, 11);
-    assertEquals("a22b", assertThrows(IllegalArgumentException.class, () -> Ensure.same(1, 2, "a{}b", new Object[]{22})).getMessage());
   }
 
   @Test

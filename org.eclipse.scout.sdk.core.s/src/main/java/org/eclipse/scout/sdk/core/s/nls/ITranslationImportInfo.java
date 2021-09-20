@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,10 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
+
 /**
- * Represents the result of a {@link ITranslation} import on a {@link TranslationStoreStack}.
+ * Represents the result of a {@link ITranslation} import on a {@link TranslationManager}.
  * 
- * @see TranslationStoreStack#importTranslations(List, String, ITranslationStore)
+ * @see TranslationManager#importTranslations(List, String, ITranslationStore)
  */
 public interface ITranslationImportInfo {
   /**
@@ -41,10 +44,10 @@ public interface ITranslationImportInfo {
   int result();
 
   /**
-   * @return An unmodifiable {@link Map} holding all imported (updated or newly created) {@link ITranslationEntry
+   * @return An unmodifiable {@link Map} holding all imported (updated or newly created) {@link IStackedTranslation
    *         entries} grouped by key.
    */
-  Map<String, ITranslationEntry> importedTranslations();
+  Map<String, IStackedTranslation> importedTranslations();
 
   /**
    * @return All columns of the header row that could not be mapped to a language or the key column. These columns have
