@@ -151,7 +151,7 @@ public class StagingMojo extends AbstractStagingMojo {
 
   public void updateComposite(File outputDir, File contentJar, String folderName) throws MojoExecutionException {
     try {
-      getLog().info("Downloading " + contentJar);
+      getLog().info("Extracting " + contentJar);
       var jarName = contentJar.getName();
       var contentXML = extractCompositeArchive(outputDir, contentJar);
       appendChild(contentXML, getUpdatesiteDir());
@@ -231,19 +231,21 @@ public class StagingMojo extends AbstractStagingMojo {
     return "" + count;
   }
 
-  private static File downloadJar(String url, String jarName, String outputDir) throws MojoExecutionException {
+  private File downloadJar(String url, String jarName, String outputDir) throws MojoExecutionException {
+    var path = url + "/" + jarName;
     try {
-      var u = new URL(url + "/" + jarName);
+      var u = new URL(path);
       var conn = u.openConnection();
-      var outfile = new File(outputDir, jarName);
+      var outFile = new File(outputDir, jarName);
+      getLog().info("Downloading " + path + " to " + outFile);
       //noinspection NestedTryStatement
-      try (var inputStream = conn.getInputStream(); var f = new FileOutputStream(outfile)) {
+      try (var inputStream = conn.getInputStream(); var f = new FileOutputStream(outFile)) {
         FileUtility.copy(inputStream, f);
       }
-      return outfile;
+      return outFile;
     }
     catch (IOException e) {
-      throw new MojoExecutionException("Could not downlaod Jar " + e);
+      throw new MojoExecutionException("Could not download '" + path + "'." + e);
     }
   }
 

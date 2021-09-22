@@ -111,12 +111,12 @@ public final class FileUtility {
     }
   }
 
-  private static void addFolderToJar(File baseDir, File srcdir, JarOutputStream zOut) throws IOException {
-    if (!srcdir.exists() || !srcdir.isDirectory()) {
-      throw new IOException("source directory " + srcdir + " does not exist or is not a folder");
+  private static void addFolderToJar(File baseDir, File srcDir, JarOutputStream zOut) throws IOException {
+    if (!srcDir.exists() || !srcDir.isDirectory()) {
+      throw new IOException("source directory " + srcDir + " does not exist or is not a folder");
     }
     //noinspection ConstantConditions
-    for (var f : srcdir.listFiles()) {
+    for (var f : srcDir.listFiles()) {
       if (f.exists() && (!f.isHidden())) {
         if (f.isDirectory()) {
           addFolderToJar(baseDir, f, zOut);
@@ -220,7 +220,7 @@ public final class FileUtility {
           throw new IllegalArgumentException("Entry is outside of the target dir: " + name);
         }
 
-        if (file.isDirectory()) { // if its a directory, create it
+        if (file.isDirectory()) { // if it is a directory, create it
           ensureDirExists(f);
         }
         else {
