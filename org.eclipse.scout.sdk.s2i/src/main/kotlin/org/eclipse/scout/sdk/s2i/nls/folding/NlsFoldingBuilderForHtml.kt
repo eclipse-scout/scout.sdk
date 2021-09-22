@@ -14,17 +14,17 @@ import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.psi.PsiElement
 import com.intellij.psi.XmlRecursiveElementWalkingVisitor
 import com.intellij.psi.xml.XmlAttributeValue
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationSpec
 
 class NlsFoldingBuilderForHtml : AbstractNlsFoldingBuilder() {
 
-    override fun buildFoldRegions(root: PsiElement, stack: TranslationStoreStack): List<FoldingDescriptor> {
+    override fun buildFoldRegions(root: PsiElement, manager: TranslationManager): List<FoldingDescriptor> {
         val folds = ArrayList<FoldingDescriptor>()
         root.accept(object : XmlRecursiveElementWalkingVisitor() {
             override fun visitXmlAttributeValue(attributeValue: XmlAttributeValue) {
                 val translationKey = attributeValue.translationSpec()?.resolveTranslationKey() ?: return
-                createFoldingDescriptor(attributeValue, translationKey, stack)?.let { folds.add(it) }
+                createFoldingDescriptor(attributeValue, translationKey, manager)?.let { folds.add(it) }
             }
         })
         return folds

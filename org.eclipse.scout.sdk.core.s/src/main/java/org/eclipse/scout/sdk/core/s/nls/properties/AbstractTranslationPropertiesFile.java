@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
 import static java.util.Collections.unmodifiableMap;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.isForbidden;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateKey;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
@@ -29,7 +30,6 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.Language;
-import org.eclipse.scout.sdk.core.s.nls.TranslationValidator;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -97,7 +97,7 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
     var iterator = entries.iterator();
     while (iterator.hasNext()) {
       var entry = iterator.next();
-      if (validateKey(entry.getKey()) != TranslationValidator.OK) {
+      if (isForbidden(validateKey(entry.getKey()))) {
         if (isEditable()) {
           // only log if you have the chance to fix it (skip logging for read-only files)
           SdkLog.warning("Skipping entry '{}={}' found in '{}' because the key is invalid.", entry.getKey(), entry.getValue(), source());

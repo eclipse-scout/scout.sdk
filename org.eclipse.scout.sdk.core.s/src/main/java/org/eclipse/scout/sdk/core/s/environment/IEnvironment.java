@@ -341,4 +341,14 @@ public interface IEnvironment extends AutoCloseable {
    *         writing the resource, this exception will be thrown on result access of this {@link IFuture}.
    */
   IFuture<Void> writeResourceAsync(CharSequence content, Path filePath, IProgress progress);
+
+  /**
+   * Deletes the directory or file at the {@link Path} given.
+   * <p>
+   * If the directory is not empty, all content is deleted as well.
+   * 
+   * @param file
+   *          The {@link Path} to delete. Must not be {@code null}.
+   */
+  void deleteIfExists(Path file);
 }

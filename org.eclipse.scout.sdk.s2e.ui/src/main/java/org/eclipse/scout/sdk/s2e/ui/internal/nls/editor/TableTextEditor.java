@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.editor;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.scout.sdk.core.s.nls.TranslationValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyListener;
@@ -35,7 +37,7 @@ public class TableTextEditor {
   public TableTextEditor(Control parent, int style) {
     m_shell = new Shell(parent.getShell(), SWT.TOOL);
     m_shell.setBounds(computeBounds(parent, style));
-    m_shell.setBackground(parent.getShell().getDisplay().getSystemColor(SWT.COLOR_GREEN));
+    setErrorStatus(null);
 
     var layout = new FillLayout();
     //noinspection SuspiciousNameCombination
@@ -95,6 +97,16 @@ public class TableTextEditor {
 
   public boolean isDisposed() {
     return m_shell.isDisposed();
+  }
+
+  public void setErrorStatus(IStatus status) {
+    var isError = status != null && TranslationValidator.isForbidden(status.getCode());
+    if (isError) {
+      m_shell.setBackground(m_shell.getDisplay().getSystemColor(SWT.COLOR_RED));
+    }
+    else {
+      m_shell.setBackground(m_shell.getDisplay().getSystemColor(SWT.COLOR_GREEN));
+    }
   }
 
   public void setText(String input) {

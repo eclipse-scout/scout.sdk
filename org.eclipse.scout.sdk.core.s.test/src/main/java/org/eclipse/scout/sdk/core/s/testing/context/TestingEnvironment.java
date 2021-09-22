@@ -53,7 +53,9 @@ import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
  * <h3>{@link TestingEnvironment}</h3> {@link IEnvironment} implementation used for testing.
@@ -241,6 +243,21 @@ public class TestingEnvironment extends AbstractEnvironment {
         .map(TypeSpi::wrap)
         .collect(toCollection(() -> result));
     return result.stream();
+  }
+
+  @Override
+  public void deleteIfExists(Path file) {
+    try {
+      if (Files.isDirectory(file)) {
+        CoreUtils.deleteDirectory(file);
+      }
+      else {
+        Files.deleteIfExists(file);
+      }
+    }
+    catch (IOException e) {
+      throw new SdkException("Unable to delete '{}'.", file, e);
+    }
   }
 
   protected IJavaEnvironment registerJavaEnvironment(JavaEnvironmentSpi env) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -79,9 +79,9 @@ public class PropertiesTranslationStoreTest {
     toAdd.putText(Language.LANGUAGE_DEFAULT, "new def");
     toAdd.putText(de, "new de");
     toAdd.putText(Language.parseThrowingOnError("notexisting"), "new not existing");
-    store.addNewTranslation(toAdd); // add new translation using the new language
+    store.setTranslation(toAdd); // add new translation using the new language
     ITranslation addAndRemove = new Translation("addedAndRemoved");
-    store.addNewTranslation(addAndRemove); // add another
+    store.setTranslation(addAndRemove); // add another
     assertEquals(5, store.entries().count());
     store.removeTranslation(addAndRemove.key()); // remove the one just inserted
     assertEquals(4, store.entries().count());

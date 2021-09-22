@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,8 +19,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.ui.internal.nls.action.CopyPasteAction;
@@ -48,15 +48,15 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  */
 public class NlsTablePage extends Composite {
 
-  private final TranslationStoreStack m_stack;
+  private final TranslationManager m_manager;
 
   private Button m_hideReadOnly;
   private NlsTable m_view;
   private NlsTableController m_controller;
 
-  public NlsTablePage(Composite parent, TranslationStoreStack stack) {
+  public NlsTablePage(Composite parent, TranslationManager manager) {
     super(parent, SWT.NONE);
-    m_stack = Ensure.notNull(stack);
+    m_manager = Ensure.notNull(manager);
 
     var toolkit = new FormToolkit(getDisplay());
     //noinspection ThisEscapedInObjectConstruction
@@ -70,7 +70,7 @@ public class NlsTablePage extends Composite {
   }
 
   protected void createContent(FormToolkit toolkit, Composite parent) {
-    m_controller = new NlsTableController(stack());
+    m_controller = new NlsTableController(translationManager());
     var rootArea = toolkit.createComposite(parent);
 
     m_hideReadOnly = toolkit.createButton(rootArea, "Hide read-only rows", SWT.CHECK);
@@ -104,16 +104,16 @@ public class NlsTablePage extends Composite {
   }
 
   protected void createFormMenu(IContributionManager manager) {
-    manager.add(new TranslationRefreshAction(stack(), m_view));
+    manager.add(new TranslationRefreshAction(translationManager(), m_view));
     manager.add(new UpdateReferenceCountAction(m_controller, m_view.getDisplay()));
-    manager.add(new TranslationNewAction(m_view.getShell(), stack(), m_controller));
-    manager.add(new LanguageNewAction(stack(), m_view.getShell()));
-    manager.add(new TranslationImportAction(stack(), m_view.getShell()));
-    manager.add(new TranslationExportAction(stack(), m_view.getShell()));
+    manager.add(new TranslationNewAction(m_view.getShell(), translationManager(), m_controller));
+    manager.add(new LanguageNewAction(translationManager(), m_view.getShell()));
+    manager.add(new TranslationImportAction(translationManager(), m_view.getShell()));
+    manager.add(new TranslationExportAction(translationManager(), m_view.getShell()));
   }
 
-  public TranslationStoreStack stack() {
-    return m_stack;
+  public TranslationManager translationManager() {
+    return m_manager;
   }
 
   private final class P_MenuListener implements IMenuListener {
@@ -130,8 +130,8 @@ public class NlsTablePage extends Composite {
     }
 
     private void addSingleSelectMenus(IContributionManager manager, NlsTableCell cursorSelection) {
-      if (cursorSelection.store().isEditable()) {
-        if (cursorSelection.column() == NlsTableController.INDEX_COLUMN_KEYS) {
+      if (cursorSelection.translation().hasEditableStores()) {
+        if (cursorSelection.column() == NlsTableController.INDEX_COLUMN_KEYS && cursorSelection.translation().hasOnlyEditableStores()) {
           manager.add(new Action("Edit key") {
             @Override
             public void run() {
@@ -140,10 +140,10 @@ public class NlsTablePage extends Composite {
           });
           manager.add(new Separator());
         }
-        manager.add(new TranslationModifyAction(getShell(), cursorSelection.entry(), stack()));
+        manager.add(new TranslationModifyAction(getShell(), cursorSelection.translation(), translationManager()));
         manager.add(new Separator());
       }
-      manager.add(new FindReferencesAction(stack(), cursorSelection.entry().key()));
+      manager.add(new FindReferencesAction(translationManager(), cursorSelection.translation().key()));
 
       var text = cursorSelection.text();
       if (!Strings.isEmpty(text)) {
@@ -151,14 +151,16 @@ public class NlsTablePage extends Composite {
         manager.add(new CopyPasteAction("Copy", text, m_view.getDisplay()));
       }
 
-      if (cursorSelection.store().isEditable()) {
+      if (cursorSelection.translation().hasOnlyEditableStores()) {
         manager.add(new Separator());
-        manager.add(new TranslationRemoveAction(stack(), cursorSelection.entry()));
+        manager.add(new TranslationRemoveAction(translationManager(), cursorSelection.translation()));
       }
     }
 
-    private void addMultiSelectMenus(IContributionManager manager, List<ITranslationEntry> entries) {
-      manager.add(new TranslationRemoveAction("Remove entries", stack(), entries));
+    private void addMultiSelectMenus(IContributionManager manager, List<IStackedTranslation> entries) {
+      if (entries.stream().allMatch(IStackedTranslation::hasOnlyEditableStores)) {
+        manager.add(new TranslationRemoveAction("Remove entries", translationManager(), entries));
+      }
     }
   }
 }

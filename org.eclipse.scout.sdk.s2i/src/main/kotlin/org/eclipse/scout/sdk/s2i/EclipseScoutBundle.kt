@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.s2i.dataobject.DataObjectManager
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.eclipse.scout.sdk.s2i.element.ElementCreationManager
 import org.eclipse.scout.sdk.s2i.model.js.JsModuleCacheImplementor
-import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackCache
+import org.eclipse.scout.sdk.s2i.nls.TranslationManagerCache
 import org.jetbrains.annotations.Nls
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
@@ -41,19 +41,19 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
         project.getService(DerivedResourceManager::class.java)
 
     fun dataObjectManager(project: Project): DataObjectManager =
-        project.getService(DataObjectManager::class.java)
+            project.getService(DataObjectManager::class.java)
 
     fun autoCreateClassIdListener(project: Project): AutoCreateClassIdListener =
-        project.getService(AutoCreateClassIdListener::class.java)
+            project.getService(AutoCreateClassIdListener::class.java)
 
     fun classIdCache(project: Project): ClassIdCache =
-        project.getService(ClassIdCache::class.java)
+            project.getService(ClassIdCache::class.java)
 
-    fun translationStoreStackCache(project: Project): TranslationStoreStackCache =
-        project.getService(TranslationStoreStackCache::class.java)
+    fun translationStoreManagerCache(project: Project): TranslationManagerCache =
+            project.getService(TranslationManagerCache::class.java)
 
     fun jsModuleCache(project: Project): JsModuleCacheImplementor =
-        project.getService(JsModuleCacheImplementor::class.java)
+            project.getService(JsModuleCacheImplementor::class.java)
 
     fun elementCreationManager(): ElementCreationManager =
         ApplicationManager.getApplication().getService(ElementCreationManager::class.java)

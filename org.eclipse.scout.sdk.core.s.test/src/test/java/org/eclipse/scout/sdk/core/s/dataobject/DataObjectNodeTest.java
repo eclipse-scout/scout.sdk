@@ -72,7 +72,7 @@ public class DataObjectNodeTest {
 
   @Test
   @SuppressWarnings({"SimplifiableJUnitAssertion", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
-  public void testHashCodeEqualsToString(IJavaEnvironment env) {
+  public void testHashCodeEqualsToString() {
     var name = "myName";
     var otherName = "otherName";
     var dataType = mock(IType.class);

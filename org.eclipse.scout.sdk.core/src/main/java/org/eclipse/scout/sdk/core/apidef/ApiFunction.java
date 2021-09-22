@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -184,7 +184,7 @@ public class ApiFunction<API extends IApiSpecification, RET> implements Function
     if (apiDefinition == null) {
       return Optional.ofNullable(task.apply(null));
     }
-    return Ensure.notNull(context, "Cannot apply {} without context because an API ({}) is present. If an API is specified the context is required to compute the API version.", ApiFunction.class.getSimpleName(), apiDefinition)
+    return Ensure.notNull(context, "Cannot apply {} without a context because API ({}) is passed. If an API is given, the context is mandatory.", ApiFunction.class.getSimpleName(), apiDefinition)
         .api(apiDefinition) // API may be absent. Then the task is not executed. This is required e.g. when filtering on an annotation (react e.g. on existence) but it is not present on the classpath).
         .map(task);
   }

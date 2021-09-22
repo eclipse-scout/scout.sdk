@@ -19,5 +19,5 @@ public interface DataObjectTestInterface {
 
   List<Long> getVersions();
 
-  Boolean isEnabled();
+  String getStringAttribute();
 }

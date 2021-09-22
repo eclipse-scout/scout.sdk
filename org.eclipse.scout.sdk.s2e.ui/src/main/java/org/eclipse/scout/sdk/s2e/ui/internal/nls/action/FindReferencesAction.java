@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.internal.nls.search.NlsFindKeyQuery;
@@ -22,10 +22,10 @@ import org.eclipse.search.ui.NewSearchUI;
  */
 public class FindReferencesAction extends Action {
 
-  private final TranslationStoreStack m_project;
+  private final TranslationManager m_project;
   private final String m_key;
 
-  public FindReferencesAction(TranslationStoreStack project, String key) {
+  public FindReferencesAction(TranslationManager project, String key) {
     super("Find References to '" + key + '\'');
     m_project = project;
     m_key = key;

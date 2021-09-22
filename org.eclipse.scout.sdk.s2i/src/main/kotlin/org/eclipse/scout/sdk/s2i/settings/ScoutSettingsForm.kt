@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2i.settings
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
+import com.intellij.ui.components.JBPanel
 import com.intellij.uiDesigner.core.GridConstraints
 import com.intellij.uiDesigner.core.GridLayoutManager
 import com.intellij.uiDesigner.core.Spacer
@@ -24,9 +25,8 @@ import java.awt.Insets
 import java.util.*
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComboBox
-import javax.swing.JPanel
 
-class ScoutSettingsForm : JPanel() {
+class ScoutSettingsForm : JBPanel<ScoutSettingsForm>() {
 
     private val m_htmlDisable = "html.disable"
     private val m_autoUpdateDerivedResources: JBCheckBox

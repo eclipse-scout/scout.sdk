@@ -19,38 +19,38 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiRecursiveElementVisitor
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores
+import org.eclipse.scout.sdk.core.s.nls.ITranslation
+import org.eclipse.scout.sdk.core.s.nls.Translations
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.moduleDirPath
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationDependencyScope
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationSpec
-import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackCache.Companion.createCacheKey
-import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader.createStack
+import org.eclipse.scout.sdk.s2i.nls.TranslationManagerCache.Companion.createCacheKey
+import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader.createManager
 import java.nio.file.Path
 import java.util.concurrent.ConcurrentHashMap
 import java.util.stream.Collectors.toSet
 
 open class MissingTranslationInspection : LocalInspectionTool() {
 
-    private val m_cachedKeysByProject = ConcurrentHashMap<Project, MutableMap<Pair<Path, TranslationStores.DependencyScope?>, Set<String>>>()
+    private val m_cachedKeysByProject = ConcurrentHashMap<Project, MutableMap<Pair<Path, Translations.DependencyScope?>, Set<String>>>()
 
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
         val nlsDependencyScope = file.translationDependencyScope() ?: return ProblemDescriptor.EMPTY_ARRAY
         try {
             val module = file.containingModule(false) ?: return ProblemDescriptor.EMPTY_ARRAY
             return if (isOnTheFly) {
-                val stack = createStack(module, nlsDependencyScope, true) ?: return ProblemDescriptor.EMPTY_ARRAY
-                checkFile(file, keysOfStack(stack), manager, true)
+                val translationManager = createManager(module, nlsDependencyScope, true) ?: return ProblemDescriptor.EMPTY_ARRAY
+                checkFile(file, keysOfManager(translationManager), manager, true)
             } else {
                 // batch inspection run: create cache. Will be removed in cleanup function
                 val cacheKey = createCacheKey(module.moduleDirPath(), nlsDependencyScope)
                 val projectCache = m_cachedKeysByProject.computeIfAbsent(file.project) { ConcurrentHashMap() }
                 val keys = projectCache.computeIfAbsent(cacheKey) {
-                    createStack(module, nlsDependencyScope)
-                            ?.let { keysOfStack(it) }
+                    createManager(module, nlsDependencyScope)
+                            ?.let { keysOfManager(it) }
                             ?: emptySet() // do not use null because the ConcurrentHashMap does not store null values
                 }
                 if (keys.isEmpty()) {
@@ -65,7 +65,7 @@ open class MissingTranslationInspection : LocalInspectionTool() {
         }
     }
 
-    private fun keysOfStack(stack: TranslationStoreStack): Set<String> = stack.allEntries().map(ITranslationEntry::key).collect(toSet())
+    private fun keysOfManager(manager: TranslationManager): Set<String> = manager.allTranslations().map(ITranslation::key).collect(toSet())
 
     private fun checkFile(file: PsiFile, visibleKeys: Set<String>, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
         val problems = ArrayList<ProblemDescriptor>()

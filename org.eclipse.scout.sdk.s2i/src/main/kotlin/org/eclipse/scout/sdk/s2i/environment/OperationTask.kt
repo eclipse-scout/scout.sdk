@@ -57,6 +57,8 @@ open class OperationTask(title: String, project: Project, private val transactio
             .map { it.cancel(); true; }
             .orElse(false)
 
+    fun schedule() = schedule<Unit>()
+
     fun <T> schedule(resultSupplier: (() -> T)? = null, delay: Long = 0, unit: TimeUnit = TimeUnit.MILLISECONDS, hidden: Boolean = false): IFuture<T> {
         val result = TaskFuture(this, resultSupplier)
         if (hidden) {

@@ -26,23 +26,26 @@ import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.s.environment.IEnvironment
-import org.eclipse.scout.sdk.core.s.environment.IProgress
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
+import org.eclipse.scout.sdk.core.s.nls.ITranslation
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment
-import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationDependencyScope
-import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader
+import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
+import org.eclipse.scout.sdk.s2i.environment.TransactionManager
+import org.eclipse.scout.sdk.s2i.environment.TransactionMember
+import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec
+import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationSpec
+import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader
 import org.eclipse.scout.sdk.s2i.nls.editor.TranslationNewDialog
+import org.eclipse.scout.sdk.s2i.resolveLocalPath
+import java.nio.file.Path
 import java.util.stream.Collectors.toList
 
-class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
+class AddMissingTranslationQuickFix(val key: String) : LocalQuickFix {
 
     val quickFixName = message("add.missing.translation")
-    private val m_saveTasks = ArrayList<(ITranslationEntry, IEnvironment, IProgress) -> Unit>()
 
     override fun getFamilyName(): String = quickFixName
 
@@ -52,38 +55,26 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
 
     fun applyFix(psiElement: PsiElement) {
         val module = psiElement.containingModule() ?: return
-        val scope = psiElement.translationDependencyScope() ?: return
-        val stack = TranslationStoreStackLoader.createStack(module, scope)
-        ApplicationManager.getApplication().invokeLater { showStoreChooser(module, psiElement.containingFile, stack) }
+        val spec = psiElement.translationSpec() ?: return
+        val manager = TranslationManagerLoader.createManager(module, spec.translationDependencyScope)
+        ApplicationManager.getApplication().invokeLater { showStoreChooser(module, spec, manager) }
     }
 
-    /**
-     * Add custom save tasks to the [LocalQuickFix].
-     * These tasks are executed in a worker thread when the missing translation is added.
-     * It therefore requires the [TranslationNewDialog] to be finished with "ok".
-     * It is not necessary to save the new [ITranslationEntry]. This is done automatically.
-     *
-     * The [ITranslationEntry] passed to the save task is the one created in the [TranslationNewDialog].
-     */
-    fun withSaveTask(task: (ITranslationEntry, IEnvironment, IProgress) -> Unit) = apply {
-        m_saveTasks.add(task)
-    }
-
-    private fun showStoreChooser(module: Module, psiFile: PsiFile, stack: TranslationStoreStack?) {
-        val stores = stack?.allEditableStores()?.collect(toList())
+    private fun showStoreChooser(module: Module, spec: TranslationLanguageSpec, manager: TranslationManager?) {
+        val stores = manager?.allEditableStores()?.collect(toList())
         if (stores == null || stores.isEmpty()) {
             SdkLog.warning("Cannot create missing translation because no editable text provider service could be found in module '{}'.", module.name)
             return
         }
 
         val project = module.project
-        val editor = prepareAndGetEditor(psiFile) // must be executed before opening the dialog so that a potential running template can be finished
+        val editor = prepareAndGetEditor(spec.element.containingFile, project) // must be executed before opening the dialog so that a potential running template can be finished
         if (stores.size == 1) {
-            openDialog(project, stores[0], stack)
+            openDialog(project, stores[0], manager, spec)
             return
         }
 
-        val popup = JBPopupFactory.getInstance().createListPopup(TranslationStorePopupStep(project, stack, stores), 10)
+        val popup = JBPopupFactory.getInstance().createListPopup(TranslationStorePopupStep(project, manager, spec, stores), 10)
         if (editor != null) {
             popup.showInBestPositionFor(editor)
         } else {
@@ -91,9 +82,8 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
         }
     }
 
-    private fun prepareAndGetEditor(psiFile: PsiFile): Editor? {
+    private fun prepareAndGetEditor(psiFile: PsiFile, project: Project): Editor? {
         if (!psiFile.isPhysical) return null
-        val project = psiFile.project
         val fileEditorManager = FileEditorManager.getInstance(project)
         val fileEditor = fileEditorManager.getSelectedEditor(psiFile.virtualFile) as? TextEditor ?: return null
         val editor = fileEditor.editor
@@ -102,19 +92,35 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
         return editor
     }
 
-    private fun openDialog(project: Project, store: ITranslationStore, stack: TranslationStoreStack) {
-        val dialog = TranslationNewDialog(project, store, stack, stack.generateNewKey(key.toString()))
-        val ok = dialog.showAndGet()
-        if (ok) {
-            val created = dialog.createdTranslation() ?: return
-            callInIdeaEnvironment(project, message("store.new.translation")) { env, progress ->
-                stack.flush(env, progress)
-                m_saveTasks.forEach { it(created, env, progress) }
-            }
+    private fun openDialog(project: Project, store: ITranslationStore, manager: TranslationManager, spec: TranslationLanguageSpec) {
+        val dialog = TranslationNewDialog(project, store, manager, manager.generateNewKey(key))
+        if (!dialog.showAndGet()) return
+        val created = dialog.createdTranslation() ?: return
+
+        callInIdeaEnvironment(project, message("store.new.translation")) { env, progress ->
+            manager.flush(env, progress)
+            updateTranslationKey(key, created, spec)
         }
     }
 
-    private inner class TranslationStorePopupStep(val project: Project, val stack: TranslationStoreStack, val stores: MutableList<ITranslationStore>) :
+    private fun updateTranslationKey(existingKey: String, createdNlsEntry: ITranslation, translationSpec: TranslationLanguageSpec) {
+        val createdKey = createdNlsEntry.key()
+        if (createdKey == existingKey) return
+        val path = translationSpec.element.containingFile.virtualFile.resolveLocalPath() ?: return
+        TransactionManager.current().register(UpdateTranslationKeyMember(path, createdKey, translationSpec))
+    }
+
+    private class UpdateTranslationKeyMember(val path: Path, val createdKey: String, val translationSpec: TranslationLanguageSpec) : TransactionMember {
+        override fun file() = path
+
+        override fun commit(progress: IdeaProgress): Boolean {
+            val newElement = translationSpec.createNewLiteral(createdKey)
+            translationSpec.element.replace(newElement)
+            return true
+        }
+    }
+
+    private inner class TranslationStorePopupStep(val project: Project, val manager: TranslationManager, val spec: TranslationLanguageSpec, val stores: MutableList<ITranslationStore>) :
             BaseListPopupStep<ITranslationStore>(message("create.new.translation.in"), stores, AllIcons.Nodes.Services) {
 
         init {
@@ -124,7 +130,7 @@ class AddMissingTranslationQuickFix(val key: CharSequence) : LocalQuickFix {
         override fun getTextFor(value: ITranslationStore): String = value.service().type().name()
 
         override fun onChosen(selectedValue: ITranslationStore, finalChoice: Boolean): PopupStep<*>? = doFinalStep {
-            openDialog(project, selectedValue, stack)
+            openDialog(project, selectedValue, manager, spec)
         }
 
         override fun isSpeedSearchEnabled() = stores.size > 3

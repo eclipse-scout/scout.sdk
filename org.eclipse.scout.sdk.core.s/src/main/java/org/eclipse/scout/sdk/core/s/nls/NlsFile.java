@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.StringJoiner;
 
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -74,15 +75,15 @@ public class NlsFile {
   }
 
   /**
-   * @param stack
-   *          The stack in which the store should be searched.
-   * @return The {@link ITranslationStore} within the given {@link TranslationStoreStack stack} whose service matches
-   *         the one of this nls file.
+   * @param manager
+   *          The manager in which the store should be searched.
+   * @return The {@link ITranslationStore} within the given {@link TranslationManager manager} whose service matches the
+   *         one of this nls file.
    */
-  public Optional<ITranslationStore> findMatchingStoreIn(TranslationStoreStack stack) {
+  public Optional<ITranslationStore> findMatchingStoreIn(TranslationManager manager) {
     return nlsClassFqn()
-        .flatMap(fqn -> Optional.ofNullable(stack)
-            .map(TranslationStoreStack::allStores)
+        .flatMap(fqn -> Optional.ofNullable(manager)
+            .map(TranslationManager::allStores)
             .flatMap(stores -> stores
                 .filter(store -> store.service().type().name().equals(fqn))
                 .findAny()));

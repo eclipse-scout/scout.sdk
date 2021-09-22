@@ -21,9 +21,12 @@ import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodExist
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.apidef.IScout22DoApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ClassIdAutoCreationExtension;
@@ -59,7 +62,20 @@ public class DoConvenienceMethodsUpdateOperationTest {
     javaEnvironment.reload();
 
     testApiOfChildDo(assertNoCompileErrors(childDo));
-    testApiOfSampleDo(assertNoCompileErrors(sampleDo));
+
+    var generatedSampleDo = assertNoCompileErrors(sampleDo);
+    var scoutApi = javaEnvironment.requireApi(IScoutApi.class);
+    if (scoutApi.maxLevel().segments()[0] >= 22) {
+      testApiOfSampleDo_Scout22(generatedSampleDo);
+
+      // check that the primitive boolean getter uses the nvl method
+      var nvlMethodName = scoutApi.requireApi(IScout22DoApi.class).DoEntity().nvlMethodName();
+      var isEnabledBodySource = generatedSampleDo.methods().withName("isEnabled").first().get().sourceOfBody().get().asCharSequence().toString();
+      assertTrue(isEnabledBodySource.indexOf(nvlMethodName + "(getEnabled())") > 0);
+    }
+    else {
+      testApiOfSampleDo_Scout10(generatedSampleDo);
+    }
 
     // validate that the "withEnabled" method has a JavaDoc pointing to the original JavaDoc of the attribute
     assertEquals("/**\n* See {@link #enabled()}.\n*/", childDo.methods().withName("withEnabled").first().get()
@@ -145,7 +161,7 @@ public class DoConvenienceMethodsUpdateOperationTest {
   /**
    * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
    */
-  private static void testApiOfSampleDo(IType sampleDo) {
+  private static void testApiOfSampleDo_Scout10(IType sampleDo) {
     assertHasFlags(sampleDo, Flags.AccPublic);
     assertHasSuperClass(sampleDo, "org.eclipse.scout.rt.dataobject.DoEntity");
     assertHasSuperInterfaces(sampleDo, new String[]{"dataobject.DataObjectTestInterface"});
@@ -154,13 +170,16 @@ public class DoConvenienceMethodsUpdateOperationTest {
     // fields of SampleDo
     assertEquals(0, sampleDo.fields().stream().count(), "field count of 'dataobject.SampleDo'");
 
-    assertEquals(8, sampleDo.methods().stream().count(), "method count of 'dataobject.SampleDo'");
+    assertEquals(11, sampleDo.methods().stream().count(), "method count of 'dataobject.SampleDo'");
     var enabled = assertMethodExist(sampleDo, "enabled", new String[]{});
     assertMethodReturnType(enabled, "org.eclipse.scout.rt.dataobject.DoValue<java.lang.Boolean>");
     assertEquals(3, enabled.annotations().stream().count(), "annotation count");
     assertAnnotation(enabled, "java.lang.Override");
     assertAnnotation(enabled, "java.lang.Deprecated");
     assertAnnotation(enabled, "org.eclipse.scout.rt.dataobject.ValueFormat");
+    var stringAttribute = assertMethodExist(sampleDo, "stringAttribute", new String[]{});
+    assertMethodReturnType(stringAttribute, "org.eclipse.scout.rt.dataobject.DoValue<java.lang.String>");
+    assertEquals(0, stringAttribute.annotations().stream().count(), "annotation count");
     var versions = assertMethodExist(sampleDo, "versions", new String[]{});
     assertMethodReturnType(versions, "org.eclipse.scout.rt.dataobject.DoList<java.lang.Long>");
     assertEquals(0, versions.annotations().stream().count(), "annotation count");
@@ -176,11 +195,92 @@ public class DoConvenienceMethodsUpdateOperationTest {
     assertAnnotation(withEnabled, "javax.annotation.Generated");
     var isEnabled = assertMethodExist(sampleDo, "isEnabled", new String[]{});
     assertMethodReturnType(isEnabled, "java.lang.Boolean");
-    assertEquals(4, isEnabled.annotations().stream().count(), "annotation count");
-    assertAnnotation(isEnabled, "java.lang.Override");
+    assertEquals(3, isEnabled.annotations().stream().count(), "annotation count");
     assertAnnotation(isEnabled, "java.lang.Deprecated");
     assertAnnotation(isEnabled, "org.eclipse.scout.rt.dataobject.ValueFormat");
     assertAnnotation(isEnabled, "javax.annotation.Generated");
+    var withStringAttribute = assertMethodExist(sampleDo, "withStringAttribute", new String[]{"java.lang.String"});
+    assertMethodReturnType(withStringAttribute, "dataobject.SampleDo");
+    assertEquals(1, withStringAttribute.annotations().stream().count(), "annotation count");
+    assertAnnotation(withStringAttribute, "javax.annotation.Generated");
+    var getStringAttribute = assertMethodExist(sampleDo, "getStringAttribute", new String[]{});
+    assertMethodReturnType(getStringAttribute, "java.lang.String");
+    assertEquals(2, getStringAttribute.annotations().stream().count(), "annotation count");
+    assertAnnotation(getStringAttribute, "java.lang.Override");
+    assertAnnotation(getStringAttribute, "javax.annotation.Generated");
+    var withVersions = assertMethodExist(sampleDo, "withVersions", new String[]{"java.util.Collection<? extends java.lang.Long>"});
+    assertMethodReturnType(withVersions, "dataobject.SampleDo");
+    assertEquals(1, withVersions.annotations().stream().count(), "annotation count");
+    assertAnnotation(withVersions, "javax.annotation.Generated");
+    var withVersions1 = assertMethodExist(sampleDo, "withVersions", new String[]{"java.lang.Long[]"});
+    assertMethodReturnType(withVersions1, "dataobject.SampleDo");
+    assertEquals(1, withVersions1.annotations().stream().count(), "annotation count");
+    assertAnnotation(withVersions1, "javax.annotation.Generated");
+    var getVersions = assertMethodExist(sampleDo, "getVersions", new String[]{});
+    assertMethodReturnType(getVersions, "java.util.List<java.lang.Long>");
+    assertEquals(2, getVersions.annotations().stream().count(), "annotation count");
+    assertAnnotation(getVersions, "java.lang.Override");
+    assertAnnotation(getVersions, "javax.annotation.Generated");
+
+    assertEquals(0, sampleDo.innerTypes().stream().count(), "inner types count of 'SampleDo'");
+  }
+
+  /**
+   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   */
+  private static void testApiOfSampleDo_Scout22(IType sampleDo) {
+    assertHasFlags(sampleDo, Flags.AccPublic);
+    assertHasSuperClass(sampleDo, "org.eclipse.scout.rt.dataobject.DoEntity");
+    assertHasSuperInterfaces(sampleDo, new String[]{"dataobject.DataObjectTestInterface"});
+    assertEquals(0, sampleDo.annotations().stream().count(), "annotation count");
+
+    // fields of SampleDo
+    assertEquals(0, sampleDo.fields().stream().count(), "field count of 'dataobject.SampleDo'");
+
+    assertEquals(12, sampleDo.methods().stream().count(), "method count of 'dataobject.SampleDo'");
+    var enabled = assertMethodExist(sampleDo, "enabled", new String[]{});
+    assertMethodReturnType(enabled, "org.eclipse.scout.rt.dataobject.DoValue<java.lang.Boolean>");
+    assertEquals(3, enabled.annotations().stream().count(), "annotation count");
+    assertAnnotation(enabled, "java.lang.Override");
+    assertAnnotation(enabled, "java.lang.Deprecated");
+    assertAnnotation(enabled, "org.eclipse.scout.rt.dataobject.ValueFormat");
+    var stringAttribute = assertMethodExist(sampleDo, "stringAttribute", new String[]{});
+    assertMethodReturnType(stringAttribute, "org.eclipse.scout.rt.dataobject.DoValue<java.lang.String>");
+    assertEquals(0, stringAttribute.annotations().stream().count(), "annotation count");
+    var versions = assertMethodExist(sampleDo, "versions", new String[]{});
+    assertMethodReturnType(versions, "org.eclipse.scout.rt.dataobject.DoList<java.lang.Long>");
+    assertEquals(0, versions.annotations().stream().count(), "annotation count");
+    var ignored = assertMethodExist(sampleDo, "ignored", new String[]{});
+    assertMethodReturnType(ignored, "org.eclipse.scout.rt.dataobject.DoValue<java.lang.Long>");
+    assertEquals(1, ignored.annotations().stream().count(), "annotation count");
+    assertAnnotation(ignored, "org.eclipse.scout.rt.dataobject.IgnoreConvenienceMethodGeneration");
+    var withEnabled = assertMethodExist(sampleDo, "withEnabled", new String[]{"java.lang.Boolean"});
+    assertMethodReturnType(withEnabled, "dataobject.SampleDo");
+    assertEquals(3, withEnabled.annotations().stream().count(), "annotation count");
+    assertAnnotation(withEnabled, "java.lang.Deprecated");
+    assertAnnotation(withEnabled, "org.eclipse.scout.rt.dataobject.ValueFormat");
+    assertAnnotation(withEnabled, "javax.annotation.Generated");
+    var getEnabled = assertMethodExist(sampleDo, "getEnabled", new String[]{});
+    assertMethodReturnType(getEnabled, "java.lang.Boolean");
+    assertEquals(3, getEnabled.annotations().stream().count(), "annotation count");
+    assertAnnotation(getEnabled, "java.lang.Deprecated");
+    assertAnnotation(getEnabled, "org.eclipse.scout.rt.dataobject.ValueFormat");
+    assertAnnotation(getEnabled, "javax.annotation.Generated");
+    var isEnabled = assertMethodExist(sampleDo, "isEnabled", new String[]{});
+    assertMethodReturnType(isEnabled, "boolean");
+    assertEquals(3, isEnabled.annotations().stream().count(), "annotation count");
+    assertAnnotation(isEnabled, "java.lang.Deprecated");
+    assertAnnotation(isEnabled, "org.eclipse.scout.rt.dataobject.ValueFormat");
+    assertAnnotation(isEnabled, "javax.annotation.Generated");
+    var withStringAttribute = assertMethodExist(sampleDo, "withStringAttribute", new String[]{"java.lang.String"});
+    assertMethodReturnType(withStringAttribute, "dataobject.SampleDo");
+    assertEquals(1, withStringAttribute.annotations().stream().count(), "annotation count");
+    assertAnnotation(withStringAttribute, "javax.annotation.Generated");
+    var getStringAttribute = assertMethodExist(sampleDo, "getStringAttribute", new String[]{});
+    assertMethodReturnType(getStringAttribute, "java.lang.String");
+    assertEquals(2, getStringAttribute.annotations().stream().count(), "annotation count");
+    assertAnnotation(getStringAttribute, "java.lang.Override");
+    assertAnnotation(getStringAttribute, "javax.annotation.Generated");
     var withVersions = assertMethodExist(sampleDo, "withVersions", new String[]{"java.util.Collection<? extends java.lang.Long>"});
     assertMethodReturnType(withVersions, "dataobject.SampleDo");
     assertEquals(1, withVersions.annotations().stream().count(), "annotation count");

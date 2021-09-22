@@ -21,10 +21,10 @@ import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope.allScope
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.nls.Language
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationDependencyScope
-import org.eclipse.scout.sdk.s2i.nls.TranslationStoreStackLoader
+import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
 import java.util.regex.Pattern
 
@@ -56,22 +56,22 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
         val scope = root.translationDependencyScope() ?: return FoldingDescriptor.EMPTY
         val module = root.containingModule() ?: return FoldingDescriptor.EMPTY
         val project = root.project
-        val stack = TranslationStoreStackLoader.createStack(module, scope, true) ?: return FoldingDescriptor.EMPTY
+        val manager = TranslationManagerLoader.createManager(module, scope, true) ?: return FoldingDescriptor.EMPTY
         m_javaLangStringType = PsiType.getTypeByName(CommonClassNames.JAVA_LANG_STRING, project, allScope(project))
         m_requestedLanguage = ScoutSettings.getTranslationLanguage(project)
-        val result = buildFoldRegions(root, stack).toTypedArray()
+        val result = buildFoldRegions(root, manager).toTypedArray()
         SdkLog.debug("Folding region creation took {}ms.", System.currentTimeMillis() - start)
         return result
     }
 
-    abstract fun buildFoldRegions(root: PsiElement, stack: TranslationStoreStack): List<FoldingDescriptor>
+    abstract fun buildFoldRegions(root: PsiElement, manager: TranslationManager): List<FoldingDescriptor>
 
     override fun getPlaceholderText(node: ASTNode): String? = null
 
     override fun isCollapsedByDefault(node: ASTNode) = isFoldingOn()
 
-    protected open fun createFoldingDescriptor(element: PsiElement, key: String, stack: TranslationStoreStack): FoldingDescriptor? {
-        val translation = stack.translation(key).orElse(null) ?: return null
+    protected open fun createFoldingDescriptor(element: PsiElement, key: String, manager: TranslationManager): FoldingDescriptor? {
+        val translation = manager.translation(key).orElse(null) ?: return null
         var text = translation.bestText(m_requestedLanguage).orElse(null) ?: return null
 
         if (element is PsiMethodCallExpression) {

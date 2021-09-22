@@ -33,7 +33,9 @@ import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.model.api.query.AbstractQuery;
+import org.eclipse.scout.sdk.core.s.apidef.IScout22DoApi;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.s.builder.java.body.IScoutMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.s.builder.java.body.ScoutMethodBodyBuilder;
@@ -217,6 +219,33 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
         .withOverrideIfNecessary(true, owner);
   }
 
+  protected static String computeDoNodeCollectionSetterParameterDataType(IType owner, CharSequence methodName, CharSequence dataTypeReference) {
+    var methodId = JavaTypes.createMethodIdentifier(methodName, singleton(Collection.class.getName()));
+    var parentMethod = owner.superTypes()
+        .withSelf(false).stream()
+        .flatMap(st -> st.methods().withMethodIdentifier(methodId).stream())
+        .findAny();
+
+    // inherit parameter signature from parent (sometimes it is Collection<? extends Xyz> and sometimes only implemented as Collection<Xyz>).
+    var needsExtends = parentMethod
+        .map(IMethod::parameters)
+        .flatMap(AbstractQuery::first)
+        .map(IMethodParameter::dataType)
+        .map(IType::reference)
+        .map(ref -> ref.contains(JavaTypes.EXTENDS))
+        .orElse(true);
+
+    var collectionDataTypeRef = new StringBuilder(Collection.class.getName()).append(JavaTypes.C_GENERIC_START);
+    if (needsExtends) {
+      collectionDataTypeRef.append(JavaTypes.C_QUESTION_MARK).append(' ').append(JavaTypes.EXTENDS).append(' ').append(dataTypeReference);
+    }
+    else {
+      collectionDataTypeRef.append(dataTypeReference);
+    }
+    collectionDataTypeRef.append(JavaTypes.C_GENERIC_END);
+    return collectionDataTypeRef.toString();
+  }
+
   /**
    * Creates a collection DO chained setter for varargs values of the form:
    *
@@ -286,48 +315,34 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static IScoutMethodGenerator<?, ?> createDoNodeGetter(CharSequence name, String returnTypeReference) {
-    var getterPrefix = dataObjectGetterPrefixFor(returnTypeReference);
     return create()
         .asPublic()
         .withReturnType(returnTypeReference)
-        .withElementName(getterPrefix + capitalize(name))
+        .withElementNameFrom(IScoutApi.class, api -> computeDoNodeGetterName(name, returnTypeReference, api))
         .withAnnotation(createDoConvenienceMethodsGenerated())
-        .withBody(b -> b.returnClause().appendDoNodeGet(name).semicolon());
+        .withBody(b -> computeDoNodeGetterBody(name, returnTypeReference, b));
   }
 
-  protected static String computeDoNodeCollectionSetterParameterDataType(IType owner, CharSequence methodName, CharSequence dataTypeReference) {
-    var methodId = JavaTypes.createMethodIdentifier(methodName, singleton(Collection.class.getName()));
-    var parentMethod = owner.superTypes()
-        .withSelf(false).stream()
-        .flatMap(st -> st.methods().withMethodIdentifier(methodId).stream())
-        .findAny();
-
-    // inherit parameter signature from parent (sometimes it is Collection<? extends Xyz> and sometimes only implemented as Collection<Xyz>).
-    var needsExtends = parentMethod
-        .map(IMethod::parameters)
-        .flatMap(AbstractQuery::first)
-        .map(IMethodParameter::dataType)
-        .map(IType::reference)
-        .map(ref -> ref.contains(JavaTypes.EXTENDS))
-        .orElse(true);
-
-    var collectionDataTypeRef = new StringBuilder(Collection.class.getName()).append(JavaTypes.C_GENERIC_START);
-    if (needsExtends) {
-      collectionDataTypeRef.append(JavaTypes.C_QUESTION_MARK).append(' ').append(JavaTypes.EXTENDS).append(' ').append(dataTypeReference);
-    }
-    else {
-      collectionDataTypeRef.append(dataTypeReference);
-    }
-    collectionDataTypeRef.append(JavaTypes.C_GENERIC_END);
-    return collectionDataTypeRef.toString();
+  protected static String computeDoNodeGetterName(CharSequence doNodeName, CharSequence doNodeType, IScoutInterfaceApi api) {
+    return api.IDoEntity().computeGetterPrefixFor(doNodeType) + capitalize(doNodeName);
   }
 
-  protected static String dataObjectGetterPrefixFor(String type) {
-    // for DOs the bool prefix is used for boxed booleans
-    if (Boolean.class.getName().equals(type)) {
-      return PropertyBean.GETTER_BOOL_PREFIX;
+  protected static void computeDoNodeGetterBody(CharSequence name, String returnTypeReference, IScoutMethodBodyBuilder<?> builder) {
+    if (JavaTypes._boolean.equals(returnTypeReference)) {
+      // special body for primitive boolean getters (Scout >= 22 only)
+      var scout22DoApi = builder.context()
+          .api(IScoutApi.class)
+          .flatMap(scoutApi -> scoutApi.api(IScout22DoApi.class));
+      if (scout22DoApi.isPresent()) {
+        builder.returnClause()
+            .append(scout22DoApi.get().DoEntity().nvlMethodName())
+            .parenthesisOpen()
+            .appendFrom(IScoutApi.class, api -> computeDoNodeGetterName(name, JavaTypes.Boolean, api)).parenthesisOpen().parenthesisClose()
+            .parenthesisClose().semicolon();
+        return;
+      }
     }
-    return PropertyBean.GETTER_PREFIX;
+    builder.returnClause().appendDoNodeGet(name).semicolon();
   }
 
   protected static String buildReturnTypeReferenceFor(IType owner) {

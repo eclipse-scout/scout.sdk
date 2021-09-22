@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import java.util.Optional;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.sdk.core.s.nls.Language;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.internal.nls.LanguageNewDialog;
@@ -28,9 +28,9 @@ import org.eclipse.swt.widgets.Shell;
 public class LanguageNewAction extends Action {
 
   private final Shell m_shell;
-  private final TranslationStoreStack m_project;
+  private final TranslationManager m_project;
 
-  public LanguageNewAction(TranslationStoreStack project, Shell s) {
+  public LanguageNewAction(TranslationManager project, Shell s) {
     super("New Language...");
     m_project = project;
     m_shell = s;

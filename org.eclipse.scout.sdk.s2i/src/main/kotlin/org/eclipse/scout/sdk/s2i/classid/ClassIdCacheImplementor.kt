@@ -87,7 +87,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     private fun findAllClassIds(scoutApi: IScoutApi, scope: SearchScope, indicator: ProgressIndicator?) =
             project.findAllTypesAnnotatedWith(scoutApi.ClassId().fqn(), scope, indicator)
                     .filter { it.isValid }
-                    .mapNotNull { ClassIdAnnotation.of(null, it, scoutApi) }
+                    .mapNotNull { ClassIdAnnotation.of(null, it, project, scoutApi) }
                     .filter { it.hasValue() }
 
     override fun typesWithClassId(classId: String): List<String> = usageByClassId()[classId] ?: emptyList()
@@ -154,7 +154,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
                     return
                 }
                 val declaringAnnotation = PsiTreeUtil.getParentOfType(expression, PsiAnnotation::class.java, false, *m_stopTypes) ?: return
-                val classId = ClassIdAnnotation.of(declaringAnnotation, scoutApi) ?: return
+                val classId = ClassIdAnnotation.of(declaringAnnotation, project, scoutApi) ?: return
                 if (ignoreClassId(classId)) {
                     return
                 }

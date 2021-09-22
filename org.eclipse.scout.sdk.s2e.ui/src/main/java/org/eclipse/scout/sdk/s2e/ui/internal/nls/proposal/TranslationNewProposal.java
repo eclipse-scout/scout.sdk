@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
@@ -31,11 +31,11 @@ import org.eclipse.swt.widgets.Display;
 public class TranslationNewProposal extends AbstractTranslationProposal {
 
   private final Image m_image;
-  private final TranslationStoreStack m_stack;
+  private final TranslationManager m_manager;
 
-  public TranslationNewProposal(TranslationStoreStack project, String prefix, int initialOffset) {
+  public TranslationNewProposal(TranslationManager manager, String prefix, int initialOffset) {
     super(prefix, initialOffset);
-    m_stack = project;
+    m_manager = manager;
     m_image = S2ESdkUiActivator.getImage(ISdkIcons.TextAdd);
   }
 
@@ -63,11 +63,11 @@ public class TranslationNewProposal extends AbstractTranslationProposal {
       proposalFieldText = Strings.fromStringLiteral('"' + searchText + '"').toString();
     }
 
-    var key = m_stack.generateNewKey(proposalFieldText);
+    var key = m_manager.generateNewKey(proposalFieldText);
     var entry = new Translation(key);
     entry.putText(Language.LANGUAGE_DEFAULT, proposalFieldText);
 
-    var action = new TranslationNewAction(Display.getDefault().getActiveShell(), m_stack, entry);
+    var action = new TranslationNewAction(Display.getDefault().getActiveShell(), m_manager, entry);
     action.run();
     action.getCreatedTranslation()
         .ifPresent(createdEntry -> {

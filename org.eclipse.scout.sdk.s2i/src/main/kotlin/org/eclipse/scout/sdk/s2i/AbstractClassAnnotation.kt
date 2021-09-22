@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2i
 
+import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
@@ -17,26 +18,26 @@ import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 
-abstract class AbstractClassAnnotation protected constructor(val psiClass: PsiClass, val psiAnnotation: PsiAnnotation, val scoutApi: IScoutApi) {
+abstract class AbstractClassAnnotation protected constructor(val psiClass: PsiClass, val psiAnnotation: PsiAnnotation, val project: Project, val scoutApi: IScoutApi) {
 
     private val m_ownerFqn = FinalValue<String>()
 
     companion object {
-        fun classAnnotation(fqn: String, annotation: PsiAnnotation?, owner: PsiClass?): Pair<PsiClass, PsiAnnotation>? {
+        fun classAnnotation(fqn: String, annotation: PsiAnnotation?, owner: PsiClass?, project: Project): Pair<PsiClass, PsiAnnotation>? {
             if (owner == null && annotation == null) {
                 return null
             }
 
-            val declaringClass = owner ?: computeInReadAction(annotation!!.project) { PsiTreeUtil.getParentOfType(annotation, PsiClass::class.java) } ?: return null
-            val annotationElement = resolveAnnotation(fqn, annotation, declaringClass) ?: return null
+            val declaringClass = owner ?: computeInReadAction(project) { PsiTreeUtil.getParentOfType(annotation, PsiClass::class.java) } ?: return null
+            val annotationElement = resolveAnnotation(fqn, annotation, declaringClass, project) ?: return null
             return declaringClass to annotationElement
         }
 
-        private fun resolveAnnotation(fqn: String, annotation: PsiAnnotation?, owner: PsiClass): PsiAnnotation? {
+        private fun resolveAnnotation(fqn: String, annotation: PsiAnnotation?, owner: PsiClass, project: Project): PsiAnnotation? {
             if (annotation == null) {
-                return computeInReadAction(owner.project) { owner.getAnnotation(fqn) }
+                return computeInReadAction(project) { owner.getAnnotation(fqn) }
             }
-            val annotationName = computeInReadAction(annotation.project) {
+            val annotationName = computeInReadAction(project) {
                 // do not use annotation.qualifiedName here because it requires a resolve (slow and might not be allowed in contexts like psi change listeners)
                 annotation.nameReferenceElement?.referenceName
             } ?: return null
@@ -48,7 +49,7 @@ abstract class AbstractClassAnnotation protected constructor(val psiClass: PsiCl
     }
 
     fun ownerFqn(): String? = m_ownerFqn.computeIfAbsentAndGet {
-        computeInReadAction(psiClass.project) {
+        computeInReadAction(project) {
             psiClass.qualifiedName
         }
     }

@@ -24,7 +24,7 @@ import com.intellij.patterns.StringPattern
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.util.ProcessingContext
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores
+import org.eclipse.scout.sdk.core.s.nls.Translations
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.JsonTextKeyPattern
 import org.eclipse.scout.sdk.core.util.Strings
 
@@ -94,7 +94,7 @@ object PsiTranslationPatternsForJs {
         }
     }
 
-    class JsTranslationSpec(element: PsiElement) : TranslationLanguageSpec(element, TranslationStores.DependencyScope.NODE, "'", PsiTranslationPatternsForJs::getTranslationKeyFromJs) {
+    class JsTranslationSpec(element: PsiElement) : TranslationLanguageSpec(element, Translations.DependencyScope.NODE, "'", PsiTranslationPatternsForJs::getTranslationKeyFromJs) {
 
         override fun decorateTranslationKey(nlsKey: String) =
                 if (TEXT_KEY_PATTERN.accepts(element) || TEXT_KEY_PATTERN.accepts(element.parent))

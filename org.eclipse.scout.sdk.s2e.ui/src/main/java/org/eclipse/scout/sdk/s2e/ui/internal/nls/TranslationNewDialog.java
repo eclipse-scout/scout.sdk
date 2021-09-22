@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,15 +19,15 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.nls.Language;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractWizardPage;
 import org.eclipse.swt.widgets.Shell;
 
 public class TranslationNewDialog extends AbstractTranslationDialog {
 
-  public TranslationNewDialog(Shell parentShell, TranslationStoreStack project, ITranslation row) {
+  public TranslationNewDialog(Shell parentShell, TranslationManager project, ITranslation row) {
     super(parentShell, "New Entry", row, project, true);
   }
 

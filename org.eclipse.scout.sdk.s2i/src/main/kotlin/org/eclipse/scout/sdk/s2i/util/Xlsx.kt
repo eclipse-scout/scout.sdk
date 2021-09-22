@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import org.apache.poi.ss.formula.ConditionalFormattingEvaluator
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.WorkbookUtil
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.SdkException
 import java.io.BufferedOutputStream
 import java.io.File
@@ -31,6 +32,9 @@ object Xlsx {
      */
     fun write(tableData: List<List<String?>>, sheetName: String, file: File) {
         val wb = XSSFWorkbook()
+        wb.properties.coreProperties.creator = CoreUtils.getUsername()
+        wb.properties.coreProperties.title = "Translation Export"
+        wb.properties.extendedProperties.application = "Eclipse Scout Plugin for IntelliJ IDEA"
         val sheet = wb.createSheet(WorkbookUtil.createSafeSheetName(sheetName))
         for (rowIndex in tableData.indices) {
             val row = sheet.createRow(rowIndex)

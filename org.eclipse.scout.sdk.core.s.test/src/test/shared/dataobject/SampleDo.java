@@ -29,6 +29,10 @@ public class SampleDo extends DoEntity implements DataObjectTestInterface {
     return doValue("enabled");
   }
 
+  public DoValue<String> stringAttribute() {
+    return doValue("stringAttribute");
+  }
+
   public DoList<Long> versions() {
     return doList("versions");
   }
@@ -42,16 +46,31 @@ public class SampleDo extends DoEntity implements DataObjectTestInterface {
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
 
+  @Deprecated
+  @ValueFormat(pattern = "test-pattern")
   @Generated("DoConvenienceMethodsGenerator")
   public SampleDo withEnabled(Boolean enabled) {
     enabled().set(enabled);
     return this;
   }
 
-  @Override
+  @Deprecated
+  @ValueFormat(pattern = "test-pattern")
   @Generated("DoConvenienceMethodsGenerator")
   public Boolean isEnabled() {
     return enabled().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public SampleDo withStringAttribute(String stringAttribute) {
+    stringAttribute().set(stringAttribute);
+    return this;
+  }
+
+  @Override
+  @Generated("DoConvenienceMethodsGenerator")
+  public String getStringAttribute() {
+    return stringAttribute().get();
   }
 
   @Generated("DoConvenienceMethodsGenerator")

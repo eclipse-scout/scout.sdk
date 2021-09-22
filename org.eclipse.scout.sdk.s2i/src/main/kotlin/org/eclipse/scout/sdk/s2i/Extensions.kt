@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2i
 import com.intellij.analysis.AnalysisScope
 import com.intellij.analysis.AnalysisUIOptions
 import com.intellij.analysis.BaseAnalysisActionDialog
+import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.lang.properties.psi.PropertiesFile
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -50,9 +51,9 @@ import org.eclipse.scout.sdk.core.model.api.IType
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.Language
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile
 import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStore
 import org.eclipse.scout.sdk.core.s.nls.properties.ReadOnlyTranslationFile
@@ -282,6 +283,7 @@ fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, in
     options.isRecursiveSearch = true
     options.scope = scope
     options.searchPattern = "@$annotation( )\nclass \$Class\$ {}"
+    options.setFileType(JavaFileType.INSTANCE)
 
     val constraint = MatchVariableConstraint()
     constraint.name = "Class"
@@ -406,21 +408,22 @@ fun ITranslationStore.resolvePropertiesFile(language: Language, psiManager: PsiM
 }
 
 /**
- * Tries to resolve the [com.intellij.lang.properties.IProperty] that corresponds to this [ITranslationEntry] and the [Language] given.
- * @param language The [Language] of this [ITranslationEntry] for which the [com.intellij.lang.properties.IProperty] should be returned.
+ * Tries to resolve the [com.intellij.lang.properties.IProperty] that corresponds to this [IStackedTranslation] and the [Language] given.
+ * @param language The [Language] of this [IStackedTranslation] for which the [com.intellij.lang.properties.IProperty] should be returned.
  * @param project The [Project] in which the [com.intellij.lang.properties.IProperty] should be searched.
- * @return The [com.intellij.lang.properties.IProperty] of this [ITranslationEntry] and the [Language] given or null if it could not be found.
+ * @return The [com.intellij.lang.properties.IProperty] of this [IStackedTranslation] and the [Language] given or null if it could not be found.
  */
-fun ITranslationEntry.resolveProperty(language: Language, project: Project) = resolveProperty(language, PsiManager.getInstance(project))
+fun IStackedTranslation.resolveProperty(language: Language, project: Project) = resolveProperty(language, PsiManager.getInstance(project))
 
 /**
- * Tries to resolve the [com.intellij.lang.properties.IProperty] that corresponds to this [ITranslationEntry] and the [Language] given.
- * @param language The [Language] of this [ITranslationEntry] for which the [com.intellij.lang.properties.IProperty] should be returned.
+ * Tries to resolve the [com.intellij.lang.properties.IProperty] that corresponds to this [IStackedTranslation] and the [Language] given.
+ * @param language The [Language] of this [IStackedTranslation] for which the [com.intellij.lang.properties.IProperty] should be returned.
  * @param psiManager The [PsiManager] to lookup the file.
- * @return The [com.intellij.lang.properties.IProperty] of this [ITranslationEntry] and the [Language] given or null if it could not be found.
+ * @return The [com.intellij.lang.properties.IProperty] of this [IStackedTranslation] and the [Language] given or null if it could not be found.
  */
-fun ITranslationEntry.resolveProperty(language: Language, psiManager: PsiManager) = store()
-        .resolvePropertiesFile(language, psiManager)
+fun IStackedTranslation.resolveProperty(language: Language, psiManager: PsiManager) = entry(language).orElse(null)
+        ?.store()
+        ?.resolvePropertiesFile(language, psiManager)
         ?.findPropertyByKey(key())
 
 /**

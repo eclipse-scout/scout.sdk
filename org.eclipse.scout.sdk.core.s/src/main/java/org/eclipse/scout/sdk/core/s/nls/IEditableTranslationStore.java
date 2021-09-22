@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,42 +24,6 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public interface IEditableTranslationStore extends ITranslationStore {
 
   /**
-   * Adds a new {@link ITranslation} to that {@link ITranslationStore}.
-   * <p>
-   * If there existed an entry with the same key already, it is replaced.
-   *
-   * @param newTranslation
-   *          The new entry. Must not be {@code null}.
-   * @return the just added {@link ITranslationEntry}.
-   * @throws IllegalArgumentException
-   *           if this store is not editable ({@link #isEditable()}).
-   */
-  ITranslationEntry addNewTranslation(ITranslation newTranslation);
-
-  /**
-   * Flushes all changes made to the data source.
-   *
-   * @param env
-   *          The {@link IEnvironment} to store the new content.
-   * @param progress
-   *          The {@link IProgress} monitor.
-   * @throws IllegalArgumentException
-   *           if this store is not editable ({@link #isEditable()}).
-   */
-  void flush(IEnvironment env, IProgress progress);
-
-  /**
-   * Removes the translation with the specified key from this store.
-   *
-   * @param key
-   *          The key of the translation to remove. Must not be blank (see {@link Strings#isBlank(CharSequence)}).
-   * @return The removed {@link ITranslationEntry} or {@code null} if it could not be found.
-   * @throws IllegalArgumentException
-   *           if this store is not editable ({@link #isEditable()}).
-   */
-  ITranslationEntry removeTranslation(String key);
-
-  /**
    * Adds a new {@link Language} to this store.
    * <p>
    * If this {@link Language} already existed, it will be replaced.
@@ -72,10 +36,15 @@ public interface IEditableTranslationStore extends ITranslationStore {
   void addNewLanguage(Language language);
 
   /**
-   * @return {@code true} if there were changes to that store since the last {@link #reload(IProgress)} or
-   *         {@link #flush(IEnvironment, IProgress)}. {@code false} otherwise.
+   * Updates or creates the {@link ITranslationEntry} with the same key as the specified {@link ITranslation}.<br>
+   * The languages and texts of the existing {@link ITranslationEntry} are replaced with the ones from the specified
+   * template. Languages no longer present are removed from the entry. Missing languages are created as needed.
+   *
+   * @param template
+   *          The template that defines the new languages and texts. Must not be {@code null}.
+   * @return The modified or created {@link ITranslationEntry}.
    */
-  boolean isDirty();
+  ITranslationEntry setTranslation(ITranslation template);
 
   /**
    * Changes the key of the {@link ITranslationEntry} with the specified key.
@@ -89,14 +58,31 @@ public interface IEditableTranslationStore extends ITranslationStore {
   ITranslationEntry changeKey(String oldKey, String newKey);
 
   /**
-   * Updates the {@link ITranslationEntry} with the same key as the specified {@link ITranslation}.<br>
-   * The languages and texts of the existing {@link ITranslationEntry} are replaced with the ones from the specified
-   * template.
+   * Removes the translation with the specified key from this store.
    *
-   * @param template
-   *          The template that defines the new languages and texts of an existing {@link ITranslationEntry} with the
-   *          same key as the template. Must not be {@code null}.
-   * @return The modified {@link ITranslationEntry}.
+   * @param key
+   *          The key of the translation to remove. Must not be blank (see {@link Strings#isBlank(CharSequence)}).
+   * @return The removed {@link ITranslationEntry} or {@code null} if it could not be found.
+   * @throws IllegalArgumentException
+   *           if this store is not editable ({@link #isEditable()}).
    */
-  ITranslationEntry updateTranslation(ITranslation template);
+  ITranslationEntry removeTranslation(String key);
+
+  /**
+   * @return {@code true} if there were changes to that store since the last {@link #reload(IProgress)} or
+   *         {@link #flush(IEnvironment, IProgress)}. {@code false} otherwise.
+   */
+  boolean isDirty();
+
+  /**
+   * Flushes all changes made to the data source.
+   *
+   * @param env
+   *          The {@link IEnvironment} to store the new content.
+   * @param progress
+   *          The {@link IProgress} monitor.
+   * @throws IllegalArgumentException
+   *           if this store is not editable ({@link #isEditable()}).
+   */
+  void flush(IEnvironment env, IProgress progress);
 }

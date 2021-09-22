@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,8 +30,8 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreSupplierExtension;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope;
+import org.eclipse.scout.sdk.core.s.nls.Translations;
+import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutFullJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
@@ -207,7 +207,7 @@ public class MissingTranslationQueryTest {
   }
 
   protected static MissingTranslationQuery createQuery(TestingEnvironment env) {
-    return new MissingTranslationQuery((p, s) -> TranslationStores.forModule(p, env, new NullProgress(), s).collect(toList()));
+    return new MissingTranslationQuery((p, s) -> Translations.storesForModule(p, env, new NullProgress(), s).collect(toList()));
   }
 
   protected static MissingTranslationQuery createQueryWithKeys(String[] javaKeys, String... nodeKeys) {

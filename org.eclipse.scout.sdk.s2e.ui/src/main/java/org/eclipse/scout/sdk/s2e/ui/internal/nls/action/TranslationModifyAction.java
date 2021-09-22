@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.nls.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.internal.nls.AbstractTranslationDialog;
@@ -26,23 +26,23 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class TranslationModifyAction extends Action {
 
-  private final ITranslationEntry m_entry;
-  private final TranslationStoreStack m_project;
+  private final IStackedTranslation m_entry;
+  private final TranslationManager m_manager;
   private final Shell m_parentShell;
 
-  public TranslationModifyAction(Shell parentShell, ITranslationEntry entry, TranslationStoreStack stack) {
+  public TranslationModifyAction(Shell parentShell, IStackedTranslation entry, TranslationManager manager) {
     super("Modify Entry...");
     m_entry = entry;
-    m_project = stack;
+    m_manager = manager;
     m_parentShell = parentShell;
-    setEnabled(stack.isEditable());
+    setEnabled(manager.isEditable());
     setImageDescriptor(S2ESdkUiActivator.getImageDescriptor(ISdkIcons.Text));
   }
 
   @Override
   public void run() {
-    AbstractTranslationDialog dialog = new TranslationModifyDialog(m_parentShell, m_project, m_entry);
+    AbstractTranslationDialog dialog = new TranslationModifyDialog(m_parentShell, m_manager, m_entry);
     var acceptedTranslation = dialog.show();
-    acceptedTranslation.ifPresent(m_project::updateTranslation);
+    acceptedTranslation.ifPresent(m_manager::setTranslation);
   }
 }

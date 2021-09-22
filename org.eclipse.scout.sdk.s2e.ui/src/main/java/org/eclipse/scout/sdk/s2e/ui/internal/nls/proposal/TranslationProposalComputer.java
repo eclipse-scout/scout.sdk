@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,9 +26,9 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope;
+import org.eclipse.scout.sdk.core.s.nls.Translations;
+import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 
 /**
  * <h3>{@link TranslationProposalComputer}</h3>
@@ -73,8 +73,8 @@ public class TranslationProposalComputer implements IJavaCompletionProposalCompu
         var modulePath = context.getCompilationUnit().getJavaProject().getProject().getLocation().toFile().toPath();
 
         return callInEclipseEnvironment(
-            (env, progress) -> TranslationStores.createStack(modulePath, env, progress, DependencyScope.JAVA)
-                .map(stack -> collectProposals(stack, prefix, offset))
+            (env, progress) -> Translations.createManager(modulePath, env, progress, DependencyScope.JAVA)
+                .map(manager -> collectProposals(manager, prefix, offset))
                 .orElseGet(Collections::emptyList))
                     .result();
       }
@@ -85,12 +85,12 @@ public class TranslationProposalComputer implements IJavaCompletionProposalCompu
     return emptyList();
   }
 
-  protected static List<ICompletionProposal> collectProposals(TranslationStoreStack stack, String prefix, int offset) {
-    List<ICompletionProposal> result = stack.allWithPrefix(prefix)
+  protected static List<ICompletionProposal> collectProposals(TranslationManager manager, String prefix, int offset) {
+    List<ICompletionProposal> result = manager.allTranslationsWithPrefix(prefix)
         .map(t -> new TranslationProposal(t, prefix, offset))
         .collect(toList());
-    if (stack.isEditable()) {
-      result.add(new TranslationNewProposal(stack, prefix, offset));
+    if (manager.isEditable()) {
+      result.add(new TranslationNewProposal(manager, prefix, offset));
     }
     return result;
   }

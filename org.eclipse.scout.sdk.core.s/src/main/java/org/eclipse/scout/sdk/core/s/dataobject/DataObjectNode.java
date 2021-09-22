@@ -16,8 +16,8 @@ import java.util.StringJoiner;
 
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.apidef.IScout22DoApi;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutDoCollectionApi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
@@ -61,11 +61,11 @@ public class DataObjectNode {
       if (scoutApi.DoList().fqn().equals(name)) {
         return Optional.of(LIST);
       }
-      return scoutApi.api(IScoutDoCollectionApi.class)
+      return scoutApi.api(IScout22DoApi.class)
           .flatMap(a -> detectDoCollection(a, name));
     }
 
-    static Optional<DataObjectNodeKind> detectDoCollection(IScoutDoCollectionApi extendedApi, String name) {
+    static Optional<DataObjectNodeKind> detectDoCollection(IScout22DoApi extendedApi, String name) {
       if (extendedApi.DoSet().fqn().equals(name)) {
         return Optional.of(SET);
       }
@@ -146,7 +146,7 @@ public class DataObjectNode {
   }
 
   @Override
-  @SuppressWarnings("squid:S1067") // Reduce the number of conditional operators
+  @SuppressWarnings("squid:S1067") // Number of conditional operators
   public boolean equals(Object o) {
     if (this == o) {
       return true;

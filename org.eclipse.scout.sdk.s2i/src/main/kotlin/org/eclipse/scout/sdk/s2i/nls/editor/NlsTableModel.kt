@@ -15,6 +15,9 @@ import com.intellij.openapi.project.Project
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.nls.*
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator.*
+import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManagerEvent
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment
 import java.util.Collections.singleton
@@ -24,10 +27,10 @@ import java.util.stream.Stream
 import javax.swing.table.AbstractTableModel
 import kotlin.streams.toList
 
-class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : AbstractTableModel() {
+class NlsTableModel(val translationManager: TranslationManager, val project: Project) : AbstractTableModel() {
 
-    private var m_filter: Predicate<ITranslationEntry>? = null
-    private var m_translations: MutableList<ITranslationEntry>? = null
+    private var m_filter: Predicate<IStackedTranslation>? = null
+    private var m_translations: MutableList<IStackedTranslation>? = null
     private var m_languages: MutableList<Language>? = null
 
     companion object {
@@ -38,7 +41,7 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
     }
 
     init {
-        stack.addListener(StackListener())
+        translationManager.addListener(ManagerListener())
         buildCache()
     }
 
@@ -50,7 +53,7 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
 
     override fun getColumnCount() = NUM_ADDITIONAL_COLUMNS + languages().size
 
-    fun setFilter(newFilter: Predicate<ITranslationEntry>?): Boolean {
+    fun setFilter(newFilter: Predicate<IStackedTranslation>?): Boolean {
         m_filter = newFilter
         return buildCache()
     }
@@ -59,7 +62,7 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
 
     fun translationForRow(rowIndex: Int) = translations()[rowIndex]
 
-    fun rowForTranslation(translation: ITranslationEntry) = translations().indexOf(translation)
+    fun rowForTranslation(translation: IStackedTranslation) = translations().indexOf(translation)
 
     fun rowForTranslationWithKey(key: String): Int {
         val translations = translations()
@@ -71,13 +74,13 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
         return -1
     }
 
-    private fun acceptFilter(candidate: ITranslationEntry) = m_filter?.test(candidate) ?: true
+    private fun acceptFilter(candidate: IStackedTranslation) = m_filter?.test(candidate) ?: true
 
     private fun buildCache(forceReload: Boolean = false): Boolean {
-        val newTranslations = stack.allEntries().collect(toList())
+        val newTranslations = translationManager.allTranslations().collect(toList())
         val newLanguages = newTranslations.stream()
                 .filter { acceptFilter(it) }
-                .flatMap { it.store().languages() }
+                .flatMap { it.languagesOfAllStores() }
                 .distinct()
                 .sorted()
                 .collect(toList())
@@ -91,8 +94,8 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
         return false
     }
 
-    private fun saveStack() = callInIdeaEnvironment(project, EclipseScoutBundle.message("saving.translations")) { env, progress ->
-        stack.flush(env, progress)
+    private fun saveManager() = callInIdeaEnvironment(project, EclipseScoutBundle.message("saving.translations")) { env, progress ->
+        translationManager.flush(env, progress)
     }
 
     override fun getColumnName(column: Int): String {
@@ -115,7 +118,10 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
 
     override fun isCellEditable(rowIndex: Int, columnIndex: Int): Boolean {
         val entry = translationForRow(rowIndex)
-        return entry.store().isEditable
+        if (columnIndex == KEY_COLUMN_INDEX) {
+            return entry.hasOnlyEditableStores()
+        }
+        return entry.hasEditableStores()
     }
 
     override fun setValueAt(aValue: Any?, rowIndex: Int, columnIndex: Int) {
@@ -126,36 +132,43 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
 
         val text = aValue.toString()
         val toUpdate = translationForRow(rowIndex)
-        if (KEY_COLUMN_INDEX == columnIndex) {
-            val newKey = text.trim()
-            if (newKey == toUpdate.key()) {
-                // no save necessary
-                return
+        try {
+            if (KEY_COLUMN_INDEX == columnIndex) {
+                val newKey = text.trim()
+                if (newKey == toUpdate.key()) {
+                    // no save necessary
+                    return
+                }
+                translationManager.changeKey(toUpdate.key(), newKey)
+            } else {
+                val lang = languageForColumn(columnIndex)
+                val updated = Translation(toUpdate)
+                updated.putText(lang, text)
+                translationManager.setTranslation(updated)
             }
-            stack.changeKey(toUpdate.key(), newKey)
-        } else {
-            val lang = languageForColumn(columnIndex)
-            val updated = Translation(toUpdate)
-            updated.putText(lang, text)
-            stack.updateTranslation(updated)
+        } catch (e: RuntimeException) {
+            SdkLog.error("Unable to save value.", e)
         }
     }
 
     fun validate(aValue: Any?, rowIndex: Int, columnIndex: Int): Int {
+        val selectedTranslation = translationForRow(rowIndex)
+        val newCellValue = aValue?.toString()?.trim()
         if (columnIndex == KEY_COLUMN_INDEX) {
-            val selectedTranslation = translationForRow(rowIndex)
-            val key = aValue?.toString()?.trim()
-            return validateKey(stack, selectedTranslation.store(), key, singleton(selectedTranslation.key()))
+            return selectedTranslation.stores()
+                    .mapToInt { validateKey(translationManager, it, newCellValue, singleton(selectedTranslation.key())) }
+                    .max().orElse(OK)
         }
         if (columnIndex == DEFAULT_LANGUAGE_COLUMN_INDEX) {
-            return validateDefaultText(aValue?.toString())
+            return validateDefaultText(newCellValue, selectedTranslation)
         }
-        return OK
+        val selectedLanguage = languageForColumn(columnIndex)
+        return validateText(newCellValue, selectedTranslation, selectedLanguage)
     }
 
-    private inner class StackListener : ITranslationStoreStackListener {
+    private inner class ManagerListener : ITranslationManagerListener {
 
-        override fun stackChanged(events: Stream<TranslationStoreStackEvent>) {
+        override fun managerChanged(events: Stream<TranslationManagerEvent>) {
             val allEvents = events.toList()
             val application = ApplicationManager.getApplication()
             if (application.isDispatchThread) {
@@ -169,8 +182,8 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
             }
         }
 
-        private fun handleEvents(events: List<TranslationStoreStackEvent>) {
-            val containsReloadEvent = events.map { it.type() }.any { it == TranslationStoreStackEvent.TYPE_RELOAD }
+        private fun handleEvents(events: List<TranslationManagerEvent>) {
+            val containsReloadEvent = events.map { it.type() }.any { it == TranslationManagerEvent.TYPE_RELOAD }
             if (containsReloadEvent) {
                 buildCache(true)
                 return
@@ -178,29 +191,38 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
 
             events.forEach { handleEvent(it) }
             val needsSave = events.map { it.type() }.any {
-                it == TranslationStoreStackEvent.TYPE_REMOVE_TRANSLATION
-                        || it == TranslationStoreStackEvent.TYPE_NEW_TRANSLATION
-                        || it == TranslationStoreStackEvent.TYPE_KEY_CHANGED
-                        || it == TranslationStoreStackEvent.TYPE_UPDATE_TRANSLATION
-                        || it == TranslationStoreStackEvent.TYPE_NEW_LANGUAGE
+                it == TranslationManagerEvent.TYPE_REMOVE_TRANSLATION
+                        || it == TranslationManagerEvent.TYPE_NEW_TRANSLATION
+                        || it == TranslationManagerEvent.TYPE_KEY_CHANGED
+                        || it == TranslationManagerEvent.TYPE_UPDATE_TRANSLATION
+                        || it == TranslationManagerEvent.TYPE_NEW_LANGUAGE
             }
             if (needsSave) {
-                SdkLog.debug("About to save translation store stack.")
-                saveStack()
+                SdkLog.debug("About to save translation manager.")
+                saveManager()
             }
         }
 
-        private fun handleEvent(event: TranslationStoreStackEvent) {
+        private fun handleEvent(event: TranslationManagerEvent) {
             when (event.type()) {
-                TranslationStoreStackEvent.TYPE_REMOVE_TRANSLATION -> translationsRemoved(event)
-                TranslationStoreStackEvent.TYPE_NEW_TRANSLATION -> translationsAdded(event)
-                TranslationStoreStackEvent.TYPE_KEY_CHANGED -> translationsUpdated(event)
-                TranslationStoreStackEvent.TYPE_UPDATE_TRANSLATION -> translationsUpdated(event)
-                TranslationStoreStackEvent.TYPE_NEW_LANGUAGE -> buildCache()
+                TranslationManagerEvent.TYPE_REMOVE_TRANSLATION -> translationsRemoved(event)
+                TranslationManagerEvent.TYPE_NEW_TRANSLATION -> translationsAdded(event)
+                TranslationManagerEvent.TYPE_KEY_CHANGED -> translationKeyChanged(event)
+                TranslationManagerEvent.TYPE_UPDATE_TRANSLATION -> translationsUpdated(event)
+                TranslationManagerEvent.TYPE_NEW_LANGUAGE -> buildCache()
             }
         }
 
-        private fun translationsUpdated(event: TranslationStoreStackEvent) = event.entry().ifPresent {
+        private fun translationKeyChanged(event: TranslationManagerEvent) {
+            val index = rowForTranslationWithKey(event.key().orElse(null))
+            if (index < 0) {
+                return
+            }
+            translations()[index] = event.translation().get()
+            fireTableRowsUpdated(index, index)
+        }
+
+        private fun translationsUpdated(event: TranslationManagerEvent) = event.translation().ifPresent {
             val index = rowForTranslationWithKey(it.key())
             if (index < 0) {
                 return@ifPresent
@@ -208,14 +230,14 @@ class NlsTableModel(val stack: TranslationStoreStack, val project: Project) : Ab
             fireTableRowsUpdated(index, index)
         }
 
-        private fun translationsAdded(event: TranslationStoreStackEvent) = event.entry().ifPresent {
+        private fun translationsAdded(event: TranslationManagerEvent) = event.translation().ifPresent {
             val translations = translations()
             translations.add(it)
             val index = translations.size - 1
             fireTableRowsInserted(index, index)
         }
 
-        private fun translationsRemoved(event: TranslationStoreStackEvent) = event.entry().ifPresent {
+        private fun translationsRemoved(event: TranslationManagerEvent) = event.translation().ifPresent {
             val index = rowForTranslationWithKey(it.key())
             if (index < 0) {
                 return@ifPresent

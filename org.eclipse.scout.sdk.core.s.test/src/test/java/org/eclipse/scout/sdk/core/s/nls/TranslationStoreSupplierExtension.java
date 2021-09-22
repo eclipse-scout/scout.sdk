@@ -10,11 +10,10 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.createStack;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.registerStoreSupplier;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.registerUiTextContributor;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.removeStoreSupplier;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationStores.removeUiTextContributor;
+import static org.eclipse.scout.sdk.core.s.nls.Translations.registerStoreSupplier;
+import static org.eclipse.scout.sdk.core.s.nls.Translations.registerUiTextContributor;
+import static org.eclipse.scout.sdk.core.s.nls.Translations.removeStoreSupplier;
+import static org.eclipse.scout.sdk.core.s.nls.Translations.removeUiTextContributor;
 import static org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.parseLanguageFromFileName;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +41,8 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope;
+import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile;
 import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile;
 import org.eclipse.scout.sdk.core.s.nls.properties.ITranslationPropertiesFile;
@@ -102,13 +102,13 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
     m_supplier = null;
   }
 
-  public static TranslationStoreStack testingStack(IEnvironment env) {
-    return createStack(Paths.get(""), env, new NullProgress(), DependencyScope.ALL)
+  public static TranslationManager testingManager(IEnvironment env) {
+    return Translations.createManager(Paths.get(""), env, new NullProgress(), DependencyScope.ALL)
         .orElseThrow(TranslationStoreSupplierExtension::createExtensionNotRegisteredError);
   }
 
   public static PropertiesTranslationStore testingStore(IEnvironment env) {
-    return (PropertiesTranslationStore) testingStack(env)
+    return (PropertiesTranslationStore) testingManager(env)
         .primaryEditableStore()
         .orElseThrow(TranslationStoreSupplierExtension::createExtensionNotRegisteredError);
   }

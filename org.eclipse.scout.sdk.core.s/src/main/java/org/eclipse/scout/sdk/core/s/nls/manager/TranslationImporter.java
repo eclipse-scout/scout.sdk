@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,13 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package org.eclipse.scout.sdk.core.s.nls;
+package org.eclipse.scout.sdk.core.s.nls.manager;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.isForbidden;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateDefaultText;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateKey;
 
@@ -30,13 +31,18 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
+import org.eclipse.scout.sdk.core.s.nls.ITranslation;
+import org.eclipse.scout.sdk.core.s.nls.ITranslationImportInfo;
+import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
+import org.eclipse.scout.sdk.core.s.nls.Language;
+import org.eclipse.scout.sdk.core.s.nls.Translation;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 public class TranslationImporter implements ITranslationImportInfo {
 
   // input
-  private final TranslationStoreStack m_stack;
+  private final TranslationManager m_manager;
   private final List<List<String>> m_rawTableData;
   private final ITranslationStore m_storeForNewTranslations;
   private final String m_keyColumnName;
@@ -50,11 +56,11 @@ public class TranslationImporter implements ITranslationImportInfo {
   private final Map<Integer, String> m_unmappedColumns;
   private final Set<String> m_duplicateKeys;
   private final List<Integer> m_invalidRows;
-  private final Map<String, ITranslationEntry> m_importedTranslations;
+  private final Map<String, IStackedTranslation> m_importedTranslations;
   private int m_result;
 
-  protected TranslationImporter(TranslationStoreStack stackToImportTo, List<List<String>> rawTableData, String keyColumnName, ITranslationStore storeForNewTranslations) {
-    m_stack = Ensure.notNull(stackToImportTo);
+  protected TranslationImporter(TranslationManager managerToImportTo, List<List<String>> rawTableData, String keyColumnName, ITranslationStore storeForNewTranslations) {
+    m_manager = Ensure.notNull(managerToImportTo);
     m_rawTableData = Ensure.notNull(rawTableData);
     m_storeForNewTranslations = storeForNewTranslations;
     m_keyColumnName = Ensure.notBlank(keyColumnName);
@@ -95,16 +101,16 @@ public class TranslationImporter implements ITranslationImportInfo {
       return NO_DATA;
     }
 
-    var stack = stack();
+    var manager = translationManager();
     var targetForNewTranslations = storeForNewTranslations();
-    stack.setChanging(true);
+    manager.setChanging(true);
     try {
       m_importedTranslations.putAll(toImport.values().stream()
-          .map(translation -> stack.mergeTranslation(translation, targetForNewTranslations))
+          .map(translation -> manager.mergeTranslation(translation, targetForNewTranslations))
           .collect(toMap(ITranslation::key, Function.identity(), Ensure::failOnDuplicates)));
     }
     finally {
-      stack.setChanging(false);
+      manager.setChanging(false);
     }
     return importedTranslations().size();
   }
@@ -127,7 +133,7 @@ public class TranslationImporter implements ITranslationImportInfo {
       return null;
     }
     var key = row.get(keyColumnIndex());
-    if (validateKey(key) != TranslationValidator.OK) {
+    if (isForbidden(validateKey(key))) {
       m_invalidRows.add(rowIndex);
       return null;
     }
@@ -138,7 +144,8 @@ public class TranslationImporter implements ITranslationImportInfo {
       return null;
     }
     var defaultLangText = row.get(defaultLanguageColumnIndex());
-    if (validateDefaultText(defaultLangText) != TranslationValidator.OK) {
+
+    if (isForbidden(validateDefaultText(defaultLangText, translationManager().translation(key).orElse(null)))) {
       m_invalidRows.add(rowIndex);
       return null;
     }
@@ -215,7 +222,7 @@ public class TranslationImporter implements ITranslationImportInfo {
   }
 
   @Override
-  public Map<String, ITranslationEntry> importedTranslations() {
+  public Map<String, IStackedTranslation> importedTranslations() {
     return unmodifiableMap(m_importedTranslations);
   }
 
@@ -257,8 +264,8 @@ public class TranslationImporter implements ITranslationImportInfo {
     return m_keyColumnName;
   }
 
-  public TranslationStoreStack stack() {
-    return m_stack;
+  public TranslationManager translationManager() {
+    return m_manager;
   }
 
   public List<List<String>> rawTableData() {

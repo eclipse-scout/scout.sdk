@@ -79,8 +79,15 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
 
   @SuppressWarnings("TypeMayBeWeakened")
   protected static Function<IType, Optional<? extends IAnnotatable>> getMethodLookup(MethodSpi method) {
-    var methodId = method.wrap().identifier();
-    return level -> level.methods().withMethodIdentifier(methodId).first();
+    var m = method.wrap();
+    var declaringType = m.declaringType().orElse(null);
+    return level -> {
+      if (declaringType == level) {
+        // if the level is the class of the start method: directly return the method without computing an identifier (better performance for queries without super types) 
+        return Optional.of(m);
+      }
+      return level.methods().withMethodIdentifier(m.identifier()).first();
+    };
   }
 
   protected IType getType() {

@@ -38,8 +38,8 @@ import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStores.DependencyScope;
+import org.eclipse.scout.sdk.core.s.nls.Translations;
+import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope;
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.AbstractTranslationPattern;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch;
@@ -73,7 +73,7 @@ public class MissingTranslationQuery implements IFileQuery {
   private final BiFunction<Path, DependencyScope, List<ITranslationStore>> m_storeSupplier;
 
   public MissingTranslationQuery(IEnvironment env, IProgress progress) {
-    this((p, s) -> TranslationStores.forModule(p, env, progress, s).collect(toList()));
+    this((p, s) -> Translations.storesForModule(p, env, progress, s).collect(toList()));
   }
 
   public MissingTranslationQuery(BiFunction<Path, DependencyScope, List<ITranslationStore>> storeSupplier) {
@@ -190,7 +190,7 @@ public class MissingTranslationQuery implements IFileQuery {
   protected boolean keyExistsForModule(Path modulePath, String key, DependencyScope scope) {
     return accessibleKeysForModule(modulePath, scope)
         .map(keys -> keys.contains(key))
-        .orElse(true); // no stack could be created: the module is no scout module (no TextProviderService visible, but at least the Scout service should be available). In that case no markers should be created.
+        .orElse(true); // no manager could be created: the module is no scout module (no TextProviderService visible, but at least the Scout service should be available). In that case no markers should be created.
   }
 
   protected Optional<Set<String>> accessibleKeysForModule(Path modulePath, DependencyScope scope) {

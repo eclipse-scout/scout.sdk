@@ -171,13 +171,13 @@ public class StagingMojo extends AbstractStagingMojo {
 
   public static File extractCompositeArchive(File outputDir, File content) throws MojoExecutionException {
     if (content == null || !content.getName().endsWith(".jar")) {
-      throw new IllegalArgumentException("Composite Archive must be a jar file " + content);
+      throw new IllegalArgumentException("Composite Archive must be a jar file: " + content);
     }
     try {
       FileUtility.extractArchive(content, outputDir);
     }
     catch (IOException e) {
-      throw new MojoExecutionException("Could not extract archive", e);
+      throw new MojoExecutionException("Could not extract archive '" + content + "'.", e);
     }
     var xmlName = content.getName().replace(".jar", ".xml");
     var xmlFile = new File(content.getParent(), xmlName);

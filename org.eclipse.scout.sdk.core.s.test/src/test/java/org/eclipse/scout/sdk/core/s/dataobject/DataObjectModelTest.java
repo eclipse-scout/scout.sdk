@@ -60,7 +60,8 @@ public class DataObjectModelTest {
     var model = wrap(env.requireType(SampleDo.class.getName())).get();
     var nodeNames = model.nodes().stream()
         .map(DataObjectNode::name)
+        .sorted()
         .collect(joining(","));
-    assertEquals("enabled,versions", nodeNames);
+    assertEquals("enabled,stringAttribute,versions", nodeNames);
   }
 }

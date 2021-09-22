@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,8 +20,10 @@ import java.util.Locale.LanguageRange;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link Translation}</h3>
@@ -34,7 +36,7 @@ public class Translation implements ITranslation {
   private final Map<Language, String> m_texts;
 
   public Translation(ITranslation template) {
-    m_key = Ensure.notNull(Ensure.notNull(template).key());
+    m_key = Ensure.notNull(template.key());
     m_texts = new TreeMap<>(template.texts());
   }
 
@@ -58,7 +60,7 @@ public class Translation implements ITranslation {
    *          for this {@link Language} it is replaced.
    */
   public void putText(Language lang, String text) {
-    if (text == null) {
+    if (Strings.isEmpty(text)) {
       textsMap().remove(Ensure.notNull(lang));
     }
     else {
@@ -73,20 +75,6 @@ public class Translation implements ITranslation {
       translation.texts().forEach(merged::putText);
     }
     return merged;
-  }
-
-  /**
-   * Replaces all translations with the specified ones.
-   *
-   * @param newTranslations
-   *          The new translation entries.
-   */
-  public void setTexts(Map<Language, String> newTranslations) {
-    textsMap().clear();
-    if (newTranslations == null || newTranslations.isEmpty()) {
-      return;
-    }
-    textsMap().putAll(newTranslations);
   }
 
   /**
@@ -129,6 +117,11 @@ public class Translation implements ITranslation {
   @Override
   public Map<Language, String> texts() {
     return unmodifiableMap(textsMap());
+  }
+
+  @Override
+  public Stream<Language> languages() {
+    return textsMap().keySet().stream();
   }
 
   @Override

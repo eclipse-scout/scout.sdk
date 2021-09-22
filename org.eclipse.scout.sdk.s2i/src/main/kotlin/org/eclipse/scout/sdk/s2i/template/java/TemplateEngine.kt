@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -185,8 +185,9 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
             return null
         }
         val siblings = findOrderSiblings()
-        val first = OrderAnnotation.valueOf(siblings[0], context.scoutApi)
-        val second = OrderAnnotation.valueOf(siblings[1], context.scoutApi)
+        val project = context.module.project
+        val first = OrderAnnotation.valueOf(siblings[0], project, context.scoutApi)
+        val second = OrderAnnotation.valueOf(siblings[1], project, context.scoutApi)
         val orderValue = org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.convertToJavaSource(org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.getNewViewOrderValue(first, second))
         val orderAnnotationFqn = context.scoutApi.Order().fqn()
         return "@$orderAnnotationFqn($orderValue)"

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,7 +26,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.Language;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
@@ -45,15 +45,15 @@ import org.eclipse.ui.PlatformUI;
 public class LanguageNewDialog extends TitleAreaDialog {
 
   private final String m_title;
-  private final TranslationStoreStack m_stack;
+  private final TranslationManager m_manager;
 
   private String m_languageIso;
   private String m_countryIso;
   private ITranslationStore m_store;
 
-  public LanguageNewDialog(Shell parentShell, TranslationStoreStack stack) {
+  public LanguageNewDialog(Shell parentShell, TranslationManager manager) {
     super(parentShell);
-    m_stack = Ensure.notNull(stack);
+    m_manager = Ensure.notNull(manager);
     m_title = "Add a new language";
   }
 
@@ -95,9 +95,9 @@ public class LanguageNewDialog extends TitleAreaDialog {
     countryChooser.addProposalListener(item -> setCountryIso(Optional.ofNullable((Locale) item).map(Locale::getCountry).orElse(null)));
 
     // Store
-    var storeChooser = FieldToolkit.createTranslationStoreProposalField(rootArea, "Create in", stack(), 60);
+    var storeChooser = FieldToolkit.createTranslationStoreProposalField(rootArea, "Create in", translationManager(), 60);
     storeChooser.addProposalListener(item -> setStore((ITranslationStore) item));
-    storeChooser.acceptProposal(stack().primaryEditableStore().orElse(null));
+    storeChooser.acceptProposal(translationManager().primaryEditableStore().orElse(null));
 
     attachGridData(storeChooser);
     attachGridData(countryChooser);
@@ -154,8 +154,8 @@ public class LanguageNewDialog extends TitleAreaDialog {
         .applyTo(c);
   }
 
-  public TranslationStoreStack stack() {
-    return m_stack;
+  public TranslationManager translationManager() {
+    return m_manager;
   }
 
   public String getLanguageIso() {

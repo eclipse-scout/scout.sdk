@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,7 +15,7 @@ import static org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils.queryResultToSearchRe
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack;
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationKeysQuery;
 import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker;
 import org.eclipse.search.internal.ui.text.FileSearchQuery;
@@ -27,9 +27,9 @@ import org.eclipse.search.internal.ui.text.FileSearchResult;
 public class NlsFindKeyQuery extends FileSearchQuery {
 
   private final String m_nlsKey;
-  private final TranslationStoreStack m_project;
+  private final TranslationManager m_project;
 
-  public NlsFindKeyQuery(TranslationStoreStack project, String nlsKey) {
+  public NlsFindKeyQuery(TranslationManager project, String nlsKey) {
     super("", false, false, null);
     m_project = project;
     m_nlsKey = nlsKey;
@@ -62,7 +62,7 @@ public class NlsFindKeyQuery extends FileSearchQuery {
     return m_nlsKey;
   }
 
-  public TranslationStoreStack getProject() {
+  public TranslationManager getProject() {
     return m_project;
   }
 }

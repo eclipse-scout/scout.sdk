@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,11 +18,10 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.*
-import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.Translation
-import org.eclipse.scout.sdk.core.s.nls.TranslationStoreStack
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator.*
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
@@ -34,7 +33,7 @@ import javax.swing.*
 import javax.swing.event.DocumentEvent
 
 @Suppress("LeakingThis")
-abstract class AbstractTranslationDialog(val project: Project, val store: ITranslationStore, val stack: TranslationStoreStack, val initialKey: String? = null, val initialLanguageShown: Language? = null) : DialogWrapper(project, true, IdeModalityType.PROJECT) {
+abstract class AbstractTranslationDialog(val project: Project, val languages: Collection<Language>, val translationManager: TranslationManager, val initialKey: String? = null, val initialLanguageShown: Language? = null) : DialogWrapper(project, true, IdeModalityType.PROJECT) {
 
     private val m_dimensionKey = "scout.nls.translationDialog"
     private val m_languageTextFields = LinkedHashMap<Language, JBTextArea>()
@@ -118,7 +117,7 @@ abstract class AbstractTranslationDialog(val project: Project, val store: ITrans
 
     private fun createTabPane(): JBTabbedPane {
         val tabPane = JBTabbedPane(SwingConstants.TOP, JTabbedPane.WRAP_TAB_LAYOUT)
-        store.languages().sorted().forEach {
+        languages.sorted().forEach {
             val txt = JBTextArea()
             txt.font = keyTextField().font
             txt.margin = Insets(5, 7, 5, 5)
@@ -137,11 +136,20 @@ abstract class AbstractTranslationDialog(val project: Project, val store: ITrans
     private fun installValidation() {
         val triggerValidation = object : DocumentAdapter() {
             override fun textChanged(e: DocumentEvent) {
-                setErrorStatus(listOfNotNull(validateKeyField(), validateDefaultTextField()))
+                setErrorStatus(validateValues().filterNotNull())
             }
         }
-        keyTextField().document.addDocumentListener(triggerValidation)
-        m_languageTextFields.values.forEach { it.document.addDocumentListener(triggerValidation) }
+        keyTextField()
+                .takeIf { it.isEnabled }
+                ?.document
+                ?.addDocumentListener(triggerValidation)
+        m_languageTextFields.values
+                .filter { it.isEnabled }
+                .forEach { it.document.addDocumentListener(triggerValidation) }
+    }
+
+    protected open fun validateValues(): MutableList<ValidationInfo?> {
+        return mutableListOf(validateDefaultTextField())
     }
 
     private fun setErrorStatus(infos: List<ValidationInfo>) {
@@ -180,29 +188,22 @@ abstract class AbstractTranslationDialog(val project: Project, val store: ITrans
                 if (blue.length == 1) "0$blue" else blue
     }
 
-    protected open fun validateKeyField(): ValidationInfo? {
-        val key = keyTextField().text ?: ""
-        return toValidationInfo(validateKey(stack, store, key))
-    }
-
     protected open fun validateDefaultTextField(): ValidationInfo? {
         val defaultText = defaultLanguageTextField().text
-        return toValidationInfo(validateDefaultText(defaultText))
+        return toValidationInfo(validateDefaultText(defaultText, translationManager.translation(keyTextField().text).orElse(null)))
     }
 
     protected open fun toValidationInfo(errorCode: Int): ValidationInfo? {
-        val defaultLangMissing = ValidationInfo(message("please.provide.text.for.lang.x", Language.LANGUAGE_DEFAULT.displayName()))
-        val invalidKey = ValidationInfo(message("please.specify.translation.key.with.desc"))
         val info = when (errorCode) {
             OK -> null
-            DEFAULT_TRANSLATION_MISSING_ERROR -> defaultLangMissing
-            DEFAULT_TRANSLATION_EMPTY_ERROR -> defaultLangMissing
-            KEY_EMPTY_ERROR -> invalidKey
-            KEY_ALREADY_EXISTS_ERROR -> ValidationInfo(message("key.already.exists.in.service"))
+            DEFAULT_TRANSLATION_MISSING_ERROR -> ValidationInfo(message("please.provide.text.for.lang.x", Language.LANGUAGE_DEFAULT.displayName()))
+            KEY_EMPTY_ERROR -> ValidationInfo(message("please.specify.translation.key.with.desc"))
+            KEY_ALREADY_EXISTS_ERROR -> ValidationInfo(message("key.already.exists"))
             KEY_OVERRIDES_OTHER_STORE_WARNING -> ValidationInfo(message("key.would.override.desc"))
             KEY_IS_OVERRIDDEN_BY_OTHER_STORE_WARNING -> ValidationInfo(message("key.would.be.overridden.desc"))
             KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING -> ValidationInfo(message("key.overrides.and.is.overridden.desc"))
-            else -> invalidKey
+            TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING -> null
+            else -> ValidationInfo(message("please.specify.translation.key.with.desc"))
         }
         if (info == null || isForbidden(errorCode)) {
             return info
@@ -259,10 +260,10 @@ abstract class AbstractTranslationDialog(val project: Project, val store: ITrans
             if (Strings.isBlank(defaultLangText)) {
                 return
             }
-            val oldKey = stack.generateNewKey(m_lastDefaultLangText)
+            val oldKey = translationManager.generateNewKey(m_lastDefaultLangText)
             val curKey = Strings.notBlank(m_keyTextField.text).orElse("")
             if (curKey == oldKey) {
-                m_keyTextField.text = stack.generateNewKey(defaultLangText)
+                m_keyTextField.text = translationManager.generateNewKey(defaultLangText)
             }
             m_lastDefaultLangText = defaultLangText
         }
