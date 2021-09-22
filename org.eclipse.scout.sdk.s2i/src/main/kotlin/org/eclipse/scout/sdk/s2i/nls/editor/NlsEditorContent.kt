@@ -65,8 +65,9 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
     private val m_table = NlsTable(translationManager, project)
     private val m_textFilter = TextFieldWithMaxLen(maxLength = 2000)
     private val m_regexHelpButton = CompatibilityHelper.createRegExLink("<html><body><b>?</b></body></html>", this)
-    private val m_hideReadOnly = JBCheckBox(message("hide.dependency.rows"), true)
     private val m_hideInherited = JBCheckBox(message("hide.inherited.rows"), true)
+    private val m_hideRowsWithOnlyReadOnly = JBCheckBox(message("hide.dependency.translations"), true)
+    private val m_hideLanguagesWithOnlyReadOnly = JBCheckBox(message("hide.dependency.languages"), true)
 
     private var m_searchPattern: Predicate<String>? = null
 
@@ -107,8 +108,9 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
         val focusPolicy = IndexedFocusTraversalPolicy()
         focusPolicy.addComponent(m_textFilter)
         focusPolicy.addComponent(m_regexHelpButton)
-        focusPolicy.addComponent(m_hideReadOnly)
         focusPolicy.addComponent(m_hideInherited)
+        focusPolicy.addComponent(m_hideRowsWithOnlyReadOnly)
+        focusPolicy.addComponent(m_hideLanguagesWithOnlyReadOnly)
         focusTraversalPolicy = focusPolicy
 
         filterChanged()
@@ -118,11 +120,16 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
 
     private fun filterChanged() {
         m_searchPattern = toPredicate(m_textFilter.text)
-        m_table.setFilter { acceptTranslation(it) }
+        m_table.setFilter(this::acceptTranslation, this::acceptLanguage)
+    }
+
+    private fun acceptLanguage(candidate: Language): Boolean {
+        val isHideReadOnlyLanguages = m_hideLanguagesWithOnlyReadOnly.isSelected
+        return !isHideReadOnlyLanguages || translationManager.allEditableStores().anyMatch { it.containsLanguage(candidate) }
     }
 
     private fun acceptTranslation(candidate: IStackedTranslation): Boolean {
-        val isHideReadOnlyRows = m_hideReadOnly.isSelected
+        val isHideReadOnlyRows = m_hideRowsWithOnlyReadOnly.isSelected
         if (isHideReadOnlyRows && !candidate.hasEditableStores()) {
             return false
         }
@@ -473,23 +480,32 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
             m_regexHelpButton.isFocusable = true
             add(m_regexHelpButton, regexHelpLayout)
 
-            val readOnlyLayout = GridBagConstraints()
-            readOnlyLayout.gridx = 2
-            readOnlyLayout.gridy = 0
-            readOnlyLayout.insets = Insets(0, 24, 0, 0)
-            m_hideReadOnly.addActionListener { filterChanged() }
-            m_hideReadOnly.toolTipText = message("hide.dependency.rows.desc")
-            m_hideReadOnly.isFocusable = true
-            add(m_hideReadOnly, readOnlyLayout)
-
             val inheritedLayout = GridBagConstraints()
-            inheritedLayout.gridx = 3
+            inheritedLayout.gridx = 2
             inheritedLayout.gridy = 0
-            inheritedLayout.insets = Insets(0, 16, 0, 4)
+            inheritedLayout.insets = Insets(0, 16, 0, 0)
             m_hideInherited.addActionListener { filterChanged() }
             m_hideInherited.toolTipText = message("hide.inherited.rows.desc", primaryStore.service().type().name())
             m_hideInherited.isFocusable = true
             add(m_hideInherited, inheritedLayout)
+
+            val readOnlyRowsLayout = GridBagConstraints()
+            readOnlyRowsLayout.gridx = 3
+            readOnlyRowsLayout.gridy = 0
+            readOnlyRowsLayout.insets = Insets(0, 12, 0, 0)
+            m_hideRowsWithOnlyReadOnly.addActionListener { filterChanged() }
+            m_hideRowsWithOnlyReadOnly.toolTipText = message("hide.dependency.translations.desc")
+            m_hideRowsWithOnlyReadOnly.isFocusable = true
+            add(m_hideRowsWithOnlyReadOnly, readOnlyRowsLayout)
+
+            val readOnlyLanguagesLayout = GridBagConstraints()
+            readOnlyLanguagesLayout.gridx = 4
+            readOnlyLanguagesLayout.gridy = 0
+            readOnlyLanguagesLayout.insets = Insets(0, 12, 0, 4)
+            m_hideLanguagesWithOnlyReadOnly.addActionListener { filterChanged() }
+            m_hideLanguagesWithOnlyReadOnly.toolTipText = message("hide.dependency.languages.desc")
+            m_hideLanguagesWithOnlyReadOnly.isFocusable = true
+            add(m_hideLanguagesWithOnlyReadOnly, readOnlyLanguagesLayout)
         }
     }
 }

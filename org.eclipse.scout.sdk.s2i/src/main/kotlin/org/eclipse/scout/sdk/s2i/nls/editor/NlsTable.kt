@@ -37,9 +37,11 @@ import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextArea
 import com.intellij.util.ui.JBDimension
 import com.intellij.util.ui.PositionTracker
+import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator.*
 import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
+import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.nls.editor.NlsTableModel.Companion.KEY_COLUMN_INDEX
@@ -49,7 +51,6 @@ import org.eclipse.scout.sdk.s2i.ui.TextAreaWithContentSize
 import java.awt.*
 import java.awt.event.*
 import java.util.*
-import java.util.function.Predicate
 import javax.swing.*
 import javax.swing.KeyStroke.getKeyStroke
 import javax.swing.event.DocumentEvent
@@ -69,17 +70,19 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
     private val m_tableSorterFilter = TableRowSorter(m_model)
     private val m_cellMargin = Insets(1, 4, 2, 2)
     private val m_editStartEvent = EventObject(this)
+    private val m_fontHeight = FinalValue<Int>()
 
     private var m_balloon: Balloon? = null
     private var m_balloonContent: JBLabel? = null
     var contextMenu: JPopupMenu? = null
 
     init {
-        m_table.tableColumnsChangedCallback = { adjustView() }
-        m_table.tableChangedCallback = {
-            adjustRowHeights(it)
+        m_model.addDataChangedListener {
             m_tableSorterFilter.sort() // re-apply filter as the filtered rows might have changed
         }
+
+        m_table.tableColumnsChangedCallback = { adjustView() }
+        m_table.tableChangedCallback = { adjustRowHeights(it) }
         m_table.columnWidthSupplier = { if (it.modelIndex == KEY_COLUMN_INDEX) 250 else 350 }
         m_table.fillsViewportHeight = true
         m_table.autoResizeMode = JTable.AUTO_RESIZE_OFF
@@ -156,7 +159,9 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
         }
     }
 
-    private fun fontHeight() = getFontMetrics(m_table.font).height
+    private fun fontHeight() = m_fontHeight.computeIfAbsentAndGet {
+        getFontMetrics(m_table.font).height
+    }
 
     private fun adjustRowHeight(rowIndex: Int, fontHeight: Int, additionalText: String? = null): Int {
         if (rowIndex < 0 || rowIndex >= m_table.rowCount) return -1
@@ -227,14 +232,14 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
         m_table.scrollToSelection()
     }
 
-    fun setFilter(newFilter: Predicate<IStackedTranslation>?) {
+    fun setFilter(rowFilter: ((IStackedTranslation) -> Boolean)?, columnFilter: ((Language) -> Boolean)?) {
         val filter = object : RowFilter<NlsTableModel, Int>() {
             override fun include(entry: Entry<out NlsTableModel, out Int>): Boolean {
-                return newFilter?.test(m_model.translationForRow(entry.identifier)) ?: true
+                return rowFilter?.invoke(m_model.translationForRow(entry.identifier)) ?: true
             }
         }
         m_tableSorterFilter.rowFilter = filter
-        val tableStructureChanged = m_model.setFilter(newFilter)
+        val tableStructureChanged = m_model.setFilter(rowFilter, columnFilter)
         if (!tableStructureChanged) {
             adjustView() // only if the structure did not change. Because on structure change it is done anyway
         }
