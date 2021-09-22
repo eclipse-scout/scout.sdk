@@ -18,10 +18,10 @@ import org.eclipse.scout.sdk.core.s.nls.TranslationValidator.*
 import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManagerEvent
+import org.eclipse.scout.sdk.core.util.EventListenerList
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment
 import java.util.Collections.singleton
-import java.util.function.Predicate
 import java.util.stream.Collectors.toList
 import java.util.stream.Stream
 import javax.swing.table.AbstractTableModel
@@ -29,9 +29,11 @@ import kotlin.streams.toList
 
 class NlsTableModel(val translationManager: TranslationManager, val project: Project) : AbstractTableModel() {
 
-    private var m_filter: Predicate<IStackedTranslation>? = null
+    private var m_translationFilter: ((IStackedTranslation) -> Boolean)? = null
+    private var m_languageFilter: ((Language) -> Boolean)? = null
     private var m_translations: MutableList<IStackedTranslation>? = null
     private var m_languages: MutableList<Language>? = null
+    private val m_dataChangedListeners = ArrayList<() -> Unit>()
 
     companion object {
         val KEY_COLUMN_HEADER_NAME = EclipseScoutBundle.message("key")
@@ -49,12 +51,17 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
 
     fun languages() = m_languages!!
 
+    internal fun addDataChangedListener(listener: () -> Unit) {
+        m_dataChangedListeners.add(listener)
+    }
+
     override fun getRowCount() = translations().size
 
     override fun getColumnCount() = NUM_ADDITIONAL_COLUMNS + languages().size
 
-    fun setFilter(newFilter: Predicate<IStackedTranslation>?): Boolean {
-        m_filter = newFilter
+    fun setFilter(rowFilter: ((IStackedTranslation) -> Boolean)?, columnFilter: ((Language) -> Boolean)?): Boolean {
+        m_translationFilter = rowFilter
+        m_languageFilter = columnFilter
         return buildCache()
     }
 
@@ -74,14 +81,17 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
         return -1
     }
 
-    private fun acceptFilter(candidate: IStackedTranslation) = m_filter?.test(candidate) ?: true
+    private fun acceptTranslationFilter(candidate: IStackedTranslation) = m_translationFilter?.invoke(candidate) ?: true
+
+    private fun acceptLanguageFilter(candidate: Language) = m_languageFilter?.invoke(candidate) ?: true
 
     private fun buildCache(forceReload: Boolean = false): Boolean {
         val newTranslations = translationManager.allTranslations().collect(toList())
         val newLanguages = newTranslations.stream()
-                .filter { acceptFilter(it) }
+                .filter { acceptTranslationFilter(it) }
                 .flatMap { it.languagesOfAllStores() }
                 .distinct()
+                .filter { acceptLanguageFilter(it) }
                 .sorted()
                 .collect(toList())
 
@@ -166,7 +176,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
         return validateText(newCellValue, selectedTranslation, selectedLanguage)
     }
 
-    private inner class ManagerListener : ITranslationManagerListener {
+    private inner class ManagerListener : ITranslationManagerListener, EventListenerList.IWeakEventListener {
 
         override fun managerChanged(events: Stream<TranslationManagerEvent>) {
             val allEvents = events.toList()
@@ -183,25 +193,31 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
         }
 
         private fun handleEvents(events: List<TranslationManagerEvent>) {
-            val containsReloadEvent = events.map { it.type() }.any { it == TranslationManagerEvent.TYPE_RELOAD }
-            if (containsReloadEvent) {
-                buildCache(true)
-                return
+            val doFullReload = events.size > 100 || events.any { it.type() == TranslationManagerEvent.TYPE_RELOAD }
+            val needsSave = events.any {
+                it.type() == TranslationManagerEvent.TYPE_REMOVE_TRANSLATION
+                        || it.type() == TranslationManagerEvent.TYPE_NEW_TRANSLATION
+                        || it.type() == TranslationManagerEvent.TYPE_KEY_CHANGED
+                        || it.type() == TranslationManagerEvent.TYPE_UPDATE_TRANSLATION
+                        || it.type() == TranslationManagerEvent.TYPE_NEW_LANGUAGE
             }
 
-            events.forEach { handleEvent(it) }
-            val needsSave = events.map { it.type() }.any {
-                it == TranslationManagerEvent.TYPE_REMOVE_TRANSLATION
-                        || it == TranslationManagerEvent.TYPE_NEW_TRANSLATION
-                        || it == TranslationManagerEvent.TYPE_KEY_CHANGED
-                        || it == TranslationManagerEvent.TYPE_UPDATE_TRANSLATION
-                        || it == TranslationManagerEvent.TYPE_NEW_LANGUAGE
+            if (doFullReload) {
+                buildCache(true)
+            } else {
+                events.forEach { handleEvent(it) }
+            }
+
+            if (doFullReload || needsSave) {
+                fireDataChangedListeners()
             }
             if (needsSave) {
                 SdkLog.debug("About to save translation manager.")
                 saveManager()
             }
         }
+
+        private fun fireDataChangedListeners() = m_dataChangedListeners.forEach { it() }
 
         private fun handleEvent(event: TranslationManagerEvent) {
             when (event.type()) {
