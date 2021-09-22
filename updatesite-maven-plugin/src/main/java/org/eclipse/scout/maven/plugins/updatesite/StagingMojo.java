@@ -62,7 +62,7 @@ public class StagingMojo extends AbstractStagingMojo {
   @Parameter(defaultValue = "nightly")
   private String compositeDir;
 
-  @Parameter(defaultValue = "http://download.eclipse.org/scout")
+  @Parameter(defaultValue = "https://download.eclipse.org/scout")
   private String repositoryUrl;
 
   @Parameter(defaultValue = "100")
