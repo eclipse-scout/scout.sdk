@@ -33,6 +33,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
     private var m_languageFilter: ((Language) -> Boolean)? = null
     private var m_translations: MutableList<IStackedTranslation>? = null
     private var m_languages: MutableList<Language>? = null
+    private val m_managerListener = ManagerListener() // store as member because the listener is weak!
     private val m_dataChangedListeners = ArrayList<() -> Unit>()
 
     companion object {
@@ -43,7 +44,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
     }
 
     init {
-        translationManager.addListener(ManagerListener())
+        translationManager.addListener(m_managerListener)
         buildCache()
     }
 
