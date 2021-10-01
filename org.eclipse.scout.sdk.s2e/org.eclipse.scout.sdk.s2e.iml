@@ -57,7 +57,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: jdom:jdom:1.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-model:3.6.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven.shared:maven-invoker:2.1.1" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: commons-io:commons-io:2.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: commons-io:commons-io:2.11.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.codehaus.plexus:plexus-velocity:1.1.8" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-collections:commons-collections:3.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.velocity:velocity:1.5" level="project" />
