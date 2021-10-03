@@ -128,7 +128,7 @@ public class MethodGeneratorTest {
         .withThrowable(IOException.class.getName())
         .withThrowable(SecurityException.class.getName())
         .withThrowable(RuntimeException.class.getName())
-        .withoutThrowable(filter -> RuntimeException.class.getName().equals(filter.apply().get().fqn()))
+        .withoutThrowable(filter -> RuntimeException.class.getName().equals(filter.apply().orElseThrow().fqn()))
         .withReturnType(JavaTypes._byte)
         .withParameter(
             MethodParameterGenerator.create()
@@ -257,7 +257,7 @@ public class MethodGeneratorTest {
 
   protected static Object[] methodOrderFor(IMethodGenerator<?, ?> g) {
     // sort first by number of arguments, then by method name length
-    return new Object[]{g.parameters().count(), g.elementName((IJavaEnvironment) null).get().length()};
+    return new Object[]{g.parameters().count(), g.elementName((IJavaEnvironment) null).orElseThrow().length()};
   }
 
   @Test

@@ -32,8 +32,8 @@ public class ScoutApiTest {
 
   @Test
   public void testCreate(IJavaEnvironment env) {
-    assertApiContainsData(ScoutApi.create(env.requireType(Long.class.getName())).get());
-    assertApiContainsData(ScoutApi.create(env).get());
+    assertApiContainsData(ScoutApi.create(env.requireType(Long.class.getName())).orElseThrow());
+    assertApiContainsData(ScoutApi.create(env).orElseThrow());
   }
 
   @Test

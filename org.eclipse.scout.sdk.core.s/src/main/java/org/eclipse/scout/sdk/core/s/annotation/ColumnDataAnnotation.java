@@ -89,7 +89,7 @@ public class ColumnDataAnnotation extends AbstractManagedAnnotation {
     // otherwise the column data is already available and nothing has to be done (IGNORE).
     var replacedType = type.superClass();
     if (replacedType.isPresent()) {
-      var sdkColumnCommandOfReplaced = sdkColumnCommandOf(replacedType.get());
+      var sdkColumnCommandOfReplaced = sdkColumnCommandOf(replacedType.orElseThrow());
       if (sdkColumnCommand.orElse(SdkColumnCommand.IGNORE) == SdkColumnCommand.CREATE
           && sdkColumnCommandOfReplaced.orElse(SdkColumnCommand.CREATE) == SdkColumnCommand.IGNORE) {
         return Optional.of(SdkColumnCommand.CREATE);

@@ -190,7 +190,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     // the DtoGeneratorFactory parses the @FormData-Annotation and uses the given formData-IType, therefore the formData needs to be created already
     getCreatedFormData().result();
     var formDataGenerator = DtoGeneratorFactory.createFormDataGenerator(getCreatedForm().result(), getFormDataSourceFolder().javaEnvironment());
-    env.writeCompilationUnitAsync(formDataGenerator.get(), getFormDataSourceFolder(), progress);
+    env.writeCompilationUnitAsync(formDataGenerator.orElseThrow(), getFormDataSourceFolder(), progress);
   }
 
   protected TestGenerator<?> createFormTestBuilder(IScoutVariousApi scoutApi) {
@@ -352,7 +352,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
       return;
     }
 
-    var returnType = builder.surroundingMethodReturnType().get();
+    var returnType = builder.surroundingMethodReturnType().orElseThrow();
     builder
         .returnClause()
         .append(getParamNameHavingDataType(builder.surroundingMethod(), returnType, builder.context())

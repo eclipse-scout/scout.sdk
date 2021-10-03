@@ -87,7 +87,7 @@ public class PropertyBean {
     for (var m : methods) {
       var getterName = getterName(m);
       if (getterName.isPresent()) {
-        beans.computeIfAbsent(getterName.get(),
+        beans.computeIfAbsent(getterName.orElseThrow(),
             key -> new PropertyBean(type, key))
             .setReadMethodIfAbsent(m);
       }
@@ -219,14 +219,14 @@ public class PropertyBean {
     CharSequence methodName = m.elementName(context).orElseThrow(() -> newFail("Method name is missing."));
     //noinspection NumericCastThatLosesPrecision
     var numParams = (int) m.parameters().count();
-    var returnTypeRef = returnType.get().apply(context);
+    var returnTypeRef = returnType.orElseThrow().apply(context);
     if (returnTypeRef.isEmpty()) {
       return Optional.empty();
     }
     if (setter) {
-      return setterName(methodName, numParams, returnTypeRef.get());
+      return setterName(methodName, numParams, returnTypeRef.orElseThrow());
     }
-    return getterName(methodName, numParams, returnTypeRef.get());
+    return getterName(methodName, numParams, returnTypeRef.orElseThrow());
   }
 
   protected static Optional<String> nameOf(IMethod m, boolean setter) {
@@ -285,8 +285,8 @@ public class PropertyBean {
     return readMethod()
         .flatMap(IMethod::returnType)
         .orElseGet(() -> writeMethod()
-            .map(writeMethod -> writeMethod.parameters().first().get().dataType())
-            .get());
+            .map(writeMethod -> writeMethod.parameters().first().orElseThrow().dataType())
+            .orElseThrow());
   }
 
   /**

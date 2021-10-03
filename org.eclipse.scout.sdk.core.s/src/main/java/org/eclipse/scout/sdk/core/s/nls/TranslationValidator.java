@@ -101,6 +101,7 @@ public final class TranslationValidator {
    *          The validation result code to check.
    * @return {@code true} if the given validation result describes a forbidden or invalid state.
    */
+  @SuppressWarnings("squid:S1067") // number of conditional operators
   public static boolean isForbidden(int result) {
     return result != OK
         && result != KEY_OVERRIDES_OTHER_STORE_WARNING

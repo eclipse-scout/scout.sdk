@@ -100,7 +100,7 @@ public class TypeGeneratorTest {
         .withField(FieldGenerator.createSerialVersionUid(), 0, -100, "whatever")
         .withField(FieldGenerator.create()
             .withElementName("willBeRemoved"))
-        .withoutField(f -> "willBeRemoved".equals(f.elementName().get()))
+        .withoutField(f -> "willBeRemoved".equals(f.elementName().orElseThrow()))
         .withMethod(MethodGenerator.create()
             .asPublic()
             .withElementName("TestClass"))
@@ -110,7 +110,7 @@ public class TypeGeneratorTest {
             .withReturnType(JavaTypes._void), 0, -200, "whatever")
         .withMethod(MethodGenerator.create()
             .withElementName("toRemove"))
-        .withoutMethod(m -> "toRemove".equals(m.elementName().get()))
+        .withoutMethod(m -> "toRemove".equals(m.elementName().orElseThrow()))
         .withType(TypeGenerator.create()
             .asPublic()
             .withElementName("InnerType"))
@@ -120,7 +120,7 @@ public class TypeGeneratorTest {
             .withElementName("FirstInnerType"), 0, -300, "whatever")
         .withType(TypeGenerator.create()
             .withElementName("RemovedType"))
-        .withoutType(t -> "RemovedType".equals(t.elementName().get()))
+        .withoutType(t -> "RemovedType".equals(t.elementName().orElseThrow()))
         .withTypeParameter(TypeParameterGenerator.create()
             .withBinding(Comparable.class.getName())
             .withElementName("T"))
@@ -131,7 +131,7 @@ public class TypeGeneratorTest {
         .setDeclaringFullyQualifiedName("a.b.c");
 
     assertEquals("a.b.c.TestClass", generator.fullyQualifiedName());
-    assertEquals(AbstractMap.class.getName(), generator.superClass().map(af -> af.apply(env).get()).get());
+    assertEquals(AbstractMap.class.getName(), generator.superClass().map(af -> af.apply(env).orElseThrow()).orElseThrow());
     assertEquals(2, generator.fields().count());
     assertEquals(2, generator.methods().count());
     assertTrue(generator.method("testMethod()", env, false).isPresent());

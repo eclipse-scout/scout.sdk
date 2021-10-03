@@ -104,7 +104,7 @@ public class WorkingCopyTransformerTest {
         if ("methodInChildClass".equals(input.model().elementName())) {
           generator.withoutFlags(Flags.AccSynchronized);
           generator.withThrowable(newException);
-          generator.withoutThrowable(func -> IOException.class.getName().equals(func.apply().get().fqn()));
+          generator.withoutThrowable(func -> IOException.class.getName().equals(func.apply().orElseThrow().fqn()));
         }
         return generator;
       }
@@ -152,18 +152,18 @@ public class WorkingCopyTransformerTest {
     var methodInChildClass = transformedUnit.requireMainType()
         .methods()
         .withName("methodInChildClass")
-        .first().get();
+        .first().orElseThrow();
     assertEquals(newPackage, transformedUnit.containingPackage().elementName());
     assertArrayEquals(new String[]{newException}, methodInChildClass.exceptionTypes().map(IType::name).toArray(String[]::new));
     assertEquals(Flags.AccProtected, methodInChildClass.flags());
     assertEquals(newSuppression, transformedUnit.requireMainType()
         .methods()
         .withName("firstCase")
-        .first().get()
+        .first().orElseThrow()
         .annotations()
         .withName(SuppressWarnings.class.getName())
-        .first().get()
-        .element("value").get()
+        .first().orElseThrow()
+        .element("value").orElseThrow()
         .value().as(String.class));
   }
 
@@ -249,7 +249,7 @@ public class WorkingCopyTransformerTest {
             return overrideGenerator.withBody(b -> b.returnClause().stringLiteral("SampleCloseable class").semicolon());
           case "close":
             // remove throws declaration for close method
-            return overrideGenerator.withoutThrowable(func -> Exception.class.getName().equals(func.apply().get().fqn()));
+            return overrideGenerator.withoutThrowable(func -> Exception.class.getName().equals(func.apply().orElseThrow().fqn()));
           default:
             return overrideGenerator;
         }
@@ -286,7 +286,7 @@ public class WorkingCopyTransformerTest {
             return overrideGenerator.withBody(b -> b.returnClause().stringLiteral("SampleCloseable class").semicolon());
           case "close":
             // remove throws declaration for close method
-            return overrideGenerator.withoutThrowable(func -> Exception.class.getName().equals(func.apply().get().fqn()));
+            return overrideGenerator.withoutThrowable(func -> Exception.class.getName().equals(func.apply().orElseThrow().fqn()));
           default:
             return overrideGenerator;
         }
@@ -354,13 +354,13 @@ public class WorkingCopyTransformerTest {
     var numParamsWithoutTransformer = CoreTestingUtils.registerCompilationUnit(env, generatorWithoutTransformer)
         .methods()
         .withName(methodToModify)
-        .first().get()
+        .first().orElseThrow()
         .parameters().stream()
         .count();
     var numParamsWithTransformer = CoreTestingUtils.registerCompilationUnit(env, generatorWithTransformer)
         .methods()
         .withName(methodToModify)
-        .first().get()
+        .first().orElseThrow()
         .parameters().stream()
         .count();
     assertEquals(2, numParamsWithoutTransformer);
@@ -392,8 +392,8 @@ public class WorkingCopyTransformerTest {
   public void testTransformerRemovingAnnotationElement(IJavaEnvironment env) {
     var annotationElementNameToRemove = "strings";
     var classWithAnnotationArrayValues = env.requireType(ClassWithAnnotationWithArrayValues.class.getName());
-    var firstAnnotation = classWithAnnotationArrayValues.annotations().withName(AnnotationWithArrayValues.class.getName()).first().get();
-    assertFalse(firstAnnotation.element(annotationElementNameToRemove).get().isDefault());
+    var firstAnnotation = classWithAnnotationArrayValues.annotations().withName(AnnotationWithArrayValues.class.getName()).first().orElseThrow();
+    assertFalse(firstAnnotation.element(annotationElementNameToRemove).orElseThrow().isDefault());
 
     IWorkingCopyTransformer removeElementTransformer = new DefaultWorkingCopyTransformer() {
       @Override
@@ -405,11 +405,11 @@ public class WorkingCopyTransformerTest {
       }
     };
 
-    var generator1 = classWithAnnotationArrayValues.toWorkingCopy().annotations().findAny().get();
-    assertTrue(generator1.element(func -> annotationElementNameToRemove.equals(func.apply().get())).isPresent()); // is not removed with default transform
+    var generator1 = classWithAnnotationArrayValues.toWorkingCopy().annotations().findAny().orElseThrow();
+    assertTrue(generator1.element(func -> annotationElementNameToRemove.equals(func.apply().orElseThrow())).isPresent()); // is not removed with default transform
 
-    var generator2 = classWithAnnotationArrayValues.toWorkingCopy(removeElementTransformer).annotations().findAny().get();
-    assertFalse(generator2.element(func -> annotationElementNameToRemove.equals(func.apply().get())).isPresent()); // is removed because of transformer
+    var generator2 = classWithAnnotationArrayValues.toWorkingCopy(removeElementTransformer).annotations().findAny().orElseThrow();
+    assertFalse(generator2.element(func -> annotationElementNameToRemove.equals(func.apply().orElseThrow())).isPresent()); // is removed because of transformer
   }
 
   @Test
@@ -427,7 +427,7 @@ public class WorkingCopyTransformerTest {
 
     // change the name so that the original class is not changed in the IJavaEnvironment. Otherwise it is modified for later tests
     var newClassName = "OtherClass";
-    generator.mainType().get().withElementName(newClassName);
+    generator.mainType().orElseThrow().withElementName(newClassName);
     generator.withElementName(newClassName);
 
     var baseTypeWithoutAnnotations = assertNoCompileErrors(env, generator);

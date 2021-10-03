@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,7 +38,7 @@ public class MavenModuleVersionTest {
   @Test
   public void testGetFromJar(IJavaEnvironment env) {
     assertFalse(MavenModuleVersion.get(null, null).isPresent());
-    assertNotNull(MavenModuleVersion.get(ScoutApi.SCOUT_RT_PLATFORM_NAME, env).get());
+    assertNotNull(MavenModuleVersion.get(ScoutApi.SCOUT_RT_PLATFORM_NAME, env).orElseThrow());
   }
 
   @Test
@@ -49,7 +49,7 @@ public class MavenModuleVersionTest {
         .withSourceFolder(modulePath.resolve(ISourceFolders.MAIN_JAVA_SOURCE_FOLDER).toString())
         .withSourcesIncluded(false)
         .call(e -> MavenModuleVersion.get(modulePath.getFileName().toString(), e));
-    assertNotNull(version.get());
+    assertNotNull(version.orElseThrow());
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ public class PropertiesTextProviderServiceTest {
   @Test
   public void testTextProviderService(IJavaEnvironment env) {
     var txtSvcType = env.requireType(TestTextProviderService.class.getName());
-    var txtSvc = PropertiesTextProviderService.create(txtSvcType).get();
+    var txtSvc = PropertiesTextProviderService.create(txtSvcType).orElseThrow();
 
     assertEquals("Prefix", txtSvc.filePrefix());
     assertEquals("formdata/shared/texts", txtSvc.folder());
@@ -68,10 +68,10 @@ public class PropertiesTextProviderServiceTest {
 
     assertFalse(PropertiesTextProviderService.fromSegments(new String[]{}, txtSvcType).isPresent());
 
-    var a = PropertiesTextProviderService.fromSegments(new String[]{"Prefix"}, txtSvcType).get();
-    var b = PropertiesTextProviderService.fromSegments(new String[]{"org", "eclipse", "Prefix"}, txtSvcType).get();
-    var c = PropertiesTextProviderService.fromSegments(new String[]{"org", "eclipse", "OtherPrefix"}, txtSvcType).get();
-    var d = PropertiesTextProviderService.fromSegments(new String[]{"org", "eclipse", "OtherPrefix"}, txtSvcType).get();
+    var a = PropertiesTextProviderService.fromSegments(new String[]{"Prefix"}, txtSvcType).orElseThrow();
+    var b = PropertiesTextProviderService.fromSegments(new String[]{"org", "eclipse", "Prefix"}, txtSvcType).orElseThrow();
+    var c = PropertiesTextProviderService.fromSegments(new String[]{"org", "eclipse", "OtherPrefix"}, txtSvcType).orElseThrow();
+    var d = PropertiesTextProviderService.fromSegments(new String[]{"org", "eclipse", "OtherPrefix"}, txtSvcType).orElseThrow();
 
     var nonPropService1 = new TextProviderService(txtSvcType);
     var nonPropService2 = new TextProviderService(txtSvcType2);

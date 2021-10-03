@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,11 +37,11 @@ public class AnnotationGeneratorTest {
         .withElement("fifth", b -> b.append(100L))
         .withElement("sixth", b -> b.append(134L))
         .withComment(b -> b.appendTodo("nothing"))
-        .withoutElement(nameFunc -> "sixth".equals(nameFunc.apply().get()));
+        .withoutElement(nameFunc -> "sixth".equals(nameFunc.apply().orElseThrow()));
 
     assertEquals(5, generator.elements().size());
-    assertFalse(generator.element(nameSelector -> "notExisting".equals(nameSelector.apply().get())).isPresent());
-    assertTrue(generator.element(nameSelector -> "second".equals(nameSelector.apply().get())).isPresent());
+    assertFalse(generator.element(nameSelector -> "notExisting".equals(nameSelector.apply().orElseThrow())).isPresent());
+    assertTrue(generator.element(nameSelector -> "second".equals(nameSelector.apply().orElseThrow())).isPresent());
     assertEquals("// TODO [anonymous] nothing\n@TestAnnotation(value = 4,\nsecond = 10.0,\nthird = false,\nfourth = 100.11,\nfifth = 100)", generator.toJavaSource().toString());
   }
 
@@ -71,7 +71,7 @@ public class AnnotationGeneratorTest {
   public void testNoValueAnnotation() {
     var src = AnnotationGenerator.create()
         .withElementName("scout.test.TestAnnotation")
-        .withoutElement(func -> "third".equals(func.apply().get()))
+        .withoutElement(func -> "third".equals(func.apply().orElseThrow()))
         .toJavaSource()
         .toString();
 

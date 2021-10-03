@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,6 +39,7 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
@@ -106,7 +107,7 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
     while (lineInfo.getOffset() >= lastLineStart) {
       var lineSource = sourceDocument.get(lineInfo.getOffset(), lineInfo.getLength());
       if (lineSource != null) {
-        lineSource = CoreUtils.removeComments(lineSource).trim();
+        lineSource = Strings.trim(CoreUtils.removeComments(lineSource)).toString();
         if (!lineSource.isEmpty()) {
           if (!isInBlockComment && lineSource.endsWith("*/")) {
             isInBlockComment = true;

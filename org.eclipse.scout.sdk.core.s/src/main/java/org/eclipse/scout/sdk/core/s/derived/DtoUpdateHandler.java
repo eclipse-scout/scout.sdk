@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,18 +48,18 @@ public class DtoUpdateHandler extends AbstractDerivedResourceHandler {
     var formDataAnnotation = findDataAnnotationForFormData(modelType);
     if (formDataAnnotation.isPresent()) {
       return getInput()
-          .getSourceFolderOf(formDataAnnotation.get().getFormDataType(), env)
+          .getSourceFolderOf(formDataAnnotation.orElseThrow().getFormDataType(), env)
           .flatMap(derivedSourceFolder -> DtoGeneratorFactory
-              .createFormDataGenerator(modelType, derivedSourceFolder.javaEnvironment(), formDataAnnotation.get())
+              .createFormDataGenerator(modelType, derivedSourceFolder.javaEnvironment(), formDataAnnotation.orElseThrow())
               .map(g -> env.writeCompilationUnitAsync(g, derivedSourceFolder, progress)));
     }
 
     var pageDataAnnotation = findDataAnnotationForPageData(modelType, scoutApi);
     if (pageDataAnnotation.isPresent()) {
       return getInput()
-          .getSourceFolderOf(pageDataAnnotation.get().getDataType(), env)
+          .getSourceFolderOf(pageDataAnnotation.orElseThrow().getDataType(), env)
           .flatMap(derivedSourceFolder -> DtoGeneratorFactory
-              .createPageDataGenerator(modelType, derivedSourceFolder.javaEnvironment(), pageDataAnnotation.get())
+              .createPageDataGenerator(modelType, derivedSourceFolder.javaEnvironment(), pageDataAnnotation.orElseThrow())
               .map(g -> env.writeCompilationUnitAsync(g, derivedSourceFolder, progress)));
     }
 

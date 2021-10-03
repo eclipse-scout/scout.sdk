@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -59,7 +59,7 @@ public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandler
         var icu = (ICompilationUnit) javaElement;
         var api = ApiHelper.scoutApiFor(icu.getJavaProject());
         if (api.isPresent()) {
-          var dtoNames = dtoMarkerAnnotationNames(api.get());
+          var dtoNames = dtoMarkerAnnotationNames(api.orElseThrow());
           for (var candidate : icu.getTypes()) {
             if (acceptType(candidate) && JdtUtils.exists(JdtUtils.getFirstAnnotationInSupertypeHierarchy(candidate, dtoNames))) {
               collector.add(candidate);

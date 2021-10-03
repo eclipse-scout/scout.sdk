@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -182,7 +182,7 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
             var scoutApi = scoutApi();
             appendCodeGeneric = selectedProposal.getTypeParameters().length > 0
                 && scoutApi.isPresent()
-                && JdtUtils.hierarchyContains(selectedProposal.newSupertypeHierarchy(null), scoutApi.get().ICode().fqn());
+                && JdtUtils.hierarchyContains(selectedProposal.newSupertypeHierarchy(null), scoutApi.orElseThrow().ICode().fqn());
             param = selectedProposal.getFullyQualifiedName();
           }
           else {
@@ -206,12 +206,12 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
   }
 
   public String getCodeIdDataType(EclipseEnvironment environment) {
-    var iCodeTypeApi = scoutApi().get().ICodeType();
+    var iCodeTypeApi = scoutApi().orElseThrow().ICodeType();
     return getCodeTypeTypeArgDatatype(iCodeTypeApi.codeIdTypeParamIndex(), iCodeTypeApi, environment);
   }
 
   public String getCodeTypeIdDataType(EclipseEnvironment environment) {
-    var iCodeTypeApi = scoutApi().get().ICodeType();
+    var iCodeTypeApi = scoutApi().orElseThrow().ICodeType();
     return getCodeTypeTypeArgDatatype(iCodeTypeApi.codeTypeIdTypeParamIndex(), iCodeTypeApi, environment);
   }
 
@@ -220,10 +220,10 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
     var codeTypeIdArg = superType.superTypes()
         .withSelf(false)
         .withName(iCodeTypeApi.fqn())
-        .first().get()
+        .first().orElseThrow()
         .typeArguments()
         .skip(typeParamIndex)
-        .findAny().get();
+        .findAny().orElseThrow();
 
     if (codeTypeIdArg.isParameterType()) {
       // it is a type parameter. So the super class does not define the data type. We must check in our type argument fields

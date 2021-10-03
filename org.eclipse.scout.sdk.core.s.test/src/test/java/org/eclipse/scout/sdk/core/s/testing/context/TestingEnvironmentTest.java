@@ -34,11 +34,11 @@ public class TestingEnvironmentTest {
   @Test
   public void testAbsolutePathWithInMemoryCu(TestingEnvironment env) {
     var je = env.primaryEnvironment();
-    var sourceFolder = je.primarySourceFolder().get();
+    var sourceFolder = je.primarySourceFolder().orElseThrow();
     var writtenCu = env
         .writeCompilationUnit(PrimaryTypeGenerator.create().withPackageName("").asPublic().withElementName("TestClass"), sourceFolder)
         .requireCompilationUnit();
-    assertSame(sourceFolder, writtenCu.containingClasspathFolder().get());
+    assertSame(sourceFolder, writtenCu.containingClasspathFolder().orElseThrow());
   }
 
   @Test
@@ -65,7 +65,7 @@ public class TestingEnvironmentTest {
 
     // create a new Java environment not having the path. It should not get the unit
     var root = Paths.get("").toAbsolutePath();
-    var newEnvWithoutHavingTheUnitOnThePath = env.findJavaEnvironment(root).get();
+    var newEnvWithoutHavingTheUnitOnThePath = env.findJavaEnvironment(root).orElseThrow();
     assertNotSame(newEnvWithoutHavingTheUnitOnThePath, createdInMemoryType.javaEnvironment()); // check it is a new environment
     assertFalse(newEnvWithoutHavingTheUnitOnThePath.classpathContains(targetSourceFolder.path())); // check it does not contain the classpath
     assertTrue(newEnvWithoutHavingTheUnitOnThePath.findType(fqn).isEmpty());

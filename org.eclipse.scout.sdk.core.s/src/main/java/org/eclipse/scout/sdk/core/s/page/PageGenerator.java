@@ -106,7 +106,7 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
 
     if (isCreateNlsMethod()) {
       mainType
-          .withMethod(ScoutMethodGenerator.createNlsMethodFrom(IScoutApi.class, api -> api.AbstractPage().getConfiguredTitleMethodName(), Strings.capitalize(elementName().get())));
+          .withMethod(ScoutMethodGenerator.createNlsMethodFrom(IScoutApi.class, api -> api.AbstractPage().getConfiguredTitleMethodName(), Strings.capitalize(elementName().orElseThrow())));
     }
   }
 

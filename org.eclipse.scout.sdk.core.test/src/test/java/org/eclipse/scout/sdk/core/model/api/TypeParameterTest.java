@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,13 +46,13 @@ public class TypeParameterTest {
     assertEquals(Serializable.class.getName(), bounds.get(2).name());
     var expectedParmSrc = "X extends AbstractList<String> & Runnable & Serializable";
     assertEquals(expectedParmSrc, param.toWorkingCopy().toJavaSource().toString());
-    assertEquals(expectedParmSrc, param.source().get().asCharSequence().toString());
+    assertEquals(expectedParmSrc, param.source().orElseThrow().asCharSequence().toString());
 
     var abstractListBound = bounds.get(0);
-    assertEquals(String.class.getName(), abstractListBound.typeArguments().findAny().get().name());
+    assertEquals(String.class.getName(), abstractListBound.typeArguments().findAny().orElseThrow().name());
 
     new CoreJavaEnvironmentBinaryOnlyFactory().accept(binEnv -> {
-      var paramBin = binEnv.requireType(ChildClass.class.getName()).typeParameters().findAny().get();
+      var paramBin = binEnv.requireType(ChildClass.class.getName()).typeParameters().findAny().orElseThrow();
       assertEquals(3, paramBin.bounds().count());
       binEnv.reload();
       assertEquals(3, paramBin.bounds().count());
@@ -61,10 +61,10 @@ public class TypeParameterTest {
 
   @Test
   public void testToString(IJavaEnvironment env) {
-    var childTypeParam = env.requireType(ChildClass.class.getName()).typeParameters().findAny().get();
+    var childTypeParam = env.requireType(ChildClass.class.getName()).typeParameters().findAny().orElseThrow();
     assertFalse(Strings.isBlank(childTypeParam.toString()));
 
-    var baseTypeParam = env.requireType(ChildClass.class.getName()).requireSuperClass().typeParameters().skip(1).findAny().get();
+    var baseTypeParam = env.requireType(ChildClass.class.getName()).requireSuperClass().typeParameters().skip(1).findAny().orElseThrow();
     assertFalse(Strings.isBlank(baseTypeParam.toString()));
   }
 

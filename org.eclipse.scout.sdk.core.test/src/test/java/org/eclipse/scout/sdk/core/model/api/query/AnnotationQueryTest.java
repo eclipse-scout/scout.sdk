@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,25 +42,25 @@ public class AnnotationQueryTest {
   @Test
   public void testAllSuperTypes(IJavaEnvironment env) {
     var testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName() + JavaTypes.C_DOLLAR + TestChildClass.class.getSimpleName());
-    assertEquals(4, testChildClass.methods().first().get().annotations().withSuperTypes(true).stream().count());
+    assertEquals(4, testChildClass.methods().first().orElseThrow().annotations().withSuperTypes(true).stream().count());
   }
 
   @Test
   public void testSuperClasses(IJavaEnvironment env) {
     var testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName() + JavaTypes.C_DOLLAR + TestChildClass.class.getSimpleName());
-    assertEquals(3, testChildClass.methods().first().get().annotations().withSuperClasses(true).stream().count());
+    assertEquals(3, testChildClass.methods().first().orElseThrow().annotations().withSuperClasses(true).stream().count());
   }
 
   @Test
   public void testSuperInterfaces(IJavaEnvironment env) {
     var testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName() + JavaTypes.C_DOLLAR + TestChildClass.class.getSimpleName());
-    assertEquals(3, testChildClass.methods().first().get().annotations().withSuperInterfaces(true).stream().count());
+    assertEquals(3, testChildClass.methods().first().orElseThrow().annotations().withSuperInterfaces(true).stream().count());
   }
 
   @Test
   public void testOnField(IJavaEnvironment env) {
     var testChildClass = env.requireType(AnnotationQueryTestFixture.class.getName());
-    assertEquals(1, testChildClass.fields().first().get().annotations().stream().count());
+    assertEquals(1, testChildClass.fields().first().orElseThrow().annotations().stream().count());
   }
 
   @Test

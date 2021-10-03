@@ -61,18 +61,18 @@ public class QueryTest {
     assertEquals(3, childClass.superTypes().withSuperInterfaces(false).stream().count());
 
     // start with an interface but don't request super interfaces:
-    var firstSuperIfc = childClass.superTypes().withSelf(false).withSuperClasses(false).first().get();
+    var firstSuperIfc = childClass.superTypes().withSelf(false).withSuperClasses(false).first().orElseThrow();
     assertEquals(1, firstSuperIfc.superTypes().withSuperInterfaces(false).stream().count());
   }
 
   @Test
   public void testSuperMethodQuery(IJavaEnvironment env) {
     var acc = env.requireType(AbstractChildClass.class.getName());
-    assertEquals(2, acc.methods().withName("blub").first().get().superMethods().stream().count());
-    assertEquals(1, acc.methods().withName("blub").first().get().superMethods().stream().limit(1).count());
-    assertEquals(1, acc.methods().withName("blub").first().get().superMethods().withSelf(false).stream().count());
-    assertEquals(1, acc.methods().withName("blub").first().get().superMethods().withSuperClasses(false).stream().count());
-    assertEquals(1, acc.methods().withName("blub").first().get().superMethods().stream().filter(element -> AbstractBaseClass.class.getName().equals(element.requireDeclaringType().name())).count());
+    assertEquals(2, acc.methods().withName("blub").first().orElseThrow().superMethods().stream().count());
+    assertEquals(1, acc.methods().withName("blub").first().orElseThrow().superMethods().stream().limit(1).count());
+    assertEquals(1, acc.methods().withName("blub").first().orElseThrow().superMethods().withSelf(false).stream().count());
+    assertEquals(1, acc.methods().withName("blub").first().orElseThrow().superMethods().withSuperClasses(false).stream().count());
+    assertEquals(1, acc.methods().withName("blub").first().orElseThrow().superMethods().stream().filter(element -> AbstractBaseClass.class.getName().equals(element.requireDeclaringType().name())).count());
   }
 
   @Test
@@ -93,20 +93,20 @@ public class QueryTest {
     assertEquals(0, abc.innerTypes().withRecursiveInnerTypes(false).withSimpleName("InnerThree").stream().count());
 
     assertEquals(2, env.requireType(ChildClass.class.getName()).innerTypes().withSuperClasses(true).stream().count());
-    assertEquals("InnerClass2", env.requireType(ChildClass.class.getName()).innerTypes().withSuperClasses(true).item(1).get().elementName());
+    assertEquals("InnerClass2", env.requireType(ChildClass.class.getName()).innerTypes().withSuperClasses(true).item(1).orElseThrow().elementName());
     assertFalse(env.requireType(Object.class.getName()).innerTypes().withSuperClasses(true).withName("notExisting").existsAny());
     assertEquals(1, env.requireType(ChildClass.class.getName()).requireCompilationUnit().types().stream().count());
 
     var innerTypeInSuperClass = env.requireType(ChildClass.class.getName()).innerTypes().withSuperClasses(true).stream().filter(element -> "InnerClass2".equals(element.elementName())).findFirst();
     assertTrue(innerTypeInSuperClass.isPresent());
-    assertEquals("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", innerTypeInSuperClass.get().name());
+    assertEquals("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", innerTypeInSuperClass.orElseThrow().name());
   }
 
   @Test
   public void testMethodParameterQuery(IJavaEnvironment env) {
-    var methodWithParams = env.requireType(AbstractBaseClass.class.getName()).methods().withName("methodWithParams").first().get();
+    var methodWithParams = env.requireType(AbstractBaseClass.class.getName()).methods().withName("methodWithParams").first().orElseThrow();
     assertEquals(1, methodWithParams.parameters().withDataType(String.class.getName()).stream().count());
-    assertEquals(TestAnnotation.class.getName(), methodWithParams.parameters().withName("firstParam").first().get().annotations().first().get().type().name());
+    assertEquals(TestAnnotation.class.getName(), methodWithParams.parameters().withName("firstParam").first().orElseThrow().annotations().first().orElseThrow().type().name());
     assertEquals(1, methodWithParams.parameters().stream().limit(1).count());
     assertEquals(1, methodWithParams.parameters().stream().filter(element -> element.annotations().existsAny()).count());
   }
@@ -150,24 +150,24 @@ public class QueryTest {
     var acc = env.requireType(AbstractChildClass.class.getName());
     var childClass = env.requireType(ChildClass.class.getName());
     var wbc = env.requireType(WildcardBaseClass.class.getName());
-    assertEquals(2, acc.methods().withName("blub").first().get().annotations().withSuperTypes(true).withName(MarkerAnnotation.class.getName()).stream().count());
+    assertEquals(2, acc.methods().withName("blub").first().orElseThrow().annotations().withSuperTypes(true).withName(MarkerAnnotation.class.getName()).stream().count());
     assertEquals(2, childClass.annotations().withSuperClasses(true).withName(TestAnnotation.class.getName()).stream().count());
 
-    assertEquals(1, wbc.annotations().stream().filter(element -> element.element("inner").get().value() instanceof IArrayMetaValue).count());
-    assertEquals(1, acc.methods().withName("blub").first().get().annotations().stream().limit(1).count());
+    assertEquals(1, wbc.annotations().stream().filter(element -> element.element("inner").orElseThrow().value() instanceof IArrayMetaValue).count());
+    assertEquals(1, acc.methods().withName("blub").first().orElseThrow().annotations().stream().limit(1).count());
 
-    var methodInChildClass = childClass.methods().withName("methodInChildClass").first().get();
+    var methodInChildClass = childClass.methods().withName("methodInChildClass").first().orElseThrow();
     assertEquals(1, methodInChildClass.annotations().stream().filter(element -> element.elements().size() == 3).count());
 
     // annotations on hierarchical method params
     var rootType = env.requireType(MethodParamHierarchicAnnotation.class.getName());
-    var paramAnnotationChildClass = rootType.innerTypes().withSimpleName(ParamAnnotationChildClass.class.getSimpleName()).first().get();
-    var firstParam = paramAnnotationChildClass.methods().first().get().parameters().first().get();
-    var secondParam = paramAnnotationChildClass.methods().first().get().parameters().item(1).get();
+    var paramAnnotationChildClass = rootType.innerTypes().withSimpleName(ParamAnnotationChildClass.class.getSimpleName()).first().orElseThrow();
+    var firstParam = paramAnnotationChildClass.methods().first().orElseThrow().parameters().first().orElseThrow();
+    var secondParam = paramAnnotationChildClass.methods().first().orElseThrow().parameters().item(1).orElseThrow();
 
     var firstParamAnnotations = firstParam.annotations().withSuperTypes(true).stream().collect(toList());
     assertEquals(2, firstParamAnnotations.size());
-    assertEquals("test", firstParamAnnotations.get(1).element("msg").get().value().as(String.class));
+    assertEquals("test", firstParamAnnotations.get(1).element("msg").orElseThrow().value().as(String.class));
 
     var secondParamAnnotations = secondParam.annotations().withSuperTypes(true).stream().collect(toList());
     assertEquals(1, secondParamAnnotations.size());

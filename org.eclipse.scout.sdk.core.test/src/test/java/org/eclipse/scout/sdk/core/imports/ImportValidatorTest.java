@@ -229,7 +229,7 @@ public class ImportValidatorTest {
     var iv = createEnclosingTypeImportCollector(importTest);
     IImportValidator validator = new ImportValidator(iv);
 
-    assertEquals(ImportTestClass.Long.class.getSimpleName(), validator.useReference(importTest.innerTypes().first().get().name()));
+    assertEquals(ImportTestClass.Long.class.getSimpleName(), validator.useReference(importTest.innerTypes().first().orElseThrow().name()));
     assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), validator.useReference(org.eclipse.scout.sdk.core.fixture.Long.class.getName()));
   }
 
@@ -250,9 +250,9 @@ public class ImportValidatorTest {
     var mainType = env.requireType(ImportTestChildClass.class.getName());
     var cuGenerator = mainType.requireCompilationUnit().toWorkingCopy();
     var collector1 = createCompilationUnitImportCollector(cuGenerator, env);
-    var mainTypeGenerator = cuGenerator.mainType().get();
+    var mainTypeGenerator = cuGenerator.mainType().orElseThrow();
     var iv1 = new EnclosingTypeScopedImportCollector(collector1, mainTypeGenerator);
-    var iv2 = new EnclosingTypeScopedImportCollector(iv1, mainTypeGenerator.type(ImportTestChildClassInner.class.getSimpleName()).get());
+    var iv2 = new EnclosingTypeScopedImportCollector(iv1, mainTypeGenerator.type(ImportTestChildClassInner.class.getSimpleName()).orElseThrow());
     IImportValidator validator = new ImportValidator(iv2);
 
     // can be simple qualified because the referenced name is an inner type of a super class
@@ -372,12 +372,12 @@ public class ImportValidatorTest {
   protected static IImportCollector createCompilationUnitImportCollector(ICompilationUnitGenerator<?> cuSrc, IJavaEnvironment env) {
     IImportCollector validator0 = new ImportCollector(env);
     cuSrc.imports().forEach(validator0::addImport);
-    return new CompilationUnitScopedImportCollector(validator0, cuSrc.packageName().get());
+    return new CompilationUnitScopedImportCollector(validator0, cuSrc.packageName().orElseThrow());
   }
 
   protected static IImportCollector createEnclosingTypeImportCollector(IType t) {
     var cuSrc = t.requireCompilationUnit().toWorkingCopy();
     var collector1 = createCompilationUnitImportCollector(cuSrc, t.javaEnvironment());
-    return new EnclosingTypeScopedImportCollector(collector1, cuSrc.mainType().get());
+    return new EnclosingTypeScopedImportCollector(collector1, cuSrc.mainType().orElseThrow());
   }
 }

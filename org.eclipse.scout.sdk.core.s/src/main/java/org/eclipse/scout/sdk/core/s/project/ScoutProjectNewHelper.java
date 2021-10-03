@@ -142,7 +142,7 @@ public final class ScoutProjectNewHelper {
       }
 
       var doc = Xml.get(pom);
-      var modules = Xml.firstChildElement(doc.getDocumentElement(), IMavenConstants.MODULES).get();
+      var modules = Xml.firstChildElement(doc.getDocumentElement(), IMavenConstants.MODULES).orElseThrow();
       var childNodes = modules.getChildNodes();
       var targetDirectoryName = targetDirectory.getFileName().toString();
       var nodesToRemove = IntStream.range(0, childNodes.getLength())
@@ -159,7 +159,7 @@ public final class ScoutProjectNewHelper {
     }
   }
 
-  static boolean isNodeToRemove(Node n, String targetDirectoryName) {
+  static boolean isNodeToRemove(Node n, CharSequence targetDirectoryName) {
     if (n == null) {
       return false;
     }
@@ -168,7 +168,7 @@ public final class ScoutProjectNewHelper {
     }
     return n.getNodeType() == Node.ELEMENT_NODE
         && IMavenConstants.MODULE.equals(((Element) n).getTagName())
-        && !targetDirectoryName.equals(n.getTextContent().trim());
+        && !Strings.equals(targetDirectoryName, Strings.trim(n.getTextContent()));
   }
 
   static String getArtifactName(String artifactId) {

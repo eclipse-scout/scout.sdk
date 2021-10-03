@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -438,7 +438,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
         return false;
       }
 
-      var primarySourceFolder = primarySourceFolderOpt.get();
+      var primarySourceFolder = primarySourceFolderOpt.orElseThrow();
       if (!JdtUtils.exists(primarySourceFolder) || !primarySourceFolder.getResource().getProjectRelativePath().toString().toLowerCase(Locale.US).contains("java")) {
         return false;
       }
@@ -446,7 +446,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       if (optScoutApi.isEmpty()) {
         return false;
       }
-      var scoutApi = optScoutApi.get();
+      var scoutApi = optScoutApi.orElseThrow();
       if (!JdtUtils.exists(jp.findType(scoutApi.AbstractWebServiceClient().fqn()))) {
         return false;
       }
@@ -482,7 +482,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     try {
       var scoutApi = ApiHelper.scoutApiFor(jp);
       return scoutApi.isPresent()
-          && JdtUtils.exists(jp.findType(scoutApi.get().IServerSession().fqn()))
+          && JdtUtils.exists(jp.findType(scoutApi.orElseThrow().IServerSession().fqn()))
           && !jp.getProject().getFolder(IScoutSourceFolders.WEBAPP_RESOURCE_FOLDER + "/WEB-INF").exists()
           && !Files.exists(AbstractWebServiceNewOperation.getWsdlRootFolder(jp.getProject().getLocation().toFile().toPath()));
     }
@@ -535,11 +535,11 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     }
 
     var pckBuilder = new StringBuilder();
-    if (groupId.isPresent() && !artifactId.get().startsWith(groupId.get())) {
-      pckBuilder.append(groupId.get());
+    if (groupId.isPresent() && !artifactId.orElseThrow().startsWith(groupId.orElseThrow())) {
+      pckBuilder.append(groupId.orElseThrow());
       pckBuilder.append(JavaTypes.C_DOT);
     }
-    pckBuilder.append(artifactId.get());
+    pckBuilder.append(artifactId.orElseThrow());
     pckBuilder.append(JavaTypes.C_DOT);
     pckBuilder.append(baseName);
     setTargetPackage(pckBuilder.toString());

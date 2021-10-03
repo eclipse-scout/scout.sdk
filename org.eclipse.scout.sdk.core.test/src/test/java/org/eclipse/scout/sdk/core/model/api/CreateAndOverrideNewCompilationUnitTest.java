@@ -42,7 +42,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
   public void testCreateNewTypeWithErrors(IJavaEnvironment env) {
     // add an unresolved type error
     var cuSrc = createBaseClass();
-    cuSrc.mainType().get().methods().findAny().get().withReturnType("FooBar");
+    cuSrc.mainType().orElseThrow().methods().findAny().orElseThrow().withReturnType("FooBar");
     var cu = registerCompilationUnit(env, cuSrc).requireCompilationUnit();
 
     var expected =
@@ -52,11 +52,11 @@ public class CreateAndOverrideNewCompilationUnitTest {
             "    System.out.println(\"base class\");\n" +
             "  }\n" +
             "}\n";
-    assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().get().asCharSequence()));
+    assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().orElseThrow().asCharSequence()));
     assertFalse(env.compileErrors("a.b.c.BaseClass").isEmpty());
 
     //now fix the unresolved type error
-    cuSrc.mainType().get().methods().findAny().get().withReturnType(JavaTypes._void);
+    cuSrc.mainType().orElseThrow().methods().findAny().orElseThrow().withReturnType(JavaTypes._void);
     cu = registerCompilationUnit(env, cuSrc).requireCompilationUnit();
     assertNotNull(cu);
     assertTrue(env.compileErrors("a.b.c.BaseClass").isEmpty());
@@ -74,11 +74,11 @@ public class CreateAndOverrideNewCompilationUnitTest {
             "    System.out.println(\"base class\");\n" +
             "  }\n" +
             "}\n";
-    assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().get().asCharSequence()));
+    assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().orElseThrow().asCharSequence()));
 
     //now read the type from the env
     var t2 = env.requireType("a.b.c.BaseClass");
-    assertEquals(cu.requireMainType().methods().withName("run").first().get().source().get().asCharSequence(), t2.methods().withName("run").first().get().source().get().asCharSequence());
+    assertEquals(cu.requireMainType().methods().withName("run").first().orElseThrow().source().orElseThrow().asCharSequence(), t2.methods().withName("run").first().orElseThrow().source().orElseThrow().asCharSequence());
   }
 
   @Test
@@ -101,7 +101,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
             "    System.out.println(\"sub class\");\n" +
             "  }\n" +
             "}\n";
-    assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().get().asCharSequence()));
+    assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().orElseThrow().asCharSequence()));
   }
 
   @Test
@@ -118,7 +118,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
 
     // re-create modified base type
     cuSrc = createBaseClass();
-    cuSrc.mainType().get().methods().findAny().get().withBody(b -> b.append("System.out.println(\"modified base class\");"));
+    cuSrc.mainType().orElseThrow().methods().findAny().orElseThrow().withBody(b -> b.append("System.out.println(\"modified base class\");"));
     cu = registerCompilationUnit(env, cuSrc).requireCompilationUnit();
 
     var expected = "" +
@@ -128,15 +128,15 @@ public class CreateAndOverrideNewCompilationUnitTest {
         "    System.out.println(\"modified base class\");\n" +
         "  }\n" +
         "}\n";
-    assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().get().asCharSequence()));
+    assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().orElseThrow().asCharSequence()));
 
     // now read the type from the env
     var t2 = env.requireType("a.b.c.BaseClass");
-    assertEquals(cu.requireMainType().methods().withName("run").first().get().source().get().asCharSequence(), t2.methods().withName("run").first().get().source().get().asCharSequence());
+    assertEquals(cu.requireMainType().methods().withName("run").first().orElseThrow().source().orElseThrow().asCharSequence(), t2.methods().withName("run").first().orElseThrow().source().orElseThrow().asCharSequence());
 
     // and again re-create modified base type
     cuSrc = createBaseClass();
-    cuSrc.mainType().get().methods().findAny().get().withBody(b -> b.append("System.out.println(\"again modified base class\");"));
+    cuSrc.mainType().orElseThrow().methods().findAny().orElseThrow().withBody(b -> b.append("System.out.println(\"again modified base class\");"));
     cu = registerCompilationUnit(env, cuSrc).requireCompilationUnit();
 
     expected = "" +
@@ -146,11 +146,11 @@ public class CreateAndOverrideNewCompilationUnitTest {
         "    System.out.println(\"again modified base class\");\n" +
         "  }\n" +
         "}\n";
-    assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().get().asCharSequence()));
+    assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().orElseThrow().asCharSequence()));
 
     // now read the type from the env
     t2 = env.requireType("a.b.c.BaseClass");
-    assertEquals(cu.requireMainType().methods().withName("run").first().get().source().get().asCharSequence(), t2.methods().withName("run").first().get().source().get().asCharSequence());
+    assertEquals(cu.requireMainType().methods().withName("run").first().orElseThrow().source().orElseThrow().asCharSequence(), t2.methods().withName("run").first().orElseThrow().source().orElseThrow().asCharSequence());
 
   }
 

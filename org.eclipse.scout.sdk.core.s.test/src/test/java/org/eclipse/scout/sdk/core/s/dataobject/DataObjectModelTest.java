@@ -43,7 +43,7 @@ public class DataObjectModelTest {
     assertFalse(wrap(env.requireType(BaseDo.class.getName())).isPresent());
     assertFalse(new EmptyJavaEnvironmentFactory().call(je -> wrap(je.requireType(Long.class.getName()))).isPresent());
     var childDo = env.requireType(ChildDo.class.getName());
-    var model = wrap(childDo).get();
+    var model = wrap(childDo).orElseThrow();
     assertSame(childDo, model.unwrap());
     assertEquals(4, model.nodes().size());
     assertEquals(
@@ -57,7 +57,7 @@ public class DataObjectModelTest {
   @Test
   public void testIgnore(IJavaEnvironment env) {
     assertFalse(wrap(env.requireType(IgnoredDo.class.getName())).isPresent());
-    var model = wrap(env.requireType(SampleDo.class.getName())).get();
+    var model = wrap(env.requireType(SampleDo.class.getName())).orElseThrow();
     var nodeNames = model.nodes().stream()
         .map(DataObjectNode::name)
         .sorted()

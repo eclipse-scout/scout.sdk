@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManagerEvent
 import org.eclipse.scout.sdk.core.util.EventListenerList
+import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment
 import java.util.Collections.singleton
@@ -145,7 +146,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
         val toUpdate = translationForRow(rowIndex)
         try {
             if (KEY_COLUMN_INDEX == columnIndex) {
-                val newKey = text.trim()
+                val newKey = Strings.trim(text).toString()
                 if (newKey == toUpdate.key()) {
                     // no save necessary
                     return
@@ -164,7 +165,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
 
     fun validate(aValue: Any?, rowIndex: Int, columnIndex: Int): Int {
         val selectedTranslation = translationForRow(rowIndex)
-        val newCellValue = aValue?.toString()?.trim()
+        val newCellValue = Strings.trim(aValue?.toString())?.toString()
         if (columnIndex == KEY_COLUMN_INDEX) {
             return selectedTranslation.stores()
                     .mapToInt { validateKey(translationManager, it, newCellValue, singleton(selectedTranslation.key())) }
@@ -235,7 +236,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
             if (index < 0) {
                 return
             }
-            translations()[index] = event.translation().get()
+            translations()[index] = event.translation().orElseThrow()
             fireTableRowsUpdated(index, index)
         }
 

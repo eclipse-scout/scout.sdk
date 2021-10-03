@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link MavenBuild}</h3> Represents a Maven Build with all arguments.
@@ -258,7 +259,7 @@ public class MavenBuild {
    *          The value of the property. May be {@code null}.
    */
   public MavenBuild withProperty(String key, String value) {
-    m_properties.put(Ensure.notBlank(key).trim(), value);
+    m_properties.put(Strings.trim(Ensure.notBlank(key)).toString(), value);
     return this;
   }
 

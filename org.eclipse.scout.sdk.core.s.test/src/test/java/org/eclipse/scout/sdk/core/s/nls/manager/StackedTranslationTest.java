@@ -47,16 +47,16 @@ public class StackedTranslationTest {
         .map(s -> s.service().type().elementName())
         .sorted()
         .collect(joining(",")));
-    assertEquals(STORE_B_NAME, entry01.primaryEditableStore().get().service().type().elementName());
-    assertEquals(STORE_B_NAME, entry01.entry(Language.LANGUAGE_DEFAULT).get().store().service().type().elementName());
-    assertEquals(STORE_B_NAME, entry01.entry(LANGUAGE_EN).get().store().service().type().elementName());
-    assertEquals(STORE_B_NAME, entry01.entry(LANGUAGE_DE).get().store().service().type().elementName());
-    assertEquals(STORE_A_NAME, entry01.entry(LANGUAGE_FR).get().store().service().type().elementName());
-    assertEquals(STORE_B_NAME, entry01.entry(LANGUAGE_ES).get().store().service().type().elementName());
-    assertEquals("B_1_def", entry01.text(Language.LANGUAGE_DEFAULT).get());
-    assertEquals("B_1_de", entry01.text(LANGUAGE_DE).get());
-    assertEquals("B_1_es", entry01.text(LANGUAGE_ES).get());
-    assertEquals("A_1_fr", entry01.text(LANGUAGE_FR).get());
+    assertEquals(STORE_B_NAME, entry01.primaryEditableStore().orElseThrow().service().type().elementName());
+    assertEquals(STORE_B_NAME, entry01.entry(Language.LANGUAGE_DEFAULT).orElseThrow().store().service().type().elementName());
+    assertEquals(STORE_B_NAME, entry01.entry(LANGUAGE_EN).orElseThrow().store().service().type().elementName());
+    assertEquals(STORE_B_NAME, entry01.entry(LANGUAGE_DE).orElseThrow().store().service().type().elementName());
+    assertEquals(STORE_A_NAME, entry01.entry(LANGUAGE_FR).orElseThrow().store().service().type().elementName());
+    assertEquals(STORE_B_NAME, entry01.entry(LANGUAGE_ES).orElseThrow().store().service().type().elementName());
+    assertEquals("B_1_def", entry01.text(Language.LANGUAGE_DEFAULT).orElseThrow());
+    assertEquals("B_1_de", entry01.text(LANGUAGE_DE).orElseThrow());
+    assertEquals("B_1_es", entry01.text(LANGUAGE_ES).orElseThrow());
+    assertEquals("A_1_fr", entry01.text(LANGUAGE_FR).orElseThrow());
   }
 
   @Test
@@ -70,10 +70,10 @@ public class StackedTranslationTest {
         .sorted()
         .collect(joining(",")));
     assertTrue(entry02.primaryEditableStore().isEmpty());
-    assertEquals(STORE_A_NAME, entry02.entry(Language.LANGUAGE_DEFAULT).get().store().service().type().elementName());
-    assertEquals(STORE_A_NAME, entry02.entry(LANGUAGE_EN).get().store().service().type().elementName());
-    assertEquals(STORE_A_NAME, entry02.entry(LANGUAGE_DE).get().store().service().type().elementName());
-    assertEquals(STORE_A_NAME, entry02.entry(LANGUAGE_FR).get().store().service().type().elementName());
+    assertEquals(STORE_A_NAME, entry02.entry(Language.LANGUAGE_DEFAULT).orElseThrow().store().service().type().elementName());
+    assertEquals(STORE_A_NAME, entry02.entry(LANGUAGE_EN).orElseThrow().store().service().type().elementName());
+    assertEquals(STORE_A_NAME, entry02.entry(LANGUAGE_DE).orElseThrow().store().service().type().elementName());
+    assertEquals(STORE_A_NAME, entry02.entry(LANGUAGE_FR).orElseThrow().store().service().type().elementName());
     assertTrue(entry02.entry(LANGUAGE_ES).isEmpty());
   }
 
@@ -87,12 +87,12 @@ public class StackedTranslationTest {
         .map(s -> s.service().type().elementName())
         .sorted()
         .collect(joining(",")));
-    assertEquals(STORE_C_NAME, entry03.primaryEditableStore().get().service().type().elementName());
-    assertEquals(STORE_B_NAME, entry03.entry(Language.LANGUAGE_DEFAULT).get().store().service().type().elementName());
+    assertEquals(STORE_C_NAME, entry03.primaryEditableStore().orElseThrow().service().type().elementName());
+    assertEquals(STORE_B_NAME, entry03.entry(Language.LANGUAGE_DEFAULT).orElseThrow().store().service().type().elementName());
     assertTrue(entry03.entry(LANGUAGE_EN).isEmpty());
     assertTrue(entry03.entry(LANGUAGE_DE).isEmpty());
-    assertEquals(STORE_C_NAME, entry03.entry(LANGUAGE_FR).get().store().service().type().elementName());
-    assertEquals(STORE_B_NAME, entry03.entry(LANGUAGE_ES).get().store().service().type().elementName());
+    assertEquals(STORE_C_NAME, entry03.entry(LANGUAGE_FR).orElseThrow().store().service().type().elementName());
+    assertEquals(STORE_B_NAME, entry03.entry(LANGUAGE_ES).orElseThrow().store().service().type().elementName());
   }
 
   protected static StackedTranslation createStackedTranslation(String key) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -78,14 +78,14 @@ public class PackageTest {
         .flatMap(IPackage::parent)
         .flatMap(IPackage::parent)
         .flatMap(IPackage::parent)
-        .get();
+        .orElseThrow();
     assertEquals("org", org.elementName());
-    assertNull(org.parent().get().elementName());
-    assertFalse(org.parent().get().parent().isPresent());
+    assertNull(org.parent().orElseThrow().elementName());
+    assertFalse(org.parent().orElseThrow().parent().isPresent());
     assertEquals(1, pck.children().count());
     assertEquals(Paths.get(expectedPackageName.replace(JavaTypes.C_DOT, '/')), pck.asPath());
-    var pckAnnotation = pck.annotations().withName(PackageAnnotation.class.getName()).first().get();
-    assertEquals("testValue", pckAnnotation.element("testAttrib").get().value().as(String.class));
+    var pckAnnotation = pck.annotations().withName(PackageAnnotation.class.getName()).first().orElseThrow();
+    assertEquals("testValue", pckAnnotation.element("testAttrib").orElseThrow().value().as(String.class));
   }
 
   @Test

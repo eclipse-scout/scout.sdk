@@ -68,8 +68,8 @@ public class FilteredTranslationStoreTest {
     assertTrue(store.get(TranslationStoreSupplierExtension.TRANSLATION_KEY_1).isPresent()); // exists in both
 
     assertTrue(store.get(langDe).isPresent());
-    assertEquals(0, store.get(langDe).get().size());
-    assertEquals(3, store.get(Language.LANGUAGE_DEFAULT).get().size());
+    assertEquals(0, store.get(langDe).orElseThrow().size());
+    assertEquals(3, store.get(Language.LANGUAGE_DEFAULT).orElseThrow().size());
 
     assertFalse(store.get("whatever", Language.LANGUAGE_DEFAULT).isPresent()); // does not exist in filter and store
     assertFalse(store.get(TranslationStoreSupplierExtension.TRANSLATION_KEY_3, Language.LANGUAGE_DEFAULT).isPresent()); // does not exist in filter

@@ -220,7 +220,7 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
     }
     if (defaultSubtypeCommand != null && DefaultSubtypeSdkCommand.DEFAULT != defaultSubtypeCommand) {
       generator.withElementFrom(IScoutApi.class, api -> api.FormData().defaultSubtypeSdkCommandElementName(),
-          b -> b.ref(generator.elementName().get()).append(".DefaultSubtypeSdkCommand.").append(defaultSubtypeCommand.name()));
+          b -> b.ref(generator.elementName().orElseThrow()).append(".DefaultSubtypeSdkCommand.").append(defaultSubtypeCommand.name()));
     }
     return generator;
   }

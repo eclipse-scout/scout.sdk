@@ -134,7 +134,7 @@ public class TestingEnvironment extends AbstractEnvironment {
   }
 
   public IClasspathEntry primarySourceFolder() {
-    return primaryEnvironment().primarySourceFolder().get();
+    return primaryEnvironment().primarySourceFolder().orElseThrow();
   }
 
   public IJavaEnvironment primaryEnvironment() {
@@ -146,7 +146,7 @@ public class TestingEnvironment extends AbstractEnvironment {
   }
 
   public IClasspathEntry dtoSourceFolder() {
-    return dtoEnvironment().primarySourceFolder().get();
+    return dtoEnvironment().primarySourceFolder().orElseThrow();
   }
 
   protected static Throwable writeIcuToDisk(Path targetFile, CharSequence source) {

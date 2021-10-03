@@ -101,7 +101,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     var classIdApi = a.javaEnvironment().requireApi(IScoutApi.class).ClassId();
     if (classIdApi.fqn().equals(a.type().name())) {
       var valueElementName = classIdApi.valueElementName();
-      var id = a.element(valueElementName).get().value().as(String.class);
+      var id = a.element(valueElementName).orElseThrow().value().as(String.class);
       result.withElement(valueElementName, b -> b.stringLiteral(id + FORMDATA_CLASSID_SUFFIX));
     }
     return result;
@@ -152,7 +152,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     if (extendedTypeOpt.isEmpty()) {
       return thisInstance();
     }
-    var extendedType = extendedTypeOpt.get();
+    var extendedType = extendedTypeOpt.orElseThrow();
     var primaryType = extendedType.primary();
 
     Optional<IType> extendedDto = Optional.empty();
@@ -160,7 +160,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     if (primaryType.isInstanceOf(api.IForm()) || primaryType.isInstanceOf(api.IFormField())) {
       var declaring = extendedType.declaringType();
       if (extendedType.isInstanceOf(api.ITable()) && declaring.isPresent()) {
-        var tableFieldDto = getFormDataType(declaring.get());
+        var tableFieldDto = getFormDataType(declaring.orElseThrow());
         extendedDto = tableFieldDto.flatMap(dto -> dto.innerTypes().withInstanceOf(api.AbstractTableRowData()).first());
       }
       else {
@@ -316,7 +316,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
         return null;
       }
 
-      recursiveDeclaringType = declaringType.get();
+      recursiveDeclaringType = declaringType.orElseThrow();
     }
   }
 
@@ -327,7 +327,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
           .flatMap(AbstractDtoGenerator::getFormDataType)
           .map(IType::reference);
       if (replaced.isPresent()) {
-        return replaced.get();
+        return replaced.orElseThrow();
       }
     }
     return computeSuperTypeForFormDataIgnoringReplace(modelType, formDataAnnotation);
@@ -347,7 +347,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
           return genericType
               .map(IType::reference)
               .map(fqn -> superType.name() + JavaTypes.C_GENERIC_START + fqn + JavaTypes.C_GENERIC_END)
-              .get();
+              .orElseThrow();
         }
       }
     }
@@ -385,7 +385,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
     if (modelType.isInstanceOf(iExtension)) {
       var owner = modelType.resolveTypeParamValue(iExtension.ownerTypeParamIndex(), iExtension.fqn());
       if (owner.isPresent()) {
-        return owner.get().findFirst();
+        return owner.orElseThrow().findFirst();
       }
     }
 
@@ -433,7 +433,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
 
     PropertyBean.of(modelType())
         .filter(bean -> bean.readMethod().isPresent() && bean.writeMethod().isPresent())
-        .filter(bean -> hasDtoAnnotation.test(bean.readMethod().get()) || hasDtoAnnotation.test(bean.writeMethod().get()))
+        .filter(bean -> hasDtoAnnotation.test(bean.readMethod().orElseThrow()) || hasDtoAnnotation.test(bean.writeMethod().orElseThrow()))
         .sorted(comparing(PropertyBean::name).thenComparing(PropertyBean::toString))
         .forEach(this::addPropertyDto);
     return thisInstance();
@@ -455,7 +455,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
         .withElementName(propName)
         .withSuperClass(abstractPropertyDataApi.fqn() + JavaTypes.C_GENERIC_START + propDataTypeBoxed + JavaTypes.C_GENERIC_END)
         .withField(FieldGenerator.createSerialVersionUid());
-    copyAnnotations(desc.readMethod().get(), propertyTypeBuilder, targetEnvironment());
+    copyAnnotations(desc.readMethod().orElseThrow(), propertyTypeBuilder, targetEnvironment());
 
     var getterName = PropertyBean.GETTER_PREFIX + propName;
     this

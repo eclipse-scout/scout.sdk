@@ -118,7 +118,7 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
   }
 
   public static PropertiesTranslationStore createEmptyStore(IJavaEnvironment env) {
-    return new PropertiesTranslationStore(PropertiesTextProviderService.create(env.requireType(ScoutTextProviderService.class.getName())).get());
+    return new PropertiesTranslationStore(PropertiesTextProviderService.create(env.requireType(ScoutTextProviderService.class.getName())).orElseThrow());
   }
 
   private static IllegalArgumentException createExtensionNotRegisteredError() {
@@ -131,7 +131,7 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
   }
 
   protected static PropertiesTranslationStore createTestingStore(IType textService, boolean readOnly, Path directory) {
-    var originalSvc = PropertiesTextProviderService.create(textService).get();
+    var originalSvc = PropertiesTextProviderService.create(textService).orElseThrow();
     var txtSvc = spy(originalSvc);
     var store = new PropertiesTranslationStore(txtSvc);
 
@@ -176,7 +176,7 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
       }
     }
 
-    var language = parseLanguageFromFileName(file.getFileName().toString(), PROPERTIES_FILE_NAME_PREFIX).get();
+    var language = parseLanguageFromFileName(file.getFileName().toString(), PROPERTIES_FILE_NAME_PREFIX).orElseThrow();
     var props = new EditableTranslationFile(file, language);
     assertTrue(props.load(new NullProgress()));
     return props;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,10 +37,10 @@ public class ApiFunctionTest {
   public void testFunctionCalledWithoutEnvironment() {
     var val = "result".toCharArray();
     var f = new ApiFunction<IJavaApi, char[]>(val);
-    assertSame(val, f.apply().get());
+    assertSame(val, f.apply().orElseThrow());
     assertSame(val, f.apply((IApiSpecification) null));
-    assertSame(val, f.apply((IJavaSourceBuilder<?>) null).get());
-    assertSame(val, f.apply((IJavaEnvironment) null).get());
+    assertSame(val, f.apply((IJavaSourceBuilder<?>) null).orElseThrow());
+    assertSame(val, f.apply((IJavaEnvironment) null).orElseThrow());
     assertFalse(f.apiClass().isPresent());
     assertNotNull(f.apiFunction());
   }
@@ -49,7 +49,7 @@ public class ApiFunctionTest {
   public void testWithContext(IJavaEnvironment env) {
     Api.registerProvider(IJavaApi.class, new JavaApiProvider());
     try {
-      assertEquals(Java11Api.VALUE, new ApiFunction<>(IJavaApi.class, IJavaApi::method).apply(env).get());
+      assertEquals(Java11Api.VALUE, new ApiFunction<>(IJavaApi.class, IJavaApi::method).apply(env).orElseThrow());
     }
     finally {
       Api.unregisterProvider(IJavaApi.class);

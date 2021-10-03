@@ -51,9 +51,9 @@ public final class JaxWsModuleNewHelper {
   public static Path getParentPomOf(Path modulePomFile, Document modulePomDocument) {
     var parent = Xml.firstChildElement(modulePomDocument.getDocumentElement(), IMavenConstants.PARENT);
     if (parent.isPresent()) {
-      var relPat = Xml.firstChildElement(parent.get(), IMavenConstants.RELATIVE_PATH);
+      var relPat = Xml.firstChildElement(parent.orElseThrow(), IMavenConstants.RELATIVE_PATH);
       if (relPat.isPresent()) {
-        var path = relPat.get().getTextContent();
+        var path = relPat.orElseThrow().getTextContent();
         if (Strings.isBlank(path)) {
           // parent is resolved from the repository. see https://maven.apache.org/ref/3.0.3/maven-model/maven.html#class_parent
           return null;
@@ -206,7 +206,7 @@ public final class JaxWsModuleNewHelper {
         String[] suffixes = {".version", "_version"};
         Arrays.stream(suffixes)
             .map(suffix -> groupId + JavaTypes.C_DOT + parentArtifactId + suffix)
-            .filter(versionPropertyName -> Xml.firstChildElement(properties.get(), versionPropertyName).isPresent())
+            .filter(versionPropertyName -> Xml.firstChildElement(properties.orElseThrow(), versionPropertyName).isPresent())
             .findFirst()
             .ifPresent(versionPropertyName -> newVersionElement.setTextContent("${" + versionPropertyName + '}'));
       }

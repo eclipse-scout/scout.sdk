@@ -122,7 +122,7 @@ public class NlsTablePage extends Composite {
     public void menuAboutToShow(IMenuManager manager) {
       var entries = m_controller.getSelectedEntries();
       if (entries.size() == 1) {
-        addSingleSelectMenus(manager, m_view.getCursorSelection().get());
+        addSingleSelectMenus(manager, m_view.getCursorSelection().orElseThrow());
       }
       else if (entries.size() > 1) {
         addMultiSelectMenus(manager, entries);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,14 +48,14 @@ public class DataAnnotationDescriptor {
     Optional<IType> superType = Optional.empty();
     var curType = type.superClass();
     while (curType.isPresent()) {
-      superType = getDataAnnotationValue(curType.get());
+      superType = getDataAnnotationValue(curType.orElseThrow());
       if (superType.isPresent()) {
         break;
       }
-      curType = curType.get().superClass();
+      curType = curType.orElseThrow().superClass();
     }
 
-    return Optional.of(new DataAnnotationDescriptor(dtoType.get(), superType.orElse(null), type));
+    return Optional.of(new DataAnnotationDescriptor(dtoType.orElseThrow(), superType.orElse(null), type));
   }
 
   /**

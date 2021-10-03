@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -40,7 +40,7 @@ public class XmlTest {
   public void testGetFirstChildElement() throws SAXException, IOException, ParserConfigurationException {
     var b = Xml.createDocumentBuilder();
     var xml = b.parse(new InputSource(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><root><!--comment--><element>whatever</element><element>another</element></root>")));
-    var element = Xml.firstChildElement(xml.getDocumentElement(), "element").get();
+    var element = Xml.firstChildElement(xml.getDocumentElement(), "element").orElseThrow();
     assertEquals("whatever", element.getTextContent());
 
     var opt = Xml.firstChildElement(xml.getDocumentElement(), "notexisting");

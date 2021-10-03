@@ -90,7 +90,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
       return Optional.empty(); // cannot update. no source available
     }
 
-    var cuSource = originalSource.get().asCharSequence();
+    var cuSource = originalSource.orElseThrow().asCharSequence();
     var buildContext = new JavaBuilderContext(dataObjectType.javaEnvironment()); // to collect all imports
     var replacedMethods = new HashSet<IMethod>();
 
@@ -163,14 +163,14 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     var existingMethod = dataObjectType.methods().withMethodIdentifier(methodId).first();
 
     // insert at the bottom of the class
-    var insertIndex = dataObjectType.source().get().end() - 1;
+    var insertIndex = dataObjectType.source().orElseThrow().end() - 1;
     var newMethodReplacement = new Replacement(insertIndex, 0, newSource);
     if (existingMethod.isEmpty()) {
       return Stream.of(newMethodReplacement);
     }
 
     // additionally delete existing method
-    var methodToDelete = existingMethod.get();
+    var methodToDelete = existingMethod.orElseThrow();
     replacedMethods.add(methodToDelete);
     var methodDeleteReplacement = toMethodDeleteReplacement(methodToDelete, cuSource);
     return Stream.of(methodDeleteReplacement, newMethodReplacement);
@@ -190,10 +190,10 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
   }
 
   protected Replacement toMethodDeleteReplacement(IMethod method, CharSequence cuSource) {
-    var sourceRange = method.source().get();
+    var sourceRange = method.source().orElseThrow();
     var methodStartOffset = sourceRange.start();
 
-    var declarationStartRelativeToMethodSource = method.sourceOfDeclaration().get().start() - sourceRange.start();
+    var declarationStartRelativeToMethodSource = method.sourceOfDeclaration().orElseThrow().start() - sourceRange.start();
     var pos = Strings.indexOf(CONVENIENCE_METHOD_MARKER_START, sourceRange.asCharSequence(), 0, declarationStartRelativeToMethodSource);
     if (pos > 0) {
       // if a convenience marker comment start is found before the method declaration start

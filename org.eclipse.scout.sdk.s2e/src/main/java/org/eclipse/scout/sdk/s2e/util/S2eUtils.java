@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -345,14 +345,14 @@ public final class S2eUtils {
 
     switch (tier) {
       case Server:
-        sessionToFind = scoutApi.get().IServerSession().fqn();
+        sessionToFind = scoutApi.orElseThrow().IServerSession().fqn();
         break;
       case Client:
       case HtmlUi:
-        sessionToFind = scoutApi.get().IClientSession().fqn();
+        sessionToFind = scoutApi.orElseThrow().IClientSession().fqn();
         break;
       default:
-        sessionToFind = scoutApi.get().ISession().fqn();
+        sessionToFind = scoutApi.orElseThrow().ISession().fqn();
         break;
     }
     var sessions = JdtUtils.findTypesInStrictHierarchy(project, sessionToFind, monitor, filter);

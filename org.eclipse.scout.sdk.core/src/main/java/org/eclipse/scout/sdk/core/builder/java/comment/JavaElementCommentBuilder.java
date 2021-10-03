@@ -234,10 +234,10 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
       return;
     }
     var arguments = new StringTokenizer(args, ",");
-    var arg = arguments.nextToken().trim();
+    var arg = Strings.trim(arguments.nextToken());
     append(validator.useReference(arg));
     while (arguments.hasMoreTokens()) {
-      arg = arguments.nextToken().trim();
+      arg = Strings.trim(arguments.nextToken());
       append(", ").append(validator.useReference(arg));
     }
   }

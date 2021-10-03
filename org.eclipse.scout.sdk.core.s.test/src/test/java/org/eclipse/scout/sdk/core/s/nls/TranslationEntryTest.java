@@ -45,7 +45,7 @@ public class TranslationEntryTest {
     var template3 = new Translation(template1);
     template3.putText(Language.LANGUAGE_DEFAULT, null); // removes the entry
 
-    assertEquals("def", template2.text(Language.LANGUAGE_DEFAULT).get());
+    assertEquals("def", template2.text(Language.LANGUAGE_DEFAULT).orElseThrow());
     assertFalse(template2.text(Language.parseThrowingOnError("notexisting")).isPresent());
     assertFalse(template3.text(Language.LANGUAGE_DEFAULT).isPresent());
 
@@ -77,10 +77,10 @@ public class TranslationEntryTest {
     t.putText(Language.parseThrowingOnError("de_DE"), "de-DE");
     t.putText(Language.parseThrowingOnError("de_DE_x"), "de-DE-x");
 
-    assertEquals(defaultText, t.bestText(null).get());
-    assertEquals(defaultText, t.bestText(Language.parseThrowingOnError("es")).get());
-    assertEquals(englishText, t.bestText(Language.parseThrowingOnError("en_GB")).get());
-    assertEquals(germanSwitzerlandText, t.bestText(Language.parseThrowingOnError("de_CH")).get());
-    assertEquals(defaultText, t.bestText(Language.parseThrowingOnError("de")).get()); // return default because it is unspecified which german locale should win
+    assertEquals(defaultText, t.bestText(null).orElseThrow());
+    assertEquals(defaultText, t.bestText(Language.parseThrowingOnError("es")).orElseThrow());
+    assertEquals(englishText, t.bestText(Language.parseThrowingOnError("en_GB")).orElseThrow());
+    assertEquals(germanSwitzerlandText, t.bestText(Language.parseThrowingOnError("de_CH")).orElseThrow());
+    assertEquals(defaultText, t.bestText(Language.parseThrowingOnError("de")).orElseThrow()); // return default because it is unspecified which german locale should win
   }
 }

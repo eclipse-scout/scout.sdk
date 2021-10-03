@@ -173,7 +173,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
         case METHOD_TYPE_GETTER:
           templateName = CodeTemplateContextType.GETTERCOMMENT_ID;
           if (returnTypeName.isPresent()) {
-            fieldTypeSimpleName = JavaTypes.simpleName(returnTypeName.get());
+            fieldTypeSimpleName = JavaTypes.simpleName(returnTypeName.orElseThrow());
           }
           break;
         case METHOD_TYPE_SETTER:
@@ -181,7 +181,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
           var javaEnv = builderContext.environment().orElse(null);
           var firstParam = target.parameters().findAny().map(p -> p.reference(javaEnv));
           if (firstParam.isPresent()) {
-            fieldTypeSimpleName = JavaTypes.simpleName(firstParam.get());
+            fieldTypeSimpleName = JavaTypes.simpleName(firstParam.orElseThrow());
           }
           break;
         default:

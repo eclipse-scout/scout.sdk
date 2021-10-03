@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,6 +61,7 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link JdtUtils}</h3>
@@ -314,7 +315,7 @@ public final class JdtUtils {
     try {
       annotSource = annotation.getSource();
       if (annotSource != null) {
-        annotSource = annotSource.trim();
+        annotSource = Strings.trim(annotSource).toString();
       }
     }
     catch (JavaModelException e) {

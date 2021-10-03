@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.jaxws;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.scout.sdk.core.util.Strings.trim;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -221,13 +222,13 @@ public final class JaxWsUtils {
     return idPrefix + curNum;
   }
 
-  static boolean isExecutionIdUsed(String id, NodeList executionList) {
+  static boolean isExecutionIdUsed(CharSequence id, NodeList executionList) {
     return IntStream.range(0, executionList.getLength())
         .mapToObj(executionList::item)
         .filter(node -> node.getNodeType() == Node.ELEMENT_NODE)
         .map(node -> Xml.firstChildElement(node, IMavenConstants.ID))
         .flatMap(Optional::stream)
-        .anyMatch(idElement -> id.equals(idElement.getTextContent().trim()));
+        .anyMatch(idElement -> Strings.equals(id, trim(idElement.getTextContent())));
   }
 
   static Element getExecutionsElement(Node root, IScoutVariousApi api) {
@@ -246,8 +247,8 @@ public final class JaxWsUtils {
         var pluginCandidate = (Element) plugin;
         var group = Xml.firstChildElement(pluginCandidate, IMavenConstants.GROUP_ID);
         var artifact = Xml.firstChildElement(pluginCandidate, IMavenConstants.ARTIFACT_ID);
-        if (group.isPresent() && jaxWsMavenPluginGroupId.equals(group.get().getTextContent())
-            && artifact.isPresent() && JAXWS_MAVEN_PLUGIN_ARTIFACT_ID.equals(artifact.get().getTextContent())) {
+        if (group.isPresent() && jaxWsMavenPluginGroupId.equals(group.orElseThrow().getTextContent())
+            && artifact.isPresent() && JAXWS_MAVEN_PLUGIN_ARTIFACT_ID.equals(artifact.orElseThrow().getTextContent())) {
           return pluginCandidate;
         }
       }

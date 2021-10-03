@@ -41,16 +41,16 @@ public class AnnotationElementTest {
     var childClassType = env.requireType(ChildClass.class.getName());
 
     // ChildClass Annotation
-    assertEquals(3, childClassType.annotations().first().get().elements().size());
+    assertEquals(3, childClassType.annotations().first().orElseThrow().elements().size());
 
-    var inner = childClassType.annotations().first().get().element("inner").get();
+    var inner = childClassType.annotations().first().orElseThrow().element("inner").orElseThrow();
     assertArrayEquals(new Object[]{}, inner.value().as(Object[].class));
     assertEquals(MetaValueType.Array, inner.value().type());
 
-    var testAnnotValues = childClassType.annotations().first().get().element("values").get();
+    var testAnnotValues = childClassType.annotations().first().orElseThrow().element("values").orElseThrow();
     assertEquals("values", testAnnotValues.elementName());
     assertEquals(MetaValueType.Array, testAnnotValues.value().type());
-    assertEquals(childClassType.annotations().first().get(), testAnnotValues.declaringAnnotation());
+    assertEquals(childClassType.annotations().first().orElseThrow(), testAnnotValues.declaringAnnotation());
 
     var arrValue = (IArrayMetaValue) testAnnotValues.value();
     var arr = arrValue.metaValueArray();
@@ -64,21 +64,21 @@ public class AnnotationElementTest {
     assertEquals(Runnable.class.getName(), arr[1].as(IType.class).name());
 
     // methodInChildClass annotation values
-    var methodInChildClassValueMap = childClassType.methods().item(1).get().annotations().first().get().elements();
+    var methodInChildClassValueMap = childClassType.methods().item(1).orElseThrow().annotations().first().orElseThrow().elements();
     assertArrayEquals(new String[]{"values", "en", "inner"}, methodInChildClassValueMap.keySet().toArray());
     var methodInChildClassValue1 = methodInChildClassValueMap.get("values");
     assertEquals("values = Long.class", methodInChildClassValue1.toWorkingCopy().toSource(identity(), new BuilderContext()).toString());
 
     assertEquals("values", methodInChildClassValue1.elementName());
     assertEquals(MetaValueType.Type, methodInChildClassValue1.value().type());
-    assertEquals(childClassType.methods().item(1).get().annotations().first().get(), methodInChildClassValue1.declaringAnnotation());
+    assertEquals(childClassType.methods().item(1).orElseThrow().annotations().first().orElseThrow(), methodInChildClassValue1.declaringAnnotation());
     assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), methodInChildClassValue1.value().as(IType.class).name());
-    assertEquals("Long.class", methodInChildClassValue1.sourceOfExpression().get().asCharSequence().toString());
+    assertEquals("Long.class", methodInChildClassValue1.sourceOfExpression().orElseThrow().asCharSequence().toString());
 
     var methodInChildClassValue2 = methodInChildClassValueMap.get("en");
     assertEquals("en", methodInChildClassValue2.elementName());
     assertEquals(MetaValueType.Enum, methodInChildClassValue2.value().type());
-    assertEquals(childClassType.methods().item(1).get().annotations().first().get(), methodInChildClassValue2.declaringAnnotation());
+    assertEquals(childClassType.methods().item(1).orElseThrow().annotations().first().orElseThrow(), methodInChildClassValue2.declaringAnnotation());
     assertEquals("A", methodInChildClassValue2.value().as(IField.class).elementName());
 
     var methodInChildClassValue3 = methodInChildClassValueMap.get("inner");
@@ -86,20 +86,20 @@ public class AnnotationElementTest {
     assertEquals("", methodInChildClassValue3.toWorkingCopy().toSource(identity(), new BuilderContext()).toString());
 
     // firstCase annotation value
-    var suppressWarningValue = childClassType.methods().item(2).get().annotations().first().get().element("value").get();
+    var suppressWarningValue = childClassType.methods().item(2).orElseThrow().annotations().first().orElseThrow().element("value").orElseThrow();
     assertEquals("value", suppressWarningValue.elementName());
     assertEquals(MetaValueType.String, suppressWarningValue.value().type());
-    assertEquals(childClassType.methods().item(2).get().annotations().first().get(), suppressWarningValue.declaringAnnotation());
+    assertEquals(childClassType.methods().item(2).orElseThrow().annotations().first().orElseThrow(), suppressWarningValue.declaringAnnotation());
     assertEquals("unused", suppressWarningValue.value().as(String.class));
   }
 
   @Test
   public void testToString(IJavaEnvironment env) {
-    List<IAnnotationElement> values = new ArrayList<>(env.requireType(ChildClass.class.getName()).methods().item(1).get().annotations().first().get().elements().values());
+    List<IAnnotationElement> values = new ArrayList<>(env.requireType(ChildClass.class.getName()).methods().item(1).orElseThrow().annotations().first().orElseThrow().elements().values());
     var methodInChildClassValue1 = values.get(0);
     assertFalse(Strings.isBlank(methodInChildClassValue1.toString()));
 
-    var testAnnotValues = env.requireType(ChildClass.class.getName()).requireSuperClass().annotations().first().get().element("values").get();
+    var testAnnotValues = env.requireType(ChildClass.class.getName()).requireSuperClass().annotations().first().orElseThrow().element("values").orElseThrow();
     assertFalse(Strings.isBlank(testAnnotValues.toString()));
   }
 
@@ -117,7 +117,7 @@ public class AnnotationElementTest {
 
     var myClass = registerCompilationUnit(env, "@" + annotationName + "() public class MyClass {}", "test", "MyClass");
 
-    var elements = myClass.annotations().withName(annotationName).first().get().elements();
+    var elements = myClass.annotations().withName(annotationName).first().orElseThrow().elements();
     assertEquals(5, elements.size());
 
     var element = elements.get(elementName);
@@ -134,10 +134,10 @@ public class AnnotationElementTest {
     var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
 
     // BaseClass annotation
-    var testAnnotValues = baseClassType.annotations().first().get().element("values").get();
+    var testAnnotValues = baseClassType.annotations().first().orElseThrow().element("values").orElseThrow();
     assertEquals("values", testAnnotValues.elementName());
     assertEquals(MetaValueType.Array, testAnnotValues.value().type());
-    assertEquals(baseClassType.annotations().first().get(), testAnnotValues.declaringAnnotation());
+    assertEquals(baseClassType.annotations().first().orElseThrow(), testAnnotValues.declaringAnnotation());
 
     var arr = ((IArrayMetaValue) testAnnotValues.value()).metaValueArray();
     assertEquals(2, arr.length);
@@ -149,11 +149,11 @@ public class AnnotationElementTest {
     assertEquals(Runnable.class.getName(), arr[1].as(IType.class).name());
 
     // methodInBaseClass annotation
-    IAnnotatable methodInBaseClass = baseClassType.methods().first().get();
-    testAnnotValues = methodInBaseClass.annotations().first().get().element("values").get();
+    IAnnotatable methodInBaseClass = baseClassType.methods().first().orElseThrow();
+    testAnnotValues = methodInBaseClass.annotations().first().orElseThrow().element("values").orElseThrow();
     assertEquals("values", testAnnotValues.elementName());
     assertEquals(MetaValueType.Array, testAnnotValues.value().type());
-    assertEquals(methodInBaseClass.annotations().first().get(), testAnnotValues.declaringAnnotation());
+    assertEquals(methodInBaseClass.annotations().first().orElseThrow(), testAnnotValues.declaringAnnotation());
 
     arr = ((IArrayMetaValue) testAnnotValues.value()).metaValueArray();
     assertEquals(2, arr.length);

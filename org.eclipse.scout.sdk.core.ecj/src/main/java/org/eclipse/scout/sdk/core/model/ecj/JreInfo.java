@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Strings.indexOf;
 import static org.eclipse.scout.sdk.core.util.Strings.startsWith;
+import static org.eclipse.scout.sdk.core.util.Strings.trim;
 import static org.eclipse.scout.sdk.core.util.Strings.withoutQuotes;
 
 import java.io.File;
@@ -152,7 +153,7 @@ public class JreInfo {
         continue;
       }
       if (startsWith(line, prefix, false)) {
-        var value = withoutQuotes(line.substring(prefix.length()).trim());
+        var value = withoutQuotes(trim(line.substring(prefix.length())));
         if (value.length() > 0) {
           return parseVersion(value);
         }

@@ -71,7 +71,7 @@ public class JavaEnvironmentTest {
   public void testReloadWithParameterizedTypeReferences(IJavaEnvironment env) {
     var javaUtilSet = env.requireType(Set.class.getName());
     var childClass = env.requireType(ChildClass.class.getName());
-    var javaUtilSetWithArgs = childClass.methods().withName("firstCase").first().get().requireReturnType().leafComponentType().get();
+    var javaUtilSetWithArgs = childClass.methods().withName("firstCase").first().orElseThrow().requireReturnType().leafComponentType().orElseThrow();
     assertNotSame(javaUtilSet, javaUtilSetWithArgs);
     assertNotSame(javaUtilSet.unwrap(), javaUtilSetWithArgs.unwrap());
     assertEquals(Set.class.getName(), javaUtilSet.name());

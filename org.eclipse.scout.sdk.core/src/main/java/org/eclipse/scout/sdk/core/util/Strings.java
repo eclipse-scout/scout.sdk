@@ -1343,15 +1343,19 @@ public final class Strings {
 
   /**
    * Checks if a {@link CharSequence} contains only invisible characters.
-   * <p>
    *
    * <pre>
    * isBlank(null)      = true
    * isBlank("")        = true
    * isBlank(" ")       = true
+   * isBlank("  \0  ")  = true
    * isBlank("bob")     = false
    * isBlank("  bob  ") = false
    * </pre>
+   * 
+   * Unlike {@link String#isBlank()} and {@link Character#isWhitespace(char)} this method also returns {@code true} for
+   * control characters ({@code '\0'} - {@code '\8'}). For these characters it behaves more like {@link String#trim()}
+   * which also removes such control characters.
    *
    * @param cs
    *          the CharSequence to check, may be null
@@ -1365,11 +1369,56 @@ public final class Strings {
     }
     //noinspection Convert2streamapi
     for (var i = 0; i < strLen; i++) {
-      if (!Character.isWhitespace(cs.charAt(i))) {
+      if (!isInvisible(cs.charAt(i))) {
         return false;
       }
     }
     return true;
+  }
+
+  private static boolean isInvisible(char c) {
+    //noinspection CharacterComparison
+    return c <= ' ' || Character.isWhitespace(c);
+  }
+
+  /**
+   * Removes leading and trailing invisible characters from the {@link CharSequence} given.
+   * <p>
+   * Please note: While {@link String#trim()} does not correctly handle unicode whitespace characters and
+   * {@link String#strip()} does not remove invisible control characters ({@code '\0'} - {@code '\8'}), this method
+   * removes both types of invisible characters.
+   * 
+   * @param cs
+   *          The input {@link CharSequence}. May be {@code null}.
+   * @return The trimmed {@link CharSequence} as {@link StringBuilder} or {@code null} if the input is {@code null}.
+   */
+  public static CharSequence trim(CharSequence cs) {
+    if (cs == null) {
+      return null;
+    }
+    int len;
+    if ((len = cs.length()) == 0) {
+      return cs;
+    }
+
+    var start = 0;
+    while (start < len && isInvisible(cs.charAt(start))) {
+      start++;
+    }
+    if (start >= len) {
+      return new StringBuilder(0);
+    }
+
+    var end = len;
+    do {
+      end--;
+    }
+    while (start < end && isInvisible(cs.charAt(end)));
+    end++;
+
+    var result = new StringBuilder(end - start);
+    result.append(cs, start, end);
+    return result;
   }
 
   /**

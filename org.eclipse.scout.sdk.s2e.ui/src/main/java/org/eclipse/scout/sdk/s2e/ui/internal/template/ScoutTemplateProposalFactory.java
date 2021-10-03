@@ -248,7 +248,7 @@ public final class ScoutTemplateProposalFactory {
       return emptyList();
     }
 
-    var scoutModelHierarchy = optScoutApi.get().hierarchy();
+    var scoutModelHierarchy = optScoutApi.orElseThrow().hierarchy();
     Collection<String> possibleChildrenIfcFqn = scoutModelHierarchy.possibleChildrenFor(superTypesOfDeclaringType);
     if (possibleChildrenIfcFqn.isEmpty()) {
       return emptyList();

@@ -112,7 +112,7 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
     try {
       var t = findType(fqn);
       if (t.isPresent()) {
-        return new UnresolvedTypeImplementor(new UnresolvedTypeSpi(unwrap(), t.get()));
+        return new UnresolvedTypeImplementor(new UnresolvedTypeSpi(unwrap(), t.orElseThrow()));
       }
     }
     catch (MissingTypeException ex) {

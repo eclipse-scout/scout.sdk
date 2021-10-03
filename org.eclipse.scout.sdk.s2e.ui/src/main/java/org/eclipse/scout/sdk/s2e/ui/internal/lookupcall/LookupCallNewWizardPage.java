@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -291,19 +291,19 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
     }
 
     var scoutSuperType = m_provider.toScoutType(serviceImplSuperType);
-    var iLookupService = scoutApi().get().ILookupService();
+    var iLookupService = scoutApi().orElseThrow().ILookupService();
     var superClassKeyValue = scoutSuperType.resolveTypeParamValue(iLookupService.keyTypeTypeParamIndex(), iLookupService.fqn());
     if (superClassKeyValue.isEmpty()) {
       return Status.OK_STATUS;
     }
 
-    var bound = superClassKeyValue.get().findFirst();
-    if (bound.isEmpty() || Object.class.getName().equals(bound.get().name())) {
+    var bound = superClassKeyValue.orElseThrow().findFirst();
+    if (bound.isEmpty() || Object.class.getName().equals(bound.orElseThrow().name())) {
       return Status.OK_STATUS;
     }
 
     var keyType = m_provider.toScoutType(getKeyType());
-    if (bound.get().isAssignableFrom(keyType)) {
+    if (bound.orElseThrow().isAssignableFrom(keyType)) {
       return Status.OK_STATUS;
     }
     return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "The selected service super class cannot be used with the selected key class.");

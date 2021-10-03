@@ -40,7 +40,7 @@ public class ApiVersionTest {
   }
 
   private static void assertParseResult(String input, String expected) {
-    Assertions.assertEquals(expected == null ? input : expected, ApiVersion.parse(input).get().asString());
+    Assertions.assertEquals(expected == null ? input : expected, ApiVersion.parse(input).orElseThrow().asString());
   }
 
   @Test

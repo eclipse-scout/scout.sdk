@@ -205,7 +205,7 @@ public class TranslationImporter implements ITranslationImportInfo {
       else {
         var language = Language.parse(cell);
         if (language.isPresent()) {
-          columnMapping.put(i, language.get());
+          columnMapping.put(i, language.orElseThrow());
         }
         else {
           unmappedColumns.put(i, cell);

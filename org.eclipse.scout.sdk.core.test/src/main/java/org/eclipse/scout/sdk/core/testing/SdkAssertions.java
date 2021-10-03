@@ -108,7 +108,7 @@ public final class SdkAssertions {
     }
 
     var errors = String.join("\n", compileErrors);
-    var msg = "Compilation Failure: \n" + errors + "\nSource:\n" + t.requireCompilationUnit().source().get();
+    var msg = "Compilation Failure: \n" + errors + "\nSource:\n" + t.requireCompilationUnit().source().orElseThrow();
     throw new AssertionError(msg);
   }
 
@@ -317,7 +317,7 @@ public final class SdkAssertions {
   static <A extends IApiSpecification> void assertApiClassValid(String fqn, Map<ChildElementType, Map<String, String>> children, IJavaEnvironment env, A api, BiPredicate<IType, A> validateOthers) {
     var typeOpt = env.findType(fqn);
     assertTrue(typeOpt.isPresent(), "Type '" + fqn + "' could not be found.");
-    var type = typeOpt.get();
+    var type = typeOpt.orElseThrow();
     testMethods(children.get(ChildElementType.METHOD_NAME).values(), type);
     testMethods(children.get(ChildElementType.ANNOTATION_ELEMENT_NAME).values(), type);
     var notMatchingConvention = children.get(ChildElementType.OTHER);

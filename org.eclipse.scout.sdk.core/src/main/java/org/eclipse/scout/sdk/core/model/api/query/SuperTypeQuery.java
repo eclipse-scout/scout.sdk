@@ -196,7 +196,7 @@ public class SuperTypeQuery extends AbstractQuery<IType> implements Predicate<IT
     var name = getName();
     if (name != null) {
       var fqn = name.apply(t.javaEnvironment()).map(IClassNameSupplier::fqn);
-      var fqnMatches = fqn.isPresent() && fqn.get().equals(t.name());
+      var fqnMatches = fqn.isPresent() && fqn.orElseThrow().equals(t.name());
       if (!fqnMatches) {
         return false;
       }

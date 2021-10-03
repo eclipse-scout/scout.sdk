@@ -20,6 +20,7 @@ import com.intellij.psi.PsiManager
 import org.eclipse.scout.sdk.core.s.ISdkConstants
 import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.util.Strings.escapeHtml
+import org.eclipse.scout.sdk.core.util.Strings.trim
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationDependencyScope
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader.createManager
@@ -62,7 +63,7 @@ abstract class AbstractNlsDocumentationProvider : AbstractDocumentationProvider(
                 .append(DocumentationMarkup.SECTIONS_START)
         translation.texts().entries.forEach {
             doc.append(DocumentationMarkup.SECTION_HEADER_START).append(escapeHtml(it.key.displayName() + ":")).append("</p>")
-                    .append(DocumentationMarkup.SECTION_SEPARATOR).append(escapeHtml(it.value.trim())).append(DocumentationMarkup.SECTION_END).append("</tr>")
+                    .append(DocumentationMarkup.SECTION_SEPARATOR).append(escapeHtml(trim(it.value))).append(DocumentationMarkup.SECTION_END).append("</tr>")
         }
         doc.append(DocumentationMarkup.SECTIONS_END)
         return doc.toString()

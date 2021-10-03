@@ -29,6 +29,7 @@ import static org.eclipse.scout.sdk.core.s.nls.manager.TranslationManagerEvent.c
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -132,8 +133,70 @@ public class TranslationManager {
    *          The base text. From this the new key is derived.
    * @return A new valid key or an empty {@link String} if the input text is empty or {@code null}.
    */
-  public String generateNewKey(String baseText) {
-    return generateKey(baseText, true);
+  @SuppressWarnings("pmd:NPathComplexity")
+  public String generateNewKey(CharSequence baseText) {
+    if (Strings.isBlank(baseText)) {
+      return "";
+    }
+
+    // remove not allowed characters
+    var cleaned = Pattern.compile("[^" + ITranslation.KEY_ALLOWED_CHARACTER_SET + " ]*").matcher(baseText).replaceAll("");
+    if (Strings.isBlank(cleaned)) {
+      return "";
+    }
+
+    // camel case multiple words
+    var segments = Pattern.compile(" ")
+        .splitAsStream(cleaned)
+        .filter(Strings::hasText)
+        .toArray(String[]::new);
+
+    // remove not allowed characters from the first segment
+    var firstSegment = new StringBuilder(segments[0]);
+    //noinspection CharacterComparison
+    while (firstSegment.length() > 0 && !((firstSegment.charAt(0) >= 'a' && firstSegment.charAt(0) <= 'z') || (firstSegment.charAt(0) >= 'A' && firstSegment.charAt(0) <= 'Z'))) {
+      firstSegment.deleteCharAt(0);
+    }
+    segments[0] = firstSegment.toString();
+
+    // remove not allowed characters from the last segment
+    if (segments.length > 1) {
+      var lastSegment = new StringBuilder(segments[segments.length - 1]);
+      while (lastSegment.length() > 0 && (lastSegment.charAt(lastSegment.length() - 1) == '.' || lastSegment.charAt(lastSegment.length() - 1) == '-')) {
+        lastSegment.deleteCharAt(lastSegment.length() - 1);
+      }
+      segments[segments.length - 1] = lastSegment.toString();
+    }
+
+    String keyCandidate;
+    if (segments.length < 2) {
+      keyCandidate = segments[0]; // do not capitalize if only one segment
+    }
+    else {
+      keyCandidate = Arrays.stream(segments)
+          .map(Strings::capitalize)
+          .collect(joining());
+    }
+
+    var maxLength = 190;
+    // ensure max length
+    if (keyCandidate.length() > maxLength) {
+      keyCandidate = keyCandidate.substring(0, maxLength);
+    }
+
+    // add unique ending number
+    var result = keyCandidate;
+    var i = 0;
+    while (containsKeyIgnoreCase(result)) {
+      result = keyCandidate + i;
+      i++;
+    }
+    return result;
+  }
+
+  private boolean containsKeyIgnoreCase(String key) {
+    return m_translations.keySet().stream()
+        .anyMatch(existing -> existing.equalsIgnoreCase(key));
   }
 
   /**
@@ -404,7 +467,7 @@ public class TranslationManager {
         .or(entryToUpdate::primaryEditableStore)
         .or(this::primaryEditableStore)
         .map(TranslationManager::toEditableStore)
-        .get();
+        .orElseThrow();
     var changedLanguagesByStore = changedLanguages(newTranslation, entryToUpdate)
         .collect(groupingBy(changedLang -> entryToUpdate.entry(changedLang)
             .map(ITranslationEntry::store)
@@ -553,64 +616,6 @@ public class TranslationManager {
     return allStores()
         .flatMap(ITranslationStore::languages)
         .distinct();
-  }
-
-  @SuppressWarnings("pmd:NPathComplexity")
-  protected String generateKey(String baseText, boolean appendFreeNumSuffix) {
-    if (Strings.isEmpty(baseText)) {
-      return "";
-    }
-
-    var ret = new StringBuilder(baseText.length());
-
-    // remove not allowed characters
-    baseText = Pattern.compile("[^a-zA-Z0-9_.\\- ]*").matcher(baseText).replaceAll("").trim();
-
-    // camel case multiple words
-    var split = baseText.split(" ");
-    for (var splitValue : split) {
-      if (!splitValue.isEmpty()) {
-        var first = splitValue.charAt(0);
-        if (split.length > 1) {
-          first = Character.toUpperCase(first);
-        }
-        ret.append(first);
-        if (splitValue.length() > 1) {
-          ret.append(splitValue.substring(1));
-        }
-      }
-    }
-
-    // remove not allowed characters from the start
-    while (ret.length() > 0 && (ret.charAt(0) == '.' || ret.charAt(0) == '_' || ret.charAt(0) == '-')) {
-      ret.deleteCharAt(0);
-    }
-
-    // remove not allowed characters from the end
-    while (ret.length() > 0 && (ret.charAt(ret.length() - 1) == '.' || ret.charAt(ret.length() - 1) == '-')) {
-      ret.deleteCharAt(ret.length() - 1);
-    }
-
-    // ensure max length
-    var maxLength = 190;
-    String newKey;
-    if (ret.length() > maxLength) {
-      newKey = ret.substring(0, maxLength);
-    }
-    else {
-      newKey = ret.toString();
-    }
-
-    // add unique ending number if requested
-    var result = newKey;
-    if (appendFreeNumSuffix) {
-      var i = 0;
-      while (containsKey(result)) {
-        result = newKey + i;
-        i++;
-      }
-    }
-    return result;
   }
 
   /**

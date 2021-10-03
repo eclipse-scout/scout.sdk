@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,16 +41,16 @@ public class GenericMethodTest {
     assertEquals(0, t.typeArguments().count());
 
     assertEquals(2, t.typeParameters().count());
-    var p0 = t.typeParameters().findAny().get();
-    var p1 = t.typeParameters().skip(1).findAny().get();
+    var p0 = t.typeParameters().findAny().orElseThrow();
+    var p1 = t.typeParameters().skip(1).findAny().orElseThrow();
     assertEquals("IN", p0.elementName());
     assertEquals("OUT", p1.elementName());
 
-    var f = t.fields().withName("m_value").first().get();
+    var f = t.fields().withName("m_value").first().orElseThrow();
     assertEquals("OUT", f.dataType().name());
 
-    var m = t.methods().withName("transform").first().get();
-    assertEquals("IN", m.parameters().first().get().dataType().name());
+    var m = t.methods().withName("transform").first().orElseThrow();
+    assertEquals("IN", m.parameters().first().orElseThrow().dataType().name());
     assertEquals("OUT", m.requireReturnType().name());
   }
 
@@ -70,22 +70,22 @@ public class GenericMethodTest {
     var t = env.requireType(ClassWithTypeParameters.class.getName()).requireSuperClass();
 
     assertEquals(2, t.typeArguments().count());
-    var arg0 = t.typeArguments().findAny().get();
-    var arg1 = t.typeArguments().skip(1).findAny().get();
+    var arg0 = t.typeArguments().findAny().orElseThrow();
+    var arg1 = t.typeArguments().skip(1).findAny().orElseThrow();
     assertEquals("java.lang.Integer", arg0.name());
     assertEquals("java.lang.String", arg1.name());
 
     assertEquals(2, t.typeParameters().count());
-    var p0 = t.typeParameters().findAny().get();
-    var p1 = t.typeParameters().skip(1).findAny().get();
+    var p0 = t.typeParameters().findAny().orElseThrow();
+    var p1 = t.typeParameters().skip(1).findAny().orElseThrow();
     assertEquals("IN", p0.elementName());
     assertEquals("OUT", p1.elementName());
 
-    var f = t.fields().withName("m_value").first().get();
+    var f = t.fields().withName("m_value").first().orElseThrow();
     assertEquals("java.lang.String", f.dataType().name());
 
-    var m = t.methods().withName("transform").first().get();
-    assertEquals("java.lang.Integer", m.parameters().first().get().dataType().name());
+    var m = t.methods().withName("transform").first().orElseThrow();
+    assertEquals("java.lang.Integer", m.parameters().first().orElseThrow().dataType().name());
     assertEquals("java.lang.String", m.requireReturnType().name());
   }
 
@@ -94,8 +94,8 @@ public class GenericMethodTest {
     var t = env.requireType(ClassWithTypeParametersAsTypeVariables.class.getName());
 
     assertEquals(2, t.typeParameters().count());
-    var p0 = t.typeParameters().findAny().get();
-    var p1 = t.typeParameters().skip(1).findAny().get();
+    var p0 = t.typeParameters().findAny().orElseThrow();
+    var p1 = t.typeParameters().skip(1).findAny().orElseThrow();
     assertEquals("A", p0.elementName());
     assertEquals("B", p1.elementName());
 
@@ -110,22 +110,22 @@ public class GenericMethodTest {
     var t = env.requireType(ClassWithTypeParametersAsTypeVariables.class.getName()).requireSuperClass();
 
     assertEquals(2, t.typeArguments().count());
-    var arg0 = t.typeArguments().findAny().get();
-    var arg1 = t.typeArguments().skip(1).findAny().get();
+    var arg0 = t.typeArguments().findAny().orElseThrow();
+    var arg1 = t.typeArguments().skip(1).findAny().orElseThrow();
     assertEquals("A", arg0.name());
     assertEquals("B", arg1.name());
 
     assertEquals(2, t.typeParameters().count());
-    var p0 = t.typeParameters().findAny().get();
-    var p1 = t.typeParameters().skip(1).findAny().get();
+    var p0 = t.typeParameters().findAny().orElseThrow();
+    var p1 = t.typeParameters().skip(1).findAny().orElseThrow();
     assertEquals("IN", p0.elementName());
     assertEquals("OUT", p1.elementName());
 
-    var f = t.fields().withName("m_value").first().get();
+    var f = t.fields().withName("m_value").first().orElseThrow();
     assertEquals("B", f.dataType().name());
 
-    var m = t.methods().withName("transform").first().get();
-    assertEquals("A", m.parameters().first().get().dataType().name());
+    var m = t.methods().withName("transform").first().orElseThrow();
+    assertEquals("A", m.parameters().first().orElseThrow().dataType().name());
     assertEquals("B", m.requireReturnType().name());
   }
 }

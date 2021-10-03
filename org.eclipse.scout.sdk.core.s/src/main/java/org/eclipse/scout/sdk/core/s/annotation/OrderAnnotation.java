@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,7 +42,7 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
 
     //don't evaluate as stream to prevent auto boxing
     if (first.isPresent()) {
-      return first.get().value();
+      return first.orElseThrow().value();
     }
 
     if (isBean) {
@@ -140,7 +140,7 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
 
     IType prev = null;
     for (var t : i) {
-      if (t.source().get().start() > pos) {
+      if (t.source().orElseThrow().start() > pos) {
         return new IType[]{prev, t};
       }
       prev = t;
