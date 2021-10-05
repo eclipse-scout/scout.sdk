@@ -27,9 +27,15 @@ import java.util.stream.Stream;
 public interface ITranslation extends Comparable<ITranslation> {
 
   /**
+   * Character set allowed for translation keys.
+   */
+  @SuppressWarnings("RegExpRedundantEscape")
+  String KEY_ALLOWED_CHARACTER_SET = "a-zA-Z0-9_.\\-";
+
+  /**
    * Regular expression matching translation keys (see {@link #key()}).
    */
-  Pattern KEY_REGEX = Pattern.compile("[A-Za-z][a-zA-Z0-9_.\\-]{0,200}");
+  Pattern KEY_REGEX = Pattern.compile("[A-Za-z][" + KEY_ALLOWED_CHARACTER_SET + "]{0,200}");
 
   /**
    * The default comparator for {@link ITranslation}s comparing by key, then by text for the default language and

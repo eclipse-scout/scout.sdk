@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,11 +29,11 @@ import org.junit.jupiter.api.Test;
 public class LanguageTest {
   @Test
   public void testParse() {
-    assertSame(Language.LANGUAGE_DEFAULT, Language.parse("default").get());
-    assertEquals(new Language(new Locale("test")), Language.parse("test").get());
-    assertEquals(new Language(new Locale("de", "FR", "xx")), Language.parse("de_FR_xx").get());
-    assertEquals(new Language(new Locale("de", "FR")), Language.parse("de_FR").get());
-    assertEquals(new Language(new Locale("de")), Language.parse("de").get());
+    assertSame(Language.LANGUAGE_DEFAULT, Language.parse("default").orElseThrow());
+    assertEquals(new Language(new Locale("test")), Language.parse("test").orElseThrow());
+    assertEquals(new Language(new Locale("de", "FR", "xx")), Language.parse("de_FR_xx").orElseThrow());
+    assertEquals(new Language(new Locale("de", "FR")), Language.parse("de_FR").orElseThrow());
+    assertEquals(new Language(new Locale("de")), Language.parse("de").orElseThrow());
     assertFalse(Language.parse("").isPresent());
   }
 

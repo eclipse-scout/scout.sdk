@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -118,7 +118,7 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
           .appendFlags(flags())
           .refFrom(dataType)
           .space()
-          .append(ensureValidJavaName(elementName().get()));
+          .append(ensureValidJavaName(elementName().orElseThrow()));
       value().ifPresent(v -> {
         builder.equalSign();
         buildFieldValue(ExpressionBuilder.create(builder), v);
@@ -127,7 +127,7 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
     }
     else if (value().isPresent()) {
       // static constructors
-      buildFieldValue(ExpressionBuilder.create(builder), value().get());
+      buildFieldValue(ExpressionBuilder.create(builder), value().orElseThrow());
     }
   }
 

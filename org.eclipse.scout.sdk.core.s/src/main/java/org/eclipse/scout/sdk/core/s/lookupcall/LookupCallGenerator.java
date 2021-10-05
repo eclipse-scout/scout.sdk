@@ -35,9 +35,9 @@ public class LookupCallGenerator<TYPE extends LookupCallGenerator<TYPE>> extends
   @Override
   protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
     if (superType().isPresent() && keyType().isPresent()) {
-      var superTypeBuilder = new StringBuilder(superType().get());
+      var superTypeBuilder = new StringBuilder(superType().orElseThrow());
       superTypeBuilder.append(JavaTypes.C_GENERIC_START);
-      superTypeBuilder.append(keyType().get());
+      superTypeBuilder.append(keyType().orElseThrow());
       superTypeBuilder.append(JavaTypes.C_GENERIC_END);
 
       mainType
@@ -50,7 +50,7 @@ public class LookupCallGenerator<TYPE extends LookupCallGenerator<TYPE>> extends
         .withField(FieldGenerator.createSerialVersionUid());
 
     if (lookupServiceInterface().isPresent() && keyType().isPresent()) {
-      mainType.withMethod(ScoutMethodGenerator.createGetConfiguredService(lookupServiceInterface().get(), keyType().get()));
+      mainType.withMethod(ScoutMethodGenerator.createGetConfiguredService(lookupServiceInterface().orElseThrow(), keyType().orElseThrow()));
     }
   }
 

@@ -71,10 +71,10 @@ public class WellformTest {
       var name = c.getName();
       var type = env.requireType(name);
 
-      var cuSource = type.requireCompilationUnit().source().get().asCharSequence();
+      var cuSource = type.requireCompilationUnit().source().orElseThrow().asCharSequence();
 
       wf.buildSource(type, out);
-      var newCuSource = cuSource.toString().substring(0, type.source().get().start()) + out;
+      var newCuSource = cuSource.toString().substring(0, type.source().orElseThrow().start()) + out;
       assertNoCompileErrors(env, newCuSource, type.qualifier(), type.elementName());
     }
   }

@@ -46,8 +46,8 @@ public class CodeTypeNewOperationTest {
   public void testCodeTypeLongInteger(TestingEnvironment env) {
     var codeType = testCodeTypeCreation(JavaTypes.Long, JavaTypes.Integer, env);
     var id = assertFieldExist(codeType, CodeTypeGenerator.ID_CONSTANT_NAME);
-    assertEquals(MetaValueType.Long, id.constantValue().get().type());
-    assertEquals(UniqueIdExtension.UNIQUE_ID, id.constantValue().get().as(Long.class).longValue());
+    assertEquals(MetaValueType.Long, id.constantValue().orElseThrow().type());
+    assertEquals(UniqueIdExtension.UNIQUE_ID, id.constantValue().orElseThrow().as(Long.class).longValue());
   }
 
   @Test

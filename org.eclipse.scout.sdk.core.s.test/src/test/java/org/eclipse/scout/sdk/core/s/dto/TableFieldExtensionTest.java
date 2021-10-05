@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -159,7 +159,7 @@ public class TableFieldExtensionTest {
   }
 
   private static void assertValueOfRowDataExtendsAnnotation(String expectedFqn, IAnnotation rowDataExtendsAnnot) {
-    var value = rowDataExtendsAnnot.element("value").get().value();
+    var value = rowDataExtendsAnnot.element("value").orElseThrow().value();
     assertEquals(MetaValueType.Type, value.type());
     var extendsType = value.as(IType.class);
     assertEquals(expectedFqn, extendsType.name());

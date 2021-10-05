@@ -124,7 +124,7 @@ public final class CoreScoutTestingUtils {
   public static String currentScoutVersion() {
     var prop = System.getProperty(SCOUT_VERSION_KEY);
     if (Strings.hasText(prop)) {
-      return prop.trim();
+      return Strings.trim(prop).toString();
     }
     return new JavaEnvironmentWithEcjBuilder<>()
         .withoutScoutSdk()

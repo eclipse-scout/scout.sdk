@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,8 +65,8 @@ public class CompilationUnitGeneratorTest {
         .withType(TypeGenerator.create()
             .asPublic()
             .withElementName("TestClass"))
-        .withoutType(t -> "SecondClassInFile".equals(t.elementName().get()))
-        .withoutType(t -> "NotExisting".equals(t.elementName().get()));
+        .withoutType(t -> "SecondClassInFile".equals(t.elementName().orElseThrow()))
+        .withoutType(t -> "NotExisting".equals(t.elementName().orElseThrow()));
     assertEqualsRefFile(env, REF_FILE_FOLDER + "CompilationUnitGeneratorTest1.txt", generator);
     assertNoCompileErrors(env, generator);
   }

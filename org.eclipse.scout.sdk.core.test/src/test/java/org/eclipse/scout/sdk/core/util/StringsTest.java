@@ -26,6 +26,7 @@ import static org.eclipse.scout.sdk.core.util.Strings.fromThrowable;
 import static org.eclipse.scout.sdk.core.util.Strings.hasText;
 import static org.eclipse.scout.sdk.core.util.Strings.indexOf;
 import static org.eclipse.scout.sdk.core.util.Strings.isBlank;
+import static org.eclipse.scout.sdk.core.util.Strings.isEmpty;
 import static org.eclipse.scout.sdk.core.util.Strings.lastIndexOf;
 import static org.eclipse.scout.sdk.core.util.Strings.levenshteinDistance;
 import static org.eclipse.scout.sdk.core.util.Strings.nextLineEnd;
@@ -36,6 +37,7 @@ import static org.eclipse.scout.sdk.core.util.Strings.replace;
 import static org.eclipse.scout.sdk.core.util.Strings.replaceEach;
 import static org.eclipse.scout.sdk.core.util.Strings.toCharArray;
 import static org.eclipse.scout.sdk.core.util.Strings.toStringLiteral;
+import static org.eclipse.scout.sdk.core.util.Strings.trim;
 import static org.eclipse.scout.sdk.core.util.Strings.withoutQuotes;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -66,6 +68,15 @@ import org.junit.jupiter.api.Test;
  * @since 6.1.0
  */
 public class StringsTest {
+
+  @Test
+  public void testIsEmpty() {
+    assertTrue(isEmpty(null));
+    assertTrue(isEmpty(""));
+    assertFalse(isEmpty(" "));
+    assertFalse(isEmpty("bob"));
+    assertFalse(isEmpty("  bob  "));
+  }
 
   @Test
   public void testInputStreamToString() throws IOException {
@@ -194,6 +205,17 @@ public class StringsTest {
   }
 
   @Test
+  public void testTrim() {
+    assertNull(trim(null));
+    assertEquals("", trim("").toString());
+    assertEquals("", trim("    ").toString());
+    assertEquals("abc", trim("  abc  ").toString());
+    assertEquals("y\rx", trim("  \ty\rx\n  ").toString());
+    assertEquals("👌👌", trim("  👌👌\u3000  ").toString());
+    assertEquals("ab\2c", trim("\0\1ab\2c \0\1").toString());
+  }
+
+  @Test
   public void testIsBlankHasText() {
     assertTrue(isBlank(null));
     assertTrue(isBlank(""));
@@ -201,6 +223,7 @@ public class StringsTest {
     assertFalse(isBlank("bob"));
     assertFalse(isBlank("  bob  "));
     assertTrue(isBlank("  \t\r\n  "));
+    assertFalse(isBlank("👌👌"));
 
     assertFalse(hasText(null));
     assertFalse(hasText(""));
@@ -208,6 +231,12 @@ public class StringsTest {
     assertTrue(hasText("bob"));
     assertTrue(hasText("  bob  "));
     assertFalse(hasText("  \t\r\n  "));
+    assertTrue(hasText("👌👌"));
+
+    for (char c = 0; c <= 8; c++) {
+      assertTrue(isBlank(String.valueOf(c)));
+      assertFalse(hasText(String.valueOf(c)));
+    }
   }
 
   @Test

@@ -107,7 +107,7 @@ public class NlsTable extends Composite {
     else {
       // update translation
       var updatedTranslation = new Translation(cell.translation());
-      var language = cell.language().get();
+      var language = cell.language().orElseThrow();
       updatedTranslation.putText(language, newText);
       m_controller.translationManager().setTranslation(updatedTranslation);
     }

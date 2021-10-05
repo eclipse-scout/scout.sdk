@@ -93,20 +93,20 @@ public class EclipseEnvironmentTest {
   @Test
   public void testWriteCompilationUnitAsync() {
     runInEnvironment((env, fs) -> {
-      var je = env.findJavaEnvironment(null).get();
+      var je = env.findJavaEnvironment(null).orElseThrow();
       var className = "TestClass";
-      var result = env.writeCompilationUnit(PrimaryTypeGenerator.create().withElementName(className), je.primarySourceFolder().get());
+      var result = env.writeCompilationUnit(PrimaryTypeGenerator.create().withElementName(className), je.primarySourceFolder().orElseThrow());
       assertEquals(className, result.elementName());
 
       env.executeGenerator(PrimaryTypeGenerator.create()
           .withElementName(className)
-          .withField(FieldGenerator.createSerialVersionUid()), je.primarySourceFolder().get());
+          .withField(FieldGenerator.createSerialVersionUid()), je.primarySourceFolder().orElseThrow());
 
       result = env.writeCompilationUnitAsync(
           PrimaryTypeGenerator.create()
               .withElementName(className)
               .withField(FieldGenerator.createSerialVersionUid()),
-          je.primarySourceFolder().get(), null)
+          je.primarySourceFolder().orElseThrow(), null)
           .result();
       assertTrue(result.fields().first().isPresent());
     });
@@ -118,7 +118,7 @@ public class EclipseEnvironmentTest {
   @Test
   public void testCreateCompilationUnitWithReload() {
     runInEnvironment((env, fs) -> {
-      var je = env.findJavaEnvironment(null).get();
+      var je = env.findJavaEnvironment(null).orElseThrow();
       var result = env.writeCompilationUnit(
           PrimaryTypeGenerator.create()
               .withElementName("Test")
@@ -126,10 +126,10 @@ public class EclipseEnvironmentTest {
                   .withDataType(Object.class.getName())
                   .withElementName("m_field")
                   .withValue(b -> {
-                    b.context().environment().get().reload();
+                    b.context().environment().orElseThrow().reload();
                     b.nullLiteral();
                   })),
-          je.primarySourceFolder().get());
+          je.primarySourceFolder().orElseThrow());
       assertNotNull(result);
     });
   }

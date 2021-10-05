@@ -62,7 +62,7 @@ public class NlsFile {
     }
     var nlsClass = properties.getProperty(NLS_CLASS_KEY_NAME);
     if (nlsClass != null) {
-      nlsClass = nlsClass.trim();
+      nlsClass = Strings.trim(nlsClass).toString();
     }
     return Strings.notBlank(nlsClass);
   }

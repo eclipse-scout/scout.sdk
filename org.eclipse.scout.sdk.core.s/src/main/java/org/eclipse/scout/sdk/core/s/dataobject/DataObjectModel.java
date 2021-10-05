@@ -65,7 +65,7 @@ public class DataObjectModel {
     if (scoutApi.isEmpty()) {
       return false;
     }
-    var iDataObject = scoutApi.get().IDataObject();
+    var iDataObject = scoutApi.orElseThrow().IDataObject();
     return !isIgnored(candidate) && candidate.isInstanceOf(iDataObject);
   }
 
@@ -129,7 +129,7 @@ public class DataObjectModel {
     var declaringType = method.declaringType().orElse(null);
     var hasJavaDoc = method.javaDoc().isPresent();
     var isInherited = declaringType != source || isImplementedInSuperHierarchy(method);
-    return Optional.of(new DataObjectNode(optKind.get(), method, optDoValue.get(), isInherited, hasJavaDoc));
+    return Optional.of(new DataObjectNode(optKind.orElseThrow(), method, optDoValue.orElseThrow(), isInherited, hasJavaDoc));
   }
 
   protected static boolean isImplementedInSuperHierarchy(IMethod method) {

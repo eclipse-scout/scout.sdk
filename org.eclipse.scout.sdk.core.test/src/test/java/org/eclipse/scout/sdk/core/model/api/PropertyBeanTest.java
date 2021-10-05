@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -80,7 +80,7 @@ public class PropertyBeanTest {
     assertTrue(trueProp.readMethod().isPresent());
     assertTrue(trueProp.writeMethod().isPresent());
 
-    var string2Prop = PropertyBean.of(propTestClass2).findAny().get();
+    var string2Prop = PropertyBean.of(propTestClass2).findAny().orElseThrow();
     assertEquals(PropertyTestClass2.class.getName() + '#' + "String", string2Prop.toString());
 
     assertFalse(aloneProp.equals(stringProp));
@@ -103,14 +103,14 @@ public class PropertyBeanTest {
   @Test
   public void testDataTypeOf(IJavaEnvironment env) {
     var t = env.requireType(PropertyTestClass.class.getName());
-    assertEquals(String.class.getName(), PropertyBean.dataTypeOf(t.methods().withName("getString").first().get()).get().name());
-    assertEquals(String.class.getName(), PropertyBean.dataTypeOf(t.methods().withName("setString").first().get()).get().name());
+    assertEquals(String.class.getName(), PropertyBean.dataTypeOf(t.methods().withName("getString").first().orElseThrow()).orElseThrow().name());
+    assertEquals(String.class.getName(), PropertyBean.dataTypeOf(t.methods().withName("setString").first().orElseThrow()).orElseThrow().name());
 
-    assertEquals(JavaTypes._boolean, PropertyBean.dataTypeOf(t.methods().withName("isTrue").first().get()).get().name());
-    assertEquals(JavaTypes._boolean, PropertyBean.dataTypeOf(t.methods().withName("setTrue").first().get()).get().name());
+    assertEquals(JavaTypes._boolean, PropertyBean.dataTypeOf(t.methods().withName("isTrue").first().orElseThrow()).orElseThrow().name());
+    assertEquals(JavaTypes._boolean, PropertyBean.dataTypeOf(t.methods().withName("setTrue").first().orElseThrow()).orElseThrow().name());
 
-    assertEquals(String.class.getName(), PropertyBean.dataTypeOf(t.methods().withName("setAlone").first().get()).get().name());
-    assertFalse(PropertyBean.dataTypeOf(t.methods().withName("doAnything").first().get()).isPresent());
+    assertEquals(String.class.getName(), PropertyBean.dataTypeOf(t.methods().withName("setAlone").first().orElseThrow()).orElseThrow().name());
+    assertFalse(PropertyBean.dataTypeOf(t.methods().withName("doAnything").first().orElseThrow()).isPresent());
     assertFalse(PropertyBean.dataTypeOf(null).isPresent());
   }
 

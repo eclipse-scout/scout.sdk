@@ -58,9 +58,9 @@ public class PropertiesTranslationStoreTest {
     assertFalse(store.get("key__4").isPresent());
     assertTrue(store.get("key2", Language.LANGUAGE_DEFAULT).isPresent());
     assertFalse(store.get("key2", en).isPresent());
-    assertEquals(3, store.get(Language.LANGUAGE_DEFAULT).get().size());
+    assertEquals(3, store.get(Language.LANGUAGE_DEFAULT).orElseThrow().size());
     assertFalse(store.get(de).isPresent());
-    assertEquals(2, store.get(en).get().size());
+    assertEquals(2, store.get(en).orElseThrow().size());
     assertEquals(3, store.entries().count());
     assertEquals(3, store.languages().count());
     assertNotNull(store.service());
@@ -92,7 +92,7 @@ public class PropertiesTranslationStoreTest {
     store.flush(env, new NullProgress());
 
     store.reload(new NullProgress()); // check if it is written
-    assertEquals("new de", store.get("added", de).get());
+    assertEquals("new de", store.get("added", de).orElseThrow());
     assertEquals(5, store.languages().count());
     assertEquals(3, store.entries().count());
   }

@@ -49,7 +49,7 @@ public class ArrayTypeTest {
 
     var roundingModeArr = env.requireType(RoundingMode.class.getName() + arrayMarker());
     assertEquals(1, roundingModeArr.arrayDimension());
-    assertFalse(roundingModeArr.leafComponentType().get().isArray());
-    assertTrue(isEnum(roundingModeArr.leafComponentType().get().flags()));
+    assertFalse(roundingModeArr.leafComponentType().orElseThrow().isArray());
+    assertTrue(isEnum(roundingModeArr.leafComponentType().orElseThrow().flags()));
   }
 }

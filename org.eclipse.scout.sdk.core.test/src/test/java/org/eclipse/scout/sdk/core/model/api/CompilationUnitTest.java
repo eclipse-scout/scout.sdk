@@ -34,9 +34,9 @@ public class CompilationUnitTest {
   public void testIcu(IJavaEnvironment env) {
     var baseClassIcu = env.requireType(BaseClass.class.getName()).requireCompilationUnit();
     assertEquals(BaseClass.class.getName(), baseClassIcu.requireMainType().name());
-    assertEquals(BaseClass.class.getSimpleName() + JavaTypes.JAVA_FILE_SUFFIX, baseClassIcu.toWorkingCopy().fileName().get());
+    assertEquals(BaseClass.class.getSimpleName() + JavaTypes.JAVA_FILE_SUFFIX, baseClassIcu.toWorkingCopy().fileName().orElseThrow());
 
-    var firstImport = baseClassIcu.imports().findAny().get();
+    var firstImport = baseClassIcu.imports().findAny().orElseThrow();
     assertEquals("import java.io.FileNotFoundException;", firstImport.toWorkingCopy().toSource(identity(), new BuilderContext()).toString());
     assertEquals("package org.eclipse.scout.sdk.core.fixture;", baseClassIcu.containingPackage().toWorkingCopy().toSource(identity(), new BuilderContext()).toString());
 
@@ -47,8 +47,8 @@ public class CompilationUnitTest {
     assertEquals(BaseClass.class.getSimpleName() + JavaTypes.JAVA_FILE_SUFFIX, baseClassIcu.elementName());
     assertEquals(Paths.get(BaseClass.class.getName().replace('.', '/') + JavaTypes.JAVA_FILE_SUFFIX), baseClassIcu.path());
 
-    assertTrue(baseClassIcu.containingClasspathFolder().get().path().endsWith(Paths.get(FixtureHelper.FIXTURE_PATH)));
-    assertTrue(baseClassIcu.absolutePath().get().toString().replace('\\', '/').endsWith("org/eclipse/scout/sdk/core/fixture/BaseClass.java"));
+    assertTrue(baseClassIcu.containingClasspathFolder().orElseThrow().path().endsWith(Paths.get(FixtureHelper.FIXTURE_PATH)));
+    assertTrue(baseClassIcu.absolutePath().orElseThrow().toString().replace('\\', '/').endsWith("org/eclipse/scout/sdk/core/fixture/BaseClass.java"));
   }
 
   @Test
@@ -57,7 +57,7 @@ public class CompilationUnitTest {
     var sdkLong = baseClassIcu.resolveTypeBySimpleName(Long.class.getSimpleName());
 
     assertTrue(sdkLong.isPresent());
-    assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), sdkLong.get().name());
+    assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), sdkLong.orElseThrow().name());
   }
 
   @Test

@@ -85,7 +85,7 @@ public class MetaValueFactoryTest {
   @Test
   public void testCreateFromEnum(IJavaEnvironment env) {
     var type = env.requireType(TestEnum.class.getName());
-    var field = type.fields().first().get();
+    var field = type.fields().first().orElseThrow();
 
     var metaValue = MetaValueFactory.createFromEnum(field.unwrap());
     assertSame(field, metaValue.as(Object.class));
@@ -98,7 +98,7 @@ public class MetaValueFactoryTest {
 
   @Test
   public void testCreateFromAnnotation(IJavaEnvironment env) {
-    var annot = env.requireType(ChildClass.class.getName()).annotations().first().get();
+    var annot = env.requireType(ChildClass.class.getName()).annotations().first().orElseThrow();
     var metaValue = MetaValueFactory.createFromAnnotation(annot.unwrap());
     assertSame(annot, metaValue.as(Object.class));
     assertSame(annot, metaValue.as(IAnnotation.class));

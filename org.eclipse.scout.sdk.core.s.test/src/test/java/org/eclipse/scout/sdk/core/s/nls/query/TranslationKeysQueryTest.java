@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,7 @@ public class TranslationKeysQueryTest {
 
     var expectedStart = prefix.length() + 1; /* leading '"' */
     var expectedEnd = expectedStart + keyToFind1.length();
-    var finding = query.result(keyToFind1).findAny().get();
+    var finding = query.result(keyToFind1).findAny().orElseThrow();
     assertEquals(fileName, finding.file().toString());
     assertEquals(keyToFind1.length(), finding.length());
     assertEquals(expectedStart, finding.start());

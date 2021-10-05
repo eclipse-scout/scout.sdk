@@ -115,8 +115,8 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
     Set<String> usedColumnBeanNames = new HashSet<>();
     var currentRowDataSuperType = Optional.of(rowDataSuperType);
     var abstractTableRowDataFqn = scoutApi().AbstractTableRowData().fqn();
-    while (currentRowDataSuperType.isPresent() && !abstractTableRowDataFqn.equals(currentRowDataSuperType.get().name())) {
-      var curSuperType = currentRowDataSuperType.get();
+    while (currentRowDataSuperType.isPresent() && !abstractTableRowDataFqn.equals(currentRowDataSuperType.orElseThrow().name())) {
+      var curSuperType = currentRowDataSuperType.orElseThrow();
       curSuperType.fields().withFlags(ROW_DATA_FIELD_FLAGS).stream()
           .map(IField::constantValue)
           .flatMap(Optional::stream)
@@ -192,7 +192,7 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
         .withValue(b -> b.stringLiteral(columnBeanName)))
             .withField(memberFieldGenerator)
             .withMethod(MethodGenerator.createGetter(memberFieldGenerator))
-            .withMethod(MethodGenerator.createSetter(memberFieldGenerator.elementName().get(), columnValueType, Flags.AccPublic, "new"));
+            .withMethod(MethodGenerator.createSetter(memberFieldGenerator.elementName().orElseThrow(), columnValueType, Flags.AccPublic, "new"));
   }
 
   @Override
@@ -207,7 +207,7 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
         .map(jeg -> (ITypeGenerator<?>) jeg)
         .flatMap(ITypeGenerator::superClass)
         .flatMap(af -> af.apply(modelType().javaEnvironment()))
-        .get();
+        .orElseThrow();
     if (superTypeOfSurroundingTableBeanGenerator.equals(scoutApi.AbstractTablePageData().fqn())
         || superTypeOfSurroundingTableBeanGenerator.equals(scoutApi.AbstractTableFieldBeanData().fqn())) {
       return defaultSuperClass();

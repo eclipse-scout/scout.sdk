@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -69,7 +69,7 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
     if (projectTier.isEmpty()) {
       return Optional.empty();
     }
-    if (to == projectTier.get()) {
+    if (to == projectTier.orElseThrow()) {
       return Optional.of(project);
     }
     return Optional.empty();
@@ -99,7 +99,7 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
     }
 
     var name = unwrap().convert(to, origin.getElementName());
-    var packageFragment = targetSrcFolder.get().getPackageFragment(name);
+    var packageFragment = targetSrcFolder.orElseThrow().getPackageFragment(name);
     if (JdtUtils.exists(packageFragment)) {
       return Optional.of(packageFragment);
     }
@@ -131,14 +131,14 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
     }
 
     var projectRelResourcePath = origin.getPath().removeFirstSegments(1).toString();
-    var folder = targetProject.get().getProject().getFolder(projectRelResourcePath);
+    var folder = targetProject.orElseThrow().getProject().getFolder(projectRelResourcePath);
     if (folder != null && folder.exists()) {
       var element = JavaCore.create(folder);
       if (JdtUtils.exists(element) && element.getElementType() == IJavaElement.PACKAGE_FRAGMENT_ROOT) {
         return Optional.of((IPackageFragmentRoot) element);
       }
     }
-    return S2eUtils.primarySourceFolder(targetProject.get());
+    return S2eUtils.primarySourceFolder(targetProject.orElseThrow());
   }
 
   public static S2eScoutTier wrap(ScoutTier t) {

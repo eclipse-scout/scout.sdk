@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,11 +36,11 @@ public class SourceRangeTest {
     assertFalse(baseClassType.containingPackage().source().isPresent());
     assertTrue(baseClassType.source().isPresent());
 
-    var source = childClassType.source().get();
-    assertTrue(source.start() > childClassType.requireCompilationUnit().source().get().start());
-    assertTrue(source.end() < childClassType.requireCompilationUnit().source().get().end());
-    assertTrue(source.end() < childClassType.requireCompilationUnit().source().get().end());
+    var source = childClassType.source().orElseThrow();
+    assertTrue(source.start() > childClassType.requireCompilationUnit().source().orElseThrow().start());
+    assertTrue(source.end() < childClassType.requireCompilationUnit().source().orElseThrow().end());
+    assertTrue(source.end() < childClassType.requireCompilationUnit().source().orElseThrow().end());
     assertTrue(source.asCharSequence().toString().contains("ChildClass<X extends AbstractList<String> & Runnable & Serializable> extends BaseClass<X, Long> implements InterfaceLevel0 {"));
-    assertTrue(source.length() < childClassType.requireCompilationUnit().source().get().length());
+    assertTrue(source.length() < childClassType.requireCompilationUnit().source().orElseThrow().length());
   }
 }

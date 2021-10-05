@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,7 @@ import nls.TestUiTextContributor;
 public class UiTextContributorTest {
   @Test
   public void testContributorKeys(TestingEnvironment env) {
-    var contributor = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().get());
+    var contributor = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().orElseThrow());
     contributor.load(new NullProgress());
 
     var keys = contributor.keys().collect(toSet());
@@ -52,11 +52,11 @@ public class UiTextContributorTest {
   @Test
   @SuppressWarnings({"SimplifiableJUnitAssertion", "ConstantConditions", "EqualsWithItself", "EqualsBetweenInconvertibleTypes"})
   public void testToStringEquals(TestingEnvironment env) {
-    var contributor1 = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().get());
+    var contributor1 = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().orElseThrow());
     contributor1.load(new NullProgress());
-    var contributor2 = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().get());
+    var contributor2 = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().orElseThrow());
     contributor1.load(new NullProgress());
-    var contributor3 = new UiTextContributor(env.findType(Long.class.getName()).findAny().get());
+    var contributor3 = new UiTextContributor(env.findType(Long.class.getName()).findAny().orElseThrow());
     contributor1.load(new NullProgress());
 
     assertEquals(UiTextContributor.class.getSimpleName() + " [" + TestUiTextContributor.class.getName() + "]", contributor1.toString());

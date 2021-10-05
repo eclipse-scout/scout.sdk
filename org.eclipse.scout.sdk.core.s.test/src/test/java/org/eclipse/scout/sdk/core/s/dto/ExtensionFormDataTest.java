@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -68,7 +68,7 @@ public class ExtensionFormDataTest {
       testApiOfSimpleTableFormExtensionData(dto);
 
       // verify the value of the @Extends annotation
-      var annotation = dto.annotations().withManagedWrapper(ExtendsAnnotation.class).first().get();
+      var annotation = dto.annotations().withManagedWrapper(ExtendsAnnotation.class).first().orElseThrow();
       var originalRowData = annotation.value();
       assertEquals("formdata.shared.services.process.SimpleTableFormData$TestTable$TestTableRowData", originalRowData.name());
     });

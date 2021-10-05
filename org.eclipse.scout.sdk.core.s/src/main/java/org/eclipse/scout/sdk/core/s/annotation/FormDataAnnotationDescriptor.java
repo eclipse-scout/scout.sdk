@@ -85,13 +85,13 @@ public class FormDataAnnotationDescriptor {
       // check whether the super type is embedded into a form field that is annotated by @FormData with SdkCommand.IGNORE.
       var declaringType = superType.declaringType();
       while (declaringType.isPresent()) {
-        var declaringTypeFormDataAnnotation = of(declaringType.get());
+        var declaringTypeFormDataAnnotation = of(declaringType.orElseThrow());
         if (isIgnore(declaringTypeFormDataAnnotation)) {
           // super type is embedded into a ignored form field. Hence this field is ignored as well. Adjust parsed annotation.
           descriptorToFill.setSdkCommand(SdkCommand.IGNORE);
           break;
         }
-        declaringType = declaringType.get().declaringType();
+        declaringType = declaringType.orElseThrow().declaringType();
       }
     }
 
@@ -112,7 +112,7 @@ public class FormDataAnnotationDescriptor {
       return;
     }
 
-    var formDataAnnotation = optFda.get();
+    var formDataAnnotation = optFda.orElseThrow();
 
     // value
     IType dtoType = null;

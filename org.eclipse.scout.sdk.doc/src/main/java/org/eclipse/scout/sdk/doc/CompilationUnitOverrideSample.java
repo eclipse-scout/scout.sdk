@@ -38,8 +38,8 @@ public class CompilationUnitOverrideSample {
     var closeMethodSource = javaEnvironment.requireType(packageName + '.' + className)
         .methods()
         .withName("close")
-        .first().get()
-        .source().get()
+        .first().orElseThrow()
+        .source().orElseThrow()
         .asCharSequence().toString(); // <4>
     SdkLog.warning(closeMethodSource);
     // end::generatorToModel[]

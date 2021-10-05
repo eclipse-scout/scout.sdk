@@ -48,7 +48,7 @@ public class AnnotationWithCompileErrorTest {
     var type = registerCompilationUnit(env, testClass, pck, className);
     assertFalse(env.compileErrors(type).isEmpty());
 
-    var generatedValue = type.annotations().withManagedWrapper(GeneratedAnnotation.class).first().get().value();
+    var generatedValue = type.annotations().withManagedWrapper(GeneratedAnnotation.class).first().orElseThrow().value();
     assertEquals(0, generatedValue.length);
   }
 
@@ -76,7 +76,7 @@ public class AnnotationWithCompileErrorTest {
     var type = registerCompilationUnit(env, testClass, pck, className);
     assertFalse(env.compileErrors(type).isEmpty());
 
-    var nestedAnnotations = type.annotations().withManagedWrapper(AnnotationWithArrayValues.class).first().get().annos();
+    var nestedAnnotations = type.annotations().withManagedWrapper(AnnotationWithArrayValues.class).first().orElseThrow().annos();
     assertEquals(0, nestedAnnotations.length);
   }
 }

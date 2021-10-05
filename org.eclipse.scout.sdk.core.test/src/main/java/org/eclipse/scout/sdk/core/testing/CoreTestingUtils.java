@@ -26,7 +26,7 @@ import org.opentest4j.AssertionFailedError;
  * Testing helpers
  */
 public final class CoreTestingUtils {
-  private static final Pattern WHITESPACE_PAT = Pattern.compile("\\s+");
+  private static final Pattern WHITESPACE_PAT = Pattern.compile("[\\s\0\1\2\3\4\5\6\7\u0008]+");
 
   private CoreTestingUtils() {
   }
@@ -44,7 +44,7 @@ public final class CoreTestingUtils {
    */
   public static IType registerCompilationUnit(IJavaEnvironment env, ICompilationUnitGenerator<?> generator) {
     var src = Ensure.notNull(generator).toJavaSource(Ensure.notNull(env));
-    return registerCompilationUnit(env, src, generator.packageName().orElse(null), generator.elementName().get());
+    return registerCompilationUnit(env, src, generator.packageName().orElse(null), generator.elementName().orElseThrow());
   }
 
   /**
@@ -130,6 +130,6 @@ public final class CoreTestingUtils {
     if (s == null) {
       return null;
     }
-    return WHITESPACE_PAT.matcher(s).replaceAll(" ").trim();
+    return Strings.trim(WHITESPACE_PAT.matcher(s).replaceAll(" ")).toString();
   }
 }

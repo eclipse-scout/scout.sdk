@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -65,9 +65,9 @@ public class Wellformer {
       return;
     }
 
-    var source = m.source().get().asCharSequence();
+    var source = m.source().orElseThrow().asCharSequence();
     if (m.javaDoc().isPresent()) {
-      var javaDoc = m.javaDoc().get();
+      var javaDoc = m.javaDoc().orElseThrow();
       if (EMPTY_COMMENT_REGEX.matcher(javaDoc.asCharSequence()).matches()) {
         // workaround for a bug in the javadoc formatter. See bug 491387 for details.
         var javaDocEndRel = javaDoc.length() + 1 + m_lineDelimiter.length();
@@ -104,7 +104,7 @@ public class Wellformer {
       return false;
     }
 
-    var typeSource = type.source().get();
+    var typeSource = type.source().orElseThrow();
     var src = typeSource.asCharSequence();
     var children = getChildren(type);
     if (children.isEmpty()) {
@@ -115,7 +115,7 @@ public class Wellformer {
       var end = -1;
       for (var e : children) {
         if (e.source().isPresent()) {
-          var eRange = e.source().get();
+          var eRange = e.source().orElseThrow();
           start = Math.min(start, (eRange.start() - typeSource.start()));
           end = Math.max(end, (eRange.start() + eRange.length() - typeSource.start()));
         }

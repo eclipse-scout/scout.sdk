@@ -42,7 +42,7 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
 
     //don't evaluate as stream to prevent auto boxing
     if (first.isPresent()) {
-      return first.get().value();
+      return first.orElseThrow().value();
     }
 
     if (isBean) {
@@ -142,7 +142,7 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
   static IType[] findSiblingsAfterPos(IType declaringType, int pos, CharSequence orderDefinitionType) {
     IType prev = null;
     for (var t : getOrderedInnerTypes(declaringType, orderDefinitionType)) {
-      if (t.source().get().start() > pos) {
+      if (t.source().orElseThrow().start() > pos) {
         return new IType[]{prev, t};
       }
       prev = t;

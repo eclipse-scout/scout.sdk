@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,10 +36,10 @@ public class TestingEnvironmentExtension extends AbstractContextExtension<Testin
 
   @Override
   protected TestingEnvironment annotationToContext(ExtendWithTestingEnvironment annotation) {
-    return new TestingEnvironment(createJavaEnvironmentUsingBuilder(annotation.primary().value()).get().wrap(),
+    return new TestingEnvironment(createJavaEnvironmentUsingBuilder(annotation.primary().value()).orElseThrow().wrap(),
         annotation.flushToDisk(),
         annotation.assertNoCompileErrors(),
-        createJavaEnvironmentUsingBuilder(annotation.dto().value()).get().wrap());
+        createJavaEnvironmentUsingBuilder(annotation.dto().value()).orElseThrow().wrap());
   }
 
   @Override

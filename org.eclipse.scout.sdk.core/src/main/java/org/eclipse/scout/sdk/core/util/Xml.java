@@ -98,7 +98,7 @@ public final class Xml {
    */
   public static Document get(URL url) throws IOException {
     // use document builder to download the stream content because it correctly handles the xml encoding as specified in the xml declaration.
-    try (var in = Ensure.notNull(url).openStream()) {
+    try (var in = Resources.openStream(url)) {
       return get(in);
     }
   }

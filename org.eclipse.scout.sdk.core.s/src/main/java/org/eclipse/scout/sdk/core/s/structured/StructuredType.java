@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -386,7 +386,7 @@ public class StructuredType implements IStructuredType {
       // static
       if ((f.flags() & Flags.AccStatic) != 0) {
         var fieldDataType = f.dataType().reference();
-        if (logger.isPresent() && logger.get().equals(fieldDataType)) {
+        if (logger.isPresent() && logger.orElseThrow().equals(fieldDataType)) {
           loggers.add(f);
         }
         else {
@@ -448,7 +448,7 @@ public class StructuredType implements IStructuredType {
     Map<CompositeObject, IJavaElement> methods = new TreeMap<>();
     var scoutApi = scoutApi();
     if (scoutApi.isPresent()) {
-      var api = scoutApi.get();
+      var api = scoutApi.orElseThrow();
       var formDataFqn = api.FormData().fqn();
       for (var it = workingSet.iterator(); it.hasNext();) {
         var method = (IMethod) it.next();

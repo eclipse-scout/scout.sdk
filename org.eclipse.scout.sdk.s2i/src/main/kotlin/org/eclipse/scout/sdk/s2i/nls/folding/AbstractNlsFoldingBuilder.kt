@@ -78,7 +78,7 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
             val textArgs = element.argumentList.expressions
                     .filter { it.type == m_javaLangStringType }
                     .drop(1)
-                    .map { it.text.trim() }
+                    .map { it.text }
                     .map { PLACEHOLDER_START_CHAR + limitLength(it, PLACEHOLDER_MAX_LEN) + PLACEHOLDER_END_CHAR }
                     .toTypedArray()
             if (textArgs.isNotEmpty()) {

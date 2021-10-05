@@ -106,7 +106,7 @@ public final class S2eUiUtils {
           return 100;
         }
 
-        switch (tier.get().unwrap()) {
+        switch (tier.orElseThrow().unwrap()) {
           case Client:
             return 5;
           case HtmlUi:
@@ -301,9 +301,9 @@ public final class S2eUiUtils {
           var foundTier = S2eScoutTier.valueOf(unacceptedResult.getProject());
           if (foundTier.isPresent()) {
             var expectedTier = expected.unwrap();
-            result.setProject(foundTier.get().convert(expectedTier, unacceptedResult.getProject()).orElse(null));
-            result.setSrcFolder(foundTier.get().convert(expectedTier, unacceptedResult.getSrcFolder()).orElse(null));
-            result.setPackage(foundTier.get().convert(expectedTier, unacceptedResult.getPackage()).orElse(null));
+            result.setProject(foundTier.orElseThrow().convert(expectedTier, unacceptedResult.getProject()).orElse(null));
+            result.setSrcFolder(foundTier.orElseThrow().convert(expectedTier, unacceptedResult.getSrcFolder()).orElse(null));
+            result.setPackage(foundTier.orElseThrow().convert(expectedTier, unacceptedResult.getPackage()).orElse(null));
           }
         }
       }

@@ -210,7 +210,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
       return true; // not filtered by name
     }
     var fqn = name.apply(a.javaEnvironment()).map(IClassNameSupplier::fqn);
-    return fqn.isPresent() && fqn.get().equals(a.name());
+    return fqn.isPresent() && fqn.orElseThrow().equals(a.name());
   }
 
   private static Spliterator<IAnnotation> getAnnotationsSpliterator(@SuppressWarnings("TypeMayBeWeakened") IAnnotatable o) {

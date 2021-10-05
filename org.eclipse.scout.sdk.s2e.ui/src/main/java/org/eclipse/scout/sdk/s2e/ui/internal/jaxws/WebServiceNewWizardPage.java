@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2e.ui.internal.jaxws;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,7 +19,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.wsdl.WSDLException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -43,6 +41,7 @@ import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.Pom;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Resources;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
@@ -435,7 +434,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
         return false;
       }
 
-      var primarySourceFolder = primarySourceFolderOpt.get();
+      var primarySourceFolder = primarySourceFolderOpt.orElseThrow();
       if (!JdtUtils.exists(primarySourceFolder) || !primarySourceFolder.getResource().getProjectRelativePath().toString().toLowerCase(Locale.US).contains("java")) {
         return false;
       }
@@ -443,7 +442,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       if (optScoutApi.isEmpty()) {
         return false;
       }
-      var scoutApi = optScoutApi.get();
+      var scoutApi = optScoutApi.orElseThrow();
       if (!JdtUtils.exists(jp.findType(scoutApi.AbstractWebServiceClient().fqn()))) {
         return false;
       }
@@ -479,7 +478,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     try {
       var scoutApi = ApiHelper.scoutApiFor(jp);
       return scoutApi.isPresent()
-          && JdtUtils.exists(jp.findType(scoutApi.get().IServerSession().fqn()))
+          && JdtUtils.exists(jp.findType(scoutApi.orElseThrow().IServerSession().fqn()))
           && !jp.getProject().getFolder(IScoutSourceFolders.WEBAPP_RESOURCE_FOLDER + "/WEB-INF").exists()
           && !Files.exists(AbstractWebServiceNewOperation.getWsdlRootFolder(jp.getProject().getLocation().toFile().toPath()));
     }
@@ -532,11 +531,11 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     }
 
     var pckBuilder = new StringBuilder();
-    if (groupId.isPresent() && !artifactId.get().startsWith(groupId.get())) {
-      pckBuilder.append(groupId.get());
+    if (groupId.isPresent() && !artifactId.orElseThrow().startsWith(groupId.orElseThrow())) {
+      pckBuilder.append(groupId.orElseThrow());
       pckBuilder.append(JavaTypes.C_DOT);
     }
-    pckBuilder.append(artifactId.get());
+    pckBuilder.append(artifactId.orElseThrow());
     pckBuilder.append(JavaTypes.C_DOT);
     pckBuilder.append(baseName);
     setTargetPackage(pckBuilder.toString());
@@ -703,13 +702,13 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
   }
 
   protected static String validateWsdl(URL url) {
-    try (var in = url.openStream()) {
+    try (var in = Resources.openStream(url)) {
       var info = ParsedWsdl.create(url.toURI(), in, false);
       if (info.isEmpty()) {
         return "Either this Web Service uses SOAP encoding (use=encoded) or contains no operations. Ensure the Web Service uses literal encoding.";
       }
     }
-    catch (IOException | URISyntaxException | WSDLException e) {
+    catch (Exception e) {
       SdkLog.debug(e);
       return "The given WSDL cannot be parsed.";
     }

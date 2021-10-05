@@ -32,8 +32,8 @@ public class EmptyWsdlGenerator implements ISourceGenerator<ISourceBuilder<?>> {
   @Override
   @SuppressWarnings("HttpUrlsUsage")
   public void generate(ISourceBuilder<?> builder) {
-    var name = name().get();
-    var nameSpace = packageToNamespace(name, packageName().get());
+    var name = name().orElseThrow();
+    var nameSpace = packageToNamespace(name, packageName().orElseThrow());
 
     builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>").nl();
     builder.append("<wsdl:definitions name=\"").append(name).append('"').nl();

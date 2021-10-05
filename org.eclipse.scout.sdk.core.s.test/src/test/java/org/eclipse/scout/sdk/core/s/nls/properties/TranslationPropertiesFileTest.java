@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,7 +61,7 @@ public class TranslationPropertiesFileTest {
     assertEquals(0, props2.allEntries().size());
     assertEquals(2, props1.allKeys().count());
     assertEquals(0, props2.allKeys().count());
-    assertEquals(TranslationStoreSupplierExtension.KEY_1_VAL_EN, props1.translation(TranslationStoreSupplierExtension.TRANSLATION_KEY_1).get());
+    assertEquals(TranslationStoreSupplierExtension.KEY_1_VAL_EN, props1.translation(TranslationStoreSupplierExtension.TRANSLATION_KEY_1).orElseThrow());
     assertFalse(props2.translation(TranslationStoreSupplierExtension.TRANSLATION_KEY_1).isPresent());
     assertEquals(TranslationStoreSupplierExtension.EN, props1.language());
     assertEquals(Language.LANGUAGE_DEFAULT, props0.language());
@@ -88,7 +88,7 @@ public class TranslationPropertiesFileTest {
 
     var parsedLanguages = languages.stream()
         .map(lang -> getPropertiesFileName(prefix, lang))
-        .map(fileName -> parseLanguageFromFileName(fileName, prefix).get())
+        .map(fileName -> parseLanguageFromFileName(fileName, prefix).orElseThrow())
         .collect(toList());
     var parsedLocaleNames = parsedLanguages.stream()
         .map(lang -> lang == Language.LANGUAGE_DEFAULT ? Locale.ROOT : lang.locale())
@@ -101,11 +101,11 @@ public class TranslationPropertiesFileTest {
 
   @Test
   public void testParse() {
-    assertSame(Language.LANGUAGE_DEFAULT, parseLanguageFromFileName("prefix.properties", "prefix").get());
-    assertEquals(new Language(new Locale("test")), parseLanguageFromFileName("prefix_test.properties", "prefix").get());
-    assertEquals(new Language(new Locale("de", "FR", "xx")), parseLanguageFromFileName("prefix_de_FR_xx.properties", "prefix").get());
-    assertEquals(new Language(new Locale("de", "FR")), parseLanguageFromFileName("prefix_de_FR.properties", "prefix").get());
-    assertEquals(new Language(new Locale("de")), parseLanguageFromFileName("prefix_de.properties", "prefix").get());
+    assertSame(Language.LANGUAGE_DEFAULT, parseLanguageFromFileName("prefix.properties", "prefix").orElseThrow());
+    assertEquals(new Language(new Locale("test")), parseLanguageFromFileName("prefix_test.properties", "prefix").orElseThrow());
+    assertEquals(new Language(new Locale("de", "FR", "xx")), parseLanguageFromFileName("prefix_de_FR_xx.properties", "prefix").orElseThrow());
+    assertEquals(new Language(new Locale("de", "FR")), parseLanguageFromFileName("prefix_de_FR.properties", "prefix").orElseThrow());
+    assertEquals(new Language(new Locale("de")), parseLanguageFromFileName("prefix_de.properties", "prefix").orElseThrow());
     assertFalse(parseLanguageFromFileName("abc", "abc").isPresent());
     assertFalse(parseLanguageFromFileName(null, "").isPresent());
     assertFalse(parseLanguageFromFileName("prefix_test.properties", "text").isPresent());

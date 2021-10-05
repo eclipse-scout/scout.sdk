@@ -209,7 +209,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
 
   protected static void buildReferenceRec(IType type, boolean erasureOnly, StringBuilder builder) {
     if (type.isArray()) {
-      buildReferenceRec(type.leafComponentType().get(), erasureOnly, builder);
+      buildReferenceRec(type.leafComponentType().orElseThrow(), erasureOnly, builder);
       builder.append(arrayMarker(type.arrayDimension()));
       return;
     }
@@ -293,7 +293,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
       return Optional.empty(); // simple types cannot resolve anything
     }
     var env = javaEnvironment();
-    var compilationUnit = optCu.get();
+    var compilationUnit = optCu.orElseThrow();
 
     // 1. step: try to resolve the name using the declared imports
     var fromImports = resolveNameUsingImports(compilationUnit, simpleName);
@@ -397,7 +397,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
     IType result = null;
     Optional<IType> tmp = Optional.of(this);
     while (tmp.isPresent()) {
-      result = tmp.get();
+      result = tmp.orElseThrow();
       tmp = result.declaringType();
     }
     return result;

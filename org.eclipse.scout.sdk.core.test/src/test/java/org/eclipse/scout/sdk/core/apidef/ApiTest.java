@@ -40,7 +40,7 @@ public class ApiTest {
 
   @Test
   public void testVersion(IJavaEnvironment env) {
-    assertEquals(12, Api.version(IJavaApi.class, env.requireType(Long.class.getName())).get().segments()[0]);
+    assertEquals(12, Api.version(IJavaApi.class, env.requireType(Long.class.getName())).orElseThrow().segments()[0]);
   }
 
   @Test

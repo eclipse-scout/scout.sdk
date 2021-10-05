@@ -170,12 +170,12 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
       // the DtoGeneratorFactory parses the @Data-Annotation and uses the given pageData-IType, therefore the pageData needs to be created already
       getCreatedAbstractPageData().result();
       var abstractPageDataGenerator = DtoGeneratorFactory.createPageDataGenerator(getCreatedAbstractPage().result(), getPageDataSourceFolder().javaEnvironment());
-      env.writeCompilationUnitAsync(abstractPageDataGenerator.get(), getPageDataSourceFolder(), progress.newChild(1));
+      env.writeCompilationUnitAsync(abstractPageDataGenerator.orElseThrow(), getPageDataSourceFolder(), progress.newChild(1));
     }
     // the DtoGeneratorFactory parses the @Data-Annotation and uses the given pageData-IType, therefore the pageData needs to be created already
     getCreatedPageData().result();
     var pageDataGenerator = DtoGeneratorFactory.createPageDataGenerator(getCreatedPage().result(), getPageDataSourceFolder().javaEnvironment());
-    env.writeCompilationUnitAsync(pageDataGenerator.get(), getPageDataSourceFolder(), progress.newChild(1));
+    env.writeCompilationUnitAsync(pageDataGenerator.orElseThrow(), getPageDataSourceFolder(), progress.newChild(1));
   }
 
   protected IFuture<IType> createAbstractPage(boolean isPageWithTable, IEnvironment env, IProgress progress) {

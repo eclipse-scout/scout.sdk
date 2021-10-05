@@ -37,8 +37,8 @@ public class DataObjectNodeTest {
   @Test
   public void testDataObjectNodeKindValueOf(IJavaEnvironment env) {
     var scoutApi = env.requireApi(IScoutApi.class);
-    assertEquals(DataObjectNodeKind.LIST, valueOf(env.requireType(scoutApi.DoList())).get());
-    assertEquals(DataObjectNodeKind.VALUE, valueOf(env.requireType(scoutApi.DoValue())).get());
+    assertEquals(DataObjectNodeKind.LIST, valueOf(env.requireType(scoutApi.DoList())).orElseThrow());
+    assertEquals(DataObjectNodeKind.VALUE, valueOf(env.requireType(scoutApi.DoValue())).orElseThrow());
     assertFalse(valueOf(env.requireType(Long.class.getName())).isPresent());
     assertFalse(valueOf((IType) null).isPresent());
 

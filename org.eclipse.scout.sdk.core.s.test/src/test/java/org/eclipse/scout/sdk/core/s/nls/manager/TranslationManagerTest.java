@@ -72,7 +72,7 @@ public class TranslationManagerTest {
     assertEquals("key10", manager.generateNewKey("key1"));
     assertEquals("somethingNew", manager.generateNewKey("something,New "));
     assertTrue(manager.isEditable());
-    assertEquals("1_en", manager.translation("key1").get().text(Language.parseThrowingOnError("en_US")).get());
+    assertEquals("1_en", manager.translation("key1").orElseThrow().text(Language.parseThrowingOnError("en_US")).orElseThrow());
     assertFalse(manager.translation("dddd").isPresent());
     assertFalse(manager.containsKey("dddd"));
     assertTrue(manager.containsKey("key1"));
@@ -84,6 +84,17 @@ public class TranslationManagerTest {
     assertEquals(2, manager.allStores().count());
     assertEquals(3, manager.allLanguages().count());
     assertNotNull(manager.toString());
+  }
+
+  @Test
+  public void testGenerateNewKey(TestingEnvironment env) {
+    var manager = testingManager(env);
+    assertEquals("", manager.generateNewKey(null));
+    assertEquals("", manager.generateNewKey("  \t\n\r "));
+    assertEquals("", manager.generateNewKey("  ??? "));
+    assertEquals("AbcTest", manager.generateNewKey("  \t\n\r,/(*0abc test- "));
+    assertEquals("Key10", manager.generateNewKey("*key 1"));
+    assertEquals("key10", manager.generateNewKey(TranslationStoreSupplierExtension.TRANSLATION_KEY_1));
   }
 
   @Test
@@ -104,9 +115,9 @@ public class TranslationManagerTest {
     toAdd.putText(es, esAfterInsert);
     manager.mergeTranslation(toAdd, null);
     assertEquals(1, manager.allTranslationsWithPrefix("add").count());
-    assertEquals(defaultAfterInsert, manager.translation(key).get().text(Language.LANGUAGE_DEFAULT).get());
-    assertEquals(enAfterInsert, manager.translation(key).get().text(en).get());
-    assertEquals(esAfterInsert, manager.translation(key).get().text(es).get());
+    assertEquals(defaultAfterInsert, manager.translation(key).orElseThrow().text(Language.LANGUAGE_DEFAULT).orElseThrow());
+    assertEquals(enAfterInsert, manager.translation(key).orElseThrow().text(en).orElseThrow());
+    assertEquals(esAfterInsert, manager.translation(key).orElseThrow().text(es).orElseThrow());
 
     var defaultAfterModify = "default2";
     var esAfterModify = "es2";
@@ -114,9 +125,9 @@ public class TranslationManagerTest {
     toModify.putText(Language.LANGUAGE_DEFAULT, defaultAfterModify);
     toModify.putText(es, esAfterModify);
     manager.mergeTranslation(toModify, null);
-    assertEquals(defaultAfterModify, manager.translation(key).get().text(Language.LANGUAGE_DEFAULT).get());
-    assertEquals(enAfterInsert, manager.translation(key).get().text(en).get());
-    assertEquals(esAfterModify, manager.translation(key).get().text(es).get());
+    assertEquals(defaultAfterModify, manager.translation(key).orElseThrow().text(Language.LANGUAGE_DEFAULT).orElseThrow());
+    assertEquals(enAfterInsert, manager.translation(key).orElseThrow().text(en).orElseThrow());
+    assertEquals(esAfterModify, manager.translation(key).orElseThrow().text(es).orElseThrow());
   }
 
   @Test
@@ -124,11 +135,11 @@ public class TranslationManagerTest {
     var manager = testingManager(env);
     var newStore = createSimpleStoreMock();
     var deCh = Language.parseThrowingOnError("de_CH");
-    manager.addNewLanguage(deCh, manager.primaryEditableStore().get());
+    manager.addNewLanguage(deCh, manager.primaryEditableStore().orElseThrow());
     manager.flush(env, new NullProgress());
 
-    assertThrows(IllegalArgumentException.class, () -> manager.addNewLanguage(deCh, manager.allStores().filter(s -> !s.isEditable()).findAny().get()));
-    assertThrows(IllegalArgumentException.class, () -> manager.addNewLanguage(null, manager.primaryEditableStore().get()));
+    assertThrows(IllegalArgumentException.class, () -> manager.addNewLanguage(deCh, manager.allStores().filter(s -> !s.isEditable()).findAny().orElseThrow()));
+    assertThrows(IllegalArgumentException.class, () -> manager.addNewLanguage(null, manager.primaryEditableStore().orElseThrow()));
     assertThrows(IllegalArgumentException.class, () -> manager.addNewLanguage(deCh, newStore));
   }
 
@@ -151,8 +162,8 @@ public class TranslationManagerTest {
     add.putText(addLang, "tr-de");
     manager.setTranslation(add);
 
-    assertTrue(manager.primaryEditableStore().get().containsLanguage(newLang));
-    assertTrue(manager.primaryEditableStore().get().containsLanguage(addLang));
+    assertTrue(manager.primaryEditableStore().orElseThrow().containsLanguage(newLang));
+    assertTrue(manager.primaryEditableStore().orElseThrow().containsLanguage(addLang));
 
     assertEquals(4, eventProtocol.size());
     var newLangEvents = eventProtocol.stream().filter(e -> e.type() == TranslationManagerEvent.TYPE_NEW_LANGUAGE).collect(toList());
@@ -206,7 +217,7 @@ public class TranslationManagerTest {
     t.putText(Language.LANGUAGE_DEFAULT, "updated");
 
     manager.setTranslation(t);
-    assertEquals("updated", manager.translation("key1").get().text(Language.LANGUAGE_DEFAULT).get());
+    assertEquals("updated", manager.translation("key1").orElseThrow().text(Language.LANGUAGE_DEFAULT).orElseThrow());
   }
 
   @Test
@@ -217,7 +228,7 @@ public class TranslationManagerTest {
     var t = new Translation("key5");
     t.putText(Language.LANGUAGE_DEFAULT, "updated");
     writeableManager.setTranslation(t);
-    assertEquals("updated", writeableManager.translation("key5").get().text(Language.LANGUAGE_DEFAULT).get());
+    assertEquals("updated", writeableManager.translation("key5").orElseThrow().text(Language.LANGUAGE_DEFAULT).orElseThrow());
   }
 
   @Test
@@ -246,13 +257,13 @@ public class TranslationManagerTest {
     assertEquals(Map.of(Language.LANGUAGE_DEFAULT, "b_def", en, "changed_en", es, "changed_es", it, "added_it"), updatedEntry.texts());
 
     // read-only store must not be touched
-    assertEquals(entries01.get(key), storeA.get(key).get().texts());
+    assertEquals(entries01.get(key), storeA.get(key).orElseThrow().texts());
 
     // only contains the changes of the own languages
-    assertEquals(Map.of(Language.LANGUAGE_DEFAULT, "b_def", es, "changed_es"), storeB.get(key).get().texts());
+    assertEquals(Map.of(Language.LANGUAGE_DEFAULT, "b_def", es, "changed_es"), storeB.get(key).orElseThrow().texts());
 
     // gets all changes of own languages and new ones, "c_de" is removed
-    assertEquals(Map.of(en, "changed_en", it, "added_it"), storeC.get(key).get().texts());
+    assertEquals(Map.of(en, "changed_en", it, "added_it"), storeC.get(key).orElseThrow().texts());
   }
 
   @Test
@@ -286,7 +297,7 @@ public class TranslationManagerTest {
     assertTrue(manager.translation(key2).isEmpty()); // old key does not longer exist
 
     // existing read-only entry and renamed one have been merged to one manager
-    assertEquals(Map.of(Language.LANGUAGE_DEFAULT, "text_def_02", en, "text_en"), manager.translation(key1).get().texts());
+    assertEquals(Map.of(Language.LANGUAGE_DEFAULT, "text_def_02", en, "text_en"), manager.translation(key1).orElseThrow().texts());
   }
 
   @Test
@@ -299,7 +310,7 @@ public class TranslationManagerTest {
 
     // change to itself: nothing is changed
     managerWithReadOnly.changeKey(key, key);
-    assertEquals(TranslationStoreSupplierExtension.KEY_1_VAL_DEFAULT, managerWithReadOnly.translation(key).get().text(Language.LANGUAGE_DEFAULT).get());
+    assertEquals(TranslationStoreSupplierExtension.KEY_1_VAL_DEFAULT, managerWithReadOnly.translation(key).orElseThrow().text(Language.LANGUAGE_DEFAULT).orElseThrow());
 
     // the oldKey cannot be found: nothing is changed
     managerWithReadOnly.changeKey(null, "aaa");
@@ -329,7 +340,7 @@ public class TranslationManagerTest {
     manager.flush(env, new NullProgress());
     manager.reload(new NullProgress());
     assertEquals(13, manager.allTranslations().count());
-    assertEquals(textPrefix + '2', manager.translation("newKey2").get().text(Language.LANGUAGE_DEFAULT).get());
+    assertEquals(textPrefix + '2', manager.translation("newKey2").orElseThrow().text(Language.LANGUAGE_DEFAULT).orElseThrow());
   }
 
   @Test
@@ -344,7 +355,7 @@ public class TranslationManagerTest {
             createStore("b", 100.00d, entries01)));
 
     assertEquals(1, manager.allTranslations().count());
-    assertEquals("text01", manager.translation(key).get().texts().get(Language.LANGUAGE_DEFAULT));
+    assertEquals("text01", manager.translation(key).orElseThrow().texts().get(Language.LANGUAGE_DEFAULT));
 
     List<Integer> eventTypes = new ArrayList<>(); // remember each event type that happens
     manager.addListener(events -> events.forEach(e -> eventTypes.add(e.type())));
@@ -352,7 +363,7 @@ public class TranslationManagerTest {
 
     assertEquals(1, manager.allTranslations().count());
     assertTrue(manager.translation(key).isEmpty());
-    assertEquals("text01", manager.translation(newKey).get().texts().get(Language.LANGUAGE_DEFAULT));
+    assertEquals("text01", manager.translation(newKey).orElseThrow().texts().get(Language.LANGUAGE_DEFAULT));
     assertEquals(singletonList(TranslationManagerEvent.TYPE_KEY_CHANGED), eventTypes);
   }
 
@@ -502,11 +513,11 @@ public class TranslationManagerTest {
     assertEquals(asList(2, 3, 4), info2.invalidRowIndices());
     assertEquals(1, firstStore.keys().count());
     assertTrue(firstStore.containsKey(key01));
-    assertEquals(newKey01DefaultText, firstStore.get(key01, Language.LANGUAGE_DEFAULT).get());
+    assertEquals(newKey01DefaultText, firstStore.get(key01, Language.LANGUAGE_DEFAULT).orElseThrow());
     assertEquals(2, firstStore.languages().count());
     assertEquals(2, secondStore.keys().count());
     assertTrue(secondStore.containsKey(key04));
-    assertEquals(newKey04DefaultText, secondStore.get(key04, Language.LANGUAGE_DEFAULT).get());
+    assertEquals(newKey04DefaultText, secondStore.get(key04, Language.LANGUAGE_DEFAULT).orElseThrow());
     assertEquals(2, secondStore.languages().count());
   }
 
@@ -576,9 +587,9 @@ public class TranslationManagerTest {
             createStore("b", 300.00d, entries01),
             createStore("c", 100.00d, entries03)));
 
-    var k01Result = manager.allTranslations().filter(e -> key01.equals(e.key())).findAny().get();
-    var k02Result = manager.allTranslations().filter(e -> key02.equals(e.key())).findAny().get();
-    var k03Result = manager.allTranslations().filter(e -> key03.equals(e.key())).findAny().get();
+    var k01Result = manager.allTranslations().filter(e -> key01.equals(e.key())).findAny().orElseThrow();
+    var k02Result = manager.allTranslations().filter(e -> key02.equals(e.key())).findAny().orElseThrow();
+    var k03Result = manager.allTranslations().filter(e -> key03.equals(e.key())).findAny().orElseThrow();
 
     assertEquals(3, k01Result.texts().size());
     assertEquals("02_k1_de", k01Result.texts().get(langDe));

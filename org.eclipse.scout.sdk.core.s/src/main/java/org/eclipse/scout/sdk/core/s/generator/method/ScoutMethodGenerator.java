@@ -269,7 +269,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
    */
   public static IScoutMethodGenerator<?, ?> createDoCollectionSetterVarargs(String name, String dataTypeReference, IType owner) {
     var generator = createDoCollectionSetterCollection(name, dataTypeReference, owner);
-    generator.parameters().findAny().get().withDataType(dataTypeReference).asVarargs();
+    generator.parameters().findAny().orElseThrow().withDataType(dataTypeReference).asVarargs();
     return generator;
   }
 
@@ -335,7 +335,7 @@ public class ScoutMethodGenerator<TYPE extends IScoutMethodGenerator<TYPE, BODY>
           .flatMap(scoutApi -> scoutApi.api(IScout22DoApi.class));
       if (scout22DoApi.isPresent()) {
         builder.returnClause()
-            .append(scout22DoApi.get().DoEntity().nvlMethodName())
+            .append(scout22DoApi.orElseThrow().DoEntity().nvlMethodName())
             .parenthesisOpen()
             .appendFrom(IScoutApi.class, api -> computeDoNodeGetterName(name, JavaTypes.Boolean, api)).parenthesisOpen().parenthesisClose()
             .parenthesisClose().semicolon();

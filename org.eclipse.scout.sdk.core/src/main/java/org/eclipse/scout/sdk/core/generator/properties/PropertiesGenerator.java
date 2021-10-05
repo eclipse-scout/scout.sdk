@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,6 +35,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * Generator to create .properties files. It supports header comments.
@@ -170,11 +171,11 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
     String line;
     m_headerLines.clear();
     while ((line = reader.readLine()) != null) {
-      var naturalLine = line.trim();
-      if (naturalLine.isEmpty()) {
+      var lineTrimmed = Strings.trim(line);
+      if (Strings.isEmpty(lineTrimmed)) {
         m_headerLines.add(line);
       }
-      else if (isComment(naturalLine)) {
+      else if (isComment(lineTrimmed)) {
         m_headerLines.add(line);
       }
       else {

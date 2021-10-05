@@ -87,7 +87,7 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
         var text = msg.text()
         val primaryThrowable = msg.firstThrowable()
         if (Strings.isBlank(text) && primaryThrowable.isPresent) {
-            text = Strings.notBlank(primaryThrowable.get().message).orElse("Error")
+            text = Strings.notBlank(primaryThrowable.orElseThrow().message).orElse("Error")
         }
         if (Strings.isBlank(text)) {
             return // no balloon for empty log message

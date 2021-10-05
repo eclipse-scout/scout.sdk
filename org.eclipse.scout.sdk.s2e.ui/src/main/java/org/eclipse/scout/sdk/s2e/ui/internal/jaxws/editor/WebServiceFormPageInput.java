@@ -105,7 +105,6 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
 
   public WebServiceFormPageInput(Path wsdl, IJavaProject javaProject, IScoutApi api) {
     m_wsdl = Ensure.notNull(wsdl);
-    Ensure.isFile(m_wsdl);
     Ensure.isTrue(JdtUtils.exists(javaProject));
     m_javaProject = javaProject;
     m_displayName = calcDisplayName();
@@ -171,14 +170,12 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
       name = name.substring(0, lastDotPos);
     }
     name = JaxWsUtils.removeCommonSuffixes(name);
-    var camelToWords = Pattern.compile("([A-Z])").matcher(name).replaceAll(" $1");
-    camelToWords = Pattern.compile("[^A-Za-z0-9\\s]").matcher(camelToWords).replaceAll(" ").trim();
-    var words = Pattern.compile("\\s").split(camelToWords);
-    return Arrays.stream(words)
+    var words = Pattern.compile("([A-Z])").matcher(name).replaceAll(" $1");
+    var cleanWords = Strings.trim(Pattern.compile("[^A-Za-z0-9\\s]").matcher(words).replaceAll(" "));
+    return Pattern.compile("\\s").splitAsStream(cleanWords)
         .filter(Strings::hasText)
-        .map(w -> Strings.capitalize(w).toString() + ' ')
-        .collect(joining())
-        .trim();
+        .map(Strings::capitalize)
+        .collect(joining(" "));
   }
 
   protected void loadWsdlServices() {

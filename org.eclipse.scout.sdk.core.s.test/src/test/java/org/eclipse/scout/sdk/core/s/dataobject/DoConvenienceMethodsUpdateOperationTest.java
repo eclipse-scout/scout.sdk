@@ -70,7 +70,7 @@ public class DoConvenienceMethodsUpdateOperationTest {
 
       // check that the primitive boolean getter uses the nvl method
       var nvlMethodName = scoutApi.requireApi(IScout22DoApi.class).DoEntity().nvlMethodName();
-      var isEnabledBodySource = generatedSampleDo.methods().withName("isEnabled").first().get().sourceOfBody().get().asCharSequence().toString();
+      var isEnabledBodySource = generatedSampleDo.methods().withName("isEnabled").first().orElseThrow().sourceOfBody().orElseThrow().asCharSequence().toString();
       assertTrue(isEnabledBodySource.indexOf(nvlMethodName + "(getEnabled())") > 0);
     }
     else {
@@ -78,8 +78,8 @@ public class DoConvenienceMethodsUpdateOperationTest {
     }
 
     // validate that the "withEnabled" method has a JavaDoc pointing to the original JavaDoc of the attribute
-    assertEquals("/**\n* See {@link #enabled()}.\n*/", childDo.methods().withName("withEnabled").first().get()
-        .javaDoc().get().asCharSequence().toString());
+    assertEquals("/**\n* See {@link #enabled()}.\n*/", childDo.methods().withName("withEnabled").first().orElseThrow()
+        .javaDoc().orElseThrow().asCharSequence().toString());
   }
 
   @Test
@@ -97,7 +97,7 @@ public class DoConvenienceMethodsUpdateOperationTest {
     // 1. The method 'public Long getId()' is moved down into the generated section
     // 2. The single-line comment before the convenience method generated marker comment is preserved
     // 3. The method 'public ChildDoWithTypeArg withId(Long id)' gets an override annotation
-    assertEqualsRefFile(REF_FILE_FOLDER + "WithTypeParametersAndOverride.txt", childDoWithTypeArg.requireCompilationUnit().source().get().asCharSequence());
+    assertEqualsRefFile(REF_FILE_FOLDER + "WithTypeParametersAndOverride.txt", childDoWithTypeArg.requireCompilationUnit().source().orElseThrow().asCharSequence());
   }
 
   @Test

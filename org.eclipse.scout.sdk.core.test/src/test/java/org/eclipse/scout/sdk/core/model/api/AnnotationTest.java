@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -52,9 +52,9 @@ public class AnnotationTest {
     assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
     // methodInChildClass annotation
-    var methodInChildClass = childClassType.methods().item(1).get();
+    var methodInChildClass = childClassType.methods().item(1).orElseThrow();
     assertEquals(1, methodInChildClass.annotations().stream().count());
-    annotation = methodInChildClass.annotations().first().get();
+    annotation = methodInChildClass.annotations().first().orElseThrow();
     nreal = 0;
     nsynth = 0;
     for (var v : annotation.elements().values()) {
@@ -70,9 +70,9 @@ public class AnnotationTest {
     assertEquals("@TestAnnotation(values = Long.class, en = TestEnum.A)", annotation.toWorkingCopy().toJavaSource().toString());
 
     // firstCase annotation
-    var firstCase = childClassType.methods().item(2).get();
+    var firstCase = childClassType.methods().item(2).orElseThrow();
     assertEquals(1, firstCase.annotations().stream().count());
-    annotation = firstCase.annotations().first().get();
+    annotation = firstCase.annotations().first().orElseThrow();
     assertEquals(1, annotation.elements().size());
     assertTrue(annotation.element("value").isPresent());
     assertEquals(firstCase, annotation.owner());
@@ -82,8 +82,8 @@ public class AnnotationTest {
   @Test
   public void testAnnotationsWithAnnotationValues(IJavaEnvironment env) {
     var wildcardBaseClass = env.requireType("org.eclipse.scout.sdk.core.fixture.WildcardBaseClass");
-    var testAnnot = wildcardBaseClass.annotations().first().get();
-    var value = testAnnot.element("inner").get();
+    var testAnnot = wildcardBaseClass.annotations().first().orElseThrow();
+    var value = testAnnot.element("inner").orElseThrow();
     assertNotNull(value);
     assertSame(value.value().type(), MetaValueType.Array);
 
@@ -93,20 +93,20 @@ public class AnnotationTest {
     var annot0 = arr[0].as(IAnnotation.class);
     assertEquals(wildcardBaseClass, annot0.owner());
     assertEquals(ValueAnnot.class.getName(), annot0.type().name());
-    assertEquals("a", annot0.element("value").get().value().as(String.class));
+    assertEquals("a", annot0.element("value").orElseThrow().value().as(String.class));
 
     var annot1 = arr[1].as(IAnnotation.class);
     assertEquals(wildcardBaseClass, annot1.owner());
     assertEquals(ValueAnnot.class.getName(), annot1.type().name());
-    assertEquals("b", annot1.element("value").get().value().as(String.class));
+    assertEquals("b", annot1.element("value").orElseThrow().value().as(String.class));
   }
 
   @Test
   public void testToString(IJavaEnvironment env) {
-    var annotation = env.requireType(ChildClass.class.getName()).methods().item(2).get().annotations().first().get();
+    var annotation = env.requireType(ChildClass.class.getName()).methods().item(2).orElseThrow().annotations().first().orElseThrow();
     assertFalse(Strings.isBlank(annotation.toString()));
 
-    annotation = env.requireType(ChildClass.class.getName()).requireSuperClass().annotations().first().get();
+    annotation = env.requireType(ChildClass.class.getName()).requireSuperClass().annotations().first().orElseThrow();
     assertFalse(Strings.isBlank(annotation.toString()));
   }
 
@@ -131,10 +131,10 @@ public class AnnotationTest {
     assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
     // methodInBaseClass annotation
-    var methodInBaseClass = baseClassType.methods().first().get();
+    var methodInBaseClass = baseClassType.methods().first().orElseThrow();
     assertEquals(2, methodInBaseClass.annotations().stream().count());
 
-    annotation = methodInBaseClass.annotations().first().get();
+    annotation = methodInBaseClass.annotations().first().orElseThrow();
     nreal = 0;
     nsynth = 0;
     for (var v : annotation.elements().values()) {
@@ -148,7 +148,7 @@ public class AnnotationTest {
     assertEquals(methodInBaseClass, annotation.owner());
     assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
-    annotation = methodInBaseClass.annotations().item(1).get();
+    annotation = methodInBaseClass.annotations().item(1).orElseThrow();
     assertEquals(0, annotation.elements().size());
     assertEquals(methodInBaseClass, annotation.owner());
     assertEquals(MarkerAnnotation.class.getName(), annotation.type().name());
@@ -163,12 +163,12 @@ public class AnnotationTest {
     assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.flags());
     assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.flags());
 
-    assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.methods().first().get().flags());
-    assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.methods().first().get().flags());
+    assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.methods().first().orElseThrow().flags());
+    assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.methods().first().orElseThrow().flags());
   }
 
   @Test
   public void testGetAnnotation(IJavaEnvironment env) {
-    assertNotNull(env.requireType(ChildClass.class.getName()).requireSuperClass().methods().first().get().annotations().withName(MarkerAnnotation.class.getName()).first());
+    assertNotNull(env.requireType(ChildClass.class.getName()).requireSuperClass().methods().first().orElseThrow().annotations().withName(MarkerAnnotation.class.getName()).first());
   }
 }

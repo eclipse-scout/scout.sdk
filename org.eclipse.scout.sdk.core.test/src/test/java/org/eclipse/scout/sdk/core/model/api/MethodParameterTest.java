@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,7 @@ public class MethodParameterTest {
   public void testDeclaringMethodParameters(IJavaEnvironment env) {
     var childClassType = env.requireType(ChildClass.class.getName());
     assertEquals(3, childClassType.methods().stream().count());
-    var method = childClassType.methods().item(1).get();
+    var method = childClassType.methods().item(1).orElseThrow();
     var methodInChildClassParams = method.parameters().stream().collect(toList());
     assertEquals(2, methodInChildClassParams.size());
 
@@ -55,17 +55,17 @@ public class MethodParameterTest {
   @Test
   public void testToString(IJavaEnvironment env) {
     var childClassType = env.requireType(ChildClass.class.getName());
-    assertFalse(Strings.isBlank(childClassType.methods().item(1).get().parameters().item(1).get().toString()));
+    assertFalse(Strings.isBlank(childClassType.methods().item(1).orElseThrow().parameters().item(1).orElseThrow().toString()));
 
     var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
-    assertFalse(Strings.isBlank(baseClassType.methods().first().get().parameters().first().toString()));
+    assertFalse(Strings.isBlank(baseClassType.methods().first().orElseThrow().parameters().first().toString()));
   }
 
   @Test
   public void testBindingMethodParameters(IJavaEnvironment env) {
     var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
     assertEquals(2, baseClassType.methods().stream().count());
-    var method = baseClassType.methods().first().get();
+    var method = baseClassType.methods().first().orElseThrow();
     var methodInBaseClassParams = method.parameters().stream().collect(toList());
     assertEquals(1, methodInBaseClassParams.size());
 
@@ -73,7 +73,7 @@ public class MethodParameterTest {
     assertEquals("runnableParam", runnableParam.elementName());
     assertEquals(Flags.AccFinal, runnableParam.flags());
     assertEquals(method, runnableParam.declaringMethod());
-    assertEquals(JavaTypes.Double, runnableParam.dataType().leafComponentType().get().name());
+    assertEquals(JavaTypes.Double, runnableParam.dataType().leafComponentType().orElseThrow().name());
     assertTrue(runnableParam.dataType().isArray());
     assertEquals(1, runnableParam.dataType().arrayDimension());
   }

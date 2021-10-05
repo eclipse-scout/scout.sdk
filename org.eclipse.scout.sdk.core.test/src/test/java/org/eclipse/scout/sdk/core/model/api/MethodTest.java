@@ -44,7 +44,7 @@ public class MethodTest {
     assertEquals(3, childClassType.methods().stream().count());
 
     // constructor
-    var constr = childClassType.methods().first().get();
+    var constr = childClassType.methods().first().orElseThrow();
     assertEquals(childClassType, constr.requireDeclaringType());
     assertEquals(0, constr.exceptionTypes().count());
     assertEquals(Flags.AccPublic, constr.flags());
@@ -56,26 +56,26 @@ public class MethodTest {
     assertFalse(constr.toWorkingCopy().returnType().isPresent());
 
     // methodInChildClass
-    var methodInChildClass = childClassType.methods().item(1).get();
+    var methodInChildClass = childClassType.methods().item(1).orElseThrow();
     assertEquals(childClassType, methodInChildClass.requireDeclaringType());
     assertEquals(1, methodInChildClass.exceptionTypes().count());
-    assertEquals(IOException.class.getName(), methodInChildClass.exceptionTypes().findAny().get().name());
+    assertEquals(IOException.class.getName(), methodInChildClass.exceptionTypes().findAny().orElseThrow().name());
     assertEquals(Flags.AccProtected | Flags.AccSynchronized, methodInChildClass.flags());
     assertEquals("methodInChildClass", methodInChildClass.elementName());
     assertEquals(2, methodInChildClass.parameters().stream().count());
-    assertEquals(JavaTypes._boolean, methodInChildClass.requireReturnType().leafComponentType().get().name());
+    assertEquals(JavaTypes._boolean, methodInChildClass.requireReturnType().leafComponentType().orElseThrow().name());
     assertTrue(methodInChildClass.requireReturnType().isArray());
     assertFalse(methodInChildClass.isConstructor());
     assertEquals(1, methodInChildClass.annotations().stream().count());
 
     // firstCase
-    var firstCase = childClassType.methods().item(2).get();
+    var firstCase = childClassType.methods().item(2).orElseThrow();
     assertEquals(childClassType, firstCase.requireDeclaringType());
     assertEquals(0, firstCase.exceptionTypes().count());
     assertEquals(Flags.AccPrivate, firstCase.flags());
     assertEquals("firstCase", firstCase.elementName());
     assertEquals(0, firstCase.parameters().stream().count());
-    assertEquals(Set.class.getName(), firstCase.requireReturnType().leafComponentType().get().name());
+    assertEquals(Set.class.getName(), firstCase.requireReturnType().leafComponentType().orElseThrow().name());
     assertFalse(firstCase.isConstructor());
     assertEquals(1, firstCase.annotations().stream().count());
   }
@@ -83,15 +83,15 @@ public class MethodTest {
   @Test
   public void testToString(IJavaEnvironment env) {
     var childClassType = env.requireType(ChildClass.class.getName());
-    assertFalse(Strings.isBlank(childClassType.methods().item(1).get().toString()));
+    assertFalse(Strings.isBlank(childClassType.methods().item(1).orElseThrow().toString()));
   }
 
   @Test
   public void testDefaultMethods(IJavaEnvironment env) {
     var type = env.requireType(ClassWithDefaultMethods.class.getName());
     assertEquals(7, type.methods().withSuperInterfaces(true).stream().count());
-    assertEquals(4, type.superInterfaces().findAny().get().methods().stream().count());
-    var defaultMethod = type.superInterfaces().findAny().get().methods().withName("defMethod2").first().get();
+    assertEquals(4, type.superInterfaces().findAny().orElseThrow().methods().stream().count());
+    var defaultMethod = type.superInterfaces().findAny().orElseThrow().methods().withName("defMethod2").first().orElseThrow();
     assertTrue(isDefaultMethod(defaultMethod.flags()));
   }
 
@@ -102,22 +102,22 @@ public class MethodTest {
     assertEquals(2, baseClassType.methods().stream().count());
 
     // methodInBaseClass
-    var methodInBaseClass = baseClassType.methods().first().get();
+    var methodInBaseClass = baseClassType.methods().first().orElseThrow();
     assertEquals(baseClassType, methodInBaseClass.requireDeclaringType());
     assertEquals(2, methodInBaseClass.exceptionTypes().count());
-    assertEquals(IOError.class.getName(), methodInBaseClass.exceptionTypes().findAny().get().name());
-    assertEquals(FileNotFoundException.class.getName(), methodInBaseClass.exceptionTypes().skip(1).findAny().get().name());
+    assertEquals(IOError.class.getName(), methodInBaseClass.exceptionTypes().findAny().orElseThrow().name());
+    assertEquals(FileNotFoundException.class.getName(), methodInBaseClass.exceptionTypes().skip(1).findAny().orElseThrow().name());
     assertEquals(Flags.AccProtected, methodInBaseClass.flags());
     assertEquals("methodInBaseClass", methodInBaseClass.elementName());
     assertEquals(1, methodInBaseClass.parameters().stream().count());
-    assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), methodInBaseClass.requireReturnType().leafComponentType().get().name());
+    assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), methodInBaseClass.requireReturnType().leafComponentType().orElseThrow().name());
     assertEquals(2, methodInBaseClass.requireReturnType().arrayDimension());
     assertTrue(methodInBaseClass.requireReturnType().isArray());
     assertFalse(methodInBaseClass.isConstructor());
     assertEquals(2, methodInBaseClass.annotations().stream().count());
 
     // method2InBaseClass
-    var method2InBaseClass = baseClassType.methods().item(1).get();
+    var method2InBaseClass = baseClassType.methods().item(1).orElseThrow();
     assertEquals(baseClassType, method2InBaseClass.requireDeclaringType());
     assertEquals(0, method2InBaseClass.exceptionTypes().count());
     assertEquals(Flags.AccPublic | Flags.AccSynchronized | Flags.AccFinal, method2InBaseClass.flags());
@@ -131,28 +131,28 @@ public class MethodTest {
 
   @Test
   public void testFindMethodInSuperHierarchy(IJavaEnvironment env) {
-    var methodInBaseClass = env.requireType(ChildClass.class.getName()).methods().withSuperTypes(true).withAnnotation(MarkerAnnotation.class.getName()).first().get();
+    var methodInBaseClass = env.requireType(ChildClass.class.getName()).methods().withSuperTypes(true).withAnnotation(MarkerAnnotation.class.getName()).first().orElseThrow();
     assertEquals("methodInBaseClass", methodInBaseClass.elementName());
   }
 
   @Test
   public void testConstructor(IJavaEnvironment env) {
-    var secondConstr = env.requireType(ClassWithConstructors.class.getName()).methods().item(1).get();
+    var secondConstr = env.requireType(ClassWithConstructors.class.getName()).methods().item(1).orElseThrow();
     assertFalse(secondConstr.returnType().isPresent());
     assertTrue(secondConstr.isConstructor());
-    assertEquals("ClassWithConstructors(String other) throws IOException", secondConstr.sourceOfDeclaration().get().asCharSequence().toString());
+    assertEquals("ClassWithConstructors(String other) throws IOException", secondConstr.sourceOfDeclaration().orElseThrow().asCharSequence().toString());
 
-    var declarationType = env.requireType(ClassWithConstructors.class.getName()).requireCompilationUnit().types().first().get();
+    var declarationType = env.requireType(ClassWithConstructors.class.getName()).requireCompilationUnit().types().first().orElseThrow();
     assertTrue(declarationType.unwrap() instanceof DeclarationTypeWithEcj);
     assertEquals(2, declarationType.methods().stream().count());
 
-    var declarationMethod = declarationType.methods().first().get();
+    var declarationMethod = declarationType.methods().first().orElseThrow();
     assertTrue(declarationMethod.isConstructor());
     assertFalse(declarationMethod.returnType().isPresent());
-    assertEquals("ClassWithConstructors() throws IOException", declarationMethod.sourceOfDeclaration().get().asCharSequence().toString());
+    assertEquals("ClassWithConstructors() throws IOException", declarationMethod.sourceOfDeclaration().orElseThrow().asCharSequence().toString());
 
     new CoreJavaEnvironmentBinaryOnlyFactory().accept(binEnv -> {
-      binEnv.requireType(ClassWithConstructors.class.getName()).methods().item(1).get();
+      binEnv.requireType(ClassWithConstructors.class.getName()).methods().item(1).orElseThrow();
       assertFalse(secondConstr.returnType().isPresent());
     });
   }

@@ -134,17 +134,17 @@ public class NlsTableController extends ViewerComparator {
   protected boolean handleTranslationManagerEvent(TranslationManagerEvent event) {
     switch (event.type()) {
       case TranslationManagerEvent.TYPE_NEW_TRANSLATION:
-        var newTranslation = event.translation().get();
+        var newTranslation = event.translation().orElseThrow();
         m_translationList.add(new TranslationTableEntry(newTranslation));
         reveal(newTranslation.key());
         updateReferenceCountInTable();
         return true;
       case TranslationManagerEvent.TYPE_REMOVE_TRANSLATION:
-        translationToTableEntry(event.translation().get()).ifPresent(m_translationList::remove);
+        translationToTableEntry(event.translation().orElseThrow()).ifPresent(m_translationList::remove);
         updateReferenceCountInTable();
         return false;
       case TranslationManagerEvent.TYPE_NEW_LANGUAGE:
-        if (!allLanguages().contains(event.language().get())) {
+        if (!allLanguages().contains(event.language().orElseThrow())) {
           // only refresh the full table if a new column has been added.
           m_view.getDisplay().asyncExec(() -> preservingSelectionDo(this::rebind));
         }
@@ -157,13 +157,13 @@ public class NlsTableController extends ViewerComparator {
             .filter(t -> t.unwrap().key().equals(event.key().orElse(null)))
             .findAny()
             .ifPresent(m_translationList::remove);
-        var translationWitNewKey = event.translation().get();
+        var translationWitNewKey = event.translation().orElseThrow();
         m_translationList.add(new TranslationTableEntry(translationWitNewKey));
         reveal(translationWitNewKey.key());
         updateReferenceCountInTable();
         return true;
       case TranslationManagerEvent.TYPE_UPDATE_TRANSLATION:
-        var changedTranslation = event.translation().get();
+        var changedTranslation = event.translation().orElseThrow();
         for (var i = NUM_NON_LANGUAGE_COLS; i < m_observedColumns.length; i++) {
           m_observedColumns[i].fireChange(changedTranslation);
         }

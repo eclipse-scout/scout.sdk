@@ -116,7 +116,7 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
     var existingServiceImpl = javaEnvironment.findType(serverPackage + JavaTypes.C_DOT + svcName);
     ICompilationUnitGenerator<?> implBuilder;
     if (existingServiceImpl.isPresent()) {
-      var compilationUnit = existingServiceImpl.get().requireCompilationUnit();
+      var compilationUnit = existingServiceImpl.orElseThrow().requireCompilationUnit();
       implBuilder = compilationUnit.toWorkingCopy();
       implBuilder.mainType().ifPresent(t -> t.withInterface(getServiceIfcBuilder().fullyQualifiedName()));
     }
@@ -197,7 +197,7 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
     var existingServiceTest = testSourceFolder.javaEnvironment().findType(serverPackage + JavaTypes.C_DOT + elementName);
     if (existingServiceTest.isPresent()) {
       // service test class already exists
-      return SdkFuture.completed(existingServiceTest.get());
+      return SdkFuture.completed(existingServiceTest.orElseThrow());
     }
 
     var scoutApi = testSourceFolder.javaEnvironment().requireApi(IScoutApi.class);

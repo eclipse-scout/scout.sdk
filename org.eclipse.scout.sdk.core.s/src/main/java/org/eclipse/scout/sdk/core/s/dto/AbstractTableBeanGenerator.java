@@ -102,7 +102,7 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
             .withBody(b -> b.returnClause().parenthesisOpen().ref(rowDataName).parenthesisClose().space()
                 .superClause().dot().append(addRowMethodName).parenthesisOpen().append(ROW_STATE_PARAM_NAME).parenthesisClose().semicolon()),
             DtoMemberSortObjectFactory.forMethodTableData(addRowMethodName))
-        .withMethod(createRow, DtoMemberSortObjectFactory.forMethodTableData(createRow.elementName().get())) // createRow
+        .withMethod(createRow, DtoMemberSortObjectFactory.forMethodTableData(createRow.elementName().orElseThrow())) // createRow
         .withMethod(MethodGenerator.create() // getRowType
             .asPublic()
             .withReturnType(Class.class.getName() + JavaTypes.C_GENERIC_START + JavaTypes.C_QUESTION_MARK + ' ' + JavaTypes.EXTENDS + ' ' + scoutApi().AbstractTableRowData().fqn() + JavaTypes.C_GENERIC_END)

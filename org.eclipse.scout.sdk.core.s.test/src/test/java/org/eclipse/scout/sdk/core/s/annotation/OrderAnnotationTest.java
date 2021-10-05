@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -38,18 +38,18 @@ public class OrderAnnotationTest {
   @Test
   public void testNewViewOrderValue(IJavaEnvironment env) {
     var type = env.requireType("formdata.client.ui.forms.IgnoredFieldsForm$MainBox$AGroupBox");
-    var first = type.innerTypes().first().get();
-    var second = type.innerTypes().item(1).get();
+    var first = type.innerTypes().first().orElseThrow();
+    var second = type.innerTypes().item(1).orElseThrow();
     var scoutApi = env.requireApi(IScoutApi.class);
-    assertEquals(-1000.0, getNewViewOrderValue(type, scoutApi.IFormField(), first.source().get().start() - 1), DELTA);
-    assertEquals(15.0, getNewViewOrderValue(type, scoutApi.IFormField(), first.source().get().end() + 1), DELTA);
-    assertEquals(2000.0, getNewViewOrderValue(type, scoutApi.IFormField(), second.source().get().end() + 1), DELTA);
+    assertEquals(-1000.0, getNewViewOrderValue(type, scoutApi.IFormField(), first.source().orElseThrow().start() - 1), DELTA);
+    assertEquals(15.0, getNewViewOrderValue(type, scoutApi.IFormField(), first.source().orElseThrow().end() + 1), DELTA);
+    assertEquals(2000.0, getNewViewOrderValue(type, scoutApi.IFormField(), second.source().orElseThrow().end() + 1), DELTA);
 
     var formWithHighOrders = env.requireType(FormWithHighOrders.class.getName());
-    var mainBox = formWithHighOrders.innerTypes().first().get();
-    var aGroupBox = mainBox.innerTypes().first().get();
-    assertEquals(99382716061728384.0d, getNewViewOrderValue(mainBox, scoutApi.IFormField(), aGroupBox.source().get().end() + 1), DELTA);
-    assertEquals(1000, getNewViewOrderValue(aGroupBox, scoutApi.IFormField(), aGroupBox.source().get().start() + 1), DELTA);
+    var mainBox = formWithHighOrders.innerTypes().first().orElseThrow();
+    var aGroupBox = mainBox.innerTypes().first().orElseThrow();
+    assertEquals(99382716061728384.0d, getNewViewOrderValue(mainBox, scoutApi.IFormField(), aGroupBox.source().orElseThrow().end() + 1), DELTA);
+    assertEquals(1000, getNewViewOrderValue(aGroupBox, scoutApi.IFormField(), aGroupBox.source().orElseThrow().start() + 1), DELTA);
   }
 
   @Test

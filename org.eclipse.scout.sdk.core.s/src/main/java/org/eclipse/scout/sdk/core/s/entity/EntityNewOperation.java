@@ -187,7 +187,7 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected String getFormSuperType(IJavaEnvironment javaEnv) {
-    return javaEnv.api(IScoutApi.class).get().AbstractForm().fqn();
+    return javaEnv.api(IScoutApi.class).orElseThrow().AbstractForm().fqn();
   }
 
   protected PageNewOperation createPageNewOperation() {
@@ -232,7 +232,7 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected String getPageSuperType(IJavaEnvironment javaEnv) {
-    return javaEnv.api(IScoutApi.class).get().AbstractPageWithTable().fqn();
+    return javaEnv.api(IScoutApi.class).orElseThrow().AbstractPageWithTable().fqn();
   }
 
   @SuppressWarnings("MethodMayBeStatic")

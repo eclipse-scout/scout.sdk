@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -90,7 +90,7 @@ public class PageNewWizardPage extends AbstractCompilationUnitNewWizardPage {
     // remove AbstractPage from the proposal list
     var superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();
     superTypeContentProvider.setTypeProposalFilter(superTypeContentProvider.getTypeProposalFilter()
-        .and(element -> !scoutApi().get().AbstractPage().fqn().equals(element.getFullyQualifiedName())));
+        .and(element -> !scoutApi().orElseThrow().AbstractPage().fqn().equals(element.getFullyQualifiedName())));
 
     PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PAGE_NEW_WIZARD_PAGE);
   }
@@ -136,7 +136,7 @@ public class PageNewWizardPage extends AbstractCompilationUnitNewWizardPage {
 
     try {
       var supertypeHierarchy = superType.newSupertypeHierarchy(null);
-      setIsPageWithTable(JdtUtils.hierarchyContains(supertypeHierarchy, scoutApi().get().IPageWithTable().fqn()));
+      setIsPageWithTable(JdtUtils.hierarchyContains(supertypeHierarchy, scoutApi().orElseThrow().IPageWithTable().fqn()));
       if (isPageWithTable()) {
         setReadOnlySuffix(ISdkConstants.SUFFIX_PAGE_WITH_TABLE);
       }

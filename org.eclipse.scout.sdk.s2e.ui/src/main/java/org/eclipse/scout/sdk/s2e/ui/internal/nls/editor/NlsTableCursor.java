@@ -210,7 +210,7 @@ public class NlsTableCursor {
       return;
     }
 
-    var cell = selection.get();
+    var cell = selection.orElseThrow();
     var isEditable = cell.column() == NlsTableController.INDEX_COLUMN_KEYS ? cell.translation().hasOnlyEditableStores() : cell.translation().hasEditableStores();
     if (!isEditable) {
       return;
@@ -226,7 +226,7 @@ public class NlsTableCursor {
     var selectedColumn = getCursor().getColumn();
     var editingText = m_editingText.getText();
     if (selectedColumn == NlsTableController.INDEX_COLUMN_KEYS) {
-      var validationResult = getSelection().get().translation().stores()
+      var validationResult = getSelection().orElseThrow().translation().stores()
           .mapToInt(store -> validateKey(m_controller.translationManager(), store, editingText, Collections.singleton(editingText)))
           .max().orElse(TranslationValidator.OK);
       return TranslationInputValidator.toStatus(validationResult);
@@ -341,7 +341,7 @@ public class NlsTableCursor {
     m_renaming = true;
     try {
       var text = m_editingText.getText();
-      var selection = getSelection().get();
+      var selection = getSelection().orElseThrow();
       for (var listener : m_listeners.get(INlsTableCursorListener.class)) {
         listener.textStored(selection, text);
       }
