@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2e.ui.internal.jaxws;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,7 +20,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import javax.wsdl.WSDLException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -44,6 +42,7 @@ import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.Pom;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Resources;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
@@ -706,13 +705,13 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
   }
 
   protected static String validateWsdl(URL url) {
-    try (var in = url.openStream()) {
+    try (var in = Resources.openStream(url)) {
       var info = ParsedWsdl.create(url.toURI(), in, false);
       if (info.isEmpty()) {
         return "Either this Web Service uses SOAP encoding (use=encoded) or contains no operations. Ensure the Web Service uses literal encoding.";
       }
     }
-    catch (IOException | URISyntaxException | WSDLException e) {
+    catch (Exception e) {
       SdkLog.debug(e);
       return "The given WSDL cannot be parsed.";
     }

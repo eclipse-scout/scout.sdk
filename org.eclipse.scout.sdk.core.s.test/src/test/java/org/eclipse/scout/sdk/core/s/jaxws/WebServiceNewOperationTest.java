@@ -37,6 +37,7 @@ import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentBuilder;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.Resources;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Xml;
 import org.junit.jupiter.api.Tag;
@@ -55,7 +56,7 @@ public class WebServiceNewOperationTest {
 
   @Test
   public void testUnsupportedService() throws IOException, WSDLException, URISyntaxException {
-    try (var in = RPC_ENCODED_WSDL.openStream()) {
+    try (var in = Resources.openStream(RPC_ENCODED_WSDL)) {
       var info = ParsedWsdl.create(RPC_ENCODED_WSDL.toURI(), in, true);
       assertTrue(info.isEmpty());
     }
