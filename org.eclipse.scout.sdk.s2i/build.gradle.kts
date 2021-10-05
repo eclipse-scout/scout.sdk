@@ -46,7 +46,7 @@ plugins {
     id("java")
     id("maven-publish")
     id("idea")
-    id("org.jetbrains.intellij") version "1.1.6"
+    id("org.jetbrains.intellij") version "1.2.0"
     kotlin("jvm") version "1.5.31"
     id("net.linguica.maven-settings") version "0.5" // for maven settings
 }
@@ -91,7 +91,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IU-2021.2"))
+        ideVersions.set(listOf("IU-2021.2", "IU-2021.3"))
         subsystemsToCheck.set("without-android")
         failureLevel.set(FailureLevel.ALL)
     }
