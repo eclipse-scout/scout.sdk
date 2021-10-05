@@ -286,8 +286,8 @@ class TransactionManager constructor(val project: Project, val transactionName: 
 
         // map to documents
         val documentMappings = files
-                .map { pair -> pair.key to pair.value?.let { Pair(it, m_documentManager.getDocument(it)) } }
-                .toMap(HashMap())
+            .map { pair -> pair.key to pair.value?.let { Pair(it, m_documentManager.getDocument(it)) } }
+            .toMap(HashMap())
 
         // validate documents and prepare for modification
         val documentsReady = documentMappings.values.filterNotNull().all { documentReady(it.second) }
@@ -310,29 +310,14 @@ class TransactionManager constructor(val project: Project, val transactionName: 
         return true
     }
 
-    private fun commitTransaction(documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, progress: IdeaProgress): Boolean {
-        val useBulkUpdate = documentMappings.size >= BULK_UPDATE_LIMIT
-        val initialDocuments = documentMappings.values.mapNotNull { it?.second }
-        try {
-            if (useBulkUpdate) {
-                initialDocuments.forEach { it.isInBulkUpdate = true }
-            }
-            return commitAllMembers(documentMappings, progress)
-        } finally {
-            if (useBulkUpdate) {
-                initialDocuments.forEach { it.isInBulkUpdate = false }
-            }
-        }
-    }
-
-    private fun commitAllMembers(documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, progress: IdeaProgress) = m_members.entries
-            .map { commitMembersAndPersist(it.key, it.value, documentMappings, progress) }
-            .minOrNull() ?: false
+    private fun commitTransaction(documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, progress: IdeaProgress) = m_members.entries
+        .map { commitMembersAndPersist(it.key, it.value, documentMappings, progress) }
+        .minOrNull() ?: false
 
     private fun commitMembersAndPersist(path: Path, members: List<TransactionMember>, documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, progress: IdeaProgress): Boolean {
         val success = members
-                .map { member -> commitMember(member, path, documentMappings, progress.newChild(1)) }
-                .minOrNull() ?: false
+            .map { member -> commitMember(member, path, documentMappings, progress.newChild(1)) }
+            .minOrNull() ?: false
         if (success) {
             val document = documentMappings[path]?.second
             if (document != null && m_documentManager.isDocumentUnsaved(document)) {
