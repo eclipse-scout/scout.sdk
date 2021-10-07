@@ -16,6 +16,7 @@ import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.createMethodIdentifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +41,9 @@ import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode.DataObjectNodeKind;
@@ -157,13 +160,36 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     return newSource.toString();
   }
 
+  protected String createMethodDeclarationSource(IMethod m) {
+    var paramSource = m
+        .parameters().stream()
+        .map(p -> p.source().orElseThrow())
+        .map(ISourceRange::asCharSequence)
+        .collect(toList());
+    return createMethodIdentifier(m.elementName(), paramSource);
+  }
+
+  protected String createMethodDeclarationSource(IMethodGenerator<?, ?> m, IJavaEnvironment env) {
+    var paramSource = m.parameters()
+        .map(p -> p.toJavaSource(env))
+        .collect(toList());
+    return createMethodIdentifier(m.elementName(env).orElseThrow(), paramSource);
+  }
+
   protected Stream<Replacement> buildReplacements(IMethodGenerator<?, ?> generator, IType dataObjectType, CharSequence cuSource, IJavaBuilderContext buildContext, Collection<IMethod> replacedMethods) {
-    var newSource = generator.toJavaSource(buildContext); // pass a shared BuilderContext to collect imports
-    var methodId = generator.identifier(dataObjectType.javaEnvironment());
-    var existingMethod = dataObjectType.methods().withMethodIdentifier(methodId).first();
+    // search existing method not using methodId. Because the type used in the existing method might no longer exist. This would result in an exception (type missing).
+    // instead compare the source of the method declaration to be created with the source of the existing method declarations (ignoring fully qualified type names).
+    var methodDeclarationSource = createMethodDeclarationSource(generator, dataObjectType.javaEnvironment());
+    var methodName = generator.elementName(dataObjectType.javaEnvironment()).orElseThrow();
+    var existingMethod = dataObjectType
+        .methods()
+        .withName(methodName).stream()
+        .filter(m -> methodDeclarationSource.equals(createMethodDeclarationSource(m)))
+        .findAny();
 
     // insert at the bottom of the class
     var insertIndex = dataObjectType.source().orElseThrow().end() - 1;
+    var newSource = generator.toJavaSource(buildContext); // pass a shared BuilderContext to collect imports
     var newMethodReplacement = new Replacement(insertIndex, 0, newSource);
     if (existingMethod.isEmpty()) {
       return Stream.of(newMethodReplacement);
