@@ -10,19 +10,23 @@
  */
 package org.eclipse.scout.sdk.core.testing;
 
+import static java.lang.System.lineSeparator;
+import static java.util.Collections.emptyList;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.testing.CoreTestingUtils.normalizeNewLines;
 import static org.eclipse.scout.sdk.core.testing.CoreTestingUtils.registerCompilationUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiPredicate;
 
@@ -311,29 +315,44 @@ public final class SdkAssertions {
 
   public static <A extends IApiSpecification> void assertApiValid(Class<A> apiSpec, IJavaEnvironment environment, BiPredicate<IType, A> validateOthers) {
     var api = environment.requireApi(apiSpec);
-    Api.dump(api).forEach((key, value) -> assertApiClassValid(key, value, environment, api, validateOthers));
+    var errors = Api.dump(api).entrySet().stream()
+        .map(e -> collectApiClassErrors(e.getKey(), e.getValue(), environment, api, validateOthers))
+        .flatMap(Collection::stream)
+        .collect(joining(lineSeparator()));
+    if (errors.isEmpty()) {
+      return;
+    }
+    fail("API validation failed with the following errors:" + lineSeparator() + errors + lineSeparator());
   }
 
-  static <A extends IApiSpecification> void assertApiClassValid(String fqn, Map<ChildElementType, Map<String, String>> children, IJavaEnvironment env, A api, BiPredicate<IType, A> validateOthers) {
+  static <A extends IApiSpecification> Collection<String> collectApiClassErrors(String fqn, Map<ChildElementType, Map<String, String>> children, IJavaEnvironment env, A api, BiPredicate<IType, A> validateOthers) {
     var typeOpt = env.findType(fqn);
-    assertTrue(typeOpt.isPresent(), "Type '" + fqn + "' could not be found.");
+    if (typeOpt.isEmpty()) {
+      return List.of(" - Type '" + fqn + "' could not be found.");
+    }
+
     var type = typeOpt.orElseThrow();
-    testMethods(children.get(ChildElementType.METHOD_NAME).values(), type);
-    testMethods(children.get(ChildElementType.ANNOTATION_ELEMENT_NAME).values(), type);
+    var errors = new ArrayList<String>();
+    errors.addAll(testMethods(children.get(ChildElementType.METHOD_NAME).values(), type));
+    errors.addAll(testMethods(children.get(ChildElementType.ANNOTATION_ELEMENT_NAME).values(), type));
     var notMatchingConvention = children.get(ChildElementType.OTHER);
     if (notMatchingConvention == null || notMatchingConvention.isEmpty()) {
-      return;
+      return errors;
     }
     if (validateOthers != null && validateOthers.test(type, api)) {
-      return;
+      return errors;
     }
-    fail("The following methods in class '" + fqn + "' do not follow the naming convention:" + System.lineSeparator() + notMatchingConvention.values());
+    errors.add(" - The following methods in type '" + fqn + "' do not follow the naming convention: " + notMatchingConvention.values());
+    return errors;
   }
 
-  static void testMethods(Collection<String> methodNames, IType owner) {
+  static Collection<String> testMethods(Collection<String> methodNames, IType owner) {
     if (methodNames == null || methodNames.isEmpty()) {
-      return;
+      return emptyList();
     }
-    methodNames.forEach(methodName -> assertTrue(owner.methods().withName(methodName).existsAny(), () -> "'" + methodName + "' cannot be found in type '" + owner.name() + "'."));
+    return methodNames.stream()
+        .filter(name -> !owner.methods().withName(name).existsAny())
+        .map(name -> " - Method '" + name + "' cannot be found in type '" + owner.name() + "'.")
+        .collect(toList());
   }
 }
