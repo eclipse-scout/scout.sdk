@@ -133,7 +133,7 @@ public class TranslationManager {
    *          The base text. From this the new key is derived.
    * @return A new valid key or an empty {@link String} if the input text is empty or {@code null}.
    */
-  @SuppressWarnings("pmd:NPathComplexity")
+  @SuppressWarnings({"pmd:NPathComplexity", "squid:S1067"})
   public String generateNewKey(CharSequence baseText) {
     if (Strings.isBlank(baseText)) {
       return "";
