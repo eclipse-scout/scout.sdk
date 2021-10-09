@@ -129,19 +129,16 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
 
     internal fun fileCache() = m_fileCache // for testing
 
-    internal fun processFileEvents(events: List<PsiFile>) = events
-            .toHashSet()
-            .groupBy { it.containingModule() }
-            .forEach {
-                it.key?.let { module -> processModule(module, it.value) }
-            }
+    internal fun processFileEvents(events: List<PsiFile>) = computeInReadAction(project) {
+        events.toHashSet()
+                .groupBy { it.containingModule() /* requires read action */ }
+                .forEach { it.key?.let { module -> processModule(module, it.value) } }
+    }
 
     internal fun processModule(module: Module, files: List<PsiFile>) {
         val scoutApi = ApiHelper.scoutApiFor(module) ?: return
         files.forEach {
-            computeInReadAction(module.project) {
-                processFile(scoutApi, it)
-            }
+            processFile(scoutApi, it)
         }
     }
 
@@ -178,7 +175,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     private inner class PsiListener : PsiTreeChangeAdapter() {
         override fun childrenChanged(event: PsiTreeChangeEvent) {
             val file = event.file ?: return
-            if (!file.isPhysical || !file.language.isKindOf(JavaLanguage.INSTANCE)) {
+            if (!file.language.isKindOf(JavaLanguage.INSTANCE) || !file.isValid || !file.isPhysical) {
                 return
             }
             m_delayedProcessor.submit(file)
