@@ -25,6 +25,7 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
+import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
 import java.time.Duration;
 import java.util.Locale;
@@ -48,7 +49,7 @@ public final class Resources {
    * @throws IOException
    *           if the connection fails.
    * @throws SdkException
-   *           if the thread is interrupted while waiting for the response.
+   *           if the url is not valid or the thread is interrupted while waiting for the response.
    */
   public static InputStream openStream(URL url) throws IOException {
     return openStream(toURI(url));
@@ -177,6 +178,9 @@ public final class Resources {
         throw new IOException("Status code " + statusCode + " received getting '" + toSimple(uri) + "' (url shortened).");
       }
       return response.body();
+    }
+    catch (HttpConnectTimeoutException e) {
+      throw new IOException("HTTP connect timed out for URI '" + toSimple(uri) + "' (url shortened).", e);
     }
     catch (InterruptedException e) {
       throw new SdkException("Interrupted while reading from URI '{}' (url shortened).", toSimple(uri), e);
