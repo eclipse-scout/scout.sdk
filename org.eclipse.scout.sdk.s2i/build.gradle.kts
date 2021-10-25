@@ -91,7 +91,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IU-2021.2"/*, "IU-2021.3"*/))
+        ideVersions.set(listOf("IU-2021.2", "IU-2021.3"))
         subsystemsToCheck.set("without-android")
         failureLevel.set(FailureLevel.ALL)
     }
