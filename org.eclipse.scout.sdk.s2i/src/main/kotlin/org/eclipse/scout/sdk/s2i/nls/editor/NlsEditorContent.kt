@@ -159,7 +159,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
     }
 
     private fun createContextMenu() = ActionManager.getInstance()
-        .createActionPopupMenu(ActionPlaces.UNKNOWN, createContextMenuActionGroup())
+        .createActionPopupMenu("ScoutNlsEditorContextMenu", createContextMenuActionGroup())
         .component
 
     private fun createContextMenuActionGroup(): DefaultActionGroup {
@@ -172,9 +172,9 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
     }
 
     private fun createToolbar(): JComponent {
-        return ActionManager.getInstance()
-            .createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, createToolbarActionGroup(), false)
-            .component
+        val toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, createToolbarActionGroup(), false)
+        toolbar.setTargetComponent(this)
+        return toolbar.component
     }
 
     private fun createToolbarActionGroup(): ActionGroup {
