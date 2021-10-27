@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2i.model.js
 
 import com.intellij.javascript.nodejs.NodeModuleSearchUtil.collectVisibleNodeModules
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.project.guessModuleDir
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
@@ -19,8 +20,6 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.IWebConstants
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.jsModuleCache
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 /**
  * Represents the full Scout JavaScript model of a Node module.
@@ -169,7 +168,9 @@ class JsModel {
 
     private fun visitElementAndParents(modelElement: AbstractJsModelElement, visitor: (AbstractJsModelElement) -> Boolean): Boolean {
         val superElements = ArrayDeque<AbstractJsModelElement>()
+        val visited = HashSet<AbstractJsModelElement>()
         superElements.addLast(modelElement)
+        visited.add(modelElement) // to handle cycles. This might happen if a class uses a super class with the same name in the same namespace.
         while (superElements.isNotEmpty()) {
             val element = superElements.removeFirst()
             val continueVisiting = visitor(element)
@@ -177,7 +178,10 @@ class JsModel {
                 return true // early abort
             }
             if (element is JsModelClass) {
-                element.superClassNames.mapNotNull { element(it) }.forEach { superElements.addLast(it) }
+                ProgressManager.checkCanceled()
+                val supers = element.superClassNames.mapNotNull { element(it) }.filter { !visited.contains(it) }
+                visited.addAll(supers)
+                supers.forEach { superElements.addLast(it) }
             }
         }
         return false
