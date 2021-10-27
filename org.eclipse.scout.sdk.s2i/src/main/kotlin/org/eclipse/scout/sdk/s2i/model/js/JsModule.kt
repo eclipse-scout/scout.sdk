@@ -124,10 +124,14 @@ class JsModule(val name: String, val namespace: String, val sourceRoot: VirtualF
     }
 
     private fun parseJsFile(jsFile: JSFile) {
-        jsFile.accept(object : JSRecursiveWalkingElementSkippingNestedFunctionsVisitor() {
-            override fun visitJSClass(aClass: JSClass) = parseJsClass(aClass)
-            override fun visitJSVariable(node: JSVariable) = parseTopLevelEnum(node)
-        })
+        try {
+            jsFile.accept(object : JSRecursiveWalkingElementSkippingNestedFunctionsVisitor() {
+                override fun visitJSClass(aClass: JSClass) = parseJsClass(aClass)
+                override fun visitJSVariable(node: JSVariable) = parseTopLevelEnum(node)
+            })
+        } catch (e: RuntimeException) {
+            SdkLog.warning("Cannot parse file '{}'. Ignoring content.", jsFile.name, e)
+        }
     }
 
     private fun parseJsClass(jsClass: JSClass) {
