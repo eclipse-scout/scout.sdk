@@ -30,12 +30,16 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
             val javaFile = if (file is PsiJavaFile) file else null ?: return ProblemDescriptor.EMPTY_ARRAY
             val classIdCache = EclipseScoutBundle.classIdCache(javaFile.project)
             if (!classIdCache.isCacheReady()) {
-                classIdCache.setup() // nop if already setup or currently calculating
+                classIdCache.scheduleSetup() // does nothing if already scheduled or already set up
+                // do not wait for the cache to not delay other inspections
+                // as soon as the cache is ready, this inspection will start its work
+                return ProblemDescriptor.EMPTY_ARRAY
             }
+
             classIdCache.duplicates(javaFile.virtualFile.path)
-                    .mapNotNull { createProblemFor(it.value, javaFile, manager, isOnTheFly) }
-                    .flatten()
-                    .toTypedArray()
+                .mapNotNull { createProblemFor(it.value, javaFile, manager, isOnTheFly) }
+                .flatten()
+                .toTypedArray()
         } catch (e: Exception) {
             SdkLog.error("Duplicate @ClassId inspection failed for file '{}'.", file, e)
             ProblemDescriptor.EMPTY_ARRAY
@@ -43,8 +47,8 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
     }
 
     protected fun createProblemFor(duplicates: Collection<String>, file: PsiJavaFile, manager: InspectionManager, isOnTheFly: Boolean) =
-            resolvePsi(duplicates, file)
-                    .mapNotNull { createProblemFor(duplicates, it, manager, isOnTheFly) }
+        resolvePsi(duplicates, file)
+            .mapNotNull { createProblemFor(duplicates, it, manager, isOnTheFly) }
 
     protected fun createProblemFor(duplicates: Collection<String>, clazz: PsiClass, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {
         val scoutApi = ApiHelper.scoutApiFor(clazz) ?: return null
@@ -52,8 +56,8 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
         val annotation = ClassIdAnnotation.of(clazz, project, scoutApi) ?: return null
         val myName = computeInReadAction(project) { clazz.qualifiedName }
         val othersWithSameValue = duplicates
-                .filter { d -> d != myName }
-                .joinToString()
+            .filter { d -> d != myName }
+            .joinToString()
         val message = EclipseScoutBundle.message("duplicate.classid.value", othersWithSameValue)
         val quickFix = ChangeClassIdValueQuickFix(annotation)
         return manager.createProblemDescriptor(annotation.psiAnnotation, message, isOnTheFly, arrayOf(quickFix), ProblemHighlightType.ERROR)
@@ -61,9 +65,9 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
 
     protected fun resolvePsi(duplicates: Collection<String>, file: PsiJavaFile): List<PsiClass> = computeInReadAction(file.project) {
         PsiTreeUtil.findChildrenOfType(file, PsiClass::class.java)
-                .associateBy { it.qualifiedName }
-                .filter { it.key != null }
-                .filter { duplicates.contains(it.key) }
-                .map { it.value }
+            .associateBy { it.qualifiedName }
+            .filter { it.key != null }
+            .filter { duplicates.contains(it.key) }
+            .map { it.value }
     }
 }

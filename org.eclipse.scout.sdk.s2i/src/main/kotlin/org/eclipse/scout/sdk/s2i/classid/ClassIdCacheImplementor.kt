@@ -31,12 +31,14 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.dto.AbstractDtoGenerator
+import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.s.util.DelayedBuffer
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.findAllTypesAnnotatedWith
 import org.eclipse.scout.sdk.s2i.util.ApiHelper
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import kotlin.streams.asSequence
 
@@ -49,7 +51,22 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     @Volatile
     private var m_cacheReady = false
 
+    @Volatile
+    private var m_cacheSetupRunning = false
+
     override fun isCacheReady() = m_cacheReady
+
+    fun isCacheSetupRunning() = m_cacheSetupRunning
+
+    override fun scheduleSetup(): Future<*> {
+        if (isCacheReady()) {
+            return SdkFuture.completed(null) // already set up
+        }
+        if (isCacheSetupRunning()) {
+            return SdkFuture.completed(null) // already setting up
+        }
+        return AppExecutorUtil.getAppExecutorService().submit { setup() }
+    }
 
     override fun setup() = synchronized(m_fileCache) {
         // synchronized so that only one is creating the cache at a time
@@ -58,6 +75,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
         }
 
         try {
+            m_cacheSetupRunning = true
             computeInReadAction(project) {
                 trySetupCache()
             }
@@ -71,6 +89,8 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
             duplicates().forEach { SdkLog.debug("Duplicate @ClassId value '{}' found for types {}.", it.key, it.value) }
         } catch (t: Exception) {
             SdkLog.warning("Error building @ClassId value cache.", t)
+        } finally {
+            m_cacheSetupRunning = false
         }
     }
 
@@ -79,16 +99,16 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     }
 
     override fun findAllClassIds(scope: SearchScope, indicator: ProgressIndicator?) =
-            ScoutApi.allKnown().asSequence()
-                    .map { it.ClassId().fqn() to it }
-                    .distinctBy { it.first }
-                    .flatMap { findAllClassIds(it.second, scope, indicator) }
+        ScoutApi.allKnown().asSequence()
+            .map { it.ClassId().fqn() to it }
+            .distinctBy { it.first }
+            .flatMap { findAllClassIds(it.second, scope, indicator) }
 
     private fun findAllClassIds(scoutApi: IScoutApi, scope: SearchScope, indicator: ProgressIndicator?) =
-            project.findAllTypesAnnotatedWith(scoutApi.ClassId().fqn(), scope, indicator)
-                    .filter { it.isValid }
-                    .mapNotNull { ClassIdAnnotation.of(null, it, project, scoutApi) }
-                    .filter { it.hasValue() }
+        project.findAllTypesAnnotatedWith(scoutApi.ClassId().fqn(), scope, indicator)
+            .filter { it.isValid }
+            .mapNotNull { ClassIdAnnotation.of(null, it, project, scoutApi) }
+            .filter { it.hasValue() }
 
     override fun typesWithClassId(classId: String): List<String> = usageByClassId()[classId] ?: emptyList()
 
@@ -104,24 +124,24 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     internal fun usageByClassId(filter: ((Map.Entry<String, String>) -> Boolean)? = null): Map<String /* classId */, List<String /* fqn */>> {
         val nullSafeFilter = filter ?: { true }
         return m_fileCache.values
-                .asSequence()
-                .map { it.entries }
-                .flatten()
-                .filter { nullSafeFilter(it) }
-                .groupBy({ it.value }, { it.key })
+            .asSequence()
+            .map { it.entries }
+            .flatten()
+            .filter { nullSafeFilter(it) }
+            .groupBy({ it.value }, { it.key })
     }
 
     internal fun trySetupCache() {
         SdkLog.debug("Start building @ClassId value cache.")
         val start = System.currentTimeMillis()
         findAllClassIds(GlobalSearchScope.projectScope(project))
-                .filter { !ignoreClassId(it) }
-                .forEach {
-                    val fqn = it.ownerFqn() ?: return@forEach
-                    val classIdValue = it.value() ?: return@forEach
-                    val filePath = it.psiClass.containingFile.virtualFile.path
-                    m_fileCache.computeIfAbsent(filePath) { ConcurrentHashMap() }[fqn] = classIdValue
-                }
+            .filter { !ignoreClassId(it) }
+            .forEach {
+                val fqn = it.ownerFqn() ?: return@forEach
+                val classIdValue = it.value() ?: return@forEach
+                val filePath = it.psiClass.containingFile.virtualFile.path
+                m_fileCache.computeIfAbsent(filePath) { ConcurrentHashMap() }[fqn] = classIdValue
+            }
         SdkLog.debug("Finished building initial @ClassId value cache in {}ms. @ClassId values found in {} files.", System.currentTimeMillis() - start, m_fileCache.size)
     }
 
@@ -131,8 +151,8 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
 
     internal fun processFileEvents(events: List<PsiFile>) = computeInReadAction(project) {
         events.toHashSet()
-                .groupBy { it.containingModule() /* requires read action */ }
-                .forEach { it.key?.let { module -> processModule(module, it.value) } }
+            .groupBy { it.containingModule() /* read action required */ }
+            .forEach { it.key?.let { module -> processModule(module, it.value) } }
     }
 
     internal fun processModule(module: Module, files: List<PsiFile>) {

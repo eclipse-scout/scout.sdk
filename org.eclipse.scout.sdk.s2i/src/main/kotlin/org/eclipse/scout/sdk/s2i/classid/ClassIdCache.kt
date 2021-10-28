@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2i.classid
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.psi.search.SearchScope
+import java.util.concurrent.Future
 
 /**
  * Class to search for @ClassIds
@@ -28,9 +29,18 @@ interface ClassIdCache : Disposable {
     fun findAllClassIds(scope: SearchScope, indicator: ProgressIndicator? = null): Sequence<ClassIdAnnotation>
 
     /**
-     * Builds the cache. If the cache is already ready, this method does nothing.
+     * Builds the cache and waits until the setup completed. If the cache is already ready, this method does nothing.
      */
     fun setup()
+
+    /**
+     * Schedules an asynchronous setup of the ClassId cache.
+     * This method returns immediately after the setup has been scheduled.
+     * Use [isCacheReady] to check if it has completed or use the resulting [Future] to wait for setup completion.
+     *
+     * If there is already a setup scheduled or the cache is already set up, this method does nothing.
+     */
+    fun scheduleSetup(): Future<*>
 
     /**
      * @return true if the @ClassId cache is ready and the [duplicates] methods may be used.
