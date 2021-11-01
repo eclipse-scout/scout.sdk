@@ -107,7 +107,7 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
           else {
             b.appendFrom(IScoutApi.class, api -> api.AbstractForm().startInternalMethodName());
           }
-          b.parenthesisOpen().appendNew().ref(modifyHandlerFqn).parenthesisOpen().parenthesisClose().parenthesisClose().semicolon();
+          b.parenthesisOpen().appendNew(modifyHandlerFqn).parenthesisClose().parenthesisClose().semicolon();
         });
   }
 

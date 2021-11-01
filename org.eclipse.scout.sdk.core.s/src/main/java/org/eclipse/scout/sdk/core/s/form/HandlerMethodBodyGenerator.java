@@ -52,7 +52,7 @@ public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyB
 
     if (isLoad && permission().isPresent()) {
       builder
-          .nl().nl().appendFrom(IScoutApi.class, api -> api.IWidget().setEnabledPermissionMethodName()).parenthesisOpen().appendNew().ref(permission().orElseThrow()).parenthesisOpen()
+          .nl().nl().appendFrom(IScoutApi.class, api -> api.IWidget().setEnabledPermissionMethodName()).parenthesisOpen().appendNew(permission().orElseThrow())
           .append(permissionArgGenerator()
               .orElseGet(ISourceGenerator::empty)
               .generalize(builder))
@@ -68,7 +68,7 @@ public class HandlerMethodBodyGenerator implements ISourceGenerator<IMethodBodyB
       if (!isLoad || isCreateFormDataInLoad()) {
         builder.append(
             formDataInstanceCreationGenerator()
-                .orElseGet(() -> b -> b.appendNew().ref(formDataType().orElseThrow()).parenthesisOpen().parenthesisClose().semicolon().nl())
+                .orElseGet(() -> b -> b.appendNew(formDataType().orElseThrow()).parenthesisClose().semicolon().nl())
                 .generalize(builder))
             .appendExportFormData(FORM_DATA_VAR_NAME).nl();
         builder.append(FORM_DATA_VAR_NAME).equalSign();

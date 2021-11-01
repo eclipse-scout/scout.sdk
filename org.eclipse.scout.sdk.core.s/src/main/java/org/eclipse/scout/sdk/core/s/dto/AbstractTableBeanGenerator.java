@@ -76,7 +76,7 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
       createRow.asAbstract();
     }
     else {
-      createRow.withBody(b -> b.returnClause().appendNew().ref(rowDataName).parenthesisOpen().parenthesisClose().semicolon());
+      createRow.withBody(b -> b.returnClause().appendNew(rowDataName).parenthesisClose().semicolon());
     }
 
     return this
@@ -151,7 +151,7 @@ public abstract class AbstractTableBeanGenerator<TYPE extends AbstractTableBeanG
             .asPublic()
             .withReturnType(abstractTableRowDataFqn)
             .withElementName(createRowMethodName)
-            .withBody(b -> b.returnClause().appendNew().ref(abstractTableRowDataFqn).parenthesisOpen().parenthesisClose().space().blockStart().nl()
+            .withBody(b -> b.returnClause().appendNew(abstractTableRowDataFqn).parenthesisClose().space().blockStart().nl()
                 .append(FieldGenerator.createSerialVersionUid()).nl().blockEnd().semicolon()),
             DtoMemberSortObjectFactory.forMethodTableData(createRowMethodName))
         .withMethod(MethodGenerator.create()

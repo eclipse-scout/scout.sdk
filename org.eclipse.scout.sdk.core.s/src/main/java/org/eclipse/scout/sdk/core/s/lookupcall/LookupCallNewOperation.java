@@ -147,7 +147,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
             .asProtected()
             .withElementName(createLookupCallMethodName)
             .withReturnType(getCreatedLookupCallFqn())
-            .withBody(b -> b.returnClause().appendNew().ref(getCreatedLookupCallFqn()).parenthesisOpen().parenthesisClose().semicolon()))
+            .withBody(b -> b.returnClause().appendNew(getCreatedLookupCallFqn()).parenthesisClose().semicolon()))
         .withMethod(createTestMethod(createLookupCallMethodName, scoutApi.LookupCall().getDataByAllMethodName()))
         .withMethod(createTestMethod(createLookupCallMethodName, scoutApi.LookupCall().getDataByKeyMethodName()))
         .withMethod(createTestMethod(createLookupCallMethodName, scoutApi.LookupCall().getDataByTextMethodName()));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,8 +81,8 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    *          The api type that contains the class name. An instance of this type is passed to the nameSupplier. May be
    *          {@code null} in case the given nameSupplier can handle a {@code null} input.
    * @param nameSupplier
-   *          A {@link Function} to be called to obtain the {@link IClassNameSupplier} whose fully qualified name should be
-   *          added as class literal.
+   *          A {@link Function} to be called to obtain the {@link IClassNameSupplier} whose fully qualified name should
+   *          be added as class literal.
    * @param <T>
    *          The API type that contains the class name
    * @return
@@ -192,6 +192,38 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    * @return This builder
    */
   TYPE appendNew();
+
+  /**
+   * Appends a {@code new} clause for the class obtained from an {@link IApiSpecification} including a trailing opening
+   * parenthesis. The fully qualified name to use is obtained by using the {@link IClassNameSupplier} returned by
+   * invoking the given nameSupplier.
+   * <p>
+   * <b>Example:</b><br>
+   * {@code builder.appendNewFrom(IJavaApi.class, IJavaApi::ArrayList)} creates "{@code new ArrayList(}".
+   * 
+   * @param apiClass
+   *          The api type that contains the class name. An instance of this type is passed to the nameSupplier. May be
+   *          {@code null} in case the given nameSupplier can handle a {@code null} input.
+   * @param sourceProvider
+   *          A {@link Function} to be called to obtain the {@link IClassNameSupplier} whose fully qualified name should
+   *          be used after the {@code new} call.
+   * @param <API>
+   *          The API type that contains the class name
+   * @return This builder
+   */
+  <API extends IApiSpecification> TYPE appendNewFrom(Class<API> apiClass, Function<API, IClassNameSupplier> sourceProvider);
+
+  /**
+   * Appends a {@code new} clause for the class reference given including a trailing opening parenthesis.
+   * <p>
+   * <b>Example:</b><br>
+   * {@code builder.appendNew("java.util.ArrayList<java.util.String>")} creates "{@code new ArrayList<String>(}".
+   * 
+   * @param ref
+   *          The clss reference to use for the new call.
+   * @return This builder
+   */
+  TYPE appendNew(CharSequence ref);
 
   /**
    * Appends a {@code throw} clause including a trailing space.

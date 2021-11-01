@@ -262,7 +262,7 @@ public class PageNewOperation implements BiConsumer<IEnvironment, IProgress> {
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withBody(b -> {
           var varName = "pageData";
-          b.ref(getCreatedPageDataFqn()).space().append(varName).equalSign().appendNew().ref(getCreatedPageDataFqn()).parenthesisOpen().parenthesisClose().semicolon().nl()
+          b.ref(getCreatedPageDataFqn()).space().append(varName).equalSign().appendNew(getCreatedPageDataFqn()).parenthesisClose().semicolon().nl()
               .appendTodo("fill " + varName + '.')
               .returnClause().append(varName).semicolon();
         });
