@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,23 +51,23 @@ public class ImportValidator implements IImportValidator {
     return referenceParser().useReference(fullyQualifiedName);
   }
 
-  protected CharSequence handleTypeReference(CharSequence fqn, boolean isTypeArg) {
-    var cand = new TypeReferenceDescriptor(fqn, isTypeArg);
+  protected CharSequence handleTypeReference(CharSequence fqn, int typeArgDepth) {
+    var descriptor = new TypeReferenceDescriptor(fqn, typeArgDepth > 0);
     var collector = importCollector();
-    var use = collector.checkExistingImports(cand);
+    var use = collector.checkExistingImports(descriptor);
     if (use == null) {
-      use = collector.checkCurrentScope(cand);
-      if (cand.isTypeArg()) {
+      use = collector.checkCurrentScope(descriptor);
+      if (descriptor.isTypeArg()) {
         var foundInCurrentScope = use != null && use.indexOf(JavaTypes.C_DOT) < 0;
-        var inSamePackage = Objects.equals(collector.getQualifier(), cand.getQualifier()) || (Strings.isBlank(collector.getQualifier()) && Strings.isBlank(cand.getQualifier()));
+        var inSamePackage = Objects.equals(collector.getQualifier(), descriptor.getQualifier()) || (Strings.isBlank(collector.getQualifier()) && Strings.isBlank(descriptor.getQualifier()));
         if (foundInCurrentScope && inSamePackage) {
           // special case for type argument signature which are simple qualified because in same scope
-          collector.registerElement(cand); // ensure it is registered as used so that it appears in the imports for inner types only
+          collector.registerElement(descriptor); // ensure it is registered as used so that it appears in the imports for inner types only
         }
       }
     }
     if (use == null) {
-      use = collector.registerElement(cand);
+      use = collector.registerElement(descriptor);
     }
     return use;
   }

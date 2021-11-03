@@ -109,7 +109,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
     private fun scheduleUpdate(scope: SearchScope): IFuture<Unit> = callInIdeaEnvironment(project, message("update.derived.resources")) { env, progress ->
         try {
             performUpdateAsync(scope, env, progress)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             SdkLog.warning("Derived resource update for scope '{}' failed.", scope, e)
         }
     }

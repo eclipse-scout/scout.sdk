@@ -16,8 +16,11 @@ import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -59,11 +62,12 @@ public class CommentBuilderTest {
   @ExtendWith(JavaEnvironmentExtension.class)
   @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
   public void testAppendLink(IJavaEnvironment env) {
-    assertJavaElementCommentEquals("{@link}", b -> b.appendLink((CharSequence) null), env);
-    assertJavaElementCommentEquals("{@link}", b -> b.appendLink((IType) null), env);
+    assertJavaElementCommentEquals("", b -> b.appendLink((CharSequence) null), env);
+    assertJavaElementCommentEquals("", b -> b.appendLink((IType) null), env);
+    assertJavaElementCommentEquals("", b -> b.appendLink(""), env);
+
     assertJavaElementCommentEquals("{@link " + BaseClass.class.getSimpleName() + '}', BaseClass.class.getName(),
         b -> b.appendLink(env.requireType(BaseClass.class.getName())), env);
-    assertJavaElementCommentEquals("{@link}", b -> b.appendLink(""), env);
     assertJavaElementCommentEquals("{@link " + BaseClass.class.getSimpleName() + '}', BaseClass.class.getName(),
         b -> b.appendLink(BaseClass.class.getName()), env);
     assertJavaElementCommentEquals(JavaTypes._boolean, b -> b.appendLink(env.requireType(JavaTypes._boolean)), env);
@@ -80,6 +84,17 @@ public class CommentBuilderTest {
         b -> b.appendLink(List.class.getName() + "#addAll(int, " + Collection.class.getName() + ")", " label"), env);
     assertJavaElementCommentEquals("{@link List#size() label with multiple words}", List.class.getName(),
         b -> b.appendLink(List.class.getName() + "#size()", "label with multiple words"), env);
+
+    // test that generics are removed (not supported by @link)
+    assertJavaElementCommentEquals("{@link List#addAll(int, Collection) label}", Set.of(List.class.getName(), Collection.class.getName()),
+        b -> b.appendLink(List.class.getName() + "#addAll(int, " + Collection.class.getName() + "<" + BigInteger.class.getName() + ">)", " label"), env);
+
+    // test that for each type a @link is created
+    var refWithTypeArguments = Map.class.getName() + JavaTypes.C_GENERIC_START + Integer.class.getName() + ", " +
+        List.class.getName() + JavaTypes.C_GENERIC_START + BigDecimal.class.getName() + arrayMarker() + JavaTypes.C_GENERIC_END + JavaTypes.C_GENERIC_END;
+    assertJavaElementCommentEquals("{@link Map}<{@link Integer},{@link List}<{@link BigDecimal}[]>>",
+        Set.of(BigDecimal.class.getName(), Map.class.getName(), List.class.getName(), Integer.class.getName()),
+        b -> b.appendLink(refWithTypeArguments), env);
   }
 
   protected static void assertJavaElementCommentEquals(String expectedSrc, Consumer<IJavaElementCommentBuilder<?>> task, IJavaEnvironment env) {

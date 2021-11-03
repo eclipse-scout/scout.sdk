@@ -205,7 +205,7 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
 
   @Override
   public TYPE appendNewInstance(CharSequence fqn, CharSequence variableName, ISourceGenerator<IExpressionBuilder<?>> constructorArg) {
-    var newInstance = ref(fqn).space().append(variableName).equalSign().appendNew().ref(fqn).parenthesisOpen();
+    var newInstance = ref(fqn).space().append(variableName).equalSign().appendNew(fqn);
     if (constructorArg != null) {
       newInstance.append(constructorArg.generalize(ExpressionBuilder::create));
     }

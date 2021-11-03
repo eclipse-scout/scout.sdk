@@ -222,7 +222,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
             .withBody(b -> {
               var varName = "answer";
               var formDataName = getCreatedFormDataFqn();
-              b.ref(formDataName).space().append(varName).equalSign().appendNew().ref(formDataName).parenthesisOpen().parenthesisClose().semicolon().nl();
+              b.ref(formDataName).space().append(varName).equalSign().appendNew(formDataName).parenthesisClose().semicolon().nl();
               appendMockSource(b, varName, mockVarName, FormGenerator.SERVICE_PREPARE_CREATE_METHOD_NAME);
               appendMockSource(b, varName, mockVarName, FormGenerator.SERVICE_CREATE_METHOD_NAME);
               appendMockSource(b, varName, mockVarName, FormGenerator.SERVICE_LOAD_METHOD_NAME);

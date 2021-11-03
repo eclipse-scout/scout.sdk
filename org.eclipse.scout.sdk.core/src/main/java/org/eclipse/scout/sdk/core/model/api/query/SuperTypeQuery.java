@@ -168,7 +168,7 @@ public class SuperTypeQuery extends AbstractQuery<IType> implements Predicate<IT
   }
 
   /**
-   * Limit the result to {@link IType}s with the given sipmle name (see {@link IType#elementName()}).
+   * Limit the result to {@link IType}s with the given simple name (see {@link IType#elementName()}).
    *
    * @param simpleName
    *          The simple name to limit to.
@@ -195,8 +195,10 @@ public class SuperTypeQuery extends AbstractQuery<IType> implements Predicate<IT
 
     var name = getName();
     if (name != null) {
-      var fqn = name.apply(t.javaEnvironment()).map(IClassNameSupplier::fqn);
-      var fqnMatches = fqn.isPresent() && fqn.orElseThrow().equals(t.name());
+      var fqnMatches = name.apply(t.javaEnvironment())
+          .map(IClassNameSupplier::fqn)
+          .map(fqn -> fqn.equals(t.name()))
+          .orElse(false);
       if (!fqnMatches) {
         return false;
       }

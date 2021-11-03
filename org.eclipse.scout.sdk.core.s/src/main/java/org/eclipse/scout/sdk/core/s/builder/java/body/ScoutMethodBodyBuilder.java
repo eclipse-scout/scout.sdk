@@ -83,9 +83,10 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
 
   @Override
   public TYPE appendPermissionCheck(CharSequence permission) {
-    return appendIf().parenthesisOpen().appendNot().refClassFrom(IScoutApi.class, IScoutApi::ACCESS).dot().appendFrom(IScoutApi.class, api -> api.ACCESS().checkMethodName()).parenthesisOpen().appendNew().ref(permission)
-        .parenthesisOpen().parenthesisClose().parenthesisClose().parenthesisClose().space().blockStart().nl()
-        .appendThrow().appendNew().refClassFrom(IScoutApi.class, IScoutApi::VetoException).parenthesisOpen().appendTextsGet("AuthorizationFailed").parenthesisClose().semicolon().nl()
+    return appendIf().parenthesisOpen().appendNot().refClassFrom(IScoutApi.class, IScoutApi::ACCESS).dot().appendFrom(IScoutApi.class, api -> api.ACCESS().checkMethodName()).parenthesisOpen()
+        .appendNew(permission).parenthesisClose()
+        .parenthesisClose().parenthesisClose().space().blockStart().nl()
+        .appendThrow().appendNewFrom(IScoutApi.class, IScoutApi::VetoException).appendTextsGet("AuthorizationFailed").parenthesisClose().semicolon().nl()
         .blockEnd().nl();
   }
 
@@ -114,14 +115,14 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
 
   @Override
   public TYPE appendFormSetHandler(CharSequence formVariableName, CharSequence handlerSimpleName) {
-    return append(formVariableName).dot().appendFrom(IScoutApi.class, api -> api.AbstractForm().setHandlerMethodName()).parenthesisOpen().append(formVariableName).dot().appendNew().append(handlerSimpleName).parenthesisOpen()
-        .parenthesisClose().parenthesisClose().semicolon();
+    return append(formVariableName).dot().appendFrom(IScoutApi.class, api -> api.AbstractForm().setHandlerMethodName()).parenthesisOpen().append(formVariableName)
+        .dot().appendNew(handlerSimpleName).parenthesisClose().parenthesisClose().semicolon();
   }
 
   @Override
   public TYPE appendThrowVetoException(CharSequence nlsKeyName, ISourceGenerator<IExpressionBuilder<?>> varArg) {
-    var throwVeto = appendTodo("verify translation").appendThrow().appendNew().refClassFrom(IScoutApi.class, IScoutApi::VetoException).parenthesisOpen().refClassFrom(IScoutApi.class, IScoutApi::TEXTS).dot()
-        .appendFrom(IScoutApi.class, api -> api.TEXTS().getMethodName()).parenthesisOpen().stringLiteral(nlsKeyName);
+    var throwVeto = appendTodo("verify translation").appendThrow().appendNewFrom(IScoutApi.class, IScoutApi::VetoException)
+        .refClassFrom(IScoutApi.class, IScoutApi::TEXTS).dot().appendFrom(IScoutApi.class, api -> api.TEXTS().getMethodName()).parenthesisOpen().stringLiteral(nlsKeyName);
     if (varArg != null) {
       throwVeto.append(JavaTypes.C_COMMA).append(varArg.generalize(ExpressionBuilder::create));
     }

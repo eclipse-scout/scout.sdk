@@ -27,6 +27,8 @@ import org.eclipse.scout.sdk.core.imports.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.JavaTypes.ReferenceParser;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -37,7 +39,10 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<TYPE>> extends CommentBuilder<TYPE> implements IJavaElementCommentBuilder<TYPE> {
 
   private static volatile IDefaultElementCommentGeneratorSpi commentGeneratorSpi;
-  private static final Pattern LINK_REFERENCE_PATTERN = Pattern.compile("([\\w.\\[\\]]+)?(?:#([\\w]+)\\(([\\w\\s,.\\[\\]]*)\\))?");
+  public static final String LINK_PREFIX = "{@link ";
+  public static final char LINK_SUFFIX = '}';
+  public static final char LINK_MEMBER_DELIMITER = '#';
+  private static final Pattern LINK_REFERENCE_PATTERN = Pattern.compile("([\\w.\\[\\]]+)?(?:" + LINK_MEMBER_DELIMITER + "([\\w]+)\\(([\\w\\s,.\\[\\]]*)\\))?");
 
   private final Supplier<ISourceGenerator<ICommentBuilder<?>>> m_defaultCommentGeneratorSupplier;
   private final FinalValue<ISourceGenerator<ICommentBuilder<?>>> m_defaultElementCommentGenerator;
@@ -168,9 +173,9 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
   @Override
   public TYPE appendLink(IType ref, CharSequence label) {
     if (ref == null) {
-      return appendLink(null, label, true);
+      return thisInstance();
     }
-    return appendLink(ref.reference(), label, !ref.isArray() && !ref.isPrimitive() && !ref.isWildcardType() && !ref.isVoid());
+    return appendLink(ref.reference(), label);
   }
 
   @Override
@@ -180,38 +185,47 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
 
   @Override
   public TYPE appendLink(CharSequence ref, CharSequence label) {
-    return appendLink(ref, label, true);
-  }
-
-  protected TYPE appendLink(CharSequence ref, CharSequence label, boolean useLink) {
-    if (useLink) {
-      append("{@link");
+    if (!Strings.hasText(ref)) {
+      return thisInstance();
     }
-    if (Strings.hasText(ref)) {
-      if (useLink) {
-        append(' ');
-      }
-      if (m_context != null) {
-        appendLinkReference(m_context.validator(), ref);
-      }
-      else {
-        append(ref);
-      }
+
+    if (Strings.indexOf(LINK_MEMBER_DELIMITER, ref) < 0 && Strings.lastIndexOf(JavaTypes.C_GENERIC_END, ref) > 0) {
+      // it is a type reference containing arguments. Create links for each type used
+      // limitations: - only supports links to types (no members)
+      //              - label is ignored (not clear to which link it belongs).
+      var p = new ReferenceParser((fqn, typeArgDepth) -> createTypeLink(fqn));
+      var refWithLinks = p.useReference(ref);
+      return append(refWithLinks);
+    }
+
+    var useLink = isLinkPossible(ref);
+    if (useLink) {
+      append(LINK_PREFIX);
+    }
+    if (m_context != null) {
+      appendLinkReference(m_context.validator(), ref);
+    }
+    else {
+      append(ref);
     }
     if (useLink) {
       if (Strings.hasText(label)) {
-        if (!Strings.startsWith(label, " ")) {
+        if (!Character.isWhitespace(label.charAt(0))) {
           append(' ');
         }
         append(label);
       }
-      append('}');
+      append(LINK_SUFFIX);
     }
     return thisInstance();
   }
 
+  protected static boolean isLinkPossible(CharSequence ref) {
+    return !JavaTypes.isPrimitive(ref) && !JavaTypes.isArray(ref) && !JavaTypes.isWildcard(ref);
+  }
+
   protected void appendLinkReference(IImportValidator validator, CharSequence ref) {
-    var m = LINK_REFERENCE_PATTERN.matcher(ref);
+    var m = LINK_REFERENCE_PATTERN.matcher(JavaTypes.erasure(ref));
     if (!m.matches()) {
       append(ref); // cannot parse as reference
       return;
@@ -223,17 +237,22 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
       append(validator.useReference(className));
     }
     if (Strings.hasText(member)) {
-      append('#').append(member).append('(');
+      append(LINK_MEMBER_DELIMITER).append(member).append('(');
       appendArgumentNames(validator, args);
       append(')');
     }
+  }
+
+  protected CharSequence createTypeLink(CharSequence fqn) {
+    var ref = m_context != null ? m_context.validator().useReference(fqn) : fqn;
+    return LINK_PREFIX + ref + LINK_SUFFIX;
   }
 
   protected void appendArgumentNames(IImportValidator validator, String args) {
     if (!Strings.hasText(args)) {
       return;
     }
-    var arguments = new StringTokenizer(args, ",");
+    var arguments = new StringTokenizer(args, String.valueOf(JavaTypes.C_COMMA));
     var arg = Strings.trim(arguments.nextToken());
     append(validator.useReference(arg));
     while (arguments.hasMoreTokens()) {

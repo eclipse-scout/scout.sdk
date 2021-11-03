@@ -33,6 +33,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
+import org.eclipse.scout.sdk.core.builder.java.comment.JavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.generator.IAnnotatableGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
@@ -260,7 +261,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
 
   protected void appendJavaDocLink(IJavaElementCommentBuilder<?> b, String name) {
     b.appendJavaDocStart().nl()
-        .append("* See ").appendLink("#" + name + "()").append('.').nl()
+        .append("* See ").appendLink(JavaElementCommentBuilder.LINK_MEMBER_DELIMITER + name + "()").append('.').nl()
         .appendBlockCommentEnd().nl();
   }
 

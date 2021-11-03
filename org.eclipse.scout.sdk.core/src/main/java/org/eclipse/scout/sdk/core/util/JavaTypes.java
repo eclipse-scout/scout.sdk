@@ -331,6 +331,32 @@ public final class JavaTypes {
   }
 
   /**
+   * Checks if the given type name is an array type (any array dimension returns {@code true}).
+   *
+   * @param fqn
+   *          The name to check
+   * @return {@code true} if the given reference is an array type (e.g. boolean[] or java.util.List[][]).
+   */
+  public static boolean isArray(CharSequence fqn) {
+    return fqn != null
+        && fqn.length() > 0
+        && fqn.charAt(fqn.length() - 1) == ']';
+  }
+
+  /**
+   * Checks if the given type is the wildcard type (?).
+   *
+   * @param fqn
+   *          The type name to check.
+   * @return {@code true} if the given reference is the wildcard type.
+   */
+  public static boolean isWildcard(CharSequence fqn) {
+    return fqn != null
+        && fqn.length() == 1
+        && fqn.charAt(0) == C_QUESTION_MARK;
+  }
+
+  /**
    * Gets the default value for the given data type.
    *
    * @param dataType
@@ -382,7 +408,7 @@ public final class JavaTypes {
    * qualifier("java.lang.Object") -> "java.lang"
    * qualifier("Outer.Inner") -> "Outer"
    * qualifier("java.util.List<java.lang.String>") -> "java.util"
-   * qualifier("org.eclipse.scout.Outer$Inner$Inner2") -> "org.eclipse.scout"
+   * qualifier("org.eclipse.scout.TopLevelClass$Inner$Inner2") -> "org.eclipse.scout"
    * }
    * </pre>
    *
@@ -647,9 +673,15 @@ public final class JavaTypes {
 
   public static class ReferenceParser {
 
-    private final BiFunction<CharSequence, Boolean, CharSequence> m_handler;
+    private final BiFunction<CharSequence, Integer, CharSequence> m_handler;
 
-    public ReferenceParser(BiFunction<CharSequence, Boolean, CharSequence> handler) {
+    /**
+     * @param handler
+     *          The {@link BiFunction} to consume types found in a reference. The first parameter contains the fully
+     *          qualified name of the type, the second the type-argument depth (zero means it is no type argument). The
+     *          result of the {@link BiFunction} is the value collected to the reference.
+     */
+    public ReferenceParser(BiFunction<CharSequence, Integer, CharSequence> handler) {
       m_handler = Ensure.notNull(handler);
     }
 
@@ -730,7 +762,7 @@ public final class JavaTypes {
       var isArray = arrayStart > fqnStart;
 
       var fqn = src.subSequence(fqnStart, isArray ? arrayStart : end);
-      result.append(handler().apply(fqn, depth > 0));
+      result.append(handler().apply(fqn, depth));
 
       if (isArray) {
         result.append(src, arrayStart, end);
@@ -772,7 +804,12 @@ public final class JavaTypes {
       return true;
     }
 
-    public BiFunction<CharSequence, Boolean, CharSequence> handler() {
+    /**
+     * @return The {@link BiFunction} to consume a type. The first parameter contains the fully qualified name of the
+     *         type, the second the type-argument depth (zero means it is no type argument). The result of the
+     *         {@link BiFunction} is the value collected to the reference.
+     */
+    public BiFunction<CharSequence, Integer, CharSequence> handler() {
       return m_handler;
     }
   }
