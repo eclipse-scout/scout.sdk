@@ -55,6 +55,7 @@ public interface IJavaElementCommentBuilder<TYPE extends IJavaElementCommentBuil
    *          <li>{@code "java.util.List#addAll(int, java.util.Collection)"}</li>
    *          <li>{@code "#myMethod(org.eclipse.scout.MyClass)"}</li>
    *          <li>{@code "org.eclipse.scout.MyClass"}</li>
+   *          <li>{@code "java.util.List<java.lang.String>"}</li>
    *          </ul>
    * @return A reference to this object.
    */
@@ -77,6 +78,7 @@ public interface IJavaElementCommentBuilder<TYPE extends IJavaElementCommentBuil
    *          <li>{@code "java.util.List#addAll(int, java.util.Collection)"}</li>
    *          <li>{@code "#myMethod(org.eclipse.scout.MyClass)"}</li>
    *          <li>{@code "org.eclipse.scout.MyClass"}</li>
+   *          <li>{@code "java.util.List<java.lang.String>"}</li>
    *          </ul>
    * @param label
    *          An optional label which may be appended to the link.

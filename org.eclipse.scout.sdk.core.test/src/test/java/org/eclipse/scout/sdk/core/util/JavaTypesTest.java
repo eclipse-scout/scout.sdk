@@ -13,7 +13,17 @@ package org.eclipse.scout.sdk.core.util;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.boxPrimitive;
 import static org.eclipse.scout.sdk.core.util.JavaTypes.createMethodIdentifier;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.defaultValueOf;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.erasure;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.isArray;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.isPrimitive;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.isWildcard;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.qualifier;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.simpleName;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.typeArguments;
+import static org.eclipse.scout.sdk.core.util.JavaTypes.unboxToPrimitive;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -64,99 +74,120 @@ public class JavaTypesTest {
 
   @Test
   public void testBoxPrimitive() {
-    assertEquals(Boolean, JavaTypes.boxPrimitive(_boolean));
-    assertEquals(Byte, JavaTypes.boxPrimitive(_byte));
-    assertEquals(Character, JavaTypes.boxPrimitive(_char));
-    assertEquals(Double, JavaTypes.boxPrimitive(_double));
-    assertEquals(Float, JavaTypes.boxPrimitive(_float));
-    assertEquals(Integer, JavaTypes.boxPrimitive(_int));
-    assertEquals(Long, JavaTypes.boxPrimitive(_long));
-    assertEquals(Short, JavaTypes.boxPrimitive(_short));
-    assertEquals(Void, JavaTypes.boxPrimitive(_void));
+    assertEquals(Boolean, boxPrimitive(_boolean));
+    assertEquals(Byte, boxPrimitive(_byte));
+    assertEquals(Character, boxPrimitive(_char));
+    assertEquals(Double, boxPrimitive(_double));
+    assertEquals(Float, boxPrimitive(_float));
+    assertEquals(Integer, boxPrimitive(_int));
+    assertEquals(Long, boxPrimitive(_long));
+    assertEquals(Short, boxPrimitive(_short));
+    assertEquals(Void, boxPrimitive(_void));
 
-    assertEquals(Boolean, JavaTypes.boxPrimitive(Boolean));
-    assertEquals(Byte, JavaTypes.boxPrimitive(Byte));
-    assertEquals(Character, JavaTypes.boxPrimitive(Character));
-    assertEquals(Double, JavaTypes.boxPrimitive(Double));
-    assertEquals(Float, JavaTypes.boxPrimitive(Float));
-    assertEquals(Integer, JavaTypes.boxPrimitive(Integer));
-    assertEquals(Long, JavaTypes.boxPrimitive(Long));
-    assertEquals(Short, JavaTypes.boxPrimitive(Short));
-    assertEquals(Void, JavaTypes.boxPrimitive(Void));
+    assertEquals(Boolean, boxPrimitive(Boolean));
+    assertEquals(Byte, boxPrimitive(Byte));
+    assertEquals(Character, boxPrimitive(Character));
+    assertEquals(Double, boxPrimitive(Double));
+    assertEquals(Float, boxPrimitive(Float));
+    assertEquals(Integer, boxPrimitive(Integer));
+    assertEquals(Long, boxPrimitive(Long));
+    assertEquals(Short, boxPrimitive(Short));
+    assertEquals(Void, boxPrimitive(Void));
 
-    assertNull(JavaTypes.boxPrimitive(null));
-    assertEquals("whatever", JavaTypes.boxPrimitive("whatever"));
+    assertNull(boxPrimitive(null));
+    assertEquals("whatever", boxPrimitive("whatever"));
   }
 
   @Test
   public void testUnboxToPrimitive() {
-    assertEquals(_boolean, JavaTypes.unboxToPrimitive(_boolean));
-    assertEquals(_byte, JavaTypes.unboxToPrimitive(_byte));
-    assertEquals(_char, JavaTypes.unboxToPrimitive(_char));
-    assertEquals(_double, JavaTypes.unboxToPrimitive(_double));
-    assertEquals(_float, JavaTypes.unboxToPrimitive(_float));
-    assertEquals(_int, JavaTypes.unboxToPrimitive(_int));
-    assertEquals(_long, JavaTypes.unboxToPrimitive(_long));
-    assertEquals(_short, JavaTypes.unboxToPrimitive(_short));
-    assertEquals(_void, JavaTypes.unboxToPrimitive(_void));
+    assertEquals(_boolean, unboxToPrimitive(_boolean));
+    assertEquals(_byte, unboxToPrimitive(_byte));
+    assertEquals(_char, unboxToPrimitive(_char));
+    assertEquals(_double, unboxToPrimitive(_double));
+    assertEquals(_float, unboxToPrimitive(_float));
+    assertEquals(_int, unboxToPrimitive(_int));
+    assertEquals(_long, unboxToPrimitive(_long));
+    assertEquals(_short, unboxToPrimitive(_short));
+    assertEquals(_void, unboxToPrimitive(_void));
 
-    assertEquals(_boolean, JavaTypes.unboxToPrimitive(Boolean));
-    assertEquals(_byte, JavaTypes.unboxToPrimitive(Byte));
-    assertEquals(_char, JavaTypes.unboxToPrimitive(Character));
-    assertEquals(_double, JavaTypes.unboxToPrimitive(Double));
-    assertEquals(_float, JavaTypes.unboxToPrimitive(Float));
-    assertEquals(_int, JavaTypes.unboxToPrimitive(Integer));
-    assertEquals(_long, JavaTypes.unboxToPrimitive(Long));
-    assertEquals(_short, JavaTypes.unboxToPrimitive(Short));
-    assertEquals(_void, JavaTypes.unboxToPrimitive(Void));
+    assertEquals(_boolean, unboxToPrimitive(Boolean));
+    assertEquals(_byte, unboxToPrimitive(Byte));
+    assertEquals(_char, unboxToPrimitive(Character));
+    assertEquals(_double, unboxToPrimitive(Double));
+    assertEquals(_float, unboxToPrimitive(Float));
+    assertEquals(_int, unboxToPrimitive(Integer));
+    assertEquals(_long, unboxToPrimitive(Long));
+    assertEquals(_short, unboxToPrimitive(Short));
+    assertEquals(_void, unboxToPrimitive(Void));
 
-    assertNull(JavaTypes.unboxToPrimitive(null));
-    assertEquals("whatever", JavaTypes.unboxToPrimitive("whatever"));
+    assertNull(unboxToPrimitive(null));
+    assertEquals("whatever", unboxToPrimitive("whatever"));
   }
 
   @Test
   public void testDefaultValueOf() {
-    assertNull(JavaTypes.defaultValueOf(null));
+    assertNull(defaultValueOf(null));
 
     // primitives
-    assertEquals("false", JavaTypes.defaultValueOf(_boolean));
-    assertEquals("0", JavaTypes.defaultValueOf(_byte));
-    assertEquals("0", JavaTypes.defaultValueOf(_char));
-    assertEquals("0.0", JavaTypes.defaultValueOf(_double));
-    assertEquals("0.0f", JavaTypes.defaultValueOf(_float));
-    assertEquals("0", JavaTypes.defaultValueOf(_int));
-    assertEquals("0L", JavaTypes.defaultValueOf(_long));
-    assertEquals("0", JavaTypes.defaultValueOf(_short));
-    assertNull(JavaTypes.defaultValueOf(_void));
-    assertEquals("null", JavaTypes.defaultValueOf(Object.class.getName()));
+    assertEquals("false", defaultValueOf(_boolean));
+    assertEquals("0", defaultValueOf(_byte));
+    assertEquals("0", defaultValueOf(_char));
+    assertEquals("0.0", defaultValueOf(_double));
+    assertEquals("0.0f", defaultValueOf(_float));
+    assertEquals("0", defaultValueOf(_int));
+    assertEquals("0L", defaultValueOf(_long));
+    assertEquals("0", defaultValueOf(_short));
+    assertNull(defaultValueOf(_void));
+    assertEquals("null", defaultValueOf(Object.class.getName()));
 
     // complex
-    assertEquals("false", JavaTypes.defaultValueOf(Boolean));
-    assertEquals("0", JavaTypes.defaultValueOf(Byte));
-    assertEquals("0", JavaTypes.defaultValueOf(Character));
-    assertEquals("0.0", JavaTypes.defaultValueOf(Double));
-    assertEquals("0.0f", JavaTypes.defaultValueOf(Float));
-    assertEquals("0", JavaTypes.defaultValueOf(Integer));
-    assertEquals("0L", JavaTypes.defaultValueOf(Long));
-    assertEquals("0", JavaTypes.defaultValueOf(Short));
-    assertEquals("null", JavaTypes.defaultValueOf(String.class.getName()));
-    assertEquals("null", JavaTypes.defaultValueOf(Void));
+    assertEquals("false", defaultValueOf(Boolean));
+    assertEquals("0", defaultValueOf(Byte));
+    assertEquals("0", defaultValueOf(Character));
+    assertEquals("0.0", defaultValueOf(Double));
+    assertEquals("0.0f", defaultValueOf(Float));
+    assertEquals("0", defaultValueOf(Integer));
+    assertEquals("0L", defaultValueOf(Long));
+    assertEquals("0", defaultValueOf(Short));
+    assertEquals("null", defaultValueOf(String.class.getName()));
+    assertEquals("null", defaultValueOf(Void));
   }
 
   @Test
   public void testIsPrimitive() {
-    assertFalse(JavaTypes.isPrimitive(null));
-    assertTrue(JavaTypes.isPrimitive(JavaTypes._boolean));
-    assertTrue(JavaTypes.isPrimitive(JavaTypes._byte));
-    assertTrue(JavaTypes.isPrimitive(JavaTypes._char));
-    assertTrue(JavaTypes.isPrimitive(JavaTypes._double));
-    assertTrue(JavaTypes.isPrimitive(JavaTypes._float));
-    assertTrue(JavaTypes.isPrimitive(JavaTypes._int));
-    assertTrue(JavaTypes.isPrimitive(JavaTypes._long));
-    assertTrue(JavaTypes.isPrimitive(JavaTypes._short));
-    assertTrue(JavaTypes.isPrimitive(JavaTypes._void));
-    assertFalse(JavaTypes.isPrimitive(JavaTypes.Character));
-    assertFalse(JavaTypes.isPrimitive(JavaTypes.Short));
+    assertFalse(isPrimitive(null));
+    assertTrue(isPrimitive(JavaTypes._boolean));
+    assertTrue(isPrimitive(JavaTypes._byte));
+    assertTrue(isPrimitive(JavaTypes._char));
+    assertTrue(isPrimitive(JavaTypes._double));
+    assertTrue(isPrimitive(JavaTypes._float));
+    assertTrue(isPrimitive(JavaTypes._int));
+    assertTrue(isPrimitive(JavaTypes._long));
+    assertTrue(isPrimitive(JavaTypes._short));
+    assertTrue(isPrimitive(JavaTypes._void));
+    assertFalse(isPrimitive(JavaTypes.Character));
+    assertFalse(isPrimitive(JavaTypes.Short));
+  }
+
+  @Test
+  public void testIsArray() {
+    assertFalse(isArray(null));
+    assertFalse(isArray(""));
+    assertFalse(isArray(" "));
+    assertFalse(isArray(JavaTypes._boolean));
+    assertFalse(isArray(List.class.getName()));
+    assertTrue(isArray(List.class.getName() + arrayMarker(3)));
+    assertTrue(isArray(JavaTypes._boolean + arrayMarker()));
+  }
+
+  @Test
+  public void testIsWildcard() {
+    assertFalse(isWildcard(null));
+    assertFalse(isWildcard(""));
+    assertFalse(isWildcard(" "));
+    assertFalse(isWildcard(JavaTypes._boolean));
+    assertFalse(isWildcard(List.class.getName()));
+    assertTrue(isWildcard(String.valueOf(JavaTypes.C_QUESTION_MARK)));
   }
 
   @Test
@@ -239,53 +270,55 @@ public class JavaTypesTest {
 
   @Test
   public void testErasure() {
-    assertEquals("QList;", JavaTypes.erasure("QList<QT;>;"));
-    assertEquals("QList;", JavaTypes.erasure("QList;"));
-    assertEquals("QX;", JavaTypes.erasure("QX<QList<QT;>;QMap<QU;QABC<QT;>;>;>;"));
-    assertEquals("QX.Member;", JavaTypes.erasure("QX<QObject;>.Member;"));
-    assertEquals("QX.Member;", JavaTypes.erasure("QX<QObject;>.Member<QObject;>;"));
-    assertEquals("QX.Member;", JavaTypes.erasure("QX.Member<QObject;>;"));
-    assertEquals("QX.Member;", JavaTypes.erasure("QX<QObject;>.Member<QList<QT;>;QMap<QU;QABC<QT;>;>;>;"));
-    assertEquals("QX.Member;", JavaTypes.erasure("QX<QList<QT;>;QMap<QU;QABC<QT;>;>;>.Member<QObject;>;"));
-    assertEquals("X.Member", JavaTypes.erasure("X<List<T>,Map<U,ABC<T>>>.Member<Object>"));
+    assertEquals("QList;", erasure("QList<QT;>;"));
+    assertEquals("QList;", erasure("QList;"));
+    assertEquals("QX;", erasure("QX<QList<QT;>;QMap<QU;QABC<QT;>;>;>;"));
+    assertEquals("QX.Member;", erasure("QX<QObject;>.Member;"));
+    assertEquals("QX.Member;", erasure("QX<QObject;>.Member<QObject;>;"));
+    assertEquals("QX.Member;", erasure("QX.Member<QObject;>;"));
+    assertEquals("QX.Member;", erasure("QX<QObject;>.Member<QList<QT;>;QMap<QU;QABC<QT;>;>;>;"));
+    assertEquals("QX.Member;", erasure("QX<QList<QT;>;QMap<QU;QABC<QT;>;>;>.Member<QObject;>;"));
+    assertEquals("X.Member", erasure("X<List<T>,Map<U,ABC<T>>>.Member<Object>"));
     var sign = "Ljava.util.List;";
-    assertSame(sign, JavaTypes.erasure(sign));
-    assertEquals("java.util.List", JavaTypes.erasure("java.util.List<-[java.lang.Number>"));
-    assertEquals("java.util.List", JavaTypes.erasure("java.util.List<? extends java.lang.Number>"));
-    assertEquals("java.util.List", JavaTypes.erasure("java.util.List<? super java.lang.Number>"));
-    assertEquals("java.util.List", JavaTypes.erasure("java.util.List<java.lang.String>"));
+    assertSame(sign, erasure(sign));
+    assertEquals("java.util.List", erasure("java.util.List<-[java.lang.Number>"));
+    assertEquals("java.util.List", erasure("java.util.List<? extends java.lang.Number>"));
+    assertEquals("java.util.List", erasure("java.util.List<? super java.lang.Number>"));
+    assertEquals("java.util.List", erasure("java.util.List<java.lang.String>"));
+
+    assertEquals("java.util.List#myMethod(java.util.Set)", erasure("java.util.List<java.lang.Integer>#myMethod(java.util.Set<java.lang.String>)"));
   }
 
   @Test
   public void testQualifier() {
-    assertEquals("java.lang", JavaTypes.qualifier("java.lang.Object"));
-    assertEquals("", JavaTypes.qualifier(""));
-    assertEquals("java.util", JavaTypes.qualifier("java.util.List<java.lang.Object>"));
-    assertEquals("org.eclipse.scout", JavaTypes.qualifier("org.eclipse.scout.Blub$Inner$Inner"));
-    assertEquals("Outer", JavaTypes.qualifier("Outer.Inner"));
+    assertEquals("java.lang", qualifier("java.lang.Object"));
+    assertEquals("", qualifier(""));
+    assertEquals("java.util", qualifier("java.util.List<java.lang.Object>"));
+    assertEquals("org.eclipse.scout", qualifier("org.eclipse.scout.Blub$Inner$Inner"));
+    assertEquals("Outer", qualifier("Outer.Inner"));
   }
 
   @Test
   public void testSimpleName() {
-    assertEquals("Object", JavaTypes.simpleName("java.lang.Object"));
-    assertEquals("", JavaTypes.simpleName(""));
-    assertEquals("Entry", JavaTypes.simpleName("java.util.Map$Entry"));
-    assertEquals("List", JavaTypes.simpleName("java.util.List<java.lang.String>"));
-    assertEquals("Map", JavaTypes.simpleName("java.util.Map<java.lang.String, java.util.List<java.lang.Integer>>"));
+    assertEquals("Object", simpleName("java.lang.Object"));
+    assertEquals("", simpleName(""));
+    assertEquals("Entry", simpleName("java.util.Map$Entry"));
+    assertEquals("List", simpleName("java.util.List<java.lang.String>"));
+    assertEquals("Map", simpleName("java.util.Map<java.lang.String, java.util.List<java.lang.Integer>>"));
   }
 
   @Test
   public void testTypeArguments() {
-    assertEquals(singletonList("T"), JavaTypes.typeArguments("List<T>"));
-    assertEquals(Arrays.asList("T", "U"), JavaTypes.typeArguments("X<T,U>"));
-    assertEquals(singletonList("*"), JavaTypes.typeArguments("X<*>"));
-    assertEquals(Arrays.asList("? extends E", "S"), JavaTypes.typeArguments("X<? extends E,S>"));
-    assertEquals(Arrays.asList("List<T>", "Map<U,ABC<T>>"), JavaTypes.typeArguments("X<List<T>,   Map<U,ABC<T>>   >"));
-    assertEquals(emptyList(), JavaTypes.typeArguments("List"));
-    assertEquals(emptyList(), JavaTypes.typeArguments("X<Object>.Member"));
-    assertEquals(singletonList("Object"), JavaTypes.typeArguments("X<Object>.Member<Object>"));
-    assertEquals(singletonList("Object"), JavaTypes.typeArguments("X.Member<Object>"));
-    assertEquals(Arrays.asList("List<T>", "Map<U,ABC<T>>"), JavaTypes.typeArguments("X<Object>.Member<List<T>,Map<U,ABC<T>>>"));
-    assertEquals(singletonList("Object"), JavaTypes.typeArguments("X<List<T>,Map<U,ABC<T>>>.Member<Object>"));
+    assertEquals(singletonList("T"), typeArguments("List<T>"));
+    assertEquals(Arrays.asList("T", "U"), typeArguments("X<T,U>"));
+    assertEquals(singletonList("*"), typeArguments("X<*>"));
+    assertEquals(Arrays.asList("? extends E", "S"), typeArguments("X<? extends E,S>"));
+    assertEquals(Arrays.asList("List<T>", "Map<U,ABC<T>>"), typeArguments("X<List<T>,   Map<U,ABC<T>>   >"));
+    assertEquals(emptyList(), typeArguments("List"));
+    assertEquals(emptyList(), typeArguments("X<Object>.Member"));
+    assertEquals(singletonList("Object"), typeArguments("X<Object>.Member<Object>"));
+    assertEquals(singletonList("Object"), typeArguments("X.Member<Object>"));
+    assertEquals(Arrays.asList("List<T>", "Map<U,ABC<T>>"), typeArguments("X<Object>.Member<List<T>,Map<U,ABC<T>>>"));
+    assertEquals(singletonList("Object"), typeArguments("X<List<T>,Map<U,ABC<T>>>.Member<Object>"));
   }
 }
