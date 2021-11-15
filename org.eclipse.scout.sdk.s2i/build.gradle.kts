@@ -22,7 +22,7 @@ val scoutSdkPluginVersion = scoutSdkVersion.replace("-SNAPSHOT", "." + timestamp
 val kotlinVersion = "1.5"
 val javaVersion = JavaVersion.VERSION_11
 val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "22.0-SNAPSHOT")
-val intellijVersion = projectPropertyOr("intellij_version", "IU-2021.2.2") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
+val intellijVersion = projectPropertyOr("intellij_version", "IU-2021.2.3") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
 
 fun timestamp(): String {
     val now = now(Clock.systemUTC())
