@@ -292,7 +292,7 @@ public final class Api {
         .filter(m -> IClassNameSupplier.class.isAssignableFrom(m.getReturnType()))
         .map(m -> (IClassNameSupplier) invoke(m, api))
         .map(Api::dump)
-        .collect(toMap(Entry::getKey, Entry::getValue));
+        .collect(toMap(Entry::getKey, Entry::getValue, (a, b) -> a /* it does not matter which one to keep */));
   }
 
   /**

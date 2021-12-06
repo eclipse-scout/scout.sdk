@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  * <h3>{@link ScoutMethodBodyBuilder}</h3>
@@ -124,7 +123,7 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
     var throwVeto = appendTodo("verify translation").appendThrow().appendNewFrom(IScoutApi.class, IScoutApi::VetoException)
         .refClassFrom(IScoutApi.class, IScoutApi::TEXTS).dot().appendFrom(IScoutApi.class, api -> api.TEXTS().getMethodName()).parenthesisOpen().stringLiteral(nlsKeyName);
     if (varArg != null) {
-      throwVeto.append(JavaTypes.C_COMMA).append(varArg.generalize(ExpressionBuilder::create));
+      throwVeto.comma().append(varArg.generalize(ExpressionBuilder::create));
     }
     throwVeto.parenthesisClose().parenthesisClose().semicolon();
     return throwVeto;
