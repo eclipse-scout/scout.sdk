@@ -28,7 +28,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiPredicate;
 
 import org.eclipse.scout.sdk.core.apidef.Api;
 import org.eclipse.scout.sdk.core.apidef.Api.ChildElementType;
@@ -313,7 +312,7 @@ public final class SdkAssertions {
     assertApiValid(api, environment, null);
   }
 
-  public static <A extends IApiSpecification> void assertApiValid(Class<A> apiSpec, IJavaEnvironment environment, BiPredicate<IType, A> validateOthers) {
+  public static <A extends IApiSpecification> void assertApiValid(Class<A> apiSpec, IJavaEnvironment environment, ApiValidationFilter<A> validateOthers) {
     var api = environment.requireApi(apiSpec);
     var errors = Api.dump(api).entrySet().stream()
         .map(e -> collectApiClassErrors(e.getKey(), e.getValue(), environment, api, validateOthers))
@@ -325,7 +324,7 @@ public final class SdkAssertions {
     fail("API validation failed with the following errors:" + lineSeparator() + errors + lineSeparator());
   }
 
-  static <A extends IApiSpecification> Collection<String> collectApiClassErrors(String fqn, Map<ChildElementType, Map<String, String>> children, IJavaEnvironment env, A api, BiPredicate<IType, A> validateOthers) {
+  static <A extends IApiSpecification> Collection<String> collectApiClassErrors(String fqn, Map<ChildElementType, Map<String, String>> children, IJavaEnvironment env, A api, ApiValidationFilter<A> validateOthers) {
     var typeOpt = env.findType(fqn);
     if (typeOpt.isEmpty()) {
       return List.of(" - Type '" + fqn + "' could not be found.");
@@ -339,9 +338,15 @@ public final class SdkAssertions {
     if (notMatchingConvention == null || notMatchingConvention.isEmpty()) {
       return errors;
     }
-    if (validateOthers != null && validateOthers.test(type, api)) {
-      return errors;
+
+    if (validateOthers != null) {
+      // if an validation strategy is present: reduce to the
+      notMatchingConvention = validateOthers.invalid(notMatchingConvention, type, api);
+      if (notMatchingConvention == null || notMatchingConvention.isEmpty()) {
+        return errors;
+      }
     }
+
     errors.add(" - The following methods in type '" + fqn + "' do not follow the naming convention: " + notMatchingConvention.values());
     return errors;
   }
@@ -354,5 +359,10 @@ public final class SdkAssertions {
         .filter(name -> !owner.methods().withName(name).existsAny())
         .map(name -> " - Method '" + name + "' cannot be found in type '" + owner.name() + "'.")
         .collect(toList());
+  }
+
+  @FunctionalInterface
+  public interface ApiValidationFilter<A extends IApiSpecification> {
+    Map<String, String> invalid(Map<String, String> candidates, IType type, A api);
   }
 }

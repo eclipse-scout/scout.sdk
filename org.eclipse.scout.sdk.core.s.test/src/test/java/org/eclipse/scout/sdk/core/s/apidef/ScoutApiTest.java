@@ -10,11 +10,14 @@
  */
 package org.eclipse.scout.sdk.core.s.apidef;
 
+import static java.util.Collections.emptyMap;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertApiValid;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Map;
 
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -52,12 +55,15 @@ public class ScoutApiTest {
 
   @Test
   public void testScoutApiMatches(IJavaEnvironment env) {
-    assertApiValid(IScoutApi.class, env, ScoutApiTest::assertOthersValid);
+    assertApiValid(IScoutApi.class, env, ScoutApiTest::onlyInvalid);
   }
 
-  private static boolean assertOthersValid(IType type, IScoutApi api) {
-    // Menu Type enums are accepted to be different (without suffix) because the declaring class is an enum type
-    return type.isInstanceOf(api.IMenuType());
+  private static Map<String, String> onlyInvalid(Map<String, String> candidates, IType type, IScoutApi api) {
+    if (type.isInstanceOf(api.IMenuType())) {
+      // Menu Type enums are accepted to be different (without suffix) because the declaring class is an enum type
+      return emptyMap();
+    }
+    return candidates;
   }
 
   private static void assertApiContainsData(IScoutApi api) {
