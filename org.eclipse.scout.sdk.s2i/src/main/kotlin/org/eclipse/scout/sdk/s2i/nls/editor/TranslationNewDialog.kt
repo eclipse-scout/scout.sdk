@@ -30,7 +30,7 @@ class TranslationNewDialog(project: Project, val store: ITranslationStore, manag
     }
 
     override fun doSave(result: Translation) {
-        m_createdTranslation = translationManager.setTranslation(result, store)
+        m_createdTranslation = translationManager.setTranslationToStore(result, store)
     }
 
     override fun validateValues(): MutableList<ValidationInfo?> {
