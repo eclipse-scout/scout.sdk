@@ -197,6 +197,28 @@ public class TranslationManagerTest {
   }
 
   @Test
+  public void testSetTranslationToStore(TestingEnvironment env) {
+    var key = "key1";
+    var origVal = "base1";
+    var store1 = createStore("override", 100.0, emptyMap());
+    var store2 = createStore("base", 200.0, Map.of(key, Map.of(Language.LANGUAGE_DEFAULT, origVal)));
+    var manager = new TranslationManager(Stream.of(store1, store2));
+
+    assertEquals(0, store1.size());
+    assertEquals(origVal, manager.translation(key).orElseThrow().text(Language.LANGUAGE_DEFAULT).orElseThrow());
+
+    var newTranslation = new Translation(key);
+    var newContent = "1_def_added";
+    newTranslation.putText(Language.LANGUAGE_DEFAULT, newContent);
+    var newStack = manager.setTranslationToStore(newTranslation, store1);
+
+    assertEquals(2, newStack.stores().count());
+    assertEquals(1, store1.size()); // ensure new text is added to store1 even it already exists in store2 (and could be updated there)
+    assertEquals(newContent, newStack.text(Language.LANGUAGE_DEFAULT).orElseThrow());
+    assertEquals(newContent, manager.translation(key).orElseThrow().text(Language.LANGUAGE_DEFAULT).orElseThrow());
+  }
+
+  @Test
   public void testRemoveTranslation(TestingEnvironment env) {
     var store1 = createStore("a", 100.0, "key1", "key2", "key3", "key4");
     var store2 = createStore("b", 200.0, "key2", "key3", "key5");
@@ -321,7 +343,7 @@ public class TranslationManagerTest {
   public void testBatchChange(TestingEnvironment env) {
     var counter = new AtomicInteger();
     var manager = testingManager(env);
-    ITranslationManagerListener l = s -> counter.incrementAndGet();
+    var l = (ITranslationManagerListener) s -> counter.incrementAndGet();
     manager.addListener(l);
     manager.setChanging(true);
     var textPrefix = "def杉矶";

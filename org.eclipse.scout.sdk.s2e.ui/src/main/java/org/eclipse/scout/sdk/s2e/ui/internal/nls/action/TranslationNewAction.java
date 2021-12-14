@@ -66,7 +66,7 @@ public class TranslationNewAction extends Action {
     AbstractTranslationDialog dialog = new TranslationNewDialog(m_shell, m_manager, m_initialEntry);
     dialog.show().ifPresent(entry -> {
       m_createdTranslation = entry;
-      m_manager.setTranslation(entry, dialog.getSelectedStore().orElse(null));
+      m_manager.setTranslationToStore(entry, dialog.getSelectedStore().orElse(null));
       if (m_controller == null) {
         // no controller available -> directly store. Action has been used outside the editor (e.g. the code completion proposal).
         runInEclipseEnvironment(m_manager::flush);

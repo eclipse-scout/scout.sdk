@@ -54,7 +54,6 @@ import java.util.*
 import javax.swing.*
 import javax.swing.KeyStroke.getKeyStroke
 import javax.swing.event.DocumentEvent
-import javax.swing.event.TableModelEvent
 import javax.swing.plaf.UIResource
 import javax.swing.table.TableCellEditor
 import javax.swing.table.TableCellRenderer
@@ -78,11 +77,13 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
 
     init {
         m_model.addDataChangedListener {
-            m_tableSorterFilter.sort() // re-apply filter as the filtered rows might have changed
+            // re-apply filter as the filtered rows might have changed
+            // this must be executed before computing the new row heights as rows might become visible here
+            m_tableSorterFilter.sort()
+            adjustRowHeights(it)
         }
 
         m_table.tableColumnsChangedCallback = { adjustView() }
-        m_table.tableChangedCallback = { adjustRowHeights(it) }
         m_table.columnWidthSupplier = { if (it.modelIndex == KEY_COLUMN_INDEX) 250 else 350 }
         m_table.fillsViewportHeight = true
         m_table.autoResizeMode = JTable.AUTO_RESIZE_OFF
@@ -139,13 +140,9 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
         adjustRowHeights()
     }
 
-    private fun adjustRowHeights(e: TableModelEvent?) {
-        val event = e ?: return
-        if (event.type == TableModelEvent.DELETE) {
-            return
-        }
+    private fun adjustRowHeights(modelIndices: Collection<Int>) {
         val fontHeight = fontHeight()
-        (event.firstRow..event.lastRow).forEach {
+        modelIndices.forEach {
             val viewIndex = m_table.convertRowIndexToView(it)
             adjustRowHeight(viewIndex, fontHeight, null)
         }
@@ -330,8 +327,12 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
         }
     }
 
-    private inner class NewLineAction(private val txt: JBTextArea) : DumbAwareAction(null, message("insert.new.line.x",
-            getKeystrokeText(getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK))), AllIcons.Actions.SearchNewLine) {
+    private inner class NewLineAction(private val txt: JBTextArea) : DumbAwareAction(
+            null, message(
+            "insert.new.line.x",
+            getKeystrokeText(getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK))
+    ), AllIcons.Actions.SearchNewLine
+    ) {
         init {
             templatePresentation.hoveredIcon = AllIcons.Actions.SearchNewLineHover
         }
@@ -368,13 +369,21 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
             }
 
             m_cellContentPanel.layout = GridBagLayout()
-            m_cellContentPanel.add(m_scrollPane, GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START,
-                    GridBagConstraints.BOTH, Insets(0, 0, 0, 0), 0, 0))
+            m_cellContentPanel.add(
+                    m_scrollPane, GridBagConstraints(
+                    0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START,
+                    GridBagConstraints.BOTH, Insets(0, 0, 0, 0), 0, 0
+            )
+            )
 
             if (supportMultiLine) {
                 val newLineHelpButton = createButton(NewLineAction(m_txt))
-                m_cellContentPanel.add(newLineHelpButton, GridBagConstraints(1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.FIRST_LINE_END,
-                        GridBagConstraints.NONE, Insets(0, 0, 0, 0), 0, 0))
+                m_cellContentPanel.add(
+                        newLineHelpButton, GridBagConstraints(
+                        1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.FIRST_LINE_END,
+                        GridBagConstraints.NONE, Insets(0, 0, 0, 0), 0, 0
+                )
+                )
             }
         }
 

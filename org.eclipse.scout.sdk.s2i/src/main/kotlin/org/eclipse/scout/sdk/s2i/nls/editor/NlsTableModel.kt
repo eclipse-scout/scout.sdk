@@ -13,7 +13,9 @@ package org.eclipse.scout.sdk.s2i.nls.editor
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.s.nls.*
+import org.eclipse.scout.sdk.core.s.nls.ITranslationManagerListener
+import org.eclipse.scout.sdk.core.s.nls.Language
+import org.eclipse.scout.sdk.core.s.nls.Translation
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator.*
 import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
@@ -35,7 +37,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
     private var m_translations: MutableList<IStackedTranslation>? = null
     private var m_languages: MutableList<Language>? = null
     private val m_managerListener = ManagerListener() // store as member because the listener is weak!
-    private val m_dataChangedListeners = ArrayList<() -> Unit>()
+    private val m_dataChangedListeners = ArrayList<(List<Int>) -> Unit>()
 
     companion object {
         val KEY_COLUMN_HEADER_NAME = EclipseScoutBundle.message("key")
@@ -53,9 +55,11 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
 
     fun languages() = m_languages!!
 
-    internal fun addDataChangedListener(listener: () -> Unit) {
+    internal fun addDataChangedListener(listener: (List<Int>) -> Unit) {
         m_dataChangedListeners.add(listener)
     }
+
+    private fun fireDataChangedListeners(affectedRows: List<Int>) = m_dataChangedListeners.forEach { it(affectedRows) }
 
     override fun getRowCount() = translations().size
 
@@ -104,10 +108,6 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
             return true
         }
         return false
-    }
-
-    private fun saveManager() = callInIdeaEnvironment(project, EclipseScoutBundle.message("saving.translations")) { env, progress ->
-        translationManager.flush(env, progress)
     }
 
     override fun getColumnName(column: Int): String {
@@ -204,64 +204,84 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
                         || it.type() == TranslationManagerEvent.TYPE_NEW_LANGUAGE
             }
 
-            if (doFullReload) {
-                buildCache(true)
-            } else {
-                events.forEach { handleEvent(it) }
-            }
+            val affectedRowIndices = updateViewModel(doFullReload, events)
 
             if (doFullReload || needsSave) {
-                fireDataChangedListeners()
+                fireDataChangedListeners(affectedRowIndices)
             }
+
             if (needsSave) {
                 SdkLog.debug("About to save translation manager.")
                 saveManager()
             }
         }
 
-        private fun fireDataChangedListeners() = m_dataChangedListeners.forEach { it() }
-
-        private fun handleEvent(event: TranslationManagerEvent) {
-            when (event.type()) {
-                TranslationManagerEvent.TYPE_REMOVE_TRANSLATION -> translationsRemoved(event)
-                TranslationManagerEvent.TYPE_NEW_TRANSLATION -> translationsAdded(event)
-                TranslationManagerEvent.TYPE_KEY_CHANGED -> translationKeyChanged(event)
-                TranslationManagerEvent.TYPE_UPDATE_TRANSLATION -> translationsUpdated(event)
-                TranslationManagerEvent.TYPE_NEW_LANGUAGE -> buildCache()
-            }
+        private fun saveManager() = callInIdeaEnvironment(project, EclipseScoutBundle.message("saving.translations")) { env, progress ->
+            translationManager.flush(env, progress)
         }
 
-        private fun translationKeyChanged(event: TranslationManagerEvent) {
+        /**
+         * Updates the view model with the events given
+         * @return The affected model row indices
+         */
+        private fun updateViewModel(doFullReload: Boolean, events: List<TranslationManagerEvent>): List<Int> {
+            if (doFullReload) {
+                buildCache(true)
+                return emptyList() // full reload. No single rows affected
+            }
+            return events.stream()
+                    .mapToInt { updateViewModel(it) }
+                    .filter { it >= 0 }
+                    .distinct()
+                    .toList()
+        }
+
+        private fun updateViewModel(event: TranslationManagerEvent) = when (event.type()) {
+            TranslationManagerEvent.TYPE_REMOVE_TRANSLATION -> translationsRemoved(event)
+            TranslationManagerEvent.TYPE_NEW_TRANSLATION -> translationsAdded(event)
+            TranslationManagerEvent.TYPE_KEY_CHANGED -> translationKeyChanged(event)
+            TranslationManagerEvent.TYPE_UPDATE_TRANSLATION -> translationsUpdated(event)
+            TranslationManagerEvent.TYPE_NEW_LANGUAGE -> {
+                buildCache()
+                -1
+            }
+            else -> -1
+        }
+
+        private fun translationKeyChanged(event: TranslationManagerEvent): Int {
             val index = rowForTranslationWithKey(event.key().orElse(null))
             if (index < 0) {
-                return
+                return -1
             }
             translations()[index] = event.translation().orElseThrow()
             fireTableRowsUpdated(index, index)
+            return index
         }
 
-        private fun translationsUpdated(event: TranslationManagerEvent) = event.translation().ifPresent {
-            val index = rowForTranslationWithKey(it.key())
-            if (index < 0) {
-                return@ifPresent
-            }
-            fireTableRowsUpdated(index, index)
-        }
+        private fun translationsUpdated(event: TranslationManagerEvent) = event.translation()
+                .map { rowForTranslationWithKey(it.key()) }
+                .filter { it >= 0 }
+                .map {
+                    fireTableRowsUpdated(it, it)
+                    return@map it
+                }.orElse(-1)
 
-        private fun translationsAdded(event: TranslationManagerEvent) = event.translation().ifPresent {
+        private fun translationsAdded(event: TranslationManagerEvent) = event.translation().map {
             val translations = translations()
             translations.add(it)
             val index = translations.size - 1
             fireTableRowsInserted(index, index)
-        }
+            return@map index
+        }.orElse(-1)
 
-        private fun translationsRemoved(event: TranslationManagerEvent) = event.translation().ifPresent {
+        private fun translationsRemoved(event: TranslationManagerEvent) = event.translation().map {
             val index = rowForTranslationWithKey(it.key())
             if (index < 0) {
-                return@ifPresent
+                return@map -1
             }
             translations().removeAt(index)
             fireTableRowsDeleted(index, index)
-        }
+            return@map index
+        }.orElse(-1)
     }
 }

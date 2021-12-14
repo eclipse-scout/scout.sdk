@@ -53,6 +53,7 @@ public final class TranslationTestsHelper {
       allEntries.add(entryMock);
     }
 
+    when(mock.size()).then(invocation -> (long) allEntries.size());
     when(mock.isEditable()).thenReturn(isEditable);
     when(mock.get(anyString())).then(invocation -> {
       String keyToFind = invocation.getArgument(0);

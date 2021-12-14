@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.s2i.ui
 
 import com.intellij.ui.table.JBTable
-import java.util.*
 import javax.swing.JViewport
 import javax.swing.RowSorter
 import javax.swing.SortOrder
@@ -27,7 +26,6 @@ open class TablePreservingSelection(model: TableModel, private val indexToRowMap
     private var m_selectionListenerArmed = true
     private val m_selectedRows = ArrayList<Any>()
     var tableColumnsChangedCallback: ((TableModelEvent?) -> Unit)? = null
-    var tableChangedCallback: ((TableModelEvent?) -> Unit)? = null
     var columnWidthSupplier: ((TableColumn) -> Int)? = null
         set(value) {
             if (value != null) {
@@ -55,7 +53,6 @@ open class TablePreservingSelection(model: TableModel, private val indexToRowMap
         }
 
         super.tableChanged(e)
-        tableChangedCallback?.invoke(e)
     }
 
     private fun runPreservingSelectionAndSorting(runnable: () -> Unit) {

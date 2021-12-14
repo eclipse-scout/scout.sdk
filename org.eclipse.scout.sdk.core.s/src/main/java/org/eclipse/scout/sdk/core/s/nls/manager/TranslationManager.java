@@ -270,6 +270,7 @@ public class TranslationManager {
    * @throws IllegalArgumentException
    *           if the given translation is invalid, the given store does not belong to this manager or is not editable.
    * @see #setTranslation(ITranslation, ITranslationStore)
+   * @see #setTranslationToStore(ITranslation, ITranslationStore)
    */
   public IStackedTranslation mergeTranslation(ITranslation newTranslation, ITranslationStore targetInCaseNew) {
     var merged = translation(newTranslation.key())
@@ -400,13 +401,17 @@ public class TranslationManager {
   /**
    * Updates or creates an {@link IStackedTranslation}.
    * <p>
-   * If a translation with the same key as the new translation provided already exists, it is updated to match the given
+   * If a translation with the same key as the translation provided already exists, it is updated to match the given
    * one. Texts for languages no longer present are removed, new languages are created as necessary. Texts for new
    * languages or languages that are modified but currently stored in a read-only store are saved in the
-   * {@link ITranslationStore} provided.
+   * {@link ITranslationStore} provided, while existing texts are updated within its existing stores (if editable).
    * <p>
    * If no translation with such a key exists in this manager, a new one is created in the {@link ITranslationStore}
    * provided.
+   * <p>
+   * The difference to {@link #setTranslationToStore(ITranslation, ITranslationStore)} is that it uses the store given
+   * even if the translation may have texts in other stores already while this method updates translations within its
+   * existing stores.
    * <p>
    * The following conditions must be fulfilled that the operation can be completed:
    * <ul>
@@ -428,41 +433,88 @@ public class TranslationManager {
    * @throws IllegalArgumentException
    *           if one of the mentioned condition is not fulfilled.
    * @see #mergeTranslation(ITranslation, ITranslationStore)
+   * @see #setTranslationToStore(ITranslation, ITranslationStore)
    */
   public IStackedTranslation setTranslation(ITranslation newTranslation, ITranslationStore storeForNew) {
+    return setTranslationInternal(newTranslation, storeForNew, false);
+  }
+
+  /**
+   * Adds a new {@link ITranslation} to the store provided.
+   * <p>
+   * If a translation with the same key as the translation provided already exists in the store given, it is updated to
+   * match the given one. Texts for languages no longer present are removed, new languages are created as necessary.
+   * <p>
+   * If no translation with such a key exists in the store given, a new one is created in it.
+   * <p>
+   * The difference to {@link #setTranslation(ITranslation, ITranslationStore)} is that it updates the existing
+   * translation within its current stores while this method always modifies the store given (or its default value).
+   * <p>
+   * The following conditions must be fulfilled that the operation can be completed:
+   * <ul>
+   * <li>The specified {@link ITranslation} must not be {@code null} and contain a valid key.</li>
+   * <li>The specified {@link ITranslation} must contain a text for the {@link Language#LANGUAGE_DEFAULT} if not an
+   * overridden text already provides one.</li>
+   * <li>The specified store must be {@link ITranslationStore#isEditable() editable} or {@code null}.</li>
+   * <li>The specified store must be part of this manager.</li>
+   * </ul>
+   *
+   * @param newTranslation
+   *          The new translation. Must not be {@code null}.
+   * @param target
+   *          An optional target {@link ITranslationStore} to store the new translation in. If {@code null}, the
+   *          {@link IStackedTranslation#primaryEditableStore() primary editable store} of this manager is used.
+   * @return The created or updated {@link IStackedTranslation}.
+   * @throws IllegalArgumentException
+   *           if one of the mentioned condition is not fulfilled.
+   * @see #setTranslation(ITranslation, ITranslationStore)
+   * @see #mergeTranslation(ITranslation, ITranslationStore)
+   */
+  public IStackedTranslation setTranslationToStore(ITranslation newTranslation, ITranslationStore target) {
+    return setTranslationInternal(newTranslation, target, true);
+  }
+
+  public IStackedTranslation setTranslationInternal(ITranslation newTranslation, ITranslationStore targetStore, boolean enforceTargetStore) {
     Ensure.notNull(newTranslation, "A translation must be specified.");
-    Ensure.isTrue(storeForNew == null || m_stores.contains(storeForNew), "Store of wrong manager.");
+    Ensure.isTrue(targetStore == null || m_stores.contains(targetStore), "Store of wrong manager.");
     Ensure.isFalse(isForbidden(validateKey(newTranslation.key())), "Invalid key");
 
     var existingEntry = m_translations.get(newTranslation.key());
     Ensure.isFalse(isForbidden(validateDefaultText(newTranslation.text(Language.LANGUAGE_DEFAULT).orElse(null), existingEntry)),
         "Translation validation failed. Ensure a valid key and default text is available.");
 
-    if (existingEntry == null) {
-      return addNewTranslationInternal(newTranslation, storeForNew);
+    if (existingEntry == null || enforceTargetStore) {
+      // writes the translation to the store given (or the default editable)
+      return setTranslationToSpecificStore(newTranslation, existingEntry, targetStore);
     }
 
-    runAndFireChanged(() -> updateTranslationInternal(newTranslation, existingEntry, storeForNew));
+    // writes the translation to the current stores only using the targetStore for new entries
+    runAndFireChanged(() -> setTranslationToCurrentStores(newTranslation, existingEntry, targetStore));
     return existingEntry;
   }
 
-  protected IStackedTranslation addNewTranslationInternal(ITranslation newTranslation, ITranslationStore target) {
-    var editableStore = toEditableStore(
-        Optional.ofNullable(target)
-            .orElseGet(() -> primaryEditableStore()
-                .orElseThrow(() -> newFail("Cannot create new entries. All translation stores are read-only."))));
+  protected IStackedTranslation setTranslationToSpecificStore(ITranslation newTranslation, StackedTranslation existingEntry, ITranslationStore target) {
+    var editableStore = toEditableStore(Optional.ofNullable(target).orElseGet(() -> primaryEditableStore()
+        .orElseThrow(() -> newFail("Cannot create new entries. All translation stores are read-only."))));
     var result = new FinalValue<IStackedTranslation>();
     runAndFireChanged(() -> {
       var createdTranslation = editStoreObservingLanguages(editableStore, s -> s.setTranslation(newTranslation));
-      var newStacked = new StackedTranslation(List.of(createdTranslation));
-      m_translations.put(newStacked.key(), newStacked);
-      result.set(newStacked);
-      return createAddTranslationEvent(this, newStacked);
+
+      if (existingEntry == null) {
+        var created = new StackedTranslation(List.of(createdTranslation));
+        m_translations.put(created.key(), created);
+        result.set(created);
+        return createAddTranslationEvent(this, created);
+      }
+
+      existingEntry.entryUpdated(createdTranslation);
+      result.set(existingEntry);
+      return createUpdateTranslationEvent(this, existingEntry);
     });
     return result.get();
   }
 
-  protected TranslationManagerEvent updateTranslationInternal(ITranslation newTranslation, StackedTranslation entryToUpdate, ITranslationStore storeForNewLanguages) {
+  protected TranslationManagerEvent setTranslationToCurrentStores(ITranslation newTranslation, StackedTranslation entryToUpdate, ITranslationStore storeForNewLanguages) {
     var storeForNew = Optional.ofNullable(storeForNewLanguages)
         .or(entryToUpdate::primaryEditableStore)
         .or(this::primaryEditableStore)
