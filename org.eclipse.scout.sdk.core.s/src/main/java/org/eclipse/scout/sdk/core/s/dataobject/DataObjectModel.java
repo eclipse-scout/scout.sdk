@@ -58,7 +58,7 @@ public class DataObjectModel {
 
   protected static boolean isValid(IType candidate) {
     var flags = candidate.flags();
-    if (Flags.isAbstract(flags) || Flags.isInterface(flags) || !Flags.isPublic(flags) || Flags.isEnum(flags)) {
+    if (Flags.isInterface(flags) || !Flags.isPublic(flags) || Flags.isEnum(flags)) {
       return false;
     }
     var scoutApi = candidate.javaEnvironment().api(IScoutApi.class);

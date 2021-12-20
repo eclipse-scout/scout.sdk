@@ -15,6 +15,7 @@ import static org.eclipse.scout.sdk.core.s.dataobject.DataObjectModel.wrap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +41,7 @@ public class DataObjectModelTest {
   public void test(IJavaEnvironment env) {
     assertFalse(wrap(env.requireType(List.class.getName())).isPresent());
     assertFalse(wrap(env.requireType(ArrayList.class.getName())).isPresent());
-    assertFalse(wrap(env.requireType(BaseDo.class.getName())).isPresent());
+    assertTrue(wrap(env.requireType(BaseDo.class.getName())).isPresent());
     assertFalse(new EmptyJavaEnvironmentFactory().call(je -> wrap(je.requireType(Long.class.getName()))).isPresent());
     var childDo = env.requireType(ChildDo.class.getName());
     var model = wrap(childDo).orElseThrow();
