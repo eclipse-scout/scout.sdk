@@ -21,16 +21,13 @@ import java.util.Map.Entry;
 
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * <h3>{@link ArrayTypeTest}</h3> Various Tests for {@link IType}s which are arrays
  *
  * @since 5.2.0
  */
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class ArrayTypeTest {
   @Test

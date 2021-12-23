@@ -21,7 +21,6 @@ import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
@@ -42,13 +41,11 @@ public class CodeTypeGenerator<TYPE extends CodeTypeGenerator<TYPE>> extends Pri
   private ISourceGenerator<IExpressionBuilder<?>> m_idValueGenerator;
 
   @Override
-  protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
+  protected void setup() {
     classIdValue()
         .map(ScoutAnnotationGenerator::createClassId)
-        .ifPresent(mainType::withAnnotation);
-
-    mainType
-        .withField(FieldGenerator.createSerialVersionUid())
+        .ifPresent(this::withAnnotation);
+    this.withField(FieldGenerator.createSerialVersionUid())
         .withField(createId())
         .withMethod(createIdGetter());
   }

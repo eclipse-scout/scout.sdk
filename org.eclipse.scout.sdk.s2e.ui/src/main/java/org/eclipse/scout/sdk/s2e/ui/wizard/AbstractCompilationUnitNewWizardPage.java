@@ -27,7 +27,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
@@ -251,8 +251,8 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
     else {
       m_scoutApi = ApiHelper.requireScoutApiFor(javaProject, null);
     }
-    m_superTypeDefault = calcSuperTypeDefaultFqn().map(IClassNameSupplier::fqn).orElse(null);
-    var newSuperTypeDefaultBase = calcSuperTypeDefaultBaseFqn().map(IClassNameSupplier::fqn).orElse(null);
+    m_superTypeDefault = calcSuperTypeDefaultFqn().map(ITypeNameSupplier::fqn).orElse(null);
+    var newSuperTypeDefaultBase = calcSuperTypeDefaultBaseFqn().map(ITypeNameSupplier::fqn).orElse(null);
     if (!Objects.equals(m_superTypeDefaultBase, newSuperTypeDefaultBase)) {
       m_superTypeDefaultBase = newSuperTypeDefaultBase;
       setSuperTypeBaseClass(newSuperTypeDefaultBase);
@@ -276,9 +276,9 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
     }
   }
 
-  protected abstract Optional<IClassNameSupplier> calcSuperTypeDefaultFqn();
+  protected abstract Optional<ITypeNameSupplier> calcSuperTypeDefaultFqn();
 
-  protected abstract Optional<IClassNameSupplier> calcSuperTypeDefaultBaseFqn();
+  protected abstract Optional<ITypeNameSupplier> calcSuperTypeDefaultBaseFqn();
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {

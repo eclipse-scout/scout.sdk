@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,7 +36,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.imports.CompilationUnitScopedImportCollector;
 import org.eclipse.scout.sdk.core.imports.IImportCollector;
 import org.eclipse.scout.sdk.core.imports.IImportValidator;
@@ -125,7 +126,7 @@ public class MissingClassIdsNewOperation implements BiConsumer<EclipseEnvironmen
   protected Collection<IType> findCandidates(SubMonitor monitor) {
     var startTypes = ScoutApi.allKnown()
         .map(IScoutInterfaceApi::ITypeWithClassId)
-        .map(IClassNameSupplier::fqn)
+        .map(ITypeNameSupplier::fqn)
         .distinct()
         .map(JdtUtils::resolveJdtTypes)
         .flatMap(Collection::stream)
@@ -223,7 +224,7 @@ public class MissingClassIdsNewOperation implements BiConsumer<EclipseEnvironmen
     currentWorkingCopyManager().register(icu, null);
 
     var environment = env.toScoutJavaEnvironment(icu.getJavaProject());
-    IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(environment), JdtUtils.getPackage(icu));
+    IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(new JavaBuilderContext(environment)), JdtUtils.getPackage(icu));
 
     var buffer = icu.getBuffer();
     IDocument sourceDoc = new Document(buffer.getContents());

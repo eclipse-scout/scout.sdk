@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,13 +15,12 @@ import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.CommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -34,31 +33,29 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class TestGenerator<TYPE extends TestGenerator<TYPE>> extends PrimaryTypeGenerator<TYPE> {
 
   private String m_runner;
-  private ApiFunction<?, IClassNameSupplier> m_session;
+  private ApiFunction<?, ITypeNameSupplier> m_session;
   private ISourceGenerator<IExpressionBuilder<?>> m_runWithSubjectValueGenerator;
   private boolean m_isClientTest;
 
   @Override
-  protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
-
-    mainType
+  protected void setup() {
+    this
         .withField(new TodoCommentBuilder())
         .withAnnotation(ScoutAnnotationGenerator.createRunWithSubject(runWithSubjectValueGenerator()));
 
     // @RunWith
     runner()
         .map(ScoutAnnotationGenerator::createRunWith)
-        .ifPresent(mainType::withAnnotation);
+        .ifPresent(this::withAnnotation);
 
     // @RunWithSession
     if (isClientTest()) {
-        mainType
-            .withAnnotation(ScoutAnnotationGenerator.createRunWithClientSession(session().orElse(null)));
+      withAnnotation(ScoutAnnotationGenerator.createRunWithClientSession(session().orElse(null)));
     }
     else {
       session()
           .map(ScoutAnnotationGenerator::createRunWithServerSession)
-          .ifPresent(mainType::withAnnotation);
+          .ifPresent(this::withAnnotation);
     }
   }
 
@@ -83,15 +80,15 @@ public class TestGenerator<TYPE extends TestGenerator<TYPE>> extends PrimaryType
     return thisInstance();
   }
 
-  public Optional<ApiFunction<?, IClassNameSupplier>> session() {
+  public Optional<ApiFunction<?, ITypeNameSupplier>> session() {
     return Optional.ofNullable(m_session);
   }
 
   public TYPE withSession(CharSequence session) {
-    return withSessionFrom(null, api -> IClassNameSupplier.raw(session));
+    return withSessionFrom(null, api -> ITypeNameSupplier.of(session));
   }
 
-  public <API extends IApiSpecification> TYPE withSessionFrom(Class<API> apiSpec, Function<API, IClassNameSupplier> sessionFunction) {
+  public <API extends IApiSpecification> TYPE withSessionFrom(Class<API> apiSpec, Function<API, ITypeNameSupplier> sessionFunction) {
     if (sessionFunction == null) {
       m_session = null;
     }

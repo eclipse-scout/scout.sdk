@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,73 +47,73 @@ public class FormPropertiesTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(34, propertyTestFormData.methods().stream().count(), "method count of 'PropertyTestFormData'");
-    var getBoolObject = assertMethodExist(propertyTestFormData, "getBoolObject", new String[]{});
+    var getBoolObject = assertMethodExist(propertyTestFormData, "getBoolObject");
     assertMethodReturnType(getBoolObject, Boolean.class.getName());
     var setBoolObject = assertMethodExist(propertyTestFormData, "setBoolObject", new String[]{Boolean.class.getName()});
     assertMethodReturnType(setBoolObject, "void");
-    var getBoolObjectProperty = assertMethodExist(propertyTestFormData, "getBoolObjectProperty", new String[]{});
+    var getBoolObjectProperty = assertMethodExist(propertyTestFormData, "getBoolObjectProperty");
     assertMethodReturnType(getBoolObjectProperty, "formdata.shared.services.process.PropertyTestFormData$BoolObjectProperty");
-    var isBoolPrimitive = assertMethodExist(propertyTestFormData, "isBoolPrimitive", new String[]{});
+    var isBoolPrimitive = assertMethodExist(propertyTestFormData, "isBoolPrimitive");
     assertMethodReturnType(isBoolPrimitive, "boolean");
     var setBoolPrimitive = assertMethodExist(propertyTestFormData, "setBoolPrimitive", new String[]{"boolean"});
     assertMethodReturnType(setBoolPrimitive, "void");
-    var getBoolPrimitiveProperty = assertMethodExist(propertyTestFormData, "getBoolPrimitiveProperty", new String[]{});
+    var getBoolPrimitiveProperty = assertMethodExist(propertyTestFormData, "getBoolPrimitiveProperty");
     assertMethodReturnType(getBoolPrimitiveProperty, "formdata.shared.services.process.PropertyTestFormData$BoolPrimitiveProperty");
-    var getByteArray = assertMethodExist(propertyTestFormData, "getByteArray", new String[]{});
+    var getByteArray = assertMethodExist(propertyTestFormData, "getByteArray");
     assertMethodReturnType(getByteArray, "byte[]");
     var setByteArray = assertMethodExist(propertyTestFormData, "setByteArray", new String[]{"byte[]"});
     assertMethodReturnType(setByteArray, "void");
-    var getByteArrayProperty = assertMethodExist(propertyTestFormData, "getByteArrayProperty", new String[]{});
+    var getByteArrayProperty = assertMethodExist(propertyTestFormData, "getByteArrayProperty");
     assertMethodReturnType(getByteArrayProperty, "formdata.shared.services.process.PropertyTestFormData$ByteArrayProperty");
-    var getComplexArray = assertMethodExist(propertyTestFormData, "getComplexArray", new String[]{});
+    var getComplexArray = assertMethodExist(propertyTestFormData, "getComplexArray");
     assertMethodReturnType(getComplexArray, "java.util.ArrayList<java.util.List<java.lang.String>>[]");
     var setComplexArray = assertMethodExist(propertyTestFormData, "setComplexArray", new String[]{"java.util.ArrayList<java.util.List<java.lang.String>>[]"});
     assertMethodReturnType(setComplexArray, "void");
-    var getComplexArrayProperty = assertMethodExist(propertyTestFormData, "getComplexArrayProperty", new String[]{});
+    var getComplexArrayProperty = assertMethodExist(propertyTestFormData, "getComplexArrayProperty");
     assertMethodReturnType(getComplexArrayProperty, "formdata.shared.services.process.PropertyTestFormData$ComplexArrayProperty");
-    var getComplexInnerArray = assertMethodExist(propertyTestFormData, "getComplexInnerArray", new String[]{});
+    var getComplexInnerArray = assertMethodExist(propertyTestFormData, "getComplexInnerArray");
     assertMethodReturnType(getComplexInnerArray, "java.util.ArrayList<java.util.List<java.lang.String[]>>");
     var setComplexInnerArray = assertMethodExist(propertyTestFormData, "setComplexInnerArray", new String[]{"java.util.ArrayList<java.util.List<java.lang.String[]>>"});
     assertMethodReturnType(setComplexInnerArray, "void");
-    var getComplexInnerArrayProperty = assertMethodExist(propertyTestFormData, "getComplexInnerArrayProperty", new String[]{});
+    var getComplexInnerArrayProperty = assertMethodExist(propertyTestFormData, "getComplexInnerArrayProperty");
     assertMethodReturnType(getComplexInnerArrayProperty, "formdata.shared.services.process.PropertyTestFormData$ComplexInnerArrayProperty");
-    var getDoubleArrayProperty = assertMethodExist(propertyTestFormData, "getDoubleArrayProperty", new String[]{});
+    var getDoubleArrayProperty = assertMethodExist(propertyTestFormData, "getDoubleArrayProperty");
     assertMethodReturnType(getDoubleArrayProperty, "java.lang.String[][]");
     var setDoubleArrayProperty = assertMethodExist(propertyTestFormData, "setDoubleArrayProperty", new String[]{"java.lang.String[][]"});
     assertMethodReturnType(setDoubleArrayProperty, "void");
-    var getDoubleArrayPropertyProperty = assertMethodExist(propertyTestFormData, "getDoubleArrayPropertyProperty", new String[]{});
+    var getDoubleArrayPropertyProperty = assertMethodExist(propertyTestFormData, "getDoubleArrayPropertyProperty");
     assertMethodReturnType(getDoubleArrayPropertyProperty, "formdata.shared.services.process.PropertyTestFormData$DoubleArrayPropertyProperty");
-    var getIntPrimitive = assertMethodExist(propertyTestFormData, "getIntPrimitive", new String[]{});
+    var getIntPrimitive = assertMethodExist(propertyTestFormData, "getIntPrimitive");
     assertMethodReturnType(getIntPrimitive, "int");
     var setIntPrimitive = assertMethodExist(propertyTestFormData, "setIntPrimitive", new String[]{"int"});
     assertMethodReturnType(setIntPrimitive, "void");
-    var getIntPrimitiveProperty = assertMethodExist(propertyTestFormData, "getIntPrimitiveProperty", new String[]{});
+    var getIntPrimitiveProperty = assertMethodExist(propertyTestFormData, "getIntPrimitiveProperty");
     assertMethodReturnType(getIntPrimitiveProperty, "formdata.shared.services.process.PropertyTestFormData$IntPrimitiveProperty");
-    var getName = assertMethodExist(propertyTestFormData, "getName", new String[]{});
+    var getName = assertMethodExist(propertyTestFormData, "getName");
     assertMethodReturnType(getName, "formdata.shared.services.process.PropertyTestFormData$Name");
-    var getObjectProperty = assertMethodExist(propertyTestFormData, "getObjectProperty", new String[]{});
+    var getObjectProperty = assertMethodExist(propertyTestFormData, "getObjectProperty");
     assertMethodReturnType(getObjectProperty, "java.lang.Object");
     var setObjectProperty = assertMethodExist(propertyTestFormData, "setObjectProperty", new String[]{"java.lang.Object"});
     assertMethodReturnType(setObjectProperty, "void");
-    var getObjectPropertyProperty = assertMethodExist(propertyTestFormData, "getObjectPropertyProperty", new String[]{});
+    var getObjectPropertyProperty = assertMethodExist(propertyTestFormData, "getObjectPropertyProperty");
     assertMethodReturnType(getObjectPropertyProperty, "formdata.shared.services.process.PropertyTestFormData$ObjectPropertyProperty");
-    var getPropertyTestNr = assertMethodExist(propertyTestFormData, "getPropertyTestNr", new String[]{});
+    var getPropertyTestNr = assertMethodExist(propertyTestFormData, "getPropertyTestNr");
     assertMethodReturnType(getPropertyTestNr, Long.class.getName());
     var setPropertyTestNr = assertMethodExist(propertyTestFormData, "setPropertyTestNr", new String[]{Long.class.getName()});
     assertMethodReturnType(setPropertyTestNr, "void");
-    var getPropertyTestNrProperty = assertMethodExist(propertyTestFormData, "getPropertyTestNrProperty", new String[]{});
+    var getPropertyTestNrProperty = assertMethodExist(propertyTestFormData, "getPropertyTestNrProperty");
     assertMethodReturnType(getPropertyTestNrProperty, "formdata.shared.services.process.PropertyTestFormData$PropertyTestNrProperty");
-    var getSingleArrayProperty = assertMethodExist(propertyTestFormData, "getSingleArrayProperty", new String[]{});
+    var getSingleArrayProperty = assertMethodExist(propertyTestFormData, "getSingleArrayProperty");
     assertMethodReturnType(getSingleArrayProperty, "java.lang.String[]");
     var setSingleArrayProperty = assertMethodExist(propertyTestFormData, "setSingleArrayProperty", new String[]{"java.lang.String[]"});
     assertMethodReturnType(setSingleArrayProperty, "void");
-    var getSingleArrayPropertyProperty = assertMethodExist(propertyTestFormData, "getSingleArrayPropertyProperty", new String[]{});
+    var getSingleArrayPropertyProperty = assertMethodExist(propertyTestFormData, "getSingleArrayPropertyProperty");
     assertMethodReturnType(getSingleArrayPropertyProperty, "formdata.shared.services.process.PropertyTestFormData$SingleArrayPropertyProperty");
-    var getWizards = assertMethodExist(propertyTestFormData, "getWizards", new String[]{});
+    var getWizards = assertMethodExist(propertyTestFormData, "getWizards");
     assertMethodReturnType(getWizards, "java.util.HashMap<java.lang.String,java.util.List<org.eclipse.scout.rt.platform.service.IService>>");
     var setWizards = assertMethodExist(propertyTestFormData, "setWizards", new String[]{"java.util.HashMap<java.lang.String,java.util.List<org.eclipse.scout.rt.platform.service.IService>>"});
     assertMethodReturnType(setWizards, "void");
-    var getWizardsProperty = assertMethodExist(propertyTestFormData, "getWizardsProperty", new String[]{});
+    var getWizardsProperty = assertMethodExist(propertyTestFormData, "getWizardsProperty");
     assertMethodReturnType(getWizardsProperty, "formdata.shared.services.process.PropertyTestFormData$WizardsProperty");
 
     assertEquals(12, propertyTestFormData.innerTypes().stream().count(), "inner types count of 'PropertyTestFormData'");
@@ -227,11 +227,11 @@ public class FormPropertiesTest {
     assertFieldType(serialVersionUID8, "long");
 
     assertEquals(3, name.methods().stream().count(), "method count of 'Name'");
-    var getIntProperty = assertMethodExist(name, "getIntProperty", new String[]{});
+    var getIntProperty = assertMethodExist(name, "getIntProperty");
     assertMethodReturnType(getIntProperty, "int");
     var setIntProperty = assertMethodExist(name, "setIntProperty", new String[]{"int"});
     assertMethodReturnType(setIntProperty, "void");
-    var getIntPropertyProperty = assertMethodExist(name, "getIntPropertyProperty", new String[]{});
+    var getIntPropertyProperty = assertMethodExist(name, "getIntPropertyProperty");
     assertMethodReturnType(getIntPropertyProperty, "formdata.shared.services.process.PropertyTestFormData$Name$IntPropertyProperty");
 
     assertEquals(1, name.innerTypes().stream().count(), "inner types count of 'Name'");

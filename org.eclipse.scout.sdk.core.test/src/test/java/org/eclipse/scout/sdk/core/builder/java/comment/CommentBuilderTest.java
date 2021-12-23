@@ -31,10 +31,8 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * <h3>{@link CommentBuilderTest}</h3>
@@ -59,7 +57,6 @@ public class CommentBuilderTest {
   }
 
   @Test
-  @ExtendWith(JavaEnvironmentExtension.class)
   @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
   public void testAppendLink(IJavaEnvironment env) {
     assertJavaElementCommentEquals("", b -> b.appendLink((CharSequence) null), env);

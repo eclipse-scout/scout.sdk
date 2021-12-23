@@ -38,7 +38,7 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.TemplateVariable;
 import org.eclipse.jface.text.templates.TemplateVariableResolver;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
@@ -150,22 +150,21 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
 
   private static ISourceGenerator<ICommentBuilder<?>> createMethodCommentInternal(IMethodGenerator<?, ?> target, int type) {
     return b -> {
-      var builderCtx = b.context().properties();
-      if (!isAutomaticallyAddComments(builderCtx)) {
+      var builderContext = (IJavaBuilderContext) b.context();
+      var contextProperties = builderContext.properties();
+      if (!isAutomaticallyAddComments(contextProperties)) {
         return;
       }
-      var ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
-      var builderContext = (IJavaBuilderContext) b.context();
+      var ownerProject = contextProperties.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
       var paramNames = target.parameters()
           .map(IMethodParameterGenerator::elementName)
           .flatMap(Optional::stream)
           .collect(toList());
-      var exceptionNames = target.throwables()
+      var exceptionNames = target.throwablesFunc()
           .map(func -> func.apply(builderContext))
-          .flatMap(Optional::stream)
-          .map(IClassNameSupplier::fqn)
+          .map(ITypeNameSupplier::fqn)
           .collect(toList());
-      var returnTypeName = target.returnType().flatMap(af -> af.apply(builderContext));
+      var returnTypeName = target.returnType(builderContext);
 
       var fieldTypeSimpleName = UNDEFINED_VAR_VALUE;
       String templateName;
@@ -178,8 +177,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
           break;
         case METHOD_TYPE_SETTER:
           templateName = CodeTemplateContextType.SETTERCOMMENT_ID;
-          var javaEnv = builderContext.environment().orElse(null);
-          var firstParam = target.parameters().findAny().map(p -> p.reference(javaEnv));
+          var firstParam = target.parameters().findAny().map(p -> p.reference(builderContext));
           if (firstParam.isPresent()) {
             fieldTypeSimpleName = JavaTypes.simpleName(firstParam.orElseThrow());
           }
@@ -269,8 +267,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       var template = getCodeTemplate(CodeTemplateContextType.FIELDCOMMENT_ID, ownerProject);
       if (template != null) {
         TemplateContext templateContext = new CodeTemplateContext(template.getContextTypeId(), ownerProject, builderContext.lineDelimiter());
-        var dataType = target.dataType()
-            .flatMap(af -> af.apply(builderContext))
+        var dataType = target.dataType(builderContext)
             .map(JavaTypes::simpleName)
             .orElse(null);
         templateContext.setVariable(CodeTemplateContextType.FIELD_TYPE, dataType);

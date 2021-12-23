@@ -36,14 +36,12 @@ import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutFullJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
-import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentExtension;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
-@ExtendWith(TestingEnvironmentExtension.class)
 @ExtendWithTestingEnvironment(primary = @ExtendWithJavaEnvironmentFactory(ScoutFullJavaEnvironmentFactory.class))
 public class MissingTranslationQueryTest {
 

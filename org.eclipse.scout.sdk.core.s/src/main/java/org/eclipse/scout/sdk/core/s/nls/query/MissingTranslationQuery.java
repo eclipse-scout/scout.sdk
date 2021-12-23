@@ -31,7 +31,7 @@ import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -62,7 +62,7 @@ public class MissingTranslationQuery implements IFileQuery {
 
   private static final Set<String> JAVA_TEXTS_FILE_NAMES = ScoutApi.allKnown()
       .map(IScoutVariousApi::TEXTS)
-      .map(IClassNameSupplier::simpleName)
+      .map(ITypeNameSupplier::simpleName)
       .map(name -> name + JavaTypes.JAVA_FILE_SUFFIX)
       .collect(toSet());
   public static final String JS_TEXTS_FILE_NAME = "texts.js";

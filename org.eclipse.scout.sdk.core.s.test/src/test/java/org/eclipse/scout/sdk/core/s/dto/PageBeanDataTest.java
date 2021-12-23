@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -88,19 +88,19 @@ public class PageBeanDataTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(7, baseTablePageData.methods().stream().count(), "method count of 'BaseTablePageData'");
-    var addRow = assertMethodExist(baseTablePageData, "addRow", new String[]{});
+    var addRow = assertMethodExist(baseTablePageData, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.pages.BaseTablePageData$BaseTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(baseTablePageData, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.pages.BaseTablePageData$BaseTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(baseTablePageData, "createRow", new String[]{});
+    var createRow = assertMethodExist(baseTablePageData, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.pages.BaseTablePageData$BaseTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(baseTablePageData, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(baseTablePageData, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(baseTablePageData, "getRows", new String[]{});
+    var getRows = assertMethodExist(baseTablePageData, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.pages.BaseTablePageData$BaseTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(baseTablePageData, "rowAt", new String[]{"int"});
@@ -134,11 +134,11 @@ public class PageBeanDataTest {
     assertFieldType(m_second, "java.util.Date");
 
     assertEquals(4, baseTableRowData.methods().stream().count(), "method count of 'BaseTableRowData'");
-    var getFirst = assertMethodExist(baseTableRowData, "getFirst", new String[]{});
+    var getFirst = assertMethodExist(baseTableRowData, "getFirst");
     assertMethodReturnType(getFirst, String.class.getName());
     var setFirst = assertMethodExist(baseTableRowData, "setFirst", new String[]{String.class.getName()});
     assertMethodReturnType(setFirst, "void");
-    var getSecond = assertMethodExist(baseTableRowData, "getSecond", new String[]{});
+    var getSecond = assertMethodExist(baseTableRowData, "getSecond");
     assertMethodReturnType(getSecond, "java.util.Date");
     var setSecond = assertMethodExist(baseTableRowData, "setSecond", new String[]{"java.util.Date"});
     assertMethodReturnType(setSecond, "void");
@@ -162,19 +162,19 @@ public class PageBeanDataTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(7, extendedTablePageData.methods().stream().count(), "method count of 'ExtendedTablePageData'");
-    var addRow = assertMethodExist(extendedTablePageData, "addRow", new String[]{});
+    var addRow = assertMethodExist(extendedTablePageData, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(extendedTablePageData, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(extendedTablePageData, "createRow", new String[]{});
+    var createRow = assertMethodExist(extendedTablePageData, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(extendedTablePageData, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(extendedTablePageData, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(extendedTablePageData, "getRows", new String[]{});
+    var getRows = assertMethodExist(extendedTablePageData, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(extendedTablePageData, "rowAt", new String[]{"int"});
@@ -208,11 +208,11 @@ public class PageBeanDataTest {
     assertFieldType(m_ignoredColumnEx, "java.util.Date");
 
     assertEquals(4, extendedTableRowData.methods().stream().count(), "method count of 'ExtendedTableRowData'");
-    var getIntermediate = assertMethodExist(extendedTableRowData, "getIntermediate", new String[]{});
+    var getIntermediate = assertMethodExist(extendedTableRowData, "getIntermediate");
     assertMethodReturnType(getIntermediate, BigDecimal.class.getName());
     var setIntermediate = assertMethodExist(extendedTableRowData, "setIntermediate", new String[]{BigDecimal.class.getName()});
     assertMethodReturnType(setIntermediate, "void");
-    var getIgnoredColumnEx = assertMethodExist(extendedTableRowData, "getIgnoredColumnEx", new String[]{});
+    var getIgnoredColumnEx = assertMethodExist(extendedTableRowData, "getIgnoredColumnEx");
     assertMethodReturnType(getIgnoredColumnEx, "java.util.Date");
     var setIgnoredColumnEx = assertMethodExist(extendedTableRowData, "setIgnoredColumnEx", new String[]{"java.util.Date"});
     assertMethodReturnType(setIgnoredColumnEx, "void");
@@ -235,19 +235,19 @@ public class PageBeanDataTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(7, extendedTablePageWithoutExtendedTableData.methods().stream().count(), "method count of 'ExtendedTablePageWithoutExtendedTableData'");
-    var addRow = assertMethodExist(extendedTablePageWithoutExtendedTableData, "addRow", new String[]{});
+    var addRow = assertMethodExist(extendedTablePageWithoutExtendedTableData, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.pages.ExtendedTablePageWithoutExtendedTableData$ExtendedTablePageWithoutExtendedTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(extendedTablePageWithoutExtendedTableData, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.pages.ExtendedTablePageWithoutExtendedTableData$ExtendedTablePageWithoutExtendedTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(extendedTablePageWithoutExtendedTableData, "createRow", new String[]{});
+    var createRow = assertMethodExist(extendedTablePageWithoutExtendedTableData, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.pages.ExtendedTablePageWithoutExtendedTableData$ExtendedTablePageWithoutExtendedTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(extendedTablePageWithoutExtendedTableData, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(extendedTablePageWithoutExtendedTableData, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(extendedTablePageWithoutExtendedTableData, "getRows", new String[]{});
+    var getRows = assertMethodExist(extendedTablePageWithoutExtendedTableData, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.pages.ExtendedTablePageWithoutExtendedTableData$ExtendedTablePageWithoutExtendedTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(extendedTablePageWithoutExtendedTableData, "rowAt", new String[]{"int"});
@@ -289,19 +289,19 @@ public class PageBeanDataTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(7, baseWithExtendedTableTablePageData.methods().stream().count(), "method count of 'BaseWithExtendedTableTablePageData'");
-    var addRow = assertMethodExist(baseWithExtendedTableTablePageData, "addRow", new String[]{});
+    var addRow = assertMethodExist(baseWithExtendedTableTablePageData, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.BaseWithExtendedTableTablePageData$BaseWithExtendedTableTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(baseWithExtendedTableTablePageData, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.BaseWithExtendedTableTablePageData$BaseWithExtendedTableTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(baseWithExtendedTableTablePageData, "createRow", new String[]{});
+    var createRow = assertMethodExist(baseWithExtendedTableTablePageData, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.BaseWithExtendedTableTablePageData$BaseWithExtendedTableTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(baseWithExtendedTableTablePageData, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(baseWithExtendedTableTablePageData, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(baseWithExtendedTableTablePageData, "getRows", new String[]{});
+    var getRows = assertMethodExist(baseWithExtendedTableTablePageData, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.BaseWithExtendedTableTablePageData$BaseWithExtendedTableTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(baseWithExtendedTableTablePageData, "rowAt", new String[]{"int"});
@@ -335,11 +335,11 @@ public class PageBeanDataTest {
     assertFieldType(m_colInTable, String.class.getName());
 
     assertEquals(4, baseWithExtendedTableTableRowData.methods().stream().count(), "method count of 'BaseWithExtendedTableTableRowData'");
-    var getColInAbstractTable = assertMethodExist(baseWithExtendedTableTableRowData, "getColInAbstractTable", new String[]{});
+    var getColInAbstractTable = assertMethodExist(baseWithExtendedTableTableRowData, "getColInAbstractTable");
     assertMethodReturnType(getColInAbstractTable, String.class.getName());
     var setColInAbstractTable = assertMethodExist(baseWithExtendedTableTableRowData, "setColInAbstractTable", new String[]{String.class.getName()});
     assertMethodReturnType(setColInAbstractTable, "void");
-    var getColInTable = assertMethodExist(baseWithExtendedTableTableRowData, "getColInTable", new String[]{});
+    var getColInTable = assertMethodExist(baseWithExtendedTableTableRowData, "getColInTable");
     assertMethodReturnType(getColInTable, String.class.getName());
     var setColInTable = assertMethodExist(baseWithExtendedTableTableRowData, "setColInTable", new String[]{String.class.getName()});
     assertMethodReturnType(setColInTable, "void");
@@ -362,19 +362,19 @@ public class PageBeanDataTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(7, extendedExtendedTablePageWithExtendedTableData.methods().stream().count(), "method count of 'ExtendedExtendedTablePageWithExtendedTableData'");
-    var addRow = assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "addRow", new String[]{});
+    var addRow = assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.pages.ExtendedExtendedTablePageWithExtendedTableData$ExtendedExtendedTablePageWithExtendedTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.pages.ExtendedExtendedTablePageWithExtendedTableData$ExtendedExtendedTablePageWithExtendedTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "createRow", new String[]{});
+    var createRow = assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.pages.ExtendedExtendedTablePageWithExtendedTableData$ExtendedExtendedTablePageWithExtendedTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "getRows", new String[]{});
+    var getRows = assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.pages.ExtendedExtendedTablePageWithExtendedTableData$ExtendedExtendedTablePageWithExtendedTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "rowAt", new String[]{"int"});
@@ -403,7 +403,7 @@ public class PageBeanDataTest {
     assertFieldType(m_boolean, Boolean.class.getName());
 
     assertEquals(2, extendedExtendedTablePageWithExtendedTableRowData.methods().stream().count(), "method count of 'ExtendedExtendedTablePageWithExtendedTableRowData'");
-    var getBoolean = assertMethodExist(extendedExtendedTablePageWithExtendedTableRowData, "getBoolean", new String[]{});
+    var getBoolean = assertMethodExist(extendedExtendedTablePageWithExtendedTableRowData, "getBoolean");
     assertMethodReturnType(getBoolean, Boolean.class.getName());
     var setBoolean = assertMethodExist(extendedExtendedTablePageWithExtendedTableRowData, "setBoolean", new String[]{Boolean.class.getName()});
     assertMethodReturnType(setBoolean, "void");
@@ -434,7 +434,7 @@ public class PageBeanDataTest {
     assertFieldType(m_bigDecimalTest, BigDecimal.class.getName());
 
     assertEquals(2, pageWithTableExtensionData.methods().stream().count(), "method count of 'PageWithTableExtensionData'");
-    var getBigDecimalTest = assertMethodExist(pageWithTableExtensionData, "getBigDecimalTest", new String[]{});
+    var getBigDecimalTest = assertMethodExist(pageWithTableExtensionData, "getBigDecimalTest");
     assertMethodReturnType(getBigDecimalTest, BigDecimal.class.getName());
     var setBigDecimalTest = assertMethodExist(pageWithTableExtensionData, "setBigDecimalTest", new String[]{BigDecimal.class.getName()});
     assertMethodReturnType(setBigDecimalTest, "void");

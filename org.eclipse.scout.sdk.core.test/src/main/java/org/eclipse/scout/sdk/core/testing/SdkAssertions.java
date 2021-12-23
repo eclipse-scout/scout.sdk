@@ -182,6 +182,10 @@ public final class SdkAssertions {
     return type.orElse(null);
   }
 
+  public static IMethod assertMethodExist(IType type, String methodName) {
+    return assertMethodExist(type, methodName, new String[0]);
+  }
+
   public static IMethod assertMethodExist(IType type, String methodName, String[] parameterTypes) {
     return assertMethodExist(type, methodName, parameterTypes, null);
   }

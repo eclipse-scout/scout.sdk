@@ -18,17 +18,14 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * <h3>{@link LookupCallGeneratorTest}</h3>
  *
  * @since 5.2.0
  */
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class)
 public class LookupCallGeneratorTest {
 

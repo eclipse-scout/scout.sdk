@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -70,11 +70,11 @@ public class ReplaceWithTemplatesTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(3, abstractTemplateForReplaceBoxData.methods().stream().count(), "method count of 'AbstractTemplateForReplaceBoxData'");
-    var getTemplateBoxString = assertMethodExist(abstractTemplateForReplaceBoxData, "getTemplateBoxString", new String[]{});
+    var getTemplateBoxString = assertMethodExist(abstractTemplateForReplaceBoxData, "getTemplateBoxString");
     assertMethodReturnType(getTemplateBoxString, "formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateBoxString");
-    var getTemplateString = assertMethodExist(abstractTemplateForReplaceBoxData, "getTemplateString", new String[]{});
+    var getTemplateString = assertMethodExist(abstractTemplateForReplaceBoxData, "getTemplateString");
     assertMethodReturnType(getTemplateString, "formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateString");
-    var getTemplateTable = assertMethodExist(abstractTemplateForReplaceBoxData, "getTemplateTable", new String[]{});
+    var getTemplateTable = assertMethodExist(abstractTemplateForReplaceBoxData, "getTemplateTable");
     assertMethodReturnType(getTemplateTable, "formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateTable");
 
     assertEquals(3, abstractTemplateForReplaceBoxData.innerTypes().stream().count(), "inner types count of 'AbstractTemplateForReplaceBoxData'");
@@ -118,19 +118,19 @@ public class ReplaceWithTemplatesTest {
     assertFieldType(serialVersionUID3, "long");
 
     assertEquals(7, templateTable.methods().stream().count(), "method count of 'TemplateTable'");
-    var addRow = assertMethodExist(templateTable, "addRow", new String[]{});
+    var addRow = assertMethodExist(templateTable, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateTable$TemplateTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(templateTable, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateTable$TemplateTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(templateTable, "createRow", new String[]{});
+    var createRow = assertMethodExist(templateTable, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateTable$TemplateTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(templateTable, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(templateTable, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(templateTable, "getRows", new String[]{});
+    var getRows = assertMethodExist(templateTable, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateTable$TemplateTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(templateTable, "rowAt", new String[]{"int"});
@@ -164,11 +164,11 @@ public class ReplaceWithTemplatesTest {
     assertFieldType(m_second, String.class.getName());
 
     assertEquals(4, templateTableRowData.methods().stream().count(), "method count of 'TemplateTableRowData'");
-    var getFirst = assertMethodExist(templateTableRowData, "getFirst", new String[]{});
+    var getFirst = assertMethodExist(templateTableRowData, "getFirst");
     assertMethodReturnType(getFirst, String.class.getName());
     var setFirst = assertMethodExist(templateTableRowData, "setFirst", new String[]{String.class.getName()});
     assertMethodReturnType(setFirst, "void");
-    var getSecond = assertMethodExist(templateTableRowData, "getSecond", new String[]{});
+    var getSecond = assertMethodExist(templateTableRowData, "getSecond");
     assertMethodReturnType(getSecond, String.class.getName());
     var setSecond = assertMethodExist(templateTableRowData, "setSecond", new String[]{String.class.getName()});
     assertMethodReturnType(setSecond, "void");
@@ -192,11 +192,11 @@ public class ReplaceWithTemplatesTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(3, templateBasedFormData.methods().stream().count(), "method count of 'TemplateBasedFormData'");
-    var getUsageOneBox = assertMethodExist(templateBasedFormData, "getUsageOneBox", new String[]{});
+    var getUsageOneBox = assertMethodExist(templateBasedFormData, "getUsageOneBox");
     assertMethodReturnType(getUsageOneBox, "formdata.shared.services.process.replace.TemplateBasedFormData$UsageOneBox");
-    var getUsageTwoBox = assertMethodExist(templateBasedFormData, "getUsageTwoBox", new String[]{});
+    var getUsageTwoBox = assertMethodExist(templateBasedFormData, "getUsageTwoBox");
     assertMethodReturnType(getUsageTwoBox, "formdata.shared.services.process.replace.TemplateBasedFormData$UsageTwoBox");
-    var getUsualString = assertMethodExist(templateBasedFormData, "getUsualString", new String[]{});
+    var getUsualString = assertMethodExist(templateBasedFormData, "getUsualString");
     assertMethodReturnType(getUsualString, "formdata.shared.services.process.replace.TemplateBasedFormData$UsualString");
 
     assertEquals(3, templateBasedFormData.innerTypes().stream().count(), "inner types count of 'TemplateBasedFormData'");
@@ -212,7 +212,7 @@ public class ReplaceWithTemplatesTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(1, usageOneBox.methods().stream().count(), "method count of 'UsageOneBox'");
-    var getUsageOneString = assertMethodExist(usageOneBox, "getUsageOneString", new String[]{});
+    var getUsageOneString = assertMethodExist(usageOneBox, "getUsageOneString");
     assertMethodReturnType(getUsageOneString, "formdata.shared.services.process.replace.TemplateBasedFormData$UsageOneBox$UsageOneString");
 
     assertEquals(1, usageOneBox.innerTypes().stream().count(), "inner types count of 'UsageOneBox'");
@@ -242,7 +242,7 @@ public class ReplaceWithTemplatesTest {
     assertFieldType(serialVersionUID3, "long");
 
     assertEquals(1, usageTwoBox.methods().stream().count(), "method count of 'UsageTwoBox'");
-    var getUsageTwoTemplateTable = assertMethodExist(usageTwoBox, "getUsageTwoTemplateTable", new String[]{});
+    var getUsageTwoTemplateTable = assertMethodExist(usageTwoBox, "getUsageTwoTemplateTable");
     assertMethodReturnType(getUsageTwoTemplateTable, "formdata.shared.services.process.replace.TemplateBasedFormData$UsageTwoBox$UsageTwoTemplateTable");
 
     assertEquals(1, usageTwoBox.innerTypes().stream().count(), "inner types count of 'UsageTwoBox'");
@@ -259,19 +259,19 @@ public class ReplaceWithTemplatesTest {
     assertFieldType(serialVersionUID4, "long");
 
     assertEquals(7, usageTwoTemplateTable.methods().stream().count(), "method count of 'UsageTwoTemplateTable'");
-    var addRow = assertMethodExist(usageTwoTemplateTable, "addRow", new String[]{});
+    var addRow = assertMethodExist(usageTwoTemplateTable, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.process.replace.TemplateBasedFormData$UsageTwoBox$UsageTwoTemplateTable$UsageTwoTemplateTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(usageTwoTemplateTable, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.replace.TemplateBasedFormData$UsageTwoBox$UsageTwoTemplateTable$UsageTwoTemplateTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(usageTwoTemplateTable, "createRow", new String[]{});
+    var createRow = assertMethodExist(usageTwoTemplateTable, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.process.replace.TemplateBasedFormData$UsageTwoBox$UsageTwoTemplateTable$UsageTwoTemplateTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(usageTwoTemplateTable, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(usageTwoTemplateTable, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(usageTwoTemplateTable, "getRows", new String[]{});
+    var getRows = assertMethodExist(usageTwoTemplateTable, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.process.replace.TemplateBasedFormData$UsageTwoBox$UsageTwoTemplateTable$UsageTwoTemplateTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(usageTwoTemplateTable, "rowAt", new String[]{"int"});
@@ -299,7 +299,7 @@ public class ReplaceWithTemplatesTest {
     assertFieldType(m_third, String.class.getName());
 
     assertEquals(2, usageTwoTemplateTableRowData.methods().stream().count(), "method count of 'UsageTwoTemplateTableRowData'");
-    var getThird = assertMethodExist(usageTwoTemplateTableRowData, "getThird", new String[]{});
+    var getThird = assertMethodExist(usageTwoTemplateTableRowData, "getThird");
     assertMethodReturnType(getThird, String.class.getName());
     var setThird = assertMethodExist(usageTwoTemplateTableRowData, "setThird", new String[]{String.class.getName()});
     assertMethodReturnType(setThird, "void");
@@ -337,7 +337,7 @@ public class ReplaceWithTemplatesTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, abstractRadioButtonGroupWithFieldsData.methods().stream().count(), "method count of 'AbstractRadioButtonGroupWithFieldsData'");
-    var getInputString = assertMethodExist(abstractRadioButtonGroupWithFieldsData, "getInputString", new String[]{});
+    var getInputString = assertMethodExist(abstractRadioButtonGroupWithFieldsData, "getInputString");
     assertMethodReturnType(getInputString, "formdata.shared.services.process.replace.AbstractRadioButtonGroupWithFieldsData$InputString");
 
     assertEquals(1, abstractRadioButtonGroupWithFieldsData.innerTypes().stream().count(), "inner types count of 'AbstractRadioButtonGroupWithFieldsData'");
@@ -373,15 +373,15 @@ public class ReplaceWithTemplatesTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(5, radioButtonFormData.methods().stream().count(), "method count of 'RadioButtonFormData'");
-    var getInputExString = assertMethodExist(radioButtonFormData, "getInputExString", new String[]{});
+    var getInputExString = assertMethodExist(radioButtonFormData, "getInputExString");
     assertMethodReturnType(getInputExString, "formdata.shared.services.process.replace.RadioButtonFormData$InputExString");
-    var getUsageOneUsualString = assertMethodExist(radioButtonFormData, "getUsageOneUsualString", new String[]{});
+    var getUsageOneUsualString = assertMethodExist(radioButtonFormData, "getUsageOneUsualString");
     assertMethodReturnType(getUsageOneUsualString, "formdata.shared.services.process.replace.RadioButtonFormData$UsageOneUsualString");
-    var getUsedRadioButtonGroup = assertMethodExist(radioButtonFormData, "getUsedRadioButtonGroup", new String[]{});
+    var getUsedRadioButtonGroup = assertMethodExist(radioButtonFormData, "getUsedRadioButtonGroup");
     assertMethodReturnType(getUsedRadioButtonGroup, "formdata.shared.services.process.replace.RadioButtonFormData$UsedRadioButtonGroup");
-    var getUsualRadioButtonGroup = assertMethodExist(radioButtonFormData, "getUsualRadioButtonGroup", new String[]{});
+    var getUsualRadioButtonGroup = assertMethodExist(radioButtonFormData, "getUsualRadioButtonGroup");
     assertMethodReturnType(getUsualRadioButtonGroup, "formdata.shared.services.process.replace.RadioButtonFormData$UsualRadioButtonGroup");
-    var getUsualString = assertMethodExist(radioButtonFormData, "getUsualString", new String[]{});
+    var getUsualString = assertMethodExist(radioButtonFormData, "getUsualString");
     assertMethodReturnType(getUsualString, "formdata.shared.services.process.replace.RadioButtonFormData$UsualString");
 
     assertEquals(5, radioButtonFormData.innerTypes().stream().count(), "inner types count of 'RadioButtonFormData'");

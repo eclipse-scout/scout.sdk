@@ -17,9 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import formdata.client.ui.desktop.outline.pages.ExtendedTablePage;
 import formdata.client.ui.forms.AnnotationCopyTestForm;
@@ -34,7 +32,6 @@ import formdata.client.ui.forms.TableFieldForm;
  *
  * @since 5.2.0
  */
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(ScoutClientJavaEnvironmentFactory.class)
 public class WellformTest {
 

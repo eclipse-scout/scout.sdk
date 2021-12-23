@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.generator.method;
 
+import static java.util.function.Predicate.isEqual;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator.createOverride;
 import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
@@ -23,6 +24,7 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import java.beans.Introspector;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -30,10 +32,11 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.MethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
@@ -50,7 +53,6 @@ import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -71,18 +73,17 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
   protected final List<IMethodParameterGenerator<?>> m_parameters;
   protected final List<ITypeParameterGenerator<?>> m_typeParameters;
-  protected final List<ApiFunction<?, IClassNameSupplier>> m_exceptions;
+  protected final List<JavaBuilderContextFunction<ITypeNameSupplier>> m_throwables;
 
-  private ApiFunction<?, String> m_returnType;
+  private JavaBuilderContextFunction<String> m_returnType;
   private ISourceGenerator<BODY> m_body;
-  private ApiFunction<?, String> m_methodName;
   private boolean m_withOverrideIfNecessary;
   private IType m_overrideIfNecessaryDeclaringType;
 
   protected MethodGenerator() {
     m_parameters = new ArrayList<>();
     m_typeParameters = new ArrayList<>();
-    m_exceptions = new ArrayList<>();
+    m_throwables = new ArrayList<>();
   }
 
   protected MethodGenerator(IMethod method, IWorkingCopyTransformer transformer) {
@@ -90,7 +91,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
     m_returnType = method.returnType()
         .map(IType::reference)
-        .map(ApiFunction::new)
+        .map(JavaBuilderContextFunction::create)
         .orElse(null);
 
     m_typeParameters = method.typeParameters()
@@ -103,10 +104,10 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
         .flatMap(Optional::stream)
         .collect(toList());
 
-    m_exceptions = method.exceptionTypes()
-        .map(IType::reference)
-        .map(IClassNameSupplier::raw)
-        .map(ApiFunction::new)
+    m_throwables = method.exceptionTypes()
+        .map(IType::name)
+        .map(ITypeNameSupplier::of)
+        .map(JavaBuilderContextFunction::create)
         .collect(toList());
 
     if (canHaveBody(method.flags())) {
@@ -120,6 +121,13 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     if (method.requireDeclaringType().isInterface()) {
       withFlags(flags() | Flags.AccInterface);
     }
+  }
+
+  /**
+   * @return A new empty {@link IMethodGenerator}.
+   */
+  public static IMethodGenerator<?, ?> create() {
+    return new MethodGenerator<>();
   }
 
   /**
@@ -143,25 +151,16 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   }
 
   /**
-   * @return A new empty {@link IMethodGenerator}.
-   */
-  public static IMethodGenerator<?, ?> create() {
-    return new MethodGenerator<>();
-  }
-
-  /**
    * Creates an {@link IMethodGenerator} that creates a getter for the specified {@link IFieldGenerator}.
    *
    * @param fieldGenerator
    *          The {@link IFieldGenerator} for which the getter should be created. Must not be {@code null}.
    * @return The new {@link IMethodGenerator}.
    */
-  @SuppressWarnings("unchecked")
   public static IMethodGenerator<?, ?> createGetter(IFieldGenerator<?> fieldGenerator) {
-    var dataType = (ApiFunction<IApiSpecification, String>) fieldGenerator.dataType()
-        .orElseThrow(() -> newFail("Cannot create getter for field because it has no data type."));
+    var dataType = fieldGenerator.dataTypeFunc().orElseThrow(() -> newFail("Cannot create getter for field because it has no data type."));
     var fieldName = Ensure.notNull(fieldGenerator).elementName().orElseThrow(() -> newFail("Cannot create getter for field because it has no name."));
-    return createGetter(fieldName, dataType.apiClass().orElse(null), dataType.apiFunction(), Flags.AccPublic);
+    return createGetterFunc(fieldName, dataType, Flags.AccPublic);
   }
 
   /**
@@ -189,17 +188,53 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    * @return A new {@link IMethodGenerator} that creates a getter for the specified field.
    */
   public static IMethodGenerator<?, ?> createGetter(String fieldName, String dataType, int flags) {
-    return createGetter(fieldName, null, api -> dataType, flags);
+    return createGetterFunc(fieldName, JavaBuilderContextFunction.create(dataType), flags);
   }
 
-  public static <A extends IApiSpecification> IMethodGenerator<?, ?> createGetter(String fieldName, Class<A> apiDefinition, Function<A, String> dataTypeFunction, int flags) {
+  /**
+   * Creates an {@link IMethodGenerator} that creates a getter for a field with given name and data type.
+   * 
+   * @param fieldName
+   *          The name of the field. Must not be blank or {@code null}.
+   * @param apiDefinition
+   *          An optional api class from which the data type should be obtained. It may be {@code null} in case the
+   *          given dataTypeFunc can handle a {@code null} input.
+   * @param dataTypeFunction
+   *          A function returning the data type of the field. Must not be {@code null}.
+   * @param flags
+   *          The flags of the getter. see {@link Flags}.
+   * @return A new {@link IMethodGenerator} that creates a getter for the specified field.
+   */
+  public static <A extends IApiSpecification> IMethodGenerator<?, ?> createGetterFrom(String fieldName, Class<A> apiDefinition, Function<A, String> dataTypeFunction, int flags) {
+    return createGetterFunc(fieldName, new ApiFunction<>(apiDefinition, dataTypeFunction), flags);
+  }
+
+  /**
+   * Creates an {@link IMethodGenerator} that creates a getter for a field with given name and data type.
+   * 
+   * @param fieldName
+   *          The name of the field. Must not be blank or {@code null}.
+   * @param dataTypeFunction
+   *          A function returning the data type of the field. Must not be {@code null}.
+   * @param flags
+   *          The flags of the getter. see {@link Flags}.
+   * @return A new {@link IMethodGenerator} that creates a getter for the specified field.
+   */
+  public static IMethodGenerator<?, ?> createGetterFunc(String fieldName, Function<IJavaBuilderContext, String> dataTypeFunction, int flags) {
     var methodBaseName = getGetterSetterBaseName(fieldName);
-    return create()
-        .withElementNameFrom(apiDefinition, api -> PropertyBean.getterPrefixFor(dataTypeFunction.apply(api)) + methodBaseName)
+    var getter = create()
         .withFlags(flags)
-        .withReturnTypeFrom(apiDefinition, dataTypeFunction)
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withBody(b -> b.returnClause().append(fieldName).semicolon());
+    var constDataType = JavaBuilderContextFunction.orNull(dataTypeFunction).apply().orElse(null);
+    if (constDataType != null) {
+      return getter
+          .withElementName(PropertyBean.getterPrefixFor(constDataType) + methodBaseName)
+          .withReturnType(constDataType);
+    }
+    return getter
+        .withElementNameFunc(c -> PropertyBean.getterPrefixFor(dataTypeFunction.apply(c)) + methodBaseName)
+        .withReturnTypeFunc(dataTypeFunction);
   }
 
   /**
@@ -209,12 +244,10 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    *          The {@link IFieldGenerator} for which the setter should be created. Must not be {@code null}.
    * @return The new {@link IMethodGenerator}.
    */
-  @SuppressWarnings("unchecked")
   public static IMethodGenerator<?, ?> createSetter(IFieldGenerator<?> fieldGenerator) {
-    var dataType = (ApiFunction<IApiSpecification, String>) fieldGenerator.dataType()
-        .orElseThrow(() -> newFail("Cannot create setter for field because it has no data type."));
+    var dataType = fieldGenerator.dataTypeFunc().orElseThrow(() -> newFail("Cannot create setter for field because it has no data type."));
     return createSetter(Ensure.notNull(fieldGenerator).elementName().orElseThrow(() -> newFail("Cannot create setter for field because it has no name.")),
-        dataType.apiClass().orElse(null), dataType.apiFunction(), Flags.AccPublic, null);
+        dataType, Flags.AccPublic, null);
   }
 
   /**
@@ -259,10 +292,43 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
    * @return The new {@link IMethodGenerator}
    */
   public static IMethodGenerator<?, ?> createSetter(String fieldName, String dataType, int flags, String paramNamePrefix) {
-    return createSetter(fieldName, null, api -> dataType, flags, paramNamePrefix);
+    return createSetter(fieldName, c -> dataType, flags, paramNamePrefix);
   }
 
+  /**
+   * Creates an {@link IMethodGenerator} that creates a setter for a field with specified name and type.
+   * 
+   * @param fieldName
+   *          The name of the field the setter should change. Must not be blank or {@code null}.
+   * @param apiDefinition
+   *          An optional api class from which the data type should be obtained. It may be {@code null} in case the
+   *          given dataTypeFunc can handle a {@code null} input.
+   * @param dataTypeFunction
+   *          A function returning the data type of the field. Must not be {@code null}.
+   * @param flags
+   *          The flags of the setter. see {@link Flags}.
+   * @param paramNamePrefix
+   *          An optional prefix that will be appended to the parameter name of the setter. May be {@code null}.
+   * @return The new {@link IMethodGenerator}
+   */
   public static <A extends IApiSpecification> IMethodGenerator<?, ?> createSetter(String fieldName, Class<A> apiDefinition, Function<A, String> dataTypeFunction, int flags, String paramNamePrefix) {
+    return createSetter(fieldName, new ApiFunction<>(apiDefinition, dataTypeFunction), flags, paramNamePrefix);
+  }
+
+  /**
+   * Creates an {@link IMethodGenerator} that creates a setter for a field with specified name and type.
+   * 
+   * @param fieldName
+   *          The name of the field the setter should change. Must not be blank or {@code null}.
+   * @param dataTypeFunction
+   *          A function returning the data type of the field. Must not be {@code null}.
+   * @param flags
+   *          The flags of the setter. see {@link Flags}.
+   * @param paramNamePrefix
+   *          An optional prefix that will be appended to the parameter name of the setter. May be {@code null}.
+   * @return The new {@link IMethodGenerator}
+   */
+  public static IMethodGenerator<?, ?> createSetter(String fieldName, Function<IJavaBuilderContext, String> dataTypeFunction, int flags, String paramNamePrefix) {
     var setterBaseName = getGetterSetterBaseName(fieldName); // starts with an uppercase char
     var parameterName = getPrefixedMethodParameterName(paramNamePrefix, setterBaseName);
     return create()
@@ -271,7 +337,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
         .withReturnType(JavaTypes._void)
         .withParameter(
             MethodParameterGenerator.create()
-                .withDataTypeFrom(apiDefinition, dataTypeFunction)
+                .withDataTypeFunc(dataTypeFunction)
                 .withElementName(parameterName))
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withBody(b -> b.append(fieldName).equalSign().append(parameterName).semicolon());
@@ -334,8 +400,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   }
 
   protected boolean existsMethodInSuperHierarchy(IJavaBuilderContext context) {
-    var javaEnvironment = context.environment().orElseThrow(() -> newFail("To add an override annotation if necessary a Java environment is required."));
-    var methodId = identifier(javaEnvironment);
+    var methodId = identifier(context);
     var explicitDeclaringType = getOverrideIfNecessaryDeclaringType();
     if (explicitDeclaringType != null) {
       // explicit declaring type has been given.
@@ -373,7 +438,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     builder.append(typeParameters(), "<", ", ", "> ");
 
     // return type
-    returnType().ifPresent(t -> builder.refFrom(t).space());
+    returnTypeFunc().ifPresent(t -> builder.refFunc(t).space());
 
     // method name
     builder.append(ensureValidJavaName(elementName(builder.context()).orElseThrow(() -> newFail("Method must have a name."))));
@@ -387,11 +452,13 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     builder.append(parameters(), null, ", ", null);
     builder.parenthesisClose();
 
-    // exceptions
-    builder.references(throwables()
+    // throwables
+    builder.references(throwablesFunc()
         .map(af -> af.apply(builder.context()))
-        .flatMap(Optional::stream)
-        .map(IClassNameSupplier::fqn), " throws ", ", ", null);
+        .filter(Objects::nonNull)
+        .map(ITypeNameSupplier::fqn)
+        .filter(Strings::hasText)
+        .distinct(), " throws ", ", ", null);
 
     if (canHaveBody(flags)) {
       buildBodySource(builder);
@@ -439,7 +506,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   @Override
   protected IJavaElementCommentBuilder<?> createCommentBuilder(ISourceBuilder<?> builder) {
     var javaSourceBuilder = (IJavaSourceBuilder<?>) builder;
-    var context = javaSourceBuilder.context().environment().orElse(null);
+    var context = javaSourceBuilder.context();
     if (PropertyBean.getterName(this, context).isPresent()) {
       return JavaElementCommentBuilder.createForMethodGetter(builder, this);
     }
@@ -450,7 +517,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   }
 
   @Override
-  public String identifier(IJavaEnvironment context, boolean includeTypeArguments) {
+  public String identifier(IJavaBuilderContext context, boolean includeTypeArguments) {
     var methodParamTypes = m_parameters.stream()
         .map(param -> param.reference(context, !includeTypeArguments))
         .collect(toList());
@@ -459,90 +526,102 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
   }
 
   @Override
-  public String identifier(IJavaEnvironment context) {
+  public String identifier(IJavaBuilderContext context) {
     return identifier(context, false);
   }
 
   @Override
-  public Optional<String> elementName() {
-    return elementName((IJavaEnvironment) null);
+  public Optional<String> returnType() {
+    return returnTypeFunc().flatMap(JavaBuilderContextFunction::apply);
   }
 
   @Override
-  public Optional<String> elementName(IJavaBuilderContext context) {
-    return elementNameFunction().flatMap(func -> func.apply(context));
+  public Optional<String> returnType(IJavaBuilderContext context) {
+    return returnTypeFunc()
+        .map(f -> f.apply(context));
   }
 
   @Override
-  public Optional<String> elementName(IJavaEnvironment context) {
-    return elementNameFunction().flatMap(func -> func.apply(context));
-  }
-
-  public Optional<ApiFunction<?, String>> elementNameFunction() {
-    return Optional.ofNullable(m_methodName);
-  }
-
-  @Override
-  public TYPE withElementName(String newName) {
-    return withElementNameFrom(null, api -> newName);
-  }
-
-  @Override
-  public <A extends IApiSpecification> TYPE withElementNameFrom(Class<A> apiDefinition, Function<A, String> nameSupplier) {
-    if (nameSupplier == null) {
-      m_methodName = null;
-    }
-    else {
-      m_methodName = new ApiFunction<>(apiDefinition, nameSupplier);
-    }
-    return thisInstance();
-  }
-
-  @Override
-  public Optional<ApiFunction<?, String>> returnType() {
+  public Optional<JavaBuilderContextFunction<String>> returnTypeFunc() {
     return Optional.ofNullable(m_returnType);
   }
 
   @Override
   public TYPE withReturnType(String returnType) {
-    return withReturnTypeFrom(null, api -> returnType);
+    m_returnType = JavaBuilderContextFunction.orNull(returnType);
+    return thisInstance();
   }
 
   @Override
   public <A extends IApiSpecification> TYPE withReturnTypeFrom(Class<A> apiDefinition, Function<A, String> returnTypeSupplier) {
-    if (returnTypeSupplier == null) {
-      m_returnType = null;
-    }
-    else {
-      m_returnType = new ApiFunction<>(apiDefinition, returnTypeSupplier);
-    }
+    m_returnType = new ApiFunction<>(apiDefinition, returnTypeSupplier);
     return thisInstance();
   }
 
   @Override
-  public Stream<ApiFunction<?, IClassNameSupplier>> throwables() {
-    return m_exceptions.stream();
+  public TYPE withReturnTypeFunc(Function<IJavaBuilderContext, String> returnTypeSupplier) {
+    m_returnType = JavaBuilderContextFunction.orNull(returnTypeSupplier);
+    return thisInstance();
+  }
+
+  @Override
+  public Stream<String> throwables() {
+    return throwablesFunc()
+        .map(JavaBuilderContextFunction::apply)
+        .flatMap(Optional::stream)
+        .map(ITypeNameSupplier::fqn);
+  }
+
+  @Override
+  public Stream<JavaBuilderContextFunction<ITypeNameSupplier>> throwablesFunc() {
+    return m_throwables.stream();
   }
 
   @Override
   public TYPE withThrowable(String throwableFqn) {
-    var fqnSupplier = IClassNameSupplier.raw(throwableFqn);
-    return withThrowableFrom(null, api -> fqnSupplier);
-  }
-
-  @Override
-  public <A extends IApiSpecification> TYPE withThrowableFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> throwableSupplier) {
-    m_exceptions.add(new ApiFunction<>(apiDefinition, throwableSupplier));
+    if (Strings.hasText(throwableFqn)) {
+      m_throwables.add(JavaBuilderContextFunction.create(ITypeNameSupplier.of(throwableFqn)));
+    }
     return thisInstance();
   }
 
   @Override
-  public TYPE withoutThrowable(Predicate<ApiFunction<?, IClassNameSupplier>> toRemoveFilter) {
+  public <A extends IApiSpecification> TYPE withThrowableFrom(Class<A> apiDefinition, Function<A, ITypeNameSupplier> throwableSupplier) {
+    if (throwableSupplier != null) {
+      m_throwables.add(new ApiFunction<>(apiDefinition, throwableSupplier));
+    }
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE withThrowableFunc(Function<IJavaBuilderContext, ITypeNameSupplier> throwableSupplier) {
+    if (throwableSupplier != null) {
+      m_throwables.add(JavaBuilderContextFunction.create(throwableSupplier));
+    }
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE withoutThrowable(CharSequence fqn) {
+    return withoutThrowable(ITypeNameSupplier.of(fqn));
+  }
+
+  @Override
+  public TYPE withoutThrowable(ITypeNameSupplier cns) {
+    var fqnToRemove = cns == null ? null : cns.fqn();
+    return withoutThrowable(f -> f.apply()
+        .map(ITypeNameSupplier::fqn)
+        .filter(isEqual(fqnToRemove))
+        .isPresent());
+  }
+
+  @Override
+  public TYPE withoutThrowable(Predicate<JavaBuilderContextFunction<ITypeNameSupplier>> toRemoveFilter) {
     if (toRemoveFilter == null) {
-      m_exceptions.clear();
+      m_throwables.clear();
     }
     else {
-      m_exceptions.removeIf(toRemoveFilter);
+      m_throwables.removeIf(toRemoveFilter);
     }
     return thisInstance();
   }

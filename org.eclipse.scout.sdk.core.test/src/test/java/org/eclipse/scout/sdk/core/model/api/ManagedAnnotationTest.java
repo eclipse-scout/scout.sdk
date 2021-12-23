@@ -30,16 +30,13 @@ import org.eclipse.scout.sdk.core.fixture.managed.AnnotationWithSingleValues;
 import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * Test managed annotation wrapper {@link AbstractManagedAnnotation}
  */
 @SuppressWarnings("HtmlTagCanBeJavadocTag")
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class ManagedAnnotationTest {
 

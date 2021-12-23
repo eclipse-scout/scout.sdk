@@ -16,7 +16,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link OrderAnnotation}</h3>
@@ -33,7 +34,7 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  */
 public class OrderAnnotation extends AbstractManagedAnnotation {
 
-  protected static final ApiFunction<?, IClassNameSupplier> TYPE_NAME = new ApiFunction<>(IScoutApi.class, IScoutApi::Order);
+  protected static final ApiFunction<?, ITypeNameSupplier> TYPE_NAME = new ApiFunction<>(IScoutApi.class, IScoutApi::Order);
 
   public static double valueOf(IAnnotatable owner, boolean isBean) {
     var first = owner.annotations()
@@ -51,7 +52,7 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
     return ISdkConstants.DEFAULT_VIEW_ORDER;
   }
 
-  public static double getNewViewOrderValue(IType declaringType, IClassNameSupplier orderDefinitionType, int pos) {
+  public static double getNewViewOrderValue(IType declaringType, ITypeNameSupplier orderDefinitionType, int pos) {
     return getNewViewOrderValue(declaringType, orderDefinitionType.fqn(), pos);
   }
 
@@ -202,13 +203,7 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
   public static String convertToJavaSource(double order) {
     var f = NumberFormat.getNumberInstance(Locale.US);
     f.setGroupingUsed(false);
-    var newOrderStr = f.format(order);
-
-    var zeroSuffix = JavaTypes.C_DOT + "0";
-    if (newOrderStr.endsWith(zeroSuffix)) {
-      newOrderStr = newOrderStr.substring(0, newOrderStr.length() - zeroSuffix.length());
-    }
-
+    var newOrderStr = Strings.removeSuffix(f.format(order), JavaTypes.C_DOT + "0");
     if (order > Integer.MAX_VALUE && newOrderStr.indexOf(JavaTypes.C_DOT) < 0) {
       // we must specify the double data type because we do not have a decimal separator and we do not fit into an integer literal.
       newOrderStr += 'd';

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,8 +11,10 @@
 package org.eclipse.scout.sdk.core.imports;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
@@ -26,9 +28,15 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 public interface IImportCollector {
 
   /**
-   * @return The {@link IJavaEnvironment} this {@link IImportCollector} uses to resolve types. May be {@code null}.
+   * @return The {@link IJavaBuilderContext} this {@link IImportCollector} belongs to.
    */
-  IJavaEnvironment getJavaEnvironment();
+  Optional<IJavaBuilderContext> getContext();
+
+  /**
+   * @return The {@link IJavaEnvironment} of the {@link #getContext() context} (see
+   *         {@link IJavaBuilderContext#environment()}).
+   */
+  Optional<IJavaEnvironment> getJavaEnvironment();
 
   /**
    * @return the qualifier of the scope this {@link IImportCollector} represents.

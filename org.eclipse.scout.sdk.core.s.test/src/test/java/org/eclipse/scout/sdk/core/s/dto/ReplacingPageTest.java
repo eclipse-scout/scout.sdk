@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,7 +55,7 @@ public class ReplacingPageTest {
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(7, replacingPageData.methods().stream().count(), "method count of 'formdata.shared.services.pages.ReplacingPageData'");
-    var addRow = assertMethodExist(replacingPageData, "addRow", new String[]{});
+    var addRow = assertMethodExist(replacingPageData, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.pages.ReplacingPageData$ReplacingRowData");
     assertEquals(1, addRow.annotations().stream().count(), "annotation count");
     assertAnnotation(addRow, "java.lang.Override");
@@ -63,15 +63,15 @@ public class ReplacingPageTest {
     assertMethodReturnType(addRow1, "formdata.shared.services.pages.ReplacingPageData$ReplacingRowData");
     assertEquals(1, addRow1.annotations().stream().count(), "annotation count");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(replacingPageData, "createRow", new String[]{});
+    var createRow = assertMethodExist(replacingPageData, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.pages.ReplacingPageData$ReplacingRowData");
     assertEquals(1, createRow.annotations().stream().count(), "annotation count");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(replacingPageData, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(replacingPageData, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertEquals(1, getRowType.annotations().stream().count(), "annotation count");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(replacingPageData, "getRows", new String[]{});
+    var getRows = assertMethodExist(replacingPageData, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.pages.ReplacingPageData$ReplacingRowData[]");
     assertEquals(1, getRows.annotations().stream().count(), "annotation count");
     assertAnnotation(getRows, "java.lang.Override");

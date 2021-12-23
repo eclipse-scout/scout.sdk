@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.s.builder.java.body;
 import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -114,7 +114,7 @@ public interface IScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TY
    * @see #appendBeansGet(CharSequence)
    * @see #appendBeansGetVariable(CharSequence, CharSequence)
    */
-  <T extends IApiSpecification> TYPE appendBeansGetFrom(Class<T> apiClass, Function<T, IClassNameSupplier> beanNameProvider);
+  <T extends IApiSpecification> TYPE appendBeansGetFrom(Class<T> apiClass, Function<T, ITypeNameSupplier> beanNameProvider);
 
   /**
    * Creates source like {@code getFieldByClass(FieldFqn.class)} without trailing semicolon.

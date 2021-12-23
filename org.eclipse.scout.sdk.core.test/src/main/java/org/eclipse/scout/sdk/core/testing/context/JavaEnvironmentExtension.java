@@ -39,8 +39,10 @@ import org.junit.platform.commons.support.ReflectionSupport;
  */
 public class JavaEnvironmentExtension extends AbstractContextExtension<IJavaEnvironment, ExtendWithJavaEnvironmentFactory> {
 
-  protected JavaEnvironmentExtension() {
-    super("javaEnv");
+  public static final String KEY = "javaEnv";
+
+  public JavaEnvironmentExtension() {
+    super(KEY);
   }
 
   public static Optional<JavaEnvironmentWithEcj> createJavaEnvironmentUsingBuilder(JavaEnvironmentWithEcjBuilder<?> builder) {

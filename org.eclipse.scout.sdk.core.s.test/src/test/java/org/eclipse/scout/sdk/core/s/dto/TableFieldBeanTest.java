@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,19 +87,19 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(7, abstractAddressTableFieldData.methods().stream().count(), "method count of 'AbstractAddressTableFieldData'");
-    var addRow = assertMethodExist(abstractAddressTableFieldData, "addRow", new String[]{});
+    var addRow = assertMethodExist(abstractAddressTableFieldData, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.process.AbstractAddressTableFieldData$AbstractAddressTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(abstractAddressTableFieldData, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.AbstractAddressTableFieldData$AbstractAddressTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(abstractAddressTableFieldData, "createRow", new String[]{});
+    var createRow = assertMethodExist(abstractAddressTableFieldData, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.process.AbstractAddressTableFieldData$AbstractAddressTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(abstractAddressTableFieldData, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(abstractAddressTableFieldData, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(abstractAddressTableFieldData, "getRows", new String[]{});
+    var getRows = assertMethodExist(abstractAddressTableFieldData, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.process.AbstractAddressTableFieldData$AbstractAddressTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(abstractAddressTableFieldData, "rowAt", new String[]{"int"});
@@ -139,15 +139,15 @@ public class TableFieldBeanTest {
     assertFieldType(m_poBoxAddress, Boolean.class.getName());
 
     assertEquals(6, abstractAddressTableRowData.methods().stream().count(), "method count of 'AbstractAddressTableRowData'");
-    var getAddressId = assertMethodExist(abstractAddressTableRowData, "getAddressId", new String[]{});
+    var getAddressId = assertMethodExist(abstractAddressTableRowData, "getAddressId");
     assertMethodReturnType(getAddressId, String.class.getName());
     var setAddressId = assertMethodExist(abstractAddressTableRowData, "setAddressId", new String[]{String.class.getName()});
     assertMethodReturnType(setAddressId, "void");
-    var getStreet = assertMethodExist(abstractAddressTableRowData, "getStreet", new String[]{});
+    var getStreet = assertMethodExist(abstractAddressTableRowData, "getStreet");
     assertMethodReturnType(getStreet, String.class.getName());
     var setStreet = assertMethodExist(abstractAddressTableRowData, "setStreet", new String[]{String.class.getName()});
     assertMethodReturnType(setStreet, "void");
-    var getPoBoxAddress = assertMethodExist(abstractAddressTableRowData, "getPoBoxAddress", new String[]{});
+    var getPoBoxAddress = assertMethodExist(abstractAddressTableRowData, "getPoBoxAddress");
     assertMethodReturnType(getPoBoxAddress, Boolean.class.getName());
     var setPoBoxAddress = assertMethodExist(abstractAddressTableRowData, "setPoBoxAddress", new String[]{Boolean.class.getName()});
     assertMethodReturnType(setPoBoxAddress, "void");
@@ -170,15 +170,15 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(5, tableFieldBaseFormData.methods().stream().count(), "method count of 'TableFieldBaseFormData'");
-    var getAddressTable = assertMethodExist(tableFieldBaseFormData, "getAddressTable", new String[]{});
+    var getAddressTable = assertMethodExist(tableFieldBaseFormData, "getAddressTable");
     assertMethodReturnType(getAddressTable, "formdata.shared.services.process.replace.TableFieldBaseFormData$AddressTable");
-    var getEmptyTable = assertMethodExist(tableFieldBaseFormData, "getEmptyTable", new String[]{});
+    var getEmptyTable = assertMethodExist(tableFieldBaseFormData, "getEmptyTable");
     assertMethodReturnType(getEmptyTable, "formdata.shared.services.process.replace.TableFieldBaseFormData$EmptyTable");
-    var getNoTable = assertMethodExist(tableFieldBaseFormData, "getNoTable", new String[]{});
+    var getNoTable = assertMethodExist(tableFieldBaseFormData, "getNoTable");
     assertMethodReturnType(getNoTable, "formdata.shared.services.process.replace.TableFieldBaseFormData$NoTable");
-    var getPersonTable = assertMethodExist(tableFieldBaseFormData, "getPersonTable", new String[]{});
+    var getPersonTable = assertMethodExist(tableFieldBaseFormData, "getPersonTable");
     assertMethodReturnType(getPersonTable, "formdata.shared.services.process.replace.TableFieldBaseFormData$PersonTable");
-    var getTable = assertMethodExist(tableFieldBaseFormData, "getTable", new String[]{});
+    var getTable = assertMethodExist(tableFieldBaseFormData, "getTable");
     assertMethodReturnType(getTable, "formdata.shared.services.process.replace.TableFieldBaseFormData$Table");
 
     assertEquals(5, tableFieldBaseFormData.innerTypes().stream().count(), "inner types count of 'TableFieldBaseFormData'");
@@ -194,19 +194,19 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(7, addressTable.methods().stream().count(), "method count of 'AddressTable'");
-    var addRow = assertMethodExist(addressTable, "addRow", new String[]{});
+    var addRow = assertMethodExist(addressTable, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.process.replace.TableFieldBaseFormData$AddressTable$AddressTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(addressTable, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.replace.TableFieldBaseFormData$AddressTable$AddressTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(addressTable, "createRow", new String[]{});
+    var createRow = assertMethodExist(addressTable, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.process.replace.TableFieldBaseFormData$AddressTable$AddressTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(addressTable, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(addressTable, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(addressTable, "getRows", new String[]{});
+    var getRows = assertMethodExist(addressTable, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.process.replace.TableFieldBaseFormData$AddressTable$AddressTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(addressTable, "rowAt", new String[]{"int"});
@@ -234,7 +234,7 @@ public class TableFieldBeanTest {
     assertFieldType(m_city, String.class.getName());
 
     assertEquals(2, addressTableRowData.methods().stream().count(), "method count of 'AddressTableRowData'");
-    var getCity = assertMethodExist(addressTableRowData, "getCity", new String[]{});
+    var getCity = assertMethodExist(addressTableRowData, "getCity");
     assertMethodReturnType(getCity, String.class.getName());
     var setCity = assertMethodExist(addressTableRowData, "setCity", new String[]{String.class.getName()});
     assertMethodReturnType(setCity, "void");
@@ -252,19 +252,19 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID3, "long");
 
     assertEquals(7, emptyTable.methods().stream().count(), "method count of 'EmptyTable'");
-    var addRow2 = assertMethodExist(emptyTable, "addRow", new String[]{});
+    var addRow2 = assertMethodExist(emptyTable, "addRow");
     assertMethodReturnType(addRow2, "formdata.shared.services.process.replace.TableFieldBaseFormData$EmptyTable$EmptyTableRowData");
     assertAnnotation(addRow2, "java.lang.Override");
     var addRow3 = assertMethodExist(emptyTable, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow3, "formdata.shared.services.process.replace.TableFieldBaseFormData$EmptyTable$EmptyTableRowData");
     assertAnnotation(addRow3, "java.lang.Override");
-    var createRow1 = assertMethodExist(emptyTable, "createRow", new String[]{});
+    var createRow1 = assertMethodExist(emptyTable, "createRow");
     assertMethodReturnType(createRow1, "formdata.shared.services.process.replace.TableFieldBaseFormData$EmptyTable$EmptyTableRowData");
     assertAnnotation(createRow1, "java.lang.Override");
-    var getRowType1 = assertMethodExist(emptyTable, "getRowType", new String[]{});
+    var getRowType1 = assertMethodExist(emptyTable, "getRowType");
     assertMethodReturnType(getRowType1, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType1, "java.lang.Override");
-    var getRows1 = assertMethodExist(emptyTable, "getRows", new String[]{});
+    var getRows1 = assertMethodExist(emptyTable, "getRows");
     assertMethodReturnType(getRows1, "formdata.shared.services.process.replace.TableFieldBaseFormData$EmptyTable$EmptyTableRowData[]");
     assertAnnotation(getRows1, "java.lang.Override");
     var rowAt1 = assertMethodExist(emptyTable, "rowAt", new String[]{"int"});
@@ -300,10 +300,10 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID5, "long");
 
     assertEquals(2, noTable.methods().stream().count(), "method count of 'NoTable'");
-    var createRow2 = assertMethodExist(noTable, "createRow", new String[]{});
+    var createRow2 = assertMethodExist(noTable, "createRow");
     assertMethodReturnType(createRow2, "org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData");
     assertAnnotation(createRow2, "java.lang.Override");
-    var getRowType2 = assertMethodExist(noTable, "getRowType", new String[]{});
+    var getRowType2 = assertMethodExist(noTable, "getRowType");
     assertMethodReturnType(getRowType2, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType2, "java.lang.Override");
 
@@ -320,19 +320,19 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID6, "long");
 
     assertEquals(7, personTable.methods().stream().count(), "method count of 'PersonTable'");
-    var addRow4 = assertMethodExist(personTable, "addRow", new String[]{});
+    var addRow4 = assertMethodExist(personTable, "addRow");
     assertMethodReturnType(addRow4, "formdata.shared.services.process.replace.TableFieldBaseFormData$PersonTable$PersonTableRowData");
     assertAnnotation(addRow4, "java.lang.Override");
     var addRow5 = assertMethodExist(personTable, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow5, "formdata.shared.services.process.replace.TableFieldBaseFormData$PersonTable$PersonTableRowData");
     assertAnnotation(addRow5, "java.lang.Override");
-    var createRow3 = assertMethodExist(personTable, "createRow", new String[]{});
+    var createRow3 = assertMethodExist(personTable, "createRow");
     assertMethodReturnType(createRow3, "formdata.shared.services.process.replace.TableFieldBaseFormData$PersonTable$PersonTableRowData");
     assertAnnotation(createRow3, "java.lang.Override");
-    var getRowType3 = assertMethodExist(personTable, "getRowType", new String[]{});
+    var getRowType3 = assertMethodExist(personTable, "getRowType");
     assertMethodReturnType(getRowType3, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType3, "java.lang.Override");
-    var getRows2 = assertMethodExist(personTable, "getRows", new String[]{});
+    var getRows2 = assertMethodExist(personTable, "getRows");
     assertMethodReturnType(getRows2, "formdata.shared.services.process.replace.TableFieldBaseFormData$PersonTable$PersonTableRowData[]");
     assertAnnotation(getRows2, "java.lang.Override");
     var rowAt2 = assertMethodExist(personTable, "rowAt", new String[]{"int"});
@@ -368,19 +368,19 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID8, "long");
 
     assertEquals(7, table.methods().stream().count(), "method count of 'Table'");
-    var addRow6 = assertMethodExist(table, "addRow", new String[]{});
+    var addRow6 = assertMethodExist(table, "addRow");
     assertMethodReturnType(addRow6, "formdata.shared.services.process.replace.TableFieldBaseFormData$Table$TableRowData");
     assertAnnotation(addRow6, "java.lang.Override");
     var addRow7 = assertMethodExist(table, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow7, "formdata.shared.services.process.replace.TableFieldBaseFormData$Table$TableRowData");
     assertAnnotation(addRow7, "java.lang.Override");
-    var createRow4 = assertMethodExist(table, "createRow", new String[]{});
+    var createRow4 = assertMethodExist(table, "createRow");
     assertMethodReturnType(createRow4, "formdata.shared.services.process.replace.TableFieldBaseFormData$Table$TableRowData");
     assertAnnotation(createRow4, "java.lang.Override");
-    var getRowType4 = assertMethodExist(table, "getRowType", new String[]{});
+    var getRowType4 = assertMethodExist(table, "getRowType");
     assertMethodReturnType(getRowType4, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType4, "java.lang.Override");
-    var getRows3 = assertMethodExist(table, "getRows", new String[]{});
+    var getRows3 = assertMethodExist(table, "getRows");
     assertMethodReturnType(getRows3, "formdata.shared.services.process.replace.TableFieldBaseFormData$Table$TableRowData[]");
     assertAnnotation(getRows3, "java.lang.Override");
     var rowAt3 = assertMethodExist(table, "rowAt", new String[]{"int"});
@@ -414,11 +414,11 @@ public class TableFieldBeanTest {
     assertFieldType(m_second, String.class.getName());
 
     assertEquals(4, tableRowData.methods().stream().count(), "method count of 'TableRowData'");
-    var getFirst = assertMethodExist(tableRowData, "getFirst", new String[]{});
+    var getFirst = assertMethodExist(tableRowData, "getFirst");
     assertMethodReturnType(getFirst, String.class.getName());
     var setFirst = assertMethodExist(tableRowData, "setFirst", new String[]{String.class.getName()});
     assertMethodReturnType(setFirst, "void");
-    var getSecond = assertMethodExist(tableRowData, "getSecond", new String[]{});
+    var getSecond = assertMethodExist(tableRowData, "getSecond");
     assertMethodReturnType(getSecond, String.class.getName());
     var setSecond = assertMethodExist(tableRowData, "setSecond", new String[]{String.class.getName()});
     assertMethodReturnType(setSecond, "void");
@@ -441,15 +441,15 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(5, tableFieldExFormData.methods().stream().count(), "method count of 'TableFieldExFormData'");
-    var getEmptyTableExtended = assertMethodExist(tableFieldExFormData, "getEmptyTableExtended", new String[]{});
+    var getEmptyTableExtended = assertMethodExist(tableFieldExFormData, "getEmptyTableExtended");
     assertMethodReturnType(getEmptyTableExtended, "formdata.shared.services.process.replace.TableFieldExFormData$EmptyTableExtended");
-    var getExtendedAddress = assertMethodExist(tableFieldExFormData, "getExtendedAddress", new String[]{});
+    var getExtendedAddress = assertMethodExist(tableFieldExFormData, "getExtendedAddress");
     assertMethodReturnType(getExtendedAddress, "formdata.shared.services.process.replace.TableFieldExFormData$ExtendedAddress");
-    var getExtendedPersonTable = assertMethodExist(tableFieldExFormData, "getExtendedPersonTable", new String[]{});
+    var getExtendedPersonTable = assertMethodExist(tableFieldExFormData, "getExtendedPersonTable");
     assertMethodReturnType(getExtendedPersonTable, "formdata.shared.services.process.replace.TableFieldExFormData$ExtendedPersonTable");
-    var getNoTableExtended = assertMethodExist(tableFieldExFormData, "getNoTableExtended", new String[]{});
+    var getNoTableExtended = assertMethodExist(tableFieldExFormData, "getNoTableExtended");
     assertMethodReturnType(getNoTableExtended, "formdata.shared.services.process.replace.TableFieldExFormData$NoTableExtended");
-    var getTableExtended = assertMethodExist(tableFieldExFormData, "getTableExtended", new String[]{});
+    var getTableExtended = assertMethodExist(tableFieldExFormData, "getTableExtended");
     assertMethodReturnType(getTableExtended, "formdata.shared.services.process.replace.TableFieldExFormData$TableExtended");
 
     assertEquals(5, tableFieldExFormData.innerTypes().stream().count(), "inner types count of 'TableFieldExFormData'");
@@ -466,19 +466,19 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(7, emptyTableExtended.methods().stream().count(), "method count of 'EmptyTableExtended'");
-    var addRow = assertMethodExist(emptyTableExtended, "addRow", new String[]{});
+    var addRow = assertMethodExist(emptyTableExtended, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.process.replace.TableFieldExFormData$EmptyTableExtended$EmptyTableExtendedRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(emptyTableExtended, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.replace.TableFieldExFormData$EmptyTableExtended$EmptyTableExtendedRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(emptyTableExtended, "createRow", new String[]{});
+    var createRow = assertMethodExist(emptyTableExtended, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.process.replace.TableFieldExFormData$EmptyTableExtended$EmptyTableExtendedRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(emptyTableExtended, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(emptyTableExtended, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(emptyTableExtended, "getRows", new String[]{});
+    var getRows = assertMethodExist(emptyTableExtended, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.process.replace.TableFieldExFormData$EmptyTableExtended$EmptyTableExtendedRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(emptyTableExtended, "rowAt", new String[]{"int"});
@@ -506,7 +506,7 @@ public class TableFieldBeanTest {
     assertFieldType(m_single, String.class.getName());
 
     assertEquals(2, emptyTableExtendedRowData.methods().stream().count(), "method count of 'EmptyTableExtendedRowData'");
-    var getSingle = assertMethodExist(emptyTableExtendedRowData, "getSingle", new String[]{});
+    var getSingle = assertMethodExist(emptyTableExtendedRowData, "getSingle");
     assertMethodReturnType(getSingle, String.class.getName());
     var setSingle = assertMethodExist(emptyTableExtendedRowData, "setSingle", new String[]{String.class.getName()});
     assertMethodReturnType(setSingle, "void");
@@ -525,19 +525,19 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID3, "long");
 
     assertEquals(7, extendedAddress.methods().stream().count(), "method count of 'ExtendedAddress'");
-    var addRow2 = assertMethodExist(extendedAddress, "addRow", new String[]{});
+    var addRow2 = assertMethodExist(extendedAddress, "addRow");
     assertMethodReturnType(addRow2, "formdata.shared.services.process.replace.TableFieldExFormData$ExtendedAddress$ExtendedAddressRowData");
     assertAnnotation(addRow2, "java.lang.Override");
     var addRow3 = assertMethodExist(extendedAddress, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow3, "formdata.shared.services.process.replace.TableFieldExFormData$ExtendedAddress$ExtendedAddressRowData");
     assertAnnotation(addRow3, "java.lang.Override");
-    var createRow1 = assertMethodExist(extendedAddress, "createRow", new String[]{});
+    var createRow1 = assertMethodExist(extendedAddress, "createRow");
     assertMethodReturnType(createRow1, "formdata.shared.services.process.replace.TableFieldExFormData$ExtendedAddress$ExtendedAddressRowData");
     assertAnnotation(createRow1, "java.lang.Override");
-    var getRowType1 = assertMethodExist(extendedAddress, "getRowType", new String[]{});
+    var getRowType1 = assertMethodExist(extendedAddress, "getRowType");
     assertMethodReturnType(getRowType1, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType1, "java.lang.Override");
-    var getRows1 = assertMethodExist(extendedAddress, "getRows", new String[]{});
+    var getRows1 = assertMethodExist(extendedAddress, "getRows");
     assertMethodReturnType(getRows1, "formdata.shared.services.process.replace.TableFieldExFormData$ExtendedAddress$ExtendedAddressRowData[]");
     assertAnnotation(getRows1, "java.lang.Override");
     var rowAt1 = assertMethodExist(extendedAddress, "rowAt", new String[]{"int"});
@@ -565,7 +565,7 @@ public class TableFieldBeanTest {
     assertFieldType(m_state, String.class.getName());
 
     assertEquals(2, extendedAddressRowData.methods().stream().count(), "method count of 'ExtendedAddressRowData'");
-    var getState = assertMethodExist(extendedAddressRowData, "getState", new String[]{});
+    var getState = assertMethodExist(extendedAddressRowData, "getState");
     assertMethodReturnType(getState, String.class.getName());
     var setState = assertMethodExist(extendedAddressRowData, "setState", new String[]{String.class.getName()});
     assertMethodReturnType(setState, "void");
@@ -584,19 +584,19 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID5, "long");
 
     assertEquals(7, extendedPersonTable.methods().stream().count(), "method count of 'ExtendedPersonTable'");
-    var addRow4 = assertMethodExist(extendedPersonTable, "addRow", new String[]{});
+    var addRow4 = assertMethodExist(extendedPersonTable, "addRow");
     assertMethodReturnType(addRow4, "formdata.shared.services.process.replace.TableFieldExFormData$ExtendedPersonTable$ExtendedPersonTableRowData");
     assertAnnotation(addRow4, "java.lang.Override");
     var addRow5 = assertMethodExist(extendedPersonTable, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow5, "formdata.shared.services.process.replace.TableFieldExFormData$ExtendedPersonTable$ExtendedPersonTableRowData");
     assertAnnotation(addRow5, "java.lang.Override");
-    var createRow2 = assertMethodExist(extendedPersonTable, "createRow", new String[]{});
+    var createRow2 = assertMethodExist(extendedPersonTable, "createRow");
     assertMethodReturnType(createRow2, "formdata.shared.services.process.replace.TableFieldExFormData$ExtendedPersonTable$ExtendedPersonTableRowData");
     assertAnnotation(createRow2, "java.lang.Override");
-    var getRowType2 = assertMethodExist(extendedPersonTable, "getRowType", new String[]{});
+    var getRowType2 = assertMethodExist(extendedPersonTable, "getRowType");
     assertMethodReturnType(getRowType2, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType2, "java.lang.Override");
-    var getRows2 = assertMethodExist(extendedPersonTable, "getRows", new String[]{});
+    var getRows2 = assertMethodExist(extendedPersonTable, "getRows");
     assertMethodReturnType(getRows2, "formdata.shared.services.process.replace.TableFieldExFormData$ExtendedPersonTable$ExtendedPersonTableRowData[]");
     assertAnnotation(getRows2, "java.lang.Override");
     var rowAt2 = assertMethodExist(extendedPersonTable, "rowAt", new String[]{"int"});
@@ -624,7 +624,7 @@ public class TableFieldBeanTest {
     assertFieldType(m_lastName, String.class.getName());
 
     assertEquals(2, extendedPersonTableRowData.methods().stream().count(), "method count of 'ExtendedPersonTableRowData'");
-    var getLastName = assertMethodExist(extendedPersonTableRowData, "getLastName", new String[]{});
+    var getLastName = assertMethodExist(extendedPersonTableRowData, "getLastName");
     assertMethodReturnType(getLastName, String.class.getName());
     var setLastName = assertMethodExist(extendedPersonTableRowData, "setLastName", new String[]{String.class.getName()});
     assertMethodReturnType(setLastName, "void");
@@ -643,19 +643,19 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID7, "long");
 
     assertEquals(7, noTableExtended.methods().stream().count(), "method count of 'NoTableExtended'");
-    var addRow6 = assertMethodExist(noTableExtended, "addRow", new String[]{});
+    var addRow6 = assertMethodExist(noTableExtended, "addRow");
     assertMethodReturnType(addRow6, "formdata.shared.services.process.replace.TableFieldExFormData$NoTableExtended$NoTableExtendedRowData");
     assertAnnotation(addRow6, "java.lang.Override");
     var addRow7 = assertMethodExist(noTableExtended, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow7, "formdata.shared.services.process.replace.TableFieldExFormData$NoTableExtended$NoTableExtendedRowData");
     assertAnnotation(addRow7, "java.lang.Override");
-    var createRow3 = assertMethodExist(noTableExtended, "createRow", new String[]{});
+    var createRow3 = assertMethodExist(noTableExtended, "createRow");
     assertMethodReturnType(createRow3, "formdata.shared.services.process.replace.TableFieldExFormData$NoTableExtended$NoTableExtendedRowData");
     assertAnnotation(createRow3, "java.lang.Override");
-    var getRowType3 = assertMethodExist(noTableExtended, "getRowType", new String[]{});
+    var getRowType3 = assertMethodExist(noTableExtended, "getRowType");
     assertMethodReturnType(getRowType3, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType3, "java.lang.Override");
-    var getRows3 = assertMethodExist(noTableExtended, "getRows", new String[]{});
+    var getRows3 = assertMethodExist(noTableExtended, "getRows");
     assertMethodReturnType(getRows3, "formdata.shared.services.process.replace.TableFieldExFormData$NoTableExtended$NoTableExtendedRowData[]");
     assertAnnotation(getRows3, "java.lang.Override");
     var rowAt3 = assertMethodExist(noTableExtended, "rowAt", new String[]{"int"});
@@ -683,7 +683,7 @@ public class TableFieldBeanTest {
     assertFieldType(m_new, String.class.getName());
 
     assertEquals(2, noTableExtendedRowData.methods().stream().count(), "method count of 'NoTableExtendedRowData'");
-    var getNew = assertMethodExist(noTableExtendedRowData, "getNew", new String[]{});
+    var getNew = assertMethodExist(noTableExtendedRowData, "getNew");
     assertMethodReturnType(getNew, String.class.getName());
     var setNew = assertMethodExist(noTableExtendedRowData, "setNew", new String[]{String.class.getName()});
     assertMethodReturnType(setNew, "void");
@@ -702,19 +702,19 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID9, "long");
 
     assertEquals(7, tableExtended.methods().stream().count(), "method count of 'TableExtended'");
-    var addRow8 = assertMethodExist(tableExtended, "addRow", new String[]{});
+    var addRow8 = assertMethodExist(tableExtended, "addRow");
     assertMethodReturnType(addRow8, "formdata.shared.services.process.replace.TableFieldExFormData$TableExtended$TableExtendedRowData");
     assertAnnotation(addRow8, "java.lang.Override");
     var addRow9 = assertMethodExist(tableExtended, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow9, "formdata.shared.services.process.replace.TableFieldExFormData$TableExtended$TableExtendedRowData");
     assertAnnotation(addRow9, "java.lang.Override");
-    var createRow4 = assertMethodExist(tableExtended, "createRow", new String[]{});
+    var createRow4 = assertMethodExist(tableExtended, "createRow");
     assertMethodReturnType(createRow4, "formdata.shared.services.process.replace.TableFieldExFormData$TableExtended$TableExtendedRowData");
     assertAnnotation(createRow4, "java.lang.Override");
-    var getRowType4 = assertMethodExist(tableExtended, "getRowType", new String[]{});
+    var getRowType4 = assertMethodExist(tableExtended, "getRowType");
     assertMethodReturnType(getRowType4, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType4, "java.lang.Override");
-    var getRows4 = assertMethodExist(tableExtended, "getRows", new String[]{});
+    var getRows4 = assertMethodExist(tableExtended, "getRows");
     assertMethodReturnType(getRows4, "formdata.shared.services.process.replace.TableFieldExFormData$TableExtended$TableExtendedRowData[]");
     assertAnnotation(getRows4, "java.lang.Override");
     var rowAt4 = assertMethodExist(tableExtended, "rowAt", new String[]{"int"});
@@ -742,7 +742,7 @@ public class TableFieldBeanTest {
     assertFieldType(m_boolean, Boolean.class.getName());
 
     assertEquals(2, tableExtendedRowData.methods().stream().count(), "method count of 'TableExtendedRowData'");
-    var getBoolean = assertMethodExist(tableExtendedRowData, "getBoolean", new String[]{});
+    var getBoolean = assertMethodExist(tableExtendedRowData, "getBoolean");
     assertMethodReturnType(getBoolean, Boolean.class.getName());
     var setBoolean = assertMethodExist(tableExtendedRowData, "setBoolean", new String[]{Boolean.class.getName()});
     assertMethodReturnType(setBoolean, "void");
@@ -765,7 +765,7 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, baseWithExtendedTableFormData.methods().stream().count(), "method count of 'BaseWithExtendedTableFormData'");
-    var getTableInForm = assertMethodExist(baseWithExtendedTableFormData, "getTableInForm", new String[]{});
+    var getTableInForm = assertMethodExist(baseWithExtendedTableFormData, "getTableInForm");
     assertMethodReturnType(getTableInForm, "formdata.shared.services.BaseWithExtendedTableFormData$TableInForm");
 
     assertEquals(1, baseWithExtendedTableFormData.innerTypes().stream().count(), "inner types count of 'BaseWithExtendedTableFormData'");
@@ -781,19 +781,19 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(7, tableInForm.methods().stream().count(), "method count of 'TableInForm'");
-    var addRow = assertMethodExist(tableInForm, "addRow", new String[]{});
+    var addRow = assertMethodExist(tableInForm, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.BaseWithExtendedTableFormData$TableInForm$TableInFormRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(tableInForm, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.BaseWithExtendedTableFormData$TableInForm$TableInFormRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(tableInForm, "createRow", new String[]{});
+    var createRow = assertMethodExist(tableInForm, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.BaseWithExtendedTableFormData$TableInForm$TableInFormRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(tableInForm, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(tableInForm, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(tableInForm, "getRows", new String[]{});
+    var getRows = assertMethodExist(tableInForm, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.BaseWithExtendedTableFormData$TableInForm$TableInFormRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(tableInForm, "rowAt", new String[]{"int"});
@@ -827,11 +827,11 @@ public class TableFieldBeanTest {
     assertFieldType(m_colInDesktopForm, String.class.getName());
 
     assertEquals(4, tableInFormRowData.methods().stream().count(), "method count of 'TableInFormRowData'");
-    var getColInAbstractTable = assertMethodExist(tableInFormRowData, "getColInAbstractTable", new String[]{});
+    var getColInAbstractTable = assertMethodExist(tableInFormRowData, "getColInAbstractTable");
     assertMethodReturnType(getColInAbstractTable, String.class.getName());
     var setColInAbstractTable = assertMethodExist(tableInFormRowData, "setColInAbstractTable", new String[]{String.class.getName()});
     assertMethodReturnType(setColInAbstractTable, "void");
-    var getColInDesktopForm = assertMethodExist(tableInFormRowData, "getColInDesktopForm", new String[]{});
+    var getColInDesktopForm = assertMethodExist(tableInFormRowData, "getColInDesktopForm");
     assertMethodReturnType(getColInDesktopForm, String.class.getName());
     var setColInDesktopForm = assertMethodExist(tableInFormRowData, "setColInDesktopForm", new String[]{String.class.getName()});
     assertMethodReturnType(setColInDesktopForm, "void");
@@ -854,7 +854,7 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, childWithExtendedTableFormData.methods().stream().count(), "method count of 'ChildWithExtendedTableFormData'");
-    var getChildTable = assertMethodExist(childWithExtendedTableFormData, "getChildTable", new String[]{});
+    var getChildTable = assertMethodExist(childWithExtendedTableFormData, "getChildTable");
     assertMethodReturnType(getChildTable, "formdata.shared.services.ChildWithExtendedTableFormData$ChildTable");
 
     assertEquals(1, childWithExtendedTableFormData.innerTypes().stream().count(), "inner types count of 'ChildWithExtendedTableFormData'");
@@ -870,19 +870,19 @@ public class TableFieldBeanTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(7, childTable.methods().stream().count(), "method count of 'ChildTable'");
-    var addRow = assertMethodExist(childTable, "addRow", new String[]{});
+    var addRow = assertMethodExist(childTable, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.ChildWithExtendedTableFormData$ChildTable$ChildTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(childTable, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.ChildWithExtendedTableFormData$ChildTable$ChildTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(childTable, "createRow", new String[]{});
+    var createRow = assertMethodExist(childTable, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.ChildWithExtendedTableFormData$ChildTable$ChildTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(childTable, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(childTable, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(childTable, "getRows", new String[]{});
+    var getRows = assertMethodExist(childTable, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.ChildWithExtendedTableFormData$ChildTable$ChildTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(childTable, "rowAt", new String[]{"int"});
@@ -922,15 +922,15 @@ public class TableFieldBeanTest {
     assertFieldType(m_colInDesktopForm, String.class.getName());
 
     assertEquals(6, childTableRowData.methods().stream().count(), "method count of 'ChildTableRowData'");
-    var getCol1InChildForm = assertMethodExist(childTableRowData, "getCol1InChildForm", new String[]{});
+    var getCol1InChildForm = assertMethodExist(childTableRowData, "getCol1InChildForm");
     assertMethodReturnType(getCol1InChildForm, String.class.getName());
     var setCol1InChildForm = assertMethodExist(childTableRowData, "setCol1InChildForm", new String[]{String.class.getName()});
     assertMethodReturnType(setCol1InChildForm, "void");
-    var getColInAbstractTable = assertMethodExist(childTableRowData, "getColInAbstractTable", new String[]{});
+    var getColInAbstractTable = assertMethodExist(childTableRowData, "getColInAbstractTable");
     assertMethodReturnType(getColInAbstractTable, String.class.getName());
     var setColInAbstractTable = assertMethodExist(childTableRowData, "setColInAbstractTable", new String[]{String.class.getName()});
     assertMethodReturnType(setColInAbstractTable, "void");
-    var getColInDesktopForm = assertMethodExist(childTableRowData, "getColInDesktopForm", new String[]{});
+    var getColInDesktopForm = assertMethodExist(childTableRowData, "getColInDesktopForm");
     assertMethodReturnType(getColInDesktopForm, String.class.getName());
     var setColInDesktopForm = assertMethodExist(childTableRowData, "setColInDesktopForm", new String[]{String.class.getName()});
     assertMethodReturnType(setColInDesktopForm, "void");
@@ -955,7 +955,7 @@ public class TableFieldBeanTest {
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(1, columnWithoutTypeFormData.methods().stream().count(), "method count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData'");
-    var getMyTable = assertMethodExist(columnWithoutTypeFormData, "getMyTable", new String[]{});
+    var getMyTable = assertMethodExist(columnWithoutTypeFormData, "getMyTable");
     assertMethodReturnType(getMyTable, "formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable");
     assertEquals(0, getMyTable.annotations().stream().count(), "annotation count");
 
@@ -974,7 +974,7 @@ public class TableFieldBeanTest {
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
 
     assertEquals(7, myTable.methods().stream().count(), "method count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable'");
-    var addRow = assertMethodExist(myTable, "addRow", new String[]{});
+    var addRow = assertMethodExist(myTable, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData");
     assertEquals(1, addRow.annotations().stream().count(), "annotation count");
     assertAnnotation(addRow, "java.lang.Override");
@@ -982,15 +982,15 @@ public class TableFieldBeanTest {
     assertMethodReturnType(addRow1, "formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData");
     assertEquals(1, addRow1.annotations().stream().count(), "annotation count");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(myTable, "createRow", new String[]{});
+    var createRow = assertMethodExist(myTable, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData");
     assertEquals(1, createRow.annotations().stream().count(), "annotation count");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(myTable, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(myTable, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertEquals(1, getRowType.annotations().stream().count(), "annotation count");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(myTable, "getRows", new String[]{});
+    var getRows = assertMethodExist(myTable, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData[]");
     assertEquals(1, getRows.annotations().stream().count(), "annotation count");
     assertAnnotation(getRows, "java.lang.Override");
@@ -1025,7 +1025,7 @@ public class TableFieldBeanTest {
     assertEquals(0, m_my.annotations().stream().count(), "annotation count");
 
     assertEquals(2, myTableRowData.methods().stream().count(), "method count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData'");
-    var getMy = assertMethodExist(myTableRowData, "getMy", new String[]{});
+    var getMy = assertMethodExist(myTableRowData, "getMy");
     assertMethodReturnType(getMy, "java.lang.Object");
     assertEquals(0, getMy.annotations().stream().count(), "annotation count");
     var setMy = assertMethodExist(myTableRowData, "setMy", new String[]{"java.lang.Object"});

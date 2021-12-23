@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEn
 import org.eclipse.scout.sdk.core.s.testing.context.ClassIdAutoCreationExtension;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
-import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,7 +34,6 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
  *
  * @since 5.2.0
  */
-@ExtendWith(TestingEnvironmentExtension.class)
 @ExtendWith(ClassIdAutoCreationExtension.class)
 @ExtendWithTestingEnvironment(
     primary = @ExtendWithJavaEnvironmentFactory(ScoutFullJavaEnvironmentFactory.class),

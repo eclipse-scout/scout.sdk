@@ -19,7 +19,7 @@ import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiModifier
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
@@ -83,7 +83,7 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
             ?.asStream()
             ?: Stream.empty()
 
-    private fun resolveSubClasses(module: Module, env: IdeaEnvironment, nameFunction: (IScoutApi) -> IClassNameSupplier): Sequence<TypeMapping> {
+    private fun resolveSubClasses(module: Module, env: IdeaEnvironment, nameFunction: (IScoutApi) -> ITypeNameSupplier): Sequence<TypeMapping> {
         val javaEnv = env.toScoutJavaEnvironment(module) ?: return emptySequence()
         return javaEnv.api(IScoutApi::class.java)
                 .map { nameFunction(it).fqn() }

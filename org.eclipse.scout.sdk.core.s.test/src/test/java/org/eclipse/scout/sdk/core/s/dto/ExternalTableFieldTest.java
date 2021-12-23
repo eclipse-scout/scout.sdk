@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,19 +48,19 @@ public class ExternalTableFieldTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(7, abstractCompanyTableFieldData.methods().stream().count(), "method count of 'formdata.shared.services.process.AbstractCompanyTableFieldData'");
-    var addRow = assertMethodExist(abstractCompanyTableFieldData, "addRow", new String[]{});
+    var addRow = assertMethodExist(abstractCompanyTableFieldData, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(abstractCompanyTableFieldData, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(abstractCompanyTableFieldData, "createRow", new String[]{});
+    var createRow = assertMethodExist(abstractCompanyTableFieldData, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(abstractCompanyTableFieldData, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(abstractCompanyTableFieldData, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(abstractCompanyTableFieldData, "getRows", new String[]{});
+    var getRows = assertMethodExist(abstractCompanyTableFieldData, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(abstractCompanyTableFieldData, "rowAt", new String[]{"int"});
@@ -88,7 +88,7 @@ public class ExternalTableFieldTest {
     assertFieldType(m_name, "java.lang.String");
 
     assertEquals(2, abstractCompanyTableRowData.methods().stream().count(), "method count of 'formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData'");
-    var getName = assertMethodExist(abstractCompanyTableRowData, "getName", new String[]{});
+    var getName = assertMethodExist(abstractCompanyTableRowData, "getName");
     assertMethodReturnType(getName, "java.lang.String");
     var setName = assertMethodExist(abstractCompanyTableRowData, "setName", new String[]{"java.lang.String"});
     assertMethodReturnType(setName, "void");

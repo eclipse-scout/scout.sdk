@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
@@ -48,7 +48,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
   private boolean m_includeSuperClasses;
   private boolean m_includeSuperInterfaces;
 
-  private ApiFunction<?, IClassNameSupplier> m_name;
+  private ApiFunction<?, ITypeNameSupplier> m_name;
   private Class<AbstractManagedAnnotation> m_managedWrapperType;
 
   public AnnotationQuery(IType containerType, JavaElementSpi owner) {
@@ -152,11 +152,11 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
    * @return this
    */
   public AnnotationQuery<T> withName(CharSequence fullyQualifiedName) {
-    return withNameFrom(null, api -> IClassNameSupplier.raw(fullyQualifiedName));
+    return withNameFrom(null, api -> ITypeNameSupplier.of(fullyQualifiedName));
   }
 
   /**
-   * Limit the {@link IAnnotation}s to the {@link IClassNameSupplier} returned by the given nameFunction.<br>
+   * Limit the {@link IAnnotation}s to the {@link ITypeNameSupplier} returned by the given nameFunction.<br>
    * <b>Example:</b> {@code type.annotations().withNameFrom(IJavaApi.class, IJavaApi::Override)}.
    *
    * @param api
@@ -168,7 +168,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
    *          The API type that contains the class name
    * @return this
    */
-  public <API extends IApiSpecification> AnnotationQuery<T> withNameFrom(Class<API> api, Function<API, IClassNameSupplier> nameFunction) {
+  public <API extends IApiSpecification> AnnotationQuery<T> withNameFrom(Class<API> api, Function<API, ITypeNameSupplier> nameFunction) {
     if (nameFunction == null) {
       m_name = null;
     }
@@ -178,7 +178,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
     return this;
   }
 
-  protected ApiFunction<?, IClassNameSupplier> getName() {
+  protected ApiFunction<?, ITypeNameSupplier> getName() {
     return m_name;
   }
 
@@ -209,7 +209,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
     if (name == null) {
       return true; // not filtered by name
     }
-    var fqn = name.apply(a.javaEnvironment()).map(IClassNameSupplier::fqn);
+    var fqn = name.apply(a.javaEnvironment()).map(ITypeNameSupplier::fqn);
     return fqn.isPresent() && fqn.orElseThrow().equals(a.name());
   }
 

@@ -12,82 +12,83 @@ package org.eclipse.scout.sdk.core.s.apidef;
 
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.generator.method.IScoutMethodGenerator;
 
 @SuppressWarnings({"squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // method naming conventions
 public interface IScoutInterfaceApi {
   IAccordion IAccordion();
 
-  interface IAccordion extends IClassNameSupplier {
+  interface IAccordion extends ITypeNameSupplier {
   }
 
   IAccordionField IAccordionField();
 
-  interface IAccordionField extends IClassNameSupplier {
+  interface IAccordionField extends ITypeNameSupplier {
   }
 
   IAction IAction();
 
-  interface IAction extends IClassNameSupplier {
+  interface IAction extends ITypeNameSupplier {
   }
 
   IActionNode IActionNode();
 
-  interface IActionNode extends IClassNameSupplier {
+  interface IActionNode extends ITypeNameSupplier {
   }
 
   IBigDecimalField IBigDecimalField();
 
-  interface IBigDecimalField extends IClassNameSupplier {
+  interface IBigDecimalField extends ITypeNameSupplier {
   }
 
   IBooleanField IBooleanField();
 
-  interface IBooleanField extends IClassNameSupplier {
+  interface IBooleanField extends ITypeNameSupplier {
   }
 
   IBrowserField IBrowserField();
 
-  interface IBrowserField extends IClassNameSupplier {
+  interface IBrowserField extends ITypeNameSupplier {
   }
 
   IButton IButton();
 
-  interface IButton extends IClassNameSupplier {
+  interface IButton extends ITypeNameSupplier {
   }
 
   ICalendar ICalendar();
 
-  interface ICalendar extends IClassNameSupplier {
+  interface ICalendar extends ITypeNameSupplier {
   }
 
   ICalendarField ICalendarField();
 
-  interface ICalendarField extends IClassNameSupplier {
+  interface ICalendarField extends ITypeNameSupplier {
   }
 
   ICalendarItemProvider ICalendarItemProvider();
 
-  interface ICalendarItemProvider extends IClassNameSupplier {
+  interface ICalendarItemProvider extends ITypeNameSupplier {
   }
 
   IClientSession IClientSession();
 
-  interface IClientSession extends IClassNameSupplier {
+  interface IClientSession extends ITypeNameSupplier {
     String getDesktopMethodName();
   }
 
   ICode ICode();
 
-  interface ICode extends IClassNameSupplier {
+  interface ICode extends ITypeNameSupplier {
     String getIdMethodName();
   }
 
   ICodeType ICodeType();
 
-  interface ICodeType extends IClassNameSupplier {
+  interface ICodeType extends ITypeNameSupplier {
     int codeTypeIdTypeParamIndex();
 
     int codeIdTypeParamIndex();
@@ -97,7 +98,7 @@ public interface IScoutInterfaceApi {
 
   ITableBeanHolder ITableBeanHolder();
 
-  interface ITableBeanHolder extends IClassNameSupplier {
+  interface ITableBeanHolder extends ITypeNameSupplier {
     String addRowMethodName();
 
     String getRowTypeMethodName();
@@ -107,56 +108,56 @@ public interface IScoutInterfaceApi {
 
   IColumn IColumn();
 
-  interface IColumn extends IClassNameSupplier {
+  interface IColumn extends ITypeNameSupplier {
     int valueTypeParamIndex();
   }
 
   ICompositeField ICompositeField();
 
-  interface ICompositeField extends IClassNameSupplier {
+  interface ICompositeField extends ITypeNameSupplier {
     String getFieldByClassMethodName();
   }
 
   IPropertyHolder IPropertyHolder();
 
-  interface IPropertyHolder extends IClassNameSupplier {
+  interface IPropertyHolder extends ITypeNameSupplier {
     String getPropertyByClassMethodName();
   }
 
   ICompositeFieldExtension ICompositeFieldExtension();
 
-  interface ICompositeFieldExtension extends IClassNameSupplier {
+  interface ICompositeFieldExtension extends ITypeNameSupplier {
   }
 
   IContextMenuOwner IContextMenuOwner();
 
-  interface IContextMenuOwner extends IClassNameSupplier {
+  interface IContextMenuOwner extends ITypeNameSupplier {
   }
 
   IDataChangeObserver IDataChangeObserver();
 
-  interface IDataChangeObserver extends IClassNameSupplier {
+  interface IDataChangeObserver extends ITypeNameSupplier {
     String registerDataChangeListenerMethodName();
   }
 
   IDataModelAttribute IDataModelAttribute();
 
-  interface IDataModelAttribute extends IClassNameSupplier {
+  interface IDataModelAttribute extends ITypeNameSupplier {
   }
 
   IDataModelEntity IDataModelEntity();
 
-  interface IDataModelEntity extends IClassNameSupplier {
+  interface IDataModelEntity extends ITypeNameSupplier {
   }
 
   IDataObject IDataObject();
 
-  interface IDataObject extends IClassNameSupplier {
+  interface IDataObject extends ITypeNameSupplier {
   }
 
   IDoEntity IDoEntity();
 
-  interface IDoEntity extends IClassNameSupplier {
+  interface IDoEntity extends ITypeNameSupplier {
     /**
      * Computes the getter prefix for a DoNode attribute. This is "get" for most objects and (depending on Scout
      * version) "is" for boolean types.
@@ -178,28 +179,28 @@ public interface IScoutInterfaceApi {
      *          The {@link IType} that contains the attribute and will hold the created getters
      * @return A {@link Stream} returning any additional getters.
      */
-    Stream<IMethodGenerator<?, ?>> getAdditionalDoNodeGetters(CharSequence name, CharSequence dataTypeRef, IType ownerType);
+    Stream<IScoutMethodGenerator<?, ?>> getAdditionalDoNodeGetters(CharSequence name, CharSequence dataTypeRef, IType ownerType);
   }
 
   IDateField IDateField();
 
-  interface IDateField extends IClassNameSupplier {
+  interface IDateField extends ITypeNameSupplier {
   }
 
   IDesktop IDesktop();
 
-  interface IDesktop extends IClassNameSupplier {
+  interface IDesktop extends ITypeNameSupplier {
     String dataChangedMethodName();
   }
 
   IDesktopExtension IDesktopExtension();
 
-  interface IDesktopExtension extends IClassNameSupplier {
+  interface IDesktopExtension extends ITypeNameSupplier {
   }
 
   IExtension IExtension();
 
-  interface IExtension extends IClassNameSupplier {
+  interface IExtension extends ITypeNameSupplier {
     int ownerTypeParamIndex();
 
     String getOwnerMethodName();
@@ -207,17 +208,17 @@ public interface IScoutInterfaceApi {
 
   IFileChooserButton IFileChooserButton();
 
-  interface IFileChooserButton extends IClassNameSupplier {
+  interface IFileChooserButton extends ITypeNameSupplier {
   }
 
   IFileChooserField IFileChooserField();
 
-  interface IFileChooserField extends IClassNameSupplier {
+  interface IFileChooserField extends ITypeNameSupplier {
   }
 
   IForm IForm();
 
-  interface IForm extends IClassNameSupplier {
+  interface IForm extends ITypeNameSupplier {
     String getFieldByClassMethodName();
 
     String exportFormDataMethodName();
@@ -229,82 +230,82 @@ public interface IScoutInterfaceApi {
 
   IFormExtension IFormExtension();
 
-  interface IFormExtension extends IClassNameSupplier {
+  interface IFormExtension extends ITypeNameSupplier {
   }
 
   IFormField IFormField();
 
-  interface IFormField extends IClassNameSupplier {
+  interface IFormField extends ITypeNameSupplier {
   }
 
   IFormFieldExtension IFormFieldExtension();
 
-  interface IFormFieldExtension extends IClassNameSupplier {
+  interface IFormFieldExtension extends ITypeNameSupplier {
   }
 
   IFormFieldMenu IFormFieldMenu();
 
-  interface IFormFieldMenu extends IClassNameSupplier {
+  interface IFormFieldMenu extends ITypeNameSupplier {
   }
 
   IFormHandler IFormHandler();
 
-  interface IFormHandler extends IClassNameSupplier {
+  interface IFormHandler extends ITypeNameSupplier {
   }
 
   IGroup IGroup();
 
-  interface IGroup extends IClassNameSupplier {
+  interface IGroup extends ITypeNameSupplier {
   }
 
   IGroupBox IGroupBox();
 
-  interface IGroupBox extends IClassNameSupplier {
+  interface IGroupBox extends ITypeNameSupplier {
   }
 
   IHtmlField IHtmlField();
 
-  interface IHtmlField extends IClassNameSupplier {
+  interface IHtmlField extends ITypeNameSupplier {
   }
 
   IImageField IImageField();
 
-  interface IImageField extends IClassNameSupplier {
+  interface IImageField extends ITypeNameSupplier {
   }
 
   IKeyStroke IKeyStroke();
 
-  interface IKeyStroke extends IClassNameSupplier {
+  interface IKeyStroke extends ITypeNameSupplier {
   }
 
   ILabelField ILabelField();
 
-  interface ILabelField extends IClassNameSupplier {
+  interface ILabelField extends ITypeNameSupplier {
   }
 
   IListBox IListBox();
 
-  interface IListBox extends IClassNameSupplier {
+  interface IListBox extends ITypeNameSupplier {
   }
 
   ILongField ILongField();
 
-  interface ILongField extends IClassNameSupplier {
+  interface ILongField extends ITypeNameSupplier {
   }
 
   ILookupCall ILookupCall();
 
-  interface ILookupCall extends IClassNameSupplier {
+  interface ILookupCall extends ITypeNameSupplier {
   }
 
   ILookupRow ILookupRow();
 
-  interface ILookupRow extends IClassNameSupplier {
+  interface ILookupRow extends ITypeNameSupplier {
   }
 
   ILookupService ILookupService();
 
-  interface ILookupService extends IClassNameSupplier {
+  interface ILookupService extends ITypeNameSupplier {
     int keyTypeTypeParamIndex();
 
     String getDataByKeyMethodName();
@@ -314,17 +315,17 @@ public interface IScoutInterfaceApi {
 
   IMenu IMenu();
 
-  interface IMenu extends IClassNameSupplier {
+  interface IMenu extends ITypeNameSupplier {
   }
 
   IMenuType IMenuType();
 
-  interface IMenuType extends IClassNameSupplier {
+  interface IMenuType extends ITypeNameSupplier {
   }
 
   IMessageBox IMessageBox();
 
-  interface IMessageBox extends IClassNameSupplier {
+  interface IMessageBox extends ITypeNameSupplier {
     String showMethodName();
 
     String withHeaderMethodName();
@@ -332,103 +333,103 @@ public interface IScoutInterfaceApi {
 
   IMode IMode();
 
-  interface IMode extends IClassNameSupplier {
+  interface IMode extends ITypeNameSupplier {
   }
 
   IModeSelectorField IModeSelectorField();
 
-  interface IModeSelectorField extends IClassNameSupplier {
+  interface IModeSelectorField extends ITypeNameSupplier {
   }
 
   IOrdered IOrdered();
 
-  interface IOrdered extends IClassNameSupplier {
+  interface IOrdered extends ITypeNameSupplier {
   }
 
   IOutline IOutline();
 
-  interface IOutline extends IClassNameSupplier {
+  interface IOutline extends ITypeNameSupplier {
   }
 
   IPage IPage();
 
-  interface IPage extends IClassNameSupplier {
+  interface IPage extends ITypeNameSupplier {
     String initPageMethodName();
   }
 
   IPageWithNodes IPageWithNodes();
 
-  interface IPageWithNodes extends IClassNameSupplier {
+  interface IPageWithNodes extends ITypeNameSupplier {
   }
 
   IPageWithTable IPageWithTable();
 
-  interface IPageWithTable extends IClassNameSupplier {
+  interface IPageWithTable extends ITypeNameSupplier {
   }
 
   IPageWithTableExtension IPageWithTableExtension();
 
-  interface IPageWithTableExtension extends IClassNameSupplier {
+  interface IPageWithTableExtension extends ITypeNameSupplier {
   }
 
   IPrettyPrintDataObjectMapper IPrettyPrintDataObjectMapper();
 
-  interface IPrettyPrintDataObjectMapper extends IClassNameSupplier {
+  interface IPrettyPrintDataObjectMapper extends ITypeNameSupplier {
   }
 
   IProposalField IProposalField();
 
-  interface IProposalField extends IClassNameSupplier {
+  interface IProposalField extends ITypeNameSupplier {
   }
 
   IRadioButton IRadioButton();
 
-  interface IRadioButton extends IClassNameSupplier {
+  interface IRadioButton extends ITypeNameSupplier {
   }
 
   IRadioButtonGroup IRadioButtonGroup();
 
-  interface IRadioButtonGroup extends IClassNameSupplier {
+  interface IRadioButtonGroup extends ITypeNameSupplier {
   }
 
   ISequenceBox ISequenceBox();
 
-  interface ISequenceBox extends IClassNameSupplier {
+  interface ISequenceBox extends ITypeNameSupplier {
   }
 
   IServerSession IServerSession();
 
-  interface IServerSession extends IClassNameSupplier {
+  interface IServerSession extends ITypeNameSupplier {
   }
 
   IService IService();
 
-  interface IService extends IClassNameSupplier {
+  interface IService extends ITypeNameSupplier {
   }
 
   ISession ISession();
 
-  interface ISession extends IClassNameSupplier {
+  interface ISession extends ITypeNameSupplier {
   }
 
   ISmartField ISmartField();
 
-  interface ISmartField extends IClassNameSupplier {
+  interface ISmartField extends ITypeNameSupplier {
   }
 
   IStringField IStringField();
 
-  interface IStringField extends IClassNameSupplier {
+  interface IStringField extends ITypeNameSupplier {
   }
 
   ITabBox ITabBox();
 
-  interface ITabBox extends IClassNameSupplier {
+  interface ITabBox extends ITypeNameSupplier {
   }
 
   ITable ITable();
 
-  interface ITable extends IClassNameSupplier {
+  interface ITable extends ITypeNameSupplier {
     String getColumnSetMethodName();
 
     String getSelectedRowCountMethodName();
@@ -436,84 +437,84 @@ public interface IScoutInterfaceApi {
 
   ITableControl ITableControl();
 
-  interface ITableControl extends IClassNameSupplier {
+  interface ITableControl extends ITypeNameSupplier {
   }
 
   ITableExtension ITableExtension();
 
-  interface ITableExtension extends IClassNameSupplier {
+  interface ITableExtension extends ITypeNameSupplier {
   }
 
   ITableField ITableField();
 
-  interface ITableField extends IClassNameSupplier {
+  interface ITableField extends ITypeNameSupplier {
   }
 
   ITagField ITagField();
 
-  interface ITagField extends IClassNameSupplier {
+  interface ITagField extends ITypeNameSupplier {
   }
 
   ITextProviderService ITextProviderService();
 
-  interface ITextProviderService extends IClassNameSupplier {
+  interface ITextProviderService extends ITypeNameSupplier {
   }
 
   ITile ITile();
 
-  interface ITile extends IClassNameSupplier {
+  interface ITile extends ITypeNameSupplier {
   }
 
   ITileField ITileField();
 
-  interface ITileField extends IClassNameSupplier {
+  interface ITileField extends ITypeNameSupplier {
   }
 
   ITileGrid ITileGrid();
 
-  interface ITileGrid extends IClassNameSupplier {
+  interface ITileGrid extends ITypeNameSupplier {
   }
 
   ITree ITree();
 
-  interface ITree extends IClassNameSupplier {
+  interface ITree extends ITypeNameSupplier {
   }
 
   ITreeField ITreeField();
 
-  interface ITreeField extends IClassNameSupplier {
+  interface ITreeField extends ITypeNameSupplier {
   }
 
   ITreeNode ITreeNode();
 
-  interface ITreeNode extends IClassNameSupplier {
+  interface ITreeNode extends ITypeNameSupplier {
     String setVisibleGrantedMethodName();
   }
 
   ITypeWithClassId ITypeWithClassId();
 
-  interface ITypeWithClassId extends IClassNameSupplier {
+  interface ITypeWithClassId extends ITypeNameSupplier {
   }
 
   IUuId IUuId();
 
-  interface IUuId extends IClassNameSupplier {
+  interface IUuId extends ITypeNameSupplier {
   }
 
   IValueField IValueField();
 
-  interface IValueField extends IClassNameSupplier {
+  interface IValueField extends ITypeNameSupplier {
     int valueTypeParamIndex();
   }
 
   IViewButton IViewButton();
 
-  interface IViewButton extends IClassNameSupplier {
+  interface IViewButton extends ITypeNameSupplier {
   }
 
   IWidget IWidget();
 
-  interface IWidget extends IClassNameSupplier {
+  interface IWidget extends ITypeNameSupplier {
     String setEnabledPermissionMethodName();
 
     String setEnabledGrantedMethodName();
@@ -521,17 +522,17 @@ public interface IScoutInterfaceApi {
 
   IWizard IWizard();
 
-  interface IWizard extends IClassNameSupplier {
+  interface IWizard extends ITypeNameSupplier {
   }
 
   IWizardStep IWizardStep();
 
-  interface IWizardStep extends IClassNameSupplier {
+  interface IWizardStep extends ITypeNameSupplier {
   }
 
   IConfigProperty IConfigProperty();
 
-  interface IConfigProperty extends IClassNameSupplier {
+  interface IConfigProperty extends ITypeNameSupplier {
     String getKeyMethodName();
 
     String descriptionMethodName();
@@ -539,6 +540,14 @@ public interface IScoutInterfaceApi {
 
   IUiTextContributor IUiTextContributor();
 
-  interface IUiTextContributor extends IClassNameSupplier {
+  interface IUiTextContributor extends ITypeNameSupplier {
+  }
+
+  DoEntity DoEntity();
+
+  interface DoEntity extends ITypeNameSupplier {
+    String doValueMethodName();
+
+    String doListMethodName();
   }
 }

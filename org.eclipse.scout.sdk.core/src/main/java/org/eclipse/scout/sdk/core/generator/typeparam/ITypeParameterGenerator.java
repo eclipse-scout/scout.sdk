@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,9 +13,9 @@ package org.eclipse.scout.sdk.core.generator.typeparam;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 
@@ -32,7 +32,8 @@ public interface ITypeParameterGenerator<TYPE extends ITypeParameterGenerator<TY
    * Adds the specified binding to this {@link ITypeParameterGenerator}.
    *
    * @param binding
-   *          The fully qualified name of the binding to add. Must not be {@code null}.
+   *          The fully qualified name of the binding to add. This method does nothing if the binding is blank or
+   *          {@code null}.
    * @return This generator.
    * @see #withBindingFrom(Class, Function)
    */
@@ -51,6 +52,7 @@ public interface ITypeParameterGenerator<TYPE extends ITypeParameterGenerator<TY
    *          be {@code null} in case the given bindingSupplier can handle a {@code null} input.
    * @param bindingSupplier
    *          A {@link Function} to be called to obtain the binding type to add to this {@link ITypeParameterGenerator}.
+   *          Must not be {@code null}.
    * @param <A>
    *          The API type that contains the class name
    * @return This generator.
@@ -59,8 +61,27 @@ public interface ITypeParameterGenerator<TYPE extends ITypeParameterGenerator<TY
   <A extends IApiSpecification> TYPE withBindingFrom(Class<A> apiDefinition, Function<A, String> bindingSupplier);
 
   /**
+   * Adds the result of the bindingSupplier to the list of bindings.
+   * <p>
+   * This method may be handy if bindings are context dependent.
+   * </p>
+   * 
+   * @param bindingSupplier
+   *          A {@link Function} to be called to obtain the binding type to add to this {@link ITypeParameterGenerator}.
+   *          If it is {@code null}, this method does nothing.
+   * @return This generator.
+   * @see #withBinding(String)
+   */
+  TYPE withBindingFunc(Function<IJavaBuilderContext, String> bindingSupplier);
+
+  /**
+   * @return A {@link Stream} with all bounds that can be computed without context.
+   */
+  Stream<String> bounds();
+
+  /**
    * @return A {@link Stream} returning all type parameter bounds.
    */
-  Stream<ApiFunction<?, String>> bounds();
+  Stream<JavaBuilderContextFunction<String>> boundsFunc();
 
 }

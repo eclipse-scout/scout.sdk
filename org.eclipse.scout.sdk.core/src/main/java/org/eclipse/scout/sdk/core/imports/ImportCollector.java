@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,15 +17,17 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 public class ImportCollector implements IImportCollector {
-  private final IJavaEnvironment m_env;
+  private final IJavaBuilderContext m_context;
   private final Map<String/* simpleName */, ImportElement> m_imports = new HashMap<>();
   private final Map<String/* simpleName */, ImportElement> m_staticImports = new HashMap<>();
 
@@ -33,8 +35,8 @@ public class ImportCollector implements IImportCollector {
     this(null);
   }
 
-  public ImportCollector(IJavaEnvironment env) {
-    m_env = env;
+  public ImportCollector(IJavaBuilderContext context) {
+    m_context = context;
   }
 
   protected static Stream<StringBuilder> getImports(Collection<ImportElement> imports) {
@@ -80,8 +82,13 @@ public class ImportCollector implements IImportCollector {
   }
 
   @Override
-  public IJavaEnvironment getJavaEnvironment() {
-    return m_env;
+  public Optional<IJavaBuilderContext> getContext() {
+    return Optional.ofNullable(m_context);
+  }
+
+  @Override
+  public Optional<IJavaEnvironment> getJavaEnvironment() {
+    return getContext().flatMap(IJavaBuilderContext::environment);
   }
 
   @Override

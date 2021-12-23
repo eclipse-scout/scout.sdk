@@ -27,11 +27,8 @@ import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode.DataObjectNodeKind;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class)
 public class DataObjectNodeTest {
   @Test

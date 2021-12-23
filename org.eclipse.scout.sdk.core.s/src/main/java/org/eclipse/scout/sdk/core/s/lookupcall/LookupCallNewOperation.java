@@ -87,13 +87,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
   }
 
   protected void executeOperation(IEnvironment env, IProgress progress) {
-    var svcName = getLookupCallName();
-    var suffix = "Call";
-    if (svcName.endsWith(suffix)) {
-      svcName = svcName.substring(0, svcName.length() - suffix.length());
-    }
-    svcName += ISdkConstants.SUFFIX_SERVICE;
-
+    var svcName = Strings.removeSuffix(getLookupCallName(), "Call") + ISdkConstants.SUFFIX_SERVICE;
     setCreatedLookupServiceIfc(createLookupServiceIfc(svcName, env, progress.newChild(1)));
 
     if (getServerSourceFolder() != null && getLookupServiceSuperType() != null) {

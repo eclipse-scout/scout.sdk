@@ -13,9 +13,9 @@ package org.eclipse.scout.sdk.core.generator.methodparam;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
 import org.eclipse.scout.sdk.core.generator.IAnnotatableGenerator;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -95,13 +95,13 @@ public interface IMethodParameterGenerator<TYPE extends IMethodParameterGenerato
    * @see #withDataType(String)
    * @see #isVarargs()
    */
-  String reference(IJavaEnvironment context);
+  String reference(IJavaBuilderContext context);
 
   /**
    * Gets the data type reference of this {@link IMethodParameterGenerator}.
    * 
    * @param context
-   *          The {@link IJavaEnvironment} to use to compute the data types in case they are context dependent (e.g.
+   *          The {@link IJavaBuilderContext} to use to compute the data types in case they are context dependent (e.g.
    *          using an {@link IApiSpecification}). May be {@code null}.
    * @param useErasureOnly
    *          If {@code true}, no type arguments are included. If {@code false}, all type arguments are part of the
@@ -110,21 +110,36 @@ public interface IMethodParameterGenerator<TYPE extends IMethodParameterGenerato
    * @see #withDataType(String)
    * @see #isVarargs()
    */
-  String reference(IJavaEnvironment context, boolean useErasureOnly);
+  String reference(IJavaBuilderContext context, boolean useErasureOnly);
 
   /**
-   * @return An {@link ApiFunction} that describes the data type of this {@link IMethodParameterGenerator} or an empty
-   *         {@link Optional} if this {@link IMethodParameterGenerator} has no data type.
+   * @return The data type of the method parameter if it can be computed without context. Otherwise an empty
+   *         {@link Optional}.
    */
-  Optional<ApiFunction<?, String>> dataType();
+  Optional<String> dataType();
+
+  /**
+   * @param context
+   *          The context to compute the data type.
+   * @return The data type of the method parameter or an empty {@link Optional} if it has not data type yet.
+   */
+  Optional<String> dataType(IJavaBuilderContext context);
+
+  /**
+   * @return An {@link JavaBuilderContextFunction} that describes the data type of this
+   *         {@link IMethodParameterGenerator} or an empty {@link Optional} if this {@link IMethodParameterGenerator}
+   *         has no data type.
+   */
+  Optional<JavaBuilderContextFunction<String>> dataTypeFunc();
 
   /**
    * Sets the data type of this {@link IMethodParameterGenerator}.
    *
    * @param dataType
-   *          The new data type
+   *          The new data type or {@code null}.
    * @return This generator.
    * @see #withDataTypeFrom(Class, Function)
+   * @see #withDataTypeFunc(Function)
    */
   TYPE withDataType(String dataType);
 
@@ -142,11 +157,27 @@ public interface IMethodParameterGenerator<TYPE extends IMethodParameterGenerato
    *          dataTypeSupplier. May be {@code null} in case the given dataTypeSupplier can handle a {@code null} input.
    * @param dataTypeSupplier
    *          A {@link Function} to be called to obtain the method parameter data type of this
-   *          {@link IMethodParameterGenerator}.
+   *          {@link IMethodParameterGenerator}. Must not be {@code null}.
    * @param <A>
    *          The API type that contains the class name
    * @return This generator.
    * @see #withDataType(String)
+   * @see #withDataTypeFunc(Function)
    */
   <A extends IApiSpecification> TYPE withDataTypeFrom(Class<A> apiDefinition, Function<A, String> dataTypeSupplier);
+
+  /**
+   * Sets the method parameter data type to the result of the given dataTypeSupplier.
+   * <p>
+   * This method may be handy if the data type is context dependent.
+   * </p>
+   *
+   * @param dataTypeSupplier
+   *          A {@link Function} to be called to obtain the method parameter data type of this
+   *          {@link IMethodParameterGenerator} or {@code null}.
+   * @return This generator.
+   * @see #withDataType(String)
+   * @see #withDataTypeFrom(Class, Function)
+   */
+  TYPE withDataTypeFunc(Function<IJavaBuilderContext, String> dataTypeSupplier);
 }

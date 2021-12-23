@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.core.s.form;
 
 import static org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator.createOrder;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.core.util.Strings.capitalize;
+import static org.eclipse.scout.sdk.core.util.Strings.removeSuffix;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,9 +62,9 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
   private List<String> m_formFields;
 
   @Override
-  protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
+  protected void setup() {
     var mainBox = createMainBox();
-    mainType
+    this
         .withAnnotation(formData()
             .map(dto -> ScoutAnnotationGenerator.createFormData(dto, SdkCommand.CREATE, null))
             .orElse(null))
@@ -79,18 +81,15 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
     var startModify = createStartMethod("startModify", MODIFY_HANDLER_NAME);
     var startNew = createStartMethod("startNew", NEW_HANDLER_NAME);
     if (startModify != null) {
-      mainType.withMethod(startModify, 3000);
+      withMethod(startModify, 3000);
     }
     if (startNew != null) {
-      mainType.withMethod(startNew, 4000);
+      withMethod(startNew, 4000);
     }
   }
 
   protected IMethodGenerator<?, ?> createGetConfiguredTitle() {
-    var nlsKeyName = elementName().orElseThrow(() -> newFail("Form has no name."));
-    if (nlsKeyName.endsWith(ISdkConstants.SUFFIX_FORM)) {
-      nlsKeyName = Strings.capitalize(nlsKeyName.substring(0, nlsKeyName.length() - ISdkConstants.SUFFIX_FORM.length())).toString();
-    }
+    var nlsKeyName = capitalize(removeSuffix(elementName().orElseThrow(() -> newFail("Form has no name.")), ISdkConstants.SUFFIX_FORM));
     return ScoutMethodGenerator.createNlsMethodFrom(IScoutApi.class, api -> api.AbstractForm().getConfiguredTitleMethodName(), nlsKeyName);
   }
 
@@ -127,7 +126,7 @@ public class FormGenerator<TYPE extends FormGenerator<TYPE>> extends PrimaryType
     withFieldGetter(groupBox.fullyQualifiedName());
 
     var index = new AtomicInteger(1);
-    Strings.capitalize(formFields())
+    capitalize(formFields())
         .forEach(formField -> appendFormField(formField, groupBox, index.getAndIncrement() * ISdkConstants.VIEW_ORDER_ANNOTATION_VALUE_STEP));
   }
 

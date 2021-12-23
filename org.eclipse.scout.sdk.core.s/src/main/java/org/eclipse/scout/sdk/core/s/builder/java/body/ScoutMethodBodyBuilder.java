@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.s.builder.java.body;
 import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.MethodBodyBuilder;
@@ -65,12 +65,12 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
 
   @Override
   public TYPE appendBeansGet(CharSequence beanClass) {
-    var beanSupplier = IClassNameSupplier.raw(beanClass);
+    var beanSupplier = ITypeNameSupplier.of(beanClass);
     return appendBeansGetFrom(null, api -> beanSupplier);
   }
 
   @Override
-  public <T extends IApiSpecification> TYPE appendBeansGetFrom(Class<T> apiClass, Function<T, IClassNameSupplier> beanNameProvider) {
+  public <T extends IApiSpecification> TYPE appendBeansGetFrom(Class<T> apiClass, Function<T, ITypeNameSupplier> beanNameProvider) {
     return refClassFrom(IScoutApi.class, IScoutApi::BEANS).dot().appendFrom(IScoutApi.class, api -> api.BEANS().getMethodName()).parenthesisOpen()
         .classLiteralFrom(apiClass, beanNameProvider).parenthesisClose();
   }
@@ -82,7 +82,7 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
 
   @Override
   public TYPE appendPermissionCheck(CharSequence permission) {
-    return appendIf().parenthesisOpen().appendNot().refClassFrom(IScoutApi.class, IScoutApi::ACCESS).dot().appendFrom(IScoutApi.class, api -> api.ACCESS().checkMethodName()).parenthesisOpen()
+    return appendIf().appendNot().refClassFrom(IScoutApi.class, IScoutApi::ACCESS).dot().appendFrom(IScoutApi.class, api -> api.ACCESS().checkMethodName()).parenthesisOpen()
         .appendNew(permission).parenthesisClose()
         .parenthesisClose().parenthesisClose().space().blockStart().nl()
         .appendThrow().appendNewFrom(IScoutApi.class, IScoutApi::VetoException).appendTextsGet("AuthorizationFailed").parenthesisClose().semicolon().nl()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,18 +14,22 @@ import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
 import org.eclipse.scout.sdk.core.builder.java.JavaSourceBuilder;
 import org.eclipse.scout.sdk.core.generator.AbstractJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link TypeParameterGenerator}</h3>
@@ -34,7 +38,7 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  */
 public class TypeParameterGenerator<TYPE extends ITypeParameterGenerator<TYPE>> extends AbstractJavaElementGenerator<TYPE> implements ITypeParameterGenerator<TYPE> {
 
-  private final List<ApiFunction<?, String>> m_bounds;
+  private final List<JavaBuilderContextFunction<String>> m_bounds;
 
   protected TypeParameterGenerator() {
     m_bounds = new ArrayList<>();
@@ -44,8 +48,15 @@ public class TypeParameterGenerator<TYPE extends ITypeParameterGenerator<TYPE>> 
     super(param);
     m_bounds = param.bounds()
         .map(IType::reference)
-        .map(ApiFunction::new)
+        .map(JavaBuilderContextFunction::create)
         .collect(toList());
+  }
+
+  /**
+   * @return A new empty {@link ITypeParameterGenerator}.
+   */
+  public static ITypeParameterGenerator<?> create() {
+    return new TypeParameterGenerator<>();
   }
 
   /**
@@ -61,35 +72,48 @@ public class TypeParameterGenerator<TYPE extends ITypeParameterGenerator<TYPE>> 
     return new TypeParameterGenerator<>(param);
   }
 
-  /**
-   * @return A new empty {@link ITypeParameterGenerator}.
-   */
-  public static ITypeParameterGenerator<?> create() {
-    return new TypeParameterGenerator<>();
-  }
-
   @Override
   public TYPE withBinding(String binding) {
-    return withBindingFrom(null, api -> binding);
-  }
-
-  @Override
-  public <A extends IApiSpecification> TYPE withBindingFrom(Class<A> apiDefinition, Function<A, String> bindingSupplier) {
-    m_bounds.add(new ApiFunction<>(apiDefinition, bindingSupplier));
+    if (Strings.hasText(binding)) {
+      m_bounds.add(JavaBuilderContextFunction.create(binding));
+    }
     return thisInstance();
   }
 
   @Override
-  public Stream<ApiFunction<?, String>> bounds() {
+  public <A extends IApiSpecification> TYPE withBindingFrom(Class<A> apiDefinition, Function<A, String> bindingSupplier) {
+    if (bindingSupplier != null) {
+      m_bounds.add(new ApiFunction<>(apiDefinition, bindingSupplier));
+    }
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE withBindingFunc(Function<IJavaBuilderContext, String> bindingSupplier) {
+    if (bindingSupplier != null) {
+      m_bounds.add(JavaBuilderContextFunction.create(bindingSupplier));
+    }
+    return thisInstance();
+  }
+
+  @Override
+  public Stream<String> bounds() {
+    return boundsFunc()
+        .map(JavaBuilderContextFunction::apply)
+        .flatMap(Optional::stream);
+  }
+
+  @Override
+  public Stream<JavaBuilderContextFunction<String>> boundsFunc() {
     return m_bounds.stream();
   }
 
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
     super.build(builder);
-    builder.append(ensureValidJavaName(elementName().orElse(Character.toString(JavaTypes.C_QUESTION_MARK))));
+    builder.append(ensureValidJavaName(elementName(builder.context()).orElse(Character.toString(JavaTypes.C_QUESTION_MARK))));
     var bounds = m_bounds.stream()
-        .<ISourceGenerator<IJavaSourceBuilder<?>>> map(binding -> b -> b.refFrom(binding))
+        .<ISourceGenerator<IJavaSourceBuilder<?>>> map(binding -> b -> b.refFunc(binding))
         .map(g -> g.generalize(JavaSourceBuilder::create));
     builder.append(bounds, " " + JavaTypes.EXTENDS + " ", " & ", null);
   }

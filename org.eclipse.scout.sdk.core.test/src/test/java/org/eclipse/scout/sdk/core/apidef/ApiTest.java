@@ -19,13 +19,10 @@ import org.eclipse.scout.sdk.core.fixture.apidef.JavaApiProvider;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(EmptyJavaEnvironmentFactory.class)
 public class ApiTest {
   @BeforeAll
@@ -40,7 +37,7 @@ public class ApiTest {
 
   @Test
   public void testVersion(IJavaEnvironment env) {
-    assertEquals(12, Api.version(IJavaApi.class, env.requireType(Long.class.getName())).orElseThrow().segments()[0]);
+    assertEquals(12, Api.version(IJavaApi.class, env.requireType(Long.class.getName())).orElseThrow().major());
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,9 +47,9 @@ public class FormWithGroupboxesTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(2, formWithGroupBoxesFormData.methods().stream().count(), "method count of 'FormWithGroupBoxesFormData'");
-    var getFlatString = assertMethodExist(formWithGroupBoxesFormData, "getFlatString", new String[]{});
+    var getFlatString = assertMethodExist(formWithGroupBoxesFormData, "getFlatString");
     assertMethodReturnType(getFlatString, "formdata.shared.services.process.FormWithGroupBoxesFormData$FlatString");
-    var getInnerInteger = assertMethodExist(formWithGroupBoxesFormData, "getInnerInteger", new String[]{});
+    var getInnerInteger = assertMethodExist(formWithGroupBoxesFormData, "getInnerInteger");
     assertMethodReturnType(getInnerInteger, "formdata.shared.services.process.FormWithGroupBoxesFormData$InnerInteger");
 
     assertEquals(2, formWithGroupBoxesFormData.innerTypes().stream().count(), "inner types count of 'FormWithGroupBoxesFormData'");

@@ -135,7 +135,7 @@ public final class Api {
    * @return The newest supported major version for the given API.
    */
   public static int latestMajorVersion(Class<? extends IApiSpecification> api) {
-    return latest(api).maxLevel().segments()[0];
+    return latest(api).maxLevel().major();
   }
 
   /**
@@ -282,33 +282,33 @@ public final class Api {
    * @param api
    *          The {@link IApiSpecification} to dump. Must not be {@code null}.
    * @return The dump
-   * @see #dump(IClassNameSupplier)
+   * @see #dump(ITypeNameSupplier)
    */
-  public static Map<String /* fqn of all IClassNameSupplier in the API */, Map<ChildElementType, Map<String /* method name in the IClassNameSupplier */, String /* method value */>>> dump(IApiSpecification api) {
+  public static Map<String /* fqn of all ITypeNameSupplier in the API */, Map<ChildElementType, Map<String /* method name in the ITypeNameSupplier */, String /* method value */>>> dump(IApiSpecification api) {
     return Arrays.stream(Ensure.notNull(api).getClass().getMethods())
         .filter(m -> m.getParameterCount() == 0)
-        .filter(m -> IClassNameSupplier.class.isAssignableFrom(m.getReturnType()))
-        .map(m -> (IClassNameSupplier) invoke(m, api))
+        .filter(m -> ITypeNameSupplier.class.isAssignableFrom(m.getReturnType()))
+        .map(m -> (ITypeNameSupplier) invoke(m, api))
         .map(Api::dump)
         .collect(toMap(Entry::getKey, Entry::getValue, (a, b) -> a /* it does not matter which one to keep */));
   }
 
   /**
-   * Dumps the given {@link IClassNameSupplier} into an {@link Entry} data structure.
+   * Dumps the given {@link ITypeNameSupplier} into an {@link Entry} data structure.
    *
    * @param cns
-   *          The {@link IClassNameSupplier} to dump. Must not be {@code null}.
-   * @return An {@link Entry} for the given {@link IClassNameSupplier} having the fully qualified name as key and a
-   *         {@link Map} of all methods in the given {@link IClassNameSupplier} and its values grouped by
+   *          The {@link ITypeNameSupplier} to dump. Must not be {@code null}.
+   * @return An {@link Entry} for the given {@link ITypeNameSupplier} having the fully qualified name as key and a
+   *         {@link Map} of all methods in the given {@link ITypeNameSupplier} and its values grouped by
    *         {@link ChildElementType}.
    */
-  public static Entry<String /* fqn of the IClassNameSupplier */, Map<ChildElementType, Map<String /* method name in the IClassNameSupplier */, String /* method value */>>> dump(IClassNameSupplier cns) {
+  public static Entry<String /* fqn of the ITypeNameSupplier */, Map<ChildElementType, Map<String /* method name in the ITypeNameSupplier */, String /* method value */>>> dump(ITypeNameSupplier cns) {
     var supplierClass = Ensure.notNull(cns).getClass();
     var methods = Arrays.stream(supplierClass.getMethods())
         .filter(m -> m.getDeclaringClass() != Object.class)
         .filter(m -> m.getParameterCount() == 0)
         .filter(m -> m.getReturnType() != void.class)
-        .filter(m -> !"fqn".equals(m.getName()) && !"simpleName".equals(m.getName())) // methods defined in IClassNameSupplier
+        .filter(m -> !"fqn".equals(m.getName()) && !"simpleName".equals(m.getName())) // methods defined in ITypeNameSupplier
         .collect(toList());
 
     Map<ChildElementType, Map<String, String>> entries = new EnumMap<>(ChildElementType.class);
@@ -323,7 +323,7 @@ public final class Api {
     return new SimpleImmutableEntry<>(Ensure.notNull(cns).fqn(), entries);
   }
 
-  static Map<String, String> consumeMethods(Collection<Method> methods, IClassNameSupplier owner, Predicate<Method> filter) {
+  static Map<String, String> consumeMethods(Collection<Method> methods, ITypeNameSupplier owner, Predicate<Method> filter) {
     var methodResultMapping = methods.stream()
         .filter(m -> filter == null || filter.test(m))
         .collect(toMap(Method::getName, m -> String.valueOf(invoke(m, owner))));

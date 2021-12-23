@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.jaxws;
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
+import static org.eclipse.scout.sdk.core.util.Strings.removeSuffix;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -52,6 +53,7 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
 
 /**
@@ -168,11 +170,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
   }
 
   protected String getWsdlBaseName() {
-    var wsdlFileName = getWsdlFileName();
-    if (wsdlFileName.endsWith(JaxWsUtils.WSDL_FILE_SUFFIX)) {
-      wsdlFileName = wsdlFileName.substring(0, wsdlFileName.length() - JaxWsUtils.WSDL_FILE_SUFFIX.length());
-    }
-    return JaxWsUtils.removeCommonSuffixes(wsdlFileName);
+    return JaxWsUtils.removeCommonSuffixes(removeSuffix(getWsdlFileName(), JaxWsUtils.WSDL_FILE_SUFFIX));
   }
 
   protected abstract void createDerivedResources(IEnvironment env, IProgress progress);
@@ -325,11 +323,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
           throw new IllegalArgumentException("zero length path found.");
         }
 
-        var partName = pathFileName.toLowerCase(Locale.US);
-        if (partName.endsWith(JaxWsUtils.WSDL_FILE_SUFFIX)) {
-          partName = partName.substring(0, partName.length() - JaxWsUtils.WSDL_FILE_SUFFIX.length());
-        }
-
+        var partName = Strings.removeSuffix(pathFileName.toLowerCase(Locale.US), JaxWsUtils.WSDL_FILE_SUFFIX);
         var lastDotPos = JaxWsUtils.JAXWS_BINDINGS_FILE_NAME.lastIndexOf('.');
         var fileName = new StringBuilder();
         fileName.append(JaxWsUtils.JAXWS_BINDINGS_FILE_NAME, 0, lastDotPos);
@@ -418,10 +412,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
       wsdlFileName = wsdlFileName.substring(lastSlashPos + 1, lastDotPos);
     }
     else {
-      wsdlFileName = getWsdlName();
-      if (wsdlFileName.endsWith(ISdkConstants.SUFFIX_WS_PROVIDER)) {
-        wsdlFileName = wsdlFileName.substring(0, wsdlFileName.length() - ISdkConstants.SUFFIX_WS_PROVIDER.length());
-      }
+      wsdlFileName = Strings.removeSuffix(getWsdlName(), ISdkConstants.SUFFIX_WS_PROVIDER);
     }
     wsdlFileName += JaxWsUtils.WSDL_FILE_SUFFIX;
     return wsdlFileName;

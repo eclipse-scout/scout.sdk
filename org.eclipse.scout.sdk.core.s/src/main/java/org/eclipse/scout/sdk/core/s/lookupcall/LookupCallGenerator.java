@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.core.s.lookupcall;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
@@ -33,24 +32,21 @@ public class LookupCallGenerator<TYPE extends LookupCallGenerator<TYPE>> extends
   private String m_classIdValue;
 
   @Override
-  protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
+  protected void setup() {
     if (superType().isPresent() && keyType().isPresent()) {
       var superTypeBuilder = new StringBuilder(superType().orElseThrow());
       superTypeBuilder.append(JavaTypes.C_GENERIC_START);
       superTypeBuilder.append(keyType().orElseThrow());
       superTypeBuilder.append(JavaTypes.C_GENERIC_END);
-
-      mainType
-          .withSuperClass(superTypeBuilder.toString());
+      withSuperClass(superTypeBuilder.toString());
     }
-    mainType
-        .withAnnotation(classIdValue()
-            .map(ScoutAnnotationGenerator::createClassId)
-            .orElse(null))
-        .withField(FieldGenerator.createSerialVersionUid());
+    withAnnotation(classIdValue()
+        .map(ScoutAnnotationGenerator::createClassId)
+        .orElse(null))
+            .withField(FieldGenerator.createSerialVersionUid());
 
     if (lookupServiceInterface().isPresent() && keyType().isPresent()) {
-      mainType.withMethod(ScoutMethodGenerator.createGetConfiguredService(lookupServiceInterface().orElseThrow(), keyType().orElseThrow()));
+      withMethod(ScoutMethodGenerator.createGetConfiguredService(lookupServiceInterface().orElseThrow(), keyType().orElseThrow()));
     }
   }
 

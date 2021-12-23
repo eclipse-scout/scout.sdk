@@ -15,10 +15,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -43,99 +43,35 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY extends IMethodBodyBuilder<?>> extends IMemberGenerator<TYPE> {
 
   /**
-   * Returns a unique identifier for this {@link IMethod}. The identifier looks like
-   * 'methodName(dataTypeParam1,dataTypeParam2)'. Only the type erasure is used (no type arguments).
-   *
-   * @param context
-   *          The context {@link IJavaEnvironment} for which the identifier should be computed. This is required because
-   *          method parameter data types may be API dependent (see
-   *          {@link MethodParameterGenerator#withDataTypeFrom(Class, Function)}).
-   * @return The created identifier using the type erasure only.
-   * @see #identifier(IJavaEnvironment, boolean)
-   * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
-   * @see IMethod#identifier()
+   * @return The return type reference of this {@link IMethodGenerator} if it can be computed without context. An empty
+   *         {@link Optional} otherwise.
    */
-  String identifier(IJavaEnvironment context);
+  Optional<String> returnType();
 
   /**
-   * Returns the unique identifier for this {@link IMethodGenerator}. The identifier looks like
-   * 'methodName(dataTypeParam1,dataTypeParam2)'.
-   *
-   * @param context
-   *          The context {@link IJavaEnvironment} for which the identifier should be computed. This is required because
-   *          method parameter data types may be API dependent (see
-   *          {@link MethodParameterGenerator#withDataTypeFrom(Class, Function)}).
-   * @param includeTypeArguments
-   *          If {@code true} the type arguments of all parameter types are included. If {@code false} only the type
-   *          erasure is used.
-   * @return The created identifier
-   * @see #identifier(IJavaEnvironment)
-   * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
-   * @see IMethod#identifier(boolean)
-   */
-  String identifier(IJavaEnvironment context, boolean includeTypeArguments);
-
-  /**
-   * @return An {@link ApiFunction} that describes the return type of this {@link IMethodGenerator} or an empty
-   *         {@link Optional} if this {@link IMethodGenerator} describes a constructor.
-   */
-  Optional<ApiFunction<?, String>> returnType();
-
-  /**
-   * Sets the method name to the result of the given nameSupplier.
-   * <p>
-   * This method may be handy if the name of a method changes between different versions of an API. The builder then
-   * decides which API to use based on the version found in the {@link IJavaEnvironment} of the
-   * {@link IJavaBuilderContext}.
-   * </p>
-   * <b>Example:</b> {@code methodGenerator.withElementNameFrom(IJavaApi.class, api -> api.Long().valueOfMethodName())}.
-   * 
-   * @param apiDefinition
-   *          The api type that defines the method name. An instance of this API is passed to the nameSupplier. May be
-   *          {@code null} in case the given nameSupplier can handle a {@code null} input.
-   * @param nameSupplier
-   *          A {@link Function} to be called to obtain the method name of this {@link IMethodGenerator}.
-   * @param <A>
-   *          The API type that contains the class name
-   * @return This generator.
-   * @see #withElementName(String)
-   */
-  <A extends IApiSpecification> TYPE withElementNameFrom(Class<A> apiDefinition, Function<A, String> nameSupplier);
-
-  /**
-   * Gets the method name of this generator.
+   * Gets the return type reference of this {@link IMethodGenerator} or an empty {@link Optional} if it is a
+   * constructor.
    * 
    * @param context
-   *          The context {@link IJavaBuilderContext} for which the method name should be computed. This is required
-   *          because the method name may be API dependent (see
-   *          {@link IMethodGenerator#withElementNameFrom(Class, Function)}).
-   * @return The method name or an empty {@link Optional} if this method has no name.
-   * @see #withElementNameFrom(Class, Function)
-   * @see #withElementName(String)
+   *          The {@link IJavaBuilderContext} to compute the return or {@code null}.
+   * @return The return type reference or an empty {@link Optional}.
    */
-  Optional<String> elementName(IJavaBuilderContext context);
+  Optional<String> returnType(IJavaBuilderContext context);
 
   /**
-   * Gets the method name of this generator.
-   * 
-   * @param context
-   *          The context {@link IJavaEnvironment} for which the method name should be computed. This is required
-   *          because the method name may be API dependent (see
-   *          {@link IMethodGenerator#withElementNameFrom(Class, Function)}).
-   * @return The method name or an empty {@link Optional} if this method has no name.
-   * @see #withElementNameFrom(Class, Function)
-   * @see #withElementName(String)
+   * @return The function creating the return type reference or an empty {@link Optional} if this is a constructor.
    */
-  Optional<String> elementName(IJavaEnvironment context);
+  Optional<JavaBuilderContextFunction<String>> returnTypeFunc();
 
   /**
    * Sets the return type of this {@link IMethodGenerator}.
    *
    * @param returnType
-   *          The return type (e.g. {@link JavaTypes#_void}) or {@code null} if this {@link IMethodGenerator} is a
-   *          constructor.
+   *          The return type (e.g. {@link JavaTypes#_void}) or {@code "java.lang.String"} or {@code null} if this
+   *          {@link IMethodGenerator} is a constructor.
    * @return This generator.
    * @see #withReturnTypeFrom(Class, Function)
+   * @see #withReturnTypeFunc(Function)
    */
   TYPE withReturnType(String returnType);
 
@@ -158,23 +94,43 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    *          The API type that contains the class name
    * @return This generator.
    * @see #withReturnType(String)
+   * @see #withReturnTypeFunc(Function)
    */
   <A extends IApiSpecification> TYPE withReturnTypeFrom(Class<A> apiDefinition, Function<A, String> returnTypeSupplier);
+
+  /**
+   * Sets the method return type to the result of the given returnTypeSupplier.
+   * <p>
+   * This method may be handy in case the return type is context dependent.
+   * </p>
+   * 
+   * @param returnTypeSupplier
+   *          A {@link Function} returning the data type reference or {@code null} if this is a constructor.
+   * @return This generator.
+   */
+  TYPE withReturnTypeFunc(Function<IJavaBuilderContext, String> returnTypeSupplier);
 
   /**
    * @return A {@link Stream} with all {@link Throwable} types of the {@code throws} clause of this
    *         {@link IMethodGenerator}.
    */
-  Stream<ApiFunction<?, IClassNameSupplier>> throwables();
+  Stream<JavaBuilderContextFunction<ITypeNameSupplier>> throwablesFunc();
 
   /**
-   * Adds the given reference to the {@link Throwable Throwables} of this {@link IMethodGenerator}. They will be printed
-   * in the {@code throws} declaration of the method.
+   * @return A {@link Stream} with all {@link Throwable} types of the {@code throws} clause of this
+   *         {@link IMethodGenerator} that can be computed without context.
+   * @see #throwablesFunc()
+   */
+  Stream<String> throwables();
+
+  /**
+   * Adds the given reference to the {@link Throwable throwables} of this {@link IMethodGenerator}. They will be added
+   * to the {@code throws} declaration of the method.
    * <p>
-   * If the same reference is already added, this method does nothing.
+   * If the same reference is already added or the given throwable is blank or {@code null}, this method does nothing.
    *
    * @param throwableFqn
-   *          Must not be blank (see {@link Strings#isBlank(CharSequence)}).
+   *          The fully qualified name of the throwable to add. This method does nothing if it is blank or {@code null}.
    * @return This generator.
    * @see #withThrowableFrom(Class, Function)
    */
@@ -199,7 +155,43 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    * @return This generator.
    * @see #withThrowable(String)
    */
-  <A extends IApiSpecification> TYPE withThrowableFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> throwableSupplier);
+  <A extends IApiSpecification> TYPE withThrowableFrom(Class<A> apiDefinition, Function<A, ITypeNameSupplier> throwableSupplier);
+
+  /**
+   * Adds the result of the throwableSupplier to the list of throwables.
+   * <p>
+   * This method may be handy if the throwable is context dependent.
+   * </p>
+   * 
+   * @param throwableSupplier
+   *          A function returning the {@link ITypeNameSupplier} of the throwable. If the function is {@code null}, this
+   *          method does nothing. The function must not return a {@code null} supplier and the supplier must not return
+   *          {@code null} itself.
+   * @return This generator.
+   * @see #withThrowable(String)
+   * @see #withThrowableFrom(Class, Function)
+   */
+  TYPE withThrowableFunc(Function<IJavaBuilderContext, ITypeNameSupplier> throwableSupplier);
+
+  /**
+   * Removes the throwable with the given name. This method is only successful if the name of the throwable to remove
+   * can be computed without context.
+   * 
+   * @param fqn
+   *          The throwable to remove.
+   * @return This generator.
+   */
+  TYPE withoutThrowable(CharSequence fqn);
+
+  /**
+   * Removes the throwable with the given name. This method is only successful if the name of the throwable to remove
+   * can be computed without context.
+   * 
+   * @param cns
+   *          The throwable to remove.
+   * @return This generator.
+   */
+  TYPE withoutThrowable(ITypeNameSupplier cns);
 
   /**
    * Removes all throwables for which the given {@link Predicate} returns {@code true}.
@@ -209,7 +201,7 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    *          throwables are removed.
    * @return This generator.
    */
-  TYPE withoutThrowable(Predicate<ApiFunction<?, IClassNameSupplier>> toRemoveFilter);
+  TYPE withoutThrowable(Predicate<JavaBuilderContextFunction<ITypeNameSupplier>> toRemoveFilter);
 
   /**
    * @return The {@link ISourceGenerator} that creates the method body content.
@@ -311,6 +303,39 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    *         annotation if required based on super types.
    */
   boolean isWithOverrideIfNecessary();
+
+  /**
+   * Returns a unique identifier for this {@link IMethod}. The identifier looks like
+   * 'methodName(dataTypeParam1,dataTypeParam2)'. Only the type erasure is used (no type arguments).
+   *
+   * @param context
+   *          The context {@link IJavaEnvironment} for which the identifier should be computed. This is required because
+   *          method parameter data types may be API dependent (see
+   *          {@link MethodParameterGenerator#withDataTypeFrom(Class, Function)}).
+   * @return The created identifier using the type erasure only.
+   * @see #identifier(IJavaBuilderContext, boolean)
+   * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
+   * @see IMethod#identifier()
+   */
+  String identifier(IJavaBuilderContext context);
+
+  /**
+   * Returns the unique identifier for this {@link IMethodGenerator}. The identifier looks like
+   * 'methodName(dataTypeParam1,dataTypeParam2)'.
+   *
+   * @param context
+   *          The context {@link IJavaEnvironment} for which the identifier should be computed. This is required because
+   *          method parameter data types may be API dependent (see
+   *          {@link MethodParameterGenerator#withDataTypeFrom(Class, Function)}).
+   * @param includeTypeArguments
+   *          If {@code true} the type arguments of all parameter types are included. If {@code false} only the type
+   *          erasure is used.
+   * @return The created identifier
+   * @see #identifier(IJavaBuilderContext)
+   * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
+   * @see IMethod#identifier(boolean)
+   */
+  String identifier(IJavaBuilderContext context, boolean includeTypeArguments);
 
   /**
    * Marks this {@link IMethodGenerator} to be {@code abstract}.

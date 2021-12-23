@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,9 +51,9 @@ public class MasterFieldFormDataTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(2, masterFieldTestFormData.methods().stream().count(), "method count of 'MasterFieldTestFormData'");
-    var getMyMaster = assertMethodExist(masterFieldTestFormData, "getMyMaster", new String[]{});
+    var getMyMaster = assertMethodExist(masterFieldTestFormData, "getMyMaster");
     assertMethodReturnType(getMyMaster, "formdata.shared.services.MasterFieldTestFormData$MyMaster");
-    var getMySlave = assertMethodExist(masterFieldTestFormData, "getMySlave", new String[]{});
+    var getMySlave = assertMethodExist(masterFieldTestFormData, "getMySlave");
     assertMethodReturnType(getMySlave, "formdata.shared.services.MasterFieldTestFormData$MySlave");
 
     assertEquals(2, masterFieldTestFormData.innerTypes().stream().count(), "inner types count of 'MasterFieldTestFormData'");

@@ -38,18 +38,23 @@ public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
 
     // inner types
     m_innerTypeSimpleNames = enclosingTypeGenerator.types()
-        .map(ITypeGenerator::elementName)
+        .map(t -> t.elementName(getContext().orElse(null)))
         .flatMap(Optional::stream)
         .collect(toSet());
 
-    var env = getJavaEnvironment();
+    var context = getContext().orElse(null);
+    if (context == null) {
+      m_visibleInnerTypeInSuperHierarchyNames = emptySet();
+      return;
+    }
+    var env = getJavaEnvironment().orElse(null);
     if (env == null) {
       m_visibleInnerTypeInSuperHierarchyNames = emptySet();
       return;
     }
 
-    m_visibleInnerTypeInSuperHierarchyNames = Stream.concat(enclosingTypeGenerator.superClass().stream(), enclosingTypeGenerator.interfaces())
-        .flatMap(af -> af.apply(env).stream())
+    m_visibleInnerTypeInSuperHierarchyNames = Stream.concat(enclosingTypeGenerator.superClassFunc().stream(), enclosingTypeGenerator.interfacesFunc())
+        .map(af -> af.apply(context))
         .map(JavaTypes::erasure)
         .map(env::findType)
         .flatMap(Optional::stream)

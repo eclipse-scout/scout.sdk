@@ -60,7 +60,6 @@ import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.DefaultCommentGeneratorExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.testing.context.UsernameExtension;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
@@ -73,7 +72,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * @since 8.0.0
  */
 @ExtendWith(UsernameExtension.class)
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWith(DefaultCommentGeneratorExtension.class)
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class WorkingCopyTransformerTest {
@@ -104,7 +102,7 @@ public class WorkingCopyTransformerTest {
         if ("methodInChildClass".equals(input.model().elementName())) {
           generator.withoutFlags(Flags.AccSynchronized);
           generator.withThrowable(newException);
-          generator.withoutThrowable(func -> IOException.class.getName().equals(func.apply().orElseThrow().fqn()));
+          generator.withoutThrowable(IOException.class.getName());
         }
         return generator;
       }
@@ -249,7 +247,7 @@ public class WorkingCopyTransformerTest {
             return overrideGenerator.withBody(b -> b.returnClause().stringLiteral("SampleCloseable class").semicolon());
           case "close":
             // remove throws declaration for close method
-            return overrideGenerator.withoutThrowable(func -> Exception.class.getName().equals(func.apply().orElseThrow().fqn()));
+            return overrideGenerator.withoutThrowable(Exception.class.getName());
           default:
             return overrideGenerator;
         }
@@ -286,7 +284,7 @@ public class WorkingCopyTransformerTest {
             return overrideGenerator.withBody(b -> b.returnClause().stringLiteral("SampleCloseable class").semicolon());
           case "close":
             // remove throws declaration for close method
-            return overrideGenerator.withoutThrowable(func -> Exception.class.getName().equals(func.apply().orElseThrow().fqn()));
+            return overrideGenerator.withoutThrowable(Exception.class.getName());
           default:
             return overrideGenerator;
         }

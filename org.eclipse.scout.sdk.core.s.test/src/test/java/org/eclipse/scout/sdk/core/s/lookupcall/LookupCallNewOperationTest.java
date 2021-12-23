@@ -19,11 +19,9 @@ import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutServerJavaEn
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
-import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 
@@ -32,7 +30,6 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
  *
  * @since 5.2.0
  */
-@ExtendWith(TestingEnvironmentExtension.class)
 public class LookupCallNewOperationTest {
 
   @DisplayName("Test LookupCall Creation")

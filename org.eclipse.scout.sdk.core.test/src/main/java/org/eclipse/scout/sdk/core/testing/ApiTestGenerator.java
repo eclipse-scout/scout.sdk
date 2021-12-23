@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,33 +51,6 @@ public class ApiTestGenerator {
     m_usedMemberNames = new HashSet<>();
   }
 
-  protected static void buildMethod(IMethod method, String methodVarName, StringBuilder source) {
-    var parameterTypes = method.parameters().stream().collect(toList());
-    if (!parameterTypes.isEmpty()) {
-      for (var i = 0; i < parameterTypes.size(); i++) {
-        source.append(toStringLiteral(parameterTypes.get(i).dataType().reference()));
-        if (i < parameterTypes.size() - 1) {
-          source.append(", ");
-        }
-      }
-    }
-    source.append("});").append(NL);
-    if (method.isConstructor()) {
-      source.append("assertTrue(").append(methodVarName).append(".isConstructor());").append(NL);
-    }
-
-    method.returnType()
-        .map(IType::reference)
-        .ifPresent(ref -> source.append("assertMethodReturnType(")
-            .append(methodVarName)
-            .append(", \"")
-            .append(ref)
-            .append("\");")
-            .append(NL));
-
-    createAnnotationsAsserts(method, source, methodVarName);
-  }
-
   protected static void buildField(IField field, String fieldVarName, StringBuilder source, String flagsRef) {
     source.append("assertHasFlags(").append(fieldVarName).append(", ").append(getFlagsSource(field.flags(), flagsRef)).append(");").append(NL);
     source.append("assertFieldType(").append(fieldVarName).append(", ").append(toStringLiteral(field.dataType().reference())).append(");").append(NL);
@@ -119,14 +92,13 @@ public class ApiTestGenerator {
     IImportValidator validator = new ImportValidator(collector);
     var sourceBuilder = new StringBuilder();
     var typeVarName = getMemberName(m_element.elementName());
-    var iTypeRef = validator.useReference(IType.class.getName());
 
     sourceBuilder.append("/**").append(NL);
     sourceBuilder.append("* @Generated with ").append(getClass().getName()).append(NL);
     sourceBuilder.append("*/").append(NL);
 
     sourceBuilder.append("private static void testApiOf").append(m_element.elementName()).append('(').append("IType ").append(typeVarName).append(") {").append(NL);
-    buildType(m_element, typeVarName, sourceBuilder, validator, iTypeRef);
+    buildType(m_element, typeVarName, sourceBuilder, validator);
     sourceBuilder.append('}');
 
     collector.addStaticImport(SdkAssertions.class.getName() + ".assertAnnotation");
@@ -151,7 +123,7 @@ public class ApiTestGenerator {
     return result.toString();
   }
 
-  protected void buildType(IType type, String typeVarName, StringBuilder source, IImportValidator validator, String iTypeRef) {
+  protected void buildType(IType type, String typeVarName, StringBuilder source, IImportValidator validator) {
     var flagsRef = validator.useReference(Flags.class.getName());
 
     source.append("assertHasFlags(").append(typeVarName).append(", ").append(getFlagsSource(type.flags(), flagsRef)).append(");").append(NL);
@@ -197,7 +169,14 @@ public class ApiTestGenerator {
     source.append("assertEquals(").append(methods.size()).append(", ").append(typeVarName).append(".methods().stream().count(), \"method count of '").append(type.name()).append("'\");").append(NL);
     for (var method : methods) {
       var methodVarName = getMemberName(method.elementName());
-      source.append("var ").append(methodVarName).append(" = ").append("assertMethodExist(").append(typeVarName).append(", \"").append(method.elementName()).append("\", new String[]{");
+      source.append("var ").append(methodVarName).append(" = ").append("assertMethodExist(").append(typeVarName).append(", \"").append(method.elementName()).append('"');
+      var parameterTypes = method.parameters().stream().collect(toList());
+      if (!parameterTypes.isEmpty()) {
+        source.append(parameterTypes.stream()
+            .map(parameterType -> toStringLiteral(parameterType.dataType().reference()))
+            .collect(joining(", ", ", new String[]{", "}")));
+      }
+      source.append(");").append(NL);
       buildMethod(method, methodVarName, source);
     }
     source.append(NL);
@@ -211,8 +190,25 @@ public class ApiTestGenerator {
       source.append("// type ").append(innerType.elementName()).append(NL);
       source.append("var ").append(innerTypeVarName).append(" = ");
       source.append("assertTypeExists(").append(typeVarName).append(", \"").append(innerType.elementName()).append("\");").append(NL);
-      buildType(innerType, innerTypeVarName, source, validator, iTypeRef);
+      buildType(innerType, innerTypeVarName, source, validator);
     }
+  }
+
+  protected static void buildMethod(IMethod method, String methodVarName, StringBuilder source) {
+    if (method.isConstructor()) {
+      source.append("assertTrue(").append(methodVarName).append(".isConstructor());").append(NL);
+    }
+
+    method.returnType()
+        .map(IType::reference)
+        .ifPresent(ref -> source.append("assertMethodReturnType(")
+            .append(methodVarName)
+            .append(", \"")
+            .append(ref)
+            .append("\");")
+            .append(NL));
+
+    createAnnotationsAsserts(method, source, methodVarName);
   }
 
   private String getMemberName(String e) {

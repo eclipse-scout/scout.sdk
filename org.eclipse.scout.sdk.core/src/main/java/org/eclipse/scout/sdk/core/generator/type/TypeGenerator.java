@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.generator.type;
 
 import static java.util.function.Function.identity;
+import static java.util.function.Predicate.isEqual;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
@@ -41,6 +42,7 @@ import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.JavaElementCommentBuilder;
@@ -59,7 +61,6 @@ import org.eclipse.scout.sdk.core.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.imports.EnclosingTypeScopedImportCollector;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -82,11 +83,11 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   private static final String HIERARCHY_TYPE_KEY = "tmpHierarchyType";
 
   private final List<ITypeParameterGenerator<?>> m_typeParameters;
-  private final List<ApiFunction<?, String>> m_interfaces;
+  private final List<JavaBuilderContextFunction<String>> m_interfaces;
   private final List<SortedMemberEntry> m_members;
   private final FinalValue<String> m_fullyQualifiedName;
   private final FinalValue<String> m_qualifier;
-  private ApiFunction<?, String> m_superClass;
+  private JavaBuilderContextFunction<String> m_superClass;
   private String m_declaringFullyQualifiedName;
   private boolean m_addAllNecessaryMethods;
   private IWorkingCopyTransformer m_unimplementedMethodsTransformer;
@@ -111,12 +112,12 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
     m_superClass = type.superClass()
         .map(IType::reference)
-        .map(ApiFunction::new)
+        .map(JavaBuilderContextFunction::create)
         .orElse(null);
 
     m_interfaces = type.superInterfaces()
         .map(IType::reference)
-        .map(ApiFunction::new)
+        .map(JavaBuilderContextFunction::create)
         .collect(toList());
 
     m_members = new ArrayList<>();
@@ -124,11 +125,13 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
         .map(f -> transformField(f, transformer)
             .map(g -> new SortedMemberEntry(g, f)))
         .flatMap(Optional::stream)
+        .peek(s -> applyConnection(s.generator(), this))
         .collect(toCollection(() -> m_members));
     type.methods().stream()
         .map(m -> transformMethod(m, transformer)
             .map(g -> new SortedMemberEntry(g, m)))
         .flatMap(Optional::stream)
+        .peek(s -> applyConnection(s.generator(), this))
         .collect(toCollection(() -> m_members));
     type.innerTypes().stream()
         .map(t -> transformType(t, transformer)
@@ -148,6 +151,13 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   /**
+   * @return A new empty {@link ITypeGenerator}.
+   */
+  public static ITypeGenerator<?> create() {
+    return new TypeGenerator<>();
+  }
+
+  /**
    * Creates a new {@link ITypeGenerator} based on the given {@link IType}.
    *
    * @param type
@@ -163,13 +173,6 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
    */
   public static ITypeGenerator<?> create(IType type, IWorkingCopyTransformer transformer) {
     return new TypeGenerator<>(type, transformer).setDeclaringFullyQualifiedName(type.qualifier());
-  }
-
-  /**
-   * @return A new empty {@link ITypeGenerator}.
-   */
-  public static ITypeGenerator<?> create() {
-    return new TypeGenerator<>();
   }
 
   @Override
@@ -219,23 +222,22 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     else {
       builder.append("class ");
     }
-    builder.append(elementName().orElseThrow(() -> newFail("Type must have a name.")));
+    builder.append(elementName(builder.context()).orElseThrow(() -> newFail("Type must have a name.")));
 
     // type parameters
     builder.append(typeParameters(), "<", ", ", ">");
 
     // super type
     if (!isInterface) {
-      superClass()
-          .flatMap(af -> af.apply(builder.context()))
+      superClassFunc()
+          .map(af -> af.apply(builder.context()))
           .filter(sup -> !Object.class.getName().equals(sup))
           .ifPresent(sup -> builder.append(" extends ").ref(sup));
     }
 
     // interfaces
-    var ifcReferences = interfaces()
+    var ifcReferences = interfacesFunc()
         .map(af -> af.apply(builder.context()))
-        .flatMap(Optional::stream)
         .distinct();
     var prefix = " " + (isInterface ? JavaTypes.EXTENDS : JavaTypes.IMPLEMENTS) + " ";
     builder.references(ifcReferences, prefix, ", ", null);
@@ -283,19 +285,38 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   @Override
-  public Stream<ApiFunction<?, String>> interfaces() {
+  public Stream<String> interfaces() {
+    return interfacesFunc()
+        .map(JavaBuilderContextFunction::apply)
+        .flatMap(Optional::stream);
+  }
+
+  @Override
+  public Stream<JavaBuilderContextFunction<String>> interfacesFunc() {
     return m_interfaces.stream();
   }
 
   @Override
   public TYPE withInterface(String interfaceReference) {
-    Ensure.notBlank(interfaceReference);
-    return withInterfaceFrom(null, api -> interfaceReference);
+    if (Strings.hasText(interfaceReference)) {
+      m_interfaces.add(JavaBuilderContextFunction.create(interfaceReference));
+    }
+    return thisInstance();
   }
 
   @Override
   public <A extends IApiSpecification> TYPE withInterfaceFrom(Class<A> apiDefinition, Function<A, String> interfaceSupplier) {
-    m_interfaces.add(new ApiFunction<>(apiDefinition, interfaceSupplier));
+    if (interfaceSupplier != null) {
+      m_interfaces.add(new ApiFunction<>(apiDefinition, interfaceSupplier));
+    }
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE withInterfaceFunc(Function<IJavaBuilderContext, String> interfaceSupplier) {
+    if (interfaceSupplier != null) {
+      m_interfaces.add(JavaBuilderContextFunction.create(interfaceSupplier));
+    }
     return thisInstance();
   }
 
@@ -306,7 +327,14 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   @Override
-  public TYPE withoutInterface(Predicate<ApiFunction<?, String>> filter) {
+  public TYPE withoutInterface(String toRemove) {
+    return withoutInterface(f -> f.apply()
+        .filter(isEqual(toRemove))
+        .isPresent());
+  }
+
+  @Override
+  public TYPE withoutInterface(Predicate<JavaBuilderContextFunction<String>> filter) {
     if (filter == null) {
       m_interfaces.clear();
     }
@@ -317,23 +345,35 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   @Override
-  public Optional<ApiFunction<?, String>> superClass() {
+  public Optional<String> superClass() {
+    return superClassFunc().flatMap(JavaBuilderContextFunction::apply);
+  }
+
+  @Override
+  public Optional<String> superClass(IJavaBuilderContext context) {
+    return superClassFunc().map(f -> f.apply(context));
+  }
+
+  @Override
+  public Optional<JavaBuilderContextFunction<String>> superClassFunc() {
     return Optional.ofNullable(m_superClass);
   }
 
   @Override
   public TYPE withSuperClass(String superType) {
-    return withSuperClassFrom(null, api -> superType);
+    m_superClass = JavaBuilderContextFunction.orNull(superType);
+    return thisInstance();
   }
 
   @Override
   public <A extends IApiSpecification> TYPE withSuperClassFrom(Class<A> apiDefinition, Function<A, String> superClassSupplier) {
-    if (superClassSupplier == null) {
-      m_superClass = null;
-    }
-    else {
-      m_superClass = new ApiFunction<>(apiDefinition, superClassSupplier);
-    }
+    m_superClass = new ApiFunction<>(apiDefinition, superClassSupplier);
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE withSuperClassFunc(Function<IJavaBuilderContext, String> superClassSupplier) {
+    m_superClass = JavaBuilderContextFunction.orNull(superClassSupplier);
     return thisInstance();
   }
 
@@ -404,24 +444,22 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
   @Override
   public TYPE withoutField(Predicate<IFieldGenerator<?>> removalFilter) {
-    removeMemberIf(IFieldGenerator.class, removalFilter).forEach(removed -> applyConnection(removed, null));
+    removeMemberIf(IFieldGenerator.class, removalFilter);
     return thisInstance();
   }
 
   @SuppressWarnings("unchecked")
-  protected <T extends IMemberGenerator<?>, P extends IMemberGenerator<?>> List<P> removeMemberIf(Class<T> type, Predicate<P> removalFilter) {
-    List<P> removed = new ArrayList<>();
+  protected <T extends IMemberGenerator<?>, P extends IMemberGenerator<?>> void removeMemberIf(Class<T> type, Predicate<P> removalFilter) {
     for (var it = m_members.iterator(); it.hasNext();) {
       var entry = it.next();
       if (entry.hasType(type)) {
         var generator = (P) entry.generator();
         if (removalFilter == null || removalFilter.test(generator)) {
           it.remove();
-          removed.add(generator);
+          applyConnection(generator, null);
         }
       }
     }
-    return removed;
   }
 
   @Override
@@ -440,12 +478,18 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
 
   @Override
   public TYPE withoutMethod(Predicate<IMethodGenerator<?, ?>> removalFilter) {
-    removeMemberIf(IMethodGenerator.class, removalFilter).forEach(removed -> applyConnection(removed, null));
+    removeMemberIf(IMethodGenerator.class, removalFilter);
     return thisInstance();
   }
 
   @Override
-  public Optional<IMethodGenerator<?, ?>> method(String methodId, IJavaEnvironment context, boolean includeTypeArguments) {
+  public TYPE withoutMethod(String identifier, IJavaBuilderContext context) {
+    this.removeMemberIf(IMethodGenerator.class, m -> Objects.equals(((IMethodGenerator<?, ?>) m).identifier(context), identifier));
+    return thisInstance();
+  }
+
+  @Override
+  public Optional<IMethodGenerator<?, ?>> method(String methodId, IJavaBuilderContext context, boolean includeTypeArguments) {
     Ensure.notBlank(methodId);
     return methods()
         .filter(m -> methodId.equals(m.identifier(context, includeTypeArguments)))
@@ -509,8 +553,13 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
   }
 
   @Override
+  public TYPE withoutType(String simpleName) {
+    return withoutType(t -> Objects.equals(simpleName, t.elementName().orElse(null)));
+  }
+
+  @Override
   public TYPE withoutType(Predicate<ITypeGenerator<?>> removalFilter) {
-    removeMemberIf(ITypeGenerator.class, removalFilter).forEach(removed -> applyConnection(removed, null));
+    removeMemberIf(ITypeGenerator.class, removalFilter);
     return thisInstance();
   }
 
@@ -562,11 +611,10 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     var hierarchyTypeGenerator = PrimaryTypeGenerator.create()
         .withPackageName(targetPackage)
         .withElementName(typeName)
-        .withInterfaces(interfaces()
-            .map(af -> af.apply(javaEnvironment))
-            .flatMap(Optional::stream));
-    superClass()
-        .flatMap(af -> af.apply(javaEnvironment))
+        .withInterfaces(interfacesFunc()
+            .map(af -> af.apply(context)));
+    superClassFunc()
+        .map(af -> af.apply(context))
         .ifPresent(hierarchyTypeGenerator::withSuperClass);
     var hierarchyTypeSource = hierarchyTypeGenerator.toJavaSource(javaEnvironment);
     javaEnvironment.registerCompilationUnitOverride(hierarchyTypeSource, targetPackage, typeName + JavaTypes.JAVA_FILE_SUFFIX);

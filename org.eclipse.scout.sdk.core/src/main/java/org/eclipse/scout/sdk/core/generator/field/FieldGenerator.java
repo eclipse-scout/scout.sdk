@@ -19,7 +19,9 @@ import java.util.function.Function;
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.JavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
@@ -35,6 +37,7 @@ import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link FieldGenerator}</h3>
@@ -44,7 +47,7 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
 public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends AbstractMemberGenerator<TYPE> implements IFieldGenerator<TYPE> {
 
   public static final String SERIAL_VERSION_UID = "serialVersionUID";
-  private ApiFunction<?, String> m_dataType;
+  private JavaBuilderContextFunction<String> m_dataType;
   private ISourceGenerator<IExpressionBuilder<?>> m_valueGenerator;
 
   protected FieldGenerator() {
@@ -59,6 +62,13 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
             .orElseGet(() -> field.constantValue()
                 .map(mv -> createMetaValueGenerator(mv, transformer))
                 .orElse(null)));
+  }
+
+  /**
+   * @return A new empty {@link IFieldGenerator}.
+   */
+  public static IFieldGenerator<?> create() {
+    return new FieldGenerator<>();
   }
 
   /**
@@ -79,13 +89,6 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
    */
   public static IFieldGenerator<?> create(IField field, IWorkingCopyTransformer transformer) {
     return new FieldGenerator<>(field, transformer);
-  }
-
-  /**
-   * @return A new empty {@link IFieldGenerator}.
-   */
-  public static IFieldGenerator<?> create() {
-    return new FieldGenerator<>();
   }
 
   /**
@@ -112,13 +115,13 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
   }
 
   protected void buildFieldSource(IMemberBuilder<?> builder) {
-    if (elementName().isPresent()) {
-      var dataType = dataType().orElseThrow(() -> newFail("Field data type missing for builder {}", this));
+    var elementName = elementName(builder.context()).filter(Strings::hasText);
+    if (elementName.isPresent()) {
       builder
           .appendFlags(flags())
-          .refFrom(dataType)
+          .refFunc(dataTypeFunc().orElseThrow(() -> newFail("Field data type missing for builder {}", this)))
           .space()
-          .append(ensureValidJavaName(elementName().orElseThrow()));
+          .append(ensureValidJavaName(elementName.orElseThrow()));
       value().ifPresent(v -> {
         builder.equalSign();
         buildFieldValue(ExpressionBuilder.create(builder), v);
@@ -136,23 +139,35 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
   }
 
   @Override
-  public Optional<ApiFunction<?, String>> dataType() {
+  public Optional<String> dataType() {
+    return dataTypeFunc().flatMap(JavaBuilderContextFunction::apply);
+  }
+
+  @Override
+  public Optional<String> dataType(IJavaBuilderContext context) {
+    return dataTypeFunc().map(f -> f.apply(context));
+  }
+
+  @Override
+  public Optional<JavaBuilderContextFunction<String>> dataTypeFunc() {
     return Optional.ofNullable(m_dataType);
   }
 
   @Override
   public TYPE withDataType(String dataType) {
-    return withDataTypeFrom(null, api -> dataType);
+    m_dataType = JavaBuilderContextFunction.orNull(dataType);
+    return thisInstance();
   }
 
   @Override
   public <A extends IApiSpecification> TYPE withDataTypeFrom(Class<A> apiDefinition, Function<A, String> dataTypeSupplier) {
-    if (dataTypeSupplier == null) {
-      m_dataType = null;
-    }
-    else {
-      m_dataType = new ApiFunction<>(apiDefinition, dataTypeSupplier);
-    }
+    m_dataType = new ApiFunction<>(apiDefinition, dataTypeSupplier);
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE withDataTypeFunc(Function<IJavaBuilderContext, String> dataTypeSupplier) {
+    m_dataType = JavaBuilderContextFunction.orNull(dataTypeSupplier);
     return thisInstance();
   }
 

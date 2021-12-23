@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.permission;
 import java.security.Permission;
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
@@ -37,13 +37,13 @@ public class PermissionNewWizardPage extends AbstractCompilationUnitNewWizardPag
   }
 
   @Override
-  protected Optional<IClassNameSupplier> calcSuperTypeDefaultFqn() {
+  protected Optional<ITypeNameSupplier> calcSuperTypeDefaultFqn() {
     return scoutApi().map(IScoutApi::AbstractPermission);
   }
 
   @Override
-  protected Optional<IClassNameSupplier> calcSuperTypeDefaultBaseFqn() {
-    return Optional.of(Permission.class.getName()).map(IClassNameSupplier::raw);
+  protected Optional<ITypeNameSupplier> calcSuperTypeDefaultBaseFqn() {
+    return Optional.of(Permission.class.getName()).map(ITypeNameSupplier::of);
   }
 
   @Override

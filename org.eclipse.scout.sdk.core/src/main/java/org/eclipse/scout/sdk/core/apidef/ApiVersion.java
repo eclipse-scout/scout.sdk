@@ -128,6 +128,13 @@ public class ApiVersion implements Comparable<ApiVersion> {
   }
 
   /**
+   * @return The major version (first of {@link #segments()}).
+   */
+  public int major() {
+    return m_segments[0];
+  }
+
+  /**
    * @return A {@link String} representation of the version. Never returns {@code null}.
    */
   public String asString() {
@@ -175,7 +182,7 @@ public class ApiVersion implements Comparable<ApiVersion> {
       return 0;
     }
 
-    // also compare missing segments. missing segments are treated as zero
+    // also compare missing segments. missing segments are treated as Integer.MAX_VALUE
     var numSegments = Math.max(o.m_segments.length, m_segments.length);
     for (var i = 0; i < numSegments; i++) {
       var me = positionValue(m_segments, i);

@@ -22,7 +22,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
@@ -68,12 +68,12 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
   }
 
   @Override
-  protected Optional<IClassNameSupplier> calcSuperTypeDefaultFqn() {
+  protected Optional<ITypeNameSupplier> calcSuperTypeDefaultFqn() {
     return scoutApi().map(IScoutApi::LookupCall);
   }
 
   @Override
-  protected Optional<IClassNameSupplier> calcSuperTypeDefaultBaseFqn() {
+  protected Optional<ITypeNameSupplier> calcSuperTypeDefaultBaseFqn() {
     return scoutApi().map(IScoutApi::ILookupCall);
   }
 
@@ -92,7 +92,7 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
     superTypeContentProvider.setTypeProposalFilter(new PublicAbstractPrimaryTypeFilter() {
       @Override
       public boolean test(IType candidate) {
-        var lookupCallFqn = scoutApi().map(IScoutApi::LookupCall).map(IClassNameSupplier::fqn).orElse(null);
+        var lookupCallFqn = scoutApi().map(IScoutApi::LookupCall).map(ITypeNameSupplier::fqn).orElse(null);
         return JdtUtils.exists(candidate) && (candidate.getFullyQualifiedName().equals(lookupCallFqn) || super.test(candidate));
       }
     });
@@ -106,7 +106,7 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
   protected IType calcServiceImplSuperTypeDefault() {
     return scoutApi()
         .map(IScoutApi::AbstractLookupService)
-        .map(IClassNameSupplier::fqn)
+        .map(ITypeNameSupplier::fqn)
         .map(fqn -> resolveType(getServerJavaProject(), fqn))
         .orElse(null);
   }
@@ -221,7 +221,7 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
     super.handleJavaProjectChanged();
 
     guessServerFolders();
-    setServiceImplSuperTypeBaseClassInternal(scoutApi().map(IScoutApi::ILookupService).map(IClassNameSupplier::fqn).orElse(null));
+    setServiceImplSuperTypeBaseClassInternal(scoutApi().map(IScoutApi::ILookupService).map(ITypeNameSupplier::fqn).orElse(null));
 
     if (!isControlCreated()) {
       return;

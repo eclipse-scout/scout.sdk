@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
@@ -103,8 +102,7 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
     }
 
     var parameterNames = surroundingMethod().parameters()
-        .map(IMethodParameterGenerator::elementName)
-        .map(nameOpt -> nameOpt.orElseThrow(() -> newFail("Parameter has no name")))
+        .map(p -> p.elementName(context()).orElseThrow(() -> newFail("Parameter has no name")))
         .map(ISourceGenerator::raw);
 
     return parenthesisOpen()
@@ -118,8 +116,8 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
     return append(surroundingMethod()
         .parameters()
         .skip(index)
-        .findAny().orElseThrow(() -> newFail("Cannot find parameter with index {} in method {}", index, surroundingMethod().elementName().orElse(null)))
-        .elementName().orElseThrow(() -> newFail("Parameter with index {} in method {} has no name.", index, surroundingMethod().elementName().orElse(null))));
+        .findAny().orElseThrow(() -> newFail("Cannot find parameter with index {} in method {}.", index, surroundingMethod().elementName(context()).orElse(null)))
+        .elementName(context()).orElseThrow(() -> newFail("Parameter with index {} in method {} has no name.", index, surroundingMethod().elementName(context()).orElse(null))));
   }
 
   @Override
@@ -193,9 +191,7 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
 
   @Override
   public Optional<String> surroundingMethodReturnType() {
-    return surroundingMethod()
-        .returnType()
-        .flatMap(api -> api.apply(context()));
+    return surroundingMethod().returnType(context());
   }
 
   @Override

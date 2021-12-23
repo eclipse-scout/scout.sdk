@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -126,8 +127,8 @@ public class PropertyBean {
    * @return An {@link Optional} containing the property name if the given {@link IMethodGenerator} is a valid getter.
    *         Otherwise an empty {@link Optional} is returned.
    */
-  public static Optional<String> getterName(IMethodGenerator<?, ?> m, IJavaEnvironment context) {
-    return nameOf(m, false, context);
+  public static Optional<String> getterName(IMethodGenerator<?, ?> m, IJavaBuilderContext context) {
+    return propertyNameOf(m, false, context);
   }
 
   /**
@@ -139,7 +140,7 @@ public class PropertyBean {
    *         an empty {@link Optional} is returned.
    */
   public static Optional<String> getterName(IMethod m) {
-    return nameOf(m, false);
+    return propertyNameOf(m, false);
   }
 
   protected static Optional<String> getterName(CharSequence methodName, int numParams, String returnType) {
@@ -179,8 +180,8 @@ public class PropertyBean {
    * @return An {@link Optional} containing the property name if the given {@link IMethodGenerator} is a valid setter.
    *         Otherwise an empty {@link Optional} is returned.
    */
-  public static Optional<String> setterName(IMethodGenerator<?, ?> m, IJavaEnvironment context) {
-    return nameOf(m, true, context);
+  public static Optional<String> setterName(IMethodGenerator<?, ?> m, IJavaBuilderContext context) {
+    return propertyNameOf(m, true, context);
   }
 
   /**
@@ -192,7 +193,7 @@ public class PropertyBean {
    *         an empty {@link Optional} is returned.
    */
   public static Optional<String> setterName(IMethod m) {
-    return nameOf(m, true);
+    return propertyNameOf(m, true);
   }
 
   protected static Optional<String> setterName(CharSequence methodName, int numParams, String returnType) {
@@ -211,33 +212,28 @@ public class PropertyBean {
     return Optional.of(matcher.group(2));
   }
 
-  protected static Optional<String> nameOf(IMethodGenerator<?, ?> m, boolean setter, IJavaEnvironment context) {
-    var returnType = m.returnType();
+  protected static Optional<String> propertyNameOf(IMethodGenerator<?, ?> m, boolean setter, IJavaBuilderContext context) {
+    var returnType = m.returnType(context);
     if (returnType.isEmpty()) {
-      return Optional.empty();
+      return Optional.empty(); // constructors
     }
     CharSequence methodName = m.elementName(context).orElseThrow(() -> newFail("Method name is missing."));
     //noinspection NumericCastThatLosesPrecision
     var numParams = (int) m.parameters().count();
-    var returnTypeRef = returnType.orElseThrow().apply(context);
-    if (returnTypeRef.isEmpty()) {
-      return Optional.empty();
-    }
     if (setter) {
-      return setterName(methodName, numParams, returnTypeRef.orElseThrow());
+      return setterName(methodName, numParams, returnType.orElseThrow());
     }
-    return getterName(methodName, numParams, returnTypeRef.orElseThrow());
+    return getterName(methodName, numParams, returnType.orElseThrow());
   }
 
-  protected static Optional<String> nameOf(IMethod m, boolean setter) {
+  protected static Optional<String> propertyNameOf(IMethod m, boolean setter) {
     var returnType = m.returnType();
     if (returnType.isEmpty()) {
       return Optional.empty();
     }
 
-    //noinspection NumericCastThatLosesPrecision
-    var numParams = (int) m.parameters().stream().count();
-    var returnDataType = m.requireReturnType().name();
+    var numParams = m.parameters().count();
+    var returnDataType = returnType.orElseThrow().name();
     if (setter) {
       return setterName(m.elementName(), numParams, returnDataType);
     }

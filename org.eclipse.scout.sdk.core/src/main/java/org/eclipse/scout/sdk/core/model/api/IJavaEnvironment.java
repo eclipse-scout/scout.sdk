@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.apidef.Api;
 import org.eclipse.scout.sdk.core.apidef.IApiProvider;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.model.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
@@ -64,14 +64,14 @@ public interface IJavaEnvironment {
    * For more details see {@link #findType(String)}.
    * 
    * @param fqn
-   *          The {@link IClassNameSupplier} of the type to find. Must not be {@code null}.
-   * @return An {@link Optional} holding the {@link IType} matching the given {@link IClassNameSupplier} or an empty
+   *          The {@link ITypeNameSupplier} of the type to find. Must not be {@code null}.
+   * @return An {@link Optional} holding the {@link IType} matching the given {@link ITypeNameSupplier} or an empty
    *         {@link Optional} if it could not be found.
    * @see #findType(String)
    * @see #requireType(String)
    * @see JavaTypes
    */
-  Optional<IType> findType(IClassNameSupplier fqn);
+  Optional<IType> findType(ITypeNameSupplier fqn);
 
   /**
    * Tries to find the {@link IType} with the name as returned by the given nameSupplier.<br>
@@ -84,13 +84,13 @@ public interface IJavaEnvironment {
    *          A {@link Function} to be called to obtain the type name to find.
    * @param <A>
    *          The API type that contains the class name
-   * @return An {@link Optional} holding the {@link IType} matching the given {@link IClassNameSupplier} or an empty
+   * @return An {@link Optional} holding the {@link IType} matching the given {@link ITypeNameSupplier} or an empty
    *         {@link Optional} if it could not be found.
    * @see #findType(String)
    * @see #requireType(String)
    * @see JavaTypes
    */
-  <A extends IApiSpecification> Optional<IType> findTypeFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> nameSupplier);
+  <A extends IApiSpecification> Optional<IType> findTypeFrom(Class<A> apiDefinition, Function<A, ITypeNameSupplier> nameSupplier);
 
   /**
    * Same as {@link #findType(String)} but throws an {@link IllegalArgumentException} if the type could not be found.
@@ -106,17 +106,17 @@ public interface IJavaEnvironment {
   IType requireType(String fqn);
 
   /**
-   * Same as {@link #findType(IClassNameSupplier)} but throws an {@link IllegalArgumentException} if the type could not
+   * Same as {@link #findType(ITypeNameSupplier)} but throws an {@link IllegalArgumentException} if the type could not
    * be found.
    * 
    * @param nameSupplier
-   *          The {@link IClassNameSupplier} of the type to find. Must not be {@code null}.
+   *          The {@link ITypeNameSupplier} of the type to find. Must not be {@code null}.
    * @return The {@link IType} for the specified fully qualified name. Never returns {@code null}.
    * @see #findType(String)
    * @see #requireType(String)
    * @see JavaTypes
    */
-  IType requireType(IClassNameSupplier nameSupplier);
+  IType requireType(ITypeNameSupplier nameSupplier);
 
   /**
    * Same as {@link #findTypeFrom(Class, Function)} but throws an {@link IllegalArgumentException} if the type could not
@@ -129,13 +129,13 @@ public interface IJavaEnvironment {
    *          A {@link Function} to be called to obtain the type name to find.
    * @param <A>
    *          The API type that contains the class name
-   * @return The {@link IType} for the {@link IClassNameSupplier} returned by the given nameSupplier. Never returns
+   * @return The {@link IType} for the {@link ITypeNameSupplier} returned by the given nameSupplier. Never returns
    *         {@code null}.
    * @see #findType(String)
    * @see #requireType(String)
    * @see JavaTypes
    */
-  <A extends IApiSpecification> IType requireTypeFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> nameSupplier);
+  <A extends IApiSpecification> IType requireTypeFrom(Class<A> apiDefinition, Function<A, ITypeNameSupplier> nameSupplier);
 
   /**
    * Checks if an {@link IType} with given fully qualified name exists on the classpath of this

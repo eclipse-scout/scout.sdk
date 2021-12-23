@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * <h3>{@link ExtendWithTestingEnvironment}</h3>
@@ -44,6 +45,7 @@ import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFacto
 @Documented
 @Retention(RUNTIME)
 @Target({TYPE, METHOD})
+@ExtendWith(TestingEnvironmentExtension.class)
 public @interface ExtendWithTestingEnvironment {
 
   /**

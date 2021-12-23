@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.testing;
 
+import org.eclipse.scout.sdk.core.builder.IBuilderContext;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
 import org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -33,27 +35,33 @@ public class TestingElementCommentGenerator implements IDefaultElementCommentGen
 
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createTypeComment(ITypeGenerator<?> target) {
-    return b -> b.appendJavaDocComment("Default Testing Comment for\nType " + target.elementName().orElse(""));
+    return b -> b.appendJavaDocComment("Default Testing Comment for\nType " + target.elementName(toJavaBuilderContext(b.context())).orElse(""));
   }
 
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createMethodComment(IMethodGenerator<?, ?> target) {
-    return b -> b.appendJavaDocComment("Default Testing Comment for\nMethod " + target.elementName().orElse(""));
+    return b -> b.appendJavaDocComment("Default Testing Comment for\nMethod " + target.elementName(toJavaBuilderContext(b.context())).orElse(""));
   }
 
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createGetterMethodComment(IMethodGenerator<?, ?> target) {
-    return b -> b.appendJavaDocComment("Default Testing Comment for\nGetter " + target.elementName().orElse(""));
+    return b -> b.appendJavaDocComment("Default Testing Comment for\nGetter " + target.elementName(toJavaBuilderContext(b.context())).orElse(""));
   }
 
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createSetterMethodComment(IMethodGenerator<?, ?> target) {
-    return b -> b.appendJavaDocComment("Default Testing Comment for\nSetter " + target.elementName().orElse(""));
+    return b -> b.appendJavaDocComment("Default Testing Comment for\nSetter " + target.elementName(toJavaBuilderContext(b.context())).orElse(""));
   }
 
   @Override
   public ISourceGenerator<ICommentBuilder<?>> createFieldComment(IFieldGenerator<?> target) {
-    return b -> b.appendJavaDocComment("Default Testing Comment for\nField " + target.elementName().orElse(""));
+    return b -> b.appendJavaDocComment("Default Testing Comment for\nField " + target.elementName(toJavaBuilderContext(b.context())).orElse(""));
   }
 
+  protected static IJavaBuilderContext toJavaBuilderContext(IBuilderContext context) {
+    if (context instanceof IJavaBuilderContext) {
+      return (IJavaBuilderContext) context;
+    }
+    return null;
+  }
 }

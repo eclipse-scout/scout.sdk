@@ -13,9 +13,9 @@ package org.eclipse.scout.sdk.core.s.apidef;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.MaxApiLevel;
-import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
+import org.eclipse.scout.sdk.core.s.generator.method.IScoutMethodGenerator;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -891,7 +891,7 @@ public interface Scout10Api extends IScoutApi {
     }
 
     @Override
-    public Stream<IMethodGenerator<?, ?>> getAdditionalDoNodeGetters(CharSequence name, CharSequence dataTypeRef, IType ownerType) {
+    public Stream<IScoutMethodGenerator<?, ?>> getAdditionalDoNodeGetters(CharSequence name, CharSequence dataTypeRef, IType ownerType) {
       return Stream.empty();
     }
   }
@@ -4477,6 +4477,44 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
+  IScoutAnnotationApi.TypeVersion TYPE_VERSION = new TypeVersion();
+
+  @Override
+  default IScoutAnnotationApi.TypeVersion TypeVersion() {
+    return TYPE_VERSION;
+  }
+
+  class TypeVersion implements IScoutAnnotationApi.TypeVersion {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.TypeVersion";
+    }
+
+    @Override
+    public String valueElementName() {
+      return "value";
+    }
+  }
+
+  IScoutAnnotationApi.TypeName TYPE_NAME = new TypeName();
+
+  @Override
+  default IScoutAnnotationApi.TypeName TypeName() {
+    return TYPE_NAME;
+  }
+
+  class TypeName implements IScoutAnnotationApi.TypeName {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.TypeName";
+    }
+
+    @Override
+    public String valueElementName() {
+      return "value";
+    }
+  }
+
   IScoutVariousApi.MessageBoxes MESSAGE_BOXES = new MessageBoxes();
 
   @Override
@@ -4499,6 +4537,30 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String showDeleteConfirmationMessageMethodName() {
       return "showDeleteConfirmationMessage";
+    }
+  }
+
+  IScoutInterfaceApi.DoEntity DO_ENTITY = new DoEntity();
+
+  @Override
+  default IScoutInterfaceApi.DoEntity DoEntity() {
+    return DO_ENTITY;
+  }
+
+  class DoEntity implements IScoutInterfaceApi.DoEntity {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.DoEntity";
+    }
+
+    @Override
+    public String doValueMethodName() {
+      return "doValue";
+    }
+
+    @Override
+    public String doListMethodName() {
+      return "doList";
     }
   }
 }

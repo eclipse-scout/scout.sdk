@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -48,13 +48,13 @@ public class TableFieldFormTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(4, tableFieldFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData'");
-    var getCompanyTable = assertMethodExist(tableFieldFormData, "getCompanyTable", new String[]{});
+    var getCompanyTable = assertMethodExist(tableFieldFormData, "getCompanyTable");
     assertMethodReturnType(getCompanyTable, "formdata.shared.services.process.TableFieldFormData$CompanyTable");
-    var getConcreteTable = assertMethodExist(tableFieldFormData, "getConcreteTable", new String[]{});
+    var getConcreteTable = assertMethodExist(tableFieldFormData, "getConcreteTable");
     assertMethodReturnType(getConcreteTable, "formdata.shared.services.process.TableFieldFormData$ConcreteTable");
-    var getPersonTable = assertMethodExist(tableFieldFormData, "getPersonTable", new String[]{});
+    var getPersonTable = assertMethodExist(tableFieldFormData, "getPersonTable");
     assertMethodReturnType(getPersonTable, "formdata.shared.services.process.TableFieldFormData$PersonTable");
-    var getTableFieldWithExternalTable = assertMethodExist(tableFieldFormData, "getTableFieldWithExternalTable", new String[]{});
+    var getTableFieldWithExternalTable = assertMethodExist(tableFieldFormData, "getTableFieldWithExternalTable");
     assertMethodReturnType(getTableFieldWithExternalTable, "formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable");
 
     assertEquals(4, tableFieldFormData.innerTypes().stream().count(), "inner types count of 'TableFieldFormData'");
@@ -70,19 +70,19 @@ public class TableFieldFormTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(7, companyTable.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable'");
-    var addRow = assertMethodExist(companyTable, "addRow", new String[]{});
+    var addRow = assertMethodExist(companyTable, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(companyTable, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(companyTable, "createRow", new String[]{});
+    var createRow = assertMethodExist(companyTable, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(companyTable, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(companyTable, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(companyTable, "getRows", new String[]{});
+    var getRows = assertMethodExist(companyTable, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(companyTable, "rowAt", new String[]{"int"});
@@ -118,19 +118,19 @@ public class TableFieldFormTest {
     assertFieldType(serialVersionUID3, "long");
 
     assertEquals(7, concreteTable.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable'");
-    var addRow2 = assertMethodExist(concreteTable, "addRow", new String[]{});
+    var addRow2 = assertMethodExist(concreteTable, "addRow");
     assertMethodReturnType(addRow2, "formdata.shared.services.process.TableFieldFormData$ConcreteTable$ConcreteTableRowData");
     assertAnnotation(addRow2, "java.lang.Override");
     var addRow3 = assertMethodExist(concreteTable, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow3, "formdata.shared.services.process.TableFieldFormData$ConcreteTable$ConcreteTableRowData");
     assertAnnotation(addRow3, "java.lang.Override");
-    var createRow1 = assertMethodExist(concreteTable, "createRow", new String[]{});
+    var createRow1 = assertMethodExist(concreteTable, "createRow");
     assertMethodReturnType(createRow1, "formdata.shared.services.process.TableFieldFormData$ConcreteTable$ConcreteTableRowData");
     assertAnnotation(createRow1, "java.lang.Override");
-    var getRowType1 = assertMethodExist(concreteTable, "getRowType", new String[]{});
+    var getRowType1 = assertMethodExist(concreteTable, "getRowType");
     assertMethodReturnType(getRowType1, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType1, "java.lang.Override");
-    var getRows1 = assertMethodExist(concreteTable, "getRows", new String[]{});
+    var getRows1 = assertMethodExist(concreteTable, "getRows");
     assertMethodReturnType(getRows1, "formdata.shared.services.process.TableFieldFormData$ConcreteTable$ConcreteTableRowData[]");
     assertAnnotation(getRows1, "java.lang.Override");
     var rowAt1 = assertMethodExist(concreteTable, "rowAt", new String[]{"int"});
@@ -164,11 +164,11 @@ public class TableFieldFormTest {
     assertFieldType(m_extKey, "java.lang.Integer");
 
     assertEquals(4, concreteTableRowData.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable$ConcreteTableRowData'");
-    var getName = assertMethodExist(concreteTableRowData, "getName", new String[]{});
+    var getName = assertMethodExist(concreteTableRowData, "getName");
     assertMethodReturnType(getName, "java.lang.String");
     var setName = assertMethodExist(concreteTableRowData, "setName", new String[]{"java.lang.String"});
     assertMethodReturnType(setName, "void");
-    var getExtKey = assertMethodExist(concreteTableRowData, "getExtKey", new String[]{});
+    var getExtKey = assertMethodExist(concreteTableRowData, "getExtKey");
     assertMethodReturnType(getExtKey, "java.lang.Integer");
     var setExtKey = assertMethodExist(concreteTableRowData, "setExtKey", new String[]{"java.lang.Integer"});
     assertMethodReturnType(setExtKey, "void");
@@ -186,19 +186,19 @@ public class TableFieldFormTest {
     assertFieldType(serialVersionUID5, "long");
 
     assertEquals(7, personTable.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$PersonTable'");
-    var addRow4 = assertMethodExist(personTable, "addRow", new String[]{});
+    var addRow4 = assertMethodExist(personTable, "addRow");
     assertMethodReturnType(addRow4, "formdata.shared.services.process.TableFieldFormData$PersonTable$PersonTableRowData");
     assertAnnotation(addRow4, "java.lang.Override");
     var addRow5 = assertMethodExist(personTable, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow5, "formdata.shared.services.process.TableFieldFormData$PersonTable$PersonTableRowData");
     assertAnnotation(addRow5, "java.lang.Override");
-    var createRow2 = assertMethodExist(personTable, "createRow", new String[]{});
+    var createRow2 = assertMethodExist(personTable, "createRow");
     assertMethodReturnType(createRow2, "formdata.shared.services.process.TableFieldFormData$PersonTable$PersonTableRowData");
     assertAnnotation(createRow2, "java.lang.Override");
-    var getRowType2 = assertMethodExist(personTable, "getRowType", new String[]{});
+    var getRowType2 = assertMethodExist(personTable, "getRowType");
     assertMethodReturnType(getRowType2, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType2, "java.lang.Override");
-    var getRows2 = assertMethodExist(personTable, "getRows", new String[]{});
+    var getRows2 = assertMethodExist(personTable, "getRows");
     assertMethodReturnType(getRows2, "formdata.shared.services.process.TableFieldFormData$PersonTable$PersonTableRowData[]");
     assertAnnotation(getRows2, "java.lang.Override");
     var rowAt2 = assertMethodExist(personTable, "rowAt", new String[]{"int"});
@@ -250,23 +250,23 @@ public class TableFieldFormTest {
     assertFieldType(m_custom, "java.util.Set<java.util.Map<java.lang.String,java.lang.Integer>>");
 
     assertEquals(10, personTableRowData.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$PersonTable$PersonTableRowData'");
-    var getPersonNr = assertMethodExist(personTableRowData, "getPersonNr", new String[]{});
+    var getPersonNr = assertMethodExist(personTableRowData, "getPersonNr");
     assertMethodReturnType(getPersonNr, "java.lang.Long");
     var setPersonNr = assertMethodExist(personTableRowData, "setPersonNr", new String[]{"java.lang.Long"});
     assertMethodReturnType(setPersonNr, "void");
-    var getName1 = assertMethodExist(personTableRowData, "getName", new String[]{});
+    var getName1 = assertMethodExist(personTableRowData, "getName");
     assertMethodReturnType(getName1, "java.lang.String");
     var setName1 = assertMethodExist(personTableRowData, "setName", new String[]{"java.lang.String"});
     assertMethodReturnType(setName1, "void");
-    var getAnObject = assertMethodExist(personTableRowData, "getAnObject", new String[]{});
+    var getAnObject = assertMethodExist(personTableRowData, "getAnObject");
     assertMethodReturnType(getAnObject, "java.lang.Object");
     var setAnObject = assertMethodExist(personTableRowData, "setAnObject", new String[]{"java.lang.Object"});
     assertMethodReturnType(setAnObject, "void");
-    var getSmartLong = assertMethodExist(personTableRowData, "getSmartLong", new String[]{});
+    var getSmartLong = assertMethodExist(personTableRowData, "getSmartLong");
     assertMethodReturnType(getSmartLong, "java.lang.Long");
     var setSmartLong = assertMethodExist(personTableRowData, "setSmartLong", new String[]{"java.lang.Long"});
     assertMethodReturnType(setSmartLong, "void");
-    var getCustom = assertMethodExist(personTableRowData, "getCustom", new String[]{});
+    var getCustom = assertMethodExist(personTableRowData, "getCustom");
     assertMethodReturnType(getCustom, "java.util.Set<java.util.Map<java.lang.String,java.lang.Integer>>");
     var setCustom = assertMethodExist(personTableRowData, "setCustom", new String[]{"java.util.Set<java.util.Map<java.lang.String,java.lang.Integer>>"});
     assertMethodReturnType(setCustom, "void");
@@ -284,19 +284,19 @@ public class TableFieldFormTest {
     assertFieldType(serialVersionUID7, "long");
 
     assertEquals(7, tableFieldWithExternalTable.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable'");
-    var addRow6 = assertMethodExist(tableFieldWithExternalTable, "addRow", new String[]{});
+    var addRow6 = assertMethodExist(tableFieldWithExternalTable, "addRow");
     assertMethodReturnType(addRow6, "formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable$TableFieldWithExternalTableRowData");
     assertAnnotation(addRow6, "java.lang.Override");
     var addRow7 = assertMethodExist(tableFieldWithExternalTable, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow7, "formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable$TableFieldWithExternalTableRowData");
     assertAnnotation(addRow7, "java.lang.Override");
-    var createRow3 = assertMethodExist(tableFieldWithExternalTable, "createRow", new String[]{});
+    var createRow3 = assertMethodExist(tableFieldWithExternalTable, "createRow");
     assertMethodReturnType(createRow3, "formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable$TableFieldWithExternalTableRowData");
     assertAnnotation(createRow3, "java.lang.Override");
-    var getRowType3 = assertMethodExist(tableFieldWithExternalTable, "getRowType", new String[]{});
+    var getRowType3 = assertMethodExist(tableFieldWithExternalTable, "getRowType");
     assertMethodReturnType(getRowType3, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType3, "java.lang.Override");
-    var getRows3 = assertMethodExist(tableFieldWithExternalTable, "getRows", new String[]{});
+    var getRows3 = assertMethodExist(tableFieldWithExternalTable, "getRows");
     assertMethodReturnType(getRows3, "formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable$TableFieldWithExternalTableRowData[]");
     assertAnnotation(getRows3, "java.lang.Override");
     var rowAt3 = assertMethodExist(tableFieldWithExternalTable, "rowAt", new String[]{"int"});
@@ -336,15 +336,15 @@ public class TableFieldFormTest {
     assertFieldType(m_bb, "java.lang.String");
 
     assertEquals(6, tableFieldWithExternalTableRowData.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable$TableFieldWithExternalTableRowData'");
-    var getAa = assertMethodExist(tableFieldWithExternalTableRowData, "getAa", new String[]{});
+    var getAa = assertMethodExist(tableFieldWithExternalTableRowData, "getAa");
     assertMethodReturnType(getAa, "java.lang.String");
     var setAa = assertMethodExist(tableFieldWithExternalTableRowData, "setAa", new String[]{"java.lang.String"});
     assertMethodReturnType(setAa, "void");
-    var getXx = assertMethodExist(tableFieldWithExternalTableRowData, "getXx", new String[]{});
+    var getXx = assertMethodExist(tableFieldWithExternalTableRowData, "getXx");
     assertMethodReturnType(getXx, "java.lang.String");
     var setXx = assertMethodExist(tableFieldWithExternalTableRowData, "setXx", new String[]{"java.lang.String"});
     assertMethodReturnType(setXx, "void");
-    var getBb = assertMethodExist(tableFieldWithExternalTableRowData, "getBb", new String[]{});
+    var getBb = assertMethodExist(tableFieldWithExternalTableRowData, "getBb");
     assertMethodReturnType(getBb, "java.lang.String");
     var setBb = assertMethodExist(tableFieldWithExternalTableRowData, "setBb", new String[]{"java.lang.String"});
     assertMethodReturnType(setBb, "void");

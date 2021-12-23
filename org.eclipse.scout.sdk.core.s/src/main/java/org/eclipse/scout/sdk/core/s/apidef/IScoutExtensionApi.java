@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,163 +10,163 @@
  */
 package org.eclipse.scout.sdk.core.s.apidef;
 
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 
 @SuppressWarnings({"squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // method naming conventions
 public interface IScoutExtensionApi {
   AbstractAccordionFieldExtension AbstractAccordionFieldExtension();
 
-  interface AbstractAccordionFieldExtension extends IClassNameSupplier {
+  interface AbstractAccordionFieldExtension extends ITypeNameSupplier {
   }
 
   AbstractActionExtension AbstractActionExtension();
 
-  interface AbstractActionExtension extends IClassNameSupplier {
+  interface AbstractActionExtension extends ITypeNameSupplier {
   }
 
   AbstractActionNodeExtension AbstractActionNodeExtension();
 
-  interface AbstractActionNodeExtension extends IClassNameSupplier {
+  interface AbstractActionNodeExtension extends ITypeNameSupplier {
   }
 
   AbstractButtonExtension AbstractButtonExtension();
 
-  interface AbstractButtonExtension extends IClassNameSupplier {
+  interface AbstractButtonExtension extends ITypeNameSupplier {
   }
 
   AbstractCalendarExtension AbstractCalendarExtension();
 
-  interface AbstractCalendarExtension extends IClassNameSupplier {
+  interface AbstractCalendarExtension extends ITypeNameSupplier {
   }
 
   AbstractCalendarFieldExtension AbstractCalendarFieldExtension();
 
-  interface AbstractCalendarFieldExtension extends IClassNameSupplier {
+  interface AbstractCalendarFieldExtension extends ITypeNameSupplier {
   }
 
   AbstractCalendarItemProviderExtension AbstractCalendarItemProviderExtension();
 
-  interface AbstractCalendarItemProviderExtension extends IClassNameSupplier {
+  interface AbstractCalendarItemProviderExtension extends ITypeNameSupplier {
   }
 
   AbstractCodeExtension AbstractCodeExtension();
 
-  interface AbstractCodeExtension extends IClassNameSupplier {
+  interface AbstractCodeExtension extends ITypeNameSupplier {
   }
 
   AbstractCodeTypeWithGenericExtension AbstractCodeTypeWithGenericExtension();
 
-  interface AbstractCodeTypeWithGenericExtension extends IClassNameSupplier {
+  interface AbstractCodeTypeWithGenericExtension extends ITypeNameSupplier {
   }
 
   AbstractComposerFieldExtension AbstractComposerFieldExtension();
 
-  interface AbstractComposerFieldExtension extends IClassNameSupplier {
+  interface AbstractComposerFieldExtension extends ITypeNameSupplier {
   }
 
   AbstractCompositeFieldExtension AbstractCompositeFieldExtension();
 
-  interface AbstractCompositeFieldExtension extends IClassNameSupplier {
+  interface AbstractCompositeFieldExtension extends ITypeNameSupplier {
   }
 
   AbstractDataModelEntityExtension AbstractDataModelEntityExtension();
 
-  interface AbstractDataModelEntityExtension extends IClassNameSupplier {
+  interface AbstractDataModelEntityExtension extends ITypeNameSupplier {
   }
 
   AbstractFormExtension AbstractFormExtension();
 
-  interface AbstractFormExtension extends IClassNameSupplier {
+  interface AbstractFormExtension extends ITypeNameSupplier {
   }
 
   AbstractFormFieldExtension AbstractFormFieldExtension();
 
-  interface AbstractFormFieldExtension extends IClassNameSupplier {
+  interface AbstractFormFieldExtension extends ITypeNameSupplier {
   }
 
   AbstractGroupBoxExtension AbstractGroupBoxExtension();
 
-  interface AbstractGroupBoxExtension extends IClassNameSupplier {
+  interface AbstractGroupBoxExtension extends ITypeNameSupplier {
   }
 
   AbstractGroupExtension AbstractGroupExtension();
 
-  interface AbstractGroupExtension extends IClassNameSupplier {
+  interface AbstractGroupExtension extends ITypeNameSupplier {
   }
 
   AbstractImageFieldExtension AbstractImageFieldExtension();
 
-  interface AbstractImageFieldExtension extends IClassNameSupplier {
+  interface AbstractImageFieldExtension extends ITypeNameSupplier {
   }
 
   AbstractListBoxExtension AbstractListBoxExtension();
 
-  interface AbstractListBoxExtension extends IClassNameSupplier {
+  interface AbstractListBoxExtension extends ITypeNameSupplier {
   }
 
   AbstractPageWithTableExtension AbstractPageWithTableExtension();
 
-  interface AbstractPageWithTableExtension extends IClassNameSupplier {
+  interface AbstractPageWithTableExtension extends ITypeNameSupplier {
   }
 
   AbstractRadioButtonGroupExtension AbstractRadioButtonGroupExtension();
 
-  interface AbstractRadioButtonGroupExtension extends IClassNameSupplier {
+  interface AbstractRadioButtonGroupExtension extends ITypeNameSupplier {
   }
 
   AbstractTabBoxExtension AbstractTabBoxExtension();
 
-  interface AbstractTabBoxExtension extends IClassNameSupplier {
+  interface AbstractTabBoxExtension extends ITypeNameSupplier {
   }
 
   AbstractTableExtension AbstractTableExtension();
 
-  interface AbstractTableExtension extends IClassNameSupplier {
+  interface AbstractTableExtension extends ITypeNameSupplier {
   }
 
   AbstractTableFieldExtension AbstractTableFieldExtension();
 
-  interface AbstractTableFieldExtension extends IClassNameSupplier {
+  interface AbstractTableFieldExtension extends ITypeNameSupplier {
   }
 
   AbstractTileFieldExtension AbstractTileFieldExtension();
 
-  interface AbstractTileFieldExtension extends IClassNameSupplier {
+  interface AbstractTileFieldExtension extends ITypeNameSupplier {
   }
 
   AbstractTileGridExtension AbstractTileGridExtension();
 
-  interface AbstractTileGridExtension extends IClassNameSupplier {
+  interface AbstractTileGridExtension extends ITypeNameSupplier {
   }
 
   AbstractTreeBoxExtension AbstractTreeBoxExtension();
 
-  interface AbstractTreeBoxExtension extends IClassNameSupplier {
+  interface AbstractTreeBoxExtension extends ITypeNameSupplier {
   }
 
   AbstractTreeExtension AbstractTreeExtension();
 
-  interface AbstractTreeExtension extends IClassNameSupplier {
+  interface AbstractTreeExtension extends ITypeNameSupplier {
   }
 
   AbstractTreeFieldExtension AbstractTreeFieldExtension();
 
-  interface AbstractTreeFieldExtension extends IClassNameSupplier {
+  interface AbstractTreeFieldExtension extends ITypeNameSupplier {
   }
 
   AbstractTreeNodeExtension AbstractTreeNodeExtension();
 
-  interface AbstractTreeNodeExtension extends IClassNameSupplier {
+  interface AbstractTreeNodeExtension extends ITypeNameSupplier {
   }
 
   AbstractValueFieldExtension AbstractValueFieldExtension();
 
-  interface AbstractValueFieldExtension extends IClassNameSupplier {
+  interface AbstractValueFieldExtension extends ITypeNameSupplier {
   }
 
   AbstractWizardExtension AbstractWizardExtension();
 
-  interface AbstractWizardExtension extends IClassNameSupplier {
+  interface AbstractWizardExtension extends ITypeNameSupplier {
   }
 
 }

@@ -21,11 +21,11 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.spliterator.HierarchicalStreamBuilder;
@@ -47,7 +47,7 @@ public class MethodQuery extends AbstractQuery<IMethod> implements Predicate<IMe
 
   // used in this predicate
   private String m_name;
-  private ApiFunction<?, IClassNameSupplier> m_annotation;
+  private ApiFunction<?, ITypeNameSupplier> m_annotation;
   private int m_flags = -1;
   private Pattern m_methodNamePattern;
 
@@ -94,12 +94,12 @@ public class MethodQuery extends AbstractQuery<IMethod> implements Predicate<IMe
    * @return this
    */
   public MethodQuery withAnnotation(CharSequence fqn) {
-    return withAnnotationFrom(null, api -> IClassNameSupplier.raw(fqn));
+    return withAnnotationFrom(null, api -> ITypeNameSupplier.of(fqn));
   }
 
   /**
    * Limit the {@link IMethod}s to the ones having an {@link IAnnotation} with the fully qualified name as specified by
-   * the {@link IClassNameSupplier} returned by the given nameFunction.<br>
+   * the {@link ITypeNameSupplier} returned by the given nameFunction.<br>
    * <b>Example:</b> {@code type.methods().withAnnotationFrom(IJavaApi.class, IJavaApi::Deprecated)}.
    *
    * @param api
@@ -111,7 +111,7 @@ public class MethodQuery extends AbstractQuery<IMethod> implements Predicate<IMe
    *          The API type that contains the class name
    * @return this
    */
-  public <API extends IApiSpecification> MethodQuery withAnnotationFrom(Class<API> api, Function<API, IClassNameSupplier> nameFunction) {
+  public <API extends IApiSpecification> MethodQuery withAnnotationFrom(Class<API> api, Function<API, ITypeNameSupplier> nameFunction) {
     if (nameFunction == null) {
       m_annotation = null;
     }
@@ -121,7 +121,7 @@ public class MethodQuery extends AbstractQuery<IMethod> implements Predicate<IMe
     return this;
   }
 
-  protected ApiFunction<?, IClassNameSupplier> getAnnotation() {
+  protected ApiFunction<?, ITypeNameSupplier> getAnnotation() {
     return m_annotation;
   }
 
@@ -195,7 +195,7 @@ public class MethodQuery extends AbstractQuery<IMethod> implements Predicate<IMe
    *
    * @param id
    *          The id (with type erasure only) of the {@link IMethod}. <br>
-   *          Use {@link IMethod#identifier()}, {@link IMethodGenerator#identifier(IJavaEnvironment)} or
+   *          Use {@link IMethod#identifier()}, {@link IMethodGenerator#identifier(IJavaBuilderContext)} or
    *          {@link JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)} to create a method
    *          identifier.
    * @return this
@@ -249,7 +249,7 @@ public class MethodQuery extends AbstractQuery<IMethod> implements Predicate<IMe
 
     var annotation = getAnnotation();
     return annotation == null || annotation.apply(candidate.javaEnvironment())
-        .map(IClassNameSupplier::fqn)
+        .map(ITypeNameSupplier::fqn)
         .map(annotationFqn -> candidate.annotations().withName(annotationFqn).existsAny())
         .orElse(false);
   }

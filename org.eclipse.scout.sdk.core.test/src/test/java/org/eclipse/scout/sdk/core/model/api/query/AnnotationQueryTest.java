@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.scout.sdk.core.apidef.Api;
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.fixture.AnnotationQueryTestFixture;
 import org.eclipse.scout.sdk.core.fixture.AnnotationQueryTestFixture.TestChildClass;
 import org.eclipse.scout.sdk.core.fixture.apidef.AlwaysMissingApiProvider;
@@ -25,17 +25,14 @@ import org.eclipse.scout.sdk.core.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * <h3>{@link AnnotationQueryTest}</h3>
  *
  * @since 5.2.0
  */
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class AnnotationQueryTest {
 
@@ -89,6 +86,6 @@ public class AnnotationQueryTest {
   }
 
   private static final class AlwaysMissingAnnotation extends AbstractManagedAnnotation {
-    public static final ApiFunction<?, IClassNameSupplier> TYPE_NAME = new ApiFunction<>(IAlwaysMissingApi.class, IAlwaysMissingApi::alwaysMissing);
+    public static final ApiFunction<?, ITypeNameSupplier> TYPE_NAME = new ApiFunction<>(IAlwaysMissingApi.class, IAlwaysMissingApi::alwaysMissing);
   }
 }

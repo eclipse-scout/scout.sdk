@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
-import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentExtension;
 import org.eclipse.scout.sdk.core.s.testing.context.UniqueIdExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
@@ -38,7 +37,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * @since 5.2.0
  */
 @ExtendWith(UniqueIdExtension.class)
-@ExtendWith(TestingEnvironmentExtension.class)
 @ExtendWithTestingEnvironment(primary = @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class))
 public class CodeTypeNewOperationTest {
 

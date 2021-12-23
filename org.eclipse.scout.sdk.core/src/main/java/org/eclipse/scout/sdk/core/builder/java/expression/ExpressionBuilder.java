@@ -15,7 +15,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaSourceBuilderWrapper;
@@ -57,8 +57,13 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
   }
 
   @Override
-  public <T extends IApiSpecification> TYPE classLiteralFrom(Class<T> apiClass, Function<T, IClassNameSupplier> nameSupplier) {
+  public <T extends IApiSpecification> TYPE classLiteralFrom(Class<T> apiClass, Function<T, ITypeNameSupplier> nameSupplier) {
     return refClassFrom(apiClass, nameSupplier).append(JavaTypes.CLASS_FILE_SUFFIX);
+  }
+
+  @Override
+  public TYPE classLiteralFunc(Function<IJavaBuilderContext, ITypeNameSupplier> func) {
+    return refClassFunc(func).append(JavaTypes.CLASS_FILE_SUFFIX);
   }
 
   @Override
@@ -67,7 +72,7 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
   }
 
   @Override
-  public <API extends IApiSpecification> TYPE appendNewFrom(Class<API> apiClass, Function<API, IClassNameSupplier> sourceProvider) {
+  public <API extends IApiSpecification> TYPE appendNewFrom(Class<API> apiClass, Function<API, ITypeNameSupplier> sourceProvider) {
     return appendNew().refClassFrom(apiClass, sourceProvider).parenthesisOpen();
   }
 
@@ -88,7 +93,7 @@ public class ExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> extends Ja
 
   @Override
   public TYPE appendIf() {
-    return append("if ");
+    return append("if").space().parenthesisOpen();
   }
 
   @Override

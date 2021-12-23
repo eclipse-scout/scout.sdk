@@ -580,6 +580,7 @@ By default, a random UUID provider is registered but others may be added.
 * `TranslationStoreSupplier`: A registry of `ITranslationStoreSupplier` implementations.
 Such classes can discover and load Scout text provider services in a given scope.
 Use `TranslationStores#registerStoreSupplier` to add a supplier.
+* DoContextResolver: Data object context resolvers may be contributed by implementing `IDoContextResolver` and activating using `DoContextResolvers#set`.
 
 ==== Translations API
 
@@ -628,12 +629,14 @@ The `EditableTranslationFile` represents a `.properties` file on the local file 
 Tests are written using https://junit.org/junit5/[JUnit 5].
 Various https://junit.org/junit5/docs/current/user-guide/#extensions[Extensions] are provided:
 
-* `JavaEnvironmentExtension`
-* `DefaultCommentGeneratorExtension`
-* `UsernameExtension`
-* `ClassIdAutoCreationExtension`
-* `TestingEnvironmentExtension`
-* `UniqueIdExtension`
+* `JavaEnvironmentExtension`: To specify `IJavaEnvironment` arguments in tests.
+* `DefaultCommentGeneratorExtension`: To activate a default comment generator for Java elements.
+* `UsernameExtension`: To set the context username to a fixed value (make output of user dependent code predictable).
+* `ClassIdAutoCreationExtension`: If specified, enables automatic `@ClassId` creation.
+* `TestingEnvironmentExtension`: To specify `TestingEnvironment` arguments in tests.
+* `UniqueIdExtension`: To specify a fixed unique id value (make output of id dependent code predictable).
+* `EnabledFor`: To only execute tests if a certain API is available (see <<API Definition>>).
+* `ExtendWithDoContext`: To specify a data object context (namespace, type-version).
 
 Furthermore, have a look at the following useful helper classes:
 
@@ -650,7 +653,8 @@ Furthermore, have a look at the following useful helper classes:
 ----
 include::{codedir}/ExampleTest.java[tags=exampleTest]
 ----
-<1> Executes the given generator, registers the created source in the `IJavaEnvironment` (see <<From Generator to Model>>) and checks the generated source for compile errors.
+<1> Only exexutes the test if min the `IJavaApi` version 11 can be found in the `IJavaEnvironment` created by the `RunningJavaEnvironmentFactory`.
+<2> Executes the given generator, registers the created source in the `IJavaEnvironment` (see <<From Generator to Model>>) and checks the generated source for compile errors.
 
 === S2i
 

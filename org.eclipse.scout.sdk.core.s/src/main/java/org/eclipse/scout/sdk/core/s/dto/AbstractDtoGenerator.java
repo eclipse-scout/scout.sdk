@@ -59,7 +59,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
   private final IType m_modelType;
   private final IJavaEnvironment m_targetEnvironment;
   private final IScoutApi m_scoutApi;
-  private boolean m_setupExecuted;
+  private IJavaSourceBuilder<?> m_currentBuilder; // only set during build
 
   protected AbstractDtoGenerator(IType modelType, IJavaEnvironment targetEnvironment) {
     m_modelType = Ensure.notNull(modelType);
@@ -69,15 +69,22 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
 
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
-    if (!m_setupExecuted) {
+    m_currentBuilder = builder;
+    try {
       setupBuilder();
-      m_setupExecuted = true;
+      super.build(builder);
     }
-    super.build(builder);
+    finally {
+      m_currentBuilder = null;
+    }
   }
 
   public IScoutApi scoutApi() {
     return m_scoutApi;
+  }
+
+  protected IJavaSourceBuilder<?> currentBuilder() {
+    return m_currentBuilder;
   }
 
   protected void copyAnnotations() {
@@ -142,7 +149,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
         .collect(toSet());
 
     methods()
-        .filter(msb -> allSuperInterfaceMethods.contains(msb.identifier(javaEnvironment)))
+        .filter(msb -> allSuperInterfaceMethods.contains(msb.identifier(currentBuilder().context())))
         .forEach(msb -> msb.withAnnotation(AnnotationGenerator.createOverride()));
     return thisInstance();
   }

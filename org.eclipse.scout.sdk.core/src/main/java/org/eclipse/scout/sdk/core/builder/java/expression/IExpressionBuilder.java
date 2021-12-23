@@ -14,7 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
@@ -68,7 +68,7 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
 
   /**
    * Appends a class literal obtained from an {@link IApiSpecification}. The fully qualified name to use is obtained by
-   * using the {@link IClassNameSupplier} returned by invoking the given nameSupplier.
+   * using the {@link ITypeNameSupplier} returned by invoking the given nameSupplier.
    * <p>
    * This method may be handy if the name of a class changes between different versions of an API. The builder then
    * decides which API to use based on the version found in the {@link IJavaEnvironment} of the
@@ -81,13 +81,27 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    *          The api type that contains the class name. An instance of this type is passed to the nameSupplier. May be
    *          {@code null} in case the given nameSupplier can handle a {@code null} input.
    * @param nameSupplier
-   *          A {@link Function} to be called to obtain the {@link IClassNameSupplier} whose fully qualified name should
+   *          A {@link Function} to be called to obtain the {@link ITypeNameSupplier} whose fully qualified name should
    *          be added as class literal.
    * @param <T>
    *          The API type that contains the class name
-   * @return
+   * @return This builder
    */
-  <T extends IApiSpecification> TYPE classLiteralFrom(Class<T> apiClass, Function<T, IClassNameSupplier> nameSupplier);
+  <T extends IApiSpecification> TYPE classLiteralFrom(Class<T> apiClass, Function<T, ITypeNameSupplier> nameSupplier);
+
+  /**
+   * Appends a class literal obtained from a {@link Function}. The fully qualified name to use is obtained by using the
+   * {@link ITypeNameSupplier} returned by invoking the given function.
+   * <p>
+   * This method may be handy in case the class literal is dependent of the {@link #context()} of this builder.
+   * </p>
+   *
+   * @param func
+   *          A {@link Function} to be called to obtain the {@link ITypeNameSupplier} whose fully qualified name should
+   *          be added as class literal. Must not be {@code null}.
+   * @return This builder
+   */
+  TYPE classLiteralFunc(Function<IJavaBuilderContext, ITypeNameSupplier> func);
 
   /**
    * Appends a string literal with given value. The value is automatically escaped as necessary and surrounded with
@@ -195,7 +209,7 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
 
   /**
    * Appends a {@code new} clause for the class obtained from an {@link IApiSpecification} including a trailing opening
-   * parenthesis. The fully qualified name to use is obtained by using the {@link IClassNameSupplier} returned by
+   * parenthesis. The fully qualified name to use is obtained by using the {@link ITypeNameSupplier} returned by
    * invoking the given nameSupplier.
    * <p>
    * <b>Example:</b><br>
@@ -205,13 +219,13 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
    *          The api type that contains the class name. An instance of this type is passed to the nameSupplier. May be
    *          {@code null} in case the given nameSupplier can handle a {@code null} input.
    * @param sourceProvider
-   *          A {@link Function} to be called to obtain the {@link IClassNameSupplier} whose fully qualified name should
+   *          A {@link Function} to be called to obtain the {@link ITypeNameSupplier} whose fully qualified name should
    *          be used after the {@code new} call.
    * @param <API>
    *          The API type that contains the class name
    * @return This builder
    */
-  <API extends IApiSpecification> TYPE appendNewFrom(Class<API> apiClass, Function<API, IClassNameSupplier> sourceProvider);
+  <API extends IApiSpecification> TYPE appendNewFrom(Class<API> apiClass, Function<API, ITypeNameSupplier> sourceProvider);
 
   /**
    * Appends a {@code new} clause for the class reference given including a trailing opening parenthesis.
@@ -233,7 +247,7 @@ public interface IExpressionBuilder<TYPE extends IExpressionBuilder<TYPE>> exten
   TYPE appendThrow();
 
   /**
-   * Appends an {@code if} expression with a trailing space.
+   * Appends an "{@code if (}" expression including trailing space and opening parenthesis.
    *
    * @return This builder
    */

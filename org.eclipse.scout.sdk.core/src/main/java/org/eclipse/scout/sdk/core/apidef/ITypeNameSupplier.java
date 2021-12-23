@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,28 +16,28 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  * Represents an object having a fully qualified class name.
  */
 @FunctionalInterface
-public interface IClassNameSupplier {
+public interface ITypeNameSupplier {
 
   /**
-   * @return The fully qualified name of this class.
+   * @return The fully qualified name of this type.
    */
   String fqn();
 
   /**
-   * @return The simple name of this class.
+   * @return The simple name of this type.
    */
   default String simpleName() {
     return JavaTypes.simpleName(fqn());
   }
 
   /**
-   * Creates a {@link IClassNameSupplier} from a fully qualified {@link CharSequence}.
+   * Creates a {@link ITypeNameSupplier} from a fully qualified {@link CharSequence}.
    * 
    * @param fqn
-   *          The fully qualified class name. May be {@code null}.
-   * @return A {@link IClassNameSupplier} using the fqn provided as fully qualified class name.
+   *          The fully qualified type name. May be {@code null}.
+   * @return A {@link ITypeNameSupplier} using the fqn provided as fully qualified class name.
    */
-  static IClassNameSupplier raw(CharSequence fqn) {
+  static ITypeNameSupplier of(CharSequence fqn) {
     var name = fqn == null ? null : fqn.toString();
     return () -> name;
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -81,6 +81,13 @@ public final class CompositeObject implements Comparable<CompositeObject> {
       return ((Comparable<Object>) a).compareTo(b);
     }
     return a.toString().compareTo(b.toString());
+  }
+
+  /**
+   * @return A shallow copy of the array this {@link CompositeObject} was created with.
+   */
+  public Object[] array() {
+    return Arrays.copyOf(m_value, m_value.length);
   }
 
   @Override

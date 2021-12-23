@@ -1714,4 +1714,37 @@ public final class Strings {
 
     return col0[l1];
   }
+
+  /**
+   * Removes the given suffix from the given string. If the given string does not end with given suffix (case
+   * sensitive), the string is returned unchanged.
+   *
+   * @param string
+   *          The string in which the suffix should be removed. May be {@code null}, then {@code null} is returned.
+   * @param suffix
+   *          The suffix to remove (case sensitive) or {@code null} if nothing should be removed.
+   * @return The string with the suffix removed.
+   */
+  public static String removeSuffix(String string, CharSequence suffix) {
+    return removeSuffix(string, suffix, true);
+  }
+
+  /**
+   * Removes the given suffix from the given string. If the given string does not end with given suffix, the string is
+   * returned unchanged.
+   * 
+   * @param string
+   *          The string in which the suffix should be removed. May be {@code null}, then {@code null} is returned.
+   * @param suffix
+   *          The suffix to remove or {@code null} if nothing should be removed.
+   * @param isCaseSensitive
+   *          Specifies if the suffix should match case sensitive or not.
+   * @return The string with the suffix removed.
+   */
+  public static String removeSuffix(String string, CharSequence suffix, boolean isCaseSensitive) {
+    if (endsWith(string, suffix, isCaseSensitive) && suffix.length() > 0) {
+      return string.substring(0, string.length() - suffix.length());
+    }
+    return string;
+  }
 }

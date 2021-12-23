@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.sdk.core.s;
 
+import java.util.regex.Pattern;
+
 /**
  * Defaults used for scout objects
  */
@@ -46,8 +48,13 @@ public interface ISdkConstants {
   String SUFFIX_PERMISSION_TEXT_PROVIDER_SERVICE = "PermissionDescriptionTextProviderService";
   String SUFFIX_ROW_DATA = "RowData";
   String SUFFIX_TABLE_ROW_DATA = "Table" + SUFFIX_ROW_DATA;
+  String SUFFIX_DO = "Do";
 
   String PREFIX_ABSTRACT = "Abstract";
+  String PREFIX_CREATE_PERMISSION = "Create";
+  String PREFIX_READ_PERMISSION = "Read";
+  String PREFIX_UPDATE_PERMISSION = "Update";
+  String PREFIX_DELETE_PERMISSION = "Delete";
 
   String INNER_TABLE_TYPE_NAME = "Table";
   String INNER_TREE_TYPE_NAME = "Tree";
@@ -71,4 +78,8 @@ public interface ISdkConstants {
    */
   int VIEW_ORDER_ANNOTATION_VALUE_STEP = 1000;
 
+  /**
+   * A regular expression matching a single dot.
+   */
+  Pattern REGEX_DOT = Pattern.compile("\\.");
 }
