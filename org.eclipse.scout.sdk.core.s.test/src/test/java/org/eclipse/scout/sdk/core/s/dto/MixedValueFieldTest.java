@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,7 +55,7 @@ public class MixedValueFieldTest {
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(1, mixedValueFieldFormData.methods().stream().count(), "method count of 'formdata.shared.mixed.MixedValueFieldFormData'");
-    var getFirst = assertMethodExist(mixedValueFieldFormData, "getFirst", new String[]{});
+    var getFirst = assertMethodExist(mixedValueFieldFormData, "getFirst");
     assertMethodReturnType(getFirst, "formdata.shared.mixed.MixedValueFieldFormData$First");
     assertEquals(0, getFirst.annotations().stream().count(), "annotation count");
 
@@ -74,7 +74,7 @@ public class MixedValueFieldTest {
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
 
     assertEquals(1, first.methods().stream().count(), "method count of 'formdata.shared.mixed.MixedValueFieldFormData$First'");
-    var getChangedAttributeNameFieldEx = assertMethodExist(first, "getChangedAttributeNameFieldEx", new String[]{});
+    var getChangedAttributeNameFieldEx = assertMethodExist(first, "getChangedAttributeNameFieldEx");
     assertMethodReturnType(getChangedAttributeNameFieldEx, "formdata.shared.mixed.MixedValueFieldFormData$First$ChangedAttributeNameFieldEx");
     assertEquals(0, getChangedAttributeNameFieldEx.annotations().stream().count(), "annotation count");
 

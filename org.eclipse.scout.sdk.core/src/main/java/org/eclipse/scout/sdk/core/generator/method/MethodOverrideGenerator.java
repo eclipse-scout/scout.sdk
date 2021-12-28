@@ -19,8 +19,6 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
@@ -52,7 +50,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
 
   /**
    * Creates a new {@link IMethodGenerator} that will override the method (having the same
-   * {@link #identifier(IJavaEnvironment)}) in the super hierarchy of the owning {@link ITypeGenerator}. If there is
+   * {@link #identifier(IJavaBuilderContext)}) in the super hierarchy of the owning {@link ITypeGenerator}. If there is
    * only one overload for a method it is sufficient to provide the method name.
    * <p>
    * The generated method uses the signature, return type and exceptions from the overridden method. An {@link Override}
@@ -91,7 +89,7 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
 
   /**
    * Creates a new {@link IMethodGenerator} that will override the method (having the same
-   * {@link #identifier(IJavaEnvironment)}) in the super hierarchy of the owning {@link ITypeGenerator}. If there is
+   * {@link #identifier(IJavaBuilderContext)}) in the super hierarchy of the owning {@link ITypeGenerator}. If there is
    * only one overload for a method it is sufficient to provide the method name.
    * <p>
    * By default the generated method uses the signature, return type and exceptions from the overridden method. An
@@ -130,14 +128,13 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
     m_transformer = transformer;
   }
 
-  @SuppressWarnings("unchecked")
   protected IMethodGenerator<?, ?> createDefaultOverrideGenerator(IMethod template) {
     var isFromInterface = isInterface(template.requireDeclaringType().flags());
     var needsImplementation = isFromInterface || isAbstract(template.flags());
 
     var innerGenerator =
         template.toWorkingCopy(m_transformer)
-            .clearAnnotations() // clear annotations from method
+            .withoutAllAnnotations() // clear annotations from method
             .withComment(null)
             .withAnnotation(AnnotationGenerator.createOverride())
             .withoutFlags(Flags.AccAbstract | Flags.AccInterface | Flags.AccDefaultMethod);
@@ -148,12 +145,10 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
         .generalize(inner -> createMethodBodyBuilder(inner, innerGenerator))));
 
     // clear annotations of parameters
-    innerGenerator.parameters().forEach(IAnnotatableGenerator::clearAnnotations);
+    innerGenerator.parameters().forEach(IAnnotatableGenerator::withoutAllAnnotations);
 
     // apply return type (may be narrowed)
-    returnType()
-        .map(api -> (ApiFunction<IApiSpecification, String>) api)
-        .ifPresent(ret -> innerGenerator.withReturnTypeFrom(ret.apiClass().orElse(null), ret.apiFunction()));
+    returnTypeFunc().ifPresent(innerGenerator::withReturnTypeFunc);
 
     if (isFromInterface) {
       innerGenerator.asPublic();
@@ -176,11 +171,10 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
     return transform(m_transformer, template, () -> createDefaultOverrideGenerator(template), (t, i) -> t.transformMethod(i));
   }
 
-  protected Optional<IMethod> findMethodToOverride(IType container) {
-    var javaEnvironment = container.javaEnvironment();
+  protected Optional<IMethod> findMethodToOverride(IType container, IJavaBuilderContext context) {
     var templateCandidates = container.methods()
         .withSuperTypes(true).stream()
-        .filter(m -> m.elementName().equals(elementName(javaEnvironment).orElseThrow(() -> newFail("To override a method at least the method name must be specified."))))
+        .filter(m -> m.elementName().equals(elementName(context).orElseThrow(() -> newFail("To override a method at least the method name must be specified."))))
         .collect(toMap(IMethod::identifier, identity(), (a, b) -> a));
 
     if (templateCandidates.isEmpty()) {
@@ -190,18 +184,18 @@ public class MethodOverrideGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, 
       return Optional.of(templateCandidates.values().iterator().next());
     }
 
-    return Optional.ofNullable(templateCandidates.get(identifier(javaEnvironment)));
+    return Optional.ofNullable(templateCandidates.get(identifier(context)));
   }
 
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
     var declaring = Ensure.instanceOf(declaringGenerator().orElse(null), ITypeGenerator.class, "Method can only be overridden if existing in a type.");
-    createOverrideGenerator(declaring.getHierarchyType(builder.context())).ifPresent(overrideGenerator -> overrideGenerator.generate(builder));
+    createOverrideGenerator(declaring.getHierarchyType(builder.context()), builder.context()).ifPresent(overrideGenerator -> overrideGenerator.generate(builder));
   }
 
-  protected Optional<IMethodGenerator<?, ?>> createOverrideGenerator(IType tmpType) {
-    var template = findMethodToOverride(tmpType)
-        .orElseThrow(() -> newFail("Method '{}' cannot be found in the super hierarchy.", elementName(tmpType.javaEnvironment()).orElse(null)));
+  protected Optional<IMethodGenerator<?, ?>> createOverrideGenerator(IType tmpType, IJavaBuilderContext context) {
+    var template = findMethodToOverride(tmpType, context)
+        .orElseThrow(() -> newFail("Method '{}' cannot be found in the super hierarchy.", elementName(context).orElse(null)));
     return createOverrideGenerator(template);
   }
 }

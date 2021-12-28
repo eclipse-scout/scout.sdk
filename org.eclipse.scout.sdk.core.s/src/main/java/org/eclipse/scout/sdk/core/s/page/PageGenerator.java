@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.builder.java.body.MethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -60,9 +61,9 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
   private Function<String, ISourceGenerator<IScoutMethodBodyBuilder<?>>> m_pageSvcIfcToBodySrc;
 
   @Override
-  protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
-    mainType
-        .withSuperClassFrom(IScoutApi.class, buildSuperTypeAndAppendTable())
+  protected void setup() {
+    this
+        .withSuperClassFunc(buildSuperTypeAndAppendTable())
         .withAnnotation(classIdValue()
             .map(ScoutAnnotationGenerator::createClassId)
             .orElse(null));
@@ -74,7 +75,7 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
     }
     else {
       if (isCreateLeafMethod()) {
-        mainType.withMethod(MethodGenerator.create()
+        withMethod(MethodGenerator.create()
             .withAnnotation(AnnotationGenerator.createOverride())
             .asProtected()
             .withReturnType(JavaTypes._boolean)
@@ -87,11 +88,11 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
         );
       }
       if (isPageWithTable()) {
-        mainType.withMethod(createExecLoadData());
+        withMethod(createExecLoadData());
       }
       else {
         var variableName = "pageList";
-        mainType.withMethod(MethodGenerator.create()
+        withMethod(MethodGenerator.create()
             .asProtected()
             .withReturnType(JavaTypes._void)
             .withElementNameFrom(IScoutApi.class, api -> api.AbstractPageWithNodes().execCreateChildPagesMethodName())
@@ -105,8 +106,7 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
     }
 
     if (isCreateNlsMethod()) {
-      mainType
-          .withMethod(ScoutMethodGenerator.createNlsMethodFrom(IScoutApi.class, api -> api.AbstractPage().getConfiguredTitleMethodName(), Strings.capitalize(elementName().orElseThrow())));
+      withMethod(ScoutMethodGenerator.createNlsMethodFrom(IScoutApi.class, api -> api.AbstractPage().getConfiguredTitleMethodName(), Strings.capitalize(elementName().orElseThrow())));
     }
   }
 
@@ -145,7 +145,7 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
     return execLoadData;
   }
 
-  protected Function<IScoutApi, String> buildSuperTypeAndAppendTable() {
+  protected Function<IJavaBuilderContext, String> buildSuperTypeAndAppendTable() {
     if (isPageWithTable()) {
       var tableBuilder = createTableBuilder();
       withType(tableBuilder)
@@ -154,14 +154,16 @@ public class PageGenerator<TYPE extends PageGenerator<TYPE>> extends PrimaryType
               .orElse(null));
       return buildPageWithTableSuperType(tableBuilder);
     }
-    var predefinedSuperClass = superClass();
-    return api -> predefinedSuperClass.map(af -> af.apply(api)).orElse(api.AbstractPageWithNodes().fqn());
+    var predefinedSuperClass = superClassFunc();
+    return c -> predefinedSuperClass
+        .map(f -> f.apply(c))
+        .orElseGet(() -> c.requireApi(IScoutApi.class).AbstractPageWithNodes().fqn());
   }
 
-  protected Function<IScoutApi, String> buildPageWithTableSuperType(ITypeGenerator<?> tableBuilder) {
-    var predefinedSuperClass = superClass();
-    return api -> {
-      var existingSuperClassFqn = predefinedSuperClass.map(af -> af.apply(api)).orElse(api.AbstractPageWithTable().fqn());
+  protected Function<IJavaBuilderContext, String> buildPageWithTableSuperType(ITypeGenerator<?> tableBuilder) {
+    var predefinedSuperClass = superClassFunc();
+    return c -> {
+      var existingSuperClassFqn = predefinedSuperClass.map(af -> af.apply(c)).orElseGet(() -> c.requireApi(IScoutApi.class).AbstractPageWithTable().fqn());
       var superTypeBuilder = new StringBuilder(existingSuperClassFqn).append(JavaTypes.C_GENERIC_START);
       if (isAbstract(flags())) {
         superTypeBuilder.append(TABLE_TYPE_PARAM_NAME);

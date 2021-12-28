@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import static org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.tra
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -23,8 +24,8 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -58,13 +59,22 @@ public abstract class AbstractAnnotatableGenerator<TYPE extends IAnnotatableGene
   }
 
   @Override
+  public TYPE withoutAllAnnotations() {
+    m_annotations.clear();
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE withoutAnnotation(String annotationFqn) {
+    return withoutAnnotation(g -> Objects.equals(annotationFqn, g.elementName().orElse(null)));
+  }
+
+  @Override
   public TYPE withoutAnnotation(Predicate<IAnnotationGenerator<?>> removalFilter) {
-    if(removalFilter == null) {
-      m_annotations.clear();
+    if (removalFilter == null) {
+      return withoutAllAnnotations();
     }
-    else {
-      m_annotations.removeIf(removalFilter);
-    }
+    m_annotations.removeIf(removalFilter);
     return thisInstance();
   }
 
@@ -79,12 +89,6 @@ public abstract class AbstractAnnotatableGenerator<TYPE extends IAnnotatableGene
   @Override
   public Stream<IAnnotationGenerator<?>> annotations() {
     return m_annotations.stream();
-  }
-
-  @Override
-  public TYPE clearAnnotations() {
-    m_annotations.clear();
-    return thisInstance();
   }
 
   @Override

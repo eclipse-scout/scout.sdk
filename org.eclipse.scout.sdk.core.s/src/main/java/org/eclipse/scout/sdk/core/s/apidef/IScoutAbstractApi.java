@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,141 +10,141 @@
  */
 package org.eclipse.scout.sdk.core.s.apidef;
 
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 
 @SuppressWarnings({"squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // method naming conventions
 public interface IScoutAbstractApi {
   AbstractAccordion AbstractAccordion();
 
-  interface AbstractAccordion extends IClassNameSupplier {
+  interface AbstractAccordion extends ITypeNameSupplier {
   }
 
   AbstractAccordionField AbstractAccordionField();
 
-  interface AbstractAccordionField extends IClassNameSupplier {
+  interface AbstractAccordionField extends ITypeNameSupplier {
   }
 
   AbstractActionNode AbstractActionNode();
 
-  interface AbstractActionNode extends IClassNameSupplier {
+  interface AbstractActionNode extends ITypeNameSupplier {
   }
 
   AbstractBigDecimalField AbstractBigDecimalField();
 
-  interface AbstractBigDecimalField extends IClassNameSupplier {
+  interface AbstractBigDecimalField extends ITypeNameSupplier {
   }
 
   AbstractBooleanField AbstractBooleanField();
 
-  interface AbstractBooleanField extends IClassNameSupplier {
+  interface AbstractBooleanField extends ITypeNameSupplier {
   }
 
   AbstractBrowserField AbstractBrowserField();
 
-  interface AbstractBrowserField extends IClassNameSupplier {
+  interface AbstractBrowserField extends ITypeNameSupplier {
   }
 
   AbstractButton AbstractButton();
 
-  interface AbstractButton extends IClassNameSupplier {
+  interface AbstractButton extends ITypeNameSupplier {
     String execClickActionMethodName();
   }
 
   AbstractCalendar AbstractCalendar();
 
-  interface AbstractCalendar extends IClassNameSupplier {
+  interface AbstractCalendar extends ITypeNameSupplier {
   }
 
   AbstractCalendarField AbstractCalendarField();
 
-  interface AbstractCalendarField extends IClassNameSupplier {
+  interface AbstractCalendarField extends ITypeNameSupplier {
   }
 
   AbstractCalendarItemProvider AbstractCalendarItemProvider();
 
-  interface AbstractCalendarItemProvider extends IClassNameSupplier {
+  interface AbstractCalendarItemProvider extends ITypeNameSupplier {
   }
 
   AbstractCancelButton AbstractCancelButton();
 
-  interface AbstractCancelButton extends IClassNameSupplier {
+  interface AbstractCancelButton extends ITypeNameSupplier {
   }
 
   AbstractCode AbstractCode();
 
-  interface AbstractCode extends IClassNameSupplier {
+  interface AbstractCode extends ITypeNameSupplier {
     String getConfiguredTextMethodName();
   }
 
   AbstractCodeType AbstractCodeType();
 
-  interface AbstractCodeType extends IClassNameSupplier {
+  interface AbstractCodeType extends ITypeNameSupplier {
   }
 
   AbstractCodeTypeWithGeneric AbstractCodeTypeWithGeneric();
 
-  interface AbstractCodeTypeWithGeneric extends IClassNameSupplier {
+  interface AbstractCodeTypeWithGeneric extends ITypeNameSupplier {
   }
 
   AbstractComposerField AbstractComposerField();
 
-  interface AbstractComposerField extends IClassNameSupplier {
+  interface AbstractComposerField extends ITypeNameSupplier {
   }
 
   AbstractCompositeField AbstractCompositeField();
 
-  interface AbstractCompositeField extends IClassNameSupplier {
+  interface AbstractCompositeField extends ITypeNameSupplier {
   }
 
   AbstractDataModel AbstractDataModel();
 
-  interface AbstractDataModel extends IClassNameSupplier {
+  interface AbstractDataModel extends ITypeNameSupplier {
   }
 
   AbstractDataModelEntity AbstractDataModelEntity();
 
-  interface AbstractDataModelEntity extends IClassNameSupplier {
+  interface AbstractDataModelEntity extends ITypeNameSupplier {
   }
 
   AbstractDateField AbstractDateField();
 
-  interface AbstractDateField extends IClassNameSupplier {
+  interface AbstractDateField extends ITypeNameSupplier {
   }
 
   AbstractDesktop AbstractDesktop();
 
-  interface AbstractDesktop extends IClassNameSupplier {
+  interface AbstractDesktop extends ITypeNameSupplier {
   }
 
   AbstractDesktopExtension AbstractDesktopExtension();
 
-  interface AbstractDesktopExtension extends IClassNameSupplier {
+  interface AbstractDesktopExtension extends ITypeNameSupplier {
   }
 
   AbstractDynamicNlsTextProviderService AbstractDynamicNlsTextProviderService();
 
-  interface AbstractDynamicNlsTextProviderService extends IClassNameSupplier {
+  interface AbstractDynamicNlsTextProviderService extends ITypeNameSupplier {
     String getDynamicNlsBaseNameMethodName();
   }
 
   AbstractExtension AbstractExtension();
 
-  interface AbstractExtension extends IClassNameSupplier {
+  interface AbstractExtension extends ITypeNameSupplier {
   }
 
   AbstractFileChooserButton AbstractFileChooserButton();
 
-  interface AbstractFileChooserButton extends IClassNameSupplier {
+  interface AbstractFileChooserButton extends ITypeNameSupplier {
   }
 
   AbstractFileChooserField AbstractFileChooserField();
 
-  interface AbstractFileChooserField extends IClassNameSupplier {
+  interface AbstractFileChooserField extends ITypeNameSupplier {
   }
 
   AbstractForm AbstractForm();
 
-  interface AbstractForm extends IClassNameSupplier {
+  interface AbstractForm extends ITypeNameSupplier {
     String getConfiguredTitleMethodName();
 
     String setHandlerMethodName();
@@ -156,12 +156,12 @@ public interface IScoutAbstractApi {
 
   AbstractFormData AbstractFormData();
 
-  interface AbstractFormData extends IClassNameSupplier {
+  interface AbstractFormData extends ITypeNameSupplier {
   }
 
   AbstractFormField AbstractFormField();
 
-  interface AbstractFormField extends IClassNameSupplier {
+  interface AbstractFormField extends ITypeNameSupplier {
     String getConfiguredLabelMethodName();
 
     String getConfiguredGridHMethodName();
@@ -173,12 +173,12 @@ public interface IScoutAbstractApi {
 
   AbstractFormFieldData AbstractFormFieldData();
 
-  interface AbstractFormFieldData extends IClassNameSupplier {
+  interface AbstractFormFieldData extends ITypeNameSupplier {
   }
 
   AbstractFormHandler AbstractFormHandler();
 
-  interface AbstractFormHandler extends IClassNameSupplier {
+  interface AbstractFormHandler extends ITypeNameSupplier {
     String execStoreMethodName();
 
     String execLoadMethodName();
@@ -186,86 +186,86 @@ public interface IScoutAbstractApi {
 
   AbstractGroup AbstractGroup();
 
-  interface AbstractGroup extends IClassNameSupplier {
+  interface AbstractGroup extends ITypeNameSupplier {
   }
 
   AbstractGroupBox AbstractGroupBox();
 
-  interface AbstractGroupBox extends IClassNameSupplier {
+  interface AbstractGroupBox extends ITypeNameSupplier {
   }
 
   AbstractHtmlField AbstractHtmlField();
 
-  interface AbstractHtmlField extends IClassNameSupplier {
+  interface AbstractHtmlField extends ITypeNameSupplier {
   }
 
   AbstractImageField AbstractImageField();
 
-  interface AbstractImageField extends IClassNameSupplier {
+  interface AbstractImageField extends ITypeNameSupplier {
     String getConfiguredAutoFitMethodName();
   }
 
   AbstractKeyStroke AbstractKeyStroke();
 
-  interface AbstractKeyStroke extends IClassNameSupplier {
+  interface AbstractKeyStroke extends ITypeNameSupplier {
   }
 
   AbstractLabelField AbstractLabelField();
 
-  interface AbstractLabelField extends IClassNameSupplier {
+  interface AbstractLabelField extends ITypeNameSupplier {
   }
 
   AbstractListBox AbstractListBox();
 
-  interface AbstractListBox extends IClassNameSupplier {
+  interface AbstractListBox extends ITypeNameSupplier {
   }
 
   AbstractLongField AbstractLongField();
 
-  interface AbstractLongField extends IClassNameSupplier {
+  interface AbstractLongField extends ITypeNameSupplier {
   }
 
   AbstractLookupService AbstractLookupService();
 
-  interface AbstractLookupService extends IClassNameSupplier {
+  interface AbstractLookupService extends ITypeNameSupplier {
   }
 
   AbstractMenu AbstractMenu();
 
-  interface AbstractMenu extends IClassNameSupplier {
+  interface AbstractMenu extends ITypeNameSupplier {
     String getConfiguredMenuTypesMethodName();
   }
 
   AbstractMode AbstractMode();
 
-  interface AbstractMode extends IClassNameSupplier {
+  interface AbstractMode extends ITypeNameSupplier {
   }
 
   AbstractModeSelectorField AbstractModeSelectorField();
 
-  interface AbstractModeSelectorField extends IClassNameSupplier {
+  interface AbstractModeSelectorField extends ITypeNameSupplier {
   }
 
   AbstractOkButton AbstractOkButton();
 
-  interface AbstractOkButton extends IClassNameSupplier {
+  interface AbstractOkButton extends ITypeNameSupplier {
   }
 
   AbstractPage AbstractPage();
 
-  interface AbstractPage extends IClassNameSupplier {
+  interface AbstractPage extends ITypeNameSupplier {
     String getConfiguredTitleMethodName();
   }
 
   AbstractPageWithNodes AbstractPageWithNodes();
 
-  interface AbstractPageWithNodes extends IClassNameSupplier {
+  interface AbstractPageWithNodes extends ITypeNameSupplier {
     String execCreateChildPagesMethodName();
   }
 
   AbstractPageWithTable AbstractPageWithTable();
 
-  interface AbstractPageWithTable extends IClassNameSupplier {
+  interface AbstractPageWithTable extends ITypeNameSupplier {
     String importPageDataMethodName();
 
     String execLoadDataMethodName();
@@ -273,13 +273,13 @@ public interface IScoutAbstractApi {
 
   AbstractPermission AbstractPermission();
 
-  interface AbstractPermission extends IClassNameSupplier {
+  interface AbstractPermission extends ITypeNameSupplier {
     String getAccessCheckFailedMessageMethodName();
   }
 
   AbstractPropertyData AbstractPropertyData();
 
-  interface AbstractPropertyData extends IClassNameSupplier {
+  interface AbstractPropertyData extends ITypeNameSupplier {
     String getValueMethodName();
 
     String setValueMethodName();
@@ -287,34 +287,34 @@ public interface IScoutAbstractApi {
 
   AbstractProposalField AbstractProposalField();
 
-  interface AbstractProposalField extends IClassNameSupplier {
+  interface AbstractProposalField extends ITypeNameSupplier {
   }
 
   AbstractRadioButton AbstractRadioButton();
 
-  interface AbstractRadioButton extends IClassNameSupplier {
+  interface AbstractRadioButton extends ITypeNameSupplier {
     String getConfiguredRadioValueMethodName();
   }
 
   AbstractRadioButtonGroup AbstractRadioButtonGroup();
 
-  interface AbstractRadioButtonGroup extends IClassNameSupplier {
+  interface AbstractRadioButtonGroup extends ITypeNameSupplier {
   }
 
   AbstractSequenceBox AbstractSequenceBox();
 
-  interface AbstractSequenceBox extends IClassNameSupplier {
+  interface AbstractSequenceBox extends ITypeNameSupplier {
     String getConfiguredAutoCheckFromToMethodName();
   }
 
   AbstractSmartField AbstractSmartField();
 
-  interface AbstractSmartField extends IClassNameSupplier {
+  interface AbstractSmartField extends ITypeNameSupplier {
   }
 
   AbstractColumn AbstractColumn();
 
-  interface AbstractColumn extends IClassNameSupplier {
+  interface AbstractColumn extends ITypeNameSupplier {
     String getConfiguredHeaderTextMethodName();
 
     String getConfiguredWidthMethodName();
@@ -330,38 +330,38 @@ public interface IScoutAbstractApi {
 
   AbstractStringColumn AbstractStringColumn();
 
-  interface AbstractStringColumn extends IClassNameSupplier {
+  interface AbstractStringColumn extends ITypeNameSupplier {
   }
 
   AbstractStringConfigProperty AbstractStringConfigProperty();
 
-  interface AbstractStringConfigProperty extends IClassNameSupplier {
+  interface AbstractStringConfigProperty extends ITypeNameSupplier {
   }
 
   AbstractStringField AbstractStringField();
 
-  interface AbstractStringField extends IClassNameSupplier {
+  interface AbstractStringField extends ITypeNameSupplier {
     String getConfiguredMaxLengthMethodName();
   }
 
   AbstractTabBox AbstractTabBox();
 
-  interface AbstractTabBox extends IClassNameSupplier {
+  interface AbstractTabBox extends ITypeNameSupplier {
   }
 
   AbstractTable AbstractTable();
 
-  interface AbstractTable extends IClassNameSupplier {
+  interface AbstractTable extends ITypeNameSupplier {
   }
 
   AbstractTableField AbstractTableField();
 
-  interface AbstractTableField extends IClassNameSupplier {
+  interface AbstractTableField extends ITypeNameSupplier {
   }
 
   AbstractTableFieldBeanData AbstractTableFieldBeanData();
 
-  interface AbstractTableFieldBeanData extends IClassNameSupplier {
+  interface AbstractTableFieldBeanData extends ITypeNameSupplier {
     String rowAtMethodName();
 
     String setRowsMethodName();
@@ -371,63 +371,63 @@ public interface IScoutAbstractApi {
 
   AbstractTablePageData AbstractTablePageData();
 
-  interface AbstractTablePageData extends IClassNameSupplier {
+  interface AbstractTablePageData extends ITypeNameSupplier {
   }
 
   AbstractTableRowData AbstractTableRowData();
 
-  interface AbstractTableRowData extends IClassNameSupplier {
+  interface AbstractTableRowData extends ITypeNameSupplier {
   }
 
   AbstractTagField AbstractTagField();
 
-  interface AbstractTagField extends IClassNameSupplier {
+  interface AbstractTagField extends ITypeNameSupplier {
   }
 
   AbstractTile AbstractTile();
 
-  interface AbstractTile extends IClassNameSupplier {
+  interface AbstractTile extends ITypeNameSupplier {
   }
 
   AbstractTileField AbstractTileField();
 
-  interface AbstractTileField extends IClassNameSupplier {
+  interface AbstractTileField extends ITypeNameSupplier {
   }
 
   AbstractTileGrid AbstractTileGrid();
 
-  interface AbstractTileGrid extends IClassNameSupplier {
+  interface AbstractTileGrid extends ITypeNameSupplier {
   }
 
   AbstractTree AbstractTree();
 
-  interface AbstractTree extends IClassNameSupplier {
+  interface AbstractTree extends ITypeNameSupplier {
   }
 
   AbstractTreeBox AbstractTreeBox();
 
-  interface AbstractTreeBox extends IClassNameSupplier {
+  interface AbstractTreeBox extends ITypeNameSupplier {
   }
 
   AbstractTreeField AbstractTreeField();
 
-  interface AbstractTreeField extends IClassNameSupplier {
+  interface AbstractTreeField extends ITypeNameSupplier {
   }
 
   AbstractTreeNode AbstractTreeNode();
 
-  interface AbstractTreeNode extends IClassNameSupplier {
+  interface AbstractTreeNode extends ITypeNameSupplier {
     String getConfiguredLeafMethodName();
   }
 
   AbstractValueField AbstractValueField();
 
-  interface AbstractValueField extends IClassNameSupplier {
+  interface AbstractValueField extends ITypeNameSupplier {
   }
 
   AbstractValueFieldData AbstractValueFieldData();
 
-  interface AbstractValueFieldData extends IClassNameSupplier {
+  interface AbstractValueFieldData extends ITypeNameSupplier {
     String getValueMethodName();
 
     String setValueMethodName();
@@ -435,7 +435,7 @@ public interface IScoutAbstractApi {
 
   AbstractWebServiceClient AbstractWebServiceClient();
 
-  interface AbstractWebServiceClient extends IClassNameSupplier {
+  interface AbstractWebServiceClient extends ITypeNameSupplier {
     String getConfiguredEndpointUrlPropertyMethodName();
 
     String execInstallHandlersMethodName();
@@ -445,12 +445,12 @@ public interface IScoutAbstractApi {
 
   AbstractWizard AbstractWizard();
 
-  interface AbstractWizard extends IClassNameSupplier {
+  interface AbstractWizard extends ITypeNameSupplier {
   }
 
   AbstractNumberField AbstractNumberField();
 
-  interface AbstractNumberField extends IClassNameSupplier {
+  interface AbstractNumberField extends ITypeNameSupplier {
     String getConfiguredMinValueMethodName();
 
     String getConfiguredMaxValueMethodName();
@@ -458,7 +458,7 @@ public interface IScoutAbstractApi {
 
   AbstractAction AbstractAction();
 
-  interface AbstractAction extends IClassNameSupplier {
+  interface AbstractAction extends ITypeNameSupplier {
     String execActionMethodName();
 
     String execInitActionMethodName();

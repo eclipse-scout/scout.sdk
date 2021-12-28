@@ -10,16 +10,12 @@
  */
 package org.eclipse.scout.sdk.core.builder.java;
 
-import static org.eclipse.scout.sdk.core.apidef.ApiFunction.applyWithApi;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.SourceBuilderWrapper;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -27,6 +23,7 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link JavaSourceBuilder}</h3>
@@ -153,38 +150,46 @@ public class JavaSourceBuilder extends SourceBuilderWrapper<JavaSourceBuilder> i
   }
 
   @Override
-  public <API extends IApiSpecification> JavaSourceBuilder refClassFrom(Class<API> apiClass, Function<API, IClassNameSupplier> sourceProvider) {
-    return ref(executeApi(apiClass, sourceProvider).fqn());
+  public <API extends IApiSpecification> JavaSourceBuilder refClassFrom(Class<API> apiClass, Function<API, ITypeNameSupplier> sourceProvider) {
+    return refClassFunc(new ApiFunction<>(apiClass, sourceProvider));
   }
 
   @Override
-  public <API extends IApiSpecification> JavaSourceBuilder refFrom(ApiFunction<API, ? extends CharSequence> func) {
-    Ensure.notNull(func);
-    return refFrom(func.apiClass().orElse(null), func.apiFunction());
+  public JavaSourceBuilder refClassFunc(Function<IJavaBuilderContext, ITypeNameSupplier> func) {
+    var cns = Ensure.notNull(func.apply(context()), "{} function '{}' did not return a valid value.", IJavaBuilderContext.class.getSimpleName(), func);
+    var fqn = Ensure.notBlank(cns.fqn(), "{} function '{}' did not return a valid value.", IJavaBuilderContext.class.getSimpleName(), func);
+    return ref(fqn);
   }
 
   @Override
   public <API extends IApiSpecification> JavaSourceBuilder refFrom(Class<API> apiClass, Function<API, ? extends CharSequence> refProvider) {
-    return ref(executeApi(apiClass, refProvider));
+    return refFunc(new ApiFunction<>(apiClass, refProvider));
+  }
+
+  @Override
+  public JavaSourceBuilder refFunc(Function<IJavaBuilderContext, ? extends CharSequence> func) {
+    var ref = Ensure.notBlank(func.apply(context()), "{} function '{}' did not return a valid value.", IJavaBuilderContext.class.getSimpleName(), func);
+    return ref(ref);
   }
 
   @Override
   public <API extends IApiSpecification> JavaSourceBuilder appendFrom(Class<API> apiClass, Function<API, ? extends CharSequence> sourceProvider) {
-    return append(executeApi(apiClass, sourceProvider));
+    return appendFunc(new ApiFunction<>(apiClass, sourceProvider));
   }
 
   @Override
-  public JavaSourceBuilder referencesFrom(Stream<ApiFunction<?, CharSequence>> references, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
+  public JavaSourceBuilder appendFunc(Function<IJavaBuilderContext, ? extends CharSequence> sourceProvider) {
+    var src = Ensure.notNull(sourceProvider.apply(context()), "{} function '{}' did not return a valid value.", IJavaBuilderContext.class.getSimpleName(), sourceProvider);
+    return append(src);
+  }
+
+  @Override
+  public JavaSourceBuilder referencesFrom(Stream<Function<IJavaBuilderContext, ? extends CharSequence>> references, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
     if (references == null) {
       return thisInstance();
     }
     return references(references
         .map(af -> af.apply(context()))
-        .flatMap(Optional::stream), prefix, delimiter, suffix);
-  }
-
-  protected <API extends IApiSpecification, R> R executeApi(Class<API> apiClass, Function<API, R> apiObjectProvider) {
-    return applyWithApi(apiClass, apiObjectProvider, context().environment().orElse(null))
-        .orElseThrow(() -> newFail("Api object provider could not be executed for api {}. Either the API could not be found or the function did not return a valid value.", apiClass));
+        .filter(Strings::hasText), prefix, delimiter, suffix);
   }
 }

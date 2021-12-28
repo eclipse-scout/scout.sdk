@@ -23,9 +23,7 @@ import org.eclipse.scout.sdk.core.fixture.managed.AnnotationWithArrayValues;
 import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * This Test verifies that no null annotation elements are processed by the model. According to the JLS annotation
@@ -33,7 +31,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * Java files under development. During development it may happen that invalid java files are saved. In this case the
  * corresponding annotation elements should just be ignored instead of throwing an exception like NPE.
  */
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class AnnotationWithCompileErrorTest {
 

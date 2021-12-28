@@ -32,6 +32,7 @@ import static org.eclipse.scout.sdk.core.util.Strings.levenshteinDistance;
 import static org.eclipse.scout.sdk.core.util.Strings.nextLineEnd;
 import static org.eclipse.scout.sdk.core.util.Strings.notBlank;
 import static org.eclipse.scout.sdk.core.util.Strings.notEmpty;
+import static org.eclipse.scout.sdk.core.util.Strings.removeSuffix;
 import static org.eclipse.scout.sdk.core.util.Strings.repeat;
 import static org.eclipse.scout.sdk.core.util.Strings.replace;
 import static org.eclipse.scout.sdk.core.util.Strings.replaceEach;
@@ -679,5 +680,18 @@ public class StringsTest {
 
     assertEquals(4, levenshteinDistance("thing", "something"));
     assertEquals(4, levenshteinDistance("something", "thing"));
+  }
+
+  @Test
+  public void testRemoveSuffix() {
+    assertNull(removeSuffix(null, ""));
+    assertEquals("", removeSuffix("", ""));
+    assertEquals("ab", removeSuffix("ab", ""));
+    assertEquals("ab", removeSuffix("ab", null));
+    assertEquals("", removeSuffix("", "ab"));
+    assertEquals("ab", removeSuffix("abc", "c"));
+    assertEquals("ab", removeSuffix("abcdef", "cdef"));
+    assertEquals("abcDef", removeSuffix("abcDef", "cdef"));
+    assertEquals("ab", removeSuffix("abcDef", "cdef", false));
   }
 }

@@ -158,7 +158,7 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
     withFlags(flags);
 
     // super interface (for extensions)
-    var superClass = superClass().flatMap(af -> af.apply(modelType().javaEnvironment()));
+    var superClass = superClassFunc().map(af -> af.apply(currentBuilder().context()));
     if (superClass.isEmpty()) {
       withInterface(Serializable.class.getName());
     }
@@ -205,8 +205,8 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
 
     var superTypeOfSurroundingTableBeanGenerator = declaringGenerator()
         .map(jeg -> (ITypeGenerator<?>) jeg)
-        .flatMap(ITypeGenerator::superClass)
-        .flatMap(af -> af.apply(modelType().javaEnvironment()))
+        .flatMap(ITypeGenerator::superClassFunc)
+        .map(af -> af.apply(currentBuilder().context()))
         .orElseThrow();
     if (superTypeOfSurroundingTableBeanGenerator.equals(scoutApi.AbstractTablePageData().fqn())
         || superTypeOfSurroundingTableBeanGenerator.equals(scoutApi.AbstractTableFieldBeanData().fqn())) {

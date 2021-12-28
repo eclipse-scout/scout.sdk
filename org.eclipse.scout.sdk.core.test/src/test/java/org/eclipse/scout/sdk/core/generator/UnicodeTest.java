@@ -25,16 +25,13 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * <h3>{@link UnicodeTest}</h3>
  *
  * @since 9.0.0
  */
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class UnicodeTest {
 
@@ -66,7 +63,7 @@ public class UnicodeTest {
     assertEquals(0, UNICODE.annotations().stream().count(), "annotation count");
 
     assertEquals(1, classWithUnicode.methods().stream().count(), "method count of 'org.eclipse.scout.sdk.core.fixture.ClassWithUnicode'");
-    var getValue = assertMethodExist(classWithUnicode, "getValue", new String[]{});
+    var getValue = assertMethodExist(classWithUnicode, "getValue");
     assertMethodReturnType(getValue, "java.lang.String");
     assertEquals(0, getValue.annotations().stream().count(), "annotation count");
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -78,7 +78,7 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, tableFieldWithIgnoredColumnsDefaultExFormData.methods().stream().count(), "method count of 'TableFieldWithIgnoredColumnsDefaultExFormData'");
-    var getTableDefaultEx = assertMethodExist(tableFieldWithIgnoredColumnsDefaultExFormData, "getTableDefaultEx", new String[]{});
+    var getTableDefaultEx = assertMethodExist(tableFieldWithIgnoredColumnsDefaultExFormData, "getTableDefaultEx");
     assertMethodReturnType(getTableDefaultEx, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultExFormData$TableDefaultEx");
 
     assertEquals(1, tableFieldWithIgnoredColumnsDefaultExFormData.innerTypes().stream().count(), "inner types count of 'TableFieldWithIgnoredColumnsDefaultExFormData'");
@@ -95,19 +95,19 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(7, tableDefaultEx.methods().stream().count(), "method count of 'TableDefaultEx'");
-    var addRow = assertMethodExist(tableDefaultEx, "addRow", new String[]{});
+    var addRow = assertMethodExist(tableDefaultEx, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultExFormData$TableDefaultEx$TableDefaultExRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(tableDefaultEx, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultExFormData$TableDefaultEx$TableDefaultExRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(tableDefaultEx, "createRow", new String[]{});
+    var createRow = assertMethodExist(tableDefaultEx, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultExFormData$TableDefaultEx$TableDefaultExRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(tableDefaultEx, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(tableDefaultEx, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(tableDefaultEx, "getRows", new String[]{});
+    var getRows = assertMethodExist(tableDefaultEx, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultExFormData$TableDefaultEx$TableDefaultExRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(tableDefaultEx, "rowAt", new String[]{"int"});
@@ -149,7 +149,7 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, tableFieldWithIgnoredColumnsBaseFormData.methods().stream().count(), "method count of 'TableFieldWithIgnoredColumnsBaseFormData'");
-    var getTableBase = assertMethodExist(tableFieldWithIgnoredColumnsBaseFormData, "getTableBase", new String[]{});
+    var getTableBase = assertMethodExist(tableFieldWithIgnoredColumnsBaseFormData, "getTableBase");
     assertMethodReturnType(getTableBase, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsBaseFormData$TableBase");
 
     assertEquals(1, tableFieldWithIgnoredColumnsBaseFormData.innerTypes().stream().count(), "inner types count of 'TableFieldWithIgnoredColumnsBaseFormData'");
@@ -165,19 +165,19 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(7, tableBase.methods().stream().count(), "method count of 'TableBase'");
-    var addRow = assertMethodExist(tableBase, "addRow", new String[]{});
+    var addRow = assertMethodExist(tableBase, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsBaseFormData$TableBase$TableBaseRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(tableBase, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsBaseFormData$TableBase$TableBaseRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(tableBase, "createRow", new String[]{});
+    var createRow = assertMethodExist(tableBase, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsBaseFormData$TableBase$TableBaseRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(tableBase, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(tableBase, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(tableBase, "getRows", new String[]{});
+    var getRows = assertMethodExist(tableBase, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsBaseFormData$TableBase$TableBaseRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(tableBase, "rowAt", new String[]{"int"});
@@ -211,11 +211,11 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(m_create, String.class.getName());
 
     assertEquals(4, tableBaseRowData.methods().stream().count(), "method count of 'TableBaseRowData'");
-    var getDefault = assertMethodExist(tableBaseRowData, "getDefault", new String[]{});
+    var getDefault = assertMethodExist(tableBaseRowData, "getDefault");
     assertMethodReturnType(getDefault, String.class.getName());
     var setDefault = assertMethodExist(tableBaseRowData, "setDefault", new String[]{String.class.getName()});
     assertMethodReturnType(setDefault, "void");
-    var getCreate = assertMethodExist(tableBaseRowData, "getCreate", new String[]{});
+    var getCreate = assertMethodExist(tableBaseRowData, "getCreate");
     assertMethodReturnType(getCreate, String.class.getName());
     var setCreate = assertMethodExist(tableBaseRowData, "setCreate", new String[]{String.class.getName()});
     assertMethodReturnType(setCreate, "void");
@@ -239,7 +239,7 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, tableFieldWithIgnoredColumnsIgnoreExFormData.methods().stream().count(), "method count of 'TableFieldWithIgnoredColumnsIgnoreExFormData'");
-    var getTableIgnoreEx = assertMethodExist(tableFieldWithIgnoredColumnsIgnoreExFormData, "getTableIgnoreEx", new String[]{});
+    var getTableIgnoreEx = assertMethodExist(tableFieldWithIgnoredColumnsIgnoreExFormData, "getTableIgnoreEx");
     assertMethodReturnType(getTableIgnoreEx, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsIgnoreExFormData$TableIgnoreEx");
 
     assertEquals(1, tableFieldWithIgnoredColumnsIgnoreExFormData.innerTypes().stream().count(), "inner types count of 'TableFieldWithIgnoredColumnsIgnoreExFormData'");
@@ -256,19 +256,19 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(7, tableIgnoreEx.methods().stream().count(), "method count of 'TableIgnoreEx'");
-    var addRow = assertMethodExist(tableIgnoreEx, "addRow", new String[]{});
+    var addRow = assertMethodExist(tableIgnoreEx, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsIgnoreExFormData$TableIgnoreEx$TableIgnoreExRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(tableIgnoreEx, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsIgnoreExFormData$TableIgnoreEx$TableIgnoreExRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(tableIgnoreEx, "createRow", new String[]{});
+    var createRow = assertMethodExist(tableIgnoreEx, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsIgnoreExFormData$TableIgnoreEx$TableIgnoreExRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(tableIgnoreEx, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(tableIgnoreEx, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(tableIgnoreEx, "getRows", new String[]{});
+    var getRows = assertMethodExist(tableIgnoreEx, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsIgnoreExFormData$TableIgnoreEx$TableIgnoreExRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(tableIgnoreEx, "rowAt", new String[]{"int"});
@@ -310,7 +310,7 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, tableFieldWithIgnoredColumnsDefaultCreateExFormData.methods().stream().count(), "method count of 'TableFieldWithIgnoredColumnsDefaultCreateExFormData'");
-    var getTableDefaultCreateEx = assertMethodExist(tableFieldWithIgnoredColumnsDefaultCreateExFormData, "getTableDefaultCreateEx", new String[]{});
+    var getTableDefaultCreateEx = assertMethodExist(tableFieldWithIgnoredColumnsDefaultCreateExFormData, "getTableDefaultCreateEx");
     assertMethodReturnType(getTableDefaultCreateEx, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultCreateExFormData$TableDefaultCreateEx");
 
     assertEquals(1, tableFieldWithIgnoredColumnsDefaultCreateExFormData.innerTypes().stream().count(), "inner types count of 'TableFieldWithIgnoredColumnsDefaultCreateExFormData'");
@@ -327,19 +327,19 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(7, tableDefaultCreateEx.methods().stream().count(), "method count of 'TableDefaultCreateEx'");
-    var addRow = assertMethodExist(tableDefaultCreateEx, "addRow", new String[]{});
+    var addRow = assertMethodExist(tableDefaultCreateEx, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultCreateExFormData$TableDefaultCreateEx$TableDefaultCreateExRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(tableDefaultCreateEx, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultCreateExFormData$TableDefaultCreateEx$TableDefaultCreateExRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(tableDefaultCreateEx, "createRow", new String[]{});
+    var createRow = assertMethodExist(tableDefaultCreateEx, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultCreateExFormData$TableDefaultCreateEx$TableDefaultCreateExRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(tableDefaultCreateEx, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(tableDefaultCreateEx, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(tableDefaultCreateEx, "getRows", new String[]{});
+    var getRows = assertMethodExist(tableDefaultCreateEx, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultCreateExFormData$TableDefaultCreateEx$TableDefaultCreateExRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(tableDefaultCreateEx, "rowAt", new String[]{"int"});
@@ -368,7 +368,7 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(m_ignoreDefaultCreate, String.class.getName());
 
     assertEquals(2, tableDefaultCreateExRowData.methods().stream().count(), "method count of 'TableDefaultCreateExRowData'");
-    var getIgnoreDefaultCreate = assertMethodExist(tableDefaultCreateExRowData, "getIgnoreDefaultCreate", new String[]{});
+    var getIgnoreDefaultCreate = assertMethodExist(tableDefaultCreateExRowData, "getIgnoreDefaultCreate");
     assertMethodReturnType(getIgnoreDefaultCreate, String.class.getName());
     var setIgnoreDefaultCreate = assertMethodExist(tableDefaultCreateExRowData, "setIgnoreDefaultCreate", new String[]{String.class.getName()});
     assertMethodReturnType(setIgnoreDefaultCreate, "void");
@@ -392,7 +392,7 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, tableFieldWithIgnoredColumnsCreateExFormData.methods().stream().count(), "method count of 'TableFieldWithIgnoredColumnsCreateExFormData'");
-    var getTableCreateEx = assertMethodExist(tableFieldWithIgnoredColumnsCreateExFormData, "getTableCreateEx", new String[]{});
+    var getTableCreateEx = assertMethodExist(tableFieldWithIgnoredColumnsCreateExFormData, "getTableCreateEx");
     assertMethodReturnType(getTableCreateEx, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsCreateExFormData$TableCreateEx");
 
     assertEquals(1, tableFieldWithIgnoredColumnsCreateExFormData.innerTypes().stream().count(), "inner types count of 'TableFieldWithIgnoredColumnsCreateExFormData'");
@@ -409,19 +409,19 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(7, tableCreateEx.methods().stream().count(), "method count of 'TableCreateEx'");
-    var addRow = assertMethodExist(tableCreateEx, "addRow", new String[]{});
+    var addRow = assertMethodExist(tableCreateEx, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsCreateExFormData$TableCreateEx$TableCreateExRowData");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(tableCreateEx, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsCreateExFormData$TableCreateEx$TableCreateExRowData");
     assertAnnotation(addRow1, "java.lang.Override");
-    var createRow = assertMethodExist(tableCreateEx, "createRow", new String[]{});
+    var createRow = assertMethodExist(tableCreateEx, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsCreateExFormData$TableCreateEx$TableCreateExRowData");
     assertAnnotation(createRow, "java.lang.Override");
-    var getRowType = assertMethodExist(tableCreateEx, "getRowType", new String[]{});
+    var getRowType = assertMethodExist(tableCreateEx, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
     assertAnnotation(getRowType, "java.lang.Override");
-    var getRows = assertMethodExist(tableCreateEx, "getRows", new String[]{});
+    var getRows = assertMethodExist(tableCreateEx, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsCreateExFormData$TableCreateEx$TableCreateExRowData[]");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(tableCreateEx, "rowAt", new String[]{"int"});
@@ -449,7 +449,7 @@ public class TableFieldWithIgnoredColumnsTest {
     assertFieldType(m_ignoreCreate, String.class.getName());
 
     assertEquals(2, tableCreateExRowData.methods().stream().count(), "method count of 'TableCreateExRowData'");
-    var getIgnoreCreate = assertMethodExist(tableCreateExRowData, "getIgnoreCreate", new String[]{});
+    var getIgnoreCreate = assertMethodExist(tableCreateExRowData, "getIgnoreCreate");
     assertMethodReturnType(getIgnoreCreate, String.class.getName());
     var setIgnoreCreate = assertMethodExist(tableCreateExRowData, "setIgnoreCreate", new String[]{String.class.getName()});
     assertMethodReturnType(setIgnoreCreate, "void");

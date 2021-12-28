@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
@@ -346,7 +346,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   }
 
   @Override
-  public boolean isInstanceOf(IClassNameSupplier typeName) {
+  public boolean isInstanceOf(ITypeNameSupplier typeName) {
     return isInstanceOf(typeName.fqn());
   }
 

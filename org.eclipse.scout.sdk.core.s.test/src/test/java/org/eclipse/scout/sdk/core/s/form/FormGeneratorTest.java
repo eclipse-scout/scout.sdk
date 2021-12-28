@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.core.s.permission.PermissionGenerator;
 import org.eclipse.scout.sdk.core.s.service.ServiceInterfaceGenerator;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.testing.context.UsernameExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +33,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * @since 5.2.0
  */
 @ExtendWith(UsernameExtension.class)
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(ScoutClientJavaEnvironmentFactory.class)
 public class FormGeneratorTest {
 

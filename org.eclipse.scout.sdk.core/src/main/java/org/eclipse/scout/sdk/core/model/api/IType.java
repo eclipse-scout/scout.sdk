@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.model.api;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.model.api.query.HierarchyInnerTypeQuery;
@@ -254,14 +254,14 @@ public interface IType extends IMember {
   boolean isInstanceOf(String queryType);
 
   /**
-   * Checks if the receiver (this) has the given {@link IClassNameSupplier#fqn()} in its super hierarchy.
+   * Checks if the receiver (this) has the given {@link ITypeNameSupplier#fqn()} in its super hierarchy.
    * 
    * @param typeName
-   *          The {@link IClassNameSupplier} to check. Must not be {@code null}.
+   *          The {@link ITypeNameSupplier} to check. Must not be {@code null}.
    * @return {@code true} if the given fully qualified name exists in the super hierarchy of this {@link IType}.
    *         {@code false} otherwise.
    */
-  boolean isInstanceOf(IClassNameSupplier typeName);
+  boolean isInstanceOf(ITypeNameSupplier typeName);
 
   /**
    * Checks if the given {@link IType} has the receiver (this) in its super hierarchy. see

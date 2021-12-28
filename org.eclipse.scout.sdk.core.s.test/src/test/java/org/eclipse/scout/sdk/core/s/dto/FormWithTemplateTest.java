@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,13 +47,13 @@ public class FormWithTemplateTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(4, usingTemplateFormData.methods().stream().count(), "method count of 'UsingTemplateFormData'");
-    var getExternalGroupBox = assertMethodExist(usingTemplateFormData, "getExternalGroupBox", new String[]{});
+    var getExternalGroupBox = assertMethodExist(usingTemplateFormData, "getExternalGroupBox");
     assertMethodReturnType(getExternalGroupBox, "formdata.shared.services.process.UsingTemplateFormData$ExternalGroupBox");
-    var getInternalHtml = assertMethodExist(usingTemplateFormData, "getInternalHtml", new String[]{});
+    var getInternalHtml = assertMethodExist(usingTemplateFormData, "getInternalHtml");
     assertMethodReturnType(getInternalHtml, "formdata.shared.services.process.UsingTemplateFormData$InternalHtml");
-    var getTestCheckbox = assertMethodExist(usingTemplateFormData, "getTestCheckbox", new String[]{});
+    var getTestCheckbox = assertMethodExist(usingTemplateFormData, "getTestCheckbox");
     assertMethodReturnType(getTestCheckbox, "formdata.shared.services.process.UsingTemplateFormData$TestCheckbox");
-    var getTestLimitedString = assertMethodExist(usingTemplateFormData, "getTestLimitedString", new String[]{});
+    var getTestLimitedString = assertMethodExist(usingTemplateFormData, "getTestLimitedString");
     assertMethodReturnType(getTestLimitedString, "formdata.shared.services.process.UsingTemplateFormData$TestLimitedString");
 
     assertEquals(4, usingTemplateFormData.innerTypes().stream().count(), "inner types count of 'UsingTemplateFormData'");

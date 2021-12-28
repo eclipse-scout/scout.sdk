@@ -17,7 +17,7 @@ import java.util.stream.StreamSupport;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.spliterator.SuperTypeHierarchySpliterator;
@@ -38,7 +38,7 @@ public class SuperTypeQuery extends AbstractQuery<IType> implements Predicate<IT
   private boolean m_includeSuperClasses = true;
   private boolean m_includeSuperInterfaces = true;
 
-  private ApiFunction<?, IClassNameSupplier> m_name;
+  private ApiFunction<?, ITypeNameSupplier> m_name;
   private String m_simpleName;
   private int m_flags = -1;
 
@@ -137,11 +137,11 @@ public class SuperTypeQuery extends AbstractQuery<IType> implements Predicate<IT
    * @return this
    */
   public SuperTypeQuery withName(CharSequence fullyQualifiedName) {
-    return withNameFrom(null, api -> IClassNameSupplier.raw(fullyQualifiedName));
+    return withNameFrom(null, api -> ITypeNameSupplier.of(fullyQualifiedName));
   }
 
   /**
-   * Limit the {@link IType}s to the {@link IClassNameSupplier} returned by the given nameFunction.<br>
+   * Limit the {@link IType}s to the {@link ITypeNameSupplier} returned by the given nameFunction.<br>
    * <b>Example:</b> {@code type.superTypes().withNameFrom(IJavaApi.class, IJavaApi::List)}.
    *
    * @param api
@@ -153,7 +153,7 @@ public class SuperTypeQuery extends AbstractQuery<IType> implements Predicate<IT
    *          The API type that contains the class name
    * @return this
    */
-  public <API extends IApiSpecification> SuperTypeQuery withNameFrom(Class<API> api, Function<API, IClassNameSupplier> nameFunction) {
+  public <API extends IApiSpecification> SuperTypeQuery withNameFrom(Class<API> api, Function<API, ITypeNameSupplier> nameFunction) {
     if (nameFunction == null) {
       m_name = null;
     }
@@ -163,7 +163,7 @@ public class SuperTypeQuery extends AbstractQuery<IType> implements Predicate<IT
     return this;
   }
 
-  protected ApiFunction<?, IClassNameSupplier> getName() {
+  protected ApiFunction<?, ITypeNameSupplier> getName() {
     return m_name;
   }
 
@@ -196,7 +196,7 @@ public class SuperTypeQuery extends AbstractQuery<IType> implements Predicate<IT
     var name = getName();
     if (name != null) {
       var fqnMatches = name.apply(t.javaEnvironment())
-          .map(IClassNameSupplier::fqn)
+          .map(ITypeNameSupplier::fqn)
           .map(fqn -> fqn.equals(t.name()))
           .orElse(false);
       if (!fqnMatches) {

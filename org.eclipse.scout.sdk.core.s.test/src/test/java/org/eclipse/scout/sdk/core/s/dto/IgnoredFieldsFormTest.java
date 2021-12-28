@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,7 +47,7 @@ public class IgnoredFieldsFormTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, ignoredFieldsFormData.methods().stream().count(), "method count of 'IgnoredFieldsFormData'");
-    var getNotIgnored = assertMethodExist(ignoredFieldsFormData, "getNotIgnored", new String[]{});
+    var getNotIgnored = assertMethodExist(ignoredFieldsFormData, "getNotIgnored");
     assertMethodReturnType(getNotIgnored, "formdata.shared.services.process.IgnoredFieldsFormData$NotIgnored");
 
     assertEquals(1, ignoredFieldsFormData.innerTypes().stream().count(), "inner types count of 'IgnoredFieldsFormData'");

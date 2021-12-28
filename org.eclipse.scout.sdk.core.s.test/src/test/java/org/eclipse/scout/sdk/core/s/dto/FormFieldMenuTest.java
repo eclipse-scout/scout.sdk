@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,7 +54,7 @@ public class FormFieldMenuTest {
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(1, formFieldMenuTestFormData.methods().stream().count(), "method count of 'formdata.shared.ui.forms.formfieldmenu.FormFieldMenuTestFormData'");
-    var getTestBoolean = assertMethodExist(formFieldMenuTestFormData, "getTestBoolean", new String[]{});
+    var getTestBoolean = assertMethodExist(formFieldMenuTestFormData, "getTestBoolean");
     assertMethodReturnType(getTestBoolean, "formdata.shared.ui.forms.formfieldmenu.FormFieldMenuTestFormData$TestBoolean");
     assertEquals(0, getTestBoolean.annotations().stream().count(), "annotation count");
 

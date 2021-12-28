@@ -10,14 +10,14 @@
  */
 package org.eclipse.scout.sdk.core.s.apidef;
 
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 
 @SuppressWarnings({"squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // method naming conventions
 public interface IScoutVariousApi {
 
   CalendarMenuType CalendarMenuType();
 
-  interface CalendarMenuType extends IClassNameSupplier {
+  interface CalendarMenuType extends ITypeNameSupplier {
     String CalendarComponent();
 
     String EmptySpace();
@@ -25,7 +25,7 @@ public interface IScoutVariousApi {
 
   ImageFieldMenuType ImageFieldMenuType();
 
-  interface ImageFieldMenuType extends IClassNameSupplier {
+  interface ImageFieldMenuType extends ITypeNameSupplier {
     String Null();
 
     String ImageId();
@@ -37,13 +37,13 @@ public interface IScoutVariousApi {
 
   TabBoxMenuType TabBoxMenuType();
 
-  interface TabBoxMenuType extends IClassNameSupplier {
+  interface TabBoxMenuType extends ITypeNameSupplier {
     String Header();
   }
 
   TableMenuType TableMenuType();
 
-  interface TableMenuType extends IClassNameSupplier {
+  interface TableMenuType extends ITypeNameSupplier {
     String EmptySpace();
 
     String Header();
@@ -55,7 +55,7 @@ public interface IScoutVariousApi {
 
   TileGridMenuType TileGridMenuType();
 
-  interface TileGridMenuType extends IClassNameSupplier {
+  interface TileGridMenuType extends ITypeNameSupplier {
     String EmptySpace();
 
     String SingleSelection();
@@ -65,7 +65,7 @@ public interface IScoutVariousApi {
 
   TreeMenuType TreeMenuType();
 
-  interface TreeMenuType extends IClassNameSupplier {
+  interface TreeMenuType extends ITypeNameSupplier {
     String EmptySpace();
 
     String MultiSelection();
@@ -77,7 +77,7 @@ public interface IScoutVariousApi {
 
   ValueFieldMenuType ValueFieldMenuType();
 
-  interface ValueFieldMenuType extends IClassNameSupplier {
+  interface ValueFieldMenuType extends ITypeNameSupplier {
     String NotNull();
 
     String Null();
@@ -85,7 +85,7 @@ public interface IScoutVariousApi {
 
   WebService WebService();
 
-  interface WebService extends IClassNameSupplier {
+  interface WebService extends ITypeNameSupplier {
     String nameElementName();
 
     String targetNamespaceElementName();
@@ -93,7 +93,7 @@ public interface IScoutVariousApi {
 
   WebServiceClient WebServiceClient();
 
-  interface WebServiceClient extends IClassNameSupplier {
+  interface WebServiceClient extends ITypeNameSupplier {
     String nameElementName();
 
     String targetNamespaceElementName();
@@ -101,7 +101,7 @@ public interface IScoutVariousApi {
 
   ACCESS ACCESS();
 
-  interface ACCESS extends IClassNameSupplier {
+  interface ACCESS extends ITypeNameSupplier {
     String checkMethodName();
 
     String checkAndThrowMethodName();
@@ -109,33 +109,33 @@ public interface IScoutVariousApi {
 
   BEANS BEANS();
 
-  interface BEANS extends IClassNameSupplier {
+  interface BEANS extends ITypeNameSupplier {
     String getMethodName();
   }
 
   BasicAuthenticationMethod BasicAuthenticationMethod();
 
-  interface BasicAuthenticationMethod extends IClassNameSupplier {
+  interface BasicAuthenticationMethod extends ITypeNameSupplier {
   }
 
   BinaryResource BinaryResource();
 
-  interface BinaryResource extends IClassNameSupplier {
+  interface BinaryResource extends ITypeNameSupplier {
   }
 
   BooleanUtility BooleanUtility();
 
-  interface BooleanUtility extends IClassNameSupplier {
+  interface BooleanUtility extends ITypeNameSupplier {
   }
 
   ClientTestRunner ClientTestRunner();
 
-  interface ClientTestRunner extends IClassNameSupplier {
+  interface ClientTestRunner extends ITypeNameSupplier {
   }
 
   CollectionUtility CollectionUtility();
 
-  interface CollectionUtility extends IClassNameSupplier {
+  interface CollectionUtility extends ITypeNameSupplier {
     String hashSetMethodName();
 
     String hashSetWithoutNullElementsMethodName();
@@ -143,17 +143,17 @@ public interface IScoutVariousApi {
 
   ConfigFileCredentialVerifier ConfigFileCredentialVerifier();
 
-  interface ConfigFileCredentialVerifier extends IClassNameSupplier {
+  interface ConfigFileCredentialVerifier extends ITypeNameSupplier {
   }
 
   LogHandler LogHandler();
 
-  interface LogHandler extends IClassNameSupplier {
+  interface LogHandler extends ITypeNameSupplier {
   }
 
   LookupCall LookupCall();
 
-  interface LookupCall extends IClassNameSupplier {
+  interface LookupCall extends ITypeNameSupplier {
     String getConfiguredServiceMethodName();
 
     String getDataByAllMethodName();
@@ -165,23 +165,23 @@ public interface IScoutVariousApi {
 
   NullClazz NullClazz();
 
-  interface NullClazz extends IClassNameSupplier {
+  interface NullClazz extends ITypeNameSupplier {
   }
 
   SearchFilter SearchFilter();
 
-  interface SearchFilter extends IClassNameSupplier {
+  interface SearchFilter extends ITypeNameSupplier {
     String getFormDataMethodName();
   }
 
   ServerTestRunner ServerTestRunner();
 
-  interface ServerTestRunner extends IClassNameSupplier {
+  interface ServerTestRunner extends ITypeNameSupplier {
   }
 
   TEXTS TEXTS();
 
-  interface TEXTS extends IClassNameSupplier {
+  interface TEXTS extends ITypeNameSupplier {
     String getMethodName();
 
     String getWithFallbackMethodName();
@@ -189,60 +189,60 @@ public interface IScoutVariousApi {
 
   TestEnvironmentClientSession TestEnvironmentClientSession();
 
-  interface TestEnvironmentClientSession extends IClassNameSupplier {
+  interface TestEnvironmentClientSession extends ITypeNameSupplier {
   }
 
   TriState TriState();
 
-  interface TriState extends IClassNameSupplier {
+  interface TriState extends ITypeNameSupplier {
   }
 
   UiServlet UiServlet();
 
-  interface UiServlet extends IClassNameSupplier {
+  interface UiServlet extends ITypeNameSupplier {
   }
 
   UiTextContributor UiTextContributor();
 
-  interface UiTextContributor extends IClassNameSupplier {
+  interface UiTextContributor extends ITypeNameSupplier {
     String contributeUiTextKeysMethodName();
   }
 
   VetoException VetoException();
 
-  interface VetoException extends IClassNameSupplier {
+  interface VetoException extends ITypeNameSupplier {
   }
 
   WsConsumerCorrelationIdHandler WsConsumerCorrelationIdHandler();
 
-  interface WsConsumerCorrelationIdHandler extends IClassNameSupplier {
+  interface WsConsumerCorrelationIdHandler extends ITypeNameSupplier {
   }
 
   WsProviderCorrelationIdHandler WsProviderCorrelationIdHandler();
 
-  interface WsProviderCorrelationIdHandler extends IClassNameSupplier {
+  interface WsProviderCorrelationIdHandler extends ITypeNameSupplier {
   }
 
   Logger Logger();
 
-  interface Logger extends IClassNameSupplier {
+  interface Logger extends ITypeNameSupplier {
   }
 
   Mockito Mockito();
 
-  interface Mockito extends IClassNameSupplier {
+  interface Mockito extends ITypeNameSupplier {
     String whenMethodName();
   }
 
   ArgumentMatchers ArgumentMatchers();
 
-  interface ArgumentMatchers extends IClassNameSupplier {
+  interface ArgumentMatchers extends ITypeNameSupplier {
     String anyMethodName();
   }
 
   ColumnSet ColumnSet();
 
-  interface ColumnSet extends IClassNameSupplier {
+  interface ColumnSet extends ITypeNameSupplier {
     String getColumnByClassMethodName();
   }
 
@@ -262,19 +262,19 @@ public interface IScoutVariousApi {
 
   DoValue DoValue();
 
-  interface DoValue extends IClassNameSupplier {
+  interface DoValue extends ITypeNameSupplier {
   }
 
   DoList DoList();
 
-  interface DoList extends IClassNameSupplier {
+  interface DoList extends ITypeNameSupplier {
   }
 
   String DoUpdateAllMethodName();
 
   DoNode DoNode();
 
-  interface DoNode extends IClassNameSupplier {
+  interface DoNode extends ITypeNameSupplier {
     int valueTypeParamIndex();
 
     String getMethodName();
@@ -284,7 +284,7 @@ public interface IScoutVariousApi {
 
   MessageBoxes MessageBoxes();
 
-  interface MessageBoxes extends IClassNameSupplier {
+  interface MessageBoxes extends ITypeNameSupplier {
     String createOkMethodName();
 
     String showDeleteConfirmationMessageMethodName();

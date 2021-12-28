@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
@@ -69,12 +69,12 @@ public class FormNewWizardPage extends AbstractCompilationUnitNewWizardPage {
   }
 
   @Override
-  protected Optional<IClassNameSupplier> calcSuperTypeDefaultFqn() {
+  protected Optional<ITypeNameSupplier> calcSuperTypeDefaultFqn() {
     return scoutApi().map(IScoutApi::AbstractForm);
   }
 
   @Override
-  protected Optional<IClassNameSupplier> calcSuperTypeDefaultBaseFqn() {
+  protected Optional<ITypeNameSupplier> calcSuperTypeDefaultBaseFqn() {
     return scoutApi().map(IScoutApi::IForm);
   }
 

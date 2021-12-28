@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
@@ -38,11 +37,11 @@ public class EntryPointDefinitionGenerator<TYPE extends EntryPointDefinitionGene
   private String m_entryPointName;
 
   @Override
-  protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
-    mainType
+  protected void setup() {
+    this
         .asInterface()
         .withAnnotation(AnnotationGenerator.create()
-            .withElementNameFrom(IScoutApi.class, IScoutApi::WebServiceEntryPoint)
+            .withAnnotationNameFrom(IScoutApi.class, IScoutApi::WebServiceEntryPoint)
             .withElementFrom(IScoutApi.class, api -> api.WebServiceEntryPoint().endpointInterfaceElementName(), b -> b.classLiteral(portTypeFqn()
                 .orElseThrow(() -> newFail("Fully qualified name of the PortType must be specified."))))
             .withElementFrom(IScoutApi.class, api -> api.WebServiceEntryPoint().entryPointPackageElementName(), b -> b.stringLiteral(entryPointPackage()

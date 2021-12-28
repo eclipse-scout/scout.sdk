@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
+import org.eclipse.scout.sdk.core.imports.IImportCollector;
 import org.eclipse.scout.sdk.core.imports.IImportValidator;
 import org.eclipse.scout.sdk.core.imports.ImportCollector;
 import org.eclipse.scout.sdk.core.imports.ImportValidator;
@@ -52,13 +53,16 @@ public class JavaBuilderContext implements IJavaBuilderContext {
   }
 
   public JavaBuilderContext(IBuilderContext inner, IImportValidator validator) {
-    this(inner, validator == null ? null : validator.importCollector().getJavaEnvironment(), validator);
+    this(inner, Optional.ofNullable(validator)
+        .map(IImportValidator::importCollector)
+        .flatMap(IImportCollector::getJavaEnvironment)
+        .orElse(null), validator);
   }
 
   protected JavaBuilderContext(IBuilderContext inner, IJavaEnvironment env, IImportValidator validator) {
     m_inner = Optional.ofNullable(inner).orElseGet(BuilderContext::new);
     m_env = env;
-    m_validator = Optional.ofNullable(validator).orElseGet(() -> new ImportValidator(new ImportCollector(env)));
+    m_validator = Optional.ofNullable(validator).orElseGet(() -> new ImportValidator(new ImportCollector(this)));
   }
 
   @Override

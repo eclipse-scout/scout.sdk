@@ -49,6 +49,7 @@ public class ApiVersionTest {
     var v = new ApiVersion(segments);
     assertArrayEquals(segments, v.segments());
     assertNotSame(segments, v.segments());
+    assertEquals(12, v.major());
   }
 
   @Test

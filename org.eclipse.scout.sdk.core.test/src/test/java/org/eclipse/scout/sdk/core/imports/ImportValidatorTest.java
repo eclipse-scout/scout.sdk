@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaSourceBuilder;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
@@ -39,12 +40,9 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-@ExtendWith(JavaEnvironmentExtension.class)
 public class ImportValidatorTest {
 
   @Test
@@ -370,9 +368,9 @@ public class ImportValidatorTest {
   }
 
   protected static IImportCollector createCompilationUnitImportCollector(ICompilationUnitGenerator<?> cuSrc, IJavaEnvironment env) {
-    IImportCollector validator0 = new ImportCollector(env);
-    cuSrc.imports().forEach(validator0::addImport);
-    return new CompilationUnitScopedImportCollector(validator0, cuSrc.packageName().orElseThrow());
+    IImportCollector collector = new ImportCollector(new JavaBuilderContext(env));
+    cuSrc.imports().forEach(collector::addImport);
+    return new CompilationUnitScopedImportCollector(collector, cuSrc.packageName().orElseThrow());
   }
 
   protected static IImportCollector createEnclosingTypeImportCollector(IType t) {

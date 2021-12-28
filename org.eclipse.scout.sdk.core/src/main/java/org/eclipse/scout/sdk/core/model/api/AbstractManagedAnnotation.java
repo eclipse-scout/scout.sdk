@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 
@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.core.util.SdkException;
  * <br>
  * <b>Important:</b><br>
  * Implementors must provide an empty constructor and a field with name {@value TYPE_NAME_FIELD_NAME} and data type
- * {@code ApiFunction<?, IClassNameSupplier>} to define the managed annotation fully qualified name it supports!
+ * {@code ApiFunction<?, ITypeNameSupplier>} to define the managed annotation fully qualified name it supports!
  *
  * @since 5.1.0
  */
@@ -62,7 +62,7 @@ public abstract class AbstractManagedAnnotation {
    * @return the value of the static field {@value #TYPE_NAME_FIELD_NAME} each managed annotation must have.
    */
   @SuppressWarnings("unchecked")
-  public static ApiFunction<?, IClassNameSupplier> typeName(Class<? extends AbstractManagedAnnotation> a) {
+  public static ApiFunction<?, ITypeNameSupplier> typeName(Class<? extends AbstractManagedAnnotation> a) {
     if (a == null) {
       return null;
     }
@@ -74,7 +74,7 @@ public abstract class AbstractManagedAnnotation {
     }
     catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
       throw new SdkException("Failed to read field {} of {}. Each managed annotation must define its {} using a field called '{}' of type {}.",
-          TYPE_NAME_FIELD_NAME, a, IClassNameSupplier.class.getSimpleName(), TYPE_NAME_FIELD_NAME, e, ApiFunction.class.getSimpleName());
+          TYPE_NAME_FIELD_NAME, a, ITypeNameSupplier.class.getSimpleName(), TYPE_NAME_FIELD_NAME, e, ApiFunction.class.getSimpleName());
     }
   }
 

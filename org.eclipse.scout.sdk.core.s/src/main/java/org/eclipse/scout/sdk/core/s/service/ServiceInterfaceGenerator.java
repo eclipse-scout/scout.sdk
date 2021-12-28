@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.s.service;
 
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
@@ -23,9 +22,8 @@ import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerato
 public class ServiceInterfaceGenerator<TYPE extends ServiceInterfaceGenerator<TYPE>> extends PrimaryTypeGenerator<TYPE> {
 
   @Override
-  protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
-    mainType
-        .asPublic()
+  protected void setup() {
+    asPublic()
         .asInterface()
         .withInterfaceFrom(IScoutApi.class, api -> api.IService().fqn())
         .withAnnotation(ScoutAnnotationGenerator.createTunnelToServer());

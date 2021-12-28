@@ -13,10 +13,10 @@ package org.eclipse.scout.sdk.core.s.apidef;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.MaxApiLevel;
-import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
-import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
+import org.eclipse.scout.sdk.core.s.generator.method.IScoutMethodGenerator;
+import org.eclipse.scout.sdk.core.s.generator.method.ScoutDoMethodGenerator;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -59,15 +59,20 @@ public interface Scout22Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     return DO_ENTITY;
   }
 
-  class DoEntity implements IScout22DoApi.DoEntity {
-    @Override
-    public String fqn() {
-      return "org.eclipse.scout.rt.dataobject.DoEntity";
-    }
-
+  class DoEntity extends Scout10Api.DoEntity implements IScout22DoApi.DoEntity {
     @Override
     public String nvlMethodName() {
       return "nvl";
+    }
+
+    @Override
+    public String doSetMethodName() {
+      return "doSet";
+    }
+
+    @Override
+    public String doCollectionMethodName() {
+      return "doCollection";
     }
   }
 
@@ -87,13 +92,43 @@ public interface Scout22Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     }
 
     @Override
-    public Stream<IMethodGenerator<?, ?>> getAdditionalDoNodeGetters(CharSequence name, CharSequence dataTypeRef, IType ownerType) {
+    public Stream<IScoutMethodGenerator<?, ?>> getAdditionalDoNodeGetters(CharSequence name, CharSequence dataTypeRef, IType ownerType) {
       if (!Strings.equals(JavaTypes.Boolean, dataTypeRef)) {
         return Stream.empty();
       }
 
       // since Scout 22: generate additional getter for Booleans returning a primitive boolean
-      return Stream.of(ScoutMethodGenerator.createDoNodeGetter(name, JavaTypes._boolean, ownerType));
+      return Stream.of(ScoutDoMethodGenerator.createDoNodeGetter(name, JavaTypes._boolean, ownerType));
+    }
+  }
+
+  IScout22DoApi.ITypeVersion I_TYPE_VERSION = new Scout22Api.ITypeVersion();
+
+  @Override
+  default IScout22DoApi.ITypeVersion ITypeVersion() {
+    return I_TYPE_VERSION;
+  }
+
+  class ITypeVersion implements IScout22DoApi.ITypeVersion {
+
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.ITypeVersion";
+    }
+  }
+
+  IScout22DoApi.INamespace I_NAMESPACE = new Scout22Api.INamespace();
+
+  @Override
+  default IScout22DoApi.INamespace INamespace() {
+    return I_NAMESPACE;
+  }
+
+  class INamespace implements IScout22DoApi.INamespace {
+
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.platform.namespace.INamespace";
     }
   }
 }

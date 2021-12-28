@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,6 +21,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutAbstractApi.AbstractDynamicNlsTextProviderService;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.nls.TextProviderService;
@@ -37,7 +38,6 @@ import org.eclipse.scout.sdk.core.util.JavaTypes;
  */
 public class PropertiesTextProviderService extends TextProviderService {
   protected static final Pattern REGEX_RESOURCE_BUNDLE_GETTER = Pattern.compile("return\\s*\"([^\"]*)\"\\s*;", Pattern.DOTALL);
-  protected static final Pattern REGEX_DOT = Pattern.compile("\\.");
   public static final char FOLDER_SEGMENT_DELIMITER = '/';
 
   private final String m_folder;
@@ -75,7 +75,7 @@ public class PropertiesTextProviderService extends TextProviderService {
         .map(REGEX_RESOURCE_BUNDLE_GETTER::matcher)
         .filter(Matcher::find)
         .map(m -> m.group(1))
-        .map(REGEX_DOT::split)
+        .map(ISdkConstants.REGEX_DOT::split)
         .flatMap(segments -> fromSegments(segments, txtSvc));
   }
 

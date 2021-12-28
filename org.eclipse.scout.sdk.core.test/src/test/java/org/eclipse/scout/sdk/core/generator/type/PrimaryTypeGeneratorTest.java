@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,11 @@
 package org.eclipse.scout.sdk.core.generator.type;
 
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFile;
+import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodExist;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
@@ -22,7 +26,6 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.DefaultCommentGeneratorExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.testing.context.UsernameExtension;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
@@ -34,7 +37,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * @since 6.1.0
  */
 @ExtendWith(UsernameExtension.class)
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWith(DefaultCommentGeneratorExtension.class)
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class PrimaryTypeGeneratorTest {
@@ -61,10 +63,36 @@ public class PrimaryTypeGeneratorTest {
     assertNoCompileErrors(env, generator);
   }
 
+  @Test
+  public void testMultipleExecutions(IJavaEnvironment env) {
+    var generator = new P_TestingMultipleExecutionsTypeGenerator().withElementName("TestClass");
+
+    var result1 = assertNoCompileErrors(env, generator);
+    assertEquals(1, result1.methods().stream().count());
+    assertMethodExist(result1, "num1");
+
+    var result2 = assertNoCompileErrors(env, generator);
+    assertEquals(1, result2.methods().stream().count());
+    assertMethodExist(result2, "num1"); // because setup is only executed once
+  }
+
+  private static final class P_TestingMultipleExecutionsTypeGenerator extends PrimaryTypeGenerator<P_TestingMultipleExecutionsTypeGenerator> {
+
+    private static final AtomicInteger COUNTER = new AtomicInteger();
+
+    @Override
+    protected void setup() {
+      withMethod(MethodGenerator.create()
+          .asPublic()
+          .withReturnType(JavaTypes._void)
+          .withElementName("num" + COUNTER.incrementAndGet()));
+    }
+  }
+
   private static final class P_TestingPrimaryTypeGenerator extends PrimaryTypeGenerator<P_TestingPrimaryTypeGenerator> {
     @Override
-    protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
-      mainType
+    protected void setup() {
+      this
           .withField(FieldGenerator.create()
               .withElementName("m_member")
               .withDataType(JavaTypes._boolean)

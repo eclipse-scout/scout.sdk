@@ -94,7 +94,7 @@ public class TableFieldExtensionTest {
 
     assertEquals(2, customAbstractAdvisorTableFieldTableExtensionRowData.methods().stream().count(),
         "method count of 'formdata.shared.extension.ExtensionToAbstractTableFieldTemplateData$CustomAbstractAdvisorTableFieldTableExtensionRowData'");
-    var getAdded = assertMethodExist(customAbstractAdvisorTableFieldTableExtensionRowData, "getAdded", new String[]{});
+    var getAdded = assertMethodExist(customAbstractAdvisorTableFieldTableExtensionRowData, "getAdded");
     assertMethodReturnType(getAdded, "java.lang.Boolean");
     assertEquals(0, getAdded.annotations().stream().count(), "annotation count");
     var setAdded = assertMethodExist(customAbstractAdvisorTableFieldTableExtensionRowData, "setAdded", new String[]{"java.lang.Boolean"});
@@ -148,7 +148,7 @@ public class TableFieldExtensionTest {
     assertEquals(0, m_contributed.annotations().stream().count(), "annotation count");
 
     assertEquals(2, testTableFieldExtensionRowData.methods().stream().count(), "method count of 'formdata.shared.extension.SimpleTableFormExtensionWithTableData$TestTableFieldExtensionRowData'");
-    var getContributed = assertMethodExist(testTableFieldExtensionRowData, "getContributed", new String[]{});
+    var getContributed = assertMethodExist(testTableFieldExtensionRowData, "getContributed");
     assertMethodReturnType(getContributed, "java.math.BigDecimal");
     assertEquals(0, getContributed.annotations().stream().count(), "annotation count");
     var setContributed = assertMethodExist(testTableFieldExtensionRowData, "setContributed", new String[]{"java.math.BigDecimal"});

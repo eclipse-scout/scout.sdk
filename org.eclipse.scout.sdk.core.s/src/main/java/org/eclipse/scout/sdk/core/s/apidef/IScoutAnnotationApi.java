@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.apidef;
 
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 
 @SuppressWarnings({"squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // method naming conventions
 public interface IScoutAnnotationApi {
@@ -62,53 +62,57 @@ public interface IScoutAnnotationApi {
 
   IgnoreConvenienceMethodGeneration IgnoreConvenienceMethodGeneration();
 
-  interface NlsKey extends IClassNameSupplier {
+  TypeVersion TypeVersion();
+
+  TypeName TypeName();
+
+  interface NlsKey extends ITypeNameSupplier {
   }
 
-  interface ApplicationScoped extends IClassNameSupplier {
+  interface ApplicationScoped extends ITypeNameSupplier {
   }
 
-  interface Authentication extends IClassNameSupplier {
+  interface Authentication extends ITypeNameSupplier {
     String methodElementName();
 
     String verifierElementName();
   }
 
-  interface BeanMock extends IClassNameSupplier {
+  interface BeanMock extends ITypeNameSupplier {
   }
 
-  interface Before extends IClassNameSupplier {
+  interface Before extends ITypeNameSupplier {
   }
 
-  interface ClassId extends IClassNameSupplier {
+  interface ClassId extends ITypeNameSupplier {
     String valueElementName();
   }
 
-  interface Clazz extends IClassNameSupplier {
+  interface Clazz extends ITypeNameSupplier {
     String valueElementName();
 
     String qualifiedNameElementName();
   }
 
-  interface ColumnData extends IClassNameSupplier {
+  interface ColumnData extends ITypeNameSupplier {
     String valueElementName();
   }
 
-  interface Data extends IClassNameSupplier {
+  interface Data extends ITypeNameSupplier {
     String valueElementName();
   }
 
-  interface DtoRelevant extends IClassNameSupplier {
+  interface DtoRelevant extends ITypeNameSupplier {
 
   }
 
-  interface Extends extends IClassNameSupplier {
+  interface Extends extends ITypeNameSupplier {
     String valueElementName();
 
     String pathToContainerElementName();
   }
 
-  interface FormData extends IClassNameSupplier {
+  interface FormData extends ITypeNameSupplier {
     String valueElementName();
 
     String interfacesElementName();
@@ -120,44 +124,44 @@ public interface IScoutAnnotationApi {
     String sdkCommandElementName();
   }
 
-  interface Handler extends IClassNameSupplier {
+  interface Handler extends ITypeNameSupplier {
     String valueElementName();
   }
 
-  interface Order extends IClassNameSupplier {
+  interface Order extends ITypeNameSupplier {
     String valueElementName();
   }
 
-  interface PageData extends IClassNameSupplier {
+  interface PageData extends ITypeNameSupplier {
     String valueElementName();
   }
 
-  interface Replace extends IClassNameSupplier {
+  interface Replace extends ITypeNameSupplier {
   }
 
-  interface RunWith extends IClassNameSupplier {
+  interface RunWith extends ITypeNameSupplier {
     String valueElementName();
   }
 
-  interface RunWithClientSession extends IClassNameSupplier {
+  interface RunWithClientSession extends ITypeNameSupplier {
     String valueElementName();
   }
 
-  interface RunWithServerSession extends IClassNameSupplier {
+  interface RunWithServerSession extends ITypeNameSupplier {
     String valueElementName();
   }
 
-  interface RunWithSubject extends IClassNameSupplier {
+  interface RunWithSubject extends ITypeNameSupplier {
     String valueElementName();
   }
 
-  interface Test extends IClassNameSupplier {
+  interface Test extends ITypeNameSupplier {
   }
 
-  interface TunnelToServer extends IClassNameSupplier {
+  interface TunnelToServer extends ITypeNameSupplier {
   }
 
-  interface WebServiceEntryPoint extends IClassNameSupplier {
+  interface WebServiceEntryPoint extends ITypeNameSupplier {
     String endpointInterfaceElementName();
 
     String entryPointNameElementName();
@@ -173,6 +177,14 @@ public interface IScoutAnnotationApi {
     String handlerChainElementName();
   }
 
-  interface IgnoreConvenienceMethodGeneration extends IClassNameSupplier {
+  interface IgnoreConvenienceMethodGeneration extends ITypeNameSupplier {
+  }
+
+  interface TypeVersion extends ITypeNameSupplier {
+    String valueElementName();
+  }
+
+  interface TypeName extends ITypeNameSupplier {
+    String valueElementName();
   }
 }

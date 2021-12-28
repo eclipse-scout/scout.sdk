@@ -16,7 +16,6 @@ import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 
@@ -28,11 +27,10 @@ import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 public class PermissionGenerator<TYPE extends PermissionGenerator<TYPE>> extends PrimaryTypeGenerator<TYPE> {
 
   @Override
-  protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
-    mainType
-        .withField(FieldGenerator.createSerialVersionUid())
+  protected void setup() {
+    withField(FieldGenerator.createSerialVersionUid())
         .withSuperClassFrom(IScoutApi.class, api -> api.AbstractPermission().fqn())
-        .withMethod(createConstructor(mainType));
+        .withMethod(createConstructor(this));
   }
 
   protected static IMethodGenerator<?, ?> createConstructor(IJavaElementGenerator<?> constructorOwner) {

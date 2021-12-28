@@ -14,10 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.fixture.apidef.AlwaysMissingApiProvider;
 import org.eclipse.scout.sdk.core.fixture.apidef.IAlwaysMissingApi;
 import org.eclipse.scout.sdk.core.fixture.apidef.IJavaApi;
@@ -26,11 +25,8 @@ import org.eclipse.scout.sdk.core.fixture.apidef.JavaApiProvider;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWithJavaEnvironmentFactory(EmptyJavaEnvironmentFactory.class)
 public class ApiFunctionTest {
   @Test
@@ -38,8 +34,6 @@ public class ApiFunctionTest {
     var val = "result".toCharArray();
     var f = new ApiFunction<IJavaApi, char[]>(val);
     assertSame(val, f.apply().orElseThrow());
-    assertSame(val, f.apply((IApiSpecification) null));
-    assertSame(val, f.apply((IJavaSourceBuilder<?>) null).orElseThrow());
     assertSame(val, f.apply((IJavaEnvironment) null).orElseThrow());
     assertFalse(f.apiClass().isPresent());
     assertNotNull(f.apiFunction());
@@ -57,6 +51,17 @@ public class ApiFunctionTest {
   }
 
   @Test
+  public void testFunctionWithoutApi(IJavaEnvironment env) {
+    assertEquals("val", new ApiFunction<>(null, c -> "val").apply(env).orElseThrow());
+    assertEquals("val", new ApiFunction<>(null, c -> "val").apply().orElseThrow());
+    assertEquals("val", new ApiFunction<>(null, c -> "val").apply(new JavaBuilderContext(env)));
+
+    assertEquals("val", new ApiFunction<>("val").apply(env).orElseThrow());
+    assertEquals("val", new ApiFunction<>("val").apply().orElseThrow());
+    assertEquals("val", new ApiFunction<>("val").apply(new JavaBuilderContext(env)));
+  }
+
+  @Test
   public void testMissingApiWithContext(IJavaEnvironment env) {
     Api.registerProvider(IAlwaysMissingApi.class, new AlwaysMissingApiProvider());
     try {
@@ -68,7 +73,7 @@ public class ApiFunctionTest {
   }
 
   @Test
-  public void testFailsOnApiWithoutContext() {
-    assertThrows(IllegalArgumentException.class, () -> new ApiFunction<>(IJavaApi.class, IJavaApi::method).apply());
+  public void testReturnsNullWithoutContext() {
+    assertFalse(new ApiFunction<>(IJavaApi.class, IJavaApi::method).apply().isPresent());
   }
 }

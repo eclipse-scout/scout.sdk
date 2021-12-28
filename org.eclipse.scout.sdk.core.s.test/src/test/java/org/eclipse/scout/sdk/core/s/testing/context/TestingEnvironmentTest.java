@@ -23,9 +23,7 @@ import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEn
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
-@ExtendWith(TestingEnvironmentExtension.class)
 @ExtendWithTestingEnvironment(
     primary = @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class),
     dto = @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class))

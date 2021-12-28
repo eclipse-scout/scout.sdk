@@ -31,6 +31,9 @@ public abstract class AbstractMemberGenerator<TYPE extends IMemberGenerator<TYPE
   private int m_flags;
   private IJavaElementGenerator<?> m_declaringGenerator;
 
+  protected AbstractMemberGenerator() {
+  }
+
   protected AbstractMemberGenerator(IMember member, IWorkingCopyTransformer transformer) {
     super(member, transformer);
     withFlags(member.flags());
@@ -38,9 +41,6 @@ public abstract class AbstractMemberGenerator<TYPE extends IMemberGenerator<TYPE
         .map(ISourceRange::asCharSequence)
         .<ISourceGenerator<IJavaElementCommentBuilder<?>>> map(s -> b -> b.append(s).nl())
         .ifPresent(this::withComment);
-  }
-
-  protected AbstractMemberGenerator() {
   }
 
   @Override

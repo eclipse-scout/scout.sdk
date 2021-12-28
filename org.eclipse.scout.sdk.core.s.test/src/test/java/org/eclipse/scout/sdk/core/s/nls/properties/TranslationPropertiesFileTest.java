@@ -30,7 +30,6 @@ import org.eclipse.scout.sdk.core.s.nls.TranslationStoreSupplierExtension;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ExtendWithTestingEnvironment;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
-import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironmentExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  *
  * @since 7.0.0
  */
-@ExtendWith(TestingEnvironmentExtension.class)
 @ExtendWith(TranslationStoreSupplierExtension.class)
 @ExtendWithTestingEnvironment(primary = @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class))
 public class TranslationPropertiesFileTest {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -87,7 +87,7 @@ public class NestedMultiLevelFormFieldTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, abstractMainBoxData.methods().stream().count(), "method count of 'AbstractMainBoxData'");
-    var getFirstLevel = assertMethodExist(abstractMainBoxData, "getFirstLevel", new String[]{});
+    var getFirstLevel = assertMethodExist(abstractMainBoxData, "getFirstLevel");
     assertMethodReturnType(getFirstLevel, "formdata.shared.ui.template.formfield.replace.levels.AbstractMainBoxData$FirstLevel");
 
     assertEquals(1, abstractMainBoxData.innerTypes().stream().count(), "inner types count of 'AbstractMainBoxData'");
@@ -137,7 +137,7 @@ public class NestedMultiLevelFormFieldTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, firstLevelFormData.methods().stream().count(), "method count of 'FirstLevelFormData'");
-    var getFirstInnerBox = assertMethodExist(firstLevelFormData, "getFirstInnerBox", new String[]{});
+    var getFirstInnerBox = assertMethodExist(firstLevelFormData, "getFirstInnerBox");
     assertMethodReturnType(getFirstInnerBox, "formdata.shared.ui.template.formfield.replace.levels.FirstLevelFormData$FirstInnerBox");
 
     assertEquals(1, firstLevelFormData.innerTypes().stream().count(), "inner types count of 'FirstLevelFormData'");
@@ -170,7 +170,7 @@ public class NestedMultiLevelFormFieldTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, secondLevelFormData.methods().stream().count(), "method count of 'SecondLevelFormData'");
-    var getSecondInnerBox = assertMethodExist(secondLevelFormData, "getSecondInnerBox", new String[]{});
+    var getSecondInnerBox = assertMethodExist(secondLevelFormData, "getSecondInnerBox");
     assertMethodReturnType(getSecondInnerBox, "formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData$SecondInnerBox");
 
     assertEquals(1, secondLevelFormData.innerTypes().stream().count(), "inner types count of 'SecondLevelFormData'");
@@ -187,7 +187,7 @@ public class NestedMultiLevelFormFieldTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(1, secondInnerBox.methods().stream().count(), "method count of 'SecondInnerBox'");
-    var getSecondLevel = assertMethodExist(secondInnerBox, "getSecondLevel", new String[]{});
+    var getSecondLevel = assertMethodExist(secondInnerBox, "getSecondLevel");
     assertMethodReturnType(getSecondLevel, "formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData$SecondInnerBox$SecondLevel");
 
     assertEquals(1, secondInnerBox.innerTypes().stream().count(), "inner types count of 'SecondInnerBox'");
@@ -221,7 +221,7 @@ public class NestedMultiLevelFormFieldTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(1, thirdLevelFormData.methods().stream().count(), "method count of 'ThirdLevelFormData'");
-    var getThirdInnerBox = assertMethodExist(thirdLevelFormData, "getThirdInnerBox", new String[]{});
+    var getThirdInnerBox = assertMethodExist(thirdLevelFormData, "getThirdInnerBox");
     assertMethodReturnType(getThirdInnerBox, "formdata.shared.ui.template.formfield.replace.levels.ThirdLevelFormData$ThirdInnerBox");
 
     assertEquals(1, thirdLevelFormData.innerTypes().stream().count(), "inner types count of 'ThirdLevelFormData'");
@@ -238,7 +238,7 @@ public class NestedMultiLevelFormFieldTest {
     assertFieldType(serialVersionUID1, "long");
 
     assertEquals(1, thirdInnerBox.methods().stream().count(), "method count of 'ThirdInnerBox'");
-    var getThirdLevel = assertMethodExist(thirdInnerBox, "getThirdLevel", new String[]{});
+    var getThirdLevel = assertMethodExist(thirdInnerBox, "getThirdLevel");
     assertMethodReturnType(getThirdLevel, "formdata.shared.ui.template.formfield.replace.levels.ThirdLevelFormData$ThirdInnerBox$ThirdLevel");
 
     assertEquals(1, thirdInnerBox.innerTypes().stream().count(), "inner types count of 'ThirdInnerBox'");

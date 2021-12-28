@@ -38,7 +38,6 @@ import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.DefaultCommentGeneratorExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.testing.context.UsernameExtension;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
@@ -50,7 +49,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * @since 6.1.0
  */
 @ExtendWith(UsernameExtension.class)
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWith(DefaultCommentGeneratorExtension.class)
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class MethodGeneratorTest {
@@ -128,7 +126,7 @@ public class MethodGeneratorTest {
         .withThrowable(IOException.class.getName())
         .withThrowable(SecurityException.class.getName())
         .withThrowable(RuntimeException.class.getName())
-        .withoutThrowable(filter -> RuntimeException.class.getName().equals(filter.apply().orElseThrow().fqn()))
+        .withoutThrowable(RuntimeException.class.getName())
         .withReturnType(JavaTypes._byte)
         .withParameter(
             MethodParameterGenerator.create()
@@ -160,7 +158,7 @@ public class MethodGeneratorTest {
                 .withComment(b -> b.appendJavaDocLine("type param"))
                 .withBinding(Serializable.class.getName()));
 
-    assertEquals("testMethod(java.lang.Integer,T,int[])", generator.identifier(env));
+    assertEquals("testMethod(java.lang.Integer,T,int[])", generator.identifier(null));
 
     assertEqualsRefFile(env, REF_FILE_FOLDER + "MethodGeneratorTest1.txt", generator);
   }
@@ -257,7 +255,7 @@ public class MethodGeneratorTest {
 
   protected static Object[] methodOrderFor(IMethodGenerator<?, ?> g) {
     // sort first by number of arguments, then by method name length
-    return new Object[]{g.parameters().count(), g.elementName((IJavaEnvironment) null).orElseThrow().length()};
+    return new Object[]{g.parameters().count(), g.elementName(null).orElseThrow().length()};
   }
 
   @Test

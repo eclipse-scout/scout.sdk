@@ -100,7 +100,7 @@ public class ExtensionFormDataTest {
     assertEquals(0, m_myExtension.annotations().stream().count(), "annotation count");
 
     assertEquals(2, simpleTableFormExtensionData.methods().stream().count(), "method count of 'formdata.shared.extension.SimpleTableFormExtensionData'");
-    var getMyExtension = assertMethodExist(simpleTableFormExtensionData, "getMyExtension", new String[]{});
+    var getMyExtension = assertMethodExist(simpleTableFormExtensionData, "getMyExtension");
     assertMethodReturnType(getMyExtension, "java.math.BigDecimal");
     assertEquals(0, getMyExtension.annotations().stream().count(), "annotation count");
     var setMyExtension = assertMethodExist(simpleTableFormExtensionData, "setMyExtension", new String[]{"java.math.BigDecimal"});
@@ -136,11 +136,11 @@ public class ExtensionFormDataTest {
     assertFieldType(m_fourthDouble, BigDecimal.class.getName());
 
     assertEquals(4, multiColumnExtensionData.methods().stream().count(), "method count of 'MultiColumnExtensionData'");
-    var getThirdLong = assertMethodExist(multiColumnExtensionData, "getThirdLong", new String[]{});
+    var getThirdLong = assertMethodExist(multiColumnExtensionData, "getThirdLong");
     assertMethodReturnType(getThirdLong, Long.class.getName());
     var setThirdLong = assertMethodExist(multiColumnExtensionData, "setThirdLong", new String[]{Long.class.getName()});
     assertMethodReturnType(setThirdLong, "void");
-    var getFourthDouble = assertMethodExist(multiColumnExtensionData, "getFourthDouble", new String[]{});
+    var getFourthDouble = assertMethodExist(multiColumnExtensionData, "getFourthDouble");
     assertMethodReturnType(getFourthDouble, BigDecimal.class.getName());
     var setFourthDouble = assertMethodExist(multiColumnExtensionData, "setFourthDouble", new String[]{BigDecimal.class.getName()});
     assertMethodReturnType(setFourthDouble, "void");
@@ -162,11 +162,11 @@ public class ExtensionFormDataTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(3, propertyExtensionData.methods().stream().count(), "method count of 'PropertyExtensionData'");
-    var getLongValue = assertMethodExist(propertyExtensionData, "getLongValue", new String[]{});
+    var getLongValue = assertMethodExist(propertyExtensionData, "getLongValue");
     assertMethodReturnType(getLongValue, Long.class.getName());
     var setLongValue = assertMethodExist(propertyExtensionData, "setLongValue", new String[]{Long.class.getName()});
     assertMethodReturnType(setLongValue, "void");
-    var getLongValueProperty = assertMethodExist(propertyExtensionData, "getLongValueProperty", new String[]{});
+    var getLongValueProperty = assertMethodExist(propertyExtensionData, "getLongValueProperty");
     assertMethodReturnType(getLongValueProperty, "formdata.shared.extension.PropertyExtensionData$LongValueProperty");
 
     assertEquals(1, propertyExtensionData.innerTypes().stream().count(), "inner types count of 'PropertyExtensionData'");
@@ -206,7 +206,7 @@ public class ExtensionFormDataTest {
     assertFieldType(m_thirdInteger, Integer.class.getName());
 
     assertEquals(2, thirdIntegerColumnData.methods().stream().count(), "method count of 'ThirdIntegerColumnData'");
-    var getThirdInteger = assertMethodExist(thirdIntegerColumnData, "getThirdInteger", new String[]{});
+    var getThirdInteger = assertMethodExist(thirdIntegerColumnData, "getThirdInteger");
     assertMethodReturnType(getThirdInteger, Integer.class.getName());
     var setThirdInteger = assertMethodExist(thirdIntegerColumnData, "setThirdInteger", new String[]{Integer.class.getName()});
     assertMethodReturnType(setThirdInteger, "void");
@@ -228,9 +228,9 @@ public class ExtensionFormDataTest {
     assertFieldType(serialVersionUID, "long");
 
     assertEquals(2, multipleExtGroupBoxExtensionData.methods().stream().count(), "method count of 'MultipleExtGroupBoxExtensionData'");
-    var getSecondDouble = assertMethodExist(multipleExtGroupBoxExtensionData, "getSecondDouble", new String[]{});
+    var getSecondDouble = assertMethodExist(multipleExtGroupBoxExtensionData, "getSecondDouble");
     assertMethodReturnType(getSecondDouble, "formdata.shared.extension.MultipleExtGroupBoxExtensionData$SecondDouble");
-    var getThirdDate = assertMethodExist(multipleExtGroupBoxExtensionData, "getThirdDate", new String[]{});
+    var getThirdDate = assertMethodExist(multipleExtGroupBoxExtensionData, "getThirdDate");
     assertMethodReturnType(getThirdDate, "formdata.shared.extension.MultipleExtGroupBoxExtensionData$ThirdDate");
 
     assertEquals(2, multipleExtGroupBoxExtensionData.innerTypes().stream().count(), "inner types count of 'MultipleExtGroupBoxExtensionData'");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -64,7 +64,7 @@ public class ScopeTest {
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(1, abstractScopeTestGroupBoxData.methods().stream().count(), "method count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData'");
-    var getProcess = assertMethodExist(abstractScopeTestGroupBoxData, "getProcess", new String[]{});
+    var getProcess = assertMethodExist(abstractScopeTestGroupBoxData, "getProcess");
     assertMethodReturnType(getProcess, "formdata.shared.scope.field.AbstractScopeTestGroupBoxData$Process");
     assertEquals(0, getProcess.annotations().stream().count(), "annotation count");
 
@@ -104,7 +104,7 @@ public class ScopeTest {
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(1, scopeTestFormData.methods().stream().count(), "method count of 'formdata.shared.scope.orig.ScopeTestFormData'");
-    var getProcessesBox = assertMethodExist(scopeTestFormData, "getProcessesBox", new String[]{});
+    var getProcessesBox = assertMethodExist(scopeTestFormData, "getProcessesBox");
     assertMethodReturnType(getProcessesBox, "formdata.shared.scope.orig.ScopeTestFormData$ProcessesBox");
     assertEquals(0, getProcessesBox.annotations().stream().count(), "annotation count");
 
@@ -145,10 +145,10 @@ public class ScopeTest {
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(2, extendedScopeTestFormData.methods().stream().count(), "method count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData'");
-    var getAnliegenBox = assertMethodExist(extendedScopeTestFormData, "getAnliegenBox", new String[]{});
+    var getAnliegenBox = assertMethodExist(extendedScopeTestFormData, "getAnliegenBox");
     assertMethodReturnType(getAnliegenBox, "formdata.shared.scope.extended.ExtendedScopeTestFormData$AnliegenBox");
     assertEquals(0, getAnliegenBox.annotations().stream().count(), "annotation count");
-    var getExtendedProcess = assertMethodExist(extendedScopeTestFormData, "getExtendedProcess", new String[]{});
+    var getExtendedProcess = assertMethodExist(extendedScopeTestFormData, "getExtendedProcess");
     assertMethodReturnType(getExtendedProcess, "formdata.shared.scope.extended.ExtendedScopeTestFormData$ExtendedProcess");
     assertEquals(0, getExtendedProcess.annotations().stream().count(), "annotation count");
 

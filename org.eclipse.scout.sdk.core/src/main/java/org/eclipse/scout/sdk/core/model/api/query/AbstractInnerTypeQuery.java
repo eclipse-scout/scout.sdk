@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,7 +19,7 @@ import java.util.stream.StreamSupport;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.spliterator.InnerTypeSpliterator;
@@ -35,9 +35,9 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
   private final T m_thisInstance;
 
   private boolean m_includeRecursiveInnerTypes;
-  private ApiFunction<?, IClassNameSupplier> m_name;
-  private ApiFunction<?, IClassNameSupplier> m_simpleName;
-  private ApiFunction<?, IClassNameSupplier> m_instanceOf;
+  private ApiFunction<?, ITypeNameSupplier> m_name;
+  private ApiFunction<?, ITypeNameSupplier> m_simpleName;
+  private ApiFunction<?, ITypeNameSupplier> m_instanceOf;
   private int m_flags = -1;
 
   @SuppressWarnings("unchecked")
@@ -95,12 +95,12 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
    * @return this
    */
   public T withName(CharSequence fullyQualifiedName) {
-    var supplier = IClassNameSupplier.raw(fullyQualifiedName);
+    var supplier = ITypeNameSupplier.of(fullyQualifiedName);
     return withNameFrom(null, api -> supplier);
   }
 
   /**
-   * Limit the {@link IType}s to the {@link IClassNameSupplier} returned by the given nameFunction.<br>
+   * Limit the {@link IType}s to the {@link ITypeNameSupplier} returned by the given nameFunction.<br>
    * <b>Example:</b> {@code type.innerTypes().withNameFrom(IJavaApi.class, IJavaApi::List)}.
    * 
    * @param api
@@ -112,7 +112,7 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
    *          The API type that contains the class name
    * @return this
    */
-  public <API extends IApiSpecification> T withNameFrom(Class<API> api, Function<API, IClassNameSupplier> nameFunction) {
+  public <API extends IApiSpecification> T withNameFrom(Class<API> api, Function<API, ITypeNameSupplier> nameFunction) {
     if (nameFunction == null) {
       m_name = null;
     }
@@ -122,7 +122,7 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
     return m_thisInstance;
   }
 
-  protected ApiFunction<?, IClassNameSupplier> getName() {
+  protected ApiFunction<?, ITypeNameSupplier> getName() {
     return m_name;
   }
 
@@ -135,12 +135,12 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
    * @return this
    */
   public T withSimpleName(CharSequence simpleName) {
-    var supplier = IClassNameSupplier.raw(simpleName);
+    var supplier = ITypeNameSupplier.of(simpleName);
     return withSimpleNameFrom(null, api -> supplier);
   }
 
   /**
-   * Limit the {@link IType}s to the {@link IClassNameSupplier} returned by the given simpleNameFunction.<br>
+   * Limit the {@link IType}s to the {@link ITypeNameSupplier} returned by the given simpleNameFunction.<br>
    * <b>Example:</b> {@code type.innerTypes().withSimpleNameFrom(IJavaApi.class, IJavaApi::List)}.
    * 
    * @param api
@@ -152,7 +152,7 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
    *          The API type that contains the class name
    * @return this
    */
-  public <API extends IApiSpecification> T withSimpleNameFrom(Class<API> api, Function<API, IClassNameSupplier> simpleNameFunction) {
+  public <API extends IApiSpecification> T withSimpleNameFrom(Class<API> api, Function<API, ITypeNameSupplier> simpleNameFunction) {
     if (simpleNameFunction == null) {
       m_simpleName = null;
     }
@@ -162,7 +162,7 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
     return m_thisInstance;
   }
 
-  protected ApiFunction<?, IClassNameSupplier> getSimpleName() {
+  protected ApiFunction<?, ITypeNameSupplier> getSimpleName() {
     return m_simpleName;
   }
 
@@ -176,26 +176,26 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
    * @return this
    */
   public T withInstanceOf(CharSequence typeFqn) {
-    return withInstanceOf(IClassNameSupplier.raw(typeFqn));
+    return withInstanceOf(ITypeNameSupplier.of(typeFqn));
   }
 
   /**
-   * Limit the {@link IType}s to the ones that are {@code instanceof} the given {@link IClassNameSupplier}.<br>
-   * This means all resulting {@link IType}s must have the fully qualified name of the {@link IClassNameSupplier} in
+   * Limit the {@link IType}s to the ones that are {@code instanceof} the given {@link ITypeNameSupplier}.<br>
+   * This means all resulting {@link IType}s must have the fully qualified name of the {@link ITypeNameSupplier} in
    * their super hierarchy.<br>
    * Default is no filtering.
    *
    * @param typeFqnSupplier
-   *          The {@link IClassNameSupplier} specifying the super type or {@code null} for no filtering.
+   *          The {@link ITypeNameSupplier} specifying the super type or {@code null} for no filtering.
    * @return this
    */
-  public T withInstanceOf(IClassNameSupplier typeFqnSupplier) {
+  public T withInstanceOf(ITypeNameSupplier typeFqnSupplier) {
     return withInstanceOfFrom(null, api -> typeFqnSupplier);
   }
 
   /**
-   * Limit the {@link IType}s to the ones that ar {@code instanceof} the {@link IClassNameSupplier} returned by the
-   * given nameFunction.<br>
+   * Limit the {@link IType}s to the ones that ar {@code instanceof} the {@link ITypeNameSupplier} returned by the given
+   * nameFunction.<br>
    * <b>Example:</b> {@code type.innerTypes().withInstanceOfFrom(IJavaApi.class, IJavaApi::List)}.
    * 
    * @param api
@@ -207,7 +207,7 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
    *          The API type that contains the class name
    * @return this
    */
-  public <API extends IApiSpecification> T withInstanceOfFrom(Class<API> api, Function<API, IClassNameSupplier> nameFunction) {
+  public <API extends IApiSpecification> T withInstanceOfFrom(Class<API> api, Function<API, ITypeNameSupplier> nameFunction) {
     if (nameFunction == null) {
       m_instanceOf = null;
     }
@@ -217,7 +217,7 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
     return m_thisInstance;
   }
 
-  protected ApiFunction<?, IClassNameSupplier> getInstanceOf() {
+  protected ApiFunction<?, ITypeNameSupplier> getInstanceOf() {
     return m_instanceOf;
   }
 
@@ -242,7 +242,7 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
 
     var name = Optional.ofNullable(getName())
         .flatMap(nameFilter -> nameFilter.apply(context))
-        .map(IClassNameSupplier::fqn)
+        .map(ITypeNameSupplier::fqn)
         .orElse(null);
     if (name != null && !name.equals(t.name())) {
       return false;
@@ -250,7 +250,7 @@ public abstract class AbstractInnerTypeQuery<T extends AbstractInnerTypeQuery<T>
 
     var simpleName = Optional.ofNullable(getSimpleName())
         .flatMap(simpleNameFilter -> simpleNameFilter.apply(context))
-        .map(IClassNameSupplier::simpleName)
+        .map(ITypeNameSupplier::simpleName)
         .orElse(null);
     return simpleName == null || simpleName.equals(t.elementName());
   }

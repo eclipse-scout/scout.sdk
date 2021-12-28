@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -36,6 +36,23 @@ public interface IAnnotatableGenerator<TYPE extends IAnnotatableGenerator<TYPE>>
   TYPE withAnnotation(IAnnotationGenerator<?> generator);
 
   /**
+   * Removes all annotations from this generator.
+   *
+   * @return This generator
+   */
+  TYPE withoutAllAnnotations();
+
+  /**
+   * Removes the annotation with the given fully qualified name from this generator. Only annotations with context
+   * independent names can be removed.
+   * 
+   * @param annotationFqn
+   *          The fully qualified name of the annotation to remove. E.g. "{@code java.lang.Override}".
+   * @return This generator.
+   */
+  TYPE withoutAnnotation(String annotationFqn);
+
+  /**
    * Removes all {@link IAnnotationGenerator IAnnotationGenerators} for which the given {@link Predicate} returns
    * {@code true}.
    * 
@@ -64,11 +81,4 @@ public interface IAnnotatableGenerator<TYPE extends IAnnotatableGenerator<TYPE>>
    *         {@link Optional}.
    */
   Optional<IAnnotationGenerator<?>> annotation(String annotationFqn);
-
-  /**
-   * Removes all annotations from this generator.
-   *
-   * @return This generator
-   */
-  TYPE clearAnnotations();
 }

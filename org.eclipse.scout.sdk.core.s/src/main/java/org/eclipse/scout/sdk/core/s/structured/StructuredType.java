@@ -34,7 +34,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IField;
@@ -380,7 +380,7 @@ public class StructuredType implements IStructuredType {
     List<IJavaElement> statics = new ArrayList<>();
     List<IJavaElement> members = new ArrayList<>();
 
-    var logger = scoutApi().map(IScoutApi::Logger).map(IClassNameSupplier::fqn);
+    var logger = scoutApi().map(IScoutApi::Logger).map(ITypeNameSupplier::fqn);
     for (var it = workingSet.iterator(); it.hasNext();) {
       var f = (IField) it.next();
       // static
@@ -602,7 +602,7 @@ public class StructuredType implements IStructuredType {
     consumeType(workingSet, IScoutApi::IFormHandler, Categories.TYPE_FORM_HANDLER, ScoutTypeComparators.BY_NAME);
   }
 
-  protected void consumeType(Iterable<IJavaElement> workingSet, Function<IScoutApi, IClassNameSupplier> typeInterface, Categories category, Comparator<IType> comparator) {
+  protected void consumeType(Iterable<IJavaElement> workingSet, Function<IScoutApi, ITypeNameSupplier> typeInterface, Categories category, Comparator<IType> comparator) {
     Set<IType> types = new TreeSet<>(comparator);
     var scoutApi = scoutApi().orElse(null);
     if (scoutApi != null) {

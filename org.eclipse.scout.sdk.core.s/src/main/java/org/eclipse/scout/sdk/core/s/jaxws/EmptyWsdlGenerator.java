@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -80,8 +81,8 @@ public class EmptyWsdlGenerator implements ISourceGenerator<ISourceBuilder<?>> {
     builder.append("</wsdl:definitions>").nl();
   }
 
-  protected static String packageToNamespace(String name, String packageName) {
-    var parts = packageName.split("\\.");
+  protected static String packageToNamespace(String name, CharSequence packageName) {
+    var parts = ISdkConstants.REGEX_DOT.split(packageName);
     if (parts.length > 0 && name.equalsIgnoreCase(parts[parts.length - 1])) {
       parts = Arrays.copyOf(parts, parts.length - 1);
     }

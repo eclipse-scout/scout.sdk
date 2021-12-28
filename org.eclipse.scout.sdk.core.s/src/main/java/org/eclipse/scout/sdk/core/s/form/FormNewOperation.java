@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerato
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
@@ -44,6 +45,7 @@ import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link FormNewOperation}</h3>
@@ -175,11 +177,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected String calcFormBaseName() {
-    var name = getFormName();
-    if (name.endsWith(ISdkConstants.SUFFIX_FORM)) {
-      name = name.substring(0, name.length() - ISdkConstants.SUFFIX_FORM.length());
-    }
-    return name;
+    return Strings.removeSuffix(getFormName(), ISdkConstants.SUFFIX_FORM);
   }
 
   public String getServiceBaseName() {
@@ -309,6 +307,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   protected IMethodGenerator<?, ?> createServiceMethod(String name) {
     IMethodGenerator<?, ?> methodBuilder = ScoutMethodGenerator.create()
         .asPublic()
+        .withFlags(Flags.AccInterface) // also add the method in the service interface
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withElementName(name)
         .withBody(b -> {
@@ -361,9 +360,8 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected static Optional<String> getParamNameHavingDataType(IMethodGenerator<?, ?> msb, String returnType, IJavaBuilderContext context) {
-    var environment = context.environment().orElse(null);
     return msb.parameters()
-        .filter(p -> returnType.equals(p.reference(environment)))
+        .filter(p -> returnType.equals(p.reference(context)))
         .findAny()
         .flatMap(IMethodParameterGenerator::elementName);
   }
@@ -395,15 +393,15 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected IFuture<IType> createCreatePermission(String permissionBaseName, String sharedPackage, IEnvironment env, IProgress progress) {
-    return createPermission("Create" + permissionBaseName, sharedPackage, this::setCreatedCreatePermissionFqn, env, progress);
+    return createPermission(ISdkConstants.PREFIX_CREATE_PERMISSION + permissionBaseName, sharedPackage, this::setCreatedCreatePermissionFqn, env, progress);
   }
 
   protected IFuture<IType> createReadPermission(String permissionBaseName, String sharedPackage, IEnvironment env, IProgress progress) {
-    return createPermission("Read" + permissionBaseName, sharedPackage, this::setCreatedReadPermissionFqn, env, progress);
+    return createPermission(ISdkConstants.PREFIX_READ_PERMISSION + permissionBaseName, sharedPackage, this::setCreatedReadPermissionFqn, env, progress);
   }
 
   protected IFuture<IType> createUpdatePermission(String permissionBaseName, String sharedPackage, IEnvironment env, IProgress progress) {
-    return createPermission("Update" + permissionBaseName, sharedPackage, this::setCreatedUpdatePermissionFqn, env, progress);
+    return createPermission(ISdkConstants.PREFIX_UPDATE_PERMISSION + permissionBaseName, sharedPackage, this::setCreatedUpdatePermissionFqn, env, progress);
   }
 
   protected IFuture<IType> createForm(IEnvironment env, IProgress progress) {

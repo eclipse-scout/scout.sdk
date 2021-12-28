@@ -19,7 +19,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
@@ -64,12 +64,12 @@ public class PageNewWizardPage extends AbstractCompilationUnitNewWizardPage {
   }
 
   @Override
-  protected Optional<IClassNameSupplier> calcSuperTypeDefaultFqn() {
+  protected Optional<ITypeNameSupplier> calcSuperTypeDefaultFqn() {
     return scoutApi().map(IScoutApi::AbstractPageWithTable);
   }
 
   @Override
-  protected Optional<IClassNameSupplier> calcSuperTypeDefaultBaseFqn() {
+  protected Optional<ITypeNameSupplier> calcSuperTypeDefaultBaseFqn() {
     return scoutApi().map(IScoutApi::IPage);
   }
 

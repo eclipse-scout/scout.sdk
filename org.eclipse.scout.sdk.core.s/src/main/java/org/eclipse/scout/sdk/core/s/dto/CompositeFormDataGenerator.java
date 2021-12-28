@@ -129,9 +129,7 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
    *         formDataTypeName would have.
    */
   protected boolean hasSimilarNameAs(IMethodGenerator<?, ?> msb, String formDataTypeName) {
-    var dataType = msb.returnType()
-        .flatMap(af -> af.apply(this.targetEnvironment()))
-        .orElseThrow();
+    var dataType = msb.returnType(currentBuilder().context()).orElseThrow();
     var name = PropertyBean.getterPrefixFor(dataType) + formDataTypeName;
     return name.equals(msb.elementName().orElseThrow());
   }

@@ -13,9 +13,8 @@ package org.eclipse.scout.sdk.core.builder.java;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.SourceBuilderWrapper;
 import org.eclipse.scout.sdk.core.generator.AbstractJavaElementGenerator;
@@ -115,7 +114,7 @@ public class JavaSourceBuilderWrapper<TYPE extends IJavaSourceBuilder<TYPE>> ext
   }
 
   @Override
-  public TYPE referencesFrom(Stream<ApiFunction<?, CharSequence>> references, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
+  public TYPE referencesFrom(Stream<Function<IJavaBuilderContext, ? extends CharSequence>> references, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
     inner().referencesFrom(references, prefix, delimiter, suffix);
     return thisInstance();
   }
@@ -127,20 +126,32 @@ public class JavaSourceBuilderWrapper<TYPE extends IJavaSourceBuilder<TYPE>> ext
   }
 
   @Override
-  public <API extends IApiSpecification> TYPE refFrom(ApiFunction<API, ? extends CharSequence> func) {
-    inner().refFrom(func);
+  public TYPE refFunc(Function<IJavaBuilderContext, ? extends CharSequence> func) {
+    inner().refFunc(func);
     return thisInstance();
   }
 
   @Override
-  public <API extends IApiSpecification> TYPE refClassFrom(Class<API> apiClass, Function<API, IClassNameSupplier> sourceProvider) {
+  public <API extends IApiSpecification> TYPE refClassFrom(Class<API> apiClass, Function<API, ITypeNameSupplier> sourceProvider) {
     inner().refClassFrom(apiClass, sourceProvider);
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE refClassFunc(Function<IJavaBuilderContext, ITypeNameSupplier> func) {
+    inner().refClassFunc(func);
     return thisInstance();
   }
 
   @Override
   public <API extends IApiSpecification> TYPE appendFrom(Class<API> apiClass, Function<API, ? extends CharSequence> sourceProvider) {
     inner().appendFrom(apiClass, sourceProvider);
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE appendFunc(Function<IJavaBuilderContext, ? extends CharSequence> sourceProvider) {
+    inner().appendFunc(sourceProvider);
     return thisInstance();
   }
 }

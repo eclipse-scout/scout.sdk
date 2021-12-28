@@ -95,10 +95,7 @@ public class CompilationUnitInfo {
   }
 
   private static String computeMainClassName(String fileName) {
-    if (fileName.endsWith(JavaTypes.JAVA_FILE_SUFFIX)) {
-      return fileName.substring(0, fileName.length() - JavaTypes.JAVA_FILE_SUFFIX.length());
-    }
-    return fileName;
+    return Strings.removeSuffix(fileName, JavaTypes.JAVA_FILE_SUFFIX);
   }
 
   private static String pathToClasspathString(Path p) {

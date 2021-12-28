@@ -11,12 +11,12 @@
 package org.eclipse.scout.sdk.core.s.service;
 
 import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
@@ -111,44 +111,43 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
     return result;
   }
 
-  protected ICompilationUnitGenerator<?> createServiceImplBuilder(String svcName, String serverPackage) {
+  protected ICompilationUnitGenerator<?> createServiceImplGenerator(String svcName, String serverPackage) {
     var javaEnvironment = getServerSourceFolder().javaEnvironment();
     var existingServiceImpl = javaEnvironment.findType(serverPackage + JavaTypes.C_DOT + svcName);
     ICompilationUnitGenerator<?> implBuilder;
     if (existingServiceImpl.isPresent()) {
-      var compilationUnit = existingServiceImpl.orElseThrow().requireCompilationUnit();
-      implBuilder = compilationUnit.toWorkingCopy();
-      implBuilder.mainType().ifPresent(t -> t.withInterface(getServiceIfcBuilder().fullyQualifiedName()));
+      implBuilder = existingServiceImpl.orElseThrow().requireCompilationUnit().toWorkingCopy();
     }
     else {
       implBuilder = PrimaryTypeGenerator.create()
           .withElementName(svcName)
-          .withPackageName(serverPackage)
-          .withInterface(getServiceIfcBuilder().fullyQualifiedName());
+          .withPackageName(serverPackage);
     }
-
-    for (var msb : getMethods()) {
-      var methodIdToSearch = msb.identifier(javaEnvironment);
-      var existingMethod = implBuilder
-          .mainType()
-          .flatMap(mainType -> mainType.method(methodIdToSearch, javaEnvironment, false));
-      if (existingMethod.isEmpty()) {
-        var existsInInterface = isInterface(msb.flags()) || isPublic(msb.flags());
-        if (existsInInterface) {
-          msb.withAnnotation(AnnotationGenerator.createOverride());
-        }
-        implBuilder.mainType().ifPresent(t -> t
-            .withMethod(msb
-                .withoutFlags(Flags.AccInterface)
-                .withFlags(Flags.AccPublic)
-                .withComment(null)));
-      }
-    }
+    implBuilder.mainType().ifPresent(t -> t
+        .withInterface(getServiceIfcBuilder().fullyQualifiedName())
+        .withPreProcessor(this::addMissingImplMethods));
     return implBuilder;
   }
 
+  protected void addMissingImplMethods(ITypeGenerator<?> svcImpl, IJavaBuilderContext context) {
+    for (var msb : getMethods()) {
+      var methodIdToSearch = msb.identifier(context);
+      var existingMethod = svcImpl.method(methodIdToSearch, context, false);
+      if (existingMethod.isEmpty()) {
+        var existsInInterface = isInterface(msb.flags());
+        if (existsInInterface) {
+          msb.asPublic().withAnnotation(AnnotationGenerator.createOverride());
+        }
+        svcImpl.withMethod(msb
+            .withFlags(msb.flags())
+            .withoutFlags(Flags.AccInterface)
+            .withComment(null));
+      }
+    }
+  }
+
   protected IFuture<IType> createServiceImpl(String svcName, String serverPackage, IEnvironment env, IProgress progress) {
-    var implBuilder = createServiceImplBuilder(svcName, serverPackage);
+    var implBuilder = createServiceImplGenerator(svcName, serverPackage);
     implBuilder.mainType().ifPresent(gen -> setCreatedServiceImplFqn(gen.fullyQualifiedName()));
     return env.writeCompilationUnitAsync(implBuilder, getServerSourceFolder(), progress);
   }
@@ -157,27 +156,25 @@ public class ServiceNewOperation implements BiConsumer<IEnvironment, IProgress> 
     var ifcName = 'I' + svcName;
     var javaEnvironment = getSharedSourceFolder().javaEnvironment();
     var existingServiceIfc = javaEnvironment.findType(sharedPackage + JavaTypes.C_DOT + ifcName);
-    ICompilationUnitGenerator<?> ifcBuilder;
-    ifcBuilder = existingServiceIfc
+    var ifcBuilder = existingServiceIfc
         .<ICompilationUnitGenerator<?>> map(iType -> iType.requireCompilationUnit().toWorkingCopy())
         .orElseGet(() -> new ServiceInterfaceGenerator<>()
             .withElementName(ifcName)
             .withPackageName(sharedPackage));
+    ifcBuilder.mainType().ifPresent(t -> t.withPreProcessor(this::addMissingIfcMethods));
+    return ifcBuilder;
+  }
 
+  protected void addMissingIfcMethods(ITypeGenerator<?> svcIfc, IJavaBuilderContext context) {
     for (var msb : getMethods()) {
-      if (isPublic(msb.flags()) || isInterface(msb.flags())) {
-        var methodIdToSearch = msb.identifier(javaEnvironment);
-        var existingMethod = ifcBuilder.mainType()
-            .flatMap(mainType -> mainType.method(methodIdToSearch, javaEnvironment, false));
+      if (isInterface(msb.flags())) {
+        var methodIdToSearch = msb.identifier(context);
+        var existingMethod = svcIfc.method(methodIdToSearch, context, false);
         if (existingMethod.isEmpty()) {
-          ifcBuilder.mainType().ifPresent(t -> t
-              .withMethod(msb
-                  .withoutFlags(Flags.AccPublic)
-                  .withFlags(Flags.AccInterface)));
+          svcIfc.withMethod(msb.withoutFlags(Flags.AccPublic));
         }
       }
     }
-    return ifcBuilder;
   }
 
   protected IFuture<IType> createServiceIfc(String svcName, String sharedPackage, IEnvironment env, IProgress progress) {

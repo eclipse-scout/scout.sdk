@@ -96,7 +96,8 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                 PageNewOperation()
             }
             override var prepareOperationFuncList: MutableList<(PageNewOperation, String, String?, SourceFolderHelper) -> Unit> = mutableListOf({ op, elementName, pkg, sourceFolderHelper ->
-                op.pageName = elementNameWithSuffix(elementName, ISdkConstants.SUFFIX_PAGE_WITH_TABLE)
+                val cleanedName = elementName.removeSuffix(ISdkConstants.SUFFIX_PAGE_WITH_NODES).removeSuffix(ISdkConstants.SUFFIX_OUTLINE_PAGE)
+                op.pageName = elementNameWithSuffix(cleanedName, ISdkConstants.SUFFIX_PAGE_WITH_TABLE)
                 op.`package` = sourceFolderHelper.tier()!!.convert(ScoutTier.Client, pkg)
 
                 op.clientSourceFolder = sourceFolderHelper.clientSourceFolder()

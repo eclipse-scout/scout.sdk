@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IWebConstants;
@@ -70,8 +70,8 @@ public final class Translations {
         .forEach(mapping -> registerUiTextContributor(mapping.getKey(), mapping.getValue().fqn()));
   }
 
-  private static Map<String /* node module name */, IClassNameSupplier /* text contributor */> getPredefinedTextContributorMappings(IScoutApi api) {
-    Map<String, IClassNameSupplier> mappings = new HashMap<>(2);
+  private static Map<String /* node module name */, ITypeNameSupplier /* text contributor */> getPredefinedTextContributorMappings(IScoutApi api) {
+    Map<String, ITypeNameSupplier> mappings = new HashMap<>(2);
     mappings.put(IWebConstants.SCOUT_JS_CORE_MODULE_NAME, api.UiTextContributor());
     api.api(IScoutChartApi.class).ifPresent(chartApi -> mappings.put(IWebConstants.SCOUT_JS_CHART_MODULE_NAME, chartApi.ChartUiTextContributor()));
     return mappings;

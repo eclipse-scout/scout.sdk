@@ -42,7 +42,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -90,7 +90,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
         .flatMap(Optional::stream);
   }
 
-  private static Stream<org.eclipse.scout.sdk.core.model.api.IType> resolveSubClasses(IJavaProject jp, Function<IScoutApi, IClassNameSupplier> nameFunction, EclipseEnvironment env, EclipseProgress progress) {
+  private static Stream<org.eclipse.scout.sdk.core.model.api.IType> resolveSubClasses(IJavaProject jp, Function<IScoutApi, ITypeNameSupplier> nameFunction, EclipseEnvironment env, EclipseProgress progress) {
     var scoutApi = ApiHelper.scoutApiFor(jp, env);
     if (scoutApi.isEmpty()) {
       return Stream.empty();

@@ -15,7 +15,6 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.eclipse.scout.sdk.core.util.JavaTypes.createMethodIdentifier;
 
 import java.util.ArrayList;
@@ -24,7 +23,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
@@ -39,22 +37,18 @@ import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
-import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode.DataObjectNodeKind;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
-import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.s.generator.method.IScoutMethodGenerator;
+import org.eclipse.scout.sdk.core.s.generator.method.ScoutDoMethodGenerator;
 import org.eclipse.scout.sdk.core.util.SourceState;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -62,7 +56,6 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironment, IProgress> {
 
   private static final Pattern IMPORT_PATTERN = Pattern.compile("import\\s+[\\w_.]+;");
-  public static final String CONVENIENCE_METHOD_MARKER_START = "/* ******************";
 
   private final List<IType> m_dataObjects = new ArrayList<>();
   private String m_lineSeparator;
@@ -127,7 +120,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     replacements.stream()
         .filter(r -> r.newSource().length() > 0) // not a delete replacement
         .findFirst()
-        .ifPresent(r -> r.setNewSource(convenienceMethodsMarker() + r.newSource()));
+        .ifPresent(r -> r.setNewSource(lineSeparator() + ScoutDoMethodGenerator.convenienceMethodsMarkerComment(lineSeparator()) + lineSeparator() + r.newSource()));
   }
 
   protected CharSequence insertMissingImports(IJavaBuilderContext buildContext, CharSequence newSource) {
@@ -170,18 +163,18 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     return createMethodIdentifier(m.elementName(), paramSource);
   }
 
-  protected String createMethodDeclarationSource(IMethodGenerator<?, ?> m, IJavaEnvironment env) {
+  protected String createMethodDeclarationSource(IMethodGenerator<?, ?> m, IJavaBuilderContext context) {
     var paramSource = m.parameters()
-        .map(p -> p.toJavaSource(env))
+        .map(p -> p.toJavaSource(context))
         .collect(toList());
-    return createMethodIdentifier(m.elementName(env).orElseThrow(), paramSource);
+    return createMethodIdentifier(m.elementName(context).orElseThrow(), paramSource);
   }
 
-  protected Stream<Replacement> buildReplacements(IMethodGenerator<?, ?> generator, IType dataObjectType, CharSequence cuSource, IJavaBuilderContext buildContext, Collection<IMethod> replacedMethods) {
+  protected Stream<Replacement> buildReplacements(IMethodGenerator<?, ?> generator, IType dataObjectType, CharSequence cuSource, IJavaBuilderContext context, Collection<IMethod> replacedMethods) {
     // search existing method not using methodId. Because the type used in the existing method might no longer exist. This would result in an exception (type missing).
     // instead compare the source of the method declaration to be created with the source of the existing method declarations (ignoring fully qualified type names).
-    var methodDeclarationSource = createMethodDeclarationSource(generator, dataObjectType.javaEnvironment());
-    var methodName = generator.elementName(dataObjectType.javaEnvironment()).orElseThrow();
+    var methodDeclarationSource = createMethodDeclarationSource(generator, context);
+    var methodName = generator.elementName(context).orElseThrow();
     var existingMethod = dataObjectType
         .methods()
         .withName(methodName).stream()
@@ -190,7 +183,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
 
     // insert at the bottom of the class
     var insertIndex = dataObjectType.source().orElseThrow().end() - 1;
-    var newSource = generator.toJavaSource(buildContext); // pass a shared BuilderContext to collect imports
+    var newSource = generator.toJavaSource(context); // pass a shared BuilderContext to collect imports
     var newMethodReplacement = new Replacement(insertIndex, 0, newSource);
     if (existingMethod.isEmpty()) {
       return Stream.of(newMethodReplacement);
@@ -221,7 +214,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     var methodStartOffset = sourceRange.start();
 
     var declarationStartRelativeToMethodSource = method.sourceOfDeclaration().orElseThrow().start() - sourceRange.start();
-    var pos = Strings.indexOf(CONVENIENCE_METHOD_MARKER_START, sourceRange.asCharSequence(), 0, declarationStartRelativeToMethodSource);
+    var pos = Strings.indexOf(ScoutDoMethodGenerator.CONVENIENCE_METHOD_MARKER_START, sourceRange.asCharSequence(), 0, declarationStartRelativeToMethodSource);
     if (pos > 0) {
       // if a convenience marker comment start is found before the method declaration start
       methodStartOffset += pos;
@@ -232,14 +225,8 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     return new Replacement(methodStartOffset, sourceRange.end() - methodStartOffset + 1, "");
   }
 
-  protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsFor(DataObjectNode node, IType owner) {
-    Stream<IMethodGenerator<?, ?>> methodGenerators;
-    if (node.kind() == DataObjectNodeKind.VALUE) {
-      methodGenerators = buildMethodGeneratorsForValue(node, owner);
-    }
-    else {
-      methodGenerators = buildMethodGeneratorsForCollection(node, owner);
-    }
+  protected Stream<IScoutMethodGenerator<?, ?>> buildMethodGeneratorsFor(DataObjectNode node, IType owner) {
+    var methodGenerators = ScoutDoMethodGenerator.createConvenienceMethods(node.name(), node.kind(), node.dataType().reference(), node.isInherited(), owner);
     methodGenerators = methodGenerators.peek(g -> copyAnnotations(node.method(), g));
     if (!node.hasJavaDoc()) {
       return methodGenerators;
@@ -265,76 +252,8 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
         .appendBlockCommentEnd().nl();
   }
 
-  protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsForValue(DataObjectNode node, IType owner) {
-    var dataTypeRef = node.dataType().reference();
-    var chainedSetter = ScoutMethodGenerator.createDoValueSetter(node.name(), dataTypeRef, owner);
-    if (node.isInherited()) {
-      // for inherited nodes: only overwrite (and narrow) the chained setter
-      return Stream.of(chainedSetter);
-    }
-
-    var valueGetter = ScoutMethodGenerator.createDoNodeGetter(node.name(), dataTypeRef, owner);
-    var additionalGetters = owner.javaEnvironment().requireApi(IScoutApi.class)
-        .IDoEntity().getAdditionalDoNodeGetters(node.name(), dataTypeRef, owner);
-    var allMissingGetters = Stream.concat(Stream.of(valueGetter), additionalGetters)
-        .filter(gen -> !implementedInSuperClass(gen, owner)); // skip getters already existing in the super class. no need to override
-    return Stream.concat(Stream.of(chainedSetter), allMissingGetters);
-
-  }
-
-  protected Stream<IMethodGenerator<?, ?>> buildMethodGeneratorsForCollection(DataObjectNode node, IType owner) {
-    var dataTypeRef = node.dataType().reference();
-    var chainedSetterCollection = ScoutMethodGenerator.createDoCollectionSetterCollection(node.name(), dataTypeRef, owner);
-    var chainedSetterArray = ScoutMethodGenerator.createDoCollectionSetterVarargs(node.name(), dataTypeRef, owner);
-    if (node.isInherited()) {
-      // for inherited nodes: only overwrite (and narrow) the chained setter
-      return Stream.of(chainedSetterCollection, chainedSetterArray);
-    }
-
-    String getterCollectionFqn;
-    switch (node.kind()) {
-      case LIST:
-        getterCollectionFqn = List.class.getName();
-        break;
-      case SET:
-        getterCollectionFqn = Set.class.getName();
-        break;
-      case COLLECTION:
-        getterCollectionFqn = Collection.class.getName();
-        break;
-      default:
-        throw newFail("Unsupported DoNode kind of '{}' on '{}'.", node, owner.name());
-    }
-
-    var collectionGetterReturnTypeReference = getterCollectionFqn + JavaTypes.C_GENERIC_START + dataTypeRef + JavaTypes.C_GENERIC_END;
-    var collectionGetter = ScoutMethodGenerator.createDoNodeGetter(node.name(), collectionGetterReturnTypeReference, owner);
-    if (implementedInSuperClass(collectionGetter, owner)) {
-      // the method already exists in the super class. no need to override the getter
-      return Stream.of(chainedSetterCollection, chainedSetterArray);
-    }
-    return Stream.of(chainedSetterCollection, chainedSetterArray, collectionGetter);
-  }
-
-  protected String convenienceMethodsMarker() {
-    return lineSeparator() + lineSeparator()
-        + CONVENIENCE_METHOD_MARKER_START + "********************************************************" + lineSeparator()
-        + "   * GENERATED CONVENIENCE METHODS" + lineSeparator()
-        + "   * *************************************************************************/"
-        + lineSeparator() + lineSeparator();
-  }
-
   protected IAnnotationGenerator<?> createGenerated() {
     return AnnotationGenerator.createGenerated("DoConvenienceMethodsGenerator", null);
-  }
-
-  protected boolean implementedInSuperClass(IMethodGenerator<?, ?> method, IType owner) {
-    var methodId = method.identifier(owner.javaEnvironment());
-    return owner
-        .superTypes()
-        .withSelf(false)
-        .stream()
-        .flatMap(t -> t.methods().withMethodIdentifier(methodId).stream())
-        .anyMatch(m -> !Flags.isAbstract(m.flags()) || Flags.isDefaultMethod(m.flags()));
   }
 
   protected static class Replacement {

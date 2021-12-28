@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransform
 import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link WebServiceClientGenerator}</h3>
@@ -42,8 +43,9 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
   private String m_service;
 
   @Override
-  protected void fillMainType(ITypeGenerator<? extends ITypeGenerator<?>> mainType) {
-    mainType.withSuperClassFrom(IScoutApi.class, this::buildSuperType)
+  protected void setup() {
+    this
+        .withSuperClassFrom(IScoutApi.class, this::buildSuperType)
         .withInterface(portType())
         .withType(createUrlPropertyType())
         .withMethod(createExecInstallHandlers())
@@ -66,11 +68,7 @@ public class WebServiceClientGenerator<TYPE extends WebServiceClientGenerator<TY
   }
 
   protected String getBaseName() {
-    var name = elementName().orElseThrow(() -> newFail("WebService client has no name."));
-    if (name.endsWith(ISdkConstants.SUFFIX_WS_CLIENT)) {
-      name = name.substring(0, name.length() - ISdkConstants.SUFFIX_WS_CLIENT.length());
-    }
-    return name;
+    return Strings.removeSuffix(elementName().orElseThrow(() -> newFail("WebService client has no name.")), ISdkConstants.SUFFIX_WS_CLIENT);
   }
 
   public String urlPropertyName() {

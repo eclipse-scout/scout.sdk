@@ -19,12 +19,13 @@ import java.util.function.Function;
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
 import org.eclipse.scout.sdk.core.builder.java.member.IMemberBuilder;
 import org.eclipse.scout.sdk.core.builder.java.member.MemberBuilder;
 import org.eclipse.scout.sdk.core.generator.AbstractAnnotatableGenerator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
@@ -41,7 +42,10 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
 
   private boolean m_isFinal;
   private boolean m_isVarargs;
-  private ApiFunction<?, String> m_dataType;
+  private JavaBuilderContextFunction<String> m_dataType;
+
+  protected MethodParameterGenerator() {
+  }
 
   protected MethodParameterGenerator(IMethodParameter parameter, IWorkingCopyTransformer transformer) {
     super(parameter, transformer);
@@ -57,7 +61,11 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
         .withDataType(dataType);
   }
 
-  protected MethodParameterGenerator() {
+  /**
+   * @return A new empty {@link IMethodParameterGenerator}.
+   */
+  public static IMethodParameterGenerator<?> create() {
+    return new MethodParameterGenerator<>();
   }
 
   /**
@@ -81,13 +89,6 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
     return new MethodParameterGenerator<>(parameter, transformer);
   }
 
-  /**
-   * @return A new empty {@link IMethodParameterGenerator}.
-   */
-  public static IMethodParameterGenerator<?> create() {
-    return new MethodParameterGenerator<>();
-  }
-
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
     super.build(builder);
@@ -99,16 +100,14 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
       builder.appendFlags(Flags.AccFinal);
     }
 
-    var dataType = dataType().orElseThrow(() -> newFail("Method parameter data type missing for generator {}", this))
-        .apply(builder.context())
-        .filter(Strings::hasText)
-        .orElseThrow(() -> newFail("Unable to get method parameter data type for generator {}", this));
+    var dataType = dataTypeFunc().orElseThrow(() -> newFail("Method parameter data type missing for generator {}", this))
+        .apply(builder.context());
     builder.ref(dataType);
 
     if (isVarargs()) {
       builder.append("...");
     }
-    var parameterName = ensureValidJavaName(elementName().orElseThrow(() -> newFail("Method parameter name missing for generator {}", this)));
+    var parameterName = ensureValidJavaName(elementName(builder.context()).orElseThrow(() -> newFail("Method parameter name missing for generator {}", this)));
     builder.space()
         .append(parameterName);
   }
@@ -119,23 +118,35 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
   }
 
   @Override
-  public Optional<ApiFunction<?, String>> dataType() {
+  public Optional<String> dataType() {
+    return dataTypeFunc().flatMap(JavaBuilderContextFunction::apply);
+  }
+
+  @Override
+  public Optional<String> dataType(IJavaBuilderContext context) {
+    return dataTypeFunc().map(f -> f.apply(context));
+  }
+
+  @Override
+  public Optional<JavaBuilderContextFunction<String>> dataTypeFunc() {
     return Optional.ofNullable(m_dataType);
   }
 
   @Override
   public TYPE withDataType(String dataType) {
-    return withDataTypeFrom(null, api -> dataType);
+    m_dataType = JavaBuilderContextFunction.orNull(dataType);
+    return thisInstance();
   }
 
   @Override
   public <A extends IApiSpecification> TYPE withDataTypeFrom(Class<A> apiDefinition, Function<A, String> dataTypeSupplier) {
-    if (dataTypeSupplier == null) {
-      m_dataType = null;
-    }
-    else {
-      m_dataType = new ApiFunction<>(apiDefinition, dataTypeSupplier);
-    }
+    m_dataType = new ApiFunction<>(apiDefinition, dataTypeSupplier);
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE withDataTypeFunc(Function<IJavaBuilderContext, String> dataTypeSupplier) {
+    m_dataType = JavaBuilderContextFunction.orNull(dataTypeSupplier);
     return thisInstance();
   }
 
@@ -182,14 +193,14 @@ public class MethodParameterGenerator<TYPE extends IMethodParameterGenerator<TYP
   }
 
   @Override
-  public String reference(IJavaEnvironment context) {
+  public String reference(IJavaBuilderContext context) {
     return reference(context, false);
   }
 
   @Override
-  public String reference(IJavaEnvironment context, boolean useErasureOnly) {
-    var dataTypeFunc = dataType().orElseThrow(() -> newFail("Cannot calculate the method parameter reference because the datatype is missing."));
-    var typeString = dataTypeFunc.apply(context).orElseThrow(() -> newFail("Cannot compute parameter data type of method parameter '{}'.", elementName().orElse(null)));
+  public String reference(IJavaBuilderContext context, boolean useErasureOnly) {
+    var dataTypeFunc = dataTypeFunc().orElseThrow(() -> newFail("Cannot calculate the method parameter reference because the datatype is missing."));
+    var typeString = Strings.notEmpty(dataTypeFunc.apply(context)).orElseThrow(() -> newFail("Cannot compute parameter data type of method parameter '{}'.", elementName(context).orElse(null)));
     if (useErasureOnly) {
       typeString = JavaTypes.erasure(typeString);
     }

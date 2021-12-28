@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
@@ -73,11 +73,11 @@ public class WellformAllOperation implements BiConsumer<EclipseEnvironment, Ecli
   protected static Set<String> getRootClasses() {
     return ScoutApi.allKnown()
         .flatMap(WellformAllOperation::getRootClasses)
-        .map(IClassNameSupplier::fqn)
+        .map(ITypeNameSupplier::fqn)
         .collect(toSet());
   }
 
-  protected static Stream<IClassNameSupplier> getRootClasses(IScoutInterfaceApi api) {
+  protected static Stream<ITypeNameSupplier> getRootClasses(IScoutInterfaceApi api) {
     return Stream.of(api.ICodeType(), api.IDesktop(), api.IDesktopExtension(), api.IForm(), api.IWizard(), api.IPage(), api.IOutline());
   }
 

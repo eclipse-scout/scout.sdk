@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -54,7 +54,7 @@ public class AnnotationCopyTest {
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
     assertEquals(1, annotationCopyTestFormData.methods().stream().count(), "method count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData'");
-    var getFirst = assertMethodExist(annotationCopyTestFormData, "getFirst", new String[]{});
+    var getFirst = assertMethodExist(annotationCopyTestFormData, "getFirst");
     assertMethodReturnType(getFirst, "formdata.shared.ui.forms.AnnotationCopyTestFormData$First");
     assertEquals(0, getFirst.annotations().stream().count(), "annotation count");
 

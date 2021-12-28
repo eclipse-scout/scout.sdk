@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.fixture.InterfaceWithTypeParam;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
@@ -36,7 +37,6 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.testing.context.DefaultCommentGeneratorExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.testing.context.UsernameExtension;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
@@ -49,7 +49,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
  * @since 6.1.0
  */
 @ExtendWith(UsernameExtension.class)
-@ExtendWith(JavaEnvironmentExtension.class)
 @ExtendWith(DefaultCommentGeneratorExtension.class)
 @ExtendWithJavaEnvironmentFactory(CoreJavaEnvironmentWithSourceFactory.class)
 public class TypeGeneratorTest {
@@ -90,7 +89,7 @@ public class TypeGeneratorTest {
         .withElementName("TestClass")
         .withInterfaces(interfaces)
         .withInterface(Serializable.class.getName())
-        .withoutInterface(af -> af.apply(env).orElse("").equals(Serializable.class.getName()))
+        .withoutInterface(af -> af.apply(null).equals(Serializable.class.getName()))
         .withSuperClass(AbstractMap.class.getName())
         .withField(
             FieldGenerator.create()
@@ -131,10 +130,10 @@ public class TypeGeneratorTest {
         .setDeclaringFullyQualifiedName("a.b.c");
 
     assertEquals("a.b.c.TestClass", generator.fullyQualifiedName());
-    assertEquals(AbstractMap.class.getName(), generator.superClass().map(af -> af.apply(env).orElseThrow()).orElseThrow());
+    assertEquals(AbstractMap.class.getName(), generator.superClassFunc().map(af -> af.apply(null)).orElseThrow());
     assertEquals(2, generator.fields().count());
     assertEquals(2, generator.methods().count());
-    assertTrue(generator.method("testMethod()", env, false).isPresent());
+    assertTrue(generator.method("testMethod()", new JavaBuilderContext(env), false).isPresent());
     assertEquals(2, generator.types().count());
     assertEquals(1, generator.typeParameters().count());
 
@@ -147,7 +146,7 @@ public class TypeGeneratorTest {
         .withBinding(CharSequence.class.getName())
         .withBinding(Iterable.class.getName())
         .withBinding(Comparable.class.getName());
-    assertEquals(3, typeParamGenerator.bounds().count());
+    assertEquals(3, typeParamGenerator.boundsFunc().count());
 
     var src = TypeGenerator.create()
         .asPublic()

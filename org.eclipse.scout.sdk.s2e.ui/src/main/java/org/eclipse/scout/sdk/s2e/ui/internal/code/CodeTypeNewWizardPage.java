@@ -24,7 +24,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
@@ -64,12 +64,12 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
   }
 
   @Override
-  protected Optional<IClassNameSupplier> calcSuperTypeDefaultFqn() {
+  protected Optional<ITypeNameSupplier> calcSuperTypeDefaultFqn() {
     return scoutApi().map(IScoutApi::AbstractCodeType);
   }
 
   @Override
-  protected Optional<IClassNameSupplier> calcSuperTypeDefaultBaseFqn() {
+  protected Optional<ITypeNameSupplier> calcSuperTypeDefaultBaseFqn() {
     return scoutApi().map(IScoutApi::ICodeType);
   }
 
@@ -215,7 +215,7 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
     return getCodeTypeTypeArgDatatype(iCodeTypeApi.codeTypeIdTypeParamIndex(), iCodeTypeApi, environment);
   }
 
-  protected String getCodeTypeTypeArgDatatype(int typeParamIndex, IClassNameSupplier iCodeTypeApi, EclipseEnvironment environment) {
+  protected String getCodeTypeTypeArgDatatype(int typeParamIndex, ITypeNameSupplier iCodeTypeApi, EclipseEnvironment environment) {
     var superType = environment.toScoutType(getSuperType()); // don't use m_provider here because it might already have been closed.
     var codeTypeIdArg = superType.superTypes()
         .withSelf(false)

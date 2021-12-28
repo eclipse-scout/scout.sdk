@@ -77,6 +77,7 @@
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaLogger"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.nls.IdeaTranslationStoreSupplier"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator"/>
+    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.dataobject.IdeaDoContextResolver"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.maven.IdeaMavenRunner"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdStartup"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManagerStartup"/>

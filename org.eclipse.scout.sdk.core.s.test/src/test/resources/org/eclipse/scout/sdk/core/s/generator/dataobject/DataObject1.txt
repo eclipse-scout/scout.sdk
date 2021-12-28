@@ -1,0 +1,13 @@
+package test.pck;
+
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.TypeVersion;
+
+import dataobject.FixtureTypeVersions.SdkFixture_1_0_0_0;
+
+@TypeName("sdk.MyTest")
+@TypeVersion(SdkFixture_1_0_0_0.class)
+public class MyTestDo extends DoEntity {
+
+}

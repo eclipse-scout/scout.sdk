@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,10 +11,10 @@
 package org.eclipse.scout.sdk.core.generator;
 
 import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
+import org.eclipse.scout.sdk.core.model.api.IPackage;
 import org.eclipse.scout.sdk.core.transformer.DefaultWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
-import org.eclipse.scout.sdk.core.model.api.IPackage;
 
 public class PackageGenerator extends AbstractAnnotatableGenerator<PackageGenerator> {
 
@@ -24,6 +24,13 @@ public class PackageGenerator extends AbstractAnnotatableGenerator<PackageGenera
   @SuppressWarnings("TypeMayBeWeakened")
   protected PackageGenerator(IPackage parameter, IWorkingCopyTransformer transformer) {
     super(parameter, transformer);
+  }
+
+  /**
+   * @return A new empty {@link PackageGenerator}.
+   */
+  public static PackageGenerator create() {
+    return new PackageGenerator();
   }
 
   /**
@@ -46,16 +53,9 @@ public class PackageGenerator extends AbstractAnnotatableGenerator<PackageGenera
     return new PackageGenerator(pck, transformer);
   }
 
-  /**
-   * @return A new empty {@link PackageGenerator}.
-   */
-  public static PackageGenerator create() {
-    return new PackageGenerator();
-  }
-
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
     super.build(builder);
-    elementName().ifPresent(pck -> builder.append("package ").append(pck).semicolon());
+    elementName(builder.context()).ifPresent(pck -> builder.append("package ").append(pck).semicolon());
   }
 }

@@ -15,9 +15,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
 import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
@@ -38,7 +38,6 @@ import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
 import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * <h3>{@link ITypeGenerator}</h3>
@@ -52,7 +51,13 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
   /**
    * @return A {@link Stream} with all interface types this {@link ITypeGenerator} implements.
    */
-  Stream<ApiFunction<?, String>> interfaces();
+  Stream<JavaBuilderContextFunction<String>> interfacesFunc();
+
+  /**
+   * @return A {@link Stream} with all interface references this {@link ITypeGenerator} implements and can be computed
+   *         without context.
+   */
+  Stream<String> interfaces();
 
   /**
    * Adds the specified interface reference to this type.
@@ -61,8 +66,8 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * {@code implement} the interface.
    *
    * @param interfaceReference
-   *          The interface reference to add. Must not be blank (see {@link Strings#isBlank(CharSequence)}). E.g.
-   *          {@code java.util.List<? extends java.lang.CharSequence>}.
+   *          The interface reference to add. E.g. "{@code java.util.List<? extends java.lang.CharSequence>}". In case
+   *          the reference is blank or {@code null} this method does nothing.
    * @return This generator.
    * @see #withInterfaceFrom(Class, Function)
    * @see #withInterfaces(Stream)
@@ -82,7 +87,8 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    *          The api type that defines the interface type. An instance of this API is passed to the interfaceSupplier.
    *          May be {@code null} in case the given interfaceSupplier can handle a {@code null} input.
    * @param interfaceSupplier
-   *          A {@link Function} to be called to obtain the interface type to add to this {@link ITypeGenerator}.
+   *          A {@link Function} to be called to obtain the interface type to add to this {@link ITypeGenerator}. Must
+   *          not be {@code null}.
    * @param <A>
    *          The API type that contains the class name
    * @return This generator.
@@ -90,6 +96,21 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * @see #withInterfaces(Stream)
    */
   <A extends IApiSpecification> TYPE withInterfaceFrom(Class<A> apiDefinition, Function<A, String> interfaceSupplier);
+
+  /**
+   * Adds the result of the interfaceSupplier to the list of implemented interfaces.
+   * <p>
+   * This method may be handy in case the interface reference is context dependent.
+   * </p>
+   * 
+   * @param interfaceSupplier
+   *          A {@link Function} to be called to obtain the interface type to add to this {@link ITypeGenerator}. This
+   *          method does nothing in case the supplier is {@code null}.
+   * @return This generator.
+   * @see #withInterface(String)
+   * @see #withInterfaces(Stream)
+   */
+  TYPE withInterfaceFunc(Function<IJavaBuilderContext, String> interfaceSupplier);
 
   /**
    * Adds all interface references of the specified {@link Stream} to the interfaces of this {@link ITypeGenerator}.
@@ -103,6 +124,16 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
   TYPE withInterfaces(Stream<String> interfaceReferences);
 
   /**
+   * Removes the given interface reference from this {@link ITypeGenerator}. Only context independent references can be
+   * removed with this function.
+   * 
+   * @param toRemove
+   *          The interface reference to remove.
+   * @return This generator.
+   */
+  TYPE withoutInterface(String toRemove);
+
+  /**
    * Removes all interface types for which the given {@link Predicate} returns {@code true}.
    * 
    * @param filter
@@ -110,18 +141,30 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    *          interfaces are removed.
    * @return This generator.
    */
-  TYPE withoutInterface(Predicate<ApiFunction<?, String>> filter);
+  TYPE withoutInterface(Predicate<JavaBuilderContextFunction<String>> filter);
 
   /**
-   * @return The super class of this {@link ITypeGenerator} or an empty {@link Optional} if has none.
+   * @return The super class reference in case it can be computed without context.
    */
-  Optional<ApiFunction<?, String>> superClass();
+  Optional<String> superClass();
 
   /**
-   * Sets the super class of this {@link ITypeGenerator}.
+   * @param context
+   *          The context for which the super class should be computed.
+   * @return The super class reference or an empty {@link Optional} if this {@link ITypeGenerator} has no super class.
+   */
+  Optional<String> superClass(IJavaBuilderContext context);
+
+  /**
+   * @return The super class function of this {@link ITypeGenerator} or an empty {@link Optional} if has none.
+   */
+  Optional<JavaBuilderContextFunction<String>> superClassFunc();
+
+  /**
+   * Sets the super class reference of this {@link ITypeGenerator}.
    *
    * @param superType
-   *          The super class reference.
+   *          The super class reference or {@code null} if this {@link ITypeGenerator} should not have a super class.
    * @return This generator.
    * @see #withSuperClassFrom(Class, Function)
    */
@@ -142,13 +185,27 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    *          input.
    * @param superClassSupplier
    *          A {@link Function} to be called to obtain the super class type reference to set to this
-   *          {@link ITypeGenerator}.
+   *          {@link ITypeGenerator}. Must not be {@code null}.
    * @param <A>
    *          The API type that contains the class name
    * @return This generator.
    * @see #withSuperClass(String)
    */
   <A extends IApiSpecification> TYPE withSuperClassFrom(Class<A> apiDefinition, Function<A, String> superClassSupplier);
+
+  /**
+   * Sets the result of the superClassSupplier as super class reference.
+   * <p>
+   * This method may be handy if the super class type reference is context dependent.
+   * </p>
+   * 
+   * @param superClassSupplier
+   *          A {@link Function} to be called to obtain the super class type reference to set to this
+   *          {@link ITypeGenerator} or {@code null} if it should not have a super class.
+   * @return This generator.
+   * @see #withSuperClass(String)
+   */
+  TYPE withSuperClassFunc(Function<IJavaBuilderContext, String> superClassSupplier);
 
   /**
    * Builds the fully qualified name this type will have when generated.
@@ -253,6 +310,19 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
   TYPE withoutMethod(Predicate<IMethodGenerator<?, ?>> removalFilter);
 
   /**
+   * Removes all {@link IMethodGenerator IMethodGenerators} having the
+   * {@link IMethodGenerator#identifier(IJavaBuilderContext) identifier} given.
+   * 
+   * @param identifier
+   *          The identifier of the methods to remove
+   * @param context
+   *          The {@link IJavaBuilderContext} to compute the identifiers of the methods currently registered in this
+   *          {@link ITypeGenerator}. May be {@code null} if the methods ids can be computed without context.
+   * @return This generator.
+   */
+  TYPE withoutMethod(String identifier, IJavaBuilderContext context);
+
+  /**
    * Gets the {@link IMethodGenerator} in this {@link ITypeGenerator} having the specified method identifier.
    *
    * @param methodId
@@ -265,11 +335,11 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * @param includeTypeArguments
    *          If {@code false} only the type erasure is used for all method parameter types.
    * @return The {@link IMethodGenerator} with the specified method id or an empty {@link Optional}.
-   * @see IMethodGenerator#identifier(IJavaEnvironment, boolean)
+   * @see IMethodGenerator#identifier(IJavaBuilderContext, boolean)
    * @see IMethod#identifier()
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
    */
-  Optional<IMethodGenerator<?, ?>> method(String methodId, IJavaEnvironment context, boolean includeTypeArguments);
+  Optional<IMethodGenerator<?, ?>> method(String methodId, IJavaBuilderContext context, boolean includeTypeArguments);
 
   /**
    * @return A {@link Stream} returning all member {@link ITypeGenerator}s in this {@link ITypeGenerator}.
@@ -301,6 +371,16 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IMemb
    * @see TypeGenerator#create()
    */
   TYPE withType(ITypeGenerator<?> generator, Object... sortObject);
+
+  /**
+   * Removes all nested {@link ITypeGenerator} instances having the given simple name (requires that the simple names
+   * can be computed without context)
+   * 
+   * @param simpleName
+   *          The simple name of the type to remove.
+   * @return This generator.
+   */
+  TYPE withoutType(String simpleName);
 
   /**
    * Removes all {@link ITypeGenerator ITypeGenerators} for which the specified {@link Predicate} returns {@code true}.

@@ -11,24 +11,38 @@
 package org.eclipse.scout.sdk.core.s.apidef;
 
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 
 @SuppressWarnings({"squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // method naming conventions
 public interface IScout22DoApi extends IApiSpecification {
 
   DoSet DoSet();
 
-  interface DoSet extends IClassNameSupplier {
+  interface DoSet extends ITypeNameSupplier {
   }
 
   DoCollection DoCollection();
 
-  interface DoCollection extends IClassNameSupplier {
+  interface DoCollection extends ITypeNameSupplier {
+  }
+
+  ITypeVersion ITypeVersion();
+
+  interface ITypeVersion extends ITypeNameSupplier {
+  }
+
+  INamespace INamespace();
+
+  interface INamespace extends ITypeNameSupplier {
   }
 
   DoEntity DoEntity();
 
-  interface DoEntity extends IClassNameSupplier {
+  interface DoEntity extends IScoutInterfaceApi.DoEntity {
     String nvlMethodName();
+
+    String doSetMethodName();
+
+    String doCollectionMethodName();
   }
 }

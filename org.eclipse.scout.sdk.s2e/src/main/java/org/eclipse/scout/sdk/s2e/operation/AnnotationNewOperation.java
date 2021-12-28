@@ -27,6 +27,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.imports.CompilationUnitScopedImportCollector;
@@ -35,7 +36,6 @@ import org.eclipse.scout.sdk.core.imports.IImportValidator;
 import org.eclipse.scout.sdk.core.imports.ImportCollector;
 import org.eclipse.scout.sdk.core.imports.ImportValidator;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
@@ -74,7 +74,7 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
       currentWorkingCopyManager().register(icu, progress.monitor());
 
       var javaEnv = env.toScoutJavaEnvironment(m_declaringMember.getJavaProject());
-      IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(javaEnv), JdtUtils.getPackage(icu));
+      IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(new JavaBuilderContext(javaEnv)), JdtUtils.getPackage(icu));
       IDocument doc = new Document(icu.getSource());
 
       var edit = createEdit(new ImportValidator(collector), doc, icu.findRecommendedLineSeparator());
@@ -90,8 +90,8 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
     }
   }
 
-  protected ISourceRange getAnnotationReplaceRange(IDocument sourceDocument, CharSequence newLine, CharSequence newAnnotationSource, IJavaEnvironment env) throws JavaModelException, BadLocationException {
-    var annotationFqn = getSourceBuilder().elementName(env).orElseThrow(() -> newFail("Annotation generator is missing the name."));
+  protected ISourceRange getAnnotationReplaceRange(IDocument sourceDocument, CharSequence newLine, CharSequence newAnnotationSource, IJavaBuilderContext context) throws JavaModelException, BadLocationException {
+    var annotationFqn = getSourceBuilder().elementName(context).orElseThrow(() -> newFail("Annotation generator is missing the name."));
     var sn = JavaTypes.simpleName(annotationFqn);
     var fqn = JavaTypes.qualifier(annotationFqn) + JavaTypes.C_DOT + sn;
     var newLineLength = newLine.length();
@@ -154,7 +154,7 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
       var src = getSourceBuilder().toJavaSource(new JavaBuilderContext(new BuilderContext(nl, properties), validator));
 
       // find insert/replace range
-      var replaceRange = getAnnotationReplaceRange(sourceDocument, nl, src, validator.importCollector().getJavaEnvironment());
+      var replaceRange = getAnnotationReplaceRange(sourceDocument, nl, src, validator.importCollector().getContext().orElse(null));
 
       // insert indentation at the beginning
       src.insert(0, getIndent(sourceDocument, replaceRange));

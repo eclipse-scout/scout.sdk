@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,10 +13,15 @@ package org.eclipse.scout.sdk.core.generator;
 import static java.util.function.Function.identity;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
 import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 
@@ -30,11 +35,75 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 public interface IJavaElementGenerator<TYPE extends IJavaElementGenerator<TYPE>> extends ISourceGenerator<ISourceBuilder<?>> {
 
   /**
+   * @return The name of the element if it is context independent. Otherwise an empty {@link Optional} is returned.
+   */
+  Optional<String> elementName();
+
+  /**
+   * @param context
+   *          To compute context dependent names.
+   * @return The name of the element or an empty {@link Optional} if the element has no name yet.
+   */
+  Optional<String> elementName(IJavaBuilderContext context);
+
+  /**
+   * @return The {@link JavaBuilderContextFunction} that of the element name.
+   */
+  Optional<JavaBuilderContextFunction<String>> elementNameFunc();
+
+  /**
+   * Sets the name of this {@link IJavaElementGenerator}.
+   *
+   * @param newName
+   *          The new name or {@code null}.
+   * @return This generator
+   * @see #withElementNameFrom(Class, Function)
+   * @see #withElementNameFunc(Function)
+   */
+  TYPE withElementName(String newName);
+
+  /**
+   * Sets the element name to the result of the given nameSupplier.
+   * <p>
+   * This method may be handy if the name changes between different versions of an API. The generator then decides which
+   * API to use based on the version found in the {@link IJavaEnvironment} of the {@link IJavaBuilderContext}.
+   * </p>
+   * <b>Example:</b> {@code generator.withElementNameFrom(IJavaApi.class, api -> api.Long().valueOfMethodName())}.
+   *
+   * @param apiDefinition
+   *          The api type that defines the element name. An instance of this API is passed to the nameSupplier. May be
+   *          {@code null} in case the given nameSupplier can handle a {@code null} input.
+   * @param nameSupplier
+   *          A {@link Function} to be called to obtain the element name of this {@link IJavaElementGenerator}. Must not
+   *          be {@code null}.
+   * @param <A>
+   *          The API type that contains the class name
+   * @return This generator.
+   * @see #withElementName(String)
+   * @see #withElementNameFunc(Function)
+   */
+  <A extends IApiSpecification> TYPE withElementNameFrom(Class<A> apiDefinition, Function<A, String> nameSupplier);
+
+  /**
+   * Sets the element name to the result of the given nameSupplier.
+   * <p>
+   * This method may be handy if the name is context dependent.
+   * </p>
+   * 
+   * @param nameSupplier
+   *          A {@link Function} to be called to obtain the name of this {@link IJavaElementGenerator} or {@code null}.
+   * @return This generator.
+   * @see #withElementName(String)
+   * @see #withElementNameFrom(Class, Function)
+   */
+  TYPE withElementNameFunc(Function<IJavaBuilderContext, String> nameSupplier);
+
+  /**
    * Sets the {@link ISourceGenerator} providing the javadoc comment for this {@link IJavaElementGenerator}.
    *
    * @param commentGenerator
    *          The generator for the comment or {@code null} if no comment should be generated.
-   * @return This generator
+   * @return This generator.
    */
   TYPE withComment(ISourceGenerator<IJavaElementCommentBuilder<?>> commentGenerator);
 
@@ -44,18 +113,27 @@ public interface IJavaElementGenerator<TYPE extends IJavaElementGenerator<TYPE>>
   Optional<ISourceGenerator<IJavaElementCommentBuilder<?>>> comment();
 
   /**
-   * Sets the name of this {@link IJavaElementGenerator}.
-   *
-   * @param newName
-   *          The new name or {@code null}.
-   * @return This generator
+   * Appends the given pre-processor to this generator. Pre-processors are executed before each generator execution and
+   * allow to apply any modifications at generation time. This might be useful if the setup of the generator is
+   * {@link IJavaBuilderContext context} dependent.<br>
+   * <br>
+   * <p>
+   * <b>Note:</b> pre-processors are executed each time the generator is executed. This is necessary to apply context
+   * dependent modifications. On the other hand it brings the risk that changes applied in former executions are still
+   * in the generator. Pre-processors must somehow deal with this situation. One solution could be to implement it in an
+   * idempotent way. Another might be to apply some cleanup/rollback before creating new modifications.
+   * </p>
+   * 
+   * @param processor
+   *          The pre-processor to add. This method does nothing if it is {@code null}.
+   * @return This generator.
    */
-  TYPE withElementName(String newName);
+  TYPE withPreProcessor(BiConsumer<TYPE, IJavaBuilderContext> processor);
 
   /**
-   * @return The name of the element.
+   * @return A {@link Stream} returning all pre-processors registered.
    */
-  Optional<String> elementName();
+  Stream<BiConsumer<TYPE, IJavaBuilderContext>> preProcessors();
 
   /**
    * Executes this {@link IJavaElementGenerator} and creates its source in memory.

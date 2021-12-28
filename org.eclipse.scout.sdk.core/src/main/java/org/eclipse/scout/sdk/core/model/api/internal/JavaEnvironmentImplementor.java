@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.model.api.internal;
 
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.sdk.core.apidef.ApiFunction.applyWithApi;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.eclipse.scout.sdk.core.util.Strings.toCharArray;
 
@@ -29,8 +28,9 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.apidef.Api;
+import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier;
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.CompilationUnitInfo;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
@@ -63,7 +63,7 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   }
 
   @Override
-  public Optional<IType> findType(IClassNameSupplier nameSupplier) {
+  public Optional<IType> findType(ITypeNameSupplier nameSupplier) {
     return findType(nameSupplier.fqn());
   }
 
@@ -74,13 +74,14 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   }
 
   @Override
-  public <A extends IApiSpecification> Optional<IType> findTypeFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> nameSupplier) {
-    return applyWithApi(apiDefinition, nameSupplier, this)
+  public <A extends IApiSpecification> Optional<IType> findTypeFrom(Class<A> apiDefinition, Function<A, ITypeNameSupplier> nameSupplier) {
+    return new ApiFunction<>(apiDefinition, nameSupplier)
+        .apply(this)
         .flatMap(this::findType);
   }
 
   @Override
-  public IType requireType(IClassNameSupplier nameSupplier) {
+  public IType requireType(ITypeNameSupplier nameSupplier) {
     return requireType(nameSupplier.fqn());
   }
 
@@ -91,9 +92,11 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   }
 
   @Override
-  public <A extends IApiSpecification> IType requireTypeFrom(Class<A> apiDefinition, Function<A, IClassNameSupplier> nameSupplier) {
-    return applyWithApi(apiDefinition, nameSupplier, this)
-        .map(this::requireType).orElseThrow(() -> newFail("Cannot find API '{}' in this context.", apiDefinition.getSimpleName()));
+  public <A extends IApiSpecification> IType requireTypeFrom(Class<A> apiDefinition, Function<A, ITypeNameSupplier> nameSupplier) {
+    return new ApiFunction<>(apiDefinition, nameSupplier)
+        .apply(this)
+        .map(this::requireType)
+        .orElseThrow(() -> newFail("Cannot find API '{}' in this context.", apiDefinition.getSimpleName()));
   }
 
   @Override

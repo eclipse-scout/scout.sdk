@@ -17,20 +17,23 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
+import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAbstractApi;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -39,6 +42,7 @@ import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransform
 import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
 
 /**
@@ -79,17 +83,18 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
 
     for (var up : m_webServiceImplUpdates) {
       var wsImpl = up.getWebServiceImpl().requireCompilationUnit();
-      var builder = wsImpl.toWorkingCopy();
-      var javaEnvironment = wsImpl.javaEnvironment();
+      var generator = wsImpl.toWorkingCopy();
+      var builderContext = new JavaBuilderContext(wsImpl.javaEnvironment());
 
-      builder.mainType().ifPresent(mainType -> {
+      generator.mainType().ifPresent(mainType -> {
         // remove the old import to port type
-        mainType.interfaces()
-            .flatMap(af -> af.apply(javaEnvironment).stream())
-            .forEach(builder::withoutImport);
+        mainType.interfacesFunc()
+            .map(af -> af.apply(builderContext))
+            .filter(Strings::hasText)
+            .forEach(generator::withoutImport);
 
         // remove old port type super interface
-        removePortTypeSuperInterfaces(mainType, javaEnvironment);
+        removePortTypeSuperInterfaces(mainType, builderContext);
 
         // new super interface
         var newPortTypeFqn = up.getPackage() + JavaTypes.C_DOT + up.getPortTypeName();
@@ -97,18 +102,19 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
       });
 
       // update wsdl faults (exceptions)
-      updateWsdlFaults(builder, up.getPackage(), javaEnvironment);
+      updateWsdlFaults(generator, up.getPackage(), builderContext);
 
-      env.writeCompilationUnit(builder, up.getSourceFolder(), progress);
+      env.writeCompilationUnit(generator, up.getSourceFolder(), progress);
     }
   }
 
-  protected static void updateWsdlFaults(ICompilationUnitGenerator<?> icuBuilder, String newPackage, IJavaEnvironment javaEnvironment) {
+  protected static void updateWsdlFaults(ICompilationUnitGenerator<?> icuBuilder, String newPackage, IJavaBuilderContext context) {
     icuBuilder
         .mainType()
         .ifPresent(t -> t.methods().forEach(methodBuilder -> {
-          var exceptions = methodBuilder.throwables()
-              .flatMap(func -> func.apply(javaEnvironment).stream())
+          var exceptions = methodBuilder.throwablesFunc()
+              .map(func -> func.apply(context))
+              .filter(Objects::nonNull)
               .collect(toList());
           methodBuilder.withoutThrowable(element -> true); // remove all existing exceptions
           for (var exc : exceptions) {
@@ -125,39 +131,43 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
 
     for (var up : m_webServiceClientUpdates) {
       var wsClient = up.getWebServiceClient().requireCompilationUnit();
-      var javaEnvironment = wsClient.javaEnvironment();
-      var scoutApi = javaEnvironment.requireApi(IScoutApi.class);
-      var builder = wsClient.toWorkingCopy();
+      //      var scoutApi = javaEnvironment.requireApi(IScoutApi.class);
+      var generator = wsClient.toWorkingCopy();
+      var builderContext = new JavaBuilderContext(wsClient.javaEnvironment());
 
-      builder.mainType()
+      generator.mainType()
           .ifPresent(mainType -> {
             // remove the old imports
-            for (var oldImport : JavaTypes.typeArguments(mainType.superClass().flatMap(af -> af.apply(javaEnvironment)).orElseThrow())) {
-              builder.withoutImport(oldImport);
+            for (var oldImport : JavaTypes.typeArguments(mainType.superClassFunc().map(af -> af.apply(builderContext)).orElseThrow())) {
+              generator.withoutImport(oldImport);
             }
 
             // remove old port type super interface
-            removePortTypeSuperInterfaces(mainType, javaEnvironment);
+            removePortTypeSuperInterfaces(mainType, builderContext);
 
             // set new super class and super interface
             var newPortTypeFqn = up.getPackage() + JavaTypes.C_DOT + up.getPortTypeName();
             var newWebServiceFqn = up.getPackage() + JavaTypes.C_DOT + up.getWebServiceName();
-            var superTypeFqnBuilder = new StringBuilder(scoutApi.AbstractWebServiceClient().fqn());
-            superTypeFqnBuilder.append(JavaTypes.C_GENERIC_START).append(newWebServiceFqn).append(", ").append(newPortTypeFqn).append(JavaTypes.C_GENERIC_END);
             mainType
                 .withInterface(newPortTypeFqn)
-                .withSuperClass(superTypeFqnBuilder.toString());
+                .withSuperClassFrom(IScoutApi.class, api -> buildWebServiceClientSuperClass(api, newPortTypeFqn, newWebServiceFqn));
           });
 
       // update wsdl faults (exceptions)
-      updateWsdlFaults(builder, up.getPackage(), javaEnvironment);
-      env.writeCompilationUnit(builder, up.getSourceFolder(), progress);
+      updateWsdlFaults(generator, up.getPackage(), builderContext);
+      env.writeCompilationUnit(generator, up.getSourceFolder(), progress);
     }
   }
 
-  protected static void removePortTypeSuperInterfaces(ITypeGenerator<?> generator, IJavaEnvironment environment) {
+  protected static String buildWebServiceClientSuperClass(IScoutAbstractApi api, String newPortTypeFqn, String newWebServiceFqn) {
+    var superTypeFqnBuilder = new StringBuilder(api.AbstractWebServiceClient().fqn());
+    superTypeFqnBuilder.append(JavaTypes.C_GENERIC_START).append(newWebServiceFqn).append(", ").append(newPortTypeFqn).append(JavaTypes.C_GENERIC_END);
+    return superTypeFqnBuilder.toString();
+  }
+
+  protected static void removePortTypeSuperInterfaces(ITypeGenerator<?> generator, IJavaBuilderContext context) {
     generator.withoutInterface(
-        ifc -> ifc.apply(environment)
+        ifc -> Strings.notEmpty(ifc.apply(context))
             .filter(ref -> ref.endsWith(ISdkConstants.SUFFIX_WS_PORT_TYPE))
             .isPresent());
   }

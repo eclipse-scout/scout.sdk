@@ -104,6 +104,13 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
   }
 
   /**
+   * @return A new empty {@link ICompilationUnitGenerator}.
+   */
+  public static ICompilationUnitGenerator<?> create() {
+    return new CompilationUnitGenerator<>();
+  }
+
+  /**
    * Creates a new {@link ICompilationUnitGenerator} based on the given {@link ICompilationUnit}.
    * <p>
    * <b>Example:</b> See {@link IWorkingCopyTransformer}.
@@ -124,13 +131,6 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
     return new CompilationUnitGenerator<>(cu, transformer);
   }
 
-  /**
-   * @return A new empty {@link ICompilationUnitGenerator}.
-   */
-  public static ICompilationUnitGenerator<?> create() {
-    return new CompilationUnitGenerator<>();
-  }
-
   @Override
   protected void build(IJavaSourceBuilder<?> builder) {
     var currentValidator = builder.context().validator();
@@ -145,7 +145,7 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
 
     builder
         .append(getPackage()
-            .filter(pck -> pck.elementName().isPresent())
+            .filter(pck -> pck.elementName(builder.context()).isPresent())
             .map(pck -> b -> b.append(pck).nl().nl())) // only add newlines if a package is available
         .append(builder.context().validator().importCollector().createImportDeclarations().map(ISourceGenerator::raw), null, nl, nl)
         .append(typeSource)
@@ -241,8 +241,7 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
 
   @Override
   public Optional<String> elementName() {
-    return super.elementName()
-        .map(s -> s.substring(0, s.length() - JavaTypes.JAVA_FILE_SUFFIX.length()));
+    return super.elementName().map(s -> Strings.removeSuffix(s, JavaTypes.JAVA_FILE_SUFFIX));
   }
 
   @Override

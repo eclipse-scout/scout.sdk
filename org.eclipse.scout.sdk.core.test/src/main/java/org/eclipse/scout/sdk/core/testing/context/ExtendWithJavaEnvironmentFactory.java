@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.RunningJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * <h3>{@link ExtendWithJavaEnvironmentFactory}</h3>
@@ -43,6 +44,7 @@ import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
 @Documented
 @Retention(RUNTIME)
 @Target({TYPE, METHOD})
+@ExtendWith(JavaEnvironmentExtension.class)
 public @interface ExtendWithJavaEnvironmentFactory {
   /**
    * Specifies the {@link IJavaEnvironment} factory to use.

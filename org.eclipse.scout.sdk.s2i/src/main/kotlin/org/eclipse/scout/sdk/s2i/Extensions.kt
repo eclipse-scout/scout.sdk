@@ -44,7 +44,7 @@ import com.intellij.util.CollectionQuery
 import com.intellij.util.PathUtil
 import com.intellij.util.Query
 import com.intellij.util.containers.stream
-import org.eclipse.scout.sdk.core.apidef.IClassNameSupplier
+import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.model.api.IType
@@ -372,7 +372,7 @@ fun PsiClass.visitSupers(visitor: IBreadthFirstVisitor<PsiClass>): TreeVisitResu
     return TreeTraversals.create(visitor, supplier).traverse(this)
 }
 
-fun PsiClass.isInstanceOf(classNameSupplier: IClassNameSupplier) = isInstanceOf(classNameSupplier.fqn())
+fun PsiClass.isInstanceOf(typeNameSupplier: ITypeNameSupplier) = isInstanceOf(typeNameSupplier.fqn())
 
 /**
  * Checks if this [PsiClass] has at least one of the given fully qualified names in its super hierarchy.
