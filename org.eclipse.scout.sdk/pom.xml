@@ -999,7 +999,6 @@
             <ignoredResourcePatterns>
               <ignoredResourcePattern>.*json$</ignoredResourcePattern> <!-- Added because of 'org.eclipse.scout.rt.ui.html' -->
               <ignoredResourcePattern>.*js$</ignoredResourcePattern> <!-- Added because of 'org.eclipse.scout.rt.ui.html' -->
-              <ignoredResourcePattern>.*js$</ignoredResourcePattern> <!-- Added because of 'org.eclipse.scout.rt.ui.html' -->
               <ignoredResourcePattern>.*ico$</ignoredResourcePattern>
               <ignoredResourcePattern>.*jpg$</ignoredResourcePattern>
               <ignoredResourcePattern>.*png$</ignoredResourcePattern>
