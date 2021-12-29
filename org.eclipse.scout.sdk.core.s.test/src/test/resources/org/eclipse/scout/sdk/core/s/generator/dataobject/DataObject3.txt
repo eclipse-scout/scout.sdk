@@ -4,10 +4,8 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
 
-import dataobject.context.FixtureTypeVersions.SdkFixture_1_0_0_0;
-
 @TypeName("sdk.MyTest")
-@TypeVersion(SdkFixture_1_0_0_0.class)
+@TypeVersion("dataobject.context.FixtureTypeVersions$SdkFixture_1_0_0_0")
 public class MyTestDo extends DoEntity {
 
 }

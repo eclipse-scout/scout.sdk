@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
  * @param <RET>
  *          The return type of the function.
  */
+@SuppressWarnings("squid:S2160") // Subclasses that add fields should override "equals"
 public class ApiFunction<API extends IApiSpecification, RET> extends JavaBuilderContextFunction<RET> {
 
   private final Class<API> m_apiClass;

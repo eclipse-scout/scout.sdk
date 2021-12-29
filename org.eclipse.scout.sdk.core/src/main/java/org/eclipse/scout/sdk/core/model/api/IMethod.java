@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.model.api;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.model.api.query.MethodParameterQuery;
 import org.eclipse.scout.sdk.core.model.api.query.SuperMethodQuery;
@@ -134,7 +135,7 @@ public interface IMethod extends IMember {
    * @return The created identifier
    * @see #identifier()
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
-   * @see IMethodGenerator#identifier(IJavaEnvironment, boolean)
+   * @see IMethodGenerator#identifier(IJavaBuilderContext, boolean)
    */
   String identifier(boolean includeTypeArguments);
 
@@ -145,7 +146,7 @@ public interface IMethod extends IMember {
    * @return The created identifier using the type erasure only.
    * @see #identifier(boolean)
    * @see JavaTypes#createMethodIdentifier(CharSequence, java.util.Collection)
-   * @see IMethodGenerator#identifier(IJavaEnvironment)
+   * @see IMethodGenerator#identifier(IJavaBuilderContext)
    */
   String identifier();
 

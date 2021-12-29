@@ -13,8 +13,9 @@ package org.eclipse.scout.sdk.core.testing.context;
 import static org.junit.platform.commons.support.AnnotationSupport.isAnnotated;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.ParameterizedType;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -39,7 +40,7 @@ import org.junit.platform.commons.support.AnnotationSupport;
 public abstract class AbstractContextExtension<T, C extends Annotation> implements AfterEachCallback, AfterAllCallback, ParameterResolver {
 
   private final String m_contextKey;
-  private final Class<? extends Annotation> m_annotationType;
+  private final Class<C> m_annotationType;
   private final Class<T> m_contextType;
 
   @SuppressWarnings("ThisEscapedInObjectConstruction")
@@ -74,16 +75,25 @@ public abstract class AbstractContextExtension<T, C extends Annotation> implemen
 
   @Override
   public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
-    return getOrCreateContextFor(extensionContext.getRequiredTestMethod(), extensionContext);
+    return getOrCreateContextFor(extensionContext);
   }
 
-  @SuppressWarnings("unchecked")
-  public T getOrCreateContextFor(AnnotatedElement annotationOwner, ExtensionContext extensionContext) {
-    return AnnotationSupport.findAnnotation(annotationOwner, annotationType())
-        .map(annot -> getOrCreateContext((C) annot, extensionContext))
-        .orElseGet(() -> extensionContext.getParent()
-            .map(parentContext -> getOrCreateContextFor(extensionContext.getRequiredTestClass(), parentContext))
-            .orElse(null));
+  public T getOrCreateContextFor(ExtensionContext extensionContext) {
+    return findAnnotationContext(extensionContext, annotationType())
+        .map(ac -> getOrCreateContext(ac.getKey(), ac.getValue()))
+        .orElse(null);
+  }
+
+  public static <A extends Annotation> Optional<Entry<A, ExtensionContext>> findAnnotationContext(ExtensionContext extensionContext, Class<A> annotationType) {
+    var currentContext = extensionContext;
+    while (currentContext != null) {
+      var annotation = AnnotationSupport.findAnnotation(currentContext.getElement(), annotationType);
+      if (annotation.isPresent()) {
+        return Optional.of(new SimpleImmutableEntry<>(annotation.orElseThrow(), currentContext));
+      }
+      currentContext = currentContext.getParent().orElse(null);
+    }
+    return Optional.empty();
   }
 
   /**
@@ -112,9 +122,9 @@ public abstract class AbstractContextExtension<T, C extends Annotation> implemen
     return Optional.ofNullable(getStore(context).remove(contextKey(), contextType()));
   }
 
-  protected T getOrCreateContext(C annot, ExtensionContext extensionContext) {
+  protected T getOrCreateContext(C annotation, ExtensionContext extensionContext) {
     return getStore(extensionContext)
-        .getOrComputeIfAbsent(contextKey(), k -> annotationToContext(annot), contextType());
+        .getOrComputeIfAbsent(contextKey(), k -> annotationToContext(annotation), contextType());
   }
 
   protected String contextKey() {
@@ -125,7 +135,7 @@ public abstract class AbstractContextExtension<T, C extends Annotation> implemen
     return m_contextType;
   }
 
-  protected Class<? extends Annotation> annotationType() {
+  protected Class<C> annotationType() {
     return m_annotationType;
   }
 

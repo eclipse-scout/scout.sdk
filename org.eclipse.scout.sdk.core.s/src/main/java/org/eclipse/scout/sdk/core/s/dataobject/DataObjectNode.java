@@ -31,7 +31,13 @@ public class DataObjectNode {
   public enum DataObjectNodeKind {
     VALUE,
     LIST,
+    /**
+     * Only exists in Scout >= 22
+     */
     SET,
+    /**
+     * Only exists in Scout >= 22
+     */
     COLLECTION;
 
     /**

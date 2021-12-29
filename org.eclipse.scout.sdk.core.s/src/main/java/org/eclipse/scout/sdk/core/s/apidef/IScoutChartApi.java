@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.s.apidef;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 
-@SuppressWarnings({"squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // method naming conventions
+@SuppressWarnings({"squid:S00100", "squid:S2166", "squid:S2176", "squid:S00118", "findbugs:NM_METHOD_NAMING_CONVENTION"}) // method naming conventions
 public interface IScoutChartApi extends IApiSpecification {
 
   ChartUiTextContributor ChartUiTextContributor();
