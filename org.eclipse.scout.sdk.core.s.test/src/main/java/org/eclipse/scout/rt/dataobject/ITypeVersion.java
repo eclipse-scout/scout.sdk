@@ -8,11 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-package dataobject;
+package org.eclipse.scout.rt.dataobject;
 
-import org.eclipse.scout.rt.dataobject.AbstractTypeVersion;
+/**
+ * Fixture copy of the ITypeVersion class only existing in Scout >= 22. This class is required so that tests with Scout
+ * < 22 compiles.
+ */
+public interface ITypeVersion /* extends INamespaceVersioned */ {
 
-public class FixtureTypeVersions {
-  public static final class SdkFixture_1_0_0_0 extends AbstractTypeVersion {
-  }
 }

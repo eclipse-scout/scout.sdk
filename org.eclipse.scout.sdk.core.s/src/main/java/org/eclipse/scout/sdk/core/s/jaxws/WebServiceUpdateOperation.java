@@ -131,7 +131,6 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
 
     for (var up : m_webServiceClientUpdates) {
       var wsClient = up.getWebServiceClient().requireCompilationUnit();
-      //      var scoutApi = javaEnvironment.requireApi(IScoutApi.class);
       var generator = wsClient.toWorkingCopy();
       var builderContext = new JavaBuilderContext(wsClient.javaEnvironment());
 

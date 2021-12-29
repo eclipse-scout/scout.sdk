@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.s.apidef;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.MaxApiLevel;
+import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.s.generator.method.IScoutMethodGenerator;
@@ -4493,6 +4494,11 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String valueElementName() {
       return "value";
+    }
+
+    @Override
+    public void buildValue(IExpressionBuilder<?> builder, String typeVersion) {
+      builder.stringLiteral(typeVersion);
     }
   }
 

@@ -10,7 +10,9 @@
  */
 package org.eclipse.scout.sdk.core.s.testing.context;
 
-import java.lang.reflect.AnnotatedElement;
+import static org.eclipse.scout.sdk.core.testing.context.AbstractContextExtension.findAnnotationContext;
+
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.model.api.Flags;
@@ -18,49 +20,70 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.dataobject.DoContextResolvers;
 import org.eclipse.scout.sdk.core.s.dataobject.DoContextResolvers.IDoContextResolver;
+import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
-import org.eclipse.scout.sdk.core.util.Ensure;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
+import org.junit.platform.commons.PreconditionViolationException;
 
-public class DoContextExtension implements BeforeEachCallback, AfterEachCallback {
+public class DoContextExtension implements BeforeAllCallback, BeforeEachCallback, AfterEachCallback, AfterAllCallback {
+
+  @Override
+  public void beforeAll(ExtensionContext context) {
+    beforeEach(context);
+  }
 
   @Override
   public void beforeEach(ExtensionContext context) {
-    //noinspection resource
-    context.getElement()
-        .map(e -> new TestingEnvironmentExtension().getOrCreateContextFor(e, context))
-        .map(te -> te.primarySourceFolder().javaEnvironment())
-        .or(() -> context.getElement().map(e -> new JavaEnvironmentExtension().getOrCreateContextFor(e, context)))
-        .ifPresent(je -> getOrCreateContext(context, context.getElement().orElseThrow(), je));
+    findAnnotationContext(context, ExtendWithDoContext.class)
+        .map(ac -> getStore(ac.getValue()).getOrComputeIfAbsent(contextKey(), k -> activateDoContextResolver(ac.getKey(), ac.getValue(), context)))
+        .orElseThrow(() -> new PreconditionViolationException("Annotation '" + ExtendWithDoContext.class.getSimpleName() + "' is required."));
   }
 
   protected Store getStore(ExtensionContext context) {
     return context.getStore(Namespace.create(getClass(), context));
   }
 
-  protected void getOrCreateContext(ExtensionContext context, AnnotatedElement element, IJavaEnvironment env) {
-    getStore(context).getOrComputeIfAbsent(contextKey(), k -> createContext(element, env));
-  }
-
-  protected static IDoContextResolver createContext(AnnotatedElement element, IJavaEnvironment env) {
-    var annotation = Ensure.notNull(element.getAnnotation(ExtendWithDoContext.class), "Annotation '{}' is required.", ExtendWithDoContext.class.getName());
-    var context = new TestingDoContextResolver(annotation, env);
-    DoContextResolvers.set(context);
-    return context;
-  }
-
   protected static String contextKey() {
     return "dataObjectContextResolver";
   }
 
+  protected static String oldResolverKey() {
+    return "previousDataObjectContextResolver";
+  }
+
+  protected IDoContextResolver activateDoContextResolver(ExtendWithDoContext annotation, ExtensionContext contextOfExtendWithDo, ExtensionContext rootContext) {
+    var javaEnvironment = Optional.ofNullable(new TestingEnvironmentExtension().getOrCreateContextFor(rootContext))
+        .map(te -> te.primarySourceFolder().javaEnvironment())
+        .or(() -> Optional.ofNullable(new JavaEnvironmentExtension().getOrCreateContextFor(rootContext)))
+        .orElseThrow(() -> new PreconditionViolationException("A DoContext requires an '" + ExtendWithJavaEnvironmentFactory.class.getName() + "' or '" + ExtendWithTestingEnvironment.class.getName() + "' to be present."));
+
+    var resolver = new TestingDoContextResolver(annotation, javaEnvironment);
+    var previous = DoContextResolvers.set(resolver);
+    if (previous != null) {
+      getStore(contextOfExtendWithDo).put(oldResolverKey(), previous);
+    }
+    return resolver;
+  }
+
   @Override
   public void afterEach(ExtensionContext context) {
-    DoContextResolvers.set(null);
-    getStore(context).remove(contextKey());
+    var store = getStore(context);
+    var removed = store.remove(contextKey(), IDoContextResolver.class);
+    if (removed != null) {
+      // a testing resolver is active. Revert to the previous one
+      DoContextResolvers.set(store.remove(oldResolverKey(), IDoContextResolver.class));
+    }
+  }
+
+  @Override
+  public void afterAll(ExtensionContext context) {
+    afterEach(context);
   }
 
   private static final class TestingDoContextResolver implements IDoContextResolver {

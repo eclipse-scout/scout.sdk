@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 
-import dataobject.FixtureTypeVersions.SdkFixture_1_0_0_0;
+import dataobject.context.FixtureTypeVersions.SdkFixture_1_0_0_0;
 
 @TypeName("sdk.MyTest")
 @TypeVersion(SdkFixture_1_0_0_0.class)

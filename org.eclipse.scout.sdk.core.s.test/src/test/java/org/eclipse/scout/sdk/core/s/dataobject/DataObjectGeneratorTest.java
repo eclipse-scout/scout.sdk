@@ -13,15 +13,16 @@ package org.eclipse.scout.sdk.core.s.dataobject;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFile;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
 
-import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode.DataObjectNodeKind;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.testing.apidef.ApiRequirement;
+import org.eclipse.scout.sdk.core.testing.apidef.EnabledFor;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.junit.jupiter.api.Test;
 
-import dataobject.FixtureTypeVersions.SdkFixture_1_0_0_0;
+import dataobject.context.FixtureTypeVersions.SdkFixture_1_0_0_0;
 
 @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class)
 public class DataObjectGeneratorTest {
@@ -31,19 +32,36 @@ public class DataObjectGeneratorTest {
   @Test
   public void testEmptyDoGenerator(IJavaEnvironment env) {
     var generator = new DataObjectGenerator<>()
-        .withNamespace("sdk")
-        .withTypeVersion(ITypeNameSupplier.of(SdkFixture_1_0_0_0.class.getName()))
         .withElementName("MyTestDo")
         .withPackageName("test.pck");
     assertNoCompileErrors(env, generator);
-    assertEqualsRefFile(env, REF_FILE_FOLDER + "DataObject1.txt", generator);
+    assertEqualsRefFile(env, REF_FILE_FOLDER + "DataObject0.txt", generator);
   }
 
   @Test
+  public void testDoGeneratorWithoutNodes(IJavaEnvironment env) {
+    var generator = new DataObjectGenerator<>()
+        .withNamespace("sdk")
+        .withTypeVersion(SdkFixture_1_0_0_0.class.getName())
+        .withElementName("MyTestDo")
+        .withPackageName("test.pck");
+    assertNoCompileErrors(env, generator);
+    if (env.requireApi(IScoutApi.class).maxLevel().major() >= 22) {
+      // type version is a class literal
+      assertEqualsRefFile(env, REF_FILE_FOLDER + "DataObject1.txt", generator);
+    }
+    else {
+      // type version is a string literal
+      assertEqualsRefFile(env, REF_FILE_FOLDER + "DataObject3.txt", generator);
+    }
+  }
+
+  @Test
+  @EnabledFor(api = IScoutApi.class, require = ApiRequirement.MIN, version = 22) // only Scout >= 22 has kind Collection & Set
   public void testDoGenerator(IJavaEnvironment env) {
     var generator = new DataObjectGenerator<>()
         .withNamespace("sdk")
-        .withTypeVersion(ITypeNameSupplier.of(SdkFixture_1_0_0_0.class.getName()))
+        .withTypeVersion(SdkFixture_1_0_0_0.class.getName())
         .withElementName("MyTestDo")
         .withPackageName("test.pck")
         .withNode("longValue", DataObjectNodeKind.VALUE, Long.class.getName())

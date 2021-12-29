@@ -12,13 +12,13 @@ package org.eclipse.scout.sdk.core.testing.apidef;
 
 import static org.junit.jupiter.api.extension.ConditionEvaluationResult.disabled;
 import static org.junit.jupiter.api.extension.ConditionEvaluationResult.enabled;
-import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
 
-import java.lang.reflect.AnnotatedElement;
 import java.util.Arrays;
+import java.util.Map.Entry;
 
 import org.eclipse.scout.sdk.core.apidef.Api;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.testing.context.AbstractContextExtension;
 import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
@@ -30,17 +30,14 @@ public class ApiExecutionCondition implements ExecutionCondition {
 
   @Override
   public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
-    var element = context.getElement();
-    if (element.isEmpty()) {
-      return enabled("Enabled by default");
-    }
-    return findAnnotation(element.orElseThrow(), EnabledFor.class)
-        .map(ef -> checkCorrectApiAvailable(element.orElseThrow(), ef, context))
+    return AbstractContextExtension.findAnnotationContext(context, EnabledFor.class)
+        .map(Entry::getKey)
+        .map(ef -> checkCorrectApiAvailable(ef, getJavaEnvironment(context)))
         .orElseGet(() -> enabled("Enabled by default"));
   }
 
-  protected static ConditionEvaluationResult checkCorrectApiAvailable(AnnotatedElement owner, EnabledFor enabledFor, ExtensionContext context) {
-    return Api.version(enabledFor.api(), getJavaEnvironment(owner, context))
+  protected static ConditionEvaluationResult checkCorrectApiAvailable(EnabledFor enabledFor, IJavaEnvironment environment) {
+    return Api.version(enabledFor.api(), environment)
         .map(v -> checkApiVersion(v.segments(), enabledFor.version(), enabledFor.require()))
         .orElseGet(() -> enabled("Enabled by default"));
   }
@@ -53,8 +50,8 @@ public class ApiExecutionCondition implements ExecutionCondition {
     return disabled("Disabled" + msg);
   }
 
-  protected static IJavaEnvironment getJavaEnvironment(AnnotatedElement owner, ExtensionContext context) {
-    var env = new JavaEnvironmentExtension().getOrCreateContextFor(owner, context);
+  protected static IJavaEnvironment getJavaEnvironment(ExtensionContext context) {
+    var env = new JavaEnvironmentExtension().getOrCreateContextFor(context);
     if (env != null) {
       return env;
     }

@@ -54,7 +54,7 @@ public final class DoContextResolvers {
         .orElseGet(DoContext::new);
   }
 
-  private static DoContext resolve(IDoContextResolver resolver, CharSequence targetPackage, IJavaEnvironment environment) {
+  static DoContext resolve(IDoContextResolver resolver, CharSequence targetPackage, IJavaEnvironment environment) {
     var namespaceCandidates = resolver.resolveNamespaceCandidates(environment);
     var namespace = selectNamespace(targetPackage, namespaceCandidates);
 
@@ -70,7 +70,7 @@ public final class DoContextResolvers {
     return new DoContext(namespace, typeVersion);
   }
 
-  private static IType selectNamespace(CharSequence refPackage, Stream<IType> candidates) {
+  static IType selectNamespace(CharSequence refPackage, Stream<IType> candidates) {
     var bestMatch = -1;
     IType result = null;
     var ref = ISdkConstants.REGEX_DOT.split(refPackage);
@@ -85,8 +85,8 @@ public final class DoContextResolvers {
     return result;
   }
 
-  private static int numSegmentsEquals(String[] a, String[] b) {
-    var limit = Math.min(a.length, b.length) - 1;
+  static int numSegmentsEquals(String[] a, String[] b) {
+    var limit = Math.min(a.length, b.length);
     var num = 0;
     for (var i = 0; i < limit; i++) {
       if (Objects.equals(a[i], b[i])) {
@@ -99,7 +99,7 @@ public final class DoContextResolvers {
     return num;
   }
 
-  private static Stream<IType> resolveTypeVersionCandidates(String iTypeVersionFqn, IType sibling) {
+  static Stream<IType> resolveTypeVersionCandidates(String iTypeVersionFqn, IType sibling) {
     var self = Stream.of(sibling).filter(s -> s.isInstanceOf(iTypeVersionFqn));
     var inner = sibling.innerTypes()
         .withRecursiveInnerTypes(true)
@@ -109,7 +109,7 @@ public final class DoContextResolvers {
     return Stream.concat(self, inner);
   }
 
-  private static IType selectNewestTypeVersion(Iterable<IType> typeVersionCandidates) {
+  static IType selectNewestTypeVersion(Iterable<IType> typeVersionCandidates) {
     var pat = Pattern.compile("(\\w+?)_(\\d+(?:_\\d+)*)"); // must be the same as in org.eclipse.scout.rt.dataobject.AbstractTypeVersion
     var curVersion = new CompositeObject(-1);
     IType result = null;
@@ -131,12 +131,15 @@ public final class DoContextResolvers {
 
   /**
    * Sets the {@link IDoContextResolver} to use.
-   * 
+   *
    * @param newResolver
    *          The new resolver or {@code null}.
+   * @return The previous {@link IDoContextResolver} or {@code null} if there was none.
    */
-  public static void set(IDoContextResolver newResolver) {
+  public static IDoContextResolver set(IDoContextResolver newResolver) {
+    var previous = resolver;
     resolver = newResolver;
+    return previous;
   }
 
   /**

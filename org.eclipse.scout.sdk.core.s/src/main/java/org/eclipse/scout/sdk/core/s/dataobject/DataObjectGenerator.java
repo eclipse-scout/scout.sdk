@@ -22,7 +22,6 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
 import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
@@ -43,7 +42,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public class DataObjectGenerator<TYPE extends DataObjectGenerator<TYPE>> extends PrimaryTypeGenerator<TYPE> {
 
   private String m_namespace;
-  private ITypeNameSupplier m_typeVersion;
+  private String m_typeVersion;
   private final Map<String, NodeEntry> m_nodes = new LinkedHashMap<>();
 
   @Override
@@ -51,7 +50,7 @@ public class DataObjectGenerator<TYPE extends DataObjectGenerator<TYPE>> extends
     typeVersion()
         .map(tv -> AnnotationGenerator.create()
             .withAnnotationNameFrom(IScoutApi.class, IScoutAnnotationApi::TypeVersion)
-            .withElementFrom(IScoutApi.class, api -> api.TypeVersion().valueElementName(), b -> b.classLiteral(tv.fqn())))
+            .withElementFrom(IScoutApi.class, api -> api.TypeVersion().valueElementName(), b -> b.context().requireApi(IScoutApi.class).TypeVersion().buildValue(b, tv)))
         .ifPresent(this::withAnnotation);
 
     namespace()
@@ -160,18 +159,18 @@ public class DataObjectGenerator<TYPE extends DataObjectGenerator<TYPE>> extends
     return thisInstance();
   }
 
-  public Optional<ITypeNameSupplier> typeVersion() {
-    return Optional.ofNullable(m_typeVersion);
+  public Optional<String> typeVersion() {
+    return Strings.notBlank(m_typeVersion);
   }
 
   /**
-   * Specifies the type version class to use in the @TypeVersion annotation.
+   * Specifies the type version to use in the @TypeVersion annotation.
    * 
    * @param typeVersion
-   *          The new type version class. If {@code null}, no @TypeVersion annotation is created.
+   *          The new type version. If {@code null}, no @TypeVersion annotation is created.
    * @return This generator.
    */
-  public TYPE withTypeVersion(ITypeNameSupplier typeVersion) {
+  public TYPE withTypeVersion(String typeVersion) {
     m_typeVersion = typeVersion;
     return thisInstance();
   }
