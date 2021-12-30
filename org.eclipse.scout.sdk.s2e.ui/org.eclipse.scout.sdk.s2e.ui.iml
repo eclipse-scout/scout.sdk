@@ -173,8 +173,8 @@
     <orderEntry type="library" scope="TEST" name="Maven: com.squareup.okhttp3:okhttp:3.14.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.squareup.okio:okio:1.17.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.maven.wagon:wagon-provider-api:3.3.4" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.jersey.inject:jersey-hk2:2.34" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.jersey.core:jersey-common:2.34" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.jersey.inject:jersey-hk2:2.35" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.jersey.core:jersey-common:2.35" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: jakarta.ws.rs:jakarta.ws.rs-api:2.1.6" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.hk2.external:jakarta.inject:2.6.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.glassfish.hk2:osgi-resource-locator:1.0.3" level="project" />
@@ -194,8 +194,8 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.security:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.google.http-client:google-http-client-apache-v2:1.40.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.google.http-client:google-http-client:1.40.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.http-client:google-http-client-apache-v2:1.40.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.http-client:google-http-client:1.40.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.opencensus:opencensus-api:0.28.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.grpc:grpc-context:1.27.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.opencensus:opencensus-contrib-http-util:0.28.0" level="project" />
