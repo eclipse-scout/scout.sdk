@@ -40,9 +40,10 @@ public class DoContextExtension implements BeforeAllCallback, BeforeEachCallback
 
   @Override
   public void beforeEach(ExtensionContext context) {
-    findAnnotationContext(context, ExtendWithDoContext.class)
-        .map(ac -> getStore(ac.getValue()).getOrComputeIfAbsent(contextKey(), k -> activateDoContextResolver(ac.getKey(), ac.getValue(), context)))
-        .orElseThrow(() -> new PreconditionViolationException("Annotation '" + ExtendWithDoContext.class.getSimpleName() + "' is required."));
+    var entry = findAnnotationContext(context, ExtendWithDoContext.class).orElseThrow(() -> new PreconditionViolationException("Annotation '" + ExtendWithDoContext.class.getSimpleName() + "' is required."));
+    var annotation = entry.getKey();
+    var annotationContext = entry.getValue();
+    getStore(annotationContext).getOrComputeIfAbsent(contextKey(), k -> activateDoContextResolver(annotation, annotationContext, context));
   }
 
   protected Store getStore(ExtensionContext context) {
