@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,7 +21,6 @@ import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilde
 import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
@@ -313,7 +312,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
         .withBody(b -> {
           // permission check
           if (isCreatePermissions()) {
-            var methodName = b.surroundingMethod().elementName().orElse(null);
+            var methodName = b.surroundingMethod().elementName(b.context()).orElse(null);
             String permissionFqn;
             if (FormGenerator.SERVICE_LOAD_METHOD_NAME.equals(methodName)) {
               permissionFqn = getCreatedReadPermissionFqn();
@@ -363,7 +362,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
     return msb.parameters()
         .filter(p -> returnType.equals(p.reference(context)))
         .findAny()
-        .flatMap(IMethodParameterGenerator::elementName);
+        .flatMap(param -> param.elementName(context));
   }
 
   protected IFuture<IType> createFormData(String sharedPackage, IEnvironment env, IProgress progress) {
