@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2i.environment
 
 import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.lang.LanguageImportStatements
+import com.intellij.lang.java.JavaImportOptimizer
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiFileFactory
@@ -61,9 +62,14 @@ open class CompilationUnitWriteOperation(val project: Project, val source: CharS
         try {
             CodeStyleManager.getInstance(project).reformat(psi)
             progress.worked(1)
-            LanguageImportStatements.INSTANCE.forFile(psi)
-                    .filter { it.supports(psi) }
-                    .forEach { it.processFile(psi).run() }
+
+            val optimizers = LanguageImportStatements.INSTANCE.forFile(psi)
+            if (optimizers.isEmpty()) {
+                // ensure at least the Java optimizer is executed
+                // in IJ >= 2021.2 the Java optimizer is not returned because JavaImportOptimizer#supports only returns true if in a source folder
+                optimizers.add(JavaImportOptimizer())
+            }
+            optimizers.forEach { it.processFile(psi).run() }
             progress.worked(1)
         } catch (e: Exception) {
             SdkLog.warning("Error formatting Java source of file '{}'.", psi.name, e)

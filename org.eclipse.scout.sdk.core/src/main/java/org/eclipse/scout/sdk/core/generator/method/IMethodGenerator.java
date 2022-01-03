@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -336,6 +336,11 @@ public interface IMethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BOD
    * @see IMethod#identifier(boolean)
    */
   String identifier(IJavaBuilderContext context, boolean includeTypeArguments);
+
+  /**
+   * @return {@code true} if this {@link IMethodGenerator} is a constructor (has no {@link #returnTypeFunc()}).
+   */
+  boolean isConstructor();
 
   /**
    * Marks this {@link IMethodGenerator} to be {@code abstract}.

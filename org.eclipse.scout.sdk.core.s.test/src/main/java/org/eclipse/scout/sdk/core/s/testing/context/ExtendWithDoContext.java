@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,8 +19,6 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.eclipse.scout.rt.dataobject.ITypeVersion;
-import org.eclipse.scout.rt.platform.namespace.INamespace;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.dataobject.DoContextResolvers;
 import org.eclipse.scout.sdk.core.s.dataobject.DoContextResolvers.IDoContextResolver;
@@ -43,10 +41,10 @@ public @interface ExtendWithDoContext {
   /**
    * @return The namespace class to be returned in {@link DoContextResolvers#resolve(CharSequence, IJavaEnvironment)}
    */
-  Class<? extends INamespace> namespace() default INamespace.class;
+  Class<?> namespace();
 
   /**
    * @return The type version class to be returned in {@link DoContextResolvers#resolve(CharSequence, IJavaEnvironment)}
    */
-  Class<? extends ITypeVersion> typeVersion() default ITypeVersion.class;
+  Class<?> typeVersion();
 }
