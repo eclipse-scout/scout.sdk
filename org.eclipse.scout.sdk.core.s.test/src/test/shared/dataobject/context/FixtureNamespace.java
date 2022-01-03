@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,18 +10,16 @@
  */
 package dataobject.context;
 
-import org.eclipse.scout.rt.platform.namespace.INamespace;
-
-public class FixtureNamespace implements INamespace {
+// cannot implement INamespace here as this class is not available in Scout < 22
+@SuppressWarnings("MethodMayBeStatic")
+public class FixtureNamespace {
   public static final String ID = "sdk";
   public static final double ORDER = 5100;
 
-  @Override
   public String getId() {
     return ID;
   }
 
-  @Override
   public double getOrder() {
     return ORDER;
   }

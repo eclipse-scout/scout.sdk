@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -45,7 +45,6 @@ public class DataObjectGeneratorTest {
         .withTypeVersion(SdkFixture_1_0_0_0.class.getName())
         .withElementName("MyTestDo")
         .withPackageName("test.pck");
-    assertNoCompileErrors(env, generator);
     if (env.requireApi(IScoutApi.class).maxLevel().major() >= 22) {
       // type version is a class literal
       assertEqualsRefFile(env, REF_FILE_FOLDER + "DataObject1.txt", generator);
@@ -68,7 +67,6 @@ public class DataObjectGeneratorTest {
         .withNode("stringValues", DataObjectNodeKind.LIST, String.class.getName())
         .withNodeFunc("intValues", DataObjectNodeKind.COLLECTION, c -> Integer.class.getName())
         .withNodeFrom("lookupRowSet", DataObjectNodeKind.SET, IScoutApi.class, api -> api.ILookupRow().fqn());
-    assertNoCompileErrors(env, generator);
     assertEqualsRefFile(env, REF_FILE_FOLDER + "DataObject2.txt", generator);
   }
 }
