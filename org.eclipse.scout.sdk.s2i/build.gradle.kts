@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,13 +16,13 @@ import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
 
 val SCOUT_SDK_VERSION = "10.0.0-SNAPSHOT"
-val SCOUT_SDK_PLUGIN_VERSION = SCOUT_SDK_VERSION.replace("-SNAPSHOT", "." + timestamp())
+val SCOUT_SDK_PLUGIN_VERSION = "10.0.1.".plus(timestamp())
 val JAVA_VERSION = JavaVersion.VERSION_1_8
 
 fun timestamp(): String {
     val now = now(Clock.systemUTC())
     // returned number must be a valid integer (not too big)
-    return now.format(DateTimeFormatter.ofPattern("yyMMddHHmm"))
+    return now.format(DateTimeFormatter.ofPattern("yyDDDHHmm"))
 }
 
 plugins {
