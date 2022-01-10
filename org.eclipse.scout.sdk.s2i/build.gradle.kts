@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 val scoutSdkVersion = "12.0.0-SNAPSHOT"
-val scoutSdkPluginVersion = scoutSdkVersion.replace("-SNAPSHOT", "." + timestamp())
+val scoutSdkPluginVersion = "12.0.1.".plus(timestamp())
 
 val kotlinVersion = "1.5"
 val javaVersion = JavaVersion.VERSION_11
@@ -27,7 +27,7 @@ val intellijVersion = projectPropertyOr("intellij_version", "IU-2021.2.3") // us
 fun timestamp(): String {
     val now = now(Clock.systemUTC())
     // returned number must be a valid integer (not too big)
-    return now.format(DateTimeFormatter.ofPattern("yyMMddHHmm", Locale.US))
+    return now.format(DateTimeFormatter.ofPattern("yyDDDHHmm", Locale.US))
 }
 
 fun projectPropertyOr(propertyKey: String, defaultValue: String): String {
