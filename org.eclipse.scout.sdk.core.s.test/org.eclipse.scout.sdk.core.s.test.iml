@@ -70,7 +70,7 @@
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-spi:1.4.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-transport-wagon:1.4.1" level="project" />
     <orderEntry type="library" name="Maven: io.takari.aether:aether-connector-okhttp:0.17.8" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.14.1" level="project" />
+    <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.14.9" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.17.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-provider-api:3.3.4" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.jersey.inject:jersey-hk2:2.30.1" level="project" />
