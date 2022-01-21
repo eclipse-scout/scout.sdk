@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,9 +42,9 @@ public class FormDataAnnotationDescriptor {
   }
 
   public static FormDataAnnotationDescriptor of(IType type) {
-    var anot = new FormDataAnnotationDescriptor();
+    var descriptor = new FormDataAnnotationDescriptor();
     if (type == null) {
-      return anot;
+      return descriptor;
     }
     var scoutApi = type.javaEnvironment().requireApi(IScoutApi.class);
     if (type.isInstanceOf(scoutApi.IFormExtension()) || type.isInstanceOf(scoutApi.IFormFieldExtension())) {
@@ -52,19 +52,19 @@ public class FormDataAnnotationDescriptor {
 
       var dataAnnotation = DataAnnotationDescriptor.of(type);
       dataAnnotation.ifPresent(dataAnnotationDescriptor -> {
-        anot.setAnnotationOwner(type);
-        anot.setDefaultSubtypeSdkCommand(DefaultSubtypeSdkCommand.CREATE);
-        anot.setFormDataType(dataAnnotationDescriptor.getDataType());
-        anot.setGenericOrdinal(-1);
-        anot.setSdkCommand(SdkCommand.CREATE);
-        anot.setSuperType(dataAnnotationDescriptor.getSuperDataType()
+        descriptor.setAnnotationOwner(type);
+        descriptor.setDefaultSubtypeSdkCommand(DefaultSubtypeSdkCommand.CREATE);
+        descriptor.setFormDataType(dataAnnotationDescriptor.getDataType());
+        descriptor.setGenericOrdinal(-1);
+        descriptor.setSdkCommand(SdkCommand.CREATE);
+        descriptor.setSuperType(dataAnnotationDescriptor.getSuperDataType()
             .orElseGet(() -> type.javaEnvironment().findType(scoutApi.AbstractFormFieldData()).orElse(null)));
       });
     }
     else {
-      parseFormDataAnnotationRec(anot, type, scoutApi, true);
+      parseFormDataAnnotationRec(descriptor, type, scoutApi, true);
     }
-    return anot;
+    return descriptor;
   }
 
   private static void parseFormDataAnnotationRec(FormDataAnnotationDescriptor descriptorToFill, IType type, IScoutApi api, boolean isOwner) {
@@ -72,7 +72,7 @@ public class FormDataAnnotationDescriptor {
       return;
     }
 
-    var replaceAnnotationFqn = type.javaEnvironment().requireApi(IScoutApi.class).Replace().fqn();
+    var replaceAnnotationFqn = api.Replace().fqn();
     var replaceAnnotationPresent = type.annotations().withName(replaceAnnotationFqn).existsAny();
     var superType = type.superClass().orElse(null);
 
@@ -185,43 +185,43 @@ public class FormDataAnnotationDescriptor {
     }
   }
 
-  public static boolean isCreate(FormDataAnnotationDescriptor anot) {
-    if (anot == null) {
+  public static boolean isCreate(FormDataAnnotationDescriptor descriptor) {
+    if (descriptor == null) {
       return false;
     }
-    return (anot.getSdkCommand() == SdkCommand.CREATE) || (anot.getSdkCommand() == null && anot.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.CREATE);
+    return (descriptor.getSdkCommand() == SdkCommand.CREATE) || (descriptor.getSdkCommand() == null && descriptor.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.CREATE);
   }
 
-  public static boolean isIgnore(FormDataAnnotationDescriptor anot) {
-    return (anot.getSdkCommand() == SdkCommand.IGNORE) || (anot.getSdkCommand() == null && anot.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.IGNORE);
+  public static boolean isIgnore(FormDataAnnotationDescriptor descriptor) {
+    return (descriptor.getSdkCommand() == SdkCommand.IGNORE) || (descriptor.getSdkCommand() == null && descriptor.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.IGNORE);
   }
 
-  public static boolean isSdkCommandDefault(FormDataAnnotationDescriptor anot) {
-    return anot != null && anot.getSdkCommand() == SdkCommand.DEFAULT;
+  public static boolean isSdkCommandDefault(FormDataAnnotationDescriptor descriptor) {
+    return descriptor != null && descriptor.getSdkCommand() == SdkCommand.DEFAULT;
   }
 
-  public static boolean isSdkCommandCreate(FormDataAnnotationDescriptor anot) {
-    return anot != null && anot.getSdkCommand() == SdkCommand.CREATE;
+  public static boolean isSdkCommandCreate(FormDataAnnotationDescriptor descriptor) {
+    return descriptor != null && descriptor.getSdkCommand() == SdkCommand.CREATE;
   }
 
-  public static boolean isSdkCommandUse(FormDataAnnotationDescriptor anot) {
-    return anot != null && anot.getSdkCommand() == SdkCommand.USE;
+  public static boolean isSdkCommandUse(FormDataAnnotationDescriptor descriptor) {
+    return descriptor != null && descriptor.getSdkCommand() == SdkCommand.USE;
   }
 
-  public static boolean isSdkCommandIgnore(FormDataAnnotationDescriptor anot) {
-    return anot != null && anot.getSdkCommand() == SdkCommand.IGNORE;
+  public static boolean isSdkCommandIgnore(FormDataAnnotationDescriptor descriptor) {
+    return descriptor != null && descriptor.getSdkCommand() == SdkCommand.IGNORE;
   }
 
-  public static boolean isDefaultSubtypeSdkCommandCreate(FormDataAnnotationDescriptor anot) {
-    return anot != null && anot.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.CREATE;
+  public static boolean isDefaultSubtypeSdkCommandCreate(FormDataAnnotationDescriptor descriptor) {
+    return descriptor != null && descriptor.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.CREATE;
   }
 
-  public static boolean isDefaultSubtypeSdkCommandIgnore(FormDataAnnotationDescriptor anot) {
-    return anot != null && anot.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.IGNORE;
+  public static boolean isDefaultSubtypeSdkCommandIgnore(FormDataAnnotationDescriptor descriptor) {
+    return descriptor != null && descriptor.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.IGNORE;
   }
 
-  public static boolean isDefaultSubtypeSdkCommandDefault(FormDataAnnotationDescriptor anot) {
-    return anot != null && anot.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.DEFAULT;
+  public static boolean isDefaultSubtypeSdkCommandDefault(FormDataAnnotationDescriptor descriptor) {
+    return descriptor != null && descriptor.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.DEFAULT;
   }
 
   /**
