@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -76,14 +76,7 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
     var fieldExtendsTemplateField = false;
     var isCompositeField = formField.isInstanceOf(scoutApi.ICompositeField());
     if (FormDataAnnotationDescriptor.isCreate(fieldAnnotation)) {
-      var formDataType = fieldAnnotation.getFormDataType();
-      String formDataTypeName;
-      if (formDataType == null) {
-        formDataTypeName = removeFieldSuffix(formField.elementName());
-      }
-      else {
-        formDataTypeName = formDataType.elementName();
-      }
+      var formDataTypeName = removeFieldSuffix(formField.elementName());
 
       ITypeGenerator<?> dtoGenerator;
       if (fieldAnnotation.getSuperType().isInstanceOf(scoutApi.AbstractTableFieldBeanData())) {
@@ -96,7 +89,6 @@ public class CompositeFormDataGenerator<TYPE extends CompositeFormDataGenerator<
         dtoGenerator = new CompositeFormDataGenerator<>(formField, fieldAnnotation, targetEnvironment());
       }
       else {
-
         dtoGenerator = new FormDataGenerator<>(formField, fieldAnnotation, targetEnvironment());
 
         // special case if a property has the same name as a form field -> show warning
