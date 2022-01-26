@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -55,6 +55,10 @@ public final class ScoutProjectNewHelper {
   }
 
   public static void createProject(Path workingDir, String groupId, String artifactId, String displayName, boolean useJsUiLanguage, String javaVersion, IEnvironment env, IProgress progress) throws IOException {
+    createProject(workingDir, groupId, artifactId, displayName, useJsUiLanguage, javaVersion, null /* use default (latest) */, env, progress);
+  }
+
+  public static void createProject(Path workingDir, String groupId, String artifactId, String displayName, boolean useJsUiLanguage, String javaVersion, String archetypeVersion, IEnvironment env, IProgress progress) throws IOException {
     String archetypeArtifactId;
     if (useJsUiLanguage) {
       archetypeArtifactId = ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID;
@@ -62,7 +66,7 @@ public final class ScoutProjectNewHelper {
     else {
       archetypeArtifactId = ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID;
     }
-    createProject(workingDir, groupId, artifactId, displayName, javaVersion, null /* use default */, archetypeArtifactId, null /* use latest */, env, progress);
+    createProject(workingDir, groupId, artifactId, displayName, javaVersion, null /* use default */, archetypeArtifactId, archetypeVersion, env, progress);
   }
 
   @SuppressWarnings("squid:S00107")

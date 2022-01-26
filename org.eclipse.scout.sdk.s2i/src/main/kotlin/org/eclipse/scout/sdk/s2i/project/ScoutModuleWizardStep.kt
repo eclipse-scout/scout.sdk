@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -21,41 +21,48 @@ import com.intellij.ui.components.JBRadioButton
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.layout.panel
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper.*
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 
-open class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: ScoutModuleBuilder) : ModuleWizardStep() {
+class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: ScoutModuleBuilder) : ModuleWizardStep() {
 
     private val m_propertyGraph = PropertyGraph(null, true)
-    private val m_groupIdProperty = m_propertyGraph.graphProperty(::defaultGroupId)
+    private val m_groupIdProperty = m_propertyGraph.graphProperty { "org.eclipse.scout.apps" }
     private val m_artifactIdProperty = m_propertyGraph.graphProperty(::defaultArtifactId)
-    private val m_displayNameProperty = m_propertyGraph.graphProperty(::defaultDisplayName)
-
+    private val m_displayNameProperty = m_propertyGraph.graphProperty { "My Application" }
+    private val m_versionProperty = m_propertyGraph.graphProperty { IMavenConstants.LATEST }
     private lateinit var m_useUiLanguageJava: JBRadioButton
 
     private val m_contentPanel by lazy {
         panel {
+            val columns = 32
             titledRow(message("project.name")) {
                 row(message("group.id")) {
-                    textField(m_groupIdProperty, 32)
+                    textField(m_groupIdProperty, columns)
                         .withValidationOnApply { validateGroupId(it) }
                         .withValidationOnInput { validateGroupId(it) }
                         .focused()
                 }
                 row(message("artifact.id")) {
-                    textField(m_artifactIdProperty, 32)
+                    textField(m_artifactIdProperty, columns)
                         .withValidationOnApply { validateArtifactId(it) }
                         .withValidationOnInput { validateArtifactId(it) }
                 }
                 row(message("display.name")) {
-                    textField(m_displayNameProperty, 32)
+                    textField(m_displayNameProperty, columns)
                         .withValidationOnApply { validateDisplayName(it) }
                         .withValidationOnInput { validateDisplayName(it) }
                 }
             }
-            titledRow(message("ui.lang")) {
-                buttonGroup {
-                    row { m_useUiLanguageJava = radioButton("Java", { true }, {}).component }
-                    row { radioButton("JavaScript") }
+            titledRow(message("scout.settings")) {
+                row(message("ui.lang")) {
+                    buttonGroup {
+                        row { m_useUiLanguageJava = radioButton("Java", { true }, {}).component }
+                        row { radioButton("JavaScript") }
+                    }
+                }
+                row(message("scout.version")) {
+                    textField(m_versionProperty, columns)
                 }
             }
         }.apply {
@@ -63,9 +70,9 @@ open class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: 
         }
     }
 
-    protected open fun validateGroupId(groupIdField: JBTextField): ValidationInfo? = getMavenGroupIdErrorMessage(groupIdField.text)?.let { ValidationInfo(it, groupIdField) }
+    private fun validateGroupId(groupIdField: JBTextField): ValidationInfo? = getMavenGroupIdErrorMessage(groupIdField.text)?.let { ValidationInfo(it, groupIdField) }
 
-    protected open fun validateArtifactId(artifactIdField: JBTextField): ValidationInfo? {
+    private fun validateArtifactId(artifactIdField: JBTextField): ValidationInfo? {
         val artifactId = artifactIdField.text
         val idErrorMessage = getMavenArtifactIdErrorMessage(artifactId)
         if (idErrorMessage != null) {
@@ -78,18 +85,18 @@ open class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: 
         return null
     }
 
-    protected open fun isModuleNameUsed(name: String): Boolean {
+    private fun isModuleNameUsed(name: String): Boolean {
         val modulePrefix = "$name."
         return existingModules().any { it.name.startsWith(modulePrefix) }
     }
 
-    protected open fun existingModules(): Array<Module> = wizardContext.project?.let { ModuleManager.getInstance(it).modules } ?: Module.EMPTY_ARRAY
+    private fun existingModules(): Array<Module> = wizardContext.project?.let { ModuleManager.getInstance(it).modules } ?: Module.EMPTY_ARRAY
 
-    protected open fun validateDisplayName(displayNameField: JBTextField): ValidationInfo? = getDisplayNameErrorMessage(displayNameField.text)?.let { ValidationInfo(it, displayNameField) }
+    private fun validateDisplayName(displayNameField: JBTextField) = getDisplayNameErrorMessage(displayNameField.text)?.let {
+        ValidationInfo(it, displayNameField)
+    }
 
-    protected open fun defaultGroupId() = "org.eclipse.scout.apps"
-
-    protected open fun defaultArtifactId(): String {
+    private fun defaultArtifactId(): String {
         val base = "helloscout"
         var candidate = base
         var suffix = 1
@@ -99,8 +106,6 @@ open class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: 
         }
         return candidate
     }
-
-    protected open fun defaultDisplayName() = "My Application"
 
     override fun validate() = m_contentPanel.validateCallbacks.asSequence()
         .mapNotNull { it() }
@@ -116,5 +121,9 @@ open class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: 
         builder.artifactId = m_artifactIdProperty.get()
         builder.displayName = m_displayNameProperty.get()
         builder.useJavaUiLang = m_useUiLanguageJava.isSelected
+        val version = m_versionProperty.get().trim()
+        if (version.isNotEmpty()) {
+            builder.version = version
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,6 +44,7 @@ class ScoutModuleBuilder : ModuleBuilder() {
     lateinit var displayName: String
     lateinit var javaVersion: String
     var useJavaUiLang = true
+    var version: String? = null /* use latest */
 
     override fun getModuleType(): ModuleType<*> = StdModuleTypes.JAVA
 
@@ -61,7 +62,7 @@ class ScoutModuleBuilder : ModuleBuilder() {
 
     private fun createFromArchetype(project: Project, path: Path) {
         callInIdeaEnvironment(project, message("create.new.scout.modules")) { env, p ->
-            createProject(path, groupId, artifactId, displayName, !useJavaUiLang, javaVersion, env, p)
+            createProject(path, groupId, artifactId, displayName, !useJavaUiLang, javaVersion, version, env, p)
         }.thenAccept {
             importModules(project, path)
         }
