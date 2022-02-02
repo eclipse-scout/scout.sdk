@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -195,7 +195,7 @@ public class TranslationManagerTest {
   }
 
   @Test
-  public void testSetTranslationToStore(TestingEnvironment env) {
+  public void testSetTranslationToStore() {
     var key = "key1";
     var origVal = "base1";
     var store1 = createStore("override", 100.0, emptyMap());

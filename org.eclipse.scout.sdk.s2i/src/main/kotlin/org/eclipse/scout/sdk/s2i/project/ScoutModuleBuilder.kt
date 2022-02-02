@@ -21,11 +21,13 @@ import com.intellij.openapi.module.StdModuleTypes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.SdkTypeId
+import com.intellij.openapi.projectRoots.impl.SdkVersionUtil
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
+import com.intellij.openapi.ui.Messages.*
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.psi.PsiManager
-import org.eclipse.scout.sdk.core.model.ecj.JreInfo
+import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper.createProject
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
@@ -42,9 +44,9 @@ class ScoutModuleBuilder : ModuleBuilder() {
     lateinit var groupId: String
     lateinit var artifactId: String
     lateinit var displayName: String
-    lateinit var javaVersion: String
     var useJavaUiLang = true
-    var version: String? = null /* use latest */
+    var javaVersion: Int? = null
+    var scoutVersion: String? = null /* use latest */
 
     override fun getModuleType(): ModuleType<*> = StdModuleTypes.JAVA
 
@@ -62,7 +64,7 @@ class ScoutModuleBuilder : ModuleBuilder() {
 
     private fun createFromArchetype(project: Project, path: Path) {
         callInIdeaEnvironment(project, message("create.new.scout.modules")) { env, p ->
-            createProject(path, groupId, artifactId, displayName, !useJavaUiLang, javaVersion, version, env, p)
+            createProject(path, groupId, artifactId, displayName, !useJavaUiLang, javaVersion?.toString(), scoutVersion, env, p)
         }.thenAccept {
             importModules(project, path)
         }
@@ -96,12 +98,23 @@ class ScoutModuleBuilder : ModuleBuilder() {
             nameLocationSettings.moduleName = artifactId
         }
 
-        val jdkHome = settingsStep.context.projectJdk.homePath
-        if (jdkHome != null) {
-            javaVersion = JreInfo(Paths.get(jdkHome)).version()
-        }
+        javaVersion = settingsStep.context.projectJdk.homePath
+            ?.let { SdkVersionUtil.getJdkVersionInfo(it)?.version?.feature }
 
         return super.modifySettingsStep(settingsStep)
+    }
+
+    override fun validate(currentProject: Project?, project: Project): Boolean {
+        val selectedJavaMajorVersion = javaVersion
+        if (selectedJavaMajorVersion != null) {
+            val supportedJavaVersions = ScoutProjectNewHelper.getSupportedJavaVersions(scoutVersion)
+            if (!supportedJavaVersions.contains(selectedJavaMajorVersion)) {
+                val msg = message("jdk.not.supported.msg", selectedJavaMajorVersion, scoutVersion ?: IMavenConstants.LATEST, supportedJavaVersions.joinToString(", "))
+                val result = showOkCancelDialog(msg, message("jdk.not.supported.title"), getYesButton(), getNoButton(), getWarningIcon())
+                if (result != OK) return false
+            }
+        }
+        return super.validate(currentProject, project)
     }
 
     override fun getBuilderId(): String? = javaClass.name

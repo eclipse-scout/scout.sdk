@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,11 +12,13 @@ package org.eclipse.scout.sdk.s2e.operation.project;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -29,12 +31,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.launching.StandardVMType;
+import org.eclipse.jdt.launching.IVMInstall2;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
-import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -53,14 +56,11 @@ import org.osgi.framework.Version;
  */
 public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, EclipseProgress> {
 
-  public static final String TEMPLATE_VERSION = "org.eclipse.scout.archetype.version";
-  protected static final String EXEC_ENV_PREFIX = "JavaSE-";
-  protected static final String MIN_JVM_VERSION = "1.8";
-
   private String m_groupId;
   private String m_artifactId;
   private String m_displayName;
-  private boolean m_useJsClient = true;
+  private boolean m_useJsClient;
+  private String m_scoutVersion;
   private Path m_targetDirectory;
   private List<IProject> m_createdProjects;
 
@@ -69,7 +69,7 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
     try {
       // create project on disk (using archetype)
       progress.init(100, toString());
-      ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), isUseJsClient(), getDefaultWorkspaceJavaVersion(), env, progress.newChild(5));
+      ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), isUseJsClient(), getJavaVersion(), getScoutVersion(), env, progress.newChild(5));
 
       // import into workspace
       m_createdProjects = importIntoWorkspace(progress.newChild(90));
@@ -82,71 +82,27 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
     }
   }
 
-  protected static String getDefaultWorkspaceJavaVersion() {
-    return versionToString(computeDefaultWorkspaceJavaVersion());
-  }
-
   /**
-   * Converts the specified {@link Version} to a {@link String}. Only the major and minor parts are used. Trailing
-   * zeroes are omitted.<br>
-   *
-   * @param version
-   *          The {@link Version} to convert.
-   * @return E.g. "1.8" or "9".
+   * @return The newest major Java version (e.g. 8 or 11 or 17) which is installed in the Eclipse workspace and is
+   *         supported by the {@link #getScoutVersion() selected Scout version}. If no of the JDKs registered in Eclipse
+   *         is supported by the selected Scout version, the newest major Java version that is supported by the Scout
+   *         version is returned. In this case the generated project is correct, but a matching JDK will be missing in
+   *         the workspace.
    */
-  protected static String versionToString(Version version) {
-    var b = new StringBuilder(4);
-    b.append(version.getMajor());
-    if (version.getMinor() != 0) {
-      b.append('.').append(version.getMinor());
-    }
-    return b.toString();
-  }
-
-  /**
-   * Gets the default Java version supported by the current default JVM of the workspace.
-   *
-   * @return A {@link Version} like "1.8.0" or "9.0.0" with the latest version supported in the current default JVM.
-   */
-  protected static Version computeDefaultWorkspaceJavaVersion() {
-    var result = Version.parseVersion(MIN_JVM_VERSION);
-    var defaultVm = JavaRuntime.getDefaultVMInstall();
-    if (defaultVm == null) {
-      return result;
-    }
-
-    for (var env : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
-      if (env.isStrictlyCompatible(defaultVm)) {
-        var cur = execEnvironmentToVersion(env.getId());
-        if (cur.compareTo(result) > 0) {
-          result = cur; // take the newest
-        }
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Takes a Java execution environment (e.g. "JavaSE-1.8" or "JavaSE-9") and converts it to a {@link Version}.<br>
-   * If an invalid value is passed, always 1.8 is returned as minimal version.<br>
-   *
-   * @param executionEnvId
-   *          The execution environment of the form "JavaSE-1.8" or "JavaSE-9 to parse.
-   * @return The {@link Version} holding the decimal equivalent value. E.g. {@code 1.8.0} or {@code 9.0.0}.
-   */
-  protected static Version execEnvironmentToVersion(String executionEnvId) {
-    if (executionEnvId != null && executionEnvId.startsWith(EXEC_ENV_PREFIX)) {
-      var numPart = executionEnvId.substring(EXEC_ENV_PREFIX.length());
-      if (Strings.hasText(numPart)) {
-        try {
-          return Version.parseVersion(numPart);
-        }
-        catch (IllegalArgumentException e) {
-          SdkLog.warning("Invalid number part ({}) in execution environment {}.", numPart, executionEnvId, e);
-        }
-      }
-    }
-    return Version.parseVersion(MIN_JVM_VERSION);
+  protected String getJavaVersion() {
+    var supportedJavaVersions = ScoutProjectNewHelper.getSupportedJavaVersions(getScoutVersion());
+    var supportedJavaVersionSet = Arrays.stream(supportedJavaVersions).boxed().collect(toSet());
+    var javaVersion = Arrays.stream(JavaRuntime.getVMInstallType(StandardVMType.ID_STANDARD_VM_TYPE).getVMInstalls())
+        .filter(vm -> vm instanceof IVMInstall2)
+        .map(vm -> (IVMInstall2) vm)
+        .map(IVMInstall2::getJavaVersion)
+        .filter(Strings::hasText)
+        .map(Version::new)
+        .mapToInt(v -> v.getMajor() >= 9 ? v.getMajor() : v.getMinor())
+        .filter(supportedJavaVersionSet::contains)
+        .max()
+        .orElseGet(() -> Arrays.stream(supportedJavaVersions).max().orElseThrow());
+    return Integer.toString(javaVersion);
   }
 
   protected void formatCreatedProjects(EclipseProgress progress) throws CoreException {
@@ -242,6 +198,14 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
 
   public void setUseJsClient(boolean useJsClient) {
     m_useJsClient = useJsClient;
+  }
+
+  public String getScoutVersion() {
+    return m_scoutVersion;
+  }
+
+  public void setScoutVersion(String scoutVersion) {
+    m_scoutVersion = scoutVersion;
   }
 
   @Override

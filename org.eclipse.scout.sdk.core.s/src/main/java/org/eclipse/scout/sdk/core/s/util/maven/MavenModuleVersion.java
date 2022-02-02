@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,10 @@
 package org.eclipse.scout.sdk.core.s.util.maven;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -18,7 +22,10 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.Attributes.Name;
 import java.util.jar.JarFile;
+import java.util.stream.Stream;
 import java.util.zip.ZipFile;
+
+import javax.xml.xpath.XPathExpressionException;
 
 import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.apidef.ApiVersion;
@@ -27,10 +34,10 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
+import org.w3c.dom.Node;
 
 /**
- * Helper class to compute the version of a Maven module within an {@link IJavaEnvironment}.<br>
- * The module can be a binary jar or a source folder within the {@link IJavaEnvironment}.
+ * Helper class to get version of a Maven artifacts.<br>
  */
 public final class MavenModuleVersion {
 
@@ -41,24 +48,51 @@ public final class MavenModuleVersion {
   }
 
   /**
-   * Tries to find a module within the given {@link IJavaEnvironment} and computes its Maven version.
+   * Tries to find the module specified in the given {@link IJavaEnvironment} and computes its Maven version.
    * <p>
    * For binary jars the version is taken from the {@link Name#IMPLEMENTATION_VERSION} manifest header.<br>
    * For source folders it is taken from the parent pom.xml<br>
    * Source or javadoc jar files are not supported.
    * </p>
    * 
-   * @param moduleName
-   *          The name of the Maven module. This is equal to the artifactId of the module. May be {@code null} but then
-   *          the resulting {@link Optional} will always be empty.
+   * @param artifactId
+   *          The name of the Maven module. This is the name of the jar file (without any suffixes) and the name of the
+   *          directory that contains the source folders. Typically, this is equal to the artifactId of the module. May
+   *          be {@code null} but then the resulting {@link Optional} will always be empty.
    * @param context
    *          The {@link IJavaEnvironment} in which the module should be searched. May be {@code null} but then the
    *          resulting {@link Optional} will always be empty.
    * @return An {@link Optional} holding the Maven version of the given module or an empty {@link Optional} if the
    *         module could not be found, the version cannot be parsed or one of the parameters is {@code null}.
    */
-  public static Optional<ApiVersion> get(String moduleName, IJavaEnvironment context) {
-    return modulePathIn(moduleName, context).flatMap(MavenModuleVersion::version);
+  public static Optional<ApiVersion> usedIn(String artifactId, IJavaEnvironment context) {
+    return modulePathIn(artifactId, context).flatMap(MavenModuleVersion::version);
+  }
+
+  /**
+   * Gets all versions of given artifact that can be found on Maven-central.
+   * 
+   * @param groupId
+   *          The groupId of the artifact. Must not be {@code null}.
+   * @param artifactId
+   *          The artifactId of the artifact. Must not be {@code null}.
+   * @return A {@link Stream} with all versions found on Maven-central.
+   * @throws IOException
+   *           if there is an error reading the value from Maven-central.
+   */
+  public static Stream<String> allOnCentral(String groupId, String artifactId) throws IOException {
+    try {
+      var g = URLEncoder.encode(groupId, StandardCharsets.UTF_8);
+      var a = URLEncoder.encode(artifactId, StandardCharsets.UTF_8);
+      var uri = new URI("https://search.maven.org/solrsearch/select?q=g:" + g + "+AND+a:" + a + "&core=gav&rows=200&wt=xml");
+      var dom = Xml.get(uri);
+      return Xml.evaluateXPath("result/doc/str[@name='v']", dom.getDocumentElement()).stream()
+          .map(Node::getTextContent)
+          .filter(Strings::hasText);
+    }
+    catch (URISyntaxException | XPathExpressionException e) {
+      throw new IOException(e);
+    }
   }
 
   static Optional<Path> modulePathIn(String moduleName, IJavaEnvironment context) {

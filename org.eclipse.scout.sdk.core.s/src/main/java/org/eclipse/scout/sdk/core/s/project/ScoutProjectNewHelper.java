@@ -10,21 +10,31 @@
  */
 package org.eclipse.scout.sdk.core.s.project;
 
+import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 import javax.xml.transform.TransformerException;
 
+import org.eclipse.scout.sdk.core.apidef.Api;
+import org.eclipse.scout.sdk.core.apidef.ApiVersion;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenModuleVersion;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -49,7 +59,6 @@ public final class ScoutProjectNewHelper {
 
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"/<>=:]+");
   public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z][a-z0-9_]{0,32}(?:\\.[a-z][a-z0-9_]{0,32}){0,16}$");
-  public static final String DEFAULT_JAVA_ENV = "11";
 
   private ScoutProjectNewHelper() {
   }
@@ -87,9 +96,6 @@ public final class ScoutProjectNewHelper {
     if (displayNameMsg != null) {
       throw new IllegalArgumentException(displayNameMsg);
     }
-    if (Strings.isEmpty(javaVersion)) {
-      javaVersion = DEFAULT_JAVA_ENV;
-    }
     if (Strings.isBlank(archetypeGroupId)) {
       archetypeGroupId = SCOUT_ARCHETYPES_GROUP_ID;
     }
@@ -98,6 +104,11 @@ public final class ScoutProjectNewHelper {
     }
     if (Strings.isBlank(archetypeVersion)) {
       archetypeVersion = IMavenConstants.LATEST;
+    }
+    if (Strings.isEmpty(javaVersion)) {
+      // no java version specified: use the highest version supported by the selected scout version
+      var selectedJavaVersion = Arrays.stream(getSupportedJavaVersions(archetypeVersion)).max().orElseThrow();
+      javaVersion = Integer.toString(selectedJavaVersion);
     }
 
     var pck = getPackage(groupId, artifactId);
@@ -133,7 +144,7 @@ public final class ScoutProjectNewHelper {
 
   /**
    * Workaround so that only the parent module is referenced in the root (remove non-parent modules).<br>
-   * Otherwise maven returns errors like
+   * Otherwise, maven returns errors like
    * {@code org.apache.maven.project.DuplicateProjectException: Project 'xyz' is duplicated
    * in the reactor}.
    */
@@ -229,5 +240,52 @@ public final class ScoutProjectNewHelper {
         .filter(keyWord -> s.startsWith(keyWord + JavaTypes.C_DOT) || s.endsWith(JavaTypes.C_DOT + keyWord) || s.contains(JavaTypes.C_DOT + keyWord + JavaTypes.C_DOT))
         .findAny()
         .orElse(null);
+  }
+
+  /**
+   * Gets all major Java versions (e.g. 8 or 11 or 17) that are officially supported by the Scout version given.
+   * 
+   * @param scoutVersion
+   *          The Scout version (e.g. 11.0.14 or 22.0-SNAPSHOT or LATEST).
+   * @return The supported major Java versions (e.g. 8 or 11 or 17) for the Scout version given. If the given Scout
+   *         version is invalid, the supported Java version of the newest Scout version is returned.
+   */
+  public static int[] getSupportedJavaVersions(String scoutVersion) {
+    ApiVersion scoutApiVersion;
+    if (Strings.isBlank(scoutVersion) || IMavenConstants.LATEST.equalsIgnoreCase(scoutVersion)) {
+      scoutApiVersion = ApiVersion.LATEST;
+    }
+    else {
+      scoutApiVersion = ApiVersion.parse(scoutVersion).orElse(ApiVersion.LATEST);
+    }
+    return Api.create(IScoutApi.class, scoutApiVersion).supportedJavaVersions();
+  }
+
+  /**
+   * Gets all Scout versions available on Maven central which are supported by this SDK.
+   * 
+   * @param useJavaClient
+   *          {@code true} if the versions for the archetype with the Java UI should be returned, {@code false} for the
+   *          versions of the archetype with the JavaScript UI.
+   * @param includePreviewVersions
+   *          {@code true} if preview releases should be included in the result list.
+   * @return A {@link List} holding the versions available on Maven central sorted descending (the newest version
+   *         first).
+   * @throws IOException
+   *           if there is an error reading the versions from Maven central
+   */
+  public static List<String> getSupportedArchetypeVersions(boolean useJavaClient, boolean includePreviewVersions) throws IOException {
+    var artifactId = useJavaClient ? SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID : SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID;
+    var min = ScoutApi.allKnown()
+        .map(IApiSpecification::maxLevel)
+        .min(naturalOrder())
+        .orElseThrow();
+    return MavenModuleVersion.allOnCentral(SCOUT_ARCHETYPES_GROUP_ID, artifactId)
+        .map(ApiVersion::parse)
+        .flatMap(Optional::stream)
+        .filter(v -> v.compareTo(min) >= 0) // only supported versions
+        .filter(v -> includePreviewVersions || Strings.isEmpty(v.suffix())) // include preview versions?
+        .map(ApiVersion::asString)
+        .collect(toList());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,9 +27,10 @@ public class ApiVersionTest {
   @Test
   public void testParse() {
     assertParseResult("43.245.1");
-    assertParseResult(".245.", "245");
+    assertParseResult("245", "245");
     assertParseResult("11.0-SNAPSHOT");
     assertParseResult("10.0.0-SNAPSHOT");
+    assertParseResult("9.0.0.033_Simrel_2019_12");
     assertParseResult("11");
     Assertions.assertFalse(ApiVersion.parse("").isPresent());
     Assertions.assertFalse(ApiVersion.parse(null).isPresent());
@@ -45,7 +46,7 @@ public class ApiVersionTest {
 
   @Test
   public void testSegments() {
-    int[] segments = {12, 4};
+    var segments = new int[]{12, 4};
     var v = new ApiVersion(segments);
     assertArrayEquals(segments, v.segments());
     assertNotSame(segments, v.segments());

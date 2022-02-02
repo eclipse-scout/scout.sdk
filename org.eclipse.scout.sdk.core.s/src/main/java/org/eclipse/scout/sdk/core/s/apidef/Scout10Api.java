@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,11 @@ import org.eclipse.scout.sdk.core.util.Strings;
 @MaxApiLevel(10)
 @SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
 public interface Scout10Api extends IScoutApi {
+
+  @Override
+  default int[] supportedJavaVersions() {
+    return new int[]{8, 11};
+  }
 
   IScoutAnnotationApi.ApplicationScoped APPLICATION_SCOPED_ANNOTATION = new ApplicationScoped();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,19 +10,31 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.project;
 
+import static java.util.Collections.singletonList;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.scout.sdk.core.apidef.ApiVersion;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
+import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
+import org.eclipse.scout.sdk.s2e.environment.AbstractJob;
 import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
+import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.AbstractContentProviderAdapter;
 import org.eclipse.scout.sdk.s2e.ui.fields.resource.ResourceTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.StyledTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
@@ -49,10 +61,12 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   public static final String PROP_GROUP_ID = "groupId";
   public static final String PROP_ARTIFACT_ID = "artifactId";
-  public static final String PROP_DISPLAY_NAME = "dispName";
+  public static final String PROP_DISPLAY_NAME = "displayName";
   public static final String PROP_DIR = "dir";
   public static final String PROP_USE_WORKSPACE_LOC = "useWorkspaceLoc";
   public static final String PROP_USE_JS_CLIENT = "useJsClient";
+  public static final String PROP_SCOUT_VERSION = "scoutVersion";
+  public static final String PROP_SHOW_PREVIEW_RELEASES = "showPreviewReleases";
   public static final String SETTINGS_TARGET_DIR = "targetDirSetting";
 
   protected StyledTextField m_groupIdField;
@@ -62,14 +76,45 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   protected Button m_javaScriptButton;
   protected Button m_javaButton;
 
+  protected ProposalTextField m_scoutVersionField;
+  protected Button m_showPreviewReleases;
+
   protected Button m_useWsLoc;
   protected ResourceTextField m_targetDirectoryField;
+  protected final List<String> m_scoutVersions = new ArrayList<>();
+  protected volatile boolean m_versionsLoading;
 
   public ScoutProjectNewWizardPage() {
     super(ScoutProjectNewWizardPage.class.getName());
     setTitle("Create a Scout Project");
     setDescription("Create a new Scout Project");
     initDefaultValues();
+  }
+
+  protected void initDefaultValues() {
+    // group id
+    setGroupIdInternal("org.eclipse.scout.apps");
+
+    // artifact id
+    setArtifactIdInternal("helloscout");
+
+    // display name
+    setDisplayNameInternal("My Application");
+
+    // ui language
+    setUseJsClientInternal(false);
+
+    // Scout version
+    resetVersionsToDefault();
+
+    // show preview releases
+    setShowPreviewReleases(false);
+
+    // use workspace loc
+    setUseWorkspaceLocationInternal(true);
+
+    // target directory
+    updateTargetDirViewState();
   }
 
   @Override
@@ -81,7 +126,10 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     var labelWidth = 100;
     createProjectNameGroup(parent, labelWidth);
     createClientLanguageGroup(parent);
+    createScoutVersionGroup(parent, labelWidth);
     createProjectLocationGroup(parent, labelWidth);
+
+    updateVersionsAsync(); // schedule remote version fetch
 
     PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PROJECT_NEW_WIZARD_PAGE);
   }
@@ -116,6 +164,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     });
 
     // layout
+    //noinspection DuplicatedCode
     GridLayoutFactory
         .swtDefaults()
         .applyTo(nameGroup);
@@ -152,6 +201,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         setUseJsClientInternal(!m_javaButton.getSelection());
+        updateVersionsAsync();
         pingStateChanging();
       }
     });
@@ -163,6 +213,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         setUseJsClientInternal(m_javaScriptButton.getSelection());
+        updateVersionsAsync();
         pingStateChanging();
       }
     });
@@ -185,6 +236,71 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
         .defaultsFor(m_javaScriptButton)
         .indent(13, 5)
         .applyTo(m_javaScriptButton);
+  }
+
+  @SuppressWarnings("DuplicatedCode")
+  protected void createScoutVersionGroup(Composite parent, int labelWidth) {
+    var scoutVersionBox = FieldToolkit.createGroupBox(parent, "Scout runtime version");
+
+    // create scout version proposal field
+    var scoutVersionContentProvider = new P_ScoutVersionsContentProvider();
+    m_scoutVersionField = FieldToolkit.createProposalField(scoutVersionBox, "Scout Version", TextField.TYPE_LABEL, labelWidth);
+    m_scoutVersionField.setContentProvider(scoutVersionContentProvider);
+    m_scoutVersionField.setLabelProvider(scoutVersionContentProvider);
+    m_scoutVersionField.addModifyListener(item -> {
+      setScoutVersionInternal(m_scoutVersionField.getText());
+      pingStateChanging();
+    });
+
+    // create preview-versions checkbox
+    var checkboxParent = new Composite(scoutVersionBox, SWT.NONE);
+    var checkboxLabel = new Label(checkboxParent, SWT.NONE);
+    m_showPreviewReleases = FieldToolkit.createCheckBox(checkboxParent, "Also show preview versions", false);
+    m_showPreviewReleases.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        setShowPreviewReleasesInternal(m_showPreviewReleases.getSelection());
+        updateVersionsAsync();
+        pingStateChanging();
+      }
+    });
+
+    // layout
+    GridLayoutFactory
+        .swtDefaults()
+        .applyTo(scoutVersionBox);
+    GridDataFactory
+        .defaultsFor(scoutVersionBox)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .indent(0, 10)
+        .applyTo(scoutVersionBox);
+    GridDataFactory
+        .defaultsFor(m_scoutVersionField)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(m_scoutVersionField);
+
+    checkboxParent.setLayout(new FormLayout());
+    GridDataFactory
+        .defaultsFor(checkboxParent)
+        .align(SWT.FILL, SWT.CENTER)
+        .grab(true, false)
+        .applyTo(checkboxParent);
+
+    var labelData = new FormData();
+    labelData.top = new FormAttachment(0, 4);
+    labelData.left = new FormAttachment(0, 0);
+    labelData.right = new FormAttachment(0, 100);
+    labelData.bottom = new FormAttachment(100, 0);
+    checkboxLabel.setLayoutData(labelData);
+
+    var textData = new FormData();
+    textData.top = new FormAttachment(0, 0);
+    textData.left = new FormAttachment(checkboxLabel, 5);
+    textData.right = new FormAttachment(100, 0);
+    textData.bottom = new FormAttachment(100, 0);
+    m_showPreviewReleases.setLayoutData(textData);
   }
 
   protected void createProjectLocationGroup(Composite parent, int labelWidth) {
@@ -220,6 +336,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
         .applyTo(m_targetDirectoryField);
   }
 
+  @SuppressWarnings("DuplicatedCode")
   protected Composite createLocationCheckbox(Composite p) {
     var parent = new Composite(p, SWT.NONE);
     var lbl = new Label(parent, SWT.NONE);
@@ -259,24 +376,77 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     return parent;
   }
 
-  protected void initDefaultValues() {
-    // group id
-    setGroupIdInternal("org.eclipse.scout.apps");
+  protected void updateVersionsAsync() {
+    setVersionLoading(true);
+    new AbstractJob("Load available Scout versions.") {
+      @Override
+      protected void execute(IProgressMonitor monitor) {
+        try {
+          var availableVersions = ScoutProjectNewHelper.getSupportedArchetypeVersions(!isUseJsClient(), isShowPreviewReleases());
+          if (availableVersions.isEmpty()) {
+            resetVersionsToDefault();
+          }
+          else {
+            setAvailableVersions(availableVersions);
+          }
+        }
+        catch (Exception e) {
+          SdkLog.warning("Error fetching available Scout versions from Maven central.", e);
+          resetVersionsToDefault();
+        }
+        finally {
+          getContainer().getShell().getDisplay().asyncExec(() -> setVersionLoading(false));
+        }
+      }
+    }.schedule();
+  }
 
-    // artifact id
-    setArtifactIdInternal("helloscout");
+  private void resetVersionsToDefault() {
+    setAvailableVersions(singletonList(IMavenConstants.LATEST));
+  }
 
-    // display name
-    setDisplayNameInternal("My Application");
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
+  private void setAvailableVersions(List<String> versions) {
+    m_scoutVersions.clear();
+    m_scoutVersions.addAll(versions);
+    if (isControlCreated()) {
+      getContainer().getShell().getDisplay().asyncExec(() -> {
+        var selected = m_scoutVersionField.getText();
+        var contentProvider = (P_ScoutVersionsContentProvider) m_scoutVersionField.getContentProvider();
+        contentProvider.clearCache();
+        if (!versions.contains(selected)) {
+          m_scoutVersionField.acceptProposal(versions.get(0));
+        }
+        m_scoutVersionField.setSelection(0);
+      });
+    }
+  }
 
-    // ui language
-    setUseJsClientInternal(false);
+  protected void setVersionLoading(boolean loading) {
+    m_versionsLoading = loading;
+    m_javaButton.setEnabled(!loading);
+    m_javaScriptButton.setEnabled(!loading);
+    m_scoutVersionField.setEnabled(!loading);
+    m_showPreviewReleases.setEnabled(!loading);
+    pingStateChanging();
+  }
 
-    // use workspace loc
-    setUseWorkspaceLocationInternal(true);
+  private final class P_ScoutVersionsContentProvider extends AbstractContentProviderAdapter {
 
-    // target directory
-    updateTargetDirViewState();
+    @Override
+    public void clearCache() {
+      super.clearCache();
+    }
+
+    @Override
+    public String getText(Object element) {
+      return (String) element;
+    }
+
+    @Override
+    protected Collection<?> loadProposals(IProgressMonitor monitor) {
+      return new ArrayList<>(m_scoutVersions);
+    }
   }
 
   protected void updateTargetDirViewState() {
@@ -316,6 +486,27 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     multiStatus.add(getStatusArtifactId());
     multiStatus.add(getStatusDisplayName());
     multiStatus.add(getStatusTargetDirectory());
+    multiStatus.add(getStatusScoutVersion());
+  }
+
+  @Override
+  protected void setStatus(IStatus status) {
+    super.setStatus(status);
+    var complete = status == null || !status.matches(IStatus.ERROR);
+    setPageComplete(complete && !m_versionsLoading);
+  }
+
+  protected IStatus getStatusScoutVersion() {
+    if (m_versionsLoading) {
+      return new Status(IStatus.INFO, S2ESdkUiActivator.PLUGIN_ID, "Loading available Scout versions...");
+    }
+    if (IMavenConstants.LATEST.equals(getScoutVersion())) {
+      return Status.OK_STATUS;
+    }
+    if (ApiVersion.parse(getScoutVersion()).isEmpty()) {
+      return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "Invalid Scout version.");
+    }
+    return Status.OK_STATUS;
   }
 
   protected IStatus getStatusGroupId() {
@@ -408,6 +599,30 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   protected boolean setArtifactIdInternal(String s) {
     return setPropertyString(PROP_ARTIFACT_ID, s);
+  }
+
+  public String getScoutVersion() {
+    return getPropertyString(PROP_SCOUT_VERSION);
+  }
+
+  public void setScoutVersion(String s) {
+    setPropertyWithChangingControl(m_scoutVersionField, () -> setScoutVersionInternal(s), field -> field.setText(s));
+  }
+
+  protected boolean setScoutVersionInternal(String s) {
+    return setPropertyString(PROP_SCOUT_VERSION, s);
+  }
+
+  public boolean isShowPreviewReleases() {
+    return getPropertyBool(PROP_SHOW_PREVIEW_RELEASES);
+  }
+
+  public void setShowPreviewReleases(boolean f) {
+    setPropertyWithChangingControl(m_showPreviewReleases, () -> setShowPreviewReleasesInternal(f), field -> field.setSelection(f));
+  }
+
+  protected boolean setShowPreviewReleasesInternal(boolean f) {
+    return setPropertyBool(PROP_SHOW_PREVIEW_RELEASES, f);
   }
 
   public boolean isUseWorkspaceLocation() {

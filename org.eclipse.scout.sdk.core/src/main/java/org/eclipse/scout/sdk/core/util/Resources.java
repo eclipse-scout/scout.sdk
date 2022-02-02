@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -27,8 +27,11 @@ import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.Locale;
+import java.util.zip.GZIPInputStream;
+
+import org.eclipse.scout.sdk.core.log.SdkLog;
 
 /**
  * Contains helper methods to access remote resources.
@@ -36,6 +39,16 @@ import java.util.Locale;
 public final class Resources {
 
   private static final int BUFFER_SIZE = 8192;
+
+  public static final String PROTOCOL_HTTP = "http";
+  public static final String PROTOCOL_HTTPS = "https";
+
+  public static final String HEADER_PRAGMA = "Pragma";
+  public static final String HEADER_CACHE_CONTROL = "Cache-Control";
+  public static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
+  public static final String HEADER_CONTENT_ENCODING = "Content-Encoding";
+
+  public static final String ENCODING_GZIP = "gzip";
 
   private Resources() {
   }
@@ -88,10 +101,7 @@ public final class Resources {
    */
   public static InputStream openStream(URI uri) throws IOException {
     var scheme = uri.getScheme();
-    if (scheme != null) {
-      scheme = scheme.toLowerCase(Locale.US);
-    }
-    if ("http".equals(scheme) || "https".equals(scheme)) {
+    if (PROTOCOL_HTTPS.equalsIgnoreCase(scheme) || PROTOCOL_HTTP.equalsIgnoreCase(scheme)) {
       return httpGet(uri);
     }
     var stream = uri.toURL().openStream();
@@ -102,7 +112,7 @@ public final class Resources {
   }
 
   /**
-   * Performs a HTTP GET request to the given {@link URL} without any authentication.
+   * Performs an HTTP GET request to the given {@link URL} without any authentication.
    *
    * @param url
    *          The {@link URL} to get. Must not be {@code null}.
@@ -117,7 +127,7 @@ public final class Resources {
   }
 
   /**
-   * Performs a HTTP GET request to the given uri without any authentication.
+   * Performs an HTTP GET request to the given uri without any authentication.
    *
    * @param uri
    *          The uri to get. Must be a valid {@link URI} and must not be {@code null}.
@@ -137,7 +147,7 @@ public final class Resources {
   }
 
   /**
-   * Performs a HTTP GET request to the given {@link URI} without any authentication.
+   * Performs an HTTP GET request to the given {@link URI} without any authentication.
    * 
    * @param uri
    *          The {@link URI} to get. Must not be {@code null}.
@@ -154,8 +164,9 @@ public final class Resources {
           .uri(uri)
           .version(Version.HTTP_2)
           .timeout(timeout)
-          .setHeader("Pragma", "no-cache") // HTTP/1.0
-          .setHeader("Cache-Control", "no-cache, no-store, must-revalidate") // HTTP/1.1
+          .setHeader(HEADER_PRAGMA, "no-cache") // HTTP/1.0
+          .setHeader(HEADER_CACHE_CONTROL, "no-cache, no-store, must-revalidate") // HTTP/1.1
+          .setHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP) // support gzip compression
           .GET()
           .build();
       var handler = buffering(ofInputStream(), BUFFER_SIZE);
@@ -177,7 +188,7 @@ public final class Resources {
       if (statusCode < 200 || statusCode > 299) {
         throw new IOException("Status code " + statusCode + " received getting '" + toSimple(uri) + "' (url shortened).");
       }
-      return response.body();
+      return responseToStream(response);
     }
     catch (HttpConnectTimeoutException e) {
       throw new IOException("HTTP connect timed out for URI '" + toSimple(uri) + "' (url shortened).", e);
@@ -187,21 +198,33 @@ public final class Resources {
     }
   }
 
+  static InputStream responseToStream(HttpResponse<InputStream> response) throws IOException {
+    var encoding = response.headers()
+        .firstValue(HEADER_CONTENT_ENCODING)
+        .orElse("")
+        .trim();
+    if (ENCODING_GZIP.equalsIgnoreCase(encoding)) {
+      return new GZIPInputStream(response.body());
+    }
+    return response.body();
+  }
+
   static String toSimple(URI uri) {
     try {
       return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null).toString();
     }
     catch (URISyntaxException e) {
-      throw new SdkException("Invalid URI.", e);
+      SdkLog.debug("Cannot simplify uri '{}'.", uri, e);
+      return uri.toString();
     }
   }
 
-  static URI toURI(URL url) {
+  static URI toURI(URL url) throws IOException {
     try {
       return url.toURI();
     }
     catch (URISyntaxException e) {
-      throw new SdkException("URL '{}' cannot be converted to URI.", url, e);
+      throw new IOException("URL '" + url + "' cannot be converted to URI.", e);
     }
   }
 }

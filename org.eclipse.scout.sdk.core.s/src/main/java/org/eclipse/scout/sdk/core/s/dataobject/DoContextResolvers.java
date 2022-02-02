@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -39,7 +39,7 @@ public final class DoContextResolvers {
 
   /**
    * Gets the {@link DoContext} information for the package within the given {@link IJavaEnvironment}.
-   * 
+   *
    * @param targetPackage
    *          The package for which the {@link DoContext} should be computed. Must not be {@code null}.
    * @param environment
@@ -54,14 +54,14 @@ public final class DoContextResolvers {
         .orElseGet(DoContext::new);
   }
 
-  static DoContext resolve(IDoContextResolver resolver, CharSequence targetPackage, IJavaEnvironment environment) {
-    var namespaceCandidates = resolver.resolveNamespaceCandidates(environment);
+  static DoContext resolve(IDoContextResolver res, CharSequence targetPackage, IJavaEnvironment environment) {
+    var namespaceCandidates = res.resolveNamespaceCandidates(environment);
     var namespace = selectNamespace(targetPackage, namespaceCandidates);
 
     var typeVersionCandidates = Optional.ofNullable(namespace)
         .flatMap(n -> n.javaEnvironment().requireApi(IScoutApi.class).api(IScout22DoApi.class))
         .map(doApi -> doApi.ITypeVersion().fqn())
-        .map(iTypeVersionFqn -> resolver.resolvePrimaryTypesInPackageOf(namespace)
+        .map(iTypeVersionFqn -> res.resolvePrimaryTypesInPackageOf(namespace)
             .flatMap(sibling -> resolveTypeVersionCandidates(iTypeVersionFqn, sibling))
             .collect(toList()))
         .orElseGet(Collections::emptyList);
@@ -155,7 +155,7 @@ public final class DoContextResolvers {
   public interface IDoContextResolver {
     /**
      * Resolves all source INamespace classes available on the classpath given.
-     * 
+     *
      * @param environment
      *          The classpath in which the INamespace classes should be searched.
      * @return All INamespace classes found in the classpath.
@@ -164,7 +164,7 @@ public final class DoContextResolvers {
 
     /**
      * Gets all classes in the same package as the namespace class given.
-     * 
+     *
      * @param namespace
      *          The namespace class.
      * @return All types that exist in the exact same package as the class given.

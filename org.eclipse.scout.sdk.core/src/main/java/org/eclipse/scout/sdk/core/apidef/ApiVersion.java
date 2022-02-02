@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -35,7 +35,7 @@ public class ApiVersion implements Comparable<ApiVersion> {
   /**
    * Regex of a valid API pattern.
    */
-  public static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)(\\.(\\d*))?(\\.(\\d*))?(-.*)?");
+  public static final Pattern VERSION_PATTERN = Pattern.compile("(\\d+)(\\.(\\d*))?(\\.(\\d*))?([-.].*)?");
 
   private final int[] m_segments;
   private final String m_suffix;
@@ -56,7 +56,7 @@ public class ApiVersion implements Comparable<ApiVersion> {
 
   /**
    * Parses the value of an {@link MaxApiLevel} annotation on the given class.
-   * 
+   *
    * @param clazz
    *          The class whose {@link MaxApiLevel} annotation should be parsed.
    * @return An {@link Optional} with the {@link ApiVersion} of the given class or an empty {@link Optional} if the
@@ -88,7 +88,7 @@ public class ApiVersion implements Comparable<ApiVersion> {
 
   /**
    * Parses the given {@link CharSequence} into an {@link ApiVersion}.
-   * 
+   *
    * @param version
    *          The {@link CharSequence} to parse. It must fulfill {@link #VERSION_PATTERN} to be successfully parsed.
    * @return The {@link ApiVersion} or an empty {@link Optional} if the given {@link CharSequence} cannot be parsed.
@@ -99,7 +99,7 @@ public class ApiVersion implements Comparable<ApiVersion> {
     }
 
     var matcher = VERSION_PATTERN.matcher(version);
-    if (!matcher.find()) {
+    if (!matcher.matches()) {
       return Optional.empty();
     }
 
@@ -114,7 +114,8 @@ public class ApiVersion implements Comparable<ApiVersion> {
 
   /**
    * @return The suffix {@link String} or {@code null} if this {@link ApiVersion} has no suffix. The suffix is the whole
-   *         part after the maximal three number sections (e.g. {@code "-SNAPSHOT"}).
+   *         part after the maximal three number sections including the delimiter (e.g. {@code "-SNAPSHOT"} or
+   *         {@code ".SUFFIX"}).
    */
   public String suffix() {
     return m_suffix;

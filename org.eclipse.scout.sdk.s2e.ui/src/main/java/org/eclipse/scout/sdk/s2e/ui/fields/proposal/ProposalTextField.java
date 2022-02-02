@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -255,9 +255,9 @@ public class ProposalTextField extends TextField {
           else {
             text = "";
           }
-          if (getTextComponent() != null) {
-            getTextComponent().setText(text);
-            getTextComponent().setSelection(text.length());
+          var textComp = getTextComponent();
+          if (textComp != null) {
+            textComp.setText(text);
           }
         }
       }
@@ -295,6 +295,7 @@ public class ProposalTextField extends TextField {
     return proposals.stream().anyMatch(isEqual(proposal));
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private synchronized void acceptProposalInternal(Object proposal, boolean closeProposalPopup) {
     if (proposal instanceof ISeparatorProposal) {
       return;
@@ -396,6 +397,7 @@ public class ProposalTextField extends TextField {
     }
   }
 
+  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private synchronized void updateProposals() {
     var pattern = getText();
     var index = getSelection().x;

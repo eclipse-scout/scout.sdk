@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -23,6 +23,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -73,7 +75,7 @@ public final class Xml {
   }
 
   /**
-   * Reads the content of the specified xml file into a XML {@link Document}.
+   * Reads the content of the specified xml file into an XML {@link Document}.
    *
    * @param xmlFile
    *          A {@link Path} pointing to the xml file. Must not be {@code null}.
@@ -88,7 +90,7 @@ public final class Xml {
   }
 
   /**
-   * Reads the content of the specified {@link URL} into a XML {@link Document}.
+   * Reads the content of the specified {@link URL} into an XML {@link Document}.
    *
    * @param url
    *          The {@link URL} from where the content should be read. Must not be {@code null}.
@@ -97,17 +99,35 @@ public final class Xml {
    *           if there is an exception reading the file into the document.
    */
   public static Document get(URL url) throws IOException {
+    try {
+      return get(url.toURI());
+    }
+    catch (URISyntaxException e) {
+      throw new IOException(e);
+    }
+  }
+
+  /**
+   * Reads the content of the specified {@link URI} into an XML {@link Document}.
+   *
+   * @param uri
+   *          The {@link URI} from where the content should be read. Must not be {@code null}.
+   * @return A {@link Document} with the XML content of the url.
+   * @throws IOException
+   *           if there is an exception reading the file into the document.
+   */
+  public static Document get(URI uri) throws IOException {
     // use document builder to download the stream content because it correctly handles the xml encoding as specified in the xml declaration.
-    try (var in = Resources.openStream(url)) {
+    try (var in = Resources.openStream(uri)) {
       return get(in);
     }
   }
 
   /**
-   * Converts the specified {@link String} into a XML {@link Document}.
+   * Converts the specified {@link String} into an XML {@link Document}.
    *
    * @param rawXmlAsString
-   *          The {@link String} holding the XML content. Must not be blank (see {@link Strings#isBlank(CharSequence)}.
+   *          The {@link String} holding the XML content. Must not be blank (see {@link Strings#isBlank(CharSequence)}).
    * @return A {@link Document} with the XML content of the specified {@link String}.
    * @throws IOException
    *           if there is an exception converting the {@link String}.
