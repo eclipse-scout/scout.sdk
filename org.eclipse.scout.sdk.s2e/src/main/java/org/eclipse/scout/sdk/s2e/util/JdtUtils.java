@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -713,6 +713,21 @@ public final class JdtUtils {
       }
       catch (JavaModelException e) {
         throw new SdkException(e);
+      }
+    }
+  }
+
+  public static class PublicPrimaryNonAbstractSourceTypeFilter extends PublicPrimaryTypeFilter {
+    @Override
+    public boolean test(IType candidate) {
+      try {
+        // only accept non-abstract public primary classes with source available
+        return super.test(candidate) && !isAbstract(candidate.getFlags()) && SourceRange.isAvailable(candidate.getSourceRange());
+      }
+      catch (JavaModelException e) {
+        // this element seems to be corrupt -> ignore
+        SdkLog.warning("Attempt to access source range of type '{}' failed. Type will be skipped.", candidate.getFullyQualifiedName(), e);
+        return false;
       }
     }
   }

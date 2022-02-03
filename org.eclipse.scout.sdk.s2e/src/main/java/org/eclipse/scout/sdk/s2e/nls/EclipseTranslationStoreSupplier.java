@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2e.nls;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
 import static org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.parseLanguageFromFileName;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutProgress;
 
@@ -25,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IFile;
@@ -41,7 +39,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
@@ -59,7 +56,7 @@ import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;
 import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicPrimaryTypeFilter;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicPrimaryNonAbstractSourceTypeFilter;
 
 /**
  * <h3>{@link EclipseTranslationStoreSupplier}</h3>
@@ -95,24 +92,8 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     if (scoutApi.isEmpty()) {
       return Stream.empty();
     }
-
-    Predicate<IType> filter = new PublicPrimaryTypeFilter() {
-      @Override
-      public boolean test(IType candidate) {
-        try {
-          // only accept non-abstract public primary classes with source available
-          return super.test(candidate) && !isAbstract(candidate.getFlags()) && SourceRange.isAvailable(candidate.getSourceRange());
-        }
-        catch (JavaModelException e) {
-          // this element seems to be corrupt -> ignore
-          SdkLog.warning("Attempt to access source range of type '{}' failed. Type will be skipped.", candidate.getFullyQualifiedName(), e);
-          return false;
-        }
-      }
-    };
-
     var fqn = nameFunction.apply(scoutApi.orElseThrow()).fqn();
-    return JdtUtils.findTypesInStrictHierarchy(jp, fqn, progress.monitor(), filter).stream()
+    return JdtUtils.findTypesInStrictHierarchy(jp, fqn, progress.monitor(), new PublicPrimaryNonAbstractSourceTypeFilter()).stream()
         .map(env::toScoutType);
   }
 
@@ -235,8 +216,8 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
 
   private static Collection<ITranslationPropertiesFile> filesFromPlatform(IPackageFragmentRoot r, @SuppressWarnings("TypeMayBeWeakened") PropertiesTranslationStore store) throws JavaModelException {
     var delim = '.';
-    var pckg = store.service().folder().replace(PropertiesTextProviderService.FOLDER_SEGMENT_DELIMITER, delim);
-    var textFolder = r.getPackageFragment(pckg);
+    var packageFragment = store.service().folder().replace(PropertiesTextProviderService.FOLDER_SEGMENT_DELIMITER, delim);
+    var textFolder = r.getPackageFragment(packageFragment);
     if (!JdtUtils.exists(textFolder)) {
       SdkLog.warning("Folder '{}' could not be found in '{}'. Will be ignored.", store.service().folder(), r.getElementName());
       return emptyList();
