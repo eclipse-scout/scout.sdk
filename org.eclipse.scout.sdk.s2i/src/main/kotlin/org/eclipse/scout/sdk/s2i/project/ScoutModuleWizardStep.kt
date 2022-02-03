@@ -69,40 +69,37 @@ class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: Scout
                         .withValidationOnInput { validateDisplayName(it) }
                 }
             }
-            titledRow(message("scout.settings")) {
-                row(message("ui.lang")) {
-                    buttonGroup {
-                        cell {
-                            val javaButton = radioButton("Java")
-                                .enableIf(m_loading.hasValue(false))
-                                .component
-                            javaButton.isSelected = m_useJavaAsUiLang.get()
-                            javaButton.addActionListener { onUiLanguageChanged(javaButton.isSelected) }
-                            val preferredWidth = javaButton.getFontMetrics(javaButton.font).charWidth('m') * 8
-                            javaButton.preferredSize = Dimension(preferredWidth, javaButton.preferredSize.height)
-
-                            val javaScriptButton = radioButton("JavaScript")
-                                .enableIf(m_loading.hasValue(false))
-                                .component
-                            javaScriptButton.isSelected = !m_useJavaAsUiLang.get()
-                            javaScriptButton.addActionListener { onUiLanguageChanged(!javaScriptButton.isSelected) }
-                        }
+            titledRow(message("ui.lang")) {
+                buttonGroup {
+                    row("") {
+                        val javaButton = radioButton("Java")
+                            .enableIf(m_loading.hasValue(false))
+                            .component
+                        javaButton.isSelected = m_useJavaAsUiLang.get()
+                        javaButton.addActionListener { onUiLanguageChanged(javaButton.isSelected) }
+                    }
+                    row("") {
+                        val javaScriptButton = radioButton("JavaScript")
+                            .enableIf(m_loading.hasValue(false))
+                            .component
+                        javaScriptButton.isSelected = !m_useJavaAsUiLang.get()
+                        javaScriptButton.addActionListener { onUiLanguageChanged(!javaScriptButton.isSelected) }
                     }
                 }
-                row(message("scout.version")) {
-                    cell {
-                        m_versionComboBox = comboBox(VersionComboBoxModel(), m_versionProperty)
-                            .enableIf(m_loading.hasValue(false))
-                            .withValidationOnInput { validateVersion(it) }
-                            .withValidationOnApply { validateVersion(it) }
-                            .component
-                        m_versionComboBox.isEditable = true
-                        val preferredWidth = m_versionComboBox.getFontMetrics(m_versionComboBox.font).charWidth('m') * columns + 6
-                        m_versionComboBox.preferredSize = Dimension(preferredWidth, m_versionComboBox.preferredSize.height)
+            }
+            titledRow(message("scout.version")) {
+                row("") {
+                    m_versionComboBox = comboBox(VersionComboBoxModel(), m_versionProperty)
+                        .enableIf(m_loading.hasValue(false))
+                        .withValidationOnInput { validateVersion(it) }
+                        .withValidationOnApply { validateVersion(it) }
+                        .component
+                    m_versionComboBox.isEditable = true
+                    val preferredWidth = m_versionComboBox.getFontMetrics(m_versionComboBox.font).charWidth('m') * columns + 6
+                    m_versionComboBox.preferredSize = Dimension(preferredWidth, m_versionComboBox.preferredSize.height)
 
-                        val iconLabel = JBLabel(AnimatedIcon.Default.INSTANCE)
-                        iconLabel().visibleIf(m_loading.hasValue(true))
-                    }
+                    val iconLabel = JBLabel(AnimatedIcon.Default.INSTANCE)
+                    iconLabel().visibleIf(m_loading.hasValue(true))
                 }
                 row("") {
                     checkBox(message("also.show.preview.versions"), m_showPreviewReleases)

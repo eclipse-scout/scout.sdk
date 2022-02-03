@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,6 +18,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.*
+import com.intellij.util.ui.UIUtil
 import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.Translation
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator.*
@@ -173,7 +174,7 @@ abstract class AbstractTranslationDialog(val project: Project, val languages: Co
     }
 
     private fun validationInfoToHtml(info: ValidationInfo): String {
-        val color = htmlColorString(if (info.warning) MessageType.WARNING.borderColor else ERROR_FOREGROUND_COLOR)
+        val color = htmlColorString(if (info.warning) MessageType.WARNING.borderColor else UIUtil.getErrorForeground())
         val message = Strings.escapeHtml(info.message)
         return "<font color=\"${color}\">$message</font>"
     }

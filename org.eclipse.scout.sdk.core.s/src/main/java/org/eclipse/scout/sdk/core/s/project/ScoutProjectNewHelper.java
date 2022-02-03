@@ -49,6 +49,7 @@ import org.w3c.dom.Node;
  *
  * @since 5.2.0
  */
+@SuppressWarnings("squid:S00107") // Methods should not have too many parameters
 public final class ScoutProjectNewHelper {
 
   public static final String SCOUT_ARCHETYPES_GROUP_ID = "org.eclipse.scout.archetypes";
