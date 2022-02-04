@@ -184,7 +184,6 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html.test:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.commons:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.json:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: commons-fileupload:commons-fileupload:1.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client.test:22.0-SNAPSHOT" level="project" />
@@ -218,6 +217,9 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.jboss:jandex:2.4.0.Final" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.client:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.shared:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.ui.html:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.client:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.shared:22.0-SNAPSHOT" level="project" />
