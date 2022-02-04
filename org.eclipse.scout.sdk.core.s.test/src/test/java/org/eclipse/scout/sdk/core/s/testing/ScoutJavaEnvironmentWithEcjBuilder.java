@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,12 +24,14 @@ public class ScoutJavaEnvironmentWithEcjBuilder<T extends ScoutJavaEnvironmentWi
   public ScoutJavaEnvironmentWithEcjBuilder() {
     withoutScoutSdk()
         .withParseMethodBodies(true) // required for testing
-        .exclude(".*" + Pattern.quote(".scout.sdk.") + ".*target/test-classes");
+        .exclude(".*" + Pattern.quote(".scout.sdk.") + ".*target/test-classes") // exclude sdk
+        .exclude(".*[\\/]org[\\/]apache[\\/]maven[\\/].*") // exclude Maven runtime
+        .exclude(".*[\\/]org[\\/]junit[\\/].*"); // exclude jUnit 5 (only used in SDK)
   }
 
   public T withScoutServer(boolean withServer) {
-    var rtServer = ".*" + Pattern.quote(".scout.rt.server") + ".*";
-    var mom = ".*" + Pattern.quote(".scout.rt.mom") + ".*";
+    var rtServer = ".*\\.scout\\.rt\\.server.*|.*\\.scout\\.rt\\.[\\w\\.]+\\.server.*";
+    var mom = ".*\\.scout\\.rt\\.mom.*";
     if (withServer) {
       include(rtServer);
       include(mom);
@@ -42,7 +44,7 @@ public class ScoutJavaEnvironmentWithEcjBuilder<T extends ScoutJavaEnvironmentWi
   }
 
   public T withScoutClient(boolean withClient) {
-    var regex = ".*" + Pattern.quote(".scout.rt.client") + ".*";
+    var regex = ".*\\.scout\\.rt\\.client.*|.*\\.scout\\.rt\\.[\\w\\.]+\\.client.*";
     if (withClient) {
       include(regex);
     }
@@ -53,8 +55,8 @@ public class ScoutJavaEnvironmentWithEcjBuilder<T extends ScoutJavaEnvironmentWi
   }
 
   public T withScoutHtmlUi(boolean withHtmlUi) {
-    var json = ".*" + Pattern.quote(".scout.json") + ".*";
-    var uiHtml = ".*" + Pattern.quote(".scout.rt.ui.html") + ".*";
+    var json = ".*\\.scout\\.json.*";
+    var uiHtml = ".*\\.scout\\.rt\\.ui\\.html.*|.*\\.scout\\.rt\\.[\\w\\.]+\\.ui\\.html.*";
     if (withHtmlUi) {
       include(json);
       include(uiHtml);
