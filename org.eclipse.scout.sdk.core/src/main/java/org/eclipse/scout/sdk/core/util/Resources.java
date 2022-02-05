@@ -25,9 +25,8 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
-import java.net.http.HttpConnectTimeoutException;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
 import java.time.Duration;
 import java.util.zip.GZIPInputStream;
 
@@ -112,7 +111,7 @@ public final class Resources {
   }
 
   /**
-   * Performs an HTTP GET request to the given {@link URL} without any authentication.
+   * Performs an HTTP GET request to the given {@link URL}.
    *
    * @param url
    *          The {@link URL} to get. Must not be {@code null}.
@@ -127,7 +126,7 @@ public final class Resources {
   }
 
   /**
-   * Performs an HTTP GET request to the given uri without any authentication.
+   * Performs an HTTP GET request to the given uri {@link String}.
    *
    * @param uri
    *          The uri to get. Must be a valid {@link URI} and must not be {@code null}.
@@ -147,7 +146,7 @@ public final class Resources {
   }
 
   /**
-   * Performs an HTTP GET request to the given {@link URI} without any authentication.
+   * Performs an HTTP GET request to the given {@link URI}.
    * 
    * @param uri
    *          The {@link URI} to get. Must not be {@code null}.
@@ -159,46 +158,66 @@ public final class Resources {
    */
   public static InputStream httpGet(URI uri) throws IOException {
     try {
-      var timeout = Duration.ofSeconds(10);
-      var request = HttpRequest.newBuilder()
-          .uri(uri)
-          .version(Version.HTTP_2)
-          .timeout(timeout)
-          .setHeader(HEADER_PRAGMA, "no-cache") // HTTP/1.0
-          .setHeader(HEADER_CACHE_CONTROL, "no-cache, no-store, must-revalidate") // HTTP/1.1
-          .setHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP) // support gzip compression
-          .GET()
-          .build();
-      var handler = buffering(ofInputStream(), BUFFER_SIZE);
-      var proxySelector = ProxySelector.getDefault();
-      var authenticator = Authenticator.getDefault();
-      var clientBuilder = HttpClient.newBuilder()
-          .followRedirects(Redirect.NORMAL)
-          .cookieHandler(new CookieManager(null, null))
-          .connectTimeout(timeout);
-      if (proxySelector != null) {
-        clientBuilder.proxy(proxySelector);
-      }
-      if (authenticator != null) {
-        clientBuilder.authenticator(authenticator);
-      }
-
-      var response = clientBuilder.build().send(request, handler);
-      var statusCode = response.statusCode();
-      if (statusCode < 200 || statusCode > 299) {
-        throw new IOException("Status code " + statusCode + " received getting '" + toSimple(uri) + "' (url shortened).");
-      }
-      return responseToStream(response);
-    }
-    catch (HttpConnectTimeoutException e) {
-      throw new IOException("HTTP connect timed out for URI '" + toSimple(uri) + "' (url shortened).", e);
+      return doHttpGetWithRetry(uri);
     }
     catch (InterruptedException e) {
-      throw new SdkException("Interrupted while reading from URI '{}' (url shortened).", toSimple(uri), e);
+      throw new SdkException("Interrupted while reading from URI {}", toSimple(uri), e);
     }
   }
 
-  static InputStream responseToStream(HttpResponse<InputStream> response) throws IOException {
+  static InputStream doHttpGetWithRetry(URI uri) throws IOException, InterruptedException {
+    IOException exception = null;
+    var numRetries = 3; // retry 3 times as some resources might be temporary unavailable
+    for (var attempt = 1; attempt <= numRetries; attempt++) {
+      try {
+        return doHttpGet(uri);
+      }
+      catch (HttpTimeoutException e) {
+        exception = new IOException("HTTP GET timed out for URI " + toSimple(uri), e);
+        SdkLog.debug(exception);
+      }
+      catch (IOException e) {
+        SdkLog.debug(e);
+        exception = e;
+      }
+      if (attempt < numRetries) {
+        Thread.sleep(attempt * 500L); // quick wait between retries (500ms, 1s)
+      }
+    }
+    throw exception;
+  }
+
+  static InputStream doHttpGet(URI uri) throws IOException, InterruptedException {
+    var timeout = Duration.ofSeconds(10);
+    var request = HttpRequest.newBuilder()
+        .uri(uri)
+        .version(Version.HTTP_2)
+        .timeout(timeout)
+        .setHeader(HEADER_PRAGMA, "no-cache") // HTTP/1.0
+        .setHeader(HEADER_CACHE_CONTROL, "no-cache, no-store, must-revalidate") // HTTP/1.1
+        .setHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP) // support gzip compression
+        .GET()
+        .build();
+    var handler = buffering(ofInputStream(), BUFFER_SIZE);
+    var proxySelector = ProxySelector.getDefault();
+    var authenticator = Authenticator.getDefault();
+    var clientBuilder = HttpClient.newBuilder()
+        .followRedirects(Redirect.NORMAL)
+        .cookieHandler(new CookieManager(null, null))
+        .connectTimeout(timeout);
+    if (proxySelector != null) {
+      clientBuilder.proxy(proxySelector);
+    }
+    if (authenticator != null) {
+      clientBuilder.authenticator(authenticator);
+    }
+
+    var response = clientBuilder.build().send(request, handler);
+    var statusCode = response.statusCode();
+    if (statusCode < 200 || statusCode > 299) {
+      throw new IOException("HTTP status code " + statusCode + " received from " + toSimple(uri));
+    }
+
     var encoding = response.headers()
         .firstValue(HEADER_CONTENT_ENCODING)
         .orElse("")
@@ -211,7 +230,11 @@ public final class Resources {
 
   static String toSimple(URI uri) {
     try {
-      return new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null).toString();
+      var shortened = new URI(uri.getScheme(), uri.getAuthority(), uri.getPath(), null, null);
+      if (shortened.equals(uri)) {
+        return uri.toString();
+      }
+      return shortened + " (url shortened)";
     }
     catch (URISyntaxException e) {
       SdkLog.debug("Cannot simplify uri '{}'.", uri, e);

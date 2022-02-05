@@ -33,8 +33,8 @@ import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenArtifactVersions;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
-import org.eclipse.scout.sdk.core.s.util.maven.MavenModuleVersion;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenRunner;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -281,7 +281,7 @@ public final class ScoutProjectNewHelper {
         .map(IApiSpecification::maxLevel)
         .min(naturalOrder())
         .orElseThrow();
-    return MavenModuleVersion.allOnCentral(SCOUT_ARCHETYPES_GROUP_ID, artifactId)
+    return MavenArtifactVersions.allOnCentral(SCOUT_ARCHETYPES_GROUP_ID, artifactId)
         .map(ApiVersion::parse)
         .flatMap(Optional::stream)
         .filter(v -> v.compareTo(min) >= 0) // only supported versions

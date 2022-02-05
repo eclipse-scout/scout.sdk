@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
-import org.eclipse.scout.sdk.core.s.util.maven.MavenModuleVersion;
+import org.eclipse.scout.sdk.core.s.util.maven.MavenArtifactVersions;
 
 public final class ScoutApi {
 
@@ -101,7 +101,7 @@ public final class ScoutApi {
 
     @Override
     public Optional<ApiVersion> version(IJavaEnvironment context) {
-      return MavenModuleVersion.usedIn(SCOUT_RT_PLATFORM_NAME, context);
+      return MavenArtifactVersions.usedIn(SCOUT_RT_PLATFORM_NAME, context);
     }
   }
 }

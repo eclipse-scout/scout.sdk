@@ -39,12 +39,12 @@ import org.w3c.dom.Node;
 /**
  * Helper class to get version of a Maven artifacts.<br>
  */
-public final class MavenModuleVersion {
+public final class MavenArtifactVersions {
 
   @SuppressWarnings("StaticCollection")
   private static final Map<Path, Optional<ApiVersion>> VERSION_CACHE = new ConcurrentHashMap<>();
 
-  private MavenModuleVersion() {
+  private MavenArtifactVersions() {
   }
 
   /**
@@ -66,11 +66,11 @@ public final class MavenModuleVersion {
    *         module could not be found, the version cannot be parsed or one of the parameters is {@code null}.
    */
   public static Optional<ApiVersion> usedIn(String artifactId, IJavaEnvironment context) {
-    return modulePathIn(artifactId, context).flatMap(MavenModuleVersion::version);
+    return modulePathIn(artifactId, context).flatMap(MavenArtifactVersions::version);
   }
 
   /**
-   * Gets all versions of given artifact that can be found on Maven-central.
+   * Gets the newest 200 (limitation by Maven central) versions of given artifact that can be found on Maven-central.
    * 
    * @param groupId
    *          The groupId of the artifact. Must not be {@code null}.
@@ -113,7 +113,7 @@ public final class MavenModuleVersion {
   }
 
   static Optional<ApiVersion> version(Path pathToModule) {
-    return VERSION_CACHE.computeIfAbsent(pathToModule, MavenModuleVersion::detectVersion);
+    return VERSION_CACHE.computeIfAbsent(pathToModule, MavenArtifactVersions::detectVersion);
   }
 
   static Optional<ApiVersion> detectVersion(Path pathToModule) {
