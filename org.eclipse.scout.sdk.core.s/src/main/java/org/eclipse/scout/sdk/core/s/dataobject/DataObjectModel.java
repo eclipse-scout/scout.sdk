@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -58,7 +58,7 @@ public class DataObjectModel {
 
   protected static boolean isValid(IType candidate) {
     var flags = candidate.flags();
-    if (Flags.isAbstract(flags) || Flags.isInterface(flags) || !Flags.isPublic(flags) || Flags.isEnum(flags)) {
+    if (Flags.isInterface(flags) || !Flags.isPublic(flags) || Flags.isEnum(flags)) {
       return false;
     }
     var scoutApi = candidate.javaEnvironment().api(IScoutApi.class);

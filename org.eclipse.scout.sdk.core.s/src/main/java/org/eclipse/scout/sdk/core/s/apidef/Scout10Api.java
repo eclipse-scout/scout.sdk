@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -4513,6 +4513,44 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.dataobject.TypeName";
+    }
+
+    @Override
+    public String valueElementName() {
+      return "value";
+    }
+  }
+
+  IScoutAnnotationApi.ValueFormat VALUE_FORMAT = new ValueFormat();
+
+  @Override
+  default IScoutAnnotationApi.ValueFormat ValueFormat() {
+    return VALUE_FORMAT;
+  }
+
+  class ValueFormat implements IScoutAnnotationApi.ValueFormat {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.ValueFormat";
+    }
+
+    @Override
+    public String patternElementName() {
+      return "pattern";
+    }
+  }
+
+  IScoutAnnotationApi.AttributeName ATTRIBUTE_NAME = new AttributeName();
+
+  @Override
+  default IScoutAnnotationApi.AttributeName AttributeName() {
+    return ATTRIBUTE_NAME;
+  }
+
+  class AttributeName implements IScoutAnnotationApi.AttributeName {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.AttributeName";
     }
 
     @Override
