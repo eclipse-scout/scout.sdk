@@ -4526,6 +4526,44 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
+  IScoutAnnotationApi.ValueFormat VALUE_FORMAT = new ValueFormat();
+
+  @Override
+  default IScoutAnnotationApi.ValueFormat ValueFormat() {
+    return VALUE_FORMAT;
+  }
+
+  class ValueFormat implements IScoutAnnotationApi.ValueFormat {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.ValueFormat";
+    }
+
+    @Override
+    public String patternElementName() {
+      return "pattern";
+    }
+  }
+
+  IScoutAnnotationApi.AttributeName ATTRIBUTE_NAME = new AttributeName();
+
+  @Override
+  default IScoutAnnotationApi.AttributeName AttributeName() {
+    return ATTRIBUTE_NAME;
+  }
+
+  class AttributeName implements IScoutAnnotationApi.AttributeName {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.dataobject.AttributeName";
+    }
+
+    @Override
+    public String valueElementName() {
+      return "value";
+    }
+  }
+
   IScoutVariousApi.MessageBoxes MESSAGE_BOXES = new MessageBoxes();
 
   @Override

@@ -118,12 +118,12 @@
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.jboss:jandex:2.4.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.client:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.shared:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.ui.html:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.client:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.shared:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.client:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.shared:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core:3.28.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.resources:3.16.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.runtime:3.24.0" level="project" />

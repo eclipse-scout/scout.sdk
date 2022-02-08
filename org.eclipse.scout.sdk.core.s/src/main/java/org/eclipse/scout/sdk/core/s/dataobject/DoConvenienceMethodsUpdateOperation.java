@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,6 +42,8 @@ import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -90,11 +92,12 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     var cuSource = originalSource.orElseThrow().asCharSequence();
     var buildContext = new JavaBuilderContext(dataObjectType.javaEnvironment()); // to collect all imports
     var replacedMethods = new HashSet<IMethod>();
+    var scoutApi = dataObjectType.javaEnvironment().requireApi(IScoutApi.class);
 
     // methods to add or update 
     var replacements = dataObject
         .nodes().stream()
-        .flatMap(node -> buildMethodGeneratorsFor(node, dataObjectType))
+        .flatMap(node -> buildMethodGeneratorsFor(node, dataObjectType, scoutApi))
         .flatMap(gen -> buildReplacements(gen, dataObjectType, cuSource, buildContext, replacedMethods))
         .collect(toList());
 
@@ -225,25 +228,27 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     return new Replacement(methodStartOffset, sourceRange.end() - methodStartOffset + 1, "");
   }
 
-  protected Stream<IScoutMethodGenerator<?, ?>> buildMethodGeneratorsFor(DataObjectNode node, IType owner) {
+  protected Stream<IScoutMethodGenerator<?, ?>> buildMethodGeneratorsFor(DataObjectNode node, IType owner, IScoutAnnotationApi scoutApi) {
     var methodGenerators = ScoutDoMethodGenerator.createConvenienceMethods(node.name(), node.kind(), node.dataType().reference(), node.isInherited(), owner);
-    methodGenerators = methodGenerators.peek(g -> copyAnnotations(node.method(), g));
+    methodGenerators = methodGenerators.peek(g -> copyAnnotations(node.method(), g, scoutApi));
     if (!node.hasJavaDoc()) {
       return methodGenerators;
     }
     return methodGenerators.peek(g -> g.withComment(b -> appendJavaDocLink(b, node.name())));
   }
 
-  protected void copyAnnotations(IAnnotatable source, IAnnotatableGenerator<?> target) {
+  protected void copyAnnotations(IAnnotatable source, IAnnotatableGenerator<?> target, IScoutAnnotationApi scoutApi) {
     source.annotations().stream()
-        .filter(a -> !isAnnotationIgnoredForCopy(a))
+        .filter(a -> !isAnnotationIgnoredForCopy(a, scoutApi))
         .map(IAnnotation::toWorkingCopy)
         .forEach(target::withAnnotation);
   }
 
-  protected boolean isAnnotationIgnoredForCopy(IAnnotation a) {
+  protected boolean isAnnotationIgnoredForCopy(IAnnotation a, IScoutAnnotationApi scoutApi) {
     var annotationFqn = a.type().name();
-    return Override.class.getName().equals(annotationFqn);
+    return Override.class.getName().equals(annotationFqn)
+        || scoutApi.AttributeName().fqn().equals(annotationFqn)
+        || scoutApi.ValueFormat().fqn().equals(annotationFqn);
   }
 
   protected void appendJavaDocLink(IJavaElementCommentBuilder<?> b, String name) {
