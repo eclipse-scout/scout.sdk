@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.PackageGenerator;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
@@ -25,6 +24,7 @@ import org.eclipse.scout.sdk.core.model.api.query.AnnotationQuery;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 public class PackageImplementor extends AbstractAnnotatableImplementor<PackageSpi> implements IPackage {
@@ -35,7 +35,12 @@ public class PackageImplementor extends AbstractAnnotatableImplementor<PackageSp
 
   @Override
   public Path asPath() {
-    return Paths.get(elementName().replace(JavaTypes.C_DOT, '/'));
+    var packageName = elementName();
+    if (packageName == null) {
+      // default package
+      return Paths.get("");
+    }
+    return Paths.get(packageName.replace(JavaTypes.C_DOT, '/'));
   }
 
   @Override
