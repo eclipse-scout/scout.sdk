@@ -98,10 +98,14 @@ public class DataObjectModel {
 
   protected static Optional<DataObjectNode> parseDoMethod(IType source, IMethod method) {
     var flags = method.flags();
-    if (method.isConstructor() || Flags.isAbstract(flags) || Flags.isStatic(flags)) {
+    if (method.isConstructor() || Flags.isStatic(flags)) {
       return Optional.empty();
     }
     if (Flags.isBridge(flags) || Flags.isSynthetic(flags)) {
+      return Optional.empty();
+    }
+    var declaringTypeFlags = method.requireDeclaringType().flags();
+    if (Flags.isInterface(declaringTypeFlags)) {
       return Optional.empty();
     }
     var hasParameters = method.parameters().first().isPresent();

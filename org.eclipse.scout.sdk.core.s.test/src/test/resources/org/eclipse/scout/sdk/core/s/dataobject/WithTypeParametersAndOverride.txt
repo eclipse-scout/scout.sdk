@@ -24,6 +24,10 @@ public class ChildDoWithTypeArg extends AbstractBaseDoWithTypeParam<Long> {
     return createIdAttribute(this);
   }
 
+  public DoValue<Integer> testAttribute() {
+    return doValue("testAttribute");
+  }
+
   // here a comment that must survive the DO convenience method update
 
 /* **************************************************************************
@@ -36,7 +40,11 @@ public ChildDoWithTypeArg withId(Long id) {
 id().set(id);
 return this;
 }@Generated("DoConvenienceMethodsGenerator")
-public Long getId() {
-return id().get();
+public ChildDoWithTypeArg withTestAttribute(Integer testAttribute) {
+testAttribute().set(testAttribute);
+return this;
+}@Generated("DoConvenienceMethodsGenerator")
+public Integer getTestAttribute() {
+return testAttribute().get();
 }
 }

@@ -92,9 +92,10 @@ public class DoConvenienceMethodsUpdateOperationTest {
     javaEnvironment.reload();
 
     // checks the following:
-    // 1. The method 'public Long getId()' is moved down into the generated section
+    // 1. The method 'public Integer getTestAttribute()' is moved down into the generated section and gets the Generated annotation
     // 2. The single-line comment before the convenience method generated marker comment is preserved
     // 3. The method 'public ChildDoWithTypeArg withId(Long id)' gets an override annotation
+    // 4. The oldAnnotatedMethodThatShouldBeRemoved is removed
     assertEqualsRefFile(REF_FILE_FOLDER + "WithTypeParametersAndOverride.txt", childDoWithTypeArg.requireCompilationUnit().source().orElseThrow().asCharSequence());
   }
 
@@ -123,19 +124,15 @@ public class DoConvenienceMethodsUpdateOperationTest {
     // fields of ChildDo
     assertEquals(0, childDo.fields().stream().count(), "field count of 'dataobject.ChildDo'");
 
-    assertEquals(7, childDo.methods().stream().count(), "method count of 'dataobject.ChildDo'");
-    var notANodeBecauseAbstract = assertMethodExist(childDo, "notANodeBecauseAbstract");
-    assertMethodReturnType(notANodeBecauseAbstract, "org.eclipse.scout.rt.dataobject.DoValue<java.lang.String>");
-    assertEquals(1, notANodeBecauseAbstract.annotations().stream().count(), "annotation count");
-    assertAnnotation(notANodeBecauseAbstract, "java.lang.Override");
-    var withNotANodeBecauseAbstract = assertMethodExist(childDo, "withNotANodeBecauseAbstract", new String[]{"java.lang.String"});
-    assertMethodReturnType(withNotANodeBecauseAbstract, "dataobject.ChildDo");
-    assertEquals(1, withNotANodeBecauseAbstract.annotations().stream().count(), "annotation count");
-    assertAnnotation(withNotANodeBecauseAbstract, "javax.annotation.Generated");
-    var getNotANodeBecauseAbstract = assertMethodExist(childDo, "getNotANodeBecauseAbstract");
-    assertMethodReturnType(getNotANodeBecauseAbstract, "java.lang.String");
-    assertEquals(1, getNotANodeBecauseAbstract.annotations().stream().count(), "annotation count");
-    assertAnnotation(getNotANodeBecauseAbstract, "javax.annotation.Generated");
+    assertEquals(6, childDo.methods().stream().count(), "method count of 'dataobject.ChildDo'");
+    var abstractNodeTestingInherit = assertMethodExist(childDo, "abstractNodeTestingInherit");
+    assertMethodReturnType(abstractNodeTestingInherit, "org.eclipse.scout.rt.dataobject.DoValue<java.lang.String>");
+    assertEquals(1, abstractNodeTestingInherit.annotations().stream().count(), "annotation count");
+    assertAnnotation(abstractNodeTestingInherit, "java.lang.Override");
+    var withAbstractNodeTestingInherit = assertMethodExist(childDo, "withAbstractNodeTestingInherit", new String[]{"java.lang.String"});
+    assertMethodReturnType(withAbstractNodeTestingInherit, "dataobject.ChildDo");
+    assertEquals(1, withAbstractNodeTestingInherit.annotations().stream().count(), "annotation count");
+    assertAnnotation(withAbstractNodeTestingInherit, "javax.annotation.Generated");
     var withId = assertMethodExist(childDo, "withId", new String[]{"java.lang.CharSequence"});
     assertMethodReturnType(withId, "dataobject.ChildDo");
     assertEquals(1, withId.annotations().stream().count(), "annotation count");
