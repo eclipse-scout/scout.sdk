@@ -15,7 +15,6 @@ import static org.eclipse.scout.sdk.core.s.dataobject.DataObjectModel.wrap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,14 +37,23 @@ public class DataObjectModelTest {
   public void test(IJavaEnvironment env) {
     assertFalse(wrap(env.requireType(List.class.getName())).isPresent());
     assertFalse(wrap(env.requireType(ArrayList.class.getName())).isPresent());
-    assertTrue(wrap(env.requireType(BaseDo.class.getName())).isPresent());
     assertFalse(new EmptyJavaEnvironmentFactory().call(je -> wrap(je.requireType(Long.class.getName()))).isPresent());
+
+    var baseDo = env.requireType(BaseDo.class.getName());
+    var baseDoModel = wrap(baseDo).get();
+    assertEquals("DataObjectModel [source=dataobject.BaseDo, nodes=[" +
+        "DataObjectNode [name='id', kind=VALUE, dataType='java.lang.CharSequence', inherited=false, hasJavaDoc=false], " +
+        "DataObjectNode [name='versions', kind=LIST, dataType='java.lang.Long', inherited=false, hasJavaDoc=false], " +
+        "DataObjectNode [name='enabled', kind=VALUE, dataType='java.lang.Boolean', inherited=false, hasJavaDoc=true], " +
+        "DataObjectNode [name='abstractNodeTestingInherit', kind=VALUE, dataType='java.lang.String', inherited=false, hasJavaDoc=false]]]", baseDoModel.toString());
+
     var childDo = env.requireType(ChildDo.class.getName());
     var model = wrap(childDo).orElseThrow();
     assertSame(childDo, model.unwrap());
     assertEquals(4, model.nodes().size());
     assertEquals(
-        "DataObjectModel [source=" + childDo.name() + ", nodes=[DataObjectNode [name='notANodeBecauseAbstract', kind=VALUE, dataType='java.lang.String', inherited=false, hasJavaDoc=false], " +
+        "DataObjectModel [source=" + childDo.name() + ", nodes=[" +
+            "DataObjectNode [name='abstractNodeTestingInherit', kind=VALUE, dataType='java.lang.String', inherited=true, hasJavaDoc=false], " +
             "DataObjectNode [name='id', kind=VALUE, dataType='java.lang.CharSequence', inherited=true, hasJavaDoc=false], " +
             "DataObjectNode [name='versions', kind=LIST, dataType='java.lang.Long', inherited=true, hasJavaDoc=false], " +
             "DataObjectNode [name='enabled', kind=VALUE, dataType='java.lang.Boolean', inherited=true, hasJavaDoc=true]]]",
