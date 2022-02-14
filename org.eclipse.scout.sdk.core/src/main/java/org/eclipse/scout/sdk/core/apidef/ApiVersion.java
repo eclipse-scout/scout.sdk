@@ -174,6 +174,34 @@ public class ApiVersion implements Comparable<ApiVersion> {
         + (m_suffix != null ? m_suffix.hashCode() : 0);
   }
 
+  /**
+   * Compares all segments which exist in this {@link ApiVersion} and the given one. Therefore, the compare aborts on
+   * the first segments that has a different value or after the last segment that exists for both instances.
+   * 
+   * @param o
+   *          The {@link ApiVersion} to compare against.
+   * @return The difference of the first segments that exists in both instances and have a different value.
+   */
+  public int compareCommonSegmentsTo(ApiVersion o) {
+    if (o == null) {
+      return 1;
+    }
+    if (this == o) {
+      return 0;
+    }
+    var numSegments = Math.min(o.m_segments.length, m_segments.length);
+    for (var i = 0; i < numSegments; i++) {
+      var dif = Integer.compare(m_segments[i], o.m_segments[i]);
+      if (dif != 0) {
+        return dif;
+      }
+    }
+    if (o.m_segments.length != m_segments.length) {
+      return 0;
+    }
+    return Comparator.nullsLast(String::compareTo).compare(suffix(), o.suffix());
+  }
+
   @Override
   public int compareTo(ApiVersion o) {
     if (o == null) {

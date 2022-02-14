@@ -284,7 +284,7 @@ public final class ScoutProjectNewHelper {
     return MavenArtifactVersions.allOnCentral(SCOUT_ARCHETYPES_GROUP_ID, artifactId)
         .map(ApiVersion::parse)
         .flatMap(Optional::stream)
-        .filter(v -> v.compareTo(min) >= 0) // only supported versions
+        .filter(v -> v.compareCommonSegmentsTo(min) >= 0) // only supported versions
         .filter(v -> includePreviewVersions || Strings.isEmpty(v.suffix())) // include preview versions?
         .map(ApiVersion::asString)
         .collect(toList());

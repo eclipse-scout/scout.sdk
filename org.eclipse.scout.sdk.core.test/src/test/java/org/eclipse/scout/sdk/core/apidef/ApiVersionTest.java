@@ -82,6 +82,28 @@ public class ApiVersionTest {
   }
 
   @Test
+  public void testCompareCommonSegmentsTo() {
+    var a = new ApiVersion(10);
+    var b = new ApiVersion(10, 0, 1);
+    var c = new ApiVersion(11, 2, 3);
+    var d = new ApiVersion(10, 1, 1);
+    var e = new ApiVersion(10);
+    var f = new ApiVersion("-SNAPSHOT", 10, 2);
+    var g = new ApiVersion(10, 2);
+    var h = new ApiVersion("-XYZ", 10, 2);
+
+    assertEquals(0, a.compareCommonSegmentsTo(a));
+    assertEquals(0, a.compareCommonSegmentsTo(e));
+    assertEquals(0, a.compareCommonSegmentsTo(b));
+
+    assertTrue(f.compareCommonSegmentsTo(g) < 0);
+    assertTrue(a.compareCommonSegmentsTo(null) > 0);
+    assertTrue(d.compareCommonSegmentsTo(b) > 0);
+    assertTrue(c.compareCommonSegmentsTo(a) > 0);
+    assertTrue(f.compareCommonSegmentsTo(h) < 0);
+  }
+
+  @Test
   @SuppressWarnings("EqualsWithItself")
   public void testCompareTo() {
     var a = new ApiVersion(10);

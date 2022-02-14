@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.core.apidef.Api;
 import org.eclipse.scout.sdk.core.apidef.ApiVersion;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 public class ScoutProjectNewHelperTest {
@@ -39,6 +40,7 @@ public class ScoutProjectNewHelperTest {
   }
 
   @Test
+  @Tag("IntegrationTest")
   public void testGetSupportedArchetypeVersions() throws IOException {
     var javaRelease = getSupportedArchetypeVersions(true, false);
     var javaPreview = getSupportedArchetypeVersions(true, true);
@@ -48,5 +50,7 @@ public class ScoutProjectNewHelperTest {
     assertFalse(javaScriptPreview.isEmpty());
     assertTrue(javaRelease.size() <= javaPreview.size());
     assertTrue(javaScriptRelease.size() <= javaScriptPreview.size());
+    assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("10.")));
+    assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("11.")));
   }
 }
