@@ -17,7 +17,6 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.observable.properties.GraphProperty
-import com.intellij.openapi.observable.properties.GraphPropertyImpl.Companion.graphProperty
 import com.intellij.openapi.observable.properties.PropertyGraph
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.ValidationInfo
@@ -32,21 +31,36 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper.*
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller
 import java.awt.Dimension
 import javax.swing.DefaultComboBoxModel
 
 class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: ScoutModuleBuilder) : ModuleWizardStep() {
 
     private val m_propertyGraph = PropertyGraph(null, true)
-    private val m_groupIdProperty = m_propertyGraph.graphProperty { "org.eclipse.scout.apps" }
-    private val m_artifactIdProperty = m_propertyGraph.graphProperty(::defaultArtifactId)
-    private val m_displayNameProperty = m_propertyGraph.graphProperty { "My Application" }
-    private val m_versionProperty = m_propertyGraph.graphProperty { IMavenConstants.LATEST }
-    private val m_showPreviewReleases = m_propertyGraph.graphProperty { false }
-    private val m_useJavaAsUiLang = m_propertyGraph.graphProperty { true }
-    private val m_loading = m_propertyGraph.graphProperty { true }
+    private val m_groupIdProperty = createProp("org.eclipse.scout.apps")
+    private val m_artifactIdProperty = createProp(defaultArtifactId())
+    private val m_displayNameProperty = createProp("My Application")
+    private val m_versionProperty = createProp(IMavenConstants.LATEST)
+    private val m_showPreviewReleases = createProp(false)
+    private val m_useJavaAsUiLang = createProp(true)
+    private val m_loading = createProp(true)
     private val m_availableVersions = ArrayList<String>()
     private lateinit var m_versionComboBox: ComboBox<String>
+
+    private fun <T> createProp(initialValue: T) = CompatibilityMethodCaller<GraphProperty<T>>()
+        .withCandidate(PropertyGraph::class.java, "property", Object::class.java) {
+            // used in IJ >= 2022.1
+            it.invoke(m_propertyGraph, initialValue)
+        }
+        .withCandidate("com.intellij.openapi.observable.properties.GraphPropertyImpl\$Companion", "graphProperty", PropertyGraph::class.java.name, "kotlin.jvm.functions.Function0") {
+            // used in IJ <= 2021.3. Can be removed if IJ 2022.1 is the latest supported version
+            val companion = Class.forName("com.intellij.openapi.observable.properties.GraphPropertyImpl").fields
+                .first { c -> c.type.name == "com.intellij.openapi.observable.properties.GraphPropertyImpl\$Companion" }
+                .get(null)
+            it.invoke(companion, m_propertyGraph, { initialValue })
+        }
+        .invoke()
 
     private val m_contentPanelDelegate = lazy {
         panel {

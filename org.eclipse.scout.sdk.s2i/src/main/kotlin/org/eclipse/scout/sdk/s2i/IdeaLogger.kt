@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -32,6 +32,7 @@ import org.eclipse.scout.sdk.core.log.LogMessage
 import org.eclipse.scout.sdk.core.log.SdkConsole
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller
 import java.util.logging.Level
 import javax.swing.ScrollPaneConstants
 
@@ -47,8 +48,19 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
     override fun runActivity(project: Project) {
         SdkConsole.setConsoleSpi(this)
         if (isRunningInSandbox()) {
-            @Suppress("UnstableApiUsage")
-            m_textLog.setLevel(org.apache.log4j.Level.DEBUG)
+            CompatibilityMethodCaller<Unit>()
+                .withCandidate(Logger::class.java.name, "setLevel", "com.intellij.openapi.diagnostic.LogLevel") {
+                    // for IJ >= 2022.1
+                    val debug = Class.forName("com.intellij.openapi.diagnostic.LogLevel")
+                        .enumConstants
+                        .firstOrNull { c -> c.toString() == "DEBUG" }
+                    it.invoke(m_textLog, debug)
+                }
+                .withCandidate(Logger::class.java.name, "setLevel", "org.apache.log4j.Level") {
+                    // for IJ <= 2021.3. Can be removed as soon as IJ 2022.1 is the latest supported version
+                    val debug = Class.forName("org.apache.log4j.Level").getDeclaredField("DEBUG").get(null)
+                    it.invoke(m_textLog, debug)
+                }.invoke()
         }
     }
 
