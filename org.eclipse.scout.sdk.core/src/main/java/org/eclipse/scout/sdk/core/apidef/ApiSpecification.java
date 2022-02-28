@@ -64,7 +64,7 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
     if (root == null) {
       return null;
     }
-    root.doInChain(root::mergeMethodsIntoCache);
+    mergeMethodsIntoCache(root);
     return root.apiImplementation();
   }
 
@@ -145,12 +145,13 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
     return invokeDefaultMethod(spec.apiImplementation(), methodSpec.getKey(), args);
   }
 
-  protected boolean mergeMethodsIntoCache(ApiSpecification spec) {
+  protected static void mergeMethodsIntoCache(ApiSpecification spec) {
+    Optional.ofNullable(spec.m_nestedApi).ifPresent(ApiSpecification::mergeMethodsIntoCache);
     Arrays.stream(spec.apiInterface().getMethods())
         .filter(Method::isDefault) // includes public, non-static, non-abstract
         .filter(m -> !m.isBridge() && !m.isSynthetic()) // only "real" methods
-        .forEach(m -> m_methods.putIfAbsent(JavaTypes.createMethodIdentifier(m), new SimpleImmutableEntry<>(m, spec)));
-    return true; // continue with the next spec
+        .forEach(m -> spec.m_methods.putIfAbsent(JavaTypes.createMethodIdentifier(m), new SimpleImmutableEntry<>(m, spec)));
+    Optional.ofNullable(spec.m_nestedApi).ifPresent(nestedApi -> nestedApi.m_methods.forEach(spec.m_methods::putIfAbsent));
   }
 
   @Override
