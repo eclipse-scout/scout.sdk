@@ -103,6 +103,20 @@ public class ApiSpecificationTest {
     assertEquals(Java11Api.VALUE, api17.method());
   }
 
+  @Test
+  public void testMethodsOnNestedApis() {
+    var testApi = createTestApiDefinition(new ApiVersion(null, 4));
+
+    assertEquals("someFunction4", testApi.someFunction());
+    assertEquals("someOtherFunction4", testApi.someOtherFunction());
+
+    assertEquals("someFunction3", testApi.requireApi(TestApi401.class).someFunction());
+    assertEquals("someOtherFunction4", testApi.requireApi(TestApi401.class).someOtherFunction());
+
+    assertEquals("someFunction3", testApi.requireApi(TestApi3.class).someFunction());
+    assertThrows(IllegalArgumentException.class, () -> testApi.requireApi(TestApi3.class).someOtherFunction());
+  }
+
   protected static IJavaApi createFixtureApiDefinition(int... version) {
     var spec = ApiSpecification.create(asList(Java8Api.class, Java11Api.class, Java13Api.class), new ApiVersion(version));
     assertNotNull(spec);
@@ -117,6 +131,10 @@ public class ApiSpecificationTest {
 
   public interface ITestApi extends IApiSpecification {
     String myVersion();
+
+    String someFunction();
+
+    String someOtherFunction();
   }
 
   @MaxApiLevel(3)
@@ -124,6 +142,11 @@ public class ApiSpecificationTest {
     @Override
     default String myVersion() {
       return "3";
+    }
+
+    @Override
+    default String someFunction() {
+      return "someFunction3";
     }
   }
 
@@ -133,6 +156,11 @@ public class ApiSpecificationTest {
     default String myVersion() {
       return "401";
     }
+
+    @Override
+    default String someOtherFunction() {
+      return "someOtherFunction4";
+    }
   }
 
   @MaxApiLevel(4)
@@ -140,6 +168,11 @@ public class ApiSpecificationTest {
     @Override
     default String myVersion() {
       return "4";
+    }
+
+    @Override
+    default String someFunction() {
+      return "someFunction4";
     }
   }
 }
