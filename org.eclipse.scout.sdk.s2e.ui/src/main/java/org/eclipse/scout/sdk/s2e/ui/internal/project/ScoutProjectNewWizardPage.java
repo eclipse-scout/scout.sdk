@@ -395,7 +395,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
           resetVersionsToDefault();
         }
         finally {
-          getContainer().getShell().getDisplay().asyncExec(() -> setVersionLoading(false));
+          PlatformUI.getWorkbench().getDisplay().asyncExec(() -> setVersionLoading(false));
         }
       }
     }.schedule();
@@ -410,7 +410,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     m_scoutVersions.clear();
     m_scoutVersions.addAll(versions);
     if (isControlCreated()) {
-      getContainer().getShell().getDisplay().asyncExec(() -> {
+      PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
         var selected = m_scoutVersionField.getText();
         var contentProvider = (P_ScoutVersionsContentProvider) m_scoutVersionField.getContentProvider();
         contentProvider.clearCache();
@@ -424,10 +424,12 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   protected void setVersionLoading(boolean loading) {
     m_versionsLoading = loading;
-    m_javaButton.setEnabled(!loading);
-    m_javaScriptButton.setEnabled(!loading);
-    m_scoutVersionField.setEnabled(!loading);
-    m_showPreviewReleases.setEnabled(!loading);
+    if (isControlCreated()) {
+      m_javaButton.setEnabled(!loading);
+      m_javaScriptButton.setEnabled(!loading);
+      m_scoutVersionField.setEnabled(!loading);
+      m_showPreviewReleases.setEnabled(!loading);
+    }
     pingStateChanging();
   }
 
