@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_plugin_config-master</artifactId>
-    <version>22.0.0</version>
+    <version>22.0.1</version>
     <relativePath/>
   </parent>
 
@@ -759,7 +759,7 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.2.10</version>
+        <version>1.2.11</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -826,7 +826,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>4.3.1</version>
+        <version>4.4.0</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
@@ -885,7 +885,7 @@
           <!-- use the javac compiler for the SDK because of bugs in ECJ concerning type arguments with Java 11 -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.10.0</version>
+          <version>3.10.1</version>
           <configuration>
             <compilerId>javac</compilerId>
           </configuration>
@@ -893,7 +893,7 @@
             <dependency>
               <groupId>org.codehaus.plexus</groupId>
               <artifactId>plexus-compiler-javac</artifactId>
-              <version>2.10.0</version>
+              <version>2.11.1</version>
             </dependency>
           </dependencies>
         </plugin>

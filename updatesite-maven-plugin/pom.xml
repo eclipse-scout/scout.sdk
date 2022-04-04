@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_plugin_config-master</artifactId>
-    <version>22.0.0</version>
+    <version>22.0.1</version>
     <relativePath />
   </parent>
 
@@ -28,7 +28,7 @@
   <properties>
     <scout.base.version>12.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
-    <maven.model.dependency.version>3.8.4</maven.model.dependency.version>
+    <maven.model.dependency.version>3.8.5</maven.model.dependency.version>
     <junit.version>5.8.2</junit.version>
   </properties>
 
