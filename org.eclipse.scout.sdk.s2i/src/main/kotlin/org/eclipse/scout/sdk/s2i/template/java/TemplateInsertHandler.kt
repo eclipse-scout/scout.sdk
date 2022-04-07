@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -218,7 +218,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
         private fun getInsertAnchor(innerTypeGetterContainer: PsiClass, methodName: String, innerTypeGetterMethodName: String, document: Document): Pair<PsiElement, Boolean>? {
             val gettersWithSource = innerTypeGetterContainer.methods
                 .filter { it.name.startsWith(PropertyBean.GETTER_PREFIX) }
-                .map { it to document.getText(it.textRange) }
+                .map { it to it.textRange.subSequence(document.immutableCharSequence) }
             val otherInnerTypeGetters = gettersWithSource
                 .filter { it.second.contains(innerTypeGetterMethodName) }
                 .map { it.first }
