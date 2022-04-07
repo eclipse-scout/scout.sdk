@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -293,7 +293,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
     m_newFiles.clear();
 
     // reload
-    load(new ArrayList<>(translationFiles().values()), progress); // create a copy here because the load modifies the translation files. otherwise it modifies its own method argument.
+    load(new ArrayList<>(translationFiles().values()), progress); // create a copy here because the load modifies the translation files. Otherwise, it modifies its own method argument.
   }
 
   protected Map<Language, ITranslationPropertiesFile> translationFiles() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,22 +16,46 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorLocation
 import com.intellij.openapi.fileEditor.FileEditorState
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.UserDataHolderBase
+import com.intellij.openapi.vfs.AsyncFileListener
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
+import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
+import com.intellij.util.concurrency.AppExecutorUtil
+import org.eclipse.scout.sdk.core.s.environment.NullProgress
+import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.Translations
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
+import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile
+import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile
+import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStore
+import org.eclipse.scout.sdk.core.s.util.DelayedBuffer
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader
+import org.eclipse.scout.sdk.s2i.toScoutProgress
 import java.awt.BorderLayout
 import java.awt.Graphics
 import java.beans.PropertyChangeListener
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.concurrent.TimeUnit
+import kotlin.streams.asSequence
 
 class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserDataHolderBase(), FileEditor {
 
     private val m_root = RootPanel()
+    private val m_delayedFileChangeProcessor = DelayedBuffer(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true, this::onPropertiesFilesChanged)
+
+    @Volatile
+    private var m_waitingForRefreshConfirmation = false
+    private lateinit var m_manager: TranslationManager
 
     inner class RootPanel : JBPanel<RootPanel>(BorderLayout()) {
         private var m_first = true
@@ -39,13 +63,13 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
         override fun paint(g: Graphics) {
             if (m_first) {
                 m_first = false
-                // do not schedule directly. instead schedule after this paint. otherwise there might be ArrayIndexOutOfBoundsExceptions in swing.
+                // do not schedule directly. instead, schedule after this paint. Otherwise, there might be ArrayIndexOutOfBoundsExceptions in swing.
                 ApplicationManager.getApplication().invokeLater {
                     FileDocumentManager.getInstance().saveAllDocuments() // ensures all changes are visible to the loader.
                     TranslationManagerLoader.createModalLoader(vFile, project, Translations.DependencyScope.ALL)
-                            .withErrorHandler { onLoadError(it) }
-                            .withManagerCreatedHandler { onManagerCreated(it) }
-                            .queue()
+                        .withErrorHandler { onLoadError(it) }
+                        .withManagerCreatedHandler { onManagerCreated(it) }
+                        .queue()
                 }
             }
             super.paint(g)
@@ -60,8 +84,10 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
             return
         }
 
+        m_manager = result.manager
+        VirtualFileManager.getInstance().addAsyncFileListener(VfsListener(), this)
         ApplicationManager.getApplication().invokeLater {
-            val content = NlsEditorContent(project, result.manager, result.primaryStore)
+            val content = NlsEditorContent(project, m_manager, result.primaryStore)
             m_content = content
             m_root.add(content)
             content.textFilterField().requestFocus()
@@ -69,13 +95,72 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
     }
 
     private fun onLoadError(e: Throwable) = ApplicationManager.getApplication().invokeLater {
-        m_root.add(JBLabel(toLabelString(e)))
-    }
-
-    private fun toLabelString(e: Throwable): String {
         val msg = Strings.escapeHtml(e.message)
         val stackTrace = Strings.fromThrowable(e).replace("\r", "").replace("\n", "<br>")
-        return "<html>$msg<br>$stackTrace</html>"
+        val labelString = "<html>$msg<br>$stackTrace</html>"
+        m_root.add(JBLabel(labelString))
+    }
+
+    private fun onPropertiesFilesChanged(changedFilePaths: List<String>) {
+        val loadedFiles = m_manager.allEditableStores().asSequence()
+            .mapNotNull { it as? PropertiesTranslationStore }
+            .flatMap { it.files().values.asSequence() }
+            .mapNotNull { it as? EditableTranslationFile }
+            .toList()
+        val watchedDirectories = loadedFiles.asSequence()
+            .map { it.path() }
+            .map { it.parent }
+            .toSet()
+        val hasChange = changedFilePaths.asSequence()
+            .map { Paths.get(it) }
+            .filter { watchedDirectories.any { watchedDirectory -> it.startsWith(watchedDirectory) } }
+            .any { isChanged(it, loadedFiles) }
+        if (hasChange) {
+            showPropertiesFilesChangedOutsideEditorMessage()
+        }
+    }
+
+    private fun showPropertiesFilesChangedOutsideEditorMessage() = ApplicationManager.getApplication().invokeLater {
+        val parent = m_content
+        val message = message("translations.changed.reload.question")
+        val title = vFile.name
+        val icon = Messages.getQuestionIcon()
+        m_waitingForRefreshConfirmation = true
+        val result = try {
+            if (parent == null) Messages.showYesNoDialog(project, message, title, icon)
+            else Messages.showYesNoDialog(parent, message, title, icon)
+        } finally {
+            m_waitingForRefreshConfirmation = false
+        }
+        if (result != Messages.YES) return@invokeLater
+
+        object : Task.Modal(project, parent, message("loading.translations"), true) {
+            override fun run(indicator: ProgressIndicator) {
+                m_manager.reload(indicator.toScoutProgress())
+            }
+        }.queue()
+    }
+
+    private fun isChanged(filePath: Path, currentlyLoadedFiles: List<EditableTranslationFile>): Boolean {
+        val existingTranslationFile = currentlyLoadedFiles.firstOrNull { it.path() == filePath }
+            ?: return true // a new properties file has been added to the watched folders. it might be a new language -> mark as changed
+
+        val newTranslationFile = EditableTranslationFile(filePath, Language.LANGUAGE_DEFAULT /* doesn't matter */)
+        newTranslationFile.load(NullProgress())
+        return newTranslationFile.allEntries() != existingTranslationFile.allEntries()
+    }
+
+
+    private inner class VfsListener : AsyncFileListener {
+        override fun prepareChange(events: MutableList<out VFileEvent>): AsyncFileListener.ChangeApplier? {
+            if (m_waitingForRefreshConfirmation) return null // don't show more than one box
+
+            events.asSequence()
+                .map { it.path } // use path here because the virtual file might be invalid (deleted)
+                .filter { it.endsWith(AbstractTranslationPropertiesFile.FILE_SUFFIX) } // only properties files are interesting for now
+                .forEach { m_delayedFileChangeProcessor.submit(it) }
+            return null
+        }
     }
 
     override fun getFile() = vFile
