@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -51,8 +51,8 @@ public abstract class AbstractJavaElementGenerator<TYPE extends IJavaElementGene
     withElementName(Ensure.notNull(element).elementName());
   }
 
+  @SuppressWarnings("unchecked")
   protected TYPE thisInstance() {
-    //noinspection unchecked
     return (TYPE) this;
   }
 
@@ -94,9 +94,9 @@ public abstract class AbstractJavaElementGenerator<TYPE extends IJavaElementGene
     return thisInstance();
   }
 
+  @SuppressWarnings("unchecked")
   protected void build(IJavaSourceBuilder<?> builder) {
     var context = builder.context();
-    //noinspection unchecked
     preProcessors().forEach(c -> c.accept((TYPE) this, context));
     createComment(builder);
   }
@@ -132,12 +132,12 @@ public abstract class AbstractJavaElementGenerator<TYPE extends IJavaElementGene
   }
 
   /**
-   * If the given name is a reserved java keyword a prefix is added to ensure it is a valid name to use e.g. for
+   * If the given name is a reserved java keyword a suffix is added to ensure it is a valid name to use e.g. for
    * variables or parameters.
    *
    * @param parameterName
    *          The original name.
-   * @return The new value which probably has a prefix appended.
+   * @return The new value which probably has a suffix appended.
    */
   public static String ensureValidJavaName(String parameterName) {
     if (JavaTypes.isReservedJavaKeyword(parameterName)) {
