@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,7 @@ import org.eclipse.ui.PlatformUI;
 
 public class NlsTableCursor {
 
-  private static final Pattern TEXT_EDIT_BEGIN_PAT = Pattern.compile("[a-zA-Z0-9]");
+  private static final Pattern TEXT_EDIT_BEGIN_PAT = Pattern.compile("[a-zA-Z\\d]");
   private static final String COLOR_FOREGROUND = "scout.color_table_cursor_foreground";
   private static final String COLOR_FOREGROUND_INACTIVE = "scout.color_table_cursor_inactive_foreground";
   private static final String COLOR_BACKGROUND = "scout.color_table_cursor_background";

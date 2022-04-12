@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -132,7 +132,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
     }
 
     var createLookupCallMethodName = "createLookupCall";
-    TestGenerator<?> lookupCallTestBuilder = new TestGenerator<>()
+    var lookupCallTestBuilder = new TestGenerator<>()
         .withElementName(getLookupCallName() + ISdkConstants.SUFFIX_TEST)
         .withPackageName(testPackage)
         .asClientTest(isClient)

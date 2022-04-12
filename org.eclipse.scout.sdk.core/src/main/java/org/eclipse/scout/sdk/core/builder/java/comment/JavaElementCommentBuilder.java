@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -42,7 +42,7 @@ public class JavaElementCommentBuilder<TYPE extends IJavaElementCommentBuilder<T
   public static final String LINK_PREFIX = "{@link ";
   public static final char LINK_SUFFIX = '}';
   public static final char LINK_MEMBER_DELIMITER = '#';
-  private static final Pattern LINK_REFERENCE_PATTERN = Pattern.compile("([\\w.\\[\\]]+)?(?:" + LINK_MEMBER_DELIMITER + "([\\w]+)\\(([\\w\\s,.\\[\\]]*)\\))?");
+  private static final Pattern LINK_REFERENCE_PATTERN = Pattern.compile("([\\w.\\[\\]]+)?(?:" + LINK_MEMBER_DELIMITER + "(\\w+)\\(([\\w\\s,.\\[\\]]*)\\))?");
 
   private final Supplier<ISourceGenerator<ICommentBuilder<?>>> m_defaultCommentGeneratorSupplier;
   private final FinalValue<ISourceGenerator<ICommentBuilder<?>>> m_defaultElementCommentGenerator;

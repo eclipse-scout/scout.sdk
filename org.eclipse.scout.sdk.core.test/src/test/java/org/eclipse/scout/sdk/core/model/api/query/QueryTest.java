@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -132,7 +132,7 @@ public class QueryTest {
     assertEquals(1, childClassType.methods().withFlags(Flags.AccProtected | Flags.AccSynchronized).stream().count());
     assertEquals(1, childClassType.methods().withFlags(Flags.AccPrivate).stream().count());
     assertEquals(2, childClassType.methods().stream().limit(2).count());
-    assertEquals(2, childClassType.methods().withName(Pattern.compile("[a-z0-9_]+class", Pattern.CASE_INSENSITIVE)).stream().count());
+    assertEquals(2, childClassType.methods().withName(Pattern.compile("[a-z\\d_]+class", Pattern.CASE_INSENSITIVE)).stream().count());
     assertEquals(1, childClassType.methods().withName("firstCase").stream().count());
     assertEquals(1, childClassType.methods().withSuperClasses(true).withName("method2InBaseClass").stream().count());
     assertEquals(1, childClassType.methods().withSuperClasses(true).withMethodIdentifier("methodInChildClass(java.lang.String,java.util.List)").stream().count());

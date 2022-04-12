@@ -191,7 +191,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected TestGenerator<?> createFormTestBuilder(IScoutVariousApi scoutApi) {
-    TestGenerator<?> testBuilder = new TestGenerator<>()
+    var testBuilder = new TestGenerator<>()
         .withElementName(JavaTypes.simpleName(getCreatedFormFqn()) + ISdkConstants.SUFFIX_TEST)
         .withPackageName(getClientPackage())
         .withRunner(scoutApi.ClientTestRunner().fqn())
@@ -382,7 +382,7 @@ public class FormNewOperation implements BiConsumer<IEnvironment, IProgress> {
   }
 
   protected IFuture<IType> createPermission(String permissionName, String sharedPackage, Consumer<String> fqnConsumer, IEnvironment env, IProgress progress) {
-    PermissionGenerator<?> psb = new PermissionGenerator<>()
+    var psb = new PermissionGenerator<>()
         .withElementName(permissionName)
         .withPackageName(sharedPackage);
     if (fqnConsumer != null) {

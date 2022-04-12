@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -142,11 +142,11 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     }
     progress.worked(8);
 
-    // download all resources that belong the WSDL into the project and re-parse the created WSDL with the local paths
+    // download all resources that belong the WSDL into the project and reparse the created WSDL with the local paths
     var bindingFolder = getBindingFolder(getProjectRoot(), wsdlBaseName);
     setCreatedWsdlFile(writeWsdlToProject(wsdlBaseName, env, progress.newChild(2)));
     copyReferencedResources(wsdlBaseName, env, progress.newChild(1));
-    setParsedWsdl(parseWsdl(getTargetWsdlFileUri(wsdlBaseName))); // re-parse the WSDL using local URI
+    setParsedWsdl(parseWsdl(getTargetWsdlFileUri(wsdlBaseName))); // reparse the WSDL using local URI
 
     // create bindings, add section to pom
     setCreatedJaxbBindingFile(createJaxbBinding(bindingFolder, env, progress.newChild(1)));
@@ -182,7 +182,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
       var portTypes = getParsedWsdl().getPortTypes(service.getKey());
       for (var pt : portTypes) {
         var portTypeName = pt.getQName().getLocalPart();
-        WebServiceProviderGenerator<?> wspsb = new WebServiceProviderGenerator<>()
+        var wspsb = new WebServiceProviderGenerator<>()
             .withElementName(WebServiceNames.getWebServiceProviderImplClassName(portTypeName))
             .withPackageName(getPackage())
             .withPortType(getPackage() + JavaTypes.C_DOT + WebServiceNames.getPortTypeClassName(portTypeName));
@@ -197,7 +197,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
       var portTypes = getParsedWsdl().getPortTypes(service.getKey());
       for (var pt : portTypes) {
         var portTypeName = pt.getQName().getLocalPart();
-        EntryPointDefinitionGenerator<?> epdsb = new EntryPointDefinitionGenerator<>()
+        var epdsb = new EntryPointDefinitionGenerator<>()
             .withElementName(WebServiceNames.getEntryPointDefinitionClassName(portTypeName))
             .withPackageName(getPackage())
             .withPortTypeFqn(getPackage() + JavaTypes.C_DOT + WebServiceNames.getPortTypeClassName(portTypeName))
@@ -216,7 +216,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
       var portTypes = getParsedWsdl().getPortTypes(service.getKey());
       for (var pt : portTypes) {
         var portTypeName = pt.getQName().getLocalPart();
-        WebServiceClientGenerator<?> wscsb = new WebServiceClientGenerator<>()
+        var wscsb = new WebServiceClientGenerator<>()
             .withElementName(WebServiceNames.getWebServiceClientClassName(portTypeName))
             .withPackageName(getPackage())
             .withPortType(getPackage() + JavaTypes.C_DOT + WebServiceNames.getPortTypeClassName(portTypeName))

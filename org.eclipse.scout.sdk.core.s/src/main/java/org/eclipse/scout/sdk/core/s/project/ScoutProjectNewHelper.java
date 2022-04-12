@@ -59,7 +59,7 @@ public final class ScoutProjectNewHelper {
   public static final String SCOUT_ARCHETYPES_JAXWS_MODULE_ID = "scout-jaxws-module";
 
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\\\\<>=/:\"]+");
-  public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z][a-z0-9_]{0,32}(?:\\.[a-z][a-z0-9_]{0,32}){0,16}$");
+  public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z][a-z\\d_]{0,32}(?:\\.[a-z][a-z\\d_]{0,32}){0,16}$");
 
   private ScoutProjectNewHelper() {
   }

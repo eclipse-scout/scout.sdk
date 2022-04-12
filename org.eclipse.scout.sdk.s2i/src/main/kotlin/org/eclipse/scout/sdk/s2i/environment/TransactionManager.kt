@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -310,14 +310,10 @@ class TransactionManager constructor(val project: Project, val transactionName: 
         return true
     }
 
-    private fun commitTransaction(documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, progress: IdeaProgress) = m_members.entries
-        .map { commitMembersAndPersist(it.key, it.value, documentMappings, progress) }
-        .minOrNull() ?: false
+    private fun commitTransaction(documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, progress: IdeaProgress) = m_members.entries.minOfOrNull { commitMembersAndPersist(it.key, it.value, documentMappings, progress) } ?: false
 
     private fun commitMembersAndPersist(path: Path, members: List<TransactionMember>, documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, progress: IdeaProgress): Boolean {
-        val success = members
-            .map { member -> commitMember(member, path, documentMappings, progress.newChild(1)) }
-            .minOrNull() ?: false
+        val success = members.minOfOrNull { member -> commitMember(member, path, documentMappings, progress.newChild(1)) } ?: false
         if (success) {
             val document = documentMappings[path]?.second
             if (document != null && m_documentManager.isDocumentUnsaved(document)) {

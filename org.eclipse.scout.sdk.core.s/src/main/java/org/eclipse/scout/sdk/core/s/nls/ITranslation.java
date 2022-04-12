@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -30,7 +30,7 @@ public interface ITranslation extends Comparable<ITranslation> {
    * Character set allowed for translation keys.
    */
   @SuppressWarnings("RegExpRedundantEscape")
-  String KEY_ALLOWED_CHARACTER_SET = "a-zA-Z0-9_.\\-";
+  String KEY_ALLOWED_CHARACTER_SET = "\\w.\\-";
 
   /**
    * Regular expression matching translation keys (see {@link #key()}).

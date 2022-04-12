@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -126,7 +126,7 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
    * @return A new {@code Generated} {@link IAnnotationGenerator} with the specified value and comment.
    */
   public static IAnnotationGenerator<?> createGenerated(CharSequence typeThatGeneratedTheCode, CharSequence comments) {
-    IAnnotationGenerator<?> result = new AnnotationGenerator<>()
+    var result = new AnnotationGenerator<>()
         .withElementName(GeneratedAnnotation.FQN)
         .withElement(GeneratedAnnotation.VALUE_ELEMENT_NAME, b -> b.stringLiteral(Ensure.notBlank(typeThatGeneratedTheCode)));
     Strings.notBlank(comments).ifPresent(c -> result.withElement(GeneratedAnnotation.COMMENTS_ELEMENT_NAME, b -> b.stringLiteral(c)));

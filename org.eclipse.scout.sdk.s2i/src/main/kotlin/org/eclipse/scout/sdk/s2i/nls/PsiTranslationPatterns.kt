@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -56,27 +56,26 @@ object PsiTranslationPatterns {
 
         // a method call directly returning the nls key
         return (element as? PsiCall)
-                ?.takeIf { JAVA_NLS_KEY_PATTERN.accepts(it) }
-                ?.resolveMethod()
-                ?.body
-                ?.children
-                ?.mapNotNull { it as? PsiReturnStatement }
-                ?.map { it.returnValue }
-                ?.mapNotNull { resolveExpressionToString(it) }
-                ?.firstOrNull()
+            ?.takeIf { JAVA_NLS_KEY_PATTERN.accepts(it) }
+            ?.resolveMethod()
+            ?.body
+            ?.children
+            ?.mapNotNull { it as? PsiReturnStatement }
+            ?.map { it.returnValue }
+            ?.firstNotNullOfOrNull { resolveExpressionToString(it) }
     }
 
     private fun resolveExpressionToString(element: PsiElement?, locationFilter: ((Any?) -> Boolean)? = null): String? {
         if (element is PsiLiteralExpressionImpl) {
             return asStringLiteral(element)
-                    .takeIf { locationFilter == null || locationFilter(it) }
-                    ?.value as? String
+                .takeIf { locationFilter == null || locationFilter(it) }
+                ?.value as? String
         }
 
         // reference to variable or constant
         val variable = (element as? PsiReference)
-                ?.takeIf { locationFilter == null || locationFilter(it) }
-                ?.resolve() as? PsiVariable ?: return null
+            ?.takeIf { locationFilter == null || locationFilter(it) }
+            ?.resolve() as? PsiVariable ?: return null
         val constant = variable.computeConstantValue() as? String
         if (constant != null) {
             return constant
@@ -85,25 +84,27 @@ object PsiTranslationPatterns {
     }
 
     private fun asStringLiteral(element: PsiElement?) = (element as? PsiLiteralExpressionImpl)
-            ?.takeIf { ElementType.STRING_LITERALS.contains(it.literalElementType) }
+        ?.takeIf { ElementType.STRING_LITERALS.contains(it.literalElementType) }
 
     private fun getTranslationKeyFromHtml(element: PsiElement?): String? {
         val takeIf = (element as? XmlAttributeValue)
-                ?.takeIf { HTML_KEY_PATTERN.accepts(it) }
+            ?.takeIf { HTML_KEY_PATTERN.accepts(it) }
         return takeIf
-                ?.value
+            ?.value
     }
 
     private fun htmlKeyPattern(): PsiElementPattern.Capture<PsiElement> = PlatformPatterns.psiElement()
-            .withParent(xmlAttribute(TranslationPatterns.HtmlScoutMessagePattern.ATTRIBUTE_NAME)
-                    .withParent(xmlTag().withName(TranslationPatterns.HtmlScoutMessagePattern.SCOUT_MESSAGE_TAG_NAME)))
+        .withParent(
+            xmlAttribute(TranslationPatterns.HtmlScoutMessagePattern.ATTRIBUTE_NAME)
+                .withParent(xmlTag().withName(TranslationPatterns.HtmlScoutMessagePattern.SCOUT_MESSAGE_TAG_NAME))
+        )
 
     private fun javaNlsKeyArgumentPattern(): PsiExpressionPattern.Capture<PsiExpression> {
         val patternsForAllScoutVersions = ScoutApi.allKnown()
-                .map { it.NlsKey().fqn() }
-                .distinct()
-                .map { psiExpression().with(ArgumentToMethodParameterHavingAnnotation(it)) }
-                .toArray<ElementPattern<PsiExpression>> { len -> arrayOfNulls(len) }
+            .map { it.NlsKey().fqn() }
+            .distinct()
+            .map { psiExpression().with(ArgumentToMethodParameterHavingAnnotation(it)) }
+            .toArray<ElementPattern<PsiExpression>> { len -> arrayOfNulls(len) }
         if (patternsForAllScoutVersions.size == 1) {
             return psiExpression().and(patternsForAllScoutVersions[0])
         }
@@ -116,10 +117,10 @@ object PsiTranslationPatterns {
      */
     private fun javaTextsGetPattern(): PsiJavaElementPattern.Capture<PsiElement> {
         val patternsForAllScoutVersions = ScoutApi.allKnown()
-                .map { it.TEXTS() }
-                .distinct()
-                .map { javaTextsGetPattern(it) }
-                .toArray<ElementPattern<PsiLiteralExpression>> { len -> arrayOfNulls(len) }
+            .map { it.TEXTS() }
+            .distinct()
+            .map { javaTextsGetPattern(it) }
+            .toArray<ElementPattern<PsiLiteralExpression>> { len -> arrayOfNulls(len) }
         if (patternsForAllScoutVersions.size == 1) {
             return psiElement().and(patternsForAllScoutVersions[0])
         }
@@ -131,28 +132,28 @@ object PsiTranslationPatterns {
         val localeFqn = Locale::class.java.name
         val wildcardArgument = ".."
         val getWithoutLocale = PsiJavaPatterns.psiMethod()
-                .withName(texts.methodName)
-                .definedInClass(texts.fqn())
-                .withParameters(stringFqn, wildcardArgument)
+            .withName(texts.methodName)
+            .definedInClass(texts.fqn())
+            .withParameters(stringFqn, wildcardArgument)
         val getWithLocale = PsiJavaPatterns.psiMethod()
-                .withName(texts.methodName)
-                .definedInClass(texts.fqn())
-                .withParameters(localeFqn, stringFqn, wildcardArgument)
+            .withName(texts.methodName)
+            .definedInClass(texts.fqn())
+            .withParameters(localeFqn, stringFqn, wildcardArgument)
         val getWithFallbackWithoutLocale = PsiJavaPatterns.psiMethod()
-                .withName(texts.withFallbackMethodName)
-                .definedInClass(texts.fqn())
-                .withParameters(stringFqn, stringFqn, wildcardArgument)
+            .withName(texts.withFallbackMethodName)
+            .definedInClass(texts.fqn())
+            .withParameters(stringFqn, stringFqn, wildcardArgument)
         val getWithFallbackWithLocale = PsiJavaPatterns.psiMethod()
-                .withName(texts.withFallbackMethodName)
-                .definedInClass(texts.fqn())
-                .withParameters(localeFqn, stringFqn, stringFqn, wildcardArgument)
+            .withName(texts.withFallbackMethodName)
+            .definedInClass(texts.fqn())
+            .withParameters(localeFqn, stringFqn, stringFqn, wildcardArgument)
         return or(
-                PsiJavaPatterns.literalExpression().methodCallParameter(0, getWithoutLocale),
-                PsiJavaPatterns.literalExpression().methodCallParameter(1, getWithLocale),
-                PsiJavaPatterns.literalExpression().methodCallParameter(0, getWithFallbackWithoutLocale),
-                PsiJavaPatterns.literalExpression().methodCallParameter(1, getWithFallbackWithoutLocale),
-                PsiJavaPatterns.literalExpression().methodCallParameter(1, getWithFallbackWithLocale),
-                PsiJavaPatterns.literalExpression().methodCallParameter(2, getWithFallbackWithLocale)
+            PsiJavaPatterns.literalExpression().methodCallParameter(0, getWithoutLocale),
+            PsiJavaPatterns.literalExpression().methodCallParameter(1, getWithLocale),
+            PsiJavaPatterns.literalExpression().methodCallParameter(0, getWithFallbackWithoutLocale),
+            PsiJavaPatterns.literalExpression().methodCallParameter(1, getWithFallbackWithoutLocale),
+            PsiJavaPatterns.literalExpression().methodCallParameter(1, getWithFallbackWithLocale),
+            PsiJavaPatterns.literalExpression().methodCallParameter(2, getWithFallbackWithLocale)
         )
     }
 
@@ -183,7 +184,7 @@ object PsiTranslationPatterns {
 
     class HtmlTranslationSpec(element: PsiElement) : TranslationLanguageSpec(element, Translations.DependencyScope.JAVA, "\"", PsiTranslationPatterns::getTranslationKeyFromHtml) {
         override fun createNewLiteral(text: String): PsiElement = XmlElementFactory.getInstance(element.project)
-                .createAttribute(TranslationPatterns.HtmlScoutMessagePattern.ATTRIBUTE_NAME, decorateTranslationKey(text), element)
-                .valueElement!!
+            .createAttribute(TranslationPatterns.HtmlScoutMessagePattern.ATTRIBUTE_NAME, decorateTranslationKey(text), element)
+            .valueElement!!
     }
 }
