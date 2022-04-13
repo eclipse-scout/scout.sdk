@@ -115,7 +115,9 @@ class JsModelProperty(name: String, val owner: AbstractJsModelElement, val dataT
             if (name.matches(CONSTANT_REGEX)) return null // constants
 
             val isArray = rhs is JSArrayLiteralExpression
-            val propertyTypedByName = propertyTypesByName.firstNotNullOfOrNull { it.use(name, isArray) }
+            val propertyTypedByName = propertyTypesByName
+                .mapNotNull { it.use(name, isArray) }
+                .firstOrNull() // do not use firstNotNullOfOrNull here to execute the mapNotNull for all elements before choosing the first
             if (propertyTypedByName != null) {
                 return propertyTypedByName
             }
