@@ -27,7 +27,7 @@ public interface Scout22Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
 
   @Override
   default int[] supportedJavaVersions() {
-    return new int[]{11};
+    return new int[]{11, 17};
   }
 
   IScout22DoApi.DoSet DO_SET = new DoSet();
