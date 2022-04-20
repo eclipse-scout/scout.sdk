@@ -376,6 +376,9 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     return parent;
   }
 
+  /**
+   * Executed in UI thread
+   */
   protected void updateVersionsAsync() {
     setVersionLoading(true);
     new AbstractJob("Load available Scout versions.") {
@@ -409,22 +412,39 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   private void setAvailableVersions(List<String> versions) {
     m_scoutVersions.clear();
     m_scoutVersions.addAll(versions);
-    if (isControlCreated()) {
-      PlatformUI.getWorkbench().getDisplay().asyncExec(() -> {
-        var selected = m_scoutVersionField.getText();
-        var contentProvider = (P_ScoutVersionsContentProvider) m_scoutVersionField.getContentProvider();
-        contentProvider.clearCache();
-        if (!versions.contains(selected)) {
-          m_scoutVersionField.acceptProposal(versions.get(0));
-        }
-        m_scoutVersionField.setSelection(0);
-      });
-    }
+
+    PlatformUI.getWorkbench().getDisplay().asyncExec(() -> updateVersionsFieldContent(versions));
   }
 
+  /**
+   * Executed in UI thread
+   * 
+   * @param versions
+   *          The new versions list. Is never {@code null} or empty.
+   */
+  protected void updateVersionsFieldContent(List<String> versions) {
+    var versionsField = m_scoutVersionField;
+    if (versionsField == null || versionsField.isDisposed()) { // do not use isContentCreated here as createContent() might not have finished yet
+      return;
+    }
+    var selected = versionsField.getText();
+    var contentProvider = (P_ScoutVersionsContentProvider) versionsField.getContentProvider();
+    contentProvider.clearCache();
+    if (!versions.contains(selected)) {
+      versionsField.acceptProposal(versions.get(0));
+    }
+    versionsField.setSelection(0);
+  }
+
+  /**
+   * Executed in UI thread
+   * 
+   * @param loading
+   *          The new value
+   */
   protected void setVersionLoading(boolean loading) {
     m_versionsLoading = loading;
-    if (isControlCreated()) {
+    if (m_javaButton != null && !m_javaButton.isDisposed()) { // do not use isContentCreated here as createContent() might not have finished yet
       m_javaButton.setEnabled(!loading);
       m_javaScriptButton.setEnabled(!loading);
       m_scoutVersionField.setEnabled(!loading);
