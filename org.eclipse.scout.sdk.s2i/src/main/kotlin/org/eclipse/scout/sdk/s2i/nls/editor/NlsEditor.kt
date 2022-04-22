@@ -27,34 +27,29 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
-import com.intellij.util.concurrency.AppExecutorUtil
-import org.eclipse.scout.sdk.core.s.environment.NullProgress
-import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.Translations
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile
-import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile
-import org.eclipse.scout.sdk.core.s.nls.properties.PropertiesTranslationStore
-import org.eclipse.scout.sdk.core.s.util.DelayedBuffer
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
+import org.eclipse.scout.sdk.s2i.containingModule
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader
 import org.eclipse.scout.sdk.s2i.toScoutProgress
 import java.awt.BorderLayout
 import java.awt.Graphics
 import java.beans.PropertyChangeListener
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.util.concurrent.TimeUnit
-import kotlin.streams.asSequence
 
 class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserDataHolderBase(), FileEditor {
 
     private val m_root = RootPanel()
-    private val m_delayedFileChangeProcessor = DelayedBuffer(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true, this::onPropertiesFilesChanged)
 
     @Volatile
-    private var m_waitingForRefreshConfirmation = false
+    private var m_reloadCheckNecessary = false
+
+    @Volatile
+    private var m_editorActive = false
+
     private lateinit var m_manager: TranslationManager
 
     inner class RootPanel : JBPanel<RootPanel>(BorderLayout()) {
@@ -83,9 +78,9 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
             ApplicationManager.getApplication().invokeLater { m_root.add(JBLabel(message("no.translations.found"))) }
             return
         }
-
-        m_manager = result.manager
+        setReloadCheckNecessary(false) // it was just created
         VirtualFileManager.getInstance().addAsyncFileListener(VfsListener(), this)
+        m_manager = result.manager
         ApplicationManager.getApplication().invokeLater {
             val content = NlsEditorContent(project, m_manager, result.primaryStore)
             m_content = content
@@ -101,21 +96,11 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
         m_root.add(JBLabel(labelString))
     }
 
-    private fun onPropertiesFilesChanged(changedFilePaths: List<String>) {
-        val loadedFiles = m_manager.allEditableStores().asSequence()
-            .mapNotNull { it as? PropertiesTranslationStore }
-            .flatMap { it.files().values.asSequence() }
-            .mapNotNull { it as? EditableTranslationFile }
-            .toList()
-        val watchedDirectories = loadedFiles.asSequence()
-            .map { it.path() }
-            .map { it.parent }
-            .toSet()
-        val hasChange = changedFilePaths.asSequence()
-            .map { Paths.get(it) }
-            .filter { watchedDirectories.any { watchedDirectory -> it.startsWith(watchedDirectory) } }
-            .any { isChanged(it, loadedFiles) }
-        if (hasChange) {
+    private fun doReloadCheck() = IdeaEnvironment.computeInReadActionAsync(project, true) {
+        val newManager = vFile.containingModule(project)
+            ?.let { TranslationManagerLoader.createManager(it, Translations.DependencyScope.ALL, false, null) }
+            ?.manager ?: return@computeInReadActionAsync
+        if (!newManager.contentEquals(m_manager)) {
             showPropertiesFilesChangedOutsideEditorMessage()
         }
     }
@@ -125,13 +110,8 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
         val message = message("translations.changed.reload.question")
         val title = vFile.name
         val icon = Messages.getQuestionIcon()
-        m_waitingForRefreshConfirmation = true
-        val result = try {
-            if (parent == null) Messages.showYesNoDialog(project, message, title, icon)
-            else Messages.showYesNoDialog(parent, message, title, icon)
-        } finally {
-            m_waitingForRefreshConfirmation = false
-        }
+        val result = if (parent == null) Messages.showYesNoDialog(project, message, title, icon) else Messages.showYesNoDialog(parent, message, title, icon)
+        setReloadCheckNecessary(false) // reload will be scheduled just afterwards or user not interested in the changes
         if (result != Messages.YES) return@invokeLater
 
         object : Task.Modal(project, parent, message("loading.translations"), true) {
@@ -141,27 +121,29 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
         }.queue()
     }
 
-    private fun isChanged(filePath: Path, currentlyLoadedFiles: List<EditableTranslationFile>): Boolean {
-        val existingTranslationFile = currentlyLoadedFiles.firstOrNull { it.path() == filePath }
-            ?: return true // a new properties file has been added to the watched folders. it might be a new language -> mark as changed
-
-        val newTranslationFile = EditableTranslationFile(filePath, Language.LANGUAGE_DEFAULT /* doesn't matter */)
-        newTranslationFile.load(NullProgress())
-        return newTranslationFile.allEntries() != existingTranslationFile.allEntries()
-    }
-
-
     private inner class VfsListener : AsyncFileListener {
         override fun prepareChange(events: MutableList<out VFileEvent>): AsyncFileListener.ChangeApplier? {
-            if (m_waitingForRefreshConfirmation) return null // don't show more than one box
-
-            events.asSequence()
+            if (isReloadCheckNecessary()) return null // already known that this editor must check its dirty state. Not necessary to handle more events.
+            val hasPropertiesFiles = events.asSequence()
                 .map { it.path } // use path here because the virtual file might be invalid (deleted)
-                .filter { it.endsWith(AbstractTranslationPropertiesFile.FILE_SUFFIX) } // only properties files are interesting for now
-                .forEach { m_delayedFileChangeProcessor.submit(it) }
+                .any { it.endsWith(AbstractTranslationPropertiesFile.FILE_SUFFIX) } // only properties files are interesting for now
+            if (hasPropertiesFiles) {
+                setReloadCheckNecessary(true)
+                if (isEditorActive()) {
+                    doReloadCheck() // editor has the focus. do the reload-check right now (async so that the listener can finish as fast as possible)
+                }
+            }
             return null
         }
     }
+
+    private fun isReloadCheckNecessary() = m_reloadCheckNecessary
+
+    private fun setReloadCheckNecessary(checkNecessary: Boolean) {
+        m_reloadCheckNecessary = checkNecessary
+    }
+
+    private fun isEditorActive() = m_editorActive
 
     override fun getFile() = vFile
 
@@ -175,25 +157,25 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
 
     override fun getPreferredFocusedComponent() = m_root
 
-    override fun setState(state: FileEditorState) {
-    }
+    override fun setState(state: FileEditorState) {}
 
     override fun selectNotify() {
+        m_editorActive = true
+        if (!isReloadCheckNecessary()) return // nothing to do
+        doReloadCheck() // check if reload is necessary (async to not block the ui thread)
     }
 
     override fun deselectNotify() {
+        m_editorActive = false
     }
 
     override fun getCurrentLocation(): FileEditorLocation? = null
 
     override fun getBackgroundHighlighter(): BackgroundEditorHighlighter? = null
 
-    override fun removePropertyChangeListener(listener: PropertyChangeListener) {
-    }
+    override fun removePropertyChangeListener(listener: PropertyChangeListener) {}
 
-    override fun addPropertyChangeListener(listener: PropertyChangeListener) {
-    }
+    override fun addPropertyChangeListener(listener: PropertyChangeListener) {}
 
-    override fun dispose() {
-    }
+    override fun dispose() {}
 }

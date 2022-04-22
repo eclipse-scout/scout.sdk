@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -734,6 +734,25 @@ public class TranslationManager {
    */
   public boolean removeListener(@SuppressWarnings("TypeMayBeWeakened") ITranslationManagerListener listener) {
     return m_listeners.remove(listener);
+  }
+
+  /**
+   * Checks if the content of this manager equals the content of the other.<br>
+   * Equal content means it is based on the same {@link ITranslationStore} list in the same order and all translations
+   * of all stores in all languages are the same.
+   * 
+   * @param other
+   *          The other manager to compare against.
+   * @return {@code true} if both stores have the same content, {@code false} otherwise.
+   */
+  public boolean contentEquals(TranslationManager other) {
+    if (this == other) {
+      return true;
+    }
+    if (other == null || !m_stores.equals(other.m_stores)) {
+      return false;
+    }
+    return m_translations.equals(other.m_translations);
   }
 
   protected synchronized void fireBufferedEvents() {

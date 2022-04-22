@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.eclipse.scout.rt.security.ScoutSecurityTextProviderService;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.nls.Language;
@@ -119,12 +120,14 @@ public class PropertiesTranslationStoreTest {
 
   @Test
   @SuppressWarnings({"unlikely-arg-type", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "SimplifiableJUnitAssertion", "EqualsWithItself"})
-  public void testStoreEqualsHashCode() {
+  public void testStoreEqualsHashCode(TestingEnvironment env) {
     var store1 = ScoutJavaEnvironmentFactory.call(TranslationStoreSupplierExtension::createEmptyStore, false, false);
     var store2 = ScoutJavaEnvironmentFactory.call(TranslationStoreSupplierExtension::createEmptyStore, false, false);
+    var txtSvc = env.primaryEnvironment().requireType(ScoutSecurityTextProviderService.class.getName());
+    var store3 = new PropertiesTranslationStore(PropertiesTextProviderService.create(txtSvc).orElseThrow());
 
     assertFalse(store1.equals(null));
-    assertFalse(store1.equals(store2));
+    assertFalse(store1.equals(store3));
     assertFalse(store1.equals(""));
     assertTrue(store1.equals(store1));
 

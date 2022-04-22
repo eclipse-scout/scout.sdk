@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -84,7 +84,7 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
          */
         fun <T> computeInReadAction(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: () -> T): T {
             if (ApplicationManager.getApplication().isReadAccessAllowed) {
-                // already in read action: don't submit non-blocking read-action (could end up in a dead-lock). Instead directly execute
+                // already in read action: don't submit non-blocking read-action (could end up in a dead-lock). Instead, directly execute
                 // also don't repeat until indexes are ready. If here the read-lock is already held, it must be released so that the dump mode can end
                 return callable()
             }
@@ -94,7 +94,7 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
 
         /**
          * Executes the given [callable] in a read action. If the method is invoked when already holding the read lock, it is directly executed in the calling thread.
-         * Otherwise it is executed in an asynchronous action bound to the given [Project].
+         * Otherwise, it is executed in an asynchronous action bound to the given [Project].
          * @param requireSmartMode If true, the read action waits until smart mode is available and is repeated until successful while in smart mode.
          * @param progress An optional [ProgressIndicator] to use if executed asynchronously.
          * @return A [CancellablePromise] representing the asynchronous computation.

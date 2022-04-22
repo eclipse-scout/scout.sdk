@@ -561,6 +561,24 @@ public class TranslationManagerTest {
   }
 
   @Test
+  public void testContentEquals() {
+    var firstStore = createStore("a", 100.00d, Map.of("k1", Map.of(Language.LANGUAGE_DEFAULT, "a_k1")));
+    var secondStore = createStore("b", 200.00d, Map.of("k2", Map.of(Language.LANGUAGE_DEFAULT, "b_k2")));
+    var thirdStore = createStore("c", 300.00d, Map.of("k1", Map.of(Language.LANGUAGE_DEFAULT, "c_k1")));
+
+    var manager1 = new TranslationManager(Stream.of(firstStore, secondStore));
+    var manager2 = new TranslationManager(Stream.of(firstStore, secondStore, thirdStore));
+    var manager3 = new TranslationManager(Stream.of(firstStore, secondStore));
+    var manager4 = new TranslationManager(Stream.of(firstStore, thirdStore));
+
+    assertTrue(manager1.contentEquals(manager1));
+    assertFalse(manager1.contentEquals(null));
+    assertTrue(manager1.contentEquals(manager3));
+    assertFalse(manager1.contentEquals(manager2));
+    assertFalse(manager1.contentEquals(manager4));
+  }
+
+  @Test
   public void testImportNoKeyColumn() {
     var firstStore = createStore("a", 100.00d, emptyMap());
     var secondStore = createStore("b", 200.00d, emptyMap());
