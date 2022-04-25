@@ -358,7 +358,7 @@ public class TranslationManagerTest {
     manager.removeListener(l);
     assertEquals(1, counter.intValue());
     manager.flush(env, new NullProgress());
-    manager.reload(new NullProgress());
+    manager.reload(env, new NullProgress());
     assertEquals(13, manager.allTranslations().count());
     assertEquals(textPrefix + '2', manager.translation("newKey2").orElseThrow().text(Language.LANGUAGE_DEFAULT).orElseThrow());
   }

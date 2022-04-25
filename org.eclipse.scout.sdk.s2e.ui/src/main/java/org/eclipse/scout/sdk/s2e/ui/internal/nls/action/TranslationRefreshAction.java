@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.nls.action;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.runInEclipseEnvironment;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
@@ -52,10 +53,10 @@ public class TranslationRefreshAction extends Action {
       }
     }
 
-    runInEclipseEnvironment((env, progress) -> execute(progress)).awaitDoneThrowingOnErrorOrCancel();
+    runInEclipseEnvironment(this::execute).awaitDoneThrowingOnErrorOrCancel();
   }
 
-  protected void execute(IProgress progress) {
-    m_nlsProject.reload(progress.init(100, "Refresh translations"));
+  protected void execute(IEnvironment env, IProgress progress) {
+    m_nlsProject.reload(env, progress.init(10000, "Refresh translations"));
   }
 }

@@ -11,8 +11,10 @@
 package org.eclipse.scout.sdk.core.s.nls;
 
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  * <h3>{@link TextProviderService}</h3>
@@ -23,6 +25,11 @@ import org.eclipse.scout.sdk.core.util.Ensure;
  * @since 7.0.0
  */
 public class TextProviderService {
+
+  /**
+   * Default file suffix for text-provider-services
+   */
+  public static final String TEXT_SERVICE_FILE_SUFFIX = ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE + JavaTypes.JAVA_FILE_SUFFIX;
 
   private final IType m_txtSvc;
   private final double m_order;

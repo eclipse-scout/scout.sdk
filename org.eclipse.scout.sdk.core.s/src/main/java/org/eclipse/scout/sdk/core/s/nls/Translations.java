@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -165,7 +166,8 @@ public final class Translations {
    * @see TranslationManager
    */
   public static Optional<TranslationManager> createManager(Path modulePath, IEnvironment env, IProgress progress, DependencyScope scope) {
-    return createManager(storesForModule(modulePath, env, progress, scope));
+    var stores = storesForModule(modulePath, env, progress, scope);
+    return TranslationManager.create(modulePath, stores, scope);
   }
 
   /**
@@ -190,7 +192,8 @@ public final class Translations {
    * @see TranslationManager
    */
   public static Optional<TranslationManager> createManager(Path modulePath, IEnvironment env, IProgress progress, DependencyScope... scopes) {
-    return createManager(storesForModule(modulePath, env, progress, scopes));
+    var stores = storesForModule(modulePath, env, progress, scopes);
+    return TranslationManager.create(modulePath, stores, scopes);
   }
 
   /**
@@ -201,7 +204,7 @@ public final class Translations {
    * @return A {@link TranslationManager} if the {@link Stream} given contains any stores.
    */
   public static Optional<TranslationManager> createManager(Stream<ITranslationStore> stores) {
-    return TranslationManager.create(stores);
+    return TranslationManager.create(null, stores);
   }
 
   /**
@@ -286,6 +289,7 @@ public final class Translations {
     var ticksByScope = 10000;
     progress.init(ticksByScope * scopes.length, "Resolve translation stores for module '{}'.", modulePath);
     return Arrays.stream(scopes)
+        .filter(Objects::nonNull)
         .flatMap(scope -> computeStoresForModule(modulePath, env, progress.newChild(ticksByScope), scope));
   }
 
@@ -376,18 +380,18 @@ public final class Translations {
     var aIsFiltered = a instanceof FilteredTranslationStore;
     var bIsFiltered = b instanceof FilteredTranslationStore;
     if (!aIsFiltered && !bIsFiltered) {
-      // both are unfiltered. Usually they have the same content so it doesn't matter which one to use
+      // both are unfiltered. Usually they have the same content, so it doesn't matter which one to use
       return a.size() >= b.size() ? a : b;
     }
     if (aIsFiltered && !bIsFiltered) {
-      // b is unfiltered. It contains all elements: use it
+      // "b" is unfiltered. It contains all elements: use it
       return b;
     }
     if (!aIsFiltered) {
-      // a is unfiltered. It contains all elements: use it
+      // "a" is unfiltered. It contains all elements: use it
       return a;
     }
-    // here a and b are filtered. combine them to a new store holding the union of both filters
+    // here "a" and "b" are filtered. combine them to a new store holding the union of both filters
     var filteredA = (FilteredTranslationStore) a;
     var filteredB = (FilteredTranslationStore) b;
     var filterA = filteredA.keysFilter();

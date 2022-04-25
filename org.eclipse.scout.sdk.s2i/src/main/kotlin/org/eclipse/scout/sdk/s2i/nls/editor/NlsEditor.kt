@@ -16,8 +16,6 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileEditor
 import com.intellij.openapi.fileEditor.FileEditorLocation
 import com.intellij.openapi.fileEditor.FileEditorState
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.UserDataHolderBase
@@ -27,18 +25,23 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
+import com.intellij.util.concurrency.AppExecutorUtil
+import org.eclipse.scout.sdk.core.s.nls.TextProviderService
 import org.eclipse.scout.sdk.core.s.nls.Translations
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
+import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManagerEvent
 import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader
-import org.eclipse.scout.sdk.s2i.toScoutProgress
 import java.awt.BorderLayout
 import java.awt.Graphics
 import java.beans.PropertyChangeListener
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
+import java.util.stream.Stream
 
 class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserDataHolderBase(), FileEditor {
 
@@ -49,6 +52,9 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
 
     @Volatile
     private var m_editorActive = false
+
+    @Volatile
+    private var m_scheduledReload: ScheduledFuture<*>? = null
 
     private lateinit var m_manager: TranslationManager
 
@@ -81,11 +87,20 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
         setReloadCheckNecessary(false) // it was just created
         VirtualFileManager.getInstance().addAsyncFileListener(VfsListener(), this)
         m_manager = result.manager
+        m_manager.addListener(this::onManagerChanged)
         ApplicationManager.getApplication().invokeLater {
             val content = NlsEditorContent(project, m_manager, result.primaryStore)
             m_content = content
             m_root.add(content)
             content.textFilterField().requestFocus()
+        }
+    }
+
+    private fun onManagerChanged(events: Stream<TranslationManagerEvent>) {
+        val hasReload = events.anyMatch { it.type() == TranslationManagerEvent.TYPE_RELOAD }
+        if (hasReload) {
+            // on reload: forget about any pending reload checks
+            setReloadCheckNecessary(false)
         }
     }
 
@@ -96,7 +111,7 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
         m_root.add(JBLabel(labelString))
     }
 
-    private fun doReloadCheck() = IdeaEnvironment.computeInReadActionAsync(project, true) {
+    private fun doReloadCheck() = IdeaEnvironment.computeInReadActionAsync(project) {
         val newManager = vFile.containingModule(project)
             ?.let { TranslationManagerLoader.createManager(it, Translations.DependencyScope.ALL, false, null) }
             ?.manager ?: return@computeInReadActionAsync
@@ -114,24 +129,26 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
         setReloadCheckNecessary(false) // reload will be scheduled just afterwards or user not interested in the changes
         if (result != Messages.YES) return@invokeLater
 
-        object : Task.Modal(project, parent, message("loading.translations"), true) {
-            override fun run(indicator: ProgressIndicator) {
-                m_manager.reload(indicator.toScoutProgress())
-            }
-        }.queue()
+        FileDocumentManager.getInstance().saveAllDocuments()
+        TranslationManagerLoader.scheduleManagerReload(project, m_manager)
     }
 
     private inner class VfsListener : AsyncFileListener {
         override fun prepareChange(events: MutableList<out VFileEvent>): AsyncFileListener.ChangeApplier? {
             if (isReloadCheckNecessary()) return null // already known that this editor must check its dirty state. Not necessary to handle more events.
-            val hasPropertiesFiles = events.asSequence()
-                .map { it.path } // use path here because the virtual file might be invalid (deleted)
-                .any { it.endsWith(AbstractTranslationPropertiesFile.FILE_SUFFIX) } // only properties files are interesting for now
-            if (hasPropertiesFiles) {
-                setReloadCheckNecessary(true)
-                if (isEditorActive()) {
-                    doReloadCheck() // editor has the focus. do the reload-check right now (async so that the listener can finish as fast as possible)
-                }
+            val isInteresting = events.asSequence()
+                .map { it.path } // use path here because the virtual file might be invalid (already deleted)
+                .any { it.endsWith(AbstractTranslationPropertiesFile.FILE_SUFFIX) || it.endsWith(TextProviderService.TEXT_SERVICE_FILE_SUFFIX) }
+            if (!isInteresting) return null
+
+            setReloadCheckNecessary(true)
+            if (isEditorActive()) {
+                // editor has the focus. do the reload-check right now (short delay in case there are more events coming directly afterwards)
+                m_scheduledReload?.cancel(true)
+                m_scheduledReload = AppExecutorUtil.getAppScheduledExecutorService().schedule({
+                    m_scheduledReload = null
+                    doReloadCheck()
+                }, 2, TimeUnit.SECONDS)
             }
             return null
         }

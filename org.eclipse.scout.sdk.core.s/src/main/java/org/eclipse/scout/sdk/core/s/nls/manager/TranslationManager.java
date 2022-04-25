@@ -28,6 +28,7 @@ import static org.eclipse.scout.sdk.core.s.nls.manager.TranslationManagerEvent.c
 import static org.eclipse.scout.sdk.core.s.nls.manager.TranslationManagerEvent.createUpdateTranslationEvent;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -58,6 +59,7 @@ import org.eclipse.scout.sdk.core.s.nls.TextProviderService;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreComparator;
 import org.eclipse.scout.sdk.core.s.nls.Translations;
+import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.EventListenerList;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -68,28 +70,49 @@ public class TranslationManager {
   private final List<ITranslationStore> m_stores;
   private final Map<String, StackedTranslation> m_translations;
 
+  private final Path m_modulePath; // may be null. Used to reload this manager
+  private final DependencyScope[] m_dependencyScopes;
+
   private final EventListenerList m_listeners;
   private final List<TranslationManagerEvent> m_eventBuffer;
 
   private int m_changing;
 
   protected TranslationManager(Stream<ITranslationStore> stores) {
-    m_stores = stores
-        .sorted(TranslationStoreComparator.INSTANCE)
-        .collect(toList());
+    this(null, stores);
+  }
+
+  protected TranslationManager(Path modulePath, Stream<ITranslationStore> stores, DependencyScope... scopes) {
+    m_stores = new ArrayList<>();
+    m_stores.addAll(sortStores(stores));
     m_translations = buildStackedTranslations(m_stores.stream());
     m_listeners = new EventListenerList();
     m_eventBuffer = new ArrayList<>();
+    m_modulePath = modulePath;
+    if (scopes == null || scopes.length < 1) {
+      m_dependencyScopes = new DependencyScope[0];
+    }
+    else {
+      m_dependencyScopes = Arrays.stream(scopes)
+          .filter(Objects::nonNull)
+          .toArray(DependencyScope[]::new);
+    }
 
     Translations.storesHavingImplicitOverrides(m_stores.stream()).forEach(TranslationManager::logImplicitOverrides);
   }
 
   /**
-   * Use {@link Translations#createManager(Stream)} instead
+   * Use {@link Translations#createManager(Path, IEnvironment, IProgress, DependencyScope...)} instead
    */
-  public static Optional<TranslationManager> create(Stream<ITranslationStore> stores) {
-    return Optional.of(new TranslationManager(stores))
+  public static Optional<TranslationManager> create(Path modulePath, Stream<ITranslationStore> stores, DependencyScope... scopes) {
+    return Optional.of(new TranslationManager(modulePath, stores, scopes))
         .filter(manager -> manager.allStores().findAny().isPresent());
+  }
+
+  protected static List<ITranslationStore> sortStores(Stream<ITranslationStore> stores) {
+    return stores
+        .sorted(TranslationStoreComparator.INSTANCE)
+        .collect(toList());
   }
 
   protected static Map<String, StackedTranslation> buildStackedTranslations(Stream<ITranslationStore> stores) {
@@ -644,18 +667,32 @@ public class TranslationManager {
   }
 
   /**
-   * Reloads all {@link ITranslationStore}s from their data source. All modifications already applied to the stores are
-   * discarded.
+   * Reloads this manager. All modifications already applied to the stores are discarded.
    *
+   * @param env
+   *          The {@link IEnvironment} to use to reload this manager. Must not be {@code null}.
    * @param progress
-   *          The {@link IProgress} monitor.
+   *          The {@link IProgress} monitor. Must not be {@code null}.
    */
-  public void reload(IProgress progress) {
+  public void reload(IEnvironment env, IProgress progress) {
     runAndFireChanged(() -> {
-      progress.init(m_stores.size(), "Reload all translation stores.");
-      allStores().forEach(s -> s.reload(progress.newChild(1)));
+      var modulePath = modulePath().orElse(null);
+      if (modulePath != null) {
+        // complete reload including new computation of available stores
+        var newStores = sortStores(Translations.storesForModule(modulePath, env, progress, dependencyScopes()));
+        m_stores.clear();
+        m_stores.addAll(newStores);
+      }
+      else {
+        // only reload already known stores
+        progress.init(m_stores.size(), "Reload all translation stores.");
+        allStores().forEach(s -> s.reload(progress.newChild(1)));
+      }
+
+      // rebuild stacked translation cache
       m_translations.clear();
       m_translations.putAll(buildStackedTranslations(m_stores.stream()));
+
       return createReloadEvent(this);
     });
   }
@@ -753,6 +790,14 @@ public class TranslationManager {
       return false;
     }
     return m_translations.equals(other.m_translations);
+  }
+
+  public Optional<Path> modulePath() {
+    return Optional.ofNullable(m_modulePath);
+  }
+
+  public DependencyScope[] dependencyScopes() {
+    return Arrays.copyOf(m_dependencyScopes, m_dependencyScopes.length);
   }
 
   protected synchronized void fireBufferedEvents() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,11 +19,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.messages.MessageBusConnection
-import org.eclipse.scout.sdk.core.s.ISdkConstants
+import org.eclipse.scout.sdk.core.s.nls.TextProviderService
 import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile
-import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.core.util.TtlCache
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader.createManager
 import java.nio.file.Path
@@ -32,8 +31,6 @@ import java.util.concurrent.TimeUnit
 class TranslationManagerCache(val project: Project) : Disposable {
 
     companion object {
-        private const val TEXT_SERVICE_FILE_SUFFIX = ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE + JavaTypes.JAVA_FILE_SUFFIX
-
         /**
          * @return a cache key to be used for a [TranslationManager].
          */
@@ -55,9 +52,9 @@ class TranslationManagerCache(val project: Project) : Disposable {
      * @return The [TranslationManager] for the module and scope given or null if no manager can be created for the module given (e.g. if it is no Scout module).
      */
     fun getOrCreateManager(modulePath: Path, scope: DependencyScope?): TranslationManager? =
-            m_cache.computeIfAbsent(createCacheKey(modulePath, scope)) {
-                createManager(project, modulePath, scope, false)
-            }
+        m_cache.computeIfAbsent(createCacheKey(modulePath, scope)) {
+            createManager(project, modulePath, scope, false)
+        }
 
     /**
      * Puts the manager given into the cache. An existing entry may be replaced.
@@ -67,7 +64,7 @@ class TranslationManagerCache(val project: Project) : Disposable {
      * @return the previous [TranslationManager] associated with the path and scope, or null if there was no mapping before.
      */
     fun putManager(modulePath: Path, scope: DependencyScope?, manager: TranslationManager?): TranslationManager? =
-            m_cache.put(createCacheKey(modulePath, scope), manager)
+        m_cache.put(createCacheKey(modulePath, scope), manager)
 
     /**
      * Removes all managers from the cache.
@@ -83,7 +80,7 @@ class TranslationManagerCache(val project: Project) : Disposable {
     private inner class DocumentSyncListener : FileDocumentManagerListener {
         override fun fileContentReloaded(file: VirtualFile, document: Document) {
             val path = file.path
-            if (path.endsWith(AbstractTranslationPropertiesFile.FILE_SUFFIX) || path.endsWith(TEXT_SERVICE_FILE_SUFFIX)) {
+            if (path.endsWith(AbstractTranslationPropertiesFile.FILE_SUFFIX) || path.endsWith(TextProviderService.TEXT_SERVICE_FILE_SUFFIX)) {
                 clear()
             }
         }

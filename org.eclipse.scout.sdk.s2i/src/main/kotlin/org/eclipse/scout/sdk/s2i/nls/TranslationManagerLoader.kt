@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInRe
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.moduleDirPath
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
+import org.eclipse.scout.sdk.s2i.toScoutProgress
 import java.nio.file.Path
 
 object TranslationManagerLoader {
@@ -112,6 +113,21 @@ object TranslationManagerLoader {
         return TranslationManagerLoaderResult(createdManager, primaryStore, nlsFile, module)
     }
 
+    /**
+     * Creates a modal loader and asynchronously reloads the [TranslationManager] given under the progress of the modal loader.
+     * @param project The [Project] in which the modal loader should be shown
+     * @param translationManager The [TranslationManager] to reload.
+     */
+    fun scheduleManagerReload(project: Project, translationManager: TranslationManager) {
+        object : Task.Modal(project, message("loading.translations"), true) {
+            override fun run(indicator: ProgressIndicator) = callInIdeaEnvironmentSync(project, indicator.toScoutProgress()) { e, p ->
+                computeInReadAction(project, progress = p.indicator) {
+                    translationManager.reload(e, p)
+                }
+            }
+        }.queue()
+    }
+
     internal fun createManager(project: Project, modulePath: Path, scope: DependencyScope?, useCache: Boolean = false): TranslationManager? {
         if (useCache) {
             return translationStoreManagerCache(project).getOrCreateManager(modulePath, scope)
@@ -139,13 +155,13 @@ object TranslationManagerLoader {
     private fun findPrimaryStore(nlsFile: VirtualFile?, manager: TranslationManager): ITranslationStore {
         val parsedNlsFile = nlsFile?.resolveLocalPath()?.let { NlsFile(it) }
         return parsedNlsFile?.findMatchingStoreIn(manager)?.orElse(null)
-                ?: firstStoreIn(manager, parsedNlsFile)
+            ?: firstStoreIn(manager, parsedNlsFile)
     }
 
     private fun firstStoreIn(manager: TranslationManager, nlsFile: NlsFile?): ITranslationStore {
         val fallback = manager.allStores()
-                .findFirst()
-                .orElseThrow { newFail("No translation stores found for nls file '{}'.", nlsFile?.path()) }
+            .findFirst()
+            .orElseThrow { newFail("No translation stores found for nls file '{}'.", nlsFile?.path()) }
         nlsFile?.nlsClassFqn()?.ifPresent {
             SdkLog.warning("Translation store '{}' specified in file '{}' could not be found. Fallback to '{}'.", it, nlsFile.path(), fallback.service().type().name())
         }

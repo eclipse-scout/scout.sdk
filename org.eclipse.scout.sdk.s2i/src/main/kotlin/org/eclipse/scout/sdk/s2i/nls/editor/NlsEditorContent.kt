@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,8 +18,6 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileChooserFactory
 import com.intellij.openapi.fileChooser.FileSaverDescriptor
 import com.intellij.openapi.fileEditor.FileDocumentManager
-import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.MessageType
@@ -42,10 +40,10 @@ import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.OperationTask
+import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import org.eclipse.scout.sdk.s2i.resolveProperty
 import org.eclipse.scout.sdk.s2i.resolvePsi
-import org.eclipse.scout.sdk.s2i.toScoutProgress
 import org.eclipse.scout.sdk.s2i.ui.IndexedFocusTraversalPolicy
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
 import org.eclipse.scout.sdk.s2i.util.Xlsx
@@ -330,11 +328,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
     private inner class ReloadAction : DumbAwareAction(message("reload.from.filesystem"), null, AllIcons.Actions.Refresh) {
         override fun actionPerformed(e: AnActionEvent) {
             FileDocumentManager.getInstance().saveAllDocuments()
-            object : Task.Modal(project, message("loading.translations"), true) {
-                override fun run(indicator: ProgressIndicator) {
-                    translationManager.reload(indicator.toScoutProgress())
-                }
-            }.queue()
+            TranslationManagerLoader.scheduleManagerReload(project, translationManager)
         }
     }
 
