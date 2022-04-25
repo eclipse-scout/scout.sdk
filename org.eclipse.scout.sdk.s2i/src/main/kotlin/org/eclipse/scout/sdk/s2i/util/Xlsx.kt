@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import java.io.FileOutputStream
 object Xlsx {
 
     /**
-     * Exports the given table data into an xlsx file
+     * Exports the given table data into a xlsx file
      * @param tableData The data to export
      * @param sheetName The name of the sheet holding the data
      * @param file The file to export to

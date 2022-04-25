@@ -49,11 +49,13 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>${maven.model.dependency.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
       <version>${maven.model.dependency.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
@@ -90,7 +92,7 @@
         <artifactId>maven-plugin-plugin</artifactId>
         <version>3.6.4</version>
         <configuration>
-          <goalPrefix>updatesite-maven-plugin</goalPrefix>
+          <goalPrefix>updatesite</goalPrefix>
           <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
         </configuration>
         <executions>

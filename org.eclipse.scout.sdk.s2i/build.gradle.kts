@@ -46,7 +46,7 @@ plugins {
     id("java")
     id("maven-publish")
     id("idea")
-    id("org.jetbrains.intellij") version "1.5.2"
+    id("org.jetbrains.intellij") version "1.5.3"
     kotlin("jvm") version "1.5.32"
     id("net.linguica.maven-settings") version "0.5" // for maven settings
 }
@@ -62,10 +62,10 @@ repositories {
 dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", scoutSdkVersion)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.ecj", scoutSdkVersion)
-    api("org.apache.poi", "poi-ooxml", "4.1.2")
+    api("org.apache.poi", "poi-ooxml", "5.2.2")
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    testImplementation("org.mockito", "mockito-core", "4.4.0")
+    testImplementation("org.mockito", "mockito-core", "4.5.1")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", scoutSdkVersion)
 }
