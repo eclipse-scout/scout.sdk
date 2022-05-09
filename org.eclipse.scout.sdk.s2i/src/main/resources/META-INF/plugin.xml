@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+  ~ Copyright (c) 2010-2022 BSI Business Systems Integration AG.
   ~ All rights reserved. This program and the accompanying materials
   ~ are made available under the terms of the Eclipse Public License v1.0
   ~ which accompanies this distribution, and is available at
@@ -45,6 +45,14 @@
   ]]></description>
 
   <change-notes><![CDATA[
+        <b>May 09, 2022</b><br>
+        Adds Postfix Completion for BEANS.get()<br>
+        <b>April 27, 2022</b><br>
+        Java 17 support for Scout >= 22.0.3<br>
+        <b>April 25, 2022</b><br>
+        The NLS Editor asks for reload if the underlying data has changed since the editor was last loaded.<br>
+        <b>February 02, 2022</b><br>
+        Scout project creation: Add possibility to choose the Scout version<br>
         <b>May 25, 2021</b><br>
         Adds actions to create several Scout elements like:<br>
         <ul>
@@ -81,6 +89,7 @@
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.maven.IdeaMavenRunner"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdStartup"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManagerStartup"/>
+    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.PostfixCompletionInstaller"/>
     <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdListener"/>
     <projectService serviceInterface="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager"
                     serviceImplementation="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManagerImplementor"/>
