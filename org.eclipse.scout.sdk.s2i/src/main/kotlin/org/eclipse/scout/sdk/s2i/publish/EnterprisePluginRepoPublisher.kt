@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,18 +10,22 @@
  */
 package org.eclipse.scout.sdk.s2i.publish
 
-import org.eclipse.scout.sdk.core.util.Ensure
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.jetbrains.plugin.blockmap.core.BlockMap
+import com.jetbrains.plugin.blockmap.core.FileHash
+import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.core.util.Xml
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.nio.charset.StandardCharsets
 import java.nio.file.*
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
+import java.util.zip.ZipOutputStream
 import kotlin.system.exitProcess
 
 const val XML_ATTRIBUTE_ID = "id"
@@ -31,11 +35,16 @@ const val XML_ATTRIBUTE_URL = "url"
 const val XML_TAG_NAME_PLUGIN = "plugin"
 const val XML_TAG_NAME_DESCRIPTION = "description"
 const val XML_TAG_NAME_CHANGE_NOTES = "change-notes"
+const val XML_TAG_NAME_ROOT = "plugins"
 
 const val PLUGIN_DESCRIPTOR_PATH = "META-INF/plugin.xml"
 const val PLUGIN_REPO_FILE_NAME = "updatePlugins.xml"
 
 const val PLUGINS_SUB_DIR_NAME = "plugins"
+
+const val BLOCKMAP_ZIP_SUFFIX = ".blockmap.zip"
+const val BLOCKMAP_FILENAME = "blockmap.json"
+const val HASH_FILENAME_SUFFIX = ".hash.json"
 
 
 open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: Path, val repoUrl: String?) {
@@ -67,7 +76,12 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         fun printUsage() {
             val pathSep = System.getProperty("path.separator")
             println("usage:")
-            println("java -cp kotlin-runtime.jar${pathSep}org.eclipse.scout.sdk.core.jar${pathSep}org.eclipse.scout.sdk.s2i.jar org.eclipse.scout.sdk.s2i.publish.EnterprisePluginRepoPublisher /path/to/plugin.zip /path/to/enterprise/repoDir [https://host/path-to-repo]")
+            println(
+                "java -cp blockmap-1.0.5.jar${pathSep}jackson-annotations-2.13.2.jar${pathSep}jackson-core-2.13.2.jar${pathSep}jackson-databind-2.13.2.jar${pathSep}" + // Blockmap Libs
+                        "kotlin-stdlib-1.5.32.jar${pathSep}kotlin-stdlib-common-1.5.32.jar${pathSep}kotlin-stdlib-jdk7-1.5.32.jar${pathSep}kotlin-stdlib-jdk8-1.5.32.jar${pathSep}" + // Kotlin libs
+                        "org.eclipse.scout.sdk.core-12.0.0-SNAPSHOT.jar${pathSep}org.eclipse.scout.sdk.s2i-12.0.0-SNAPSHOT.jar" + // Scout SDK libs
+                        " org.eclipse.scout.sdk.s2i.publish.EnterprisePluginRepoPublisher /path/to/plugin.zip /path/to/enterprise/repoDir [https://host/path-to-repo]"
+            )
         }
     }
 
@@ -78,11 +92,14 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
             exitProcess(4)
         }
 
-        val newZip = repoDir.relativize(copyNewPluginToRepo()).joinToString("/")
-        val oldZip = modifyUpdatePluginsXml(pluginXml)
+        val deployedPlugin = copyNewPluginToRepo()
+        writeBlockMapFiles(deployedPlugin)
 
+        val newZip = repoDir.relativize(deployedPlugin).joinToString("/")
+        val oldZip = modifyUpdatePluginsXml(pluginXml)
         if (!Objects.equals(newZip, oldZip)) {
             deleteOldPluginFromRepo(oldZip)
+            removeOldBlockMapFilesFromRepo(deployedPlugin)
         }
 
         if (oldZip == null) {
@@ -92,13 +109,52 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         }
     }
 
-    fun copyNewPluginToRepo(): Path = Files.copy(pluginToDeploy, repoDir.resolve(PLUGINS_SUB_DIR_NAME).resolve(pluginToDeploy.fileName), StandardCopyOption.REPLACE_EXISTING)
+    fun removeOldBlockMapFilesFromRepo(deployedPlugin: Path) {
+        Files.list(deployedPlugin.parent)
+            .filter { isOldBlockMapFile(it, deployedPlugin) }
+            .forEach { Files.delete(it) }
+    }
+
+    fun isOldBlockMapFile(candidate: Path, deployedPlugin: Path): Boolean {
+        val candidateFileName = candidate.fileName.toString()
+        val isBlockMapFile = candidateFileName.endsWith(BLOCKMAP_ZIP_SUFFIX) || candidateFileName.endsWith(HASH_FILENAME_SUFFIX)
+        if (!isBlockMapFile) {
+            return false
+        }
+
+        // only blockmap files that do not belong to the new plugin
+        val newPluginFileName = deployedPlugin.fileName.toString()
+        return candidateFileName != newPluginFileName + BLOCKMAP_ZIP_SUFFIX && candidateFileName != newPluginFileName + HASH_FILENAME_SUFFIX
+    }
+
+    fun writeBlockMapFiles(deployedPlugin: Path) {
+        val pluginFileName = deployedPlugin.fileName.toString()
+
+        val map = Files.newInputStream(deployedPlugin).use { ObjectMapper().writeValueAsBytes(BlockMap(it)) }
+        val blockMapFile = deployedPlugin.parent.resolve(pluginFileName + BLOCKMAP_ZIP_SUFFIX)
+        ZipOutputStream(BufferedOutputStream(Files.newOutputStream(blockMapFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))).use {
+            val entry = ZipEntry(BLOCKMAP_FILENAME)
+            entry.size = map.size.toLong()
+            it.putNextEntry(entry)
+            it.write(map)
+            it.closeEntry()
+        }
+
+        val hash = Files.newInputStream(pluginToDeploy).use { ObjectMapper().writeValueAsString(FileHash(it)).toByteArray(StandardCharsets.UTF_8) }
+        val hashFile = deployedPlugin.parent.resolve(pluginFileName + HASH_FILENAME_SUFFIX)
+        BufferedOutputStream(Files.newOutputStream(hashFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING))
+            .use { it.write(hash) }
+    }
+
+    fun copyNewPluginToRepo(): Path {
+        val targetDir = repoDir.resolve(PLUGINS_SUB_DIR_NAME)
+        Files.createDirectories(targetDir)
+        return Files.copy(pluginToDeploy, targetDir.resolve(pluginToDeploy.fileName), StandardCopyOption.REPLACE_EXISTING)
+    }
 
     fun modifyUpdatePluginsXml(pluginXml: PluginXmlDescriptor): String? {
         val updatePluginsXml = repoDir.resolve(PLUGIN_REPO_FILE_NAME)
-        val root = Xml.createDocumentBuilder()
-                .parse(updatePluginsXml.toFile())
-                .documentElement
+        val root = getOrCreatePluginsXml(updatePluginsXml)
 
         val id = pluginXml.id
         var oldUrl: String? = null
@@ -112,9 +168,22 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         // add new entry
         root.appendChild(pluginXml.toPluginElement(root.ownerDocument, pluginToDeploy.fileName.toString(), repoUrl))
         cleanupXmlDocument(root.ownerDocument)
-        writeXmlDocument(root.ownerDocument, updatePluginsXml)
+        Xml.writeDocument(root.ownerDocument, true, updatePluginsXml)
 
         return oldUrl
+    }
+
+    fun getOrCreatePluginsXml(updatePluginsXml: Path): Element {
+        if (Files.isRegularFile(updatePluginsXml)) {
+            // exists already
+            return Xml.get(updatePluginsXml).documentElement
+        }
+
+        // create a new updatePlugins.xml
+        val doc = Xml.createDocumentBuilder().newDocument()
+        val root = doc.createElement(XML_TAG_NAME_ROOT)
+        doc.appendChild(root)
+        return root
     }
 
     fun cleanupXmlDocument(document: Document) {
@@ -138,16 +207,8 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         toRemove.forEach { root.removeChild(it) }
     }
 
-    fun writeXmlDocument(document: Document, updatePluginsXml: Path) {
-        val transformer = Xml.createTransformer(true)
-
-        Files.newOutputStream(updatePluginsXml, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING).use { out ->
-            transformer.transform(DOMSource(document), StreamResult(out))
-        }
-    }
-
     /**
-     * @param oldPluginZip The old content of the url attribute of the replaced plugin. May be an absolute URL or a local path relative to the repository root.
+     * @param oldPluginZip The old content of the url attribute of the replaced plugin. Can be an absolute URL or a local path relative to the repository root.
      */
     fun deleteOldPluginFromRepo(oldPluginZip: String?) {
         if (oldPluginZip == null) {
@@ -193,8 +254,8 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
 
     fun parsePluginXml(stream: ZipInputStream): PluginXmlDescriptor {
         val root = Xml.createDocumentBuilder()
-                .parse(stream)
-                .documentElement
+            .parse(stream)
+            .documentElement
         val id = root.textContentOfChildTag(XML_ATTRIBUTE_ID)
         val version = root.textContentOfChildTag(XML_ATTRIBUTE_VERSION)
         val name = root.textContentOfChildTag(XML_ATTRIBUTE_NAME)
@@ -204,19 +265,19 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
     }
 
     fun Element.textContentOfChildTag(tagName: String): String =
-            Xml.firstChildElement(this, tagName)
-                    .map(Element::getTextContent)
-                    .map(String::trim)
-                    .orElseThrow {
-                        Ensure.newFail("Tag $tagName could not be found.")
-                    }
+        Xml.firstChildElement(this, tagName)
+            .map(Element::getTextContent)
+            .map(String::trim)
+            .orElseThrow { newFail("Tag $tagName could not be found.") }
 }
 
-data class PluginXmlDescriptor(val id: String,
-                               val version: String,
-                               val name: String,
-                               val description: String,
-                               val changeNotes: String) {
+data class PluginXmlDescriptor(
+    val id: String,
+    val version: String,
+    val name: String,
+    val description: String,
+    val changeNotes: String
+) {
     fun toPluginElement(ownerDocument: Document, fileName: String, repoUrl: String?): Element {
         val pluginElement = ownerDocument.createElement(XML_TAG_NAME_PLUGIN)
         pluginElement.setAttribute(XML_ATTRIBUTE_ID, id)
