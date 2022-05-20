@@ -99,7 +99,7 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         val oldZip = modifyUpdatePluginsXml(pluginXml)
         if (!Objects.equals(newZip, oldZip)) {
             deleteOldPluginFromRepo(oldZip)
-            removeOldBlockMapFilesFromRepo(deployedPlugin)
+            removeOldBlockMapFilesFromRepo(deployedPlugin, pluginXml.id)
         }
 
         if (oldZip == null) {
@@ -109,21 +109,25 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         }
     }
 
-    fun removeOldBlockMapFilesFromRepo(deployedPlugin: Path) {
+    fun removeOldBlockMapFilesFromRepo(deployedPlugin: Path, pluginId: String) {
+        val newPluginFileName = deployedPlugin.fileName.toString()
         Files.list(deployedPlugin.parent)
-            .filter { isOldBlockMapFile(it, deployedPlugin) }
+            .filter { isOldBlockMapFile(it, newPluginFileName, pluginId) }
             .forEach { Files.delete(it) }
     }
 
-    fun isOldBlockMapFile(candidate: Path, deployedPlugin: Path): Boolean {
+    fun isOldBlockMapFile(candidate: Path, newPluginFileName: String, pluginId: String): Boolean {
         val candidateFileName = candidate.fileName.toString()
+        if (!candidateFileName.startsWith(pluginId)) {
+            return false // not this plugin
+        }
+
         val isBlockMapFile = candidateFileName.endsWith(BLOCKMAP_ZIP_SUFFIX) || candidateFileName.endsWith(HASH_FILENAME_SUFFIX)
         if (!isBlockMapFile) {
             return false
         }
 
         // only blockmap files that do not belong to the new plugin
-        val newPluginFileName = deployedPlugin.fileName.toString()
         return candidateFileName != newPluginFileName + BLOCKMAP_ZIP_SUFFIX && candidateFileName != newPluginFileName + HASH_FILENAME_SUFFIX
     }
 
