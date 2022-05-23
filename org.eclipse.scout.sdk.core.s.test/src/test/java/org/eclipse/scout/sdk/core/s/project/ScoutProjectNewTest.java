@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.s.project;
 
-import static org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils.runMavenCleanTest;
+import static org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils.runMavenCleanVerify;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -33,7 +33,7 @@ public class ScoutProjectNewTest {
     Path targetDirectory = null;
     try {
       targetDirectory = CoreScoutTestingUtils.createClassicTestProject();
-      runMavenCleanTest(targetDirectory.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID));
+      runMavenCleanVerify(targetDirectory.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID));
     }
     finally {
       deleteDir(targetDirectory);
@@ -45,7 +45,7 @@ public class ScoutProjectNewTest {
     Path targetDirectory = null;
     try {
       targetDirectory = CoreScoutTestingUtils.createJsTestProject();
-      runMavenCleanTest(targetDirectory.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID));
+      runMavenCleanVerify(targetDirectory.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID));
     }
     finally {
       deleteDir(targetDirectory);
