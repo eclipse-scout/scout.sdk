@@ -21,9 +21,9 @@ import org.eclipse.scout.sdk.core.s.generator.method.ScoutDoMethodGenerator;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
-@MaxApiLevel({22, 0, 2})
+@MaxApiLevel({22, 0, 10})
 @SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
-public interface Scout2202Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
+public interface Scout22010Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
   @Override
   default int[] supportedJavaVersions() {
     return new int[]{11};
@@ -57,7 +57,7 @@ public interface Scout2202Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     }
   }
 
-  IScout22DoApi.DoEntity DO_ENTITY = new Scout2202Api.DoEntity();
+  IScout22DoApi.DoEntity DO_ENTITY = new Scout22010Api.DoEntity();
 
   @Override
   default IScout22DoApi.DoEntity DoEntity() {
@@ -81,7 +81,7 @@ public interface Scout2202Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     }
   }
 
-  IScoutInterfaceApi.IDoEntity I_DO_ENTITY = new Scout2202Api.IDoEntity();
+  IScoutInterfaceApi.IDoEntity I_DO_ENTITY = new Scout22010Api.IDoEntity();
 
   @Override
   default IScoutInterfaceApi.IDoEntity IDoEntity() {
@@ -107,7 +107,7 @@ public interface Scout2202Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     }
   }
 
-  IScout22DoApi.ITypeVersion I_TYPE_VERSION = new Scout2202Api.ITypeVersion();
+  IScout22DoApi.ITypeVersion I_TYPE_VERSION = new Scout22010Api.ITypeVersion();
 
   @Override
   default IScout22DoApi.ITypeVersion ITypeVersion() {
@@ -122,7 +122,7 @@ public interface Scout2202Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     }
   }
 
-  IScout22DoApi.INamespace I_NAMESPACE = new Scout2202Api.INamespace();
+  IScout22DoApi.INamespace I_NAMESPACE = new Scout22010Api.INamespace();
 
   @Override
   default IScout22DoApi.INamespace INamespace() {
@@ -137,7 +137,7 @@ public interface Scout2202Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     }
   }
 
-  IScoutAnnotationApi.TypeVersion TYPE_VERSION = new Scout2202Api.TypeVersion();
+  IScoutAnnotationApi.TypeVersion TYPE_VERSION = new Scout22010Api.TypeVersion();
 
   @Override
   default IScoutAnnotationApi.TypeVersion TypeVersion() {

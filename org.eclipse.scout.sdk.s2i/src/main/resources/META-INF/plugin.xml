@@ -48,7 +48,7 @@
         <b>May 09, 2022</b><br>
         Adds Postfix Completion for BEANS.get()<br>
         <b>April 27, 2022</b><br>
-        Java 17 support for Scout >= 22.0.3<br>
+        Java 17 support for Scout >= 22.0.11<br>
         <b>April 25, 2022</b><br>
         The NLS Editor asks for reload if the underlying data has changed since the editor was last loaded.<br>
         <b>February 02, 2022</b><br>
