@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -12,9 +12,11 @@ package org.eclipse.scout.sdk.s2i
 
 import com.intellij.AbstractBundle
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.project.Project
 import com.intellij.ui.IconManager
 import com.intellij.util.IconUtil
+import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdListener
 import org.eclipse.scout.sdk.s2i.classid.ClassIdCache
 import org.eclipse.scout.sdk.s2i.dataobject.DataObjectManager
@@ -50,15 +52,22 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
             project.getService(ClassIdCache::class.java)
 
     fun translationStoreManagerCache(project: Project): TranslationManagerCache =
-            project.getService(TranslationManagerCache::class.java)
+        project.getService(TranslationManagerCache::class.java)
 
     fun jsModuleCache(project: Project): JsModuleCacheImplementor =
-            project.getService(JsModuleCacheImplementor::class.java)
+        project.getService(JsModuleCacheImplementor::class.java)
 
     fun elementCreationManager(): ElementCreationManager =
         ApplicationManager.getApplication().getService(ElementCreationManager::class.java)
 
     fun scoutIcon(size: Int) = IconUtil.scale(ScoutIcon, null, size / ScoutIcon.iconWidth.toFloat())
+
+    fun isRunningInSandbox(): Boolean {
+        val sandbox = "plugins-sandbox"
+        return Strings.countMatches(PathManager.getPluginsPath(), sandbox) > 0
+                || Strings.countMatches(PathManager.getConfigPath(), sandbox) > 0
+                || Strings.countMatches(PathManager.getSystemPath(), sandbox) > 0
+    }
 
     private fun load(path: String) = IconManager.getInstance().getIcon(path, EclipseScoutBundle::class.java)
 }

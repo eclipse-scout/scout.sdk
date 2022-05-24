@@ -15,7 +15,6 @@ import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.application.PathManager
 import com.intellij.openapi.diagnostic.ControlFlowException
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.DumbAware
@@ -47,7 +46,8 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
      */
     override fun runActivity(project: Project) {
         SdkConsole.setConsoleSpi(this)
-        if (isRunningInSandbox()) {
+        if (EclipseScoutBundle.isRunningInSandbox()) {
+            // set log level to DEBUG for plugin development
             CompatibilityMethodCaller<Unit>()
                 .withCandidate(Logger::class.java.name, "setLevel", "com.intellij.openapi.diagnostic.LogLevel") {
                     // for IJ >= 2022.1
@@ -62,13 +62,6 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
                     it.invoke(m_textLog, debug)
                 }.invoke()
         }
-    }
-
-    protected fun isRunningInSandbox(): Boolean {
-        val sandbox = "sandbox"
-        return Strings.countMatches(PathManager.getPluginsPath(), sandbox) > 0
-                || Strings.countMatches(PathManager.getConfigPath(), sandbox) > 0
-                || Strings.countMatches(PathManager.getSystemPath(), sandbox) > 0
     }
 
     override fun clear() {
