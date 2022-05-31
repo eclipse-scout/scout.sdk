@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -46,7 +47,6 @@ import org.eclipse.jdt.internal.compiler.ast.ImportReference;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
 import org.eclipse.jdt.internal.compiler.ast.TypeDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.TypeParameter;
-import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
 import org.eclipse.jdt.internal.compiler.lookup.AnnotationBinding;
 import org.eclipse.jdt.internal.compiler.lookup.ArrayBinding;
@@ -242,7 +242,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   }
 
   private void doReloadStart() {
-    // backup old FS so that it can be closed after the reload
+    // backup old FS so that it can be closed after reload
     m_oldFsDuringReload = m_fs.get();
     clear(false); // old FS is still used during reload (to find new SPIs). Do not close it here already.
     m_initialized = true;
@@ -309,12 +309,20 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
    */
   protected void runPreservingOverrides(JavaEnvironmentWithEcj src, JavaEnvironmentWithEcj dest, Runnable task) {
     synchronized (lock()) {
-      Iterable<ICompilationUnit> units = new ArrayList<>(src.getNameEnvironment().overrideSupport().getCompilationUnits());
+      var units = new ArrayList<>(src.m_fs.opt() // only obtain overridden compilation units if filesystem has already been created
+          .map(FileSystemWithOverride::overrideSupport)
+          .map(CompilationUnitOverrideSupport::getCompilationUnits)
+          .orElse(Collections.emptyList()));
       if (task != null) {
         task.run();
       }
+      if (units.isEmpty()) {
+        return;
+      }
+
+      var overrideSupport = dest.getNameEnvironment().overrideSupport();
       for (var cu : units) {
-        dest.getNameEnvironment().overrideSupport().addCompilationUnit(cu);
+        overrideSupport.addCompilationUnit(cu);
       }
     }
   }
@@ -435,7 +443,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   }
 
   private FileSystemWithOverride buildNameEnvironment() {
-    // classpath registers a system wide file system but does not handle the fact that it might already have been created.
+    // classpath registers a system-wide file system but does not handle the fact that it might already have been created.
     // see org.eclipse.jdt.internal.compiler.batch.ClasspathMultiReleaseJar.initialize
     var cp = new ClasspathBuilder(javaHome(), m_rawClassPath);
     while (true) {
@@ -480,7 +488,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public BindingAnnotationWithEcj createBindingAnnotation(AnnotatableSpi owner, AnnotationBinding binding) {
     assertInitialized();
     synchronized (lock()) {
-      var key = new SameCompositeObject(binding, owner); // binding may be shared amongst different owners if it is a marker annotation. therefore include the owner in the key.
+      var key = new SameCompositeObject(binding, owner); // binding may be shared amongst different owners if it is a marker annotation. Therefore, include the owner in the key.
       return (BindingAnnotationWithEcj) m_elements.computeIfAbsent(key, k -> new BindingAnnotationWithEcj(this, owner, binding));
     }
   }

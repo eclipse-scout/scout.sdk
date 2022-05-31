@@ -63,8 +63,12 @@ public class MavenArtifactVersionsTest {
   @Test
   public void testNameEnvironmentAndCompilerNotCreated() {
     var spy = Mockito.spy(new JavaEnvForSpy());
-    IJavaEnvironment env = new JavaEnvironmentImplementor(spy);
-    assertFalse(MavenArtifactVersions.usedIn(ScoutApi.SCOUT_RT_PLATFORM_NAME, env).isPresent());
+
+    // use try to ensure the environment is closed. This is necessary to also test that the close does not call getNameEnvironment()
+    try (spy) {
+      IJavaEnvironment env = new JavaEnvironmentImplementor(spy);
+      assertFalse(MavenArtifactVersions.usedIn(ScoutApi.SCOUT_RT_PLATFORM_NAME, env).isPresent());
+    }
     verify(spy, never()).getNameEnvironment();
   }
 

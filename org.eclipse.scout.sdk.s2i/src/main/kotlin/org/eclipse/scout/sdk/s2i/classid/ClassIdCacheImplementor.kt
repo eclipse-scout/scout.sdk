@@ -34,7 +34,9 @@ import org.eclipse.scout.sdk.core.s.dto.AbstractDtoGenerator
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
 import org.eclipse.scout.sdk.core.s.util.DelayedBuffer
 import org.eclipse.scout.sdk.s2i.containingModule
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
+import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.findAllTypesAnnotatedWith
 import org.eclipse.scout.sdk.s2i.util.ApiHelper
 import java.util.concurrent.ConcurrentHashMap
@@ -149,41 +151,49 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
 
     internal fun fileCache() = m_fileCache // for testing
 
-    internal fun processFileEvents(events: List<PsiFile>) = computeInReadAction(project) {
-        events.toHashSet()
-            .groupBy { it.containingModule() /* read action required */ }
-            .forEach { it.key?.let { module -> processModule(module, it.value) } }
+    internal fun processFileEvents(events: List<PsiFile>) {
+        if (events.isEmpty()) return
+        val eventsByModule = computeInReadAction(project) {
+            events.toHashSet().groupBy { it.containingModule() /* read action required */ }
+        }
+        IdeaEnvironment.callInIdeaEnvironmentSync(project, IdeaProgress.empty()) { env, _ ->
+            eventsByModule.forEach { it.key?.let { module -> processModule(module, env, it.value) } }
+        }
     }
 
-    internal fun processModule(module: Module, files: List<PsiFile>) {
-        val scoutApi = ApiHelper.scoutApiFor(module) ?: return
-        files.forEach {
-            processFile(scoutApi, it)
-        }
+    internal fun processModule(module: Module, env: IdeaEnvironment, files: List<PsiFile>) {
+        val scoutApi = ApiHelper.scoutApiFor(module, env) ?: return
+        files.forEach { processFile(scoutApi, it) }
     }
 
     internal fun processFile(scoutApi: IScoutApi, file: PsiFile) {
         val path = file.virtualFile.path
         val mappingsInFile = HashMap<String /* fqn */, String /* classid value */>()
-        file.accept(object : JavaRecursiveElementWalkingVisitor() {
-            override fun visitLiteralExpression(expression: PsiLiteralExpression) {
-                if (expression.parent !is PsiNameValuePair) {
-                    return
+        computeInReadAction(project) {
+            file.accept(object : JavaRecursiveElementWalkingVisitor() {
+                override fun visitLiteralExpression(expression: PsiLiteralExpression) {
+                    if (expression.parent !is PsiNameValuePair) {
+                        return
+                    }
+                    val declaringAnnotation = PsiTreeUtil.getParentOfType(expression, PsiAnnotation::class.java, false, *m_stopTypes) ?: return
+                    val classId = ClassIdAnnotation.of(declaringAnnotation, project, scoutApi) ?: return
+                    if (ignoreClassId(classId)) {
+                        return
+                    }
+                    val value = classId.value() ?: return
+                    val qualifiedName = classId.ownerFqn() ?: return
+                    mappingsInFile[qualifiedName] = value
                 }
-                val declaringAnnotation = PsiTreeUtil.getParentOfType(expression, PsiAnnotation::class.java, false, *m_stopTypes) ?: return
-                val classId = ClassIdAnnotation.of(declaringAnnotation, project, scoutApi) ?: return
-                if (ignoreClassId(classId)) {
-                    return
-                }
-                val value = classId.value() ?: return
-                val qualifiedName = classId.ownerFqn() ?: return
-                mappingsInFile[qualifiedName] = value
-            }
 
-            override fun visitMethod(method: PsiMethod?) {
-                // do not step into methods
-            }
-        })
+                override fun visitField(field: PsiField?) {
+                    // do not set into fields
+                }
+
+                override fun visitMethod(method: PsiMethod?) {
+                    // do not step into methods
+                }
+            })
+        }
 
         if (mappingsInFile.isEmpty()) {
             m_fileCache.remove(path)
