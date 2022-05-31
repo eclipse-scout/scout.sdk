@@ -11,12 +11,21 @@
 package org.eclipse.scout.sdk.s2i.util
 
 import com.intellij.openapi.module.Module
-import org.eclipse.scout.sdk.core.s.util.ScoutTier
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification
+import org.eclipse.scout.sdk.core.s.util.ITier
+import org.eclipse.scout.sdk.core.apidef.OptApiFunction
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.findTypeByName
+import java.util.*
 
-class S2iScoutTier {
+class S2iTier {
     companion object {
-        fun valueOf(module: Module, environment: IdeaEnvironment? = null): ScoutTier? = ScoutTier.valueOf({ module.findTypeByName(it) != null }, ApiHelper.scoutApiFor(module, environment)).orElse(null)
+        fun of(module: Module, environment: IdeaEnvironment? = null): ITier<*>? = ITier.of({ module.findTypeByName(it) != null },
+            object : OptApiFunction {
+                override fun <T : IApiSpecification> apply(c: Class<T>): Optional<T> {
+                    return Optional.ofNullable(ApiHelper.apiFor(module, c, environment))
+                }
+            })
+            .orElse(null)
     }
 }

@@ -53,7 +53,7 @@ import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker;
 import org.eclipse.scout.sdk.s2e.util.EclipseWorkspaceWalker.WorkspaceFile;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
-import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
+import org.eclipse.scout.sdk.s2e.util.S2eTier;
 import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.search.internal.ui.text.FileSearchResult;
 import org.eclipse.search.ui.text.Match;
@@ -101,23 +101,23 @@ public final class S2eUiUtils {
       }
 
       private int getRanking(IJavaElement element) {
-        var tier = S2eScoutTier.valueOf(element);
-        if (tier.isEmpty()) {
+        var tierOptional = S2eTier.of(element);
+        if (tierOptional.isEmpty()) {
           return 100;
         }
 
-        switch (tier.orElseThrow().unwrap()) {
-          case Client:
-            return 5;
-          case HtmlUi:
-            return 10;
-          default:
-            return 15;
+        var tier = tierOptional.orElseThrow().unwrap();
+        if (ScoutTier.Client == tier) {
+          return 5;
         }
+        if (ScoutTier.HtmlUi == tier) {
+          return 10;
+        }
+        return 15;
       }
     };
 
-    return getPackageOfSelection(selection, elementComparator, S2eScoutTier.wrap(ScoutTier.Client));
+    return getPackageOfSelection(selection, elementComparator, S2eTier.wrap(ScoutTier.Client));
   }
 
   /**
@@ -130,7 +130,7 @@ public final class S2eUiUtils {
    */
   public static PackageContainer getSharedPackageOfSelection(ISelection selection) {
     var elementComparator = Comparator.comparing(IJavaElement::getElementName).thenComparing(Object::toString);
-    return getPackageOfSelection(selection, elementComparator, S2eScoutTier.wrap(ScoutTier.Shared));
+    return getPackageOfSelection(selection, elementComparator, S2eTier.wrap(ScoutTier.Shared));
   }
 
   /**
@@ -271,7 +271,7 @@ public final class S2eUiUtils {
     return null;
   }
 
-  private static PackageContainer getPackageOfSelection(ISelection selection, Comparator<IJavaElement> javaElementComparator, S2eScoutTier expected) {
+  private static PackageContainer getPackageOfSelection(ISelection selection, Comparator<IJavaElement> javaElementComparator, S2eTier expected) {
     var selectedResources = getResourcesOfSelection(selection);
     var result = new PackageContainer();
     if (selectedResources.isEmpty()) {
@@ -298,7 +298,7 @@ public final class S2eUiUtils {
         var unacceptedResult = new PackageContainer();
         fillContainer(unaccepted, unacceptedResult, javaElementComparator);
         if (JdtUtils.exists(unacceptedResult.getProject())) {
-          var foundTier = S2eScoutTier.valueOf(unacceptedResult.getProject());
+          var foundTier = S2eTier.of(unacceptedResult.getProject());
           if (foundTier.isPresent()) {
             var expectedTier = expected.unwrap();
             result.setProject(foundTier.orElseThrow().convert(expectedTier, unacceptedResult.getProject()).orElse(null));

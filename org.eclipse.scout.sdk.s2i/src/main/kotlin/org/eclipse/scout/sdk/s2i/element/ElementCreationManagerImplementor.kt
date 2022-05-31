@@ -42,19 +42,19 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                 op.entityName = elementName
                 op.clientPackage = sourceFolderHelper.tier()!!.convert(ScoutTier.Client, pkg)
 
-                op.clientSourceFolder = sourceFolderHelper.clientSourceFolder()
-                op.sharedSourceFolder = sourceFolderHelper.sharedSourceFolder()
-                op.serverSourceFolder = sourceFolderHelper.serverSourceFolder()
+                op.clientSourceFolder = sourceFolderHelper.sourceFolder(ScoutTier.Client)
+                op.sharedSourceFolder = sourceFolderHelper.sourceFolder(ScoutTier.Shared)
+                op.serverSourceFolder = sourceFolderHelper.sourceFolder(ScoutTier.Server)
 
-                op.sharedGeneratedSourceFolder = sourceFolderHelper.sharedGeneratedSourceFolder()
+                op.sharedGeneratedSourceFolder = sourceFolderHelper.generatedSourceFolder(ScoutTier.Shared)
 
-                op.clientTestSourceFolder = sourceFolderHelper.clientTestSourceFolder()
-                op.sharedTestSourceFolder = sourceFolderHelper.sharedTestSourceFolder()
-                op.serverTestSourceFolder = sourceFolderHelper.serverTestSourceFolder()
+                op.clientTestSourceFolder = sourceFolderHelper.testSourceFolder(ScoutTier.Client)
+                op.sharedTestSourceFolder = sourceFolderHelper.testSourceFolder(ScoutTier.Shared)
+                op.serverTestSourceFolder = sourceFolderHelper.testSourceFolder(ScoutTier.Server)
 
-                op.clientMainTestSourceFolder = sourceFolderHelper.clientMainTestSourceFolder()
-                op.sharedMainTestSourceFolder = sourceFolderHelper.sharedMainTestSourceFolder()
-                op.serverMainTestSourceFolder = sourceFolderHelper.serverMainTestSourceFolder()
+                op.clientMainTestSourceFolder = sourceFolderHelper.mainTestSourceFolder(ScoutTier.Client)
+                op.sharedMainTestSourceFolder = sourceFolderHelper.mainTestSourceFolder(ScoutTier.Shared)
+                op.serverMainTestSourceFolder = sourceFolderHelper.mainTestSourceFolder(ScoutTier.Server)
             })
         })
     }
@@ -68,24 +68,24 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                 op.formName = elementNameWithSuffix(elementName, ISdkConstants.SUFFIX_FORM)
                 op.clientPackage = sourceFolderHelper.tier()!!.convert(ScoutTier.Client, pkg)
 
-                op.clientSourceFolder = sourceFolderHelper.clientSourceFolder()
-                op.sharedSourceFolder = sourceFolderHelper.sharedSourceFolder()
-                op.serverSourceFolder = sourceFolderHelper.serverSourceFolder()
-                op.formDataSourceFolder = sourceFolderHelper.sharedGeneratedSourceFolder() ?: sourceFolderHelper.sharedSourceFolder()
+                op.clientSourceFolder = sourceFolderHelper.sourceFolder(ScoutTier.Client)
+                op.sharedSourceFolder = sourceFolderHelper.sourceFolder(ScoutTier.Shared)
+                op.serverSourceFolder = sourceFolderHelper.sourceFolder(ScoutTier.Server)
+                op.formDataSourceFolder = sourceFolderHelper.generatedSourceFolder(ScoutTier.Shared) ?: sourceFolderHelper.sourceFolder(ScoutTier.Shared)
 
-                op.clientTestSourceFolder = sourceFolderHelper.clientTestSourceFolder()
-                op.serverTestSourceFolder = sourceFolderHelper.serverTestSourceFolder()
+                op.clientTestSourceFolder = sourceFolderHelper.testSourceFolder(ScoutTier.Client)
+                op.serverTestSourceFolder = sourceFolderHelper.testSourceFolder(ScoutTier.Server)
 
-                sourceFolderHelper.clientSourceFolder()?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
+                sourceFolderHelper.sourceFolder(ScoutTier.Client)?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
                     op.superType = it.AbstractForm().fqn()
                 }
-                sourceFolderHelper.serverSourceFolder()?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
+                sourceFolderHelper.sourceFolder(ScoutTier.Server)?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
                     op.serverSession = it.IServerSession().fqn()
                 }
 
-                op.isCreateFormData = sourceFolderHelper.sharedSourceFolder() != null
-                op.isCreatePermissions = sourceFolderHelper.sharedSourceFolder() != null
-                op.isCreateOrAppendService = sourceFolderHelper.sharedSourceFolder() != null && sourceFolderHelper.serverSourceFolder() != null
+                op.isCreateFormData = sourceFolderHelper.sourceFolder(ScoutTier.Shared) != null
+                op.isCreatePermissions = sourceFolderHelper.sourceFolder(ScoutTier.Shared) != null
+                op.isCreateOrAppendService = sourceFolderHelper.sourceFolder(ScoutTier.Shared) != null && sourceFolderHelper.sourceFolder(ScoutTier.Server) != null
             })
         })
     }
@@ -100,17 +100,17 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                 op.pageName = elementNameWithSuffix(cleanedName, ISdkConstants.SUFFIX_PAGE_WITH_TABLE)
                 op.`package` = sourceFolderHelper.tier()!!.convert(ScoutTier.Client, pkg)
 
-                op.clientSourceFolder = sourceFolderHelper.clientSourceFolder()
-                op.sharedSourceFolder = sourceFolderHelper.sharedSourceFolder()
-                op.serverSourceFolder = sourceFolderHelper.serverSourceFolder()
-                op.pageDataSourceFolder = sourceFolderHelper.sharedGeneratedSourceFolder() ?: sourceFolderHelper.sharedSourceFolder()
+                op.clientSourceFolder = sourceFolderHelper.sourceFolder(ScoutTier.Client)
+                op.sharedSourceFolder = sourceFolderHelper.sourceFolder(ScoutTier.Shared)
+                op.serverSourceFolder = sourceFolderHelper.sourceFolder(ScoutTier.Server)
+                op.pageDataSourceFolder = sourceFolderHelper.generatedSourceFolder(ScoutTier.Shared) ?: sourceFolderHelper.sourceFolder(ScoutTier.Shared)
 
-                op.testSourceFolder = sourceFolderHelper.serverTestSourceFolder()
+                op.testSourceFolder = sourceFolderHelper.testSourceFolder(ScoutTier.Server)
 
-                sourceFolderHelper.clientSourceFolder()?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
+                sourceFolderHelper.sourceFolder(ScoutTier.Client)?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
                     op.superType = it.AbstractPageWithTable().fqn()
                 }
-                sourceFolderHelper.serverSourceFolder()?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
+                sourceFolderHelper.sourceFolder(ScoutTier.Server)?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
                     op.serverSession = it.IServerSession().fqn()
                 }
 
@@ -129,16 +129,16 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                 op.`package` = sourceFolderHelper.tier()!!.convert(ScoutTier.Shared, pkg)
                 op.keyType = Long::class.javaObjectType.name
 
-                op.sharedSourceFolder = sourceFolderHelper.sharedSourceFolder()
-                op.serverSourceFolder = sourceFolderHelper.serverSourceFolder()
+                op.sharedSourceFolder = sourceFolderHelper.sourceFolder(ScoutTier.Shared)
+                op.serverSourceFolder = sourceFolderHelper.sourceFolder(ScoutTier.Server)
 
-                op.testSourceFolder = sourceFolderHelper.serverTestSourceFolder()
+                op.testSourceFolder = sourceFolderHelper.testSourceFolder(ScoutTier.Server)
 
-                sourceFolderHelper.sharedSourceFolder()?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
+                sourceFolderHelper.sourceFolder(ScoutTier.Shared)?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
                     op.superType = it.LookupCall().fqn()
                     op.lookupServiceSuperType = it.AbstractLookupService().fqn()
                 }
-                sourceFolderHelper.serverSourceFolder()?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
+                sourceFolderHelper.sourceFolder(ScoutTier.Server)?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
                     op.serverSession = it.IServerSession().fqn()
                 }
             })
@@ -156,9 +156,9 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                 op.`package` = sourceFolderHelper.tier()!!.convert(ScoutTier.Shared, pkg)
                 op.codeTypeIdDataType = idDataType
 
-                op.sharedSourceFolder = sourceFolderHelper.sharedSourceFolder()
+                op.sharedSourceFolder = sourceFolderHelper.sourceFolder(ScoutTier.Shared)
 
-                sourceFolderHelper.sharedSourceFolder()?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
+                sourceFolderHelper.sourceFolder(ScoutTier.Shared)?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
                     op.superType = it.AbstractCodeType().fqn() + JavaTypes.C_GENERIC_START + idDataType + ", " + idDataType + JavaTypes.C_GENERIC_END
                 }
             })

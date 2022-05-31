@@ -32,6 +32,7 @@ import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.s.util.ITier
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
 import org.eclipse.scout.sdk.core.util.Strings.capitalize
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
@@ -161,14 +162,14 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
             SdkLog.warning("No source folder could be determined for location '{}'", dir.virtualFile)
             return false
         }
-        if (!startScoutTiers().contains(sourceFolderHelper.tier())) {
-            SdkLog.warning("Location '{}' is not a {} module", dir.virtualFile, startScoutTiers().joinToString())
+        if (!startTiers().contains(sourceFolderHelper.tier())) {
+            SdkLog.warning("Location '{}' is not a {} module", dir.virtualFile, startTiers().joinToString())
             return false
         }
         return true
     }
 
-    protected open fun startScoutTiers(): Collection<ScoutTier> = listOf(ScoutTier.Client, ScoutTier.Shared, ScoutTier.Server)
+    protected open fun startTiers(): Collection<ITier<*>> = listOf(ScoutTier.Client, ScoutTier.Shared, ScoutTier.Server)
 
     protected abstract fun operationClass(): Class<OP>
 

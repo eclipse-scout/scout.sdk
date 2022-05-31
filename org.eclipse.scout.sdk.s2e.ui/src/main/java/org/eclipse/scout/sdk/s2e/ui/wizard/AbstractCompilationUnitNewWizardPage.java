@@ -30,7 +30,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.util.ScoutTier;
+import org.eclipse.scout.sdk.core.s.util.ITier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -68,7 +68,7 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
 
   public static final String PREF_SUPER_TYPE = "superType";
 
-  private final ScoutTier m_sourceFolderTier;
+  private final ITier<?> m_sourceFolderTier;
   private IScoutApi m_scoutApi;
   private String m_superTypeDefaultBase;
   private String m_superTypeDefault;
@@ -82,7 +82,7 @@ public abstract class AbstractCompilationUnitNewWizardPage extends AbstractWizar
   private ProposalTextField m_superTypeField;
   private Group m_icuGroupField;
 
-  protected AbstractCompilationUnitNewWizardPage(String pageName, PackageContainer packageContainer, String readOnlySuffix, ScoutTier sourceFolderTier) {
+  protected AbstractCompilationUnitNewWizardPage(String pageName, PackageContainer packageContainer, String readOnlySuffix, ITier<?> sourceFolderTier) {
     super(Ensure.notNull(pageName));
     m_readOnlySuffix = Ensure.notNull(readOnlySuffix);
     m_sourceFolderTier = Ensure.notNull(sourceFolderTier);

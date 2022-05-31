@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractCompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
-import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
+import org.eclipse.scout.sdk.s2e.util.S2eTier;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -128,8 +128,8 @@ public class FormNewWizardPage extends AbstractCompilationUnitNewWizardPage {
       return;
     }
 
-    setServerSourceFolder(S2eScoutTier.wrap(ScoutTier.Client).convert(ScoutTier.Server, clientSourceFolder).orElse(null));
-    setSharedSourceFolder(S2eScoutTier.wrap(ScoutTier.Client).convert(ScoutTier.Shared, clientSourceFolder).orElse(null));
+    setServerSourceFolder(S2eTier.wrap(ScoutTier.Client).convert(ScoutTier.Server, clientSourceFolder).orElse(null));
+    setSharedSourceFolder(S2eTier.wrap(ScoutTier.Client).convert(ScoutTier.Shared, clientSourceFolder).orElse(null));
   }
 
   @Override

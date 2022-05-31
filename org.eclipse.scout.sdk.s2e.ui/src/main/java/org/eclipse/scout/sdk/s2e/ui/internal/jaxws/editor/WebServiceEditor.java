@@ -54,7 +54,7 @@ import org.eclipse.scout.sdk.s2e.operation.jaxws.RebuildArtifactsOperation;
 import org.eclipse.scout.sdk.s2e.ui.internal.jaxws.WebServiceNewWizard;
 import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
-import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
+import org.eclipse.scout.sdk.s2e.util.S2eTier;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Widget;
@@ -95,7 +95,7 @@ public class WebServiceEditor extends FormEditor {
       return;
     }
 
-    if (!S2eScoutTier.wrap(ScoutTier.Server).test(getJavaProject())) {
+    if (!S2eTier.wrap(ScoutTier.Server).test(getJavaProject())) {
       showError("Invalid project type: " + getJavaProject().getElementName() + " is not a server project", new IllegalArgumentException());
       return;
     }
