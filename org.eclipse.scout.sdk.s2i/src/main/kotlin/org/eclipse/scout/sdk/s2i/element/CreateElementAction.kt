@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -20,14 +20,15 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
-import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNameHelper
 import com.intellij.psi.util.PsiUtil
+import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
@@ -37,6 +38,7 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.util.SourceFolderHelper
 import java.util.*
+import java.util.concurrent.TimeUnit
 import java.util.function.BiConsumer
 
 abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val text: String, val description: String) : AnAction(text, description, null) {
@@ -47,7 +49,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
         val project = CommonDataKeys.PROJECT.getData(dataContext) ?: return
         val dir = view.orChooseDirectory ?: return
 
-        createPopup(dir) { EditorHelper.openInEditor(it, true, true) }.showCenteredInCurrentWindow(project)
+        createPopup(dir).showCenteredInCurrentWindow(project)
     }
 
     override fun update(e: AnActionEvent) {
@@ -78,7 +80,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
         presentation.isEnabledAndVisible = true
     }
 
-    protected fun createPopup(dir: PsiDirectory, openPsiElement: (PsiElement) -> Unit): JBPopup {
+    protected fun createPopup(dir: PsiDirectory): JBPopup {
         val contentPanel = NewItemSimplePopupPanel()
         val nameField = contentPanel.textField
         val popup = NewItemPopupUtil.createNewItemPopup(text, contentPanel, nameField)
@@ -88,7 +90,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
             if (errorMessage != null) {
                 contentPanel.setError(errorMessage)
             } else {
-                createElement(name, dir, openPsiElement)
+                createElement(name, dir)
                 popup.closeOk(it)
             }
         }
@@ -109,7 +111,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
         return errorMessage
     }
 
-    protected fun createElement(name: String, dir: PsiDirectory, openPsiElement: (PsiElement) -> Unit) {
+    protected fun createElement(name: String, dir: PsiDirectory) {
         IdeaEnvironment.callInIdeaEnvironment(dir.project, description) { env, progress ->
             val project = env.project
             val fileIndex = ProjectFileIndex.getInstance(project)
@@ -138,13 +140,20 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
             op.accept(env, progress)
             return@callInIdeaEnvironment psiClassToOpen(op)
         }.thenAccept {
-            DumbService.getInstance(dir.project).smartInvokeLater {
-                it.get()?.invoke()?.let { psi -> openPsiElement(psi) }
-            }
+            it.get()?.let { psiSupplier -> openPsiInEditorLater(dir.project, psiSupplier) }
         }.exceptionally {
             SdkLog.error("Error creating {}.", text, it)
             null
         }
+    }
+
+    protected open fun openPsiInEditorLater(project: Project, psiSupplier: () -> PsiClass?) {
+        AppExecutorUtil.getAppScheduledExecutorService().schedule({
+            DumbService.getInstance(project).smartInvokeLater {
+                val psi = psiSupplier() ?: return@smartInvokeLater
+                EditorHelper.openInEditor(psi, true, true)
+            }
+        }, 400, TimeUnit.MILLISECONDS)
     }
 
     protected open fun validateSourceFolderHelper(sourceFolderHelper: SourceFolderHelper, dir: PsiDirectory): Boolean {
