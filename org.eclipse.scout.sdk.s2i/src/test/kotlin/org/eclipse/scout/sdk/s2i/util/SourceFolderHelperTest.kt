@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.core.ISourceFolders
 import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders
+import org.eclipse.scout.sdk.core.s.util.ITier
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
 import org.jetbrains.jps.model.java.JavaSourceRootType
 import org.mockito.ArgumentMatchers.same
@@ -39,8 +40,14 @@ class SourceFolderHelperTest : TestCase() {
     private val m_findClasspathEntryMap: MutableMap<VirtualFile, IClasspathEntry> = HashMap()
     private val m_findClasspathEntry: (VirtualFile?) -> IClasspathEntry? = { m_findClasspathEntryMap[it] }
 
-    private val m_scoutTierOfModuleMap: MutableMap<Module, ScoutTier> = HashMap()
-    private val m_scoutTierOfModule: (Module) -> ScoutTier? = { m_scoutTierOfModuleMap[it] }
+    private val m_tierOfModuleMap: MutableMap<Module, ITier<*>?> = HashMap()
+    private val m_tierOfModule: (Module) -> ITier<*>? = { m_tierOfModuleMap[it] }
+
+    // no scout
+    private val m_noScoutModule = mock(Module::class.java, "noScoutModule")
+    private val m_noScoutJavaEnvironment = mock(IJavaEnvironment::class.java, "noScoutJavaEnvironment")
+    private val m_noScoutMainSourceFolder = mock(SourceFolder::class.java, "noScoutMainSourceFolder")
+    private val m_noScoutMainClasspathEntry = mock(IClasspathEntry::class.java, "noScoutMainClasspathEntry")
 
     // uiHtml
     private val m_uiHtmlModule = mock(Module::class.java, "uiHtmlModule")
@@ -158,6 +165,8 @@ class SourceFolderHelperTest : TestCase() {
     }
 
     private fun initModules() {
+        initModule(m_noScoutModule, null, "source.folder.helper.no.scout")
+
         initModule(m_uiHtmlModule, ScoutTier.HtmlUi, "source.folder.helper.ui.html")
         initModule(m_clientModule, ScoutTier.Client, "source.folder.helper.client")
         initModule(m_sharedModule, ScoutTier.Shared, "source.folder.helper.shared")
@@ -176,14 +185,16 @@ class SourceFolderHelperTest : TestCase() {
         initModule(m_subSubServerModule, ScoutTier.Server, "source.folder.helper.submodule.specific.server")
     }
 
-    private fun initModule(m: Module, scoutTier: ScoutTier, name: String) {
-        m_scoutTierOfModuleMap[m] = scoutTier
+    private fun initModule(m: Module, tier: ITier<*>?, name: String) {
+        m_tierOfModuleMap[m] = tier
         `when`(m.project).thenAnswer { m_project }
         `when`(m.name).thenAnswer { name }
     }
 
     private fun initJavaEnvironments() {
         // primarySourceFolder
+        `when`(m_noScoutJavaEnvironment.primarySourceFolder()).thenAnswer { Optional.of(m_noScoutMainClasspathEntry) }
+
         `when`(m_uiHtmlJavaEnvironment.primarySourceFolder()).thenAnswer { Optional.of(m_uiHtmlMainClasspathEntry) }
         `when`(m_clientJavaEnvironment.primarySourceFolder()).thenAnswer { Optional.of(m_clientMainClasspathEntry) }
         `when`(m_sharedJavaEnvironment.primarySourceFolder()).thenAnswer { Optional.of(m_sharedMainClasspathEntry) }
@@ -202,79 +213,110 @@ class SourceFolderHelperTest : TestCase() {
         `when`(m_subSubServerJavaEnvironment.primarySourceFolder()).thenAnswer { Optional.of(m_subSubServerMainClasspathEntry) }
 
         // sourceFolders
+        `when`(m_noScoutJavaEnvironment.sourceFolders()).thenAnswer {
+            Stream.of(m_noScoutMainClasspathEntry)
+        }
+
         `when`(m_uiHtmlJavaEnvironment.sourceFolders()).thenAnswer {
-            Stream.of(m_uiHtmlMainClasspathEntry,
-                    m_clientMainClasspathEntry,
-                    m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
+            Stream.of(
+                m_uiHtmlMainClasspathEntry,
+                m_clientMainClasspathEntry,
+                m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry
+            )
         }
         `when`(m_clientJavaEnvironment.sourceFolders()).thenAnswer {
-            Stream.of(m_clientMainClasspathEntry,
-                    m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
+            Stream.of(
+                m_clientMainClasspathEntry,
+                m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry
+            )
         }
         `when`(m_sharedJavaEnvironment.sourceFolders()).thenAnswer {
             Stream.of(m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
         }
         `when`(m_serverJavaEnvironment.sourceFolders()).thenAnswer {
-            Stream.of(m_serverMainClasspathEntry,
-                    m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
+            Stream.of(
+                m_serverMainClasspathEntry,
+                m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry
+            )
         }
 
         `when`(m_clientTestJavaEnvironment.sourceFolders()).thenAnswer {
-            Stream.of(m_clientTestMainClasspathEntry, m_clientTestTestClasspathEntry,
-                    m_clientMainClasspathEntry,
-                    m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
+            Stream.of(
+                m_clientTestMainClasspathEntry, m_clientTestTestClasspathEntry,
+                m_clientMainClasspathEntry,
+                m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry
+            )
         }
         `when`(m_sharedTestJavaEnvironment.sourceFolders()).thenAnswer {
-            Stream.of(m_sharedTestMainClasspathEntry, m_sharedTestTestClasspathEntry,
-                    m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
+            Stream.of(
+                m_sharedTestMainClasspathEntry, m_sharedTestTestClasspathEntry,
+                m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry
+            )
         }
         `when`(m_serverTestJavaEnvironment.sourceFolders()).thenAnswer {
-            Stream.of(m_serverTestMainClasspathEntry, m_serverTestTestClasspathEntry,
-                    m_serverMainClasspathEntry,
-                    m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
+            Stream.of(
+                m_serverTestMainClasspathEntry, m_serverTestTestClasspathEntry,
+                m_serverMainClasspathEntry,
+                m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry
+            )
         }
 
         `when`(m_subClientJavaEnvironment.sourceFolders()).thenAnswer {
-            Stream.of(m_subClientMainClasspathEntry, m_subClientTestClasspathEntry,
-                    m_subSharedMainClasspathEntry, m_subSharedGeneratedClasspathEntry, m_subSharedTestClasspathEntry,
-                    m_clientMainClasspathEntry,
-                    m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
+            Stream.of(
+                m_subClientMainClasspathEntry, m_subClientTestClasspathEntry,
+                m_subSharedMainClasspathEntry, m_subSharedGeneratedClasspathEntry, m_subSharedTestClasspathEntry,
+                m_clientMainClasspathEntry,
+                m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry
+            )
         }
         `when`(m_subSharedJavaEnvironment.sourceFolders()).thenAnswer {
-            Stream.of(m_subSharedMainClasspathEntry, m_subSharedGeneratedClasspathEntry, m_subSharedTestClasspathEntry,
-                    m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
+            Stream.of(
+                m_subSharedMainClasspathEntry, m_subSharedGeneratedClasspathEntry, m_subSharedTestClasspathEntry,
+                m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry
+            )
         }
         `when`(m_subServerJavaEnvironment.sourceFolders()).thenAnswer {
-            Stream.of(m_subServerMainClasspathEntry, m_subServerTestClasspathEntry,
-                    m_subSharedMainClasspathEntry, m_subSharedGeneratedClasspathEntry, m_subSharedTestClasspathEntry,
-                    m_serverMainClasspathEntry,
-                    m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
+            Stream.of(
+                m_subServerMainClasspathEntry, m_subServerTestClasspathEntry,
+                m_subSharedMainClasspathEntry, m_subSharedGeneratedClasspathEntry, m_subSharedTestClasspathEntry,
+                m_serverMainClasspathEntry,
+                m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry
+            )
         }
 
         `when`(m_subSubClientJavaEnvironment.sourceFolders()).thenAnswer {
-            Stream.of(m_subSubClientMainClasspathEntry, m_subSubClientTestClasspathEntry,
-                    m_subSubSharedMainClasspathEntry, m_subSubSharedTestClasspathEntry,
-                    m_subClientMainClasspathEntry, m_subClientTestClasspathEntry,
-                    m_subSharedMainClasspathEntry, m_subSharedGeneratedClasspathEntry, m_subSharedTestClasspathEntry,
-                    m_clientMainClasspathEntry,
-                    m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
+            Stream.of(
+                m_subSubClientMainClasspathEntry, m_subSubClientTestClasspathEntry,
+                m_subSubSharedMainClasspathEntry, m_subSubSharedTestClasspathEntry,
+                m_subClientMainClasspathEntry, m_subClientTestClasspathEntry,
+                m_subSharedMainClasspathEntry, m_subSharedGeneratedClasspathEntry, m_subSharedTestClasspathEntry,
+                m_clientMainClasspathEntry,
+                m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry
+            )
         }
         `when`(m_subSubSharedJavaEnvironment.sourceFolders()).thenAnswer {
-            Stream.of(m_subSubSharedMainClasspathEntry, m_subSubSharedTestClasspathEntry,
-                    m_subSharedMainClasspathEntry, m_subSharedGeneratedClasspathEntry, m_subSharedTestClasspathEntry,
-                    m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
+            Stream.of(
+                m_subSubSharedMainClasspathEntry, m_subSubSharedTestClasspathEntry,
+                m_subSharedMainClasspathEntry, m_subSharedGeneratedClasspathEntry, m_subSharedTestClasspathEntry,
+                m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry
+            )
         }
         `when`(m_subSubServerJavaEnvironment.sourceFolders()).thenAnswer {
-            Stream.of(m_subSubServerMainClasspathEntry, m_subSubServerTestClasspathEntry,
-                    m_subSubSharedMainClasspathEntry, m_subSubSharedTestClasspathEntry,
-                    m_subServerMainClasspathEntry, m_subServerTestClasspathEntry,
-                    m_subSharedMainClasspathEntry, m_subSharedGeneratedClasspathEntry, m_subSharedTestClasspathEntry,
-                    m_serverMainClasspathEntry,
-                    m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry)
+            Stream.of(
+                m_subSubServerMainClasspathEntry, m_subSubServerTestClasspathEntry,
+                m_subSubSharedMainClasspathEntry, m_subSubSharedTestClasspathEntry,
+                m_subServerMainClasspathEntry, m_subServerTestClasspathEntry,
+                m_subSharedMainClasspathEntry, m_subSharedGeneratedClasspathEntry, m_subSharedTestClasspathEntry,
+                m_serverMainClasspathEntry,
+                m_sharedMainClasspathEntry, m_sharedGeneratedClasspathEntry
+            )
         }
     }
 
     private fun initSourceFolders() {
+        // no scout
+        initSourceFolder(m_noScoutMainSourceFolder, m_noScoutModule, m_noScoutMainClasspathEntry, m_noScoutJavaEnvironment, false, ISourceFolders.MAIN_JAVA_SOURCE_FOLDER)
+
         // uiHtml
         initSourceFolder(m_uiHtmlMainSourceFolder, m_uiHtmlModule, m_uiHtmlMainClasspathEntry, m_uiHtmlJavaEnvironment, false, ISourceFolders.MAIN_JAVA_SOURCE_FOLDER)
 
@@ -364,18 +406,22 @@ class SourceFolderHelperTest : TestCase() {
             arrayOf(m_sharedModule)
         }
         `when`(m_moduleManager.getModuleDependentModules(same(m_clientModule))).thenAnswer {
-            listOf(m_uiHtmlModule,
-                    m_clientTestModule,
-                    m_subClientModule,
-                    m_subSubClientModule)
+            listOf(
+                m_uiHtmlModule,
+                m_clientTestModule,
+                m_subClientModule,
+                m_subSubClientModule
+            )
         }
 
         // shared
         `when`(m_moduleManager.getModuleDependentModules(same(m_sharedModule))).thenAnswer {
-            listOf(m_uiHtmlModule, m_clientModule, m_serverModule,
-                    m_clientTestModule, m_sharedTestModule, m_serverTestModule,
-                    m_subClientModule, m_subSharedModule, m_subServerModule,
-                    m_subSubClientModule, m_subSubSharedModule, m_subSubServerModule)
+            listOf(
+                m_uiHtmlModule, m_clientModule, m_serverModule,
+                m_clientTestModule, m_sharedTestModule, m_serverTestModule,
+                m_subClientModule, m_subSharedModule, m_subServerModule,
+                m_subSubClientModule, m_subSubSharedModule, m_subSubServerModule
+            )
         }
 
         // server
@@ -383,15 +429,19 @@ class SourceFolderHelperTest : TestCase() {
             arrayOf(m_sharedModule)
         }
         `when`(m_moduleManager.getModuleDependentModules(same(m_serverModule))).thenAnswer {
-            listOf(m_serverTestModule,
-                    m_subServerModule,
-                    m_subSubServerModule)
+            listOf(
+                m_serverTestModule,
+                m_subServerModule,
+                m_subSubServerModule
+            )
         }
 
         // client test
         `when`(ModuleRootManager.getInstance(m_clientTestModule).dependencies).thenAnswer {
-            arrayOf(m_clientModule, m_sharedModule,
-                    m_sharedTestModule)
+            arrayOf(
+                m_clientModule, m_sharedModule,
+                m_sharedTestModule
+            )
         }
 
         // shared test
@@ -404,14 +454,18 @@ class SourceFolderHelperTest : TestCase() {
 
         // server test
         `when`(ModuleRootManager.getInstance(m_serverTestModule).dependencies).thenAnswer {
-            arrayOf(m_sharedModule, m_serverModule,
-                    m_sharedTestModule)
+            arrayOf(
+                m_sharedModule, m_serverModule,
+                m_sharedTestModule
+            )
         }
 
         // sub client
         `when`(ModuleRootManager.getInstance(m_subClientModule).dependencies).thenAnswer {
-            arrayOf(m_clientModule, m_sharedModule,
-                    m_subSharedModule)
+            arrayOf(
+                m_clientModule, m_sharedModule,
+                m_subSharedModule
+            )
         }
         `when`(m_moduleManager.getModuleDependentModules(same(m_subClientModule))).thenAnswer {
             listOf(m_subSubClientModule)
@@ -422,14 +476,18 @@ class SourceFolderHelperTest : TestCase() {
             arrayOf(m_sharedModule)
         }
         `when`(m_moduleManager.getModuleDependentModules(same(m_subSharedModule))).thenAnswer {
-            listOf(m_subClientModule, m_subServerModule,
-                    m_subSubClientModule, m_subSubSharedModule, m_subSubServerModule)
+            listOf(
+                m_subClientModule, m_subServerModule,
+                m_subSubClientModule, m_subSubSharedModule, m_subSubServerModule
+            )
         }
 
         // sub server
         `when`(ModuleRootManager.getInstance(m_subServerModule).dependencies).thenAnswer {
-            arrayOf(m_sharedModule,
-                    m_subSharedModule)
+            arrayOf(
+                m_sharedModule,
+                m_subSharedModule
+            )
         }
         `when`(m_moduleManager.getModuleDependentModules(same(m_subServerModule))).thenAnswer {
             listOf(m_subSubServerModule)
@@ -437,16 +495,20 @@ class SourceFolderHelperTest : TestCase() {
 
         // sub sub client
         `when`(ModuleRootManager.getInstance(m_subSubClientModule).dependencies).thenAnswer {
-            arrayOf(m_clientModule, m_sharedModule,
-                    m_subClientModule, m_subSharedModule,
-                    m_subSubSharedModule)
+            arrayOf(
+                m_clientModule, m_sharedModule,
+                m_subClientModule, m_subSharedModule,
+                m_subSubSharedModule
+            )
         }
 
         // sub sub shared
         `when`(ModuleRootManager.getInstance(m_subSubSharedModule).dependencies).thenAnswer {
-            arrayOf(m_sharedModule,
-                    m_subSharedModule,
-                    m_subSubSharedModule)
+            arrayOf(
+                m_sharedModule,
+                m_subSharedModule,
+                m_subSubSharedModule
+            )
         }
         `when`(m_moduleManager.getModuleDependentModules(same(m_subSubSharedModule))).thenAnswer {
             listOf(m_subSubClientModule, m_subSubServerModule)
@@ -454,64 +516,99 @@ class SourceFolderHelperTest : TestCase() {
 
         // sub sub server
         `when`(ModuleRootManager.getInstance(m_subSubServerModule).dependencies).thenAnswer {
-            arrayOf(m_sharedModule, m_serverModule,
-                    m_subSharedModule, m_subServerModule,
-                    m_subSubSharedModule)
+            arrayOf(
+                m_sharedModule, m_serverModule,
+                m_subSharedModule, m_subServerModule,
+                m_subSubSharedModule
+            )
         }
     }
 
     fun testFindClosestSourceFolderDependency() {
-        assertPairMatches(m_clientMainSourceFolder to m_clientMainClasspathEntry,
-                SourceFolderHelper.findClosestSourceFolderDependency(m_project, ScoutTier.Client, false, m_uiHtmlMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
-        assertPairMatches(m_sharedMainSourceFolder to m_sharedMainClasspathEntry,
-                SourceFolderHelper.findClosestSourceFolderDependency(m_project, ScoutTier.Shared, false, m_clientMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
-        assertPairMatches(m_serverMainSourceFolder to m_serverMainClasspathEntry,
-                SourceFolderHelper.findClosestSourceFolderDependency(m_project, ScoutTier.Server, false, m_serverTestTestSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
-        assertPairMatches(m_sharedTestTestSourceFolder to m_sharedTestTestClasspathEntry,
-                SourceFolderHelper.findClosestSourceFolderDependency(m_project, ScoutTier.Shared, true, m_serverTestTestSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
-        assertPairMatches(m_clientMainSourceFolder to m_clientMainClasspathEntry,
-                SourceFolderHelper.findClosestSourceFolderDependency(m_project, ScoutTier.Client, false, m_subClientMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
-        assertPairMatches(m_subSubSharedMainSourceFolder to m_subSubSharedMainClasspathEntry,
-                SourceFolderHelper.findClosestSourceFolderDependency(m_project, ScoutTier.Shared, false, m_subSubServerMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
-        assertPairMatches(m_subServerTestSourceFolder to m_subServerTestClasspathEntry,
-                SourceFolderHelper.findClosestSourceFolderDependency(m_project, ScoutTier.Server, true, m_subSubServerMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
+        assertNull(SourceFolderHelper.findClosestSourceFolderDependency(m_noScoutMainSourceFolder, ScoutTier.Client, false, m_project, m_tierOfModule, m_findClasspathEntry))
+        assertPairMatches(
+            m_clientMainSourceFolder to m_clientMainClasspathEntry,
+            SourceFolderHelper.findClosestSourceFolderDependency(m_uiHtmlMainSourceFolder, ScoutTier.Client, false, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
+        assertPairMatches(
+            m_sharedMainSourceFolder to m_sharedMainClasspathEntry,
+            SourceFolderHelper.findClosestSourceFolderDependency(m_clientMainSourceFolder, ScoutTier.Shared, false, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
+        assertPairMatches(
+            m_serverMainSourceFolder to m_serverMainClasspathEntry,
+            SourceFolderHelper.findClosestSourceFolderDependency(m_serverTestTestSourceFolder, ScoutTier.Server, false, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
+        assertPairMatches(
+            m_sharedTestTestSourceFolder to m_sharedTestTestClasspathEntry,
+            SourceFolderHelper.findClosestSourceFolderDependency(m_serverTestTestSourceFolder, ScoutTier.Shared, true, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
+        assertPairMatches(
+            m_clientMainSourceFolder to m_clientMainClasspathEntry,
+            SourceFolderHelper.findClosestSourceFolderDependency(m_subClientMainSourceFolder, ScoutTier.Client, false, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
+        assertPairMatches(
+            m_subSubSharedMainSourceFolder to m_subSubSharedMainClasspathEntry,
+            SourceFolderHelper.findClosestSourceFolderDependency(m_subSubServerMainSourceFolder, ScoutTier.Shared, false, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
+        assertPairMatches(
+            m_subServerTestSourceFolder to m_subServerTestClasspathEntry,
+            SourceFolderHelper.findClosestSourceFolderDependency(m_subSubServerMainSourceFolder, ScoutTier.Server, true, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
     }
 
     fun testFindClosestDependentSourceFolder() {
-        assertPairMatches(m_uiHtmlMainSourceFolder to m_uiHtmlMainClasspathEntry,
-                SourceFolderHelper.findClosestDependentSourceFolder(m_project, ScoutTier.HtmlUi, false, m_clientMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
-        assertPairMatches(m_clientMainSourceFolder to m_clientMainClasspathEntry,
-                SourceFolderHelper.findClosestDependentSourceFolder(m_project, ScoutTier.Client, false, m_sharedMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
-        assertPairMatches(m_serverTestMainSourceFolder to m_serverTestMainClasspathEntry,
-                SourceFolderHelper.findClosestDependentSourceFolder(m_project, ScoutTier.Server, false, m_serverMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
-        assertPairMatches(m_serverTestTestSourceFolder to m_serverTestTestClasspathEntry,
-                SourceFolderHelper.findClosestDependentSourceFolder(m_project, ScoutTier.Server, true, m_serverMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
-        assertPairMatches(m_subSubClientMainSourceFolder to m_subSubClientMainClasspathEntry,
-                SourceFolderHelper.findClosestDependentSourceFolder(m_project, ScoutTier.Client, false, m_subClientMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
-        assertPairMatches(m_subSubServerMainSourceFolder to m_subSubServerMainClasspathEntry,
-                SourceFolderHelper.findClosestDependentSourceFolder(m_project, ScoutTier.Server, false, m_subSubSharedMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
-        assertPairMatches(m_subSubServerTestSourceFolder to m_subSubServerTestClasspathEntry,
-                SourceFolderHelper.findClosestDependentSourceFolder(m_project, ScoutTier.Server, true, m_subServerMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry))
+        assertNull(SourceFolderHelper.findClosestDependentSourceFolder(m_noScoutMainSourceFolder, ScoutTier.Client, false, m_project, m_tierOfModule, m_findClasspathEntry))
+
+        assertPairMatches(
+            m_uiHtmlMainSourceFolder to m_uiHtmlMainClasspathEntry,
+            SourceFolderHelper.findClosestDependentSourceFolder(m_clientMainSourceFolder, ScoutTier.HtmlUi, false, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
+        assertPairMatches(
+            m_clientMainSourceFolder to m_clientMainClasspathEntry,
+            SourceFolderHelper.findClosestDependentSourceFolder(m_sharedMainSourceFolder, ScoutTier.Client, false, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
+        assertPairMatches(
+            m_serverTestMainSourceFolder to m_serverTestMainClasspathEntry,
+            SourceFolderHelper.findClosestDependentSourceFolder(m_serverMainSourceFolder, ScoutTier.Server, false, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
+        assertPairMatches(
+            m_serverTestTestSourceFolder to m_serverTestTestClasspathEntry,
+            SourceFolderHelper.findClosestDependentSourceFolder(m_serverMainSourceFolder, ScoutTier.Server, true, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
+        assertPairMatches(
+            m_subSubClientMainSourceFolder to m_subSubClientMainClasspathEntry,
+            SourceFolderHelper.findClosestDependentSourceFolder(m_subClientMainSourceFolder, ScoutTier.Client, false, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
+        assertPairMatches(
+            m_subSubServerMainSourceFolder to m_subSubServerMainClasspathEntry,
+            SourceFolderHelper.findClosestDependentSourceFolder(m_subSubSharedMainSourceFolder, ScoutTier.Server, false, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
+        assertPairMatches(
+            m_subSubServerTestSourceFolder to m_subSubServerTestClasspathEntry,
+            SourceFolderHelper.findClosestDependentSourceFolder(m_subServerMainSourceFolder, ScoutTier.Server, true, m_project, m_tierOfModule, m_findClasspathEntry)
+        )
     }
 
     fun testStartFromSourceFolder() {
-        assertSourceFolderHelper(SourceFolderHelper(m_project, m_clientMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_clientMainClasspathEntry, ScoutTier.Client)
-        assertSourceFolderHelper(SourceFolderHelper(m_project, m_sharedMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_sharedMainClasspathEntry, ScoutTier.Shared)
-        assertSourceFolderHelper(SourceFolderHelper(m_project, m_sharedGeneratedSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_sharedGeneratedClasspathEntry, ScoutTier.Shared)
-        assertSourceFolderHelper(SourceFolderHelper(m_project, m_serverMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_serverMainClasspathEntry, ScoutTier.Server)
+        assertSourceFolderHelperNoScout(SourceFolderHelper(m_project, m_noScoutMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_noScoutMainClasspathEntry)
 
-        assertSourceFolderHelper(SourceFolderHelper(m_project, m_clientTestMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_clientTestMainClasspathEntry, ScoutTier.Client, true)
-        assertSourceFolderHelper(SourceFolderHelper(m_project, m_sharedTestMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_sharedTestMainClasspathEntry, ScoutTier.Shared, true)
-        assertSourceFolderHelper(SourceFolderHelper(m_project, m_serverTestMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_serverTestMainClasspathEntry, ScoutTier.Server, true)
+        assertSourceFolderHelper(SourceFolderHelper(m_project, m_clientMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_clientMainClasspathEntry, ScoutTier.Client)
+        assertSourceFolderHelper(SourceFolderHelper(m_project, m_sharedMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_sharedMainClasspathEntry, ScoutTier.Shared)
+        assertSourceFolderHelper(SourceFolderHelper(m_project, m_sharedGeneratedSourceFolder, m_tierOfModule, m_findClasspathEntry), m_sharedGeneratedClasspathEntry, ScoutTier.Shared)
+        assertSourceFolderHelper(SourceFolderHelper(m_project, m_serverMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_serverMainClasspathEntry, ScoutTier.Server)
 
-        assertSourceFolderHelperSub(SourceFolderHelper(m_project, m_subClientMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_subClientMainClasspathEntry, ScoutTier.Client)
-        assertSourceFolderHelperSub(SourceFolderHelper(m_project, m_subSharedMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_subSharedMainClasspathEntry, ScoutTier.Shared)
-        assertSourceFolderHelperSub(SourceFolderHelper(m_project, m_subSharedGeneratedSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_subSharedGeneratedClasspathEntry, ScoutTier.Shared)
-        assertSourceFolderHelperSub(SourceFolderHelper(m_project, m_subServerMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_subServerMainClasspathEntry, ScoutTier.Server)
+        assertSourceFolderHelper(SourceFolderHelper(m_project, m_clientTestMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_clientTestMainClasspathEntry, ScoutTier.Client, true)
+        assertSourceFolderHelper(SourceFolderHelper(m_project, m_sharedTestMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_sharedTestMainClasspathEntry, ScoutTier.Shared, true)
+        assertSourceFolderHelper(SourceFolderHelper(m_project, m_serverTestMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_serverTestMainClasspathEntry, ScoutTier.Server, true)
 
-        assertSourceFolderHelperSubSub(SourceFolderHelper(m_project, m_subSubClientMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_subSubClientMainClasspathEntry, ScoutTier.Client)
-        assertSourceFolderHelperSubSub(SourceFolderHelper(m_project, m_subSubSharedMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_subSubSharedMainClasspathEntry, ScoutTier.Shared)
-        assertSourceFolderHelperSubSub(SourceFolderHelper(m_project, m_subSubServerMainSourceFolder, m_scoutTierOfModule, m_findClasspathEntry), m_subSubServerMainClasspathEntry, ScoutTier.Server)
+        assertSourceFolderHelperSub(SourceFolderHelper(m_project, m_subClientMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_subClientMainClasspathEntry, ScoutTier.Client)
+        assertSourceFolderHelperSub(SourceFolderHelper(m_project, m_subSharedMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_subSharedMainClasspathEntry, ScoutTier.Shared)
+        assertSourceFolderHelperSub(SourceFolderHelper(m_project, m_subSharedGeneratedSourceFolder, m_tierOfModule, m_findClasspathEntry), m_subSharedGeneratedClasspathEntry, ScoutTier.Shared)
+        assertSourceFolderHelperSub(SourceFolderHelper(m_project, m_subServerMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_subServerMainClasspathEntry, ScoutTier.Server)
+
+        assertSourceFolderHelperSubSub(SourceFolderHelper(m_project, m_subSubClientMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_subSubClientMainClasspathEntry, ScoutTier.Client)
+        assertSourceFolderHelperSubSub(SourceFolderHelper(m_project, m_subSubSharedMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_subSubSharedMainClasspathEntry, ScoutTier.Shared)
+        assertSourceFolderHelperSubSub(SourceFolderHelper(m_project, m_subSubServerMainSourceFolder, m_tierOfModule, m_findClasspathEntry), m_subSubServerMainClasspathEntry, ScoutTier.Server)
     }
 
     private fun <K, V> assertPairMatches(expectedPair: Pair<K, V>, actualPair: Pair<K, V>?) {
@@ -520,57 +617,67 @@ class SourceFolderHelperTest : TestCase() {
         assertEquals(expectedPair.second, actualPair?.second)
     }
 
-    private fun assertSourceFolderHelper(sourceFolderHelper: SourceFolderHelper, classpathEntry: IClasspathEntry, scoutTier: ScoutTier, startInTestModule: Boolean = false) {
+    private fun assertSourceFolderHelperNoScout(sourceFolderHelper: SourceFolderHelper, classpathEntry: IClasspathEntry) {
         assertEquals(classpathEntry, sourceFolderHelper.classpathEntry())
-        assertEquals(scoutTier, sourceFolderHelper.tier())
+        assertNull(sourceFolderHelper.tier())
 
-        assertEquals(if (startInTestModule) m_clientTestMainClasspathEntry else m_clientMainClasspathEntry, sourceFolderHelper.clientSourceFolder())
-        assertEquals(m_clientTestTestClasspathEntry, sourceFolderHelper.clientTestSourceFolder())
-        assertEquals(m_clientTestMainClasspathEntry, sourceFolderHelper.clientMainTestSourceFolder())
-
-        assertEquals(if (startInTestModule) m_sharedTestMainClasspathEntry else m_sharedMainClasspathEntry, sourceFolderHelper.sharedSourceFolder())
-        assertEquals(if (startInTestModule) null else m_sharedGeneratedClasspathEntry, sourceFolderHelper.sharedGeneratedSourceFolder())
-        assertEquals(m_sharedTestTestClasspathEntry, sourceFolderHelper.sharedTestSourceFolder())
-        assertEquals(m_sharedTestMainClasspathEntry, sourceFolderHelper.sharedMainTestSourceFolder())
-
-        assertEquals(if (startInTestModule) m_serverTestMainClasspathEntry else m_serverMainClasspathEntry, sourceFolderHelper.serverSourceFolder())
-        assertEquals(m_serverTestTestClasspathEntry, sourceFolderHelper.serverTestSourceFolder())
-        assertEquals(m_serverTestMainClasspathEntry, sourceFolderHelper.serverMainTestSourceFolder())
+        assertNull(sourceFolderHelper.sourceFolder(ScoutTier.Client))
+        assertNull(sourceFolderHelper.testSourceFolder(ScoutTier.Client))
+        assertNull(sourceFolderHelper.mainTestSourceFolder(ScoutTier.Client))
+        assertNull(sourceFolderHelper.generatedSourceFolder(ScoutTier.Shared))
     }
 
-    private fun assertSourceFolderHelperSub(sourceFolderHelper: SourceFolderHelper, classpathEntry: IClasspathEntry, scoutTier: ScoutTier) {
+    private fun assertSourceFolderHelper(sourceFolderHelper: SourceFolderHelper, classpathEntry: IClasspathEntry, tier: ITier<*>, startInTestModule: Boolean = false) {
         assertEquals(classpathEntry, sourceFolderHelper.classpathEntry())
-        assertEquals(scoutTier, sourceFolderHelper.tier())
+        assertEquals(tier, sourceFolderHelper.tier())
 
-        assertEquals(m_subClientMainClasspathEntry, sourceFolderHelper.clientSourceFolder())
-        assertEquals(m_subClientTestClasspathEntry, sourceFolderHelper.clientTestSourceFolder())
-        assertEquals(m_subClientMainClasspathEntry, sourceFolderHelper.clientMainTestSourceFolder())
+        assertEquals(if (startInTestModule) m_clientTestMainClasspathEntry else m_clientMainClasspathEntry, sourceFolderHelper.sourceFolder(ScoutTier.Client))
+        assertEquals(m_clientTestTestClasspathEntry, sourceFolderHelper.testSourceFolder(ScoutTier.Client))
+        assertEquals(m_clientTestMainClasspathEntry, sourceFolderHelper.mainTestSourceFolder(ScoutTier.Client))
 
-        assertEquals(m_subSharedMainClasspathEntry, sourceFolderHelper.sharedSourceFolder())
-        assertEquals(m_subSharedGeneratedClasspathEntry, sourceFolderHelper.sharedGeneratedSourceFolder())
-        assertEquals(m_subSharedTestClasspathEntry, sourceFolderHelper.sharedTestSourceFolder())
-        assertEquals(m_subSharedMainClasspathEntry, sourceFolderHelper.sharedMainTestSourceFolder())
+        assertEquals(if (startInTestModule) m_sharedTestMainClasspathEntry else m_sharedMainClasspathEntry, sourceFolderHelper.sourceFolder(ScoutTier.Shared))
+        assertEquals(if (startInTestModule) null else m_sharedGeneratedClasspathEntry, sourceFolderHelper.generatedSourceFolder(ScoutTier.Shared))
+        assertEquals(m_sharedTestTestClasspathEntry, sourceFolderHelper.testSourceFolder(ScoutTier.Shared))
+        assertEquals(m_sharedTestMainClasspathEntry, sourceFolderHelper.mainTestSourceFolder(ScoutTier.Shared))
 
-        assertEquals(m_subServerMainClasspathEntry, sourceFolderHelper.serverSourceFolder())
-        assertEquals(m_subServerTestClasspathEntry, sourceFolderHelper.serverTestSourceFolder())
-        assertEquals(m_subServerMainClasspathEntry, sourceFolderHelper.serverMainTestSourceFolder())
+        assertEquals(if (startInTestModule) m_serverTestMainClasspathEntry else m_serverMainClasspathEntry, sourceFolderHelper.sourceFolder(ScoutTier.Server))
+        assertEquals(m_serverTestTestClasspathEntry, sourceFolderHelper.testSourceFolder(ScoutTier.Server))
+        assertEquals(m_serverTestMainClasspathEntry, sourceFolderHelper.mainTestSourceFolder(ScoutTier.Server))
     }
 
-    private fun assertSourceFolderHelperSubSub(sourceFolderHelper: SourceFolderHelper, classpathEntry: IClasspathEntry, scoutTier: ScoutTier) {
+    private fun assertSourceFolderHelperSub(sourceFolderHelper: SourceFolderHelper, classpathEntry: IClasspathEntry, tier: ITier<*>) {
         assertEquals(classpathEntry, sourceFolderHelper.classpathEntry())
-        assertEquals(scoutTier, sourceFolderHelper.tier())
+        assertEquals(tier, sourceFolderHelper.tier())
 
-        assertEquals(m_subSubClientMainClasspathEntry, sourceFolderHelper.clientSourceFolder())
-        assertEquals(m_subSubClientTestClasspathEntry, sourceFolderHelper.clientTestSourceFolder())
-        assertEquals(m_subSubClientMainClasspathEntry, sourceFolderHelper.clientMainTestSourceFolder())
+        assertEquals(m_subClientMainClasspathEntry, sourceFolderHelper.sourceFolder(ScoutTier.Client))
+        assertEquals(m_subClientTestClasspathEntry, sourceFolderHelper.testSourceFolder(ScoutTier.Client))
+        assertEquals(m_subClientMainClasspathEntry, sourceFolderHelper.mainTestSourceFolder(ScoutTier.Client))
 
-        assertEquals(m_subSubSharedMainClasspathEntry, sourceFolderHelper.sharedSourceFolder())
-        assertNull(sourceFolderHelper.sharedGeneratedSourceFolder())
-        assertEquals(m_subSubSharedTestClasspathEntry, sourceFolderHelper.sharedTestSourceFolder())
-        assertEquals(m_subSubSharedMainClasspathEntry, sourceFolderHelper.sharedMainTestSourceFolder())
+        assertEquals(m_subSharedMainClasspathEntry, sourceFolderHelper.sourceFolder(ScoutTier.Shared))
+        assertEquals(m_subSharedGeneratedClasspathEntry, sourceFolderHelper.generatedSourceFolder(ScoutTier.Shared))
+        assertEquals(m_subSharedTestClasspathEntry, sourceFolderHelper.testSourceFolder(ScoutTier.Shared))
+        assertEquals(m_subSharedMainClasspathEntry, sourceFolderHelper.mainTestSourceFolder(ScoutTier.Shared))
 
-        assertEquals(m_subSubServerMainClasspathEntry, sourceFolderHelper.serverSourceFolder())
-        assertEquals(m_subSubServerTestClasspathEntry, sourceFolderHelper.serverTestSourceFolder())
-        assertEquals(m_subSubServerMainClasspathEntry, sourceFolderHelper.serverMainTestSourceFolder())
+        assertEquals(m_subServerMainClasspathEntry, sourceFolderHelper.sourceFolder(ScoutTier.Server))
+        assertEquals(m_subServerTestClasspathEntry, sourceFolderHelper.testSourceFolder(ScoutTier.Server))
+        assertEquals(m_subServerMainClasspathEntry, sourceFolderHelper.mainTestSourceFolder(ScoutTier.Server))
+    }
+
+    private fun assertSourceFolderHelperSubSub(sourceFolderHelper: SourceFolderHelper, classpathEntry: IClasspathEntry, tier: ITier<*>) {
+        assertEquals(classpathEntry, sourceFolderHelper.classpathEntry())
+        assertEquals(tier, sourceFolderHelper.tier())
+
+        assertEquals(m_subSubClientMainClasspathEntry, sourceFolderHelper.sourceFolder(ScoutTier.Client))
+        assertEquals(m_subSubClientTestClasspathEntry, sourceFolderHelper.testSourceFolder(ScoutTier.Client))
+        assertEquals(m_subSubClientMainClasspathEntry, sourceFolderHelper.mainTestSourceFolder(ScoutTier.Client))
+
+        assertEquals(m_subSubSharedMainClasspathEntry, sourceFolderHelper.sourceFolder(ScoutTier.Shared))
+        assertNull(sourceFolderHelper.generatedSourceFolder(ScoutTier.Shared))
+        assertEquals(m_subSubSharedTestClasspathEntry, sourceFolderHelper.testSourceFolder(ScoutTier.Shared))
+        assertEquals(m_subSubSharedMainClasspathEntry, sourceFolderHelper.mainTestSourceFolder(ScoutTier.Shared))
+
+        assertEquals(m_subSubServerMainClasspathEntry, sourceFolderHelper.sourceFolder(ScoutTier.Server))
+        assertEquals(m_subSubServerTestClasspathEntry, sourceFolderHelper.testSourceFolder(ScoutTier.Server))
+        assertEquals(m_subSubServerMainClasspathEntry, sourceFolderHelper.mainTestSourceFolder(ScoutTier.Server))
     }
 }

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2i.lookupcall
 
 import com.intellij.psi.PsiClass
 import org.eclipse.scout.sdk.core.s.lookupcall.LookupCallNewOperation
+import org.eclipse.scout.sdk.core.s.util.ITier
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.element.CreateElementAction
@@ -20,7 +21,7 @@ import org.eclipse.scout.sdk.s2i.toIdea
 
 class CreateLookupCallAction : CreateElementAction<LookupCallNewOperation>(EclipseScoutBundle.message("create.lookupcall"), EclipseScoutBundle.message("create.lookupcall.desc")) {
 
-    override fun startScoutTiers(): Collection<ScoutTier> = listOf(ScoutTier.Shared, ScoutTier.Server)
+    override fun startTiers(): Collection<ITier<*>> = listOf(ScoutTier.Shared, ScoutTier.Server)
 
     override fun operationClass(): Class<LookupCallNewOperation> = LookupCallNewOperation::class.java
 

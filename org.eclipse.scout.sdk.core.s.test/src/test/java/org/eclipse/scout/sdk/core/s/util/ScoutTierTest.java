@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Test;
 public class ScoutTierTest {
 
   @Test
-  @SuppressWarnings("ConstantConditions")
   public void testFilter() {
     assertTrue(ScoutTier.Shared.isIncludedIn(ScoutTier.Client));
     assertTrue(ScoutTier.Shared.isIncludedIn(ScoutTier.Server));
@@ -105,23 +104,27 @@ public class ScoutTierTest {
     assertFalse(ScoutTier.Client.test(mock));
     assertFalse(ScoutTier.Server.test(mock));
     assertFalse(ScoutTier.HtmlUi.test(mock));
+    when(p.exists(scoutApi.ISession().fqn())).thenReturn(Boolean.FALSE);
 
     when(p.exists(scoutApi.IServerSession().fqn())).thenReturn(Boolean.TRUE);
     assertTrue(ScoutTier.Shared.test(mock));
     assertFalse(ScoutTier.Client.test(mock));
     assertTrue(ScoutTier.Server.test(mock));
     assertFalse(ScoutTier.HtmlUi.test(mock));
+    when(p.exists(scoutApi.IServerSession().fqn())).thenReturn(Boolean.FALSE);
 
     when(p.exists(scoutApi.IClientSession().fqn())).thenReturn(Boolean.TRUE);
     assertTrue(ScoutTier.Shared.test(mock));
     assertTrue(ScoutTier.Client.test(mock));
     assertFalse(ScoutTier.Server.test(mock));
     assertFalse(ScoutTier.HtmlUi.test(mock));
+    when(p.exists(scoutApi.IClientSession().fqn())).thenReturn(Boolean.FALSE);
 
     when(p.exists(scoutApi.UiServlet().fqn())).thenReturn(Boolean.TRUE);
     assertTrue(ScoutTier.Shared.test(mock));
     assertTrue(ScoutTier.Client.test(mock));
     assertFalse(ScoutTier.Server.test(mock));
     assertTrue(ScoutTier.HtmlUi.test(mock));
+    when(p.exists(scoutApi.UiServlet().fqn())).thenReturn(Boolean.FALSE);
   }
 }

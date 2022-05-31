@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2i.codetype
 
 import com.intellij.psi.PsiClass
 import org.eclipse.scout.sdk.core.s.codetype.CodeTypeNewOperation
+import org.eclipse.scout.sdk.core.s.util.ITier
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.element.CreateElementAction
@@ -20,7 +21,7 @@ import org.eclipse.scout.sdk.s2i.toIdea
 
 class CreateCodeTypeAction : CreateElementAction<CodeTypeNewOperation>(EclipseScoutBundle.message("create.codetype"), EclipseScoutBundle.message("create.codetype.desc")) {
 
-    override fun startScoutTiers(): Collection<ScoutTier> = listOf(ScoutTier.Shared)
+    override fun startTiers(): Collection<ITier<*>> = listOf(ScoutTier.Shared)
 
     override fun operationClass(): Class<CodeTypeNewOperation> = CodeTypeNewOperation::class.java
 

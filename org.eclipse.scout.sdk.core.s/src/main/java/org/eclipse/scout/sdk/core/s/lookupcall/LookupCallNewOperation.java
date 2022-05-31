@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.s.testcase.TestGenerator;
+import org.eclipse.scout.sdk.core.s.util.ITier;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.JavaTypes;
@@ -112,7 +113,7 @@ public class LookupCallNewOperation implements BiConsumer<IEnvironment, IProgres
     var testEnv = testSourceFolder.javaEnvironment();
 
     var scoutApi = testEnv.requireApi(IScoutApi.class);
-    var targetTier = ScoutTier.valueOf(testEnv)
+    var targetTier = ITier.of(testEnv)
         .orElseThrow(() -> newFail("Test-source-folder {} has no access to Scout classes", testSourceFolder));
     var testPackage = ScoutTier.Shared.convert(targetTier, getPackage());
     var isClient = ScoutTier.Client.isIncludedIn(targetTier);

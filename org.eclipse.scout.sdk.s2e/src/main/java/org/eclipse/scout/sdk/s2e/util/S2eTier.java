@@ -20,41 +20,43 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.core.s.util.ScoutTier;
+import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.s.util.ITier;
+import org.eclipse.scout.sdk.core.apidef.OptApiFunction;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
- * <h3>{@link S2eScoutTier}</h3>
+ * <h3>{@link S2eTier}</h3>
  *
  * @since 7.0.0
  */
-public final class S2eScoutTier implements Predicate<IJavaElement> {
+public final class S2eTier implements Predicate<IJavaElement> {
 
-  private final ScoutTier m_tier;
+  private final ITier<?> m_tier;
 
-  private S2eScoutTier(ScoutTier t) {
+  private S2eTier(ITier<?> t) {
     m_tier = t;
   }
 
-  public ScoutTier unwrap() {
+  public ITier<?> unwrap() {
     return m_tier;
   }
 
   /**
-   * Converts the given {@link IJavaProject} to its corresponding {@link IJavaProject} with given {@link ScoutTier}.<br>
+   * Converts the given {@link IJavaProject} to its corresponding {@link IJavaProject} with given {@link ITier}.<br>
    * <br>
    * <b>Example :</b><br>
    * {@code ScoutTier.Shared.convert(ScoutTier.Client, sharedJavaProject)} -> ClientJavaProject or {@code null}.
    *
    * @param to
-   *          The {@link ScoutTier} to which the {@link IJavaProject} should be converted.
+   *          The {@link ITier} to which the {@link IJavaProject} should be converted.
    * @param origin
    *          The original {@link IJavaProject}
-   * @return The {@link IJavaProject} of the given {@link ScoutTier} type that belongs to the given input
+   * @return The {@link IJavaProject} of the given {@link ITier} type that belongs to the given input
    *         {@link IJavaProject} or {@code null} if no such {@link IJavaProject} could be found in the workspace.
    */
-  public Optional<IJavaProject> convert(ScoutTier to, @SuppressWarnings("TypeMayBeWeakened") IJavaProject origin) {
+  public Optional<IJavaProject> convert(ITier<?> to, @SuppressWarnings("TypeMayBeWeakened") IJavaProject origin) {
     if (!JdtUtils.exists(origin) || to == null) {
       return Optional.empty();
     }
@@ -65,7 +67,7 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
       return Optional.empty();
     }
 
-    var projectTier = valueOf(project).map(S2eScoutTier::unwrap);
+    var projectTier = of(project).map(S2eTier::unwrap);
     if (projectTier.isEmpty()) {
       return Optional.empty();
     }
@@ -76,19 +78,19 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
   }
 
   /**
-   * Converts the given {@link IPackageFragment} to the given {@link ScoutTier}.<br>
+   * Converts the given {@link IPackageFragment} to the given {@link ITier}.<br>
    * <br>
    * <b>Example: </b><br>
    * {@code ScoutTier.Client.convert(ScoutTier.Server, clientPackage, false)}
    *
    * @param to
-   *          Specifies the target {@link ScoutTier} to which the given {@link IPackageFragment} should be converted.
+   *          Specifies the target {@link ITier} to which the given {@link IPackageFragment} should be converted.
    * @param origin
    *          The original {@link IPackageFragment} to convert.
    * @return The converted {@link IPackageFragment} or {@code null} if no matching {@link IPackageFragment} could be
    *         found.
    */
-  public Optional<IPackageFragment> convert(ScoutTier to, @SuppressWarnings("TypeMayBeWeakened") IPackageFragment origin) {
+  public Optional<IPackageFragment> convert(ITier<?> to, @SuppressWarnings("TypeMayBeWeakened") IPackageFragment origin) {
     if (!JdtUtils.exists(origin) || to == null) {
       return Optional.empty();
     }
@@ -107,20 +109,19 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
   }
 
   /**
-   * Converts the given {@link IPackageFragmentRoot} to the given {@link ScoutTier}.<br>
+   * Converts the given {@link IPackageFragmentRoot} to the given {@link ITier}.<br>
    * <br>
    * <b>Example: </b><br>
    * {@code ScoutTier.Client.convert(ScoutTier.Shared, clientSourceFolder)}
    *
    * @param to
-   *          Specifies the target {@link ScoutTier} to which the given {@link IPackageFragmentRoot} should be
-   *          converted.
+   *          Specifies the target {@link ITier} to which the given {@link IPackageFragmentRoot} should be converted.
    * @param origin
    *          The original {@link IPackageFragmentRoot} to convert.
    * @return The converted {@link IPackageFragmentRoot} or {@code null} if no matching {@link IPackageFragmentRoot}
    *         could be found.
    */
-  public Optional<IPackageFragmentRoot> convert(ScoutTier to, @SuppressWarnings("TypeMayBeWeakened") IPackageFragmentRoot origin) {
+  public Optional<IPackageFragmentRoot> convert(ITier<?> to, @SuppressWarnings("TypeMayBeWeakened") IPackageFragmentRoot origin) {
     if (!JdtUtils.exists(origin) || to == null) {
       return Optional.empty();
     }
@@ -141,17 +142,21 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
     return S2eUtils.primarySourceFolder(targetProject.orElseThrow());
   }
 
-  public static S2eScoutTier wrap(ScoutTier t) {
-    return new S2eScoutTier(Ensure.notNull(t));
+  public static S2eTier wrap(ITier<?> t) {
+    return new S2eTier(Ensure.notNull(t));
   }
 
-  public static Optional<S2eScoutTier> valueOf(IJavaElement t) {
+  public static Optional<S2eTier> of(IJavaElement t) {
     if (!JdtUtils.exists(t)) {
       return Optional.empty();
     }
-    return ApiHelper.scoutApiFor(t.getJavaProject())
-        .flatMap(api -> ScoutTier.valueOf(fqn -> JdtUtils.exists(lookupJdtType(t, fqn)), api))
-        .map(S2eScoutTier::wrap);
+
+    return ITier.of(fqn -> JdtUtils.exists(lookupJdtType(t, fqn)), new OptApiFunction() {
+      @Override
+      public <T extends IApiSpecification> Optional<T> apply(Class<T> api) {
+        return ApiHelper.apiFor(t.getJavaProject(), api);
+      }
+    }).map(S2eTier::wrap);
   }
 
   static IType lookupJdtType(IJavaElement t, String fqn) {
@@ -165,9 +170,9 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
 
   @Override
   public boolean test(IJavaElement t) {
-    var tier = valueOf(t);
+    var tier = of(t);
     return tier
-        .filter(s2eScoutTier -> unwrap().isIncludedIn(s2eScoutTier.unwrap()))
+        .filter(s2eTier -> unwrap().isIncludedIn(s2eTier.unwrap()))
         .isPresent();
   }
 
@@ -184,7 +189,7 @@ public final class S2eScoutTier implements Predicate<IJavaElement> {
     if (obj == null || getClass() != obj.getClass()) {
       return false;
     }
-    var other = (S2eScoutTier) obj;
+    var other = (S2eTier) obj;
     return m_tier == other.m_tier;
   }
 

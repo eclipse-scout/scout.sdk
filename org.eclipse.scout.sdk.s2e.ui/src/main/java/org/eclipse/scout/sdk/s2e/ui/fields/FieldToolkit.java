@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
-import org.eclipse.scout.sdk.core.s.util.ScoutTier;
+import org.eclipse.scout.sdk.core.s.util.ITier;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.JavaProjectContentProvider;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.PackageContentProvider;
@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
 import org.eclipse.scout.sdk.s2e.ui.util.S2eUiUtils;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicAbstractPrimaryTypeFilter;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicPrimaryTypeFilter;
-import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
+import org.eclipse.scout.sdk.s2e.util.S2eTier;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -108,13 +108,13 @@ public final class FieldToolkit {
     return proposalField;
   }
 
-  public static ProposalTextField createSourceFolderField(Composite parent, String label, ScoutTier tier) {
+  public static ProposalTextField createSourceFolderField(Composite parent, String label, ITier<?> tier) {
     return createSourceFolderField(parent, label, tier, TextField.DEFAULT_LABEL_WIDTH);
   }
 
-  public static ProposalTextField createSourceFolderField(Composite parent, String label, ScoutTier tier, int labelWidth) {
+  public static ProposalTextField createSourceFolderField(Composite parent, String label, ITier<?> tier, int labelWidth) {
     var proposalField = createProposalField(parent, label, TextField.TYPE_LABEL, labelWidth);
-    var provider = new SourceFolderContentProvider(S2eScoutTier.wrap(tier));
+    var provider = new SourceFolderContentProvider(S2eTier.wrap(tier));
     proposalField.setContentProvider(provider);
     proposalField.setLabelProvider(provider);
     return proposalField;

@@ -36,7 +36,7 @@ import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractCompilationUnitNewWizardPage;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicAbstractPrimaryTypeFilter;
-import org.eclipse.scout.sdk.s2e.util.S2eScoutTier;
+import org.eclipse.scout.sdk.s2e.util.S2eTier;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
@@ -200,7 +200,7 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
       return;
     }
 
-    setServerSourceFolder(S2eScoutTier.wrap(ScoutTier.Shared).convert(ScoutTier.Server, sharedSourceFolder).orElse(null));
+    setServerSourceFolder(S2eTier.wrap(ScoutTier.Shared).convert(ScoutTier.Server, sharedSourceFolder).orElse(null));
   }
 
   protected void handleServerJavaProjectChanged() {
