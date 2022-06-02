@@ -144,6 +144,10 @@ public final class JavaTypes {
    */
   public static final char C_SPACE = ' ';
   /**
+   * The Java lambda arrow. Value is {@code ->}
+   */
+  public static final String LAMBDA_ARROW = "->";
+  /**
    * The Java {@code extends} keyword.
    */
   public static final String EXTENDS = "extends";

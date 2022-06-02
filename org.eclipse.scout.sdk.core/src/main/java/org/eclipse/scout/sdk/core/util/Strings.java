@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.core.util;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Collections.emptyList;
+import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
@@ -35,6 +37,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * <h3>{@link Strings}</h3> Static utility methods to work with character sequences like {@link String},
@@ -45,6 +48,8 @@ import java.util.Optional;
 public final class Strings {
 
   private static final int INDEX_NOT_FOUND = -1;
+  private static final Pattern CAMEL_TO_SCREAMING_SNAKE_PAT = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
+  private static final Pattern SCREAMING_SNAKE_TO_CAMEL_PAT = Pattern.compile("_");
 
   private Strings() {
   }
@@ -1732,7 +1737,7 @@ public final class Strings {
   /**
    * Removes the given suffix from the given string. If the given string does not end with given suffix, the string is
    * returned unchanged.
-   * 
+   *
    * @param string
    *          The string in which the suffix should be removed. May be {@code null}, then {@code null} is returned.
    * @param suffix
@@ -1746,5 +1751,74 @@ public final class Strings {
       return string.substring(0, string.length() - suffix.length());
     }
     return string;
+  }
+
+  /**
+   * Removes the given prefix from the given string. If the given string does not start with given prefix (case
+   * sensitive), the string is returned unchanged.
+   *
+   * @param string
+   *          The string in which the prefix should be removed. May be {@code null}, then {@code null} is returned.
+   * @param prefix
+   *          The prefix to remove (case sensitive) or {@code null} if nothing should be removed.
+   * @return The string with the prefix removed.
+   */
+  public static String removePrefix(String string, CharSequence prefix) {
+    return removePrefix(string, prefix, true);
+  }
+
+  /**
+   * Removes the given prefix from the given string. If the given string does not start with given prefix, the string is
+   * returned unchanged.
+   *
+   * @param string
+   *          The string in which the prefix should be removed. May be {@code null}, then {@code null} is returned.
+   * @param prefix
+   *          The prefix to remove or {@code null} if nothing should be removed.
+   * @param isCaseSensitive
+   *          Specifies if the prefix should match case sensitive or not.
+   * @return The string with the prefix removed.
+   */
+  public static String removePrefix(String string, CharSequence prefix, boolean isCaseSensitive) {
+    if (startsWith(string, prefix, isCaseSensitive)) {
+      return string.substring(prefix.length());
+    }
+    return string;
+  }
+
+  /**
+   * Converts a camel case CharSequence to its screaming snake case equivalent.<br>
+   * <br>
+   * <b>Examples:</b><br>
+   * {@code null} -> {@code null}<br>
+   * {@code "foo"} -> {@code "FOO"}<br>
+   * {@code "FooBarSee"} -> {@code "FOO_BAR_SEE"}<br>
+   * {@code "fooBARSee"} -> {@code "FOO_BAR_SEE"}<br>
+   * {@code "foo bar see"} -> {@code "FOO BAR SEE"}<br>
+   */
+  public static String camelCaseToScreamingSnakeCase(CharSequence s) {
+    if (s == null) {
+      return null;
+    }
+    return String.join("_", CAMEL_TO_SCREAMING_SNAKE_PAT.split(s)).toUpperCase(Locale.US);
+  }
+
+  /**
+   * Converts a screaming snake case CharSequence to its camel case equivalent.<br>
+   * <br>
+   * <b>Examples:</b><br>
+   * {@code null} -> {@code null}<br>
+   * {@code "FOO"} -> {@code "Foo"}<br>
+   * {@code "FOO_BAR_SEE"} -> {@code "FooBarSee"}<br>
+   * {@code "FOO BAR SEE"} -> {@code "Foo bar see"}<br>
+   */
+  public static String screamingSnakeCaseToCamelCase(CharSequence s) {
+    if (s == null) {
+      return null;
+    }
+    return SCREAMING_SNAKE_TO_CAMEL_PAT.splitAsStream(s)
+        .filter(not(Strings::isEmpty))
+        .map(c -> capitalize(c.toLowerCase(Locale.US)))
+        .collect(joining());
   }
 }

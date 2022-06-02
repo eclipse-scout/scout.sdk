@@ -53,6 +53,7 @@ public final class Api {
   public enum ChildElementType {
 
     METHOD_NAME("MethodName"), // Methods in the type
+    FIELD_NAME("FieldName"), // Fields in the type
     TYPE_PARAM_INDEX("TypeParamIndex"), // Type Parameter indices
     ANNOTATION_ELEMENT_NAME("ElementName"), // Annotation elements
     OTHER("other"); // all other methods
