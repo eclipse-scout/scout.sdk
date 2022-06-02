@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.util;
 import static java.lang.System.lineSeparator;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static org.eclipse.scout.sdk.core.util.Strings.camelCaseToScreamingSnakeCase;
 import static org.eclipse.scout.sdk.core.util.Strings.capitalize;
 import static org.eclipse.scout.sdk.core.util.Strings.compareTo;
 import static org.eclipse.scout.sdk.core.util.Strings.countMatches;
@@ -32,10 +33,12 @@ import static org.eclipse.scout.sdk.core.util.Strings.levenshteinDistance;
 import static org.eclipse.scout.sdk.core.util.Strings.nextLineEnd;
 import static org.eclipse.scout.sdk.core.util.Strings.notBlank;
 import static org.eclipse.scout.sdk.core.util.Strings.notEmpty;
+import static org.eclipse.scout.sdk.core.util.Strings.removePrefix;
 import static org.eclipse.scout.sdk.core.util.Strings.removeSuffix;
 import static org.eclipse.scout.sdk.core.util.Strings.repeat;
 import static org.eclipse.scout.sdk.core.util.Strings.replace;
 import static org.eclipse.scout.sdk.core.util.Strings.replaceEach;
+import static org.eclipse.scout.sdk.core.util.Strings.screamingSnakeCaseToCamelCase;
 import static org.eclipse.scout.sdk.core.util.Strings.toCharArray;
 import static org.eclipse.scout.sdk.core.util.Strings.toStringLiteral;
 import static org.eclipse.scout.sdk.core.util.Strings.trim;
@@ -693,5 +696,43 @@ public class StringsTest {
     assertEquals("ab", removeSuffix("abcdef", "cdef"));
     assertEquals("abcDef", removeSuffix("abcDef", "cdef"));
     assertEquals("ab", removeSuffix("abcDef", "cdef", false));
+  }
+
+  @Test
+  public void testRemovePrefixSuffix() {
+    assertNull(removePrefix(null, ""));
+    assertEquals("", removePrefix("", ""));
+    assertEquals("ab", removePrefix("ab", ""));
+    assertEquals("ab", removePrefix("ab", null));
+    assertEquals("", removePrefix("", "ab"));
+    assertEquals("bc", removePrefix("abc", "a"));
+    assertEquals("ef", removePrefix("abcdef", "abcd"));
+    assertEquals("abcDef", removePrefix("abcDef", "abcd"));
+    assertEquals("ef", removePrefix("abcDef", "abcd", false));
+  }
+
+  @Test
+  public void testCamelCaseToScreamingSnakeCase() {
+    assertNull(camelCaseToScreamingSnakeCase(null));
+    assertEquals("", camelCaseToScreamingSnakeCase(""));
+    assertEquals(" ", camelCaseToScreamingSnakeCase(" "));
+    assertEquals("FOO", camelCaseToScreamingSnakeCase("foo"));
+    assertEquals("FOO", camelCaseToScreamingSnakeCase("FOO"));
+    assertEquals("FOO_BAR", camelCaseToScreamingSnakeCase("fooBar"));
+    assertEquals("FOO_BAR", camelCaseToScreamingSnakeCase("fooBAR"));
+    assertEquals("FOO_BAR_SEE", camelCaseToScreamingSnakeCase("fooBarSee"));
+    assertEquals("FOO_BAR_SEE", camelCaseToScreamingSnakeCase("fooBARSee"));
+    assertEquals("FOO BAR SEE", camelCaseToScreamingSnakeCase("foo bar see"));
+  }
+
+  @Test
+  public void testScreamingSnakeCaseToCamelCase() {
+    assertNull(screamingSnakeCaseToCamelCase(null));
+    assertEquals("", screamingSnakeCaseToCamelCase(""));
+    assertEquals(" ", screamingSnakeCaseToCamelCase(" "));
+    assertEquals("Foo", screamingSnakeCaseToCamelCase("FOO"));
+    assertEquals("FooBar", screamingSnakeCaseToCamelCase("FOO_BAR"));
+    assertEquals("FooBarSee", screamingSnakeCaseToCamelCase("FOO_BAR_SEE"));
+    assertEquals("Foo bar see", screamingSnakeCaseToCamelCase("FOO BAR SEE"));
   }
 }
