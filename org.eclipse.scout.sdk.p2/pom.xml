@@ -13,12 +13,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.eclipse.scout.sdk</groupId>
-    <artifactId>org.eclipse.scout.sdk-root</artifactId>
-    <version>12.0.0-SNAPSHOT</version>
+    <groupId>org.eclipse.scout</groupId>
+    <artifactId>maven_sdk_p2_plugin_config-master</artifactId>
+    <version>22.0.3-SNAPSHOT</version>
+    <relativePath/>
   </parent>
 
+  <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk.p2</artifactId>
+  <version>12.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout SDK P2</name>
   <description>Eclipse Scout SDK - Eclipse Features/Repository</description>
