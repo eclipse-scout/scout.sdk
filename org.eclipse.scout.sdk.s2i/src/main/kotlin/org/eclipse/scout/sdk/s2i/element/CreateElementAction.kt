@@ -134,6 +134,11 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
             if (lastIndexOf > 0) pkg += "." + name.substring(0, lastIndexOf)
             val elementName = capitalize(name.substring(lastIndexOf + 1, name.length)).toString()
 
+            if (pkg.isNullOrEmpty()) {
+                SdkLog.warning("No package provided")
+                return@callInIdeaEnvironment null
+            }
+
             val op = sourceFolderHelper.classpathEntry()?.javaEnvironment()?.let {
                 EclipseScoutBundle.elementCreationManager()
                     .createOperation(operationClass(), elementName, pkg, sourceFolderHelper, it)
