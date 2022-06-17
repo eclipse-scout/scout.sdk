@@ -40,6 +40,10 @@
       <exclusions>
         <!-- use jakarta modules -->
         <exclusion>
+          <groupId>javax.annotation</groupId>
+          <artifactId>javax.annotation-api</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>javax.inject</groupId>
           <artifactId>javax.inject</artifactId>
         </exclusion>
