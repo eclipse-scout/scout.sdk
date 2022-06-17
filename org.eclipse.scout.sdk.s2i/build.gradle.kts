@@ -65,7 +65,7 @@ dependencies {
     api("org.apache.poi", "poi-ooxml", "5.2.2")
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    testImplementation("org.mockito", "mockito-core", "4.6.0")
+    testImplementation("org.mockito", "mockito-core", "4.6.1")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", scoutSdkVersion)
 }
@@ -91,7 +91,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IU-2021.2.4", "IU-2021.3.3", "IU-2022.1.1", "IU-2022.2"))
+        ideVersions.set(listOf("IU-2021.2.4", "IU-2021.3.3", "IU-2022.1.2", "IU-2022.2"))
         subsystemsToCheck.set("without-android")
         failureLevel.set(FailureLevel.ALL)
     }

@@ -14,28 +14,30 @@
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" />
     <orderEntry type="library" name="Maven: wsdl4j:wsdl4j:1.6.2" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.ecj" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.launching:3.19.400" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.resources:3.16.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core:3.28.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.debug:3.19.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.launching:3.19.600" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.resources:3.17.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core:3.30.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.debug:3.19.200" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.variables:3.5.100" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.runtime:3.24.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.equinox.common:3.15.100" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.jobs:3.12.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.runtime:3.25.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.equinox.common:3.16.100" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.jobs:3.13.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.equinox.registry:3.11.100" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.equinox.preferences:3.9.100" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.equinox.preferences:3.10.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.osgi:org.osgi.service.prefs:1.1.2" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.osgi:osgi.annotation:8.0.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.contenttype:3.8.100" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.equinox.app:1.6.100" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.osgi:3.17.100" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.osgi:3.18.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.expressions:3.8.100" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.debug.core:3.18.300" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.filesystem:1.9.200" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core.manipulation:1.15.100" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.ltk.core.refactoring:3.12.100" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.commands:3.10.100" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.text:3.12.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.filebuffers:3.7.100" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.scout.sdk.deps:org.eclipse.m2e.core:1.18.3.20211018-0804" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.debug.core:3.19.100" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.filesystem:1.9.400" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core.manipulation:1.16.100" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.ltk.core.refactoring:3.12.200" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.commands:3.10.200" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.text:3.12.100" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.filebuffers:3.7.200" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.scout.sdk.deps:org.eclipse.m2e.core:1.18.4.20220208-0831" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.7.36" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:guava:30.1.1-jre" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:failureaccess:1.0.1" level="project" />
@@ -54,7 +56,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.codehaus.plexus:plexus-component-annotations:1.5.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: dom4j:dom4j:1.6.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: jdom:jdom:1.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-model:3.8.1" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-model:3.8.4" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven.shared:maven-invoker:2.1.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: commons-io:commons-io:2.11.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.codehaus.plexus:plexus-velocity:1.1.8" level="project" />
