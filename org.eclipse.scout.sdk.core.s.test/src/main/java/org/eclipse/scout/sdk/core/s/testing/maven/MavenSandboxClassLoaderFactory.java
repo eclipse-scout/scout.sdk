@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -73,7 +73,6 @@ public final class MavenSandboxClassLoaderFactory {
         "org.codehaus.plexus.util.CachedMap", // plexus-utils
         "org.codehaus.plexus.classworlds.ClassWorld", // plexus-classworlds
         "org.codehaus.plexus.ContainerConfiguration", // org.eclipse.sisu.plexus
-        "javax.decorator.Delegate", // cdi-api
         "org.eclipse.sisu.inject.MutableBeanLocator", // org.eclipse.sisu.inject
         "org.codehaus.plexus.component.annotations.Requirement", // plexus-component-annotations
         "org.sonatype.plexus.components.sec.dispatcher.SecDispatcher", // plexus-sec-dispatcher
