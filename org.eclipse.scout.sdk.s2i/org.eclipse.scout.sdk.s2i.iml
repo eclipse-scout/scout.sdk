@@ -215,7 +215,7 @@
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.5.32" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.jetbrains:annotations:23.0.0" level="project" />
     <orderEntry type="library" name="Gradle: wsdl4j:wsdl4j:1.6.2" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse.jdt:ecj:3.28.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse.jdt:ecj:3.30.0" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.poi:poi:5.2.2" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.poi:poi-ooxml-lite:5.2.2" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.xmlbeans:xmlbeans:5.0.3" level="project" />
@@ -230,13 +230,13 @@
     <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.5.32" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.mockito:mockito-core:4.6.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.client:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.client:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy:1.12.10" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy-agent:1.12.10" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.security:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.security:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.junit.jupiter:junit-jupiter-engine:5.8.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.junit.jupiter:junit-jupiter-params:5.8.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.junit.jupiter:junit-jupiter-api:5.8.2" level="project" />

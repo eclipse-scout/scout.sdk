@@ -177,7 +177,7 @@
       <id>add-datamodel.client-dependency-for-22.0-build</id>
       <activation>
         <property>
-          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (22.0) -->
+          <!-- add dependency for the scout version 22.0 -->
           <name>org.eclipse.scout.rt_version</name>
           <value>22.0-SNAPSHOT</value>
         </property>

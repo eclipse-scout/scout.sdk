@@ -78,17 +78,17 @@
     <orderEntry type="library" name="Maven: org.glassfish.hk2:hk2-api:2.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.hk2:hk2-utils:2.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.javassist:javassist:3.25.0-GA" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html.test:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.commons:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.json:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html.test:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.commons:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.json:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.4" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client.test:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client.test:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-math3:3.6.1" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.test:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.security:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.test:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.security:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.google.http-client:google-http-client-apache-v2:1.40.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.http-client:google-http-client:1.40.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
@@ -100,28 +100,28 @@
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.13" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.15" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:1.7.32" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.mom.api:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared.test:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform.test:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.mom.api:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared.test:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform.test:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.13.2" level="project" />
     <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" name="Maven: jakarta.servlet:jakarta.servlet-api:4.0.4" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.jaxws:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.jaxws:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: jakarta.xml.ws:jakarta.xml.ws-api:2.3.3" level="project" />
     <orderEntry type="library" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:2.3.3" level="project" />
     <orderEntry type="library" name="Maven: jakarta.xml.soap:jakarta.xml.soap-api:1.4.2" level="project" />
     <orderEntry type="library" name="Maven: com.sun.activation:jakarta.activation:1.2.2" level="project" />
     <orderEntry type="library" name="Maven: jakarta.jws:jakarta.jws-api:2.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.jboss:jandex:2.4.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.ui.html:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.client:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.shared:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.client:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.shared:22.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.ui.html:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.client:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.shared:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.client:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.shared:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core:3.30.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.resources:3.17.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.runtime:3.25.0" level="project" />
