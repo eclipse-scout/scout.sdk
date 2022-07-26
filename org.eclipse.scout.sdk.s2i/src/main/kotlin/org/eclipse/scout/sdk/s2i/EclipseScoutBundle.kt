@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.s2i.classid.ClassIdCache
 import org.eclipse.scout.sdk.s2i.dataobject.DataObjectManager
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.eclipse.scout.sdk.s2i.element.ElementCreationManager
+import org.eclipse.scout.sdk.s2i.js.element.JsElementsManager
 import org.eclipse.scout.sdk.s2i.model.js.JsModuleCacheImplementor
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerCache
 import org.jetbrains.annotations.Nls
@@ -59,6 +60,9 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
 
     fun elementCreationManager(): ElementCreationManager =
         ApplicationManager.getApplication().getService(ElementCreationManager::class.java)
+
+    fun jsElementsManager(project: Project): JsElementsManager =
+        project.getService(JsElementsManager::class.java)
 
     fun scoutIcon(size: Int) = IconUtil.scale(ScoutIcon, null, size / ScoutIcon.iconWidth.toFloat())
 

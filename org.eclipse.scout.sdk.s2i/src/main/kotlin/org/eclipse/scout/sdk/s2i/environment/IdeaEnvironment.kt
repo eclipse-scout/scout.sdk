@@ -36,6 +36,9 @@ import org.eclipse.scout.sdk.core.s.environment.AbstractEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
+import org.eclipse.scout.sdk.core.s.js.element.gen.IJsSourceBuilder
+import org.eclipse.scout.sdk.core.s.js.element.gen.IJsSourceGenerator
+import org.eclipse.scout.sdk.core.s.js.element.gen.JsSourceBuilder
 import org.eclipse.scout.sdk.core.util.CoreUtils.toStringIfOverwritten
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
@@ -60,9 +63,9 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
          * Executes the [task] synchronously in the current thread
          */
         fun <T> callInIdeaEnvironmentSync(project: Project, progressIndicator: IdeaProgress, task: (IdeaEnvironment, IdeaProgress) -> T): T =
-                IdeaEnvironment(project).use {
-                    return task(it, progressIndicator)
-                }
+            IdeaEnvironment(project).use {
+                return task(it, progressIndicator)
+            }
 
         /**
          * Asynchronously executes the given [task] in a [OperationTask]. The task is executed with an active [TransactionManager].
@@ -135,9 +138,9 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
     }
 
     override fun findType(fqn: String) = project
-            .findTypesByName(Ensure.notBlank(fqn), allScope(project))
-            .mapNotNull { it.toScoutType(this) }
-            .asStream()
+        .findTypesByName(Ensure.notBlank(fqn), allScope(project))
+        .mapNotNull { it.toScoutType(this) }
+        .asStream()
 
     override fun findJavaEnvironment(root: Path?): Optional<IJavaEnvironment> {
         var path = root
@@ -158,20 +161,20 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
     }
 
     fun toScoutJavaEnvironment(module: Module?): IJavaEnvironment? = module
-            ?.takeIf { it.isJavaModule() }
-            ?.let { getOrCreateEnv(it) }
-            ?.wrap()
+        ?.takeIf { it.isJavaModule() }
+        ?.let { getOrCreateEnv(it) }
+        ?.wrap()
 
     fun findClasspathEntry(classpathRoot: VirtualFile?): IClasspathEntry? = classpathRoot
-            ?.let { ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(it) }
-            ?.let { toScoutJavaEnvironment(it) }
-            ?.let { findClasspathEntry(classpathRoot, it) }
+        ?.let { ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(it) }
+        ?.let { toScoutJavaEnvironment(it) }
+        ?.let { findClasspathEntry(classpathRoot, it) }
 
     protected fun findClasspathEntry(file: VirtualFile, env: IJavaEnvironment) = file.resolveLocalPath()?.let { filePath ->
         env.sourceFolders()
-                .filter { it.path().startsWith(filePath) }
-                .findAny()
-                .orElse(null)
+            .filter { it.path().startsWith(filePath) }
+            .findAny()
+            .orElse(null)
     }
 
     protected fun getOrCreateEnv(module: Module): JavaEnvironmentWithIdea = m_envs.computeIfAbsent(module.name) { createNewJavaEnvironmentFor(module) }
@@ -221,4 +224,19 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
     }
 
     override fun javaEnvironments(): MutableCollection<out JavaEnvironmentSpi> = m_envs.values
+
+    override fun runJsSourceGenerator(generator: IJsSourceGenerator<IJsSourceBuilder<*>>): String {
+        val builder = JsSourceBuilder.create()
+            .withLineSeparator("\n")
+        generator.generate(builder)
+        return builder.source()
+    }
+
+    override fun doWriteJsSource(source: CharSequence, filePath: Path, progress: IProgress?, sync: Boolean): IFuture<Void?> {
+        val writer = JsWriteOperation(project, source, filePath)
+        if (sync) {
+            return writer.run(progress.toIdea())
+        }
+        return writer.schedule()
+    }
 }

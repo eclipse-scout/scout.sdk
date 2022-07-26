@@ -27,6 +27,8 @@ import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
+import org.eclipse.scout.sdk.core.s.js.element.gen.IJsSourceBuilder;
+import org.eclipse.scout.sdk.core.s.js.element.gen.IJsSourceGenerator;
 
 /**
  * <h3>{@link IEnvironment}</h3>
@@ -351,4 +353,8 @@ public interface IEnvironment extends AutoCloseable {
    *          The {@link Path} to delete. Must not be {@code null}.
    */
   void deleteIfExists(Path file);
+
+  void writeJsSource(IJsSourceGenerator<IJsSourceBuilder<?>> generator, Path path, IProgress progress);
+
+  IFuture<Void> writeJsSourceAsync(IJsSourceGenerator<IJsSourceBuilder<?>> generator, Path path, IProgress progress);
 }

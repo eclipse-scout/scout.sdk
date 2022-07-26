@@ -99,6 +99,8 @@
                     serviceImplementation="org.eclipse.scout.sdk.s2i.classid.ClassIdCacheImplementor"/>
     <applicationService serviceInterface="org.eclipse.scout.sdk.s2i.element.ElementCreationManager"
                         serviceImplementation="org.eclipse.scout.sdk.s2i.element.ElementCreationManagerImplementor"/>
+    <projectService serviceInterface="org.eclipse.scout.sdk.s2i.js.element.JsElementsManager"
+                    serviceImplementation="org.eclipse.scout.sdk.s2i.js.element.JsElementsManagerImpl"/>
     <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.nls.TranslationManagerCache"/>
     <applicationService serviceImplementation="org.eclipse.scout.sdk.s2i.settings.ScoutCodeFoldingSettings"/>
     <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
@@ -147,6 +149,9 @@
       <action id="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInFileMenu"
               class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInFileMenu">
         <keyboard-shortcut keymap="$default" first-keystroke="control alt shift O"/>
+      </action>
+      <action id="org.eclipse.scout.sdk.s2i.CreateJsModelForFileMenu"
+              class="org.eclipse.scout.sdk.s2i.js.element.CreateJsElementsForFileMenu">
       </action>
     </group>
 

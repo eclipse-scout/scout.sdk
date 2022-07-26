@@ -27,6 +27,8 @@ import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
+import org.eclipse.scout.sdk.core.s.js.element.gen.IJsSourceBuilder;
+import org.eclipse.scout.sdk.core.s.js.element.gen.IJsSourceGenerator;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 public abstract class AbstractEnvironment implements IEnvironment {
@@ -180,4 +182,26 @@ public abstract class AbstractEnvironment implements IEnvironment {
   protected abstract IFuture<Void> doWriteResource(CharSequence content, Path filePath, IProgress progress, boolean sync);
 
   protected abstract IFuture<IType> doWriteCompilationUnit(CharSequence source, CompilationUnitInfoWithClasspath cuInfo, IProgress progress, boolean sync);
+
+  @Override
+  public void writeJsSource(IJsSourceGenerator<IJsSourceBuilder<?>> generator, Path path, IProgress progress) {
+    writeJsSource(generator, path, progress, true).awaitDoneThrowingOnErrorOrCancel();
+  }
+
+  @Override
+  public IFuture<Void> writeJsSourceAsync(IJsSourceGenerator<IJsSourceBuilder<?>> generator, Path path, IProgress progress) {
+    return writeJsSource(generator, path, progress, false);
+  }
+
+  protected IFuture<Void> writeJsSource(IJsSourceGenerator<IJsSourceBuilder<?>> generator, Path filePath, IProgress progress, boolean sync) {
+    return handleUncompletedFuture(doWriteJsSource(runJsSourceGenerator(generator), filePath, progress, sync));
+  }
+
+  protected String runJsSourceGenerator(IJsSourceGenerator<IJsSourceBuilder<?>> generator) {
+    throw new UnsupportedOperationException();
+  }
+
+  protected IFuture<Void> doWriteJsSource(CharSequence source, Path filePath, IProgress progress, boolean sync) {
+    throw new UnsupportedOperationException();
+  }
 }
