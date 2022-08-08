@@ -33,7 +33,7 @@
           mvn clean deploy
     3b. For deploying releases (to be used by Tycho releases):
         - Prerequisite: 1. you need to have GPG properly set up, see https://central.sonatype.org/publish/requirements/gpg/
-                        2. if not already present: you need to add the server with id 'forge-releases' into your settings.xml including the corresponding credentials (e.g. oss sonatype username/password)
+                        2. if not already present: you need to add the server with id 'ossrh' into your settings.xml including the corresponding credentials (e.g. oss sonatype username/password)
         - Make sure that ${org.eclipse.m2e.core}, ${org.eclipse.m2e.core.ui}, ${org.eclipse.m2e.archetype.common},... in the parent POM don't have a '-SNAPSHOT' suffix
         3b.1 For full deploy: In org.eclipse.scout.sdk.s2e.releng/, execute
              mvn clean deploy -P deploy-releases
@@ -47,7 +47,7 @@
     <maven.deploy.skip>true</maven.deploy.skip>
     <forgeSnapshotId>bsi-tools-snapshot</forgeSnapshotId>
     <forgeSnapshotUrl>https://scout.bsiag.com/repository/org.eclipse.scout-snapshot-local</forgeSnapshotUrl>
-    <forgeReleaseId>forge-releases</forgeReleaseId>
+    <forgeReleaseId>ossrh</forgeReleaseId>
     <forgeReleaseUrl>https://oss.sonatype.org/service/local/staging/deploy/maven2/</forgeReleaseUrl>
   </properties>
 
@@ -114,8 +114,8 @@
           <includeOptional>false</includeOptional>
           <source>
             <repository>
-              <id>eclipse_2022_06</id>
-              <url>https://download.eclipse.org/releases/2022-06/</url>
+              <id>m2e_2_0_1</id>
+              <url>https://download.eclipse.org/technology/m2e/releases/2.0.1/</url>
               <layout>p2</layout>
             </repository>
           </source>
@@ -242,7 +242,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.7.0.MGPG-53</version>
             <configuration>
               <repositoryId>${forgeReleaseId}</repositoryId>
               <url>${forgeReleaseUrl}</url>
@@ -259,6 +258,10 @@
                   <sources>${downloaded}/org.eclipse.m2e.core.source_${org.eclipse.m2e.core}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.pom</pomFile>
                   <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                  <gpgArguments>
+            		<arg>--pinentry-mode</arg>
+            		<arg>loopback</arg>
+         		  </gpgArguments>
                 </configuration>
               </execution>
               <execution>
@@ -272,6 +275,10 @@
                   <sources>${downloaded}/org.eclipse.m2e.core.ui.source_${org.eclipse.m2e.core.ui}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.ui.pom</pomFile>
                   <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                  <gpgArguments>
+            		<arg>--pinentry-mode</arg>
+            		<arg>loopback</arg>
+         		  </gpgArguments>
                 </configuration>
               </execution>
               <execution>
@@ -284,6 +291,10 @@
                   <file>${downloaded}/org.eclipse.m2e.archetype.common_${org.eclipse.m2e.archetype.common}.jar</file>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.archetype.common.pom</pomFile>
                   <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
+                  <gpgArguments>
+            		<arg>--pinentry-mode</arg>
+            		<arg>loopback</arg>
+         		  </gpgArguments>
                 </configuration>
               </execution>
             </executions>
@@ -298,7 +309,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.7.0.MGPG-53</version>
             <configuration>
               <repositoryId>${forgeReleaseId}</repositoryId>
               <url>${forgeReleaseUrl}</url>

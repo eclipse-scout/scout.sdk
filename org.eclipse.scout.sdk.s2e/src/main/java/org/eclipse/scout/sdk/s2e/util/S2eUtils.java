@@ -453,7 +453,7 @@ public final class S2eUtils {
     if (configurationManager == null) {
       return emptyMap();
     }
-    var request = new MavenUpdateRequest(projects.toArray(new IProject[0]), false, updateSnapshots);
+    var request = new MavenUpdateRequest(projects, false, updateSnapshots);
     if (monitor != null && monitor.isCanceled()) {
       return emptyMap();
     }
