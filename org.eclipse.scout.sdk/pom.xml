@@ -42,12 +42,6 @@
   <properties>
     <scout.osgi.version>12.0.0</scout.osgi.version>
     <org.eclipse.scout.rt_version>23.1-SNAPSHOT</org.eclipse.scout.rt_version>
-    
-    <jdk.min.version>17</jdk.min.version>
-    <jdk.source.version>${jdk.min.version}</jdk.source.version>
-	<maven.compiler.source>${jdk.min.version}</maven.compiler.source>
-	<maven.compiler.target>${jdk.min.version}</maven.compiler.target>
-	<maven.compiler.release>${jdk.min.version}</maven.compiler.release>
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.sdk/target/jacoco-all.exec</master_coverage_jacoco_destFile>
     <master_test_forkCount>1</master_test_forkCount>
@@ -173,9 +167,9 @@
     <junit.version>5.8.2</junit.version>
 
     <!-- versions to dependencies uploaded by scout -->
-    <org.eclipse.m2e.core>2.0.0.20220711-1014</org.eclipse.m2e.core>
-    <org.eclipse.m2e.core.ui>2.0.0.20220726-0935</org.eclipse.m2e.core.ui>
-    <org.eclipse.m2e.archetype.common>3.2.1.20220620-0741</org.eclipse.m2e.archetype.common>
+    <org.eclipse.m2e.core>1.18.4.20220208-0831</org.eclipse.m2e.core>
+    <org.eclipse.m2e.core.ui>1.19.0.20220206-1032</org.eclipse.m2e.core.ui>
+    <org.eclipse.m2e.archetype.common>1.18.1.20211011-2139</org.eclipse.m2e.archetype.common>
     <maven.model.dependency.version>3.8.4</maven.model.dependency.version>
   </properties>
 
