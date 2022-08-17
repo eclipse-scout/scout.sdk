@@ -99,7 +99,7 @@
                 <groupId>org.eclipse.scout.sdk</groupId>
                 <artifactId>org.eclipse.scout.sdk-target</artifactId>
                 <version>${project.version}</version>
-                <classifier>org.eclipse.2022-06-dependencies</classifier>
+                <classifier>org.eclipse.2022-09-dependencies</classifier>
               </artifact>
             </target>
           </configuration>
