@@ -134,9 +134,9 @@
               org.eclipse.jdt.core.manipulation;bundle-version="[1.15,2)";visibility:=reexport,
               org.eclipse.jdt.launching;bundle-version="[3.19.300,4)";visibility:=reexport,
               org.eclipse.text;bundle-version="[3.12,4)";visibility:=reexport,
-              org.eclipse.m2e.maven.runtime;bundle-version="[2,2.1)";visibility:=reexport,
-              org.eclipse.m2e.archetype.common;bundle-version="[2,2.1)";visibility:=reexport,
-              org.eclipse.m2e.core;bundle-version="[2,2.1)";visibility:=reexport
+              org.eclipse.m2e.maven.runtime;bundle-version="[1.18,2.1)";visibility:=reexport,
+              org.eclipse.m2e.archetype.common;bundle-version="[1.18,2.1)";visibility:=reexport,
+              org.eclipse.m2e.core;bundle-version="[1.18,2.1)";visibility:=reexport
             </Require-Bundle>
 
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.S2ESdkActivator</Bundle-Activator>
