@@ -142,7 +142,7 @@
               org.eclipse.jface.text;bundle-version="[3.18.100,4)";visibility:=reexport,
               org.eclipse.jface;bundle-version="[3.23,4)";visibility:=reexport,
               org.eclipse.jface.databinding;bundle-version="[1.13,2)";visibility:=reexport,
-              org.eclipse.m2e.core.ui;bundle-version="[2.0,2.1)";visibility:=reexport
+              org.eclipse.m2e.core.ui;bundle-version="[1.18,2.1)";visibility:=reexport
             </Require-Bundle>
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator</Bundle-Activator>
           </instructions>
