@@ -20,7 +20,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk</artifactId>
-  <version>12.0.0-SNAPSHOT</version>
+  <version>12.0.24</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout SDK</name>
   <description>Eclipse Scout SDK</description>
@@ -41,7 +41,7 @@
 
   <properties>
     <scout.osgi.version>12.0.0</scout.osgi.version>
-    <org.eclipse.scout.rt_version>23.1-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>22.0.23</org.eclipse.scout.rt_version>
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.sdk/target/jacoco-all.exec</master_coverage_jacoco_destFile>
     <master_test_forkCount>1</master_test_forkCount>
@@ -178,72 +178,72 @@
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.24</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.test</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.24</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.ecj</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.24</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.24</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s.test</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.24</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.24</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.24</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.24</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.24</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.24</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.24</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.test</artifactId>
-        <version>12.0.0-SNAPSHOT</version>
+        <version>12.0.24</version>
       </dependency>
 
       <!-- Build Dependencies -->
