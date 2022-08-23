@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.IWebConstants
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.jsModuleCache
 import java.util.*
+import java.util.function.Predicate
 
 /**
  * Represents the full Scout JavaScript model of a Node module.
@@ -51,23 +52,23 @@ class JsModel {
 
         // find all module candidate roots
         val jsModuleRoots = sequenceOf(moduleRoot) + collectVisibleNodeModules(HashMap(), project, moduleRoot)
-                .asSequence()
-                .mapNotNull { it.virtualFile }
+            .asSequence()
+            .mapNotNull { it.virtualFile }
 
         // Pass 1: get or create the module meta data (name, namespace, containing files, etc.)
         // this pass is necessary because the next pass (parse) needs the mapping which file belongs to which module (it will call containingModule())
         jsModuleRoots
-                .mapNotNull { getOrCreateModule(jsModuleCache, it) }
-                .forEach { m_modules.add(it) }
+            .mapNotNull { getOrCreateModule(jsModuleCache, it) }
+            .forEach { m_modules.add(it) }
 
         // Pass 2: parse files of modules into AbstractJsModelElements and store in cache
         m_modules
-                .asSequence()
-                .filter { !it.isParsed() } // only the new ones. the others are from the cache
-                .forEach {
-                    it.parseModelElements(psiManager)
-                    jsModuleCache.putModule(it.moduleRoot, it)
-                }
+            .asSequence()
+            .filter { !it.isParsed() } // only the new ones. the others are from the cache
+            .forEach {
+                it.parseModelElements(psiManager)
+                jsModuleCache.putModule(it.moduleRoot, it)
+            }
 
         SdkLog.debug("JS model creation took {}ms.", System.currentTimeMillis() - start)
         return this
@@ -82,6 +83,16 @@ class JsModel {
     }
 
     /**
+     * @return The [JsModule] matching the given predicate of this [JsModel] or null if none match.
+     */
+    fun module(predicate: Predicate<JsModule>): JsModule? = m_modules.firstOrNull { predicate.test(it) }
+
+    /**
+     * @return The [JsModule] with the given module name of this [JsModel] or null if none match.
+     */
+    fun module(name: String): JsModule? = module { name == it.name }
+
+    /**
      * @return A [Sequence] containing all [JsModelClass] instances as well as top-level and nested [JsModelEnum] instances of this [JsModel].
      */
     fun elements(): Sequence<AbstractJsModelElement> = m_modules.asSequence().flatMap { it.elements() }
@@ -91,8 +102,8 @@ class JsModel {
      * @return The [AbstractJsModelElement] that corresponds to the given [objectType]. May be a [JsModelClass] or a top-level or nested [JsModelEnum].
      */
     fun element(objectType: String?) = m_modules.asSequence()
-            .mapNotNull { it.element(objectType) }
-            .firstOrNull()
+        .mapNotNull { it.element(objectType) }
+        .firstOrNull()
 
     /**
      * @param objectType The objectType (e.g. 'scout.GroupBox'). The default 'scout' namespace may be omitted. All other namespaces are required.
@@ -137,16 +148,16 @@ class JsModel {
             // if it is an enum: get its elements
             val element = element(property.dataType.type) as? JsModelEnum ?: return emptyList()
             return element.properties
-                    .map { PropertyValue(element.name + '.' + it.name, it) }
+                .map { PropertyValue(element.name + '.' + it.name, it) }
         }
         if (property.name == OBJECT_TYPE_PROPERTY_NAME) {
             // object types property: get all top level classes
             return elements()
-                    .filter { it.name.isNotEmpty() }
-                    .filter { Character.isUpperCase(it.name[0]) } // only classes
-                    .filter { !it.name.contains('.') } // only top-level elements
-                    .map { PropertyValue(it.shortName(), it) }
-                    .toList()
+                .filter { it.name.isNotEmpty() }
+                .filter { Character.isUpperCase(it.name[0]) } // only classes
+                .filter { !it.name.contains('.') } // only top-level elements
+                .map { PropertyValue(it.shortName(), it) }
+                .toList()
         }
         return when (property.dataType) {
             JsModelProperty.JsPropertyDataType.WIDGET -> resolveWidgetProposals().toList()
@@ -188,8 +199,8 @@ class JsModel {
     }
 
     private fun resolveWidgetProposals() = elements()
-            .filter { isWidget(it) }
-            .map { PropertyValue(it.shortName(), it) }
+        .filter { isWidget(it) }
+        .map { PropertyValue(it.shortName(), it) }
 
     /**
      * Properties might be declared on several levels in the class hierarchy. E.g. a property 'x' may be declared on Widget and on FormField.
@@ -206,7 +217,8 @@ class JsModel {
         return lower
     }
 
-    private fun getOrCreateModule(jsModuleCache: JsModuleCacheImplementor, moduleRoot: VirtualFile) = jsModuleCache.getModule(moduleRoot) ?: JsModule.parse(moduleRoot, this)
+    private fun getOrCreateModule(jsModuleCache: JsModuleCacheImplementor, moduleRoot: VirtualFile) =
+        jsModuleCache.getModule(moduleRoot) ?: JsModule.parse(moduleRoot, this)
 
     /**
      * Represents a possible [JsModelProperty] value to insert into the source. Can be obtained using [JsModel.valuesForProperty]

@@ -25,6 +25,7 @@ import com.intellij.lang.javascript.patterns.JSPatterns.jsProperty
 import com.intellij.lang.javascript.psi.JSLiteralExpression
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
 import com.intellij.lang.javascript.psi.JSProperty
+import com.intellij.lang.javascript.psi.JSReferenceExpression
 import com.intellij.openapi.command.WriteCommandAction.writeCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.module.Module
@@ -39,10 +40,7 @@ import icons.JavaScriptPsiIcons
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.containingModule
-import org.eclipse.scout.sdk.s2i.model.js.AbstractJsModelElement
-import org.eclipse.scout.sdk.s2i.model.js.JsModel
-import org.eclipse.scout.sdk.s2i.model.js.JsModelClass
-import org.eclipse.scout.sdk.s2i.model.js.JsModelProperty
+import org.eclipse.scout.sdk.s2i.model.js.*
 import org.eclipse.scout.sdk.s2i.template.BoolVariableAdapter
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 import org.eclipse.scout.sdk.s2i.template.VariableDescriptor
@@ -65,8 +63,9 @@ object JsModelCompletionHelper {
     val COMPLETE_VARIABLE_SRC = "\$${COMPLETE_VARIABLE.name}$"
 
     fun propertyElementPattern() = or(
-            psiElement().withSuperParent(2, jsProperty()),
-            psiElement().withParent(jsProperty()))
+        psiElement().withSuperParent(2, jsProperty()),
+        psiElement().withParent(jsProperty())
+    )
 
     fun getPropertyNameInfo(parameters: CompletionParameters, result: CompletionResultSet) = getPropertyInfo(parameters.position.parent, result.prefixMatcher.prefix, true)
 
@@ -84,8 +83,8 @@ object JsModelCompletionHelper {
 
         if (isPropertyNameCompletion && propertyName.length == CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED.length) {
             PsiTreeUtil.getParentOfType(property, JSProperty::class.java)
-                    ?.name
-                    ?.let { propertyName = it }
+                ?.name
+                ?.let { propertyName = it }
         } else if (isPropertyNameCompletion) {
             propertyName = propertyName.take(propertyName.length - CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED.length)
         }
@@ -95,14 +94,22 @@ object JsModelCompletionHelper {
         val isInArray = contextParent.elementType == JSStubElementTypes.ARRAY_LITERAL_EXPRESSION
         val siblings = contextParent.children
         val isLast = siblings.indexOf(contextElement) == siblings.size - 1
-        return PropertyCompletionInfo(property, propertyName, module, isLast, isPropertyNameCompletion,
-                findObjectType(objectLiteral), usedPropertyNames, prefix, isInArray)
+        return PropertyCompletionInfo(
+            property, propertyName, module, isLast, isPropertyNameCompletion,
+            findObjectType(objectLiteral), usedPropertyNames, prefix, isInArray, contextElement is JSLiteralExpression
+        )
     }
 
     private fun findObjectType(objectLiteral: JSObjectLiteralExpression): String? {
         val objectTypeProperty = objectLiteral.findProperty(JsModel.OBJECT_TYPE_PROPERTY_NAME) ?: return null
-        val literal = objectTypeProperty.value as? JSLiteralExpression ?: return null
-        val objectType = literal.takeIf { it.isStringLiteral }?.stringValue ?: return null
+        val objectType = when (val value = objectTypeProperty.value) {
+            is JSLiteralExpression -> value.takeIf { it.isStringLiteral }?.stringValue
+            is JSReferenceExpression -> {
+                val namespace = value.resolve()?.containingModule()?.let { JsModule.parseNamespace(it) }
+                listOfNotNull(namespace.takeIf { Strings.hasText(it) }, value.referenceName).joinToString(".")
+            }
+            else -> null
+        } ?: return null
         return if (Strings.isBlank(objectType)) null else objectType
     }
 
@@ -126,21 +133,36 @@ object JsModelCompletionHelper {
         val tailText = if (completionInfo.isPropertyNameCompletion && element is JsModelProperty) element.owner.shortName() else null
         val nodeModuleName = element?.scoutJsModule?.name
         val isTemplateRequired = completionInfo.isPropertyNameCompletion || (property.dataType == JsModelProperty.JsPropertyDataType.WIDGET && completionInfo.propertyName != JsModel.OBJECT_TYPE_PROPERTY_NAME)
-        return createLookupElement(elementText, element, nodeModuleName, tailText, icon, completionInfo.searchPrefix, isTemplateRequired) {
+        return createLookupElement(elementText, element, nodeModuleName, tailText, icon, completionInfo, isTemplateRequired) {
             buildPropertyTemplate(property, element, completionInfo)
         }
     }
 
-    fun createLookupElement(name: String, modelElement: AbstractJsModelElement?, nodeModuleName: String?, tailText: String?, icon: Icon, prefix: CharSequence, isTemplateRequired: Boolean, templateProvider: () -> Template): LookupElementBuilder {
-        var element = LookupElementBuilder.create(name, name)
-                .withCaseSensitivity(true)
-                .withPresentableText(name)
-                .withTailText(tailText, true)
-                .withTypeText(nodeModuleName)
-                .withIcon(icon)
+    fun createLookupElement(
+        name: String,
+        modelElement: AbstractJsModelElement?,
+        nodeModuleName: String?,
+        tailText: String?,
+        icon: Icon,
+        completionInfo: PropertyCompletionInfo,
+        isTemplateRequired: Boolean,
+        templateProvider: () -> Template
+    ): LookupElementBuilder {
+        val presentableName = when (modelElement) {
+            is JsModelClass -> modelElement.name
+            else -> name
+        }
+        var element = LookupElementBuilder.create(name, if (completionInfo.isInLiteral) name else presentableName)
+            .withLookupString(name)
+            .withLookupString(presentableName)
+            .withCaseSensitivity(true)
+            .withPresentableText(presentableName)
+            .withTailText(tailText, true)
+            .withTypeText(nodeModuleName)
+            .withIcon(icon)
         tailText?.let { element = element.withTailText(" ($it)", true) }
         if (isTemplateRequired) {
-            element = element.withInsertHandler { context, _ -> startTemplate(context.editor, prefix, templateProvider()) }
+            element = element.withInsertHandler { context, _ -> startTemplate(context.editor, completionInfo.searchPrefix, templateProvider()) }
             element.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true)
         }
         element.putUserData(SELECTED_ELEMENT, modelElement)
@@ -171,8 +193,10 @@ object JsModelCompletionHelper {
         when (property.dataType) {
             JsModelProperty.JsPropertyDataType.STRING -> valueSrc.appendWrapping(stringLiteralDelimiter, stringLiteralDelimiter)
             JsModelProperty.JsPropertyDataType.WIDGET -> valueSrc.appendWrapping("{", "}")
-            JsModelProperty.JsPropertyDataType.TEXT_KEY -> valueSrc.appendWrapping(stringLiteralDelimiter + TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX,
-                    TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX + stringLiteralDelimiter)
+            JsModelProperty.JsPropertyDataType.TEXT_KEY -> valueSrc.appendWrapping(
+                stringLiteralDelimiter + TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX,
+                TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX + stringLiteralDelimiter
+            )
         }
         // property value
         if (property.dataType.isCustomType()) {
@@ -187,8 +211,9 @@ object JsModelCompletionHelper {
                 JsModelProperty.JsPropertyDataType.UNKNOWN,
                 JsModelProperty.JsPropertyDataType.NUMERIC -> valueSrc.append(TEXT_VARIABLE_SRC)
                 JsModelProperty.JsPropertyDataType.WIDGET -> {
-                    val objectType = if (property.scoutJsModule.jsModel.isWidget(selectedElement)) selectedElement?.shortName() else null ?: COMPLETE_VARIABLE_SRC
-                    valueSrc.append("\n${JsModel.ID_PROPERTY_NAME}: '${TEXT_VARIABLE_SRC}',\n${JsModel.OBJECT_TYPE_PROPERTY_NAME}: '${objectType}'${END_VARIABLE_SRC}\n")
+                    val scoutJsModule = property.scoutJsModule
+                    val objectType = if (scoutJsModule.jsModel.isWidget(selectedElement)) (if (scoutJsModule.useClassReference) selectedElement?.name else selectedElement?.shortName()) else null ?: COMPLETE_VARIABLE_SRC
+                    valueSrc.append("\n${JsModel.ID_PROPERTY_NAME}: '${TEXT_VARIABLE_SRC}',\n${JsModel.OBJECT_TYPE_PROPERTY_NAME}: ${if (scoutJsModule.useClassReference) objectType else "'$objectType'"}${END_VARIABLE_SRC}\n")
                 }
             }
         }
@@ -216,8 +241,8 @@ object JsModelCompletionHelper {
         template.setValue(Template.Property.USE_STATIC_IMPORT_IF_POSSIBLE, false)
         template.parseSegments()
         TemplateImplUtil.parseVariableNames(source)
-                .mapNotNull { ALL_VARIABLES[it] }
-                .forEach { addVariable(it, template, defaultValueProvider) }
+            .mapNotNull { ALL_VARIABLES[it] }
+            .forEach { addVariable(it, template, defaultValueProvider) }
         return template
     }
 
@@ -231,8 +256,10 @@ object JsModelCompletionHelper {
         target.addVariable(name, descriptor.expression, defaultValue, true)
     }
 
-    data class PropertyCompletionInfo(val property: JSProperty, val propertyName: String, val module: Module, val isLast: Boolean, val isPropertyNameCompletion: Boolean,
-                                      val objectType: String?, val siblingPropertyNames: Set<String>, val searchPrefix: String, val isInArray: Boolean)
+    data class PropertyCompletionInfo(
+        val property: JSProperty, val propertyName: String, val module: Module, val isLast: Boolean, val isPropertyNameCompletion: Boolean,
+        val objectType: String?, val siblingPropertyNames: Set<String>, val searchPrefix: String, val isInArray: Boolean, val isInLiteral: Boolean
+    )
 
     private class WrappingStringBuilder {
         private val m_builder = StringBuilder()

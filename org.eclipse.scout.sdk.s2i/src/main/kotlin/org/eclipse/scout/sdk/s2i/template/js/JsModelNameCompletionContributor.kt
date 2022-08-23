@@ -37,24 +37,25 @@ class JsModelNameCompletionContributor : CompletionContributor() {
         }
 
         private fun getPropertyNameElements(completionInfo: JsModelCompletionHelper.PropertyCompletionInfo) = JsModel().build(completionInfo.module)
-                .properties(completionInfo.objectType).values
-                .filter { !completionInfo.siblingPropertyNames.contains(it.name) }
-                .map { createLookupElement(it.name, it, it, completionInfo) }
+            .properties(completionInfo.objectType).values
+            .filter { !completionInfo.siblingPropertyNames.contains(it.name) }
+            .map { createLookupElement(it.name, it, it, completionInfo) }
 
         private fun getUnknownObjectTypeElements(completionInfo: JsModelCompletionHelper.PropertyCompletionInfo): List<LookupElement> {
             return listOf(JsModel.ID_PROPERTY_NAME, JsModel.OBJECT_TYPE_PROPERTY_NAME)
-                    .filter { !completionInfo.siblingPropertyNames.contains(it) }
-                    .map { lookupElementForUnknownObjectType(it, completionInfo) }
+                .filter { !completionInfo.siblingPropertyNames.contains(it) }
+                .map { lookupElementForUnknownObjectType(it, completionInfo) }
         }
 
         private fun lookupElementForUnknownObjectType(propertyName: String, completionInfo: JsModelCompletionHelper.PropertyCompletionInfo) =
-                createLookupElement(propertyName, null, IWebConstants.SCOUT_JS_CORE_MODULE_NAME, JsModel.WIDGET_CLASS_NAME, JavaScriptPsiIcons.Classes.Alias, completionInfo.searchPrefix, true) {
-                    buildUnknownObjectTemplate(propertyName, completionInfo)
-                }
+            createLookupElement(propertyName, null, IWebConstants.SCOUT_JS_CORE_MODULE_NAME, JsModel.WIDGET_CLASS_NAME, JavaScriptPsiIcons.Classes.Alias, completionInfo, true) {
+                buildUnknownObjectTemplate(propertyName, completionInfo)
+            }
 
         private fun buildUnknownObjectTemplate(propertyName: String, completionInfo: JsModelCompletionHelper.PropertyCompletionInfo): TemplateImpl {
+            val useClassReference = JsModel().build(completionInfo.module).module(IWebConstants.SCOUT_JS_CORE_MODULE_NAME)?.useClassReference ?: false
             val variable = if (JsModel.ID_PROPERTY_NAME == propertyName) JsModelCompletionHelper.TEXT_VARIABLE_SRC else JsModelCompletionHelper.COMPLETE_VARIABLE_SRC
-            var source = "$propertyName: '$variable'"
+            var source = if (JsModel.OBJECT_TYPE_PROPERTY_NAME == propertyName) "$propertyName: ${if (useClassReference) variable else "'$variable'"}" else "$propertyName: '$variable'"
             if (!completionInfo.isLast) {
                 source += ','
             }

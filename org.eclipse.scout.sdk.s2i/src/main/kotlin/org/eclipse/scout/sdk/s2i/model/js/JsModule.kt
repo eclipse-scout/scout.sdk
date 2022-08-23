@@ -19,6 +19,8 @@ import com.intellij.lang.javascript.psi.JSVarStatement
 import com.intellij.lang.javascript.psi.JSVariable
 import com.intellij.lang.javascript.psi.ecmal4.JSAttributeList
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
+import com.intellij.openapi.module.Module
+import com.intellij.openapi.project.guessModuleDir
 import com.intellij.openapi.vfs.VfsUtilCore.iterateChildrenRecursively
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiManager
@@ -34,34 +36,48 @@ import java.util.regex.Pattern
  * @param mainFile The [VirtualFile] the "main" property of the package.json points to.
  * @param jsModel The owning [JsModel]
  */
-class JsModule(val name: String, val namespace: String, val sourceRoot: VirtualFile, val mainFile: VirtualFile, val moduleRoot: VirtualFile, val jsModel: JsModel) {
+class JsModule(val name: String, val namespace: String, val sourceRoot: VirtualFile, val mainFile: VirtualFile, val moduleRoot: VirtualFile, val jsModel: JsModel, val useClassReference: Boolean) {
 
     companion object {
         private const val ADAPTER_FILE_SUFFIX = "Adapter${IWebConstants.JS_FILE_SUFFIX}"
         private const val MODEL_FILE_SUFFIX = "Model${IWebConstants.JS_FILE_SUFFIX}"
-        private val NAMESPACE_PATTERN = Pattern.compile("window\\.([\\w._]+)\\s*=\\s*Object\\.assign\\(window\\.")
+        private val NAMESPACE_PATTERN_WITHOUT_CLASS_REFERENCE = Pattern.compile("window\\.([\\w._]+)\\s*=\\s*Object\\.assign\\(window\\.")
+        private val NAMESPACE_PATTERN_WITH_CLASS_REFERENCE = Pattern.compile("ObjectFactory\\.get\\(\\)\\.registerNamespace\\('([\\w._]+)',")
 
         fun parse(moduleRoot: VirtualFile, model: JsModel): JsModule? {
-            val packageJsonData = moduleRoot.findChild(PackageJsonUtil.FILE_NAME)?.let { PackageJsonData.getOrCreate(it) } ?: return null
-            val main = packageJsonData.main ?: return null
+            val packageJsonData = getPackageJsonData(moduleRoot) ?: return null
             val moduleName = packageJsonData.name?.takeIf { it.startsWith('@') } ?: return null
-            val mainFile = moduleRoot.findFileByRelativePath(main)?.takeIf { it.isValid } ?: return null
-            val ns = detectNamespace(mainFile) ?: return null
-            return JsModule(moduleName, ns, mainFile.parent, mainFile, moduleRoot, model)
+            val mainFile = getMainFile(moduleRoot, packageJsonData) ?: return null
+            var useClassReference: Boolean
+            val ns = parseNamespace(mainFile, NAMESPACE_PATTERN_WITH_CLASS_REFERENCE).also { useClassReference = true }
+                ?: parseNamespace(mainFile, NAMESPACE_PATTERN_WITHOUT_CLASS_REFERENCE).also { useClassReference = false }
+                ?: return null
+            return JsModule(moduleName, ns, mainFile.parent, mainFile, moduleRoot, model, useClassReference)
         }
 
-        private fun detectNamespace(moduleMainFile: VirtualFile): String? {
+        fun getPackageJson(moduleRoot: VirtualFile?): VirtualFile? = moduleRoot?.findChild(PackageJsonUtil.FILE_NAME)
+
+        fun getPackageJsonData(moduleRoot: VirtualFile?): PackageJsonData? = getPackageJson(moduleRoot)?.let { PackageJsonData.getOrCreate(it) }
+
+        fun getMainFile(moduleRoot: VirtualFile?, packageJsonData: PackageJsonData? = getPackageJsonData(moduleRoot)): VirtualFile? = packageJsonData?.main?.let { main -> moduleRoot?.findFileByRelativePath(main)?.takeIf { it.isValid } }
+
+        fun parseNamespace(moduleMainFile: VirtualFile, pattern: Pattern): String? {
             val fileContent = moduleMainFile
-                    .takeIf { it.isValid }
-                    ?.takeIf { it.isInLocalFileSystem }
-                    ?.contentAsText() ?: return null
-            val matcher = NAMESPACE_PATTERN.matcher(fileContent)
+                .takeIf { it.isValid }
+                ?.takeIf { it.isInLocalFileSystem }
+                ?.contentAsText() ?: return null
+            val matcher = pattern.matcher(fileContent)
             var ns: String? = null
             while (matcher.find()) {
                 ns = matcher.group(1)
             }
             return ns
         }
+
+        fun parseNamespace(moduleMainFile: VirtualFile): String? = listOf(NAMESPACE_PATTERN_WITH_CLASS_REFERENCE, NAMESPACE_PATTERN_WITHOUT_CLASS_REFERENCE)
+            .firstNotNullOfOrNull { parseNamespace(moduleMainFile, it) }
+
+        fun parseNamespace(module: Module): String? = getMainFile(module.guessModuleDir())?.let { parseNamespace(it) }
     }
 
     /**
@@ -77,9 +93,9 @@ class JsModule(val name: String, val namespace: String, val sourceRoot: VirtualF
         val files = HashSet<VirtualFile>()
         iterateChildrenRecursively(sourceRoot, this::acceptFile) { child ->
             child
-                    .takeUnless { it.isDirectory }
-                    ?.canonicalFile
-                    ?.let { files.add(it) }
+                .takeUnless { it.isDirectory }
+                ?.canonicalFile
+                ?.let { files.add(it) }
             true // keep on iterating
         }
         return files
@@ -115,10 +131,10 @@ class JsModule(val name: String, val namespace: String, val sourceRoot: VirtualF
     internal fun parseModelElements(psiManager: PsiManager) = synchronized(m_elements) {
         m_elements.clear()
         files
-                .filter { !it.name.endsWith(ADAPTER_FILE_SUFFIX) }
-                .filter { !it.name.endsWith(MODEL_FILE_SUFFIX) }
-                .mapNotNull { psiManager.findFile(it) as? JSFile }
-                .forEach { parseJsFile(it) }
+            .filter { !it.name.endsWith(ADAPTER_FILE_SUFFIX) }
+            .filter { !it.name.endsWith(MODEL_FILE_SUFFIX) }
+            .mapNotNull { psiManager.findFile(it) as? JSFile }
+            .forEach { parseJsFile(it) }
         m_parsed = true
         SdkLog.debug("Parsed module '{}'.", this)
     }

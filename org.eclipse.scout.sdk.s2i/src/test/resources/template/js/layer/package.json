@@ -1,0 +1,8 @@
+{
+  "name": "@eclipse-scout/layer",
+  "version": "1.0.0",
+  "main": "./src/index.js",
+  "dependencies": {
+    "@eclipse-scout/core": "1.0.0"
+  }
+}
