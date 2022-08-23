@@ -8,12 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  */
-// @formatter:off
-export default function() {
-  return {
-    id: "TopLevel",
-    objectType: "StringField"
-      <caret>
+// noinspection NpmUsedModulesInstalled
+import {StringField} from '@eclipse-scout/core';
+
+export default class StringFieldEx extends StringField {
+
+  static DEFAULT_MIN_LENGTH = 0;
+
+  constructor() {
+    super();
+    // noinspection JSUnusedGlobalSymbols
+    this.minLength = StringFieldEx.DEFAULT_MIN_LENGTH;
   }
 }
-// @formatter:on

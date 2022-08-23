@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.core.s.IWebConstants
 import org.eclipse.scout.sdk.s2i.model.js.JsModel
 import org.eclipse.scout.sdk.s2i.model.js.JsModelProperty
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.PropertyCompletionInfo
+import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.SELECTED_ELEMENT
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.createLookupElement
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.getPropertyValueInfo
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.propertyElementPattern
@@ -67,16 +68,25 @@ class JsModelValueCompletionContributor : CompletionContributor() {
 
             return jsModel.valuesForProperty(jsProperty).map {
                 val lookupElement = createLookupElement(it.displayText, it.element, jsProperty, completionInfo)
-                withJsImportIfNecessary(lookupElement, completionInfo.property.containingFile.originalFile, jsProperty)
+                if (!completionInfo.isInLiteral) {
+                    withJsImportIfNecessary(lookupElement, completionInfo.property.containingFile.originalFile, jsModel, jsProperty)
+                } else {
+                    lookupElement
+                }
             }
         }
 
-        private fun withJsImportIfNecessary(lookupElement: LookupElementBuilder, place: PsiElement, jsProperty: JsModelProperty): LookupElementBuilder {
-            if (!jsProperty.dataType.isCustomType()) return lookupElement
-            val jsModel = jsProperty.scoutJsModule.jsModel
-            val type = jsModel.element(jsProperty.dataType.type) ?: return lookupElement
+        private fun withJsImportIfNecessary(lookupElement: LookupElementBuilder, place: PsiElement, thisJsModel: JsModel, jsProperty: JsModelProperty): LookupElementBuilder {
+            val targetScoutJsModule = jsProperty.scoutJsModule
+            if (!jsProperty.dataType.isCustomType() && (!targetScoutJsModule.useClassReference || (jsProperty.dataType != JsModelProperty.JsPropertyDataType.WIDGET && jsProperty.name != JsModel.OBJECT_TYPE_PROPERTY_NAME))) return lookupElement
+            val targetJsModel = targetScoutJsModule.jsModel
+            val type = if (targetScoutJsModule.useClassReference && (jsProperty.dataType == JsModelProperty.JsPropertyDataType.WIDGET || jsProperty.name == JsModel.OBJECT_TYPE_PROPERTY_NAME)) {
+                lookupElement.getUserData(SELECTED_ELEMENT)
+            } else {
+                targetJsModel.element(jsProperty.dataType.type)
+            } ?: return lookupElement
             val containingFile = place.containingFile.virtualFile
-            val thisModule = jsModel.containingModule(containingFile) ?: return lookupElement
+            val thisModule = thisJsModel.containingModule(containingFile) ?: return lookupElement
             val targetModule = type.scoutJsModule
             val originalHandler = lookupElement.insertHandler
 

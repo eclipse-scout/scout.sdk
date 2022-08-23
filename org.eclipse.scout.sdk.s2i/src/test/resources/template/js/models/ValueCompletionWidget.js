@@ -9,13 +9,9 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 // @formatter:off
-export default function() {
-  return {
-    id: "TopLevel",
-    objectType: "StringField",
-    onlyHere: {
-      <caret>
-    }
-  }
-}
+export default () => ({
+  id: 'TopLevel',
+  objectType: 'StringField',
+  onlyHere: <caret>
+});
 // @formatter:on
