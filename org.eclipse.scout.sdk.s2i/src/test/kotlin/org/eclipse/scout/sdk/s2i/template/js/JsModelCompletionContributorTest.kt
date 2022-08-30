@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2i.template.js
 
 import com.intellij.codeInsight.completion.CompletionType
+import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import com.intellij.psi.PsiFile
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase
@@ -252,10 +253,12 @@ abstract class JsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase
         arrayOf(", $LABEL_PROPERTY_NAME: '${TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX}$TEMPLATE_COMPLETION_CONTENT${TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX}'")
 
     fun testNameCompletionUnknownObject() {
-        doCompleteAssertContent(NAME_COMPLETION_UNKNOWN_OBJECT_FILE, JsModel.OBJECT_TYPE_PROPERTY_NAME, *getNameCompletionUnknownObjectExpectedFileContents())
-    }
+        myFixture.configureByFile(NAME_COMPLETION_UNKNOWN_OBJECT_FILE)
 
-    protected open fun getNameCompletionUnknownObjectExpectedFileContents() = arrayOf("${JsModel.OBJECT_TYPE_PROPERTY_NAME}: $TEMPLATE_COMPLETION_CONTENT")
+        // on an empty object (no objectType) no completion should be done by Scout.
+        // it must not be a Scout object! Ensure there are several options (defaults from IDE).
+        assertTrue(computeLookupElements().size > 2)
+    }
 
     fun testValueCompletionWidget() {
         doCompleteAssertContent(VALUE_COMPLETION_WIDGET_FILE, STRING_FIELD_NAME, *getValueCompletionWidgetExpectedFileContents())
@@ -332,15 +335,19 @@ abstract class JsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase
 
     private fun doCompletion(testClassName: String, finishLookupName: String): Pair<PsiFile, AbstractJsModelElement?> {
         val psiFile = myFixture.configureByFile(testClassName)
-        myFixture.complete(CompletionType.BASIC, 1)
-        val lookupElements = myFixture.lookupElements?.asList()
+        val lookupElements = computeLookupElements()
         val lookupElementToSelect = lookupElements
-            ?.filter { it.getUserData(TemplateHelper.SCOUT_LOOKUP_ELEMENT_MARKER) ?: false }
-            ?.firstOrNull { it.allLookupStrings.contains(finishLookupName) }
-            ?: throw AssertionFailedError("No LookupElement with name '$finishLookupName' found in completion list. Available names: " + lookupElements?.map { it.lookupString })
+            .filter { it.getUserData(TemplateHelper.SCOUT_LOOKUP_ELEMENT_MARKER) ?: false }
+            .firstOrNull { it.allLookupStrings.contains(finishLookupName) }
+            ?: throw AssertionFailedError("No LookupElement with name '$finishLookupName' found in completion list. Available names: " + lookupElements.map { it.lookupString })
         val modelElement = lookupElementToSelect.getUserData(JsModelCompletionHelper.SELECTED_ELEMENT)
         val lookup = myFixture.lookup as LookupImpl
         lookup.finishLookup('\t', lookupElementToSelect)
         return psiFile to modelElement
+    }
+
+    private fun computeLookupElements(): List<LookupElement> {
+        myFixture.complete(CompletionType.BASIC, 1)
+        return myFixture.lookupElements?.asList() ?: emptyList()
     }
 }
