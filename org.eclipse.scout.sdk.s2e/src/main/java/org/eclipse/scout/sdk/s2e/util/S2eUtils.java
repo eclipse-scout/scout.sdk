@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,6 +15,7 @@ import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -49,6 +50,7 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.model.api.internal.JavaEnvironmentImplementor;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
@@ -107,9 +109,9 @@ public final class S2eUtils {
    * @param resources
    *          The resources that should be written
    * @return An {@link IStatus} describing if the given resources can be written now. If {@link IStatus#isOK()} returns
-   *         {@code true}, it is safe to continue the write operation. Otherwise the {@link IStatus} contains the files
+   *         {@code true}, it is safe to continue the write operation. Otherwise, the {@link IStatus} contains the files
    *         and reasons why this is not possible. This may be the case if the file is still read-only or because it
-   *         changed value in the mean time.
+   *         changed value in the meantime.
    */
   @SuppressWarnings("pmd:NPathComplexity")
   public static IStatus makeCommittable(Collection<IResource> resources) {
@@ -453,10 +455,45 @@ public final class S2eUtils {
     if (configurationManager == null) {
       return emptyMap();
     }
-    var request = new MavenUpdateRequest(projects.toArray(new IProject[0]), false, updateSnapshots);
+    var request = createMavenUpdateRequest(projects, false, updateSnapshots);
     if (monitor != null && monitor.isCanceled()) {
       return emptyMap();
     }
     return configurationManager.updateProjectConfiguration(request, updateConfig, cleanProject, refreshFromDisk, monitor);
+  }
+
+  /**
+   * Helper method for compatibility with different m2e versions. Can be removed, as soon as m2e 2.0 is the oldest
+   * supported version.
+   */
+  private static MavenUpdateRequest createMavenUpdateRequest(Set<IProject> projects, boolean offline, boolean updateSnapshots) {
+    Constructor<MavenUpdateRequest> constructor;
+    Object projectArg;
+    try {
+      // Version used in m2e >= 2.0 (Eclipse 2022-09 and newer)
+      //noinspection JavaReflectionMemberAccess
+      constructor = MavenUpdateRequest.class.getConstructor(Collection.class, boolean.class, boolean.class);
+      projectArg = projects;
+      SdkLog.debug("m2e 2.x API used to create Maven update requests.");
+    }
+    catch (NoSuchMethodException e1) {
+      SdkLog.debug("m2e 2.x API not available. Trying 1.x API as fallback.", e1);
+      try {
+        // Version used in m2e < 2.0 (before Eclipse 2022-09)
+        constructor = MavenUpdateRequest.class.getConstructor(IProject[].class, boolean.class, boolean.class);
+        projectArg = projects.toArray(new IProject[0]);
+        SdkLog.debug("m2e 1.x API used to create Maven update requests.");
+      }
+      catch (NoSuchMethodException e2) {
+        throw new SdkException("Cannot create MavenUpdateRequest because no compatible constructor could be found.", e2);
+      }
+    }
+
+    try {
+      return constructor.newInstance(projectArg, offline, updateSnapshots);
+    }
+    catch (ReflectiveOperationException e) {
+      throw new SdkException("Error creating MavenUpdateRequest", e);
+    }
   }
 }

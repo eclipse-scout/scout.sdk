@@ -39,9 +39,9 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>org.eclipse.2022-09-dependencies.target</file>
+                  <file>org.eclipse.2022-06-dependencies.target</file>
                   <type>target</type>
-                  <classifier>org.eclipse.2022-09</classifier>
+                  <classifier>org.eclipse.2022-06</classifier>
                 </artifact>
               </artifacts>
             </configuration>
