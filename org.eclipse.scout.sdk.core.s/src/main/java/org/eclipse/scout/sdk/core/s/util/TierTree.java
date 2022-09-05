@@ -11,10 +11,10 @@
 package org.eclipse.scout.sdk.core.s.util;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +53,7 @@ public final class TierTree {
     return INSTANCE.addDependencyImpl(tier, dependency);
   }
 
-  boolean addDependencyImpl(ITier<?> tier, ITier<?> dependency) {
+  synchronized boolean addDependencyImpl(ITier<?> tier, ITier<?> dependency) {
     Ensure.notNull(tier, "tier is null");
     Ensure.notNull(dependency, "dependency is null");
 
@@ -74,7 +74,7 @@ public final class TierTree {
     return dependencyNode.addChildren(tierNode);
   }
 
-  boolean hasDependencyImpl(ITier<?> tier, ITier<?> dependency) {
+  synchronized boolean hasDependencyImpl(ITier<?> tier, ITier<?> dependency) {
     var tierNode = m_tiers.get(tier);
     if (tierNode == null) {
       return false;
@@ -96,7 +96,7 @@ public final class TierTree {
     return INSTANCE.isAvailableImpl(tier, other);
   }
 
-  boolean isAvailableImpl(ITier<?> tier, ITier<?> other) {
+  synchronized boolean isAvailableImpl(ITier<?> tier, ITier<?> other) {
     if (!m_tiers.containsKey(tier)) {
       return false;
     }
@@ -108,7 +108,7 @@ public final class TierTree {
     return INSTANCE.topDownPathImpl(top, bottom);
   }
 
-  List<ITier<?>> topDownPathImpl(ITier<?> top, ITier<?> bottom) {
+  synchronized List<ITier<?>> topDownPathImpl(ITier<?> top, ITier<?> bottom) {
     var toNode = m_tiers.get(bottom);
     if (toNode == null) {
       return emptyList();
@@ -131,7 +131,7 @@ public final class TierTree {
       return emptyList();
     }
 
-    return Collections.unmodifiableList(path);
+    return unmodifiableList(path);
   }
 
   /**
@@ -156,7 +156,7 @@ public final class TierTree {
     return INSTANCE.tierOfImpl(typeLookupStrategy, optApiFunction);
   }
 
-  Optional<ITier<?>> tierOfImpl(Predicate<String> typeLookupStrategy, OptApiFunction optApiFunction) {
+  synchronized Optional<ITier<?>> tierOfImpl(Predicate<String> typeLookupStrategy, OptApiFunction optApiFunction) {
     var tier = new AtomicReference<ITier<?>>();
     TreeTraversals.create(new DefaultDepthFirstVisitor<>() {
       @Override
