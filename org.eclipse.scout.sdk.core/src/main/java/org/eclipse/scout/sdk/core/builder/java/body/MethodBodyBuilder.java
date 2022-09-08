@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.core.builder.java.body;
 
+import static org.eclipse.scout.sdk.core.generator.AbstractJavaElementGenerator.ensureValidJavaName;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Optional;
@@ -112,11 +113,12 @@ public class MethodBodyBuilder<TYPE extends IMethodBodyBuilder<TYPE>> extends Ex
 
   @Override
   public TYPE appendParameterName(int index) {
-    return append(surroundingMethod()
+    var declaredParameterName = surroundingMethod()
         .parameters()
         .skip(index)
         .findAny().orElseThrow(() -> newFail("Cannot find parameter with index {} in method {}.", index, surroundingMethod().elementName(context()).orElse(null)))
-        .elementName(context()).orElseThrow(() -> newFail("Parameter with index {} in method {} has no name.", index, surroundingMethod().elementName(context()).orElse(null))));
+        .elementName(context()).orElseThrow(() -> newFail("Parameter with index {} in method {} has no name.", index, surroundingMethod().elementName(context()).orElse(null)));
+    return append(ensureValidJavaName(declaredParameterName));
   }
 
   @Override

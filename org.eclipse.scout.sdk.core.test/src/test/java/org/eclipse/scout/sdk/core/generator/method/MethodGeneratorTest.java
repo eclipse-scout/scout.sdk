@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -177,6 +177,22 @@ public class MethodGeneratorTest {
     assertEqualsRefFile(env, REF_FILE_FOLDER + "MethodGeneratorTest2.txt", generator);
     assertEqualsRefFile(env, REF_FILE_FOLDER + "MethodGeneratorTest2.txt", MethodGenerator.createSetter("m_testField", JavaTypes._int, Flags.AccSynchronized | Flags.AccPublic));
     assertEqualsRefFile(env, REF_FILE_FOLDER + "MethodGeneratorTest2.txt", MethodGenerator.createSetter("m_testField", JavaTypes._int, Flags.AccSynchronized | Flags.AccPublic, ""));
+  }
+
+  @Test
+  public void testWithReservedKeywordName(IJavaEnvironment env) {
+    var generator = PrimaryTypeGenerator.create()
+        .asPublic()
+        .withElementName("TestClass")
+        .withMethod(MethodGenerator.create()
+            .asPublic()
+            .withReturnType(JavaTypes._boolean)
+            .withElementName("myTestMethod")
+            .withParameter(MethodParameterGenerator.create()
+                .withDataType(JavaTypes._boolean)
+                .withElementName("protected")) // reserved Java keyword
+            .withBody(b -> b.returnClause().appendParameterName(0).semicolon()));
+    assertNoCompileErrors(env, generator);
   }
 
   @Test
