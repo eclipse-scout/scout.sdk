@@ -43,64 +43,64 @@ class JsModelProperty(name: String, val owner: AbstractJsModelElement, val dataT
         private const val VIEW_MENU_TAB_QUALIFIED_CLASS_NAME = JsModel.SCOUT_JS_NAMESPACE + ".ViewMenuTab"
 
         private val EXCLUDED_PROPERTIES = setOf(
-                WIDGET_QUALIFIED_CLASS_NAME to "enabledComputed",
-                WIDGET_QUALIFIED_CLASS_NAME to "events",
-                WIDGET_QUALIFIED_CLASS_NAME to "attached",
-                WIDGET_QUALIFIED_CLASS_NAME to "children",
-                WIDGET_QUALIFIED_CLASS_NAME to "cloneOf",
-                WIDGET_QUALIFIED_CLASS_NAME to "destroyed",
-                WIDGET_QUALIFIED_CLASS_NAME to "destroying",
-                WIDGET_QUALIFIED_CLASS_NAME to "eventDelegators",
-                WIDGET_QUALIFIED_CLASS_NAME to "htmlComp",
-                WIDGET_QUALIFIED_CLASS_NAME to "initialized",
-                WIDGET_QUALIFIED_CLASS_NAME to "removalPending",
-                WIDGET_QUALIFIED_CLASS_NAME to "removing",
-                WIDGET_QUALIFIED_CLASS_NAME to "rendered",
-                WIDGET_QUALIFIED_CLASS_NAME to "rendering",
-                GROUP_BOX_QUALIFIED_CLASS_NAME to "controls",
-                GROUP_BOX_QUALIFIED_CLASS_NAME to "processButtons",
-                GROUP_BOX_QUALIFIED_CLASS_NAME to "processMenus",
-                GROUP_BOX_QUALIFIED_CLASS_NAME to "systemButtons",
-                GROUP_BOX_QUALIFIED_CLASS_NAME to "customButtons",
-                TAG_FIELD_QUALIFIED_CLASS_NAME to "fieldHtmlComp",
-                TAG_FIELD_QUALIFIED_CLASS_NAME to "popup",
-                SMART_FIELD_QUALIFIED_CLASS_NAME to "lookupSeqNo",
-                SMART_FIELD_QUALIFIED_CLASS_NAME to "popup",
-                TABLE_QUALIFIED_CLASS_NAME to "rootRows",
-                TABLE_QUALIFIED_CLASS_NAME to "rowBorderLeftWidth",
-                TABLE_QUALIFIED_CLASS_NAME to "rowBorderRightWidth",
-                TABLE_QUALIFIED_CLASS_NAME to "rowBorderWidth",
-                TABLE_QUALIFIED_CLASS_NAME to "rowHeight",
-                TABLE_QUALIFIED_CLASS_NAME to "rowsMap",
-                TABLE_QUALIFIED_CLASS_NAME to "rowWidth",
-                TABLE_QUALIFIED_CLASS_NAME to "visibleRows",
-                TABLE_QUALIFIED_CLASS_NAME to "visibleRowsMap",
-                TABLE_QUALIFIED_CLASS_NAME to "columnLayoutDirty",
-                TABLE_QUALIFIED_CLASS_NAME to "viewRangeDirty",
-                TABLE_QUALIFIED_CLASS_NAME to "viewRangeRendered",
-                TABLE_QUALIFIED_CLASS_NAME to "contextMenu",
-                TREE_QUALIFIED_CLASS_NAME to "groupedNodes",
-                TREE_QUALIFIED_CLASS_NAME to "runningAnimationsFinishFunc",
-                TREE_QUALIFIED_CLASS_NAME to "startAnimationFunc",
-                TREE_QUALIFIED_CLASS_NAME to "visibleNodesFlat",
-                TREE_QUALIFIED_CLASS_NAME to "visibleNodesMap",
-                TREE_QUALIFIED_CLASS_NAME to "maxNodeWidth",
-                TREE_QUALIFIED_CLASS_NAME to "nodeHeight",
-                TREE_QUALIFIED_CLASS_NAME to "nodesMap",
-                TREE_QUALIFIED_CLASS_NAME to "nodeWidth",
-                TREE_QUALIFIED_CLASS_NAME to "nodeWidthDirty",
-                TREE_QUALIFIED_CLASS_NAME to "viewRangeDirty",
-                TREE_QUALIFIED_CLASS_NAME to "viewRangeRendered",
-                TREE_QUALIFIED_CLASS_NAME to "contextMenu",
-                TILE_GRID_QUALIFIED_CLASS_NAME to "tileRemovalPendingCount",
-                TILE_GRID_QUALIFIED_CLASS_NAME to "filteredTiles",
-                TILE_GRID_QUALIFIED_CLASS_NAME to "filteredTilesDirty",
-                TILE_GRID_QUALIFIED_CLASS_NAME to "viewRangeRendered",
-                TILE_GRID_QUALIFIED_CLASS_NAME to "contextMenu",
-                BUTTON_QUALIFIED_CLASS_NAME to "popup",
-                DATE_FIELD_QUALIFIED_CLASS_NAME to "popup",
-                MENU_QUALIFIED_CLASS_NAME to "popup",
-                VIEW_MENU_TAB_QUALIFIED_CLASS_NAME to "popup"
+            WIDGET_QUALIFIED_CLASS_NAME to "enabledComputed",
+            WIDGET_QUALIFIED_CLASS_NAME to "events",
+            WIDGET_QUALIFIED_CLASS_NAME to "attached",
+            WIDGET_QUALIFIED_CLASS_NAME to "children",
+            WIDGET_QUALIFIED_CLASS_NAME to "cloneOf",
+            WIDGET_QUALIFIED_CLASS_NAME to "destroyed",
+            WIDGET_QUALIFIED_CLASS_NAME to "destroying",
+            WIDGET_QUALIFIED_CLASS_NAME to "eventDelegators",
+            WIDGET_QUALIFIED_CLASS_NAME to "htmlComp",
+            WIDGET_QUALIFIED_CLASS_NAME to "initialized",
+            WIDGET_QUALIFIED_CLASS_NAME to "removalPending",
+            WIDGET_QUALIFIED_CLASS_NAME to "removing",
+            WIDGET_QUALIFIED_CLASS_NAME to "rendered",
+            WIDGET_QUALIFIED_CLASS_NAME to "rendering",
+            GROUP_BOX_QUALIFIED_CLASS_NAME to "controls",
+            GROUP_BOX_QUALIFIED_CLASS_NAME to "processButtons",
+            GROUP_BOX_QUALIFIED_CLASS_NAME to "processMenus",
+            GROUP_BOX_QUALIFIED_CLASS_NAME to "systemButtons",
+            GROUP_BOX_QUALIFIED_CLASS_NAME to "customButtons",
+            TAG_FIELD_QUALIFIED_CLASS_NAME to "fieldHtmlComp",
+            TAG_FIELD_QUALIFIED_CLASS_NAME to "popup",
+            SMART_FIELD_QUALIFIED_CLASS_NAME to "lookupSeqNo",
+            SMART_FIELD_QUALIFIED_CLASS_NAME to "popup",
+            TABLE_QUALIFIED_CLASS_NAME to "rootRows",
+            TABLE_QUALIFIED_CLASS_NAME to "rowBorderLeftWidth",
+            TABLE_QUALIFIED_CLASS_NAME to "rowBorderRightWidth",
+            TABLE_QUALIFIED_CLASS_NAME to "rowBorderWidth",
+            TABLE_QUALIFIED_CLASS_NAME to "rowHeight",
+            TABLE_QUALIFIED_CLASS_NAME to "rowsMap",
+            TABLE_QUALIFIED_CLASS_NAME to "rowWidth",
+            TABLE_QUALIFIED_CLASS_NAME to "visibleRows",
+            TABLE_QUALIFIED_CLASS_NAME to "visibleRowsMap",
+            TABLE_QUALIFIED_CLASS_NAME to "columnLayoutDirty",
+            TABLE_QUALIFIED_CLASS_NAME to "viewRangeDirty",
+            TABLE_QUALIFIED_CLASS_NAME to "viewRangeRendered",
+            TABLE_QUALIFIED_CLASS_NAME to "contextMenu",
+            TREE_QUALIFIED_CLASS_NAME to "groupedNodes",
+            TREE_QUALIFIED_CLASS_NAME to "runningAnimationsFinishFunc",
+            TREE_QUALIFIED_CLASS_NAME to "startAnimationFunc",
+            TREE_QUALIFIED_CLASS_NAME to "visibleNodesFlat",
+            TREE_QUALIFIED_CLASS_NAME to "visibleNodesMap",
+            TREE_QUALIFIED_CLASS_NAME to "maxNodeWidth",
+            TREE_QUALIFIED_CLASS_NAME to "nodeHeight",
+            TREE_QUALIFIED_CLASS_NAME to "nodesMap",
+            TREE_QUALIFIED_CLASS_NAME to "nodeWidth",
+            TREE_QUALIFIED_CLASS_NAME to "nodeWidthDirty",
+            TREE_QUALIFIED_CLASS_NAME to "viewRangeDirty",
+            TREE_QUALIFIED_CLASS_NAME to "viewRangeRendered",
+            TREE_QUALIFIED_CLASS_NAME to "contextMenu",
+            TILE_GRID_QUALIFIED_CLASS_NAME to "tileRemovalPendingCount",
+            TILE_GRID_QUALIFIED_CLASS_NAME to "filteredTiles",
+            TILE_GRID_QUALIFIED_CLASS_NAME to "filteredTilesDirty",
+            TILE_GRID_QUALIFIED_CLASS_NAME to "viewRangeRendered",
+            TILE_GRID_QUALIFIED_CLASS_NAME to "contextMenu",
+            BUTTON_QUALIFIED_CLASS_NAME to "popup",
+            DATE_FIELD_QUALIFIED_CLASS_NAME to "popup",
+            MENU_QUALIFIED_CLASS_NAME to "popup",
+            VIEW_MENU_TAB_QUALIFIED_CLASS_NAME to "popup"
         )
 
         fun parse(property: JSAssignmentExpression, owner: AbstractJsModelElement, propertyTypesByName: List<JsModelClass.JsModelPropertyRecorder>): JsModelProperty? {
@@ -115,9 +115,8 @@ class JsModelProperty(name: String, val owner: AbstractJsModelElement, val dataT
             if (name.matches(CONSTANT_REGEX)) return null // constants
 
             val isArray = rhs is JSArrayLiteralExpression
-            val propertyTypedByName = propertyTypesByName
-                .mapNotNull { it.use(name, isArray) }
-                .firstOrNull() // do not use firstNotNullOfOrNull here to execute the mapNotNull for all elements before choosing the first
+            val properties = propertyTypesByName.mapNotNull { it.use(name, isArray) }
+            val propertyTypedByName = properties.firstOrNull()
             if (propertyTypedByName != null) {
                 return propertyTypedByName
             }
@@ -196,14 +195,14 @@ class JsModelProperty(name: String, val owner: AbstractJsModelElement, val dataT
         }
 
         fun isCustomType() =
-                this != BOOL
-                        && this != BIG_INTEGER
-                        && this != NUMERIC
-                        && this != STRING
-                        && this != WIDGET
-                        && this != TEXT_KEY
-                        && this != OBJECT
-                        && this != UNKNOWN
+            this != BOOL
+                    && this != BIG_INTEGER
+                    && this != NUMERIC
+                    && this != STRING
+                    && this != WIDGET
+                    && this != TEXT_KEY
+                    && this != OBJECT
+                    && this != UNKNOWN
     }
 
     override fun toString(): String {

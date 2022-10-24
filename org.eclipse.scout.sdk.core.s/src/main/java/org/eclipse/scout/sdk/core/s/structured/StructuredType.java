@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -238,136 +238,132 @@ public class StructuredType implements IStructuredType {
       List<IJavaElement> unknownMethods = new ArrayList<>(m_elements.get(Categories.METHOD_UNCATEGORIZED));
       List<IJavaElement> unknownTypes = new ArrayList<>(m_elements.get(Categories.TYPE_UNCATEGORIZED));
       switch (category) {
-        case FIELD_LOGGER:
-        case FIELD_STATIC:
-        case FIELD_MEMBER:
+        case FIELD_LOGGER, FIELD_STATIC, FIELD_MEMBER -> {
           visitFields(new ArrayList<>(m_elements.get(Categories.FIELD_UNKNOWN)));
           m_visitedCategories.add(Categories.FIELD_LOGGER);
           m_visitedCategories.add(Categories.FIELD_STATIC);
           m_visitedCategories.add(Categories.FIELD_MEMBER);
-          break;
-        case METHOD_CONSTRUCTOR:
+        }
+        case METHOD_CONSTRUCTOR -> {
           visitMethodConstructors(unknownMethods);
           m_visitedCategories.add(Categories.METHOD_CONSTRUCTOR);
           m_elements.put(Categories.METHOD_UNCATEGORIZED, unknownMethods);
-          break;
-        case METHOD_CONFIG_PROPERTY:
+        }
+        case METHOD_CONFIG_PROPERTY -> {
           visitMethodConfigProperty(unknownMethods);
           m_visitedCategories.add(Categories.METHOD_CONFIG_PROPERTY);
           m_elements.put(Categories.METHOD_UNCATEGORIZED, unknownMethods);
-          break;
-        case METHOD_CONFIG_EXEC:
+        }
+        case METHOD_CONFIG_EXEC -> {
           visitMethodConfigExec(unknownMethods);
           m_visitedCategories.add(Categories.METHOD_CONFIG_EXEC);
           m_elements.put(Categories.METHOD_UNCATEGORIZED, unknownMethods);
-          break;
-        case METHOD_FORM_DATA_BEAN:
+        }
+        case METHOD_FORM_DATA_BEAN -> {
           m_visitedCategories.add(Categories.METHOD_FORM_DATA_BEAN);
           visitMethodFormDataBean(unknownMethods);
           m_elements.put(Categories.METHOD_UNCATEGORIZED, unknownMethods);
-          break;
-        case METHOD_OVERRIDDEN:
+        }
+        case METHOD_OVERRIDDEN -> {
           visitMethodOverridden(unknownMethods);
           m_visitedCategories.add(Categories.METHOD_OVERRIDDEN);
           m_elements.put(Categories.METHOD_UNCATEGORIZED, unknownMethods);
-          break;
-        case METHOD_START_HANDLER:
+        }
+        case METHOD_START_HANDLER -> {
           visitMethodStartHandler(unknownMethods);
           m_visitedCategories.add(Categories.METHOD_START_HANDLER);
           m_elements.put(Categories.METHOD_UNCATEGORIZED, unknownMethods);
-          break;
-        case METHOD_INNER_TYPE_GETTER:
+        }
+        case METHOD_INNER_TYPE_GETTER -> {
           visitMethodInnerTypeGetter(unknownMethods);
           m_visitedCategories.add(Categories.METHOD_INNER_TYPE_GETTER);
           m_elements.put(Categories.METHOD_UNCATEGORIZED, unknownMethods);
-          break;
-        case METHOD_LOCAL_BEAN:
+        }
+        case METHOD_LOCAL_BEAN -> {
           visitMethodLocalBean(unknownMethods);
           m_visitedCategories.add(Categories.METHOD_LOCAL_BEAN);
           m_elements.put(Categories.METHOD_UNCATEGORIZED, unknownMethods);
-          break;
-        case TYPE_FORM_FIELD:
+        }
+        case TYPE_FORM_FIELD -> {
           visitTypeFormFields(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_FORM_FIELD);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_COLUMN:
+        }
+        case TYPE_COLUMN -> {
           visitTypeColumns(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_COLUMN);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_CODE:
+        }
+        case TYPE_CODE -> {
           visitTypeCodes(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_CODE);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_FORM:
+        }
+        case TYPE_FORM -> {
           visitTypeForms(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_FORM);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_TABLE:
+        }
+        case TYPE_TABLE -> {
           visitTypeTables(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_TABLE);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_TREE:
+        }
+        case TYPE_TREE -> {
           visitTypeTrees(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_TREE);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_CALENDAR:
+        }
+        case TYPE_CALENDAR -> {
           visitTypeCalendar(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_CALENDAR);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_CALENDAR_ITEM_PROVIDER:
+        }
+        case TYPE_CALENDAR_ITEM_PROVIDER -> {
           visitTypeCalendarItemProvider(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_CALENDAR_ITEM_PROVIDER);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_WIZARD:
+        }
+        case TYPE_WIZARD -> {
           visitTypeWizards(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_WIZARD);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_WIZARD_STEP:
+        }
+        case TYPE_WIZARD_STEP -> {
           visitTypeWizardSteps(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_WIZARD_STEP);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_MENU:
+        }
+        case TYPE_MENU -> {
           visitTypeMenus(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_MENU);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_VIEW_BUTTON:
+        }
+        case TYPE_VIEW_BUTTON -> {
           visitTypeViewButtons(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_VIEW_BUTTON);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_KEYSTROKE:
+        }
+        case TYPE_KEYSTROKE -> {
           visitTypeKeystrokes(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_KEYSTROKE);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_COMPOSER_ATTRIBUTE:
+        }
+        case TYPE_COMPOSER_ATTRIBUTE -> {
           visitTypeComposerAttribute(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_COMPOSER_ATTRIBUTE);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_COMPOSER_ENTRY:
+        }
+        case TYPE_COMPOSER_ENTRY -> {
           visitTypeDataModelEntry(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_COMPOSER_ENTRY);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        case TYPE_FORM_HANDLER:
+        }
+        case TYPE_FORM_HANDLER -> {
           visitTypeFormHandlers(unknownTypes);
           m_visitedCategories.add(Categories.TYPE_FORM_HANDLER);
           m_elements.put(Categories.TYPE_UNCATEGORIZED, unknownTypes);
-          break;
-        default:
-          break;
+        }
       }
     }
   }

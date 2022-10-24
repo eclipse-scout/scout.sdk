@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import java.util.stream.IntStream;
 public final class MessageFormatter {
 
   /**
-   * The pattern for argument place holders: {@code {}}
+   * The pattern for argument placeholders: {@code {}}
    */
   public static final String ARG_REPLACE_PATTERN = "{}";
 
@@ -52,7 +52,7 @@ public final class MessageFormatter {
       rawMessage = "";
     }
 
-    if (args == null || args.length <= 0) {
+    if (args == null || args.length == 0) {
       return new FormattingTuple(rawMessage.toString(), emptyList());
     }
 
@@ -99,8 +99,7 @@ public final class MessageFormatter {
         searchForThrowables(element, collector);
       }
     }
-    else if (o instanceof Iterable<?>) {
-      var it = (Iterable<?>) o;
+    else if (o instanceof Iterable<?> it) {
       for (Object element : it) {
         searchForThrowables(element, collector);
       }

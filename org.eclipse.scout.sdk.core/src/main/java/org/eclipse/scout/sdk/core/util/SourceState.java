@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,14 +67,11 @@ public final class SourceState {
 
     @Override
     public IState next(char c) {
-      switch (c) {
-        case '*':
-          return this;
-        case '/':
-          return DefaultState.INSTANCE;
-        default:
-          return InBlockCommentState.INSTANCE;
-      }
+      return switch (c) {
+        case '*' -> this;
+        case '/' -> DefaultState.INSTANCE;
+        default -> InBlockCommentState.INSTANCE;
+      };
     }
 
     @Override
@@ -88,14 +85,11 @@ public final class SourceState {
 
     @Override
     public IState next(char c) {
-      switch (c) {
-        case '*':
-          return InBlockCommentState.INSTANCE;
-        case '/':
-          return InLineCommentState.INSTANCE;
-        default:
-          return DefaultState.INSTANCE;
-      }
+      return switch (c) {
+        case '*' -> InBlockCommentState.INSTANCE;
+        case '/' -> InLineCommentState.INSTANCE;
+        default -> DefaultState.INSTANCE;
+      };
     }
 
     @Override
@@ -153,16 +147,11 @@ public final class SourceState {
 
     @Override
     public IState next(char c) {
-      switch (c) {
-        case '"':
-        case '`':
-        case '\'':
-          return new InStringState(c);
-        case '/':
-          return AboutToEnterCommentState.INSTANCE;
-        default:
-          return this;
-      }
+      return switch (c) {
+        case '"', '`', '\'' -> new InStringState(c);
+        case '/' -> AboutToEnterCommentState.INSTANCE;
+        default -> this;
+      };
     }
 
     @Override
@@ -182,7 +171,7 @@ public final class SourceState {
      * terminating \n.<br/>
      * So the terminating \n is no longer part of the InLineComment state (it is Default state instead) but a \r just
      * before still is.<br/>
-     * The first slash is NOT part of InLineComment state but it is the AboutToEnterComment state instead. Please note
+     * The first slash is NOT part of InLineComment state, but it is the AboutToEnterComment state instead. Please note
      * that this state may also be a simple division within the code and is therefore no comment state.
      */
     IN_LINE_COMMENT,
@@ -203,7 +192,7 @@ public final class SourceState {
     ABOUT_TO_EXIT_BLOCK_COMMENT,
     /**
      * Indicates a / character which is not within a string or char literal and ist not within a comment. This state
-     * might indicate that a comment is about to begin or it could also belong to e.g. a division.
+     * might indicate that a comment is about to begin, or it could also belong to e.g. a division.
      */
     ABOUT_TO_ENTER_COMMENT,
     /**
@@ -244,7 +233,7 @@ public final class SourceState {
   /**
    * Checks if the given position within the source specified is in a {@link String} or char literal.<br/>
    * The starting and ending quotes are considered to be in the string.<br/>
-   * This is different than the {@link State} enums itself where the ending character never belongs to the just ending
+   * This is different from the {@link State} enums itself where the ending character never belongs to the just ending
    * state.
    * 
    * @param src
@@ -278,7 +267,7 @@ public final class SourceState {
    * (return {@code false}). <br/>
    * For comments the starting slashes, ending slashes and stars are considered to be in the comment and are therefore
    * no code (return {@code false}).<br/>
-   * This is different than the {@link State} enums itself where the ending character never belongs to the just ending
+   * This is different from the {@link State} enums itself where the ending character never belongs to the just ending
    * state.
    *
    * @param src

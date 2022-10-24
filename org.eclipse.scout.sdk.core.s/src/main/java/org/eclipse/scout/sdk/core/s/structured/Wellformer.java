@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.core.s.structured;
-
-import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,9 +41,9 @@ public class Wellformer {
   }
 
   protected static List<IJavaElement> getChildren(IType t) {
-    var fields = t.fields().stream().collect(toList());
-    var innerTypes = t.innerTypes().stream().collect(toList());
-    var methods = t.methods().stream().collect(toList());
+    var fields = t.fields().stream().toList();
+    var innerTypes = t.innerTypes().stream().toList();
+    var methods = t.methods().stream().toList();
     List<IJavaElement> result = new ArrayList<>(fields.size() + innerTypes.size() + methods.size());
     result.addAll(fields);
     result.addAll(methods);

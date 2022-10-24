@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -83,23 +83,14 @@ public abstract class AbstractWizardPage extends WizardPage {
     }
     else {
       var highestSeverityStatus = getHighestSeverityStatus(status);
-      int messagetype;
-      switch (highestSeverityStatus.getSeverity()) {
-        case IStatus.INFO:
-          messagetype = IMessageProvider.INFORMATION;
-          break;
-        case IStatus.WARNING:
-          messagetype = IMessageProvider.WARNING;
-          break;
-        case IStatus.ERROR:
-          messagetype = IMessageProvider.ERROR;
-          break;
-        default:
-          messagetype = IMessageProvider.NONE;
-          break;
-      }
+      var messageType = switch (highestSeverityStatus.getSeverity()) {
+        case IStatus.INFO -> IMessageProvider.INFORMATION;
+        case IStatus.WARNING -> IMessageProvider.WARNING;
+        case IStatus.ERROR -> IMessageProvider.ERROR;
+        default -> IMessageProvider.NONE;
+      };
       var message = highestSeverityStatus.getMessage();
-      setMessage(message, messagetype);
+      setMessage(message, messageType);
     }
     setPageComplete(!status.matches(IStatus.ERROR));
     m_status = status;
@@ -151,7 +142,7 @@ public abstract class AbstractWizardPage extends WizardPage {
   }
 
   /**
-   * call to revalidate the wizard page. this method calls the overwritable method
+   * call to revalidate the wizard page. this method calls the over-writable method
    * {@link AbstractWizardPage#validatePage(MultiStatus)}.
    *
    * @see AbstractWizardPage#validatePage(MultiStatus)

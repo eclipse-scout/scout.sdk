@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.model.api.query;
 
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -125,7 +124,7 @@ public class QueryTest {
     var childClassType = env.requireType(ChildClass.class.getName());
     assertEquals(1, childClassType.methods().withAnnotation(TestAnnotation.class.getName()).stream().count());
 
-    var list = childClassType.methods().stream().filter((element) -> !element.parameters().existsAny()).collect(toList());
+    var list = childClassType.methods().stream().filter((element) -> !element.parameters().existsAny()).toList();
     assertEquals(2, list.size());
     assertTrue(list.get(0).isConstructor());
 
@@ -162,11 +161,11 @@ public class QueryTest {
     var firstParam = paramAnnotationChildClass.methods().first().orElseThrow().parameters().first().orElseThrow();
     var secondParam = paramAnnotationChildClass.methods().first().orElseThrow().parameters().item(1).orElseThrow();
 
-    var firstParamAnnotations = firstParam.annotations().withSuperTypes(true).stream().collect(toList());
+    var firstParamAnnotations = firstParam.annotations().withSuperTypes(true).stream().toList();
     assertEquals(2, firstParamAnnotations.size());
     assertEquals("test", firstParamAnnotations.get(1).element("msg").orElseThrow().value().as(String.class));
 
-    var secondParamAnnotations = secondParam.annotations().withSuperTypes(true).stream().collect(toList());
+    var secondParamAnnotations = secondParam.annotations().withSuperTypes(true).stream().toList();
     assertEquals(1, secondParamAnnotations.size());
     assertEquals(ParamMarkerAnnotation.class.getName(), secondParamAnnotations.get(0).type().name());
 

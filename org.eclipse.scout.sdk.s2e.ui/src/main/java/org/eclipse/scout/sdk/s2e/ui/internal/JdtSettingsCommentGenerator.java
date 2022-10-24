@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -169,24 +169,22 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       var fieldTypeSimpleName = UNDEFINED_VAR_VALUE;
       String templateName;
       switch (type) {
-        case METHOD_TYPE_GETTER:
+        case METHOD_TYPE_GETTER -> {
           templateName = CodeTemplateContextType.GETTERCOMMENT_ID;
           if (returnTypeName.isPresent()) {
             fieldTypeSimpleName = JavaTypes.simpleName(returnTypeName.orElseThrow());
           }
-          break;
-        case METHOD_TYPE_SETTER:
+        }
+        case METHOD_TYPE_SETTER -> {
           templateName = CodeTemplateContextType.SETTERCOMMENT_ID;
           var firstParam = target.parameters().findAny().map(p -> p.reference(builderContext));
           if (firstParam.isPresent()) {
             fieldTypeSimpleName = JavaTypes.simpleName(firstParam.orElseThrow());
           }
-          break;
-        default:
-          templateName = returnTypeName
-              .map(s -> CodeTemplateContextType.METHODCOMMENT_ID)
-              .orElse(CodeTemplateContextType.CONSTRUCTORCOMMENT_ID);
-          break;
+        }
+        default -> templateName = returnTypeName
+            .map(s -> CodeTemplateContextType.METHODCOMMENT_ID)
+            .orElse(CodeTemplateContextType.CONSTRUCTORCOMMENT_ID);
       }
 
       var template = getCodeTemplate(templateName, ownerProject);
@@ -306,7 +304,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
   }
 
   private static String evaluateTemplate(TemplateContext context, Template template) {
-    // replace the user name resolver with our own to ensure we can respect the scout specific user names.
+    // replace the username resolver with our own to ensure we can respect the scout specific usernames.
     var resolvers = context.getContextType().resolvers();
     while (resolvers.hasNext()) {
       var resolver = resolvers.next();

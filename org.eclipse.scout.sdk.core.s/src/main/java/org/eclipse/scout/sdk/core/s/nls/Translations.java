@@ -298,14 +298,11 @@ public final class Translations {
       return computeStoresForModule(modulePath, env, progress, ALL_SCOPES);
     }
 
-    switch (scope) {
-      case JAVA:
-        return forJavaModule(modulePath, env, progress);
-      case NODE:
-        return forNodeModule(modulePath, env, progress);
-      default:
-        throw newFail("Scope not implemented: {}", scope);
-    }
+    return switch (scope) {
+      case JAVA -> forJavaModule(modulePath, env, progress);
+      case NODE -> forNodeModule(modulePath, env, progress);
+      default -> throw newFail("Scope not implemented: {}", scope);
+    };
   }
 
   /**

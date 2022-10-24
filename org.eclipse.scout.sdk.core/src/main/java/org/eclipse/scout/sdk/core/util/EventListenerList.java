@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.core.util;
 
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toUnmodifiableList;
+import static java.util.Collections.unmodifiableList;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -82,17 +82,17 @@ public final class EventListenerList {
    *
    * @param type
    *          The type or {@code null} if all should be returned.
-   * @return The matching listeners as unmodifiable {@link Collection}.
+   * @return The matching listeners as unmodifiable {@link List}.
    */
   @SuppressWarnings("unchecked")
-  public <T extends EventListener> Collection<T> get(Class<T> type) {
-    Collection<Object> candidates;
+  public <T extends EventListener> List<T> get(Class<T> type) {
+    List<Object> listeners;
     synchronized (m_lock) {
       if (m_listeners == null) {
         return emptyList();
       }
 
-      candidates = new ArrayList<>(m_listeners.size());
+      listeners = new ArrayList<>(m_listeners.size());
       var iterator = m_listeners.iterator();
       while (iterator.hasNext()) {
         var listener = iterator.next();
@@ -102,24 +102,21 @@ public final class EventListenerList {
             iterator.remove(); // housekeeping: remove weak-listener that was reclaimed
           }
           else {
-            candidates.add(inner);
+            listeners.add(inner);
           }
         }
         else {
-          candidates.add(listener);
+          listeners.add(listener);
         }
       }
     }
-
+    var result = (List<T>) ((List<?>) listeners);
     if (type == null) {
-      return candidates.stream()
-          .map(candidate -> (T) candidate)
-          .collect(toUnmodifiableList());
+      return unmodifiableList(result);
     }
-    return candidates.stream()
+    return result.stream()
         .filter(candidate -> type.isAssignableFrom(candidate.getClass()))
-        .map(candidate -> (T) candidate)
-        .collect(toUnmodifiableList());
+        .toList();
   }
 
   /**

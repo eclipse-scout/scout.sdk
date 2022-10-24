@@ -14,7 +14,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.eclipse.scout.sdk.core.log.SdkLog.onTrace;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.bindingToType;
 import static org.eclipse.scout.sdk.core.model.ecj.SpiWithEcjUtils.sourceMethodOf;
@@ -468,7 +467,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
   public List<ClasspathSpi> getClasspath() {
     return m_classpath.computeIfAbsentAndGet(() -> m_rawClassPath.stream()
         .map(this::classpathEntryToSpi)
-        .collect(toUnmodifiableList()));
+        .toList());
   }
 
   public VoidTypeWithEcj createVoidType() {
@@ -716,8 +715,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
     for (var mb : valueMethods) {
       var name = new String(mb.selector);
       var md0 = Ensure.notNull(sourceMethodOf(mb), "binding is binary. Source method could not be found.");
-      if (md0 instanceof AnnotationMethodDeclaration) {
-        var md = (AnnotationMethodDeclaration) md0;
+      if (md0 instanceof AnnotationMethodDeclaration md) {
         if (md.defaultValue != null) {
           defaultValues.put(name, new MemberValuePair(mb.selector, md.defaultValue.sourceStart, md.defaultValue.sourceEnd, md.defaultValue));
         }

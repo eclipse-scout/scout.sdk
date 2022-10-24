@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -241,16 +241,15 @@ public class WorkingCopyTransformerTest {
       public IMethodGenerator<?, ?> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ?>> input) {
         var templateMethod = input.model();
         var overrideGenerator = input.requestDefaultWorkingCopy();
-        switch (templateMethod.elementName()) {
-          case "toString":
+        return switch (templateMethod.elementName()) {
+          case "toString" ->
             // provide method body for toString method
-            return overrideGenerator.withBody(b -> b.returnClause().stringLiteral("SampleCloseable class").semicolon());
-          case "close":
+            overrideGenerator.withBody(b -> b.returnClause().stringLiteral("SampleCloseable class").semicolon());
+          case "close" ->
             // remove throws declaration for close method
-            return overrideGenerator.withoutThrowable(Exception.class.getName());
-          default:
-            return overrideGenerator;
-        }
+            overrideGenerator.withoutThrowable(Exception.class.getName());
+          default -> overrideGenerator;
+        };
       }
     };
 
@@ -278,16 +277,15 @@ public class WorkingCopyTransformerTest {
       public IMethodGenerator<?, ?> transformMethod(ITransformInput<IMethod, IMethodGenerator<?, ?>> input) {
         var templateMethod = input.model();
         var overrideGenerator = input.requestDefaultWorkingCopy();
-        switch (templateMethod.elementName()) {
-          case "toString":
+        return switch (templateMethod.elementName()) {
+          case "toString" ->
             // provide method body for toString method
-            return overrideGenerator.withBody(b -> b.returnClause().stringLiteral("SampleCloseable class").semicolon());
-          case "close":
+            overrideGenerator.withBody(b -> b.returnClause().stringLiteral("SampleCloseable class").semicolon());
+          case "close" ->
             // remove throws declaration for close method
-            return overrideGenerator.withoutThrowable(Exception.class.getName());
-          default:
-            return overrideGenerator;
-        }
+            overrideGenerator.withoutThrowable(Exception.class.getName());
+          default -> overrideGenerator;
+        };
       }
     };
 
@@ -423,7 +421,7 @@ public class WorkingCopyTransformerTest {
     };
     var generator = baseType.toWorkingCopy(removeAllAnnotationsTransformer);
 
-    // change the name so that the original class is not changed in the IJavaEnvironment. Otherwise it is modified for later tests
+    // change the name so that the original class is not changed in the IJavaEnvironment. Otherwise, it is modified for later tests
     var newClassName = "OtherClass";
     generator.mainType().orElseThrow().withElementName(newClassName);
     generator.withElementName(newClassName);
@@ -483,7 +481,7 @@ public class WorkingCopyTransformerTest {
         .requireCompilationUnit()
         .toWorkingCopy(t);
 
-    // build the source here as some of the components are transformed during generation time and not during setup time.
+    // build the source here as some components are transformed during generation time and not during setup time.
     var primaryType = CoreTestingUtils.registerCompilationUnit(env, generator);
 
     assertArrayEquals(components, t.m_protocol.toArray(new String[0]));

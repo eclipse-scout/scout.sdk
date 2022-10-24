@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.model.api;
 
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -33,7 +32,7 @@ public class AnnotationTest {
     var childClassType = env.requireType(ChildClass.class.getName());
 
     // type annotation
-    var annotations = childClassType.annotations().stream().collect(toList());
+    var annotations = childClassType.annotations().stream().toList();
     assertEquals(1, annotations.size());
     var annotation = annotations.get(0);
     var nreal = 0;
@@ -112,7 +111,7 @@ public class AnnotationTest {
     var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
 
     // type annotation
-    var annotations = baseClassType.annotations().stream().collect(toList());
+    var annotations = baseClassType.annotations().stream().toList();
     assertEquals(1, annotations.size());
     var annotation = annotations.get(0);
     var nreal = 0;

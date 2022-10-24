@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -44,7 +44,7 @@ public class HugeCodeTypeTest {
     var scoutApi = env.requireApi(IScoutApi.class);
     var superType = scoutApi.AbstractCodeType().fqn() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_COMMA + JavaTypes.Long + JavaTypes.C_GENERIC_END;
     var packageName = HugeCodeType.class.getPackage().getName();
-    CodeTypeGenerator<?> ctg = new CodeTypeGenerator<>()
+    var ctg = new CodeTypeGenerator<>()
         .withPackageName(packageName)
         .withElementName(HugeCodeType.class.getSimpleName())
         .withClassIdValue("whocares")

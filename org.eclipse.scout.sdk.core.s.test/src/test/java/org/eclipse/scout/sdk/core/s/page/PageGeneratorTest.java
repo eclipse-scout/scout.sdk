@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,7 +43,7 @@ public class PageGeneratorTest {
     for (var i = 0; i < 2; i++) {
       // page service
       var dataFetchMethodName = "getTestTableData";
-      ServiceInterfaceGenerator<?> svcIfcGenerator = new ServiceInterfaceGenerator<>()
+      var svcIfcGenerator = new ServiceInterfaceGenerator<>()
           .withPackageName("org.eclipse.scout.sdk.core.s.test")
           .withElementName("IMyPageService" + i)
           .withMethod(MethodGenerator.create()
@@ -57,7 +57,7 @@ public class PageGeneratorTest {
       var createdSvcIfc = assertNoCompileErrors(env, svcIfcGenerator);
 
       // page
-      PageGenerator<?> pageGenerator = new PageGenerator<>()
+      var pageGenerator = new PageGenerator<>()
           .withPackageName("org.eclipse.scout.sdk.core.s.test")
           .withElementName("MyTablePage" + i)
           .withClassIdValue("whatever")
@@ -78,7 +78,7 @@ public class PageGeneratorTest {
   public void testPageWithNodes(IJavaEnvironment env) {
     for (var i = 0; i < 2; i++) {
       // page
-      PageGenerator<?> pageGenerator = new PageGenerator<>()
+      var pageGenerator = new PageGenerator<>()
           .withElementName("MyNodePage" + i)
           .withClassIdValue("whatever")
           .asPageWithTable(false)

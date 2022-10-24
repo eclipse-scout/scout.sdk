@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -67,25 +67,16 @@ public final class TranslationInputValidator {
   }
 
   private static String getValidationText(int validationResult) {
-    switch (validationResult) {
-      case TranslationValidator.OK:
-        return "";
-      case TranslationValidator.DEFAULT_TRANSLATION_MISSING_ERROR:
-        return "The default text must be set.";
-      case TranslationValidator.KEY_EMPTY_ERROR:
-        return "Please specify a key.";
-      case TranslationValidator.KEY_ALREADY_EXISTS_ERROR:
-        return "This key already exists!";
-      case TranslationValidator.KEY_OVERRIDES_OTHER_STORE_WARNING:
-        return "The key overrides an inherited entry.";
-      case TranslationValidator.KEY_IS_OVERRIDDEN_BY_OTHER_STORE_WARNING:
-        return "The key is overridden by another entry.";
-      case TranslationValidator.KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING:
-        return "The key overrides an inherited entry and is itself overridden by another entry.";
-      case TranslationValidator.TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING:
-        return "This text will be removed and the inherited text becomes active.";
-      default:
-        return "The key is not valid.";
-    }
+    return switch (validationResult) {
+      case TranslationValidator.OK -> "";
+      case TranslationValidator.DEFAULT_TRANSLATION_MISSING_ERROR -> "The default text must be set.";
+      case TranslationValidator.KEY_EMPTY_ERROR -> "Please specify a key.";
+      case TranslationValidator.KEY_ALREADY_EXISTS_ERROR -> "This key already exists!";
+      case TranslationValidator.KEY_OVERRIDES_OTHER_STORE_WARNING -> "The key overrides an inherited entry.";
+      case TranslationValidator.KEY_IS_OVERRIDDEN_BY_OTHER_STORE_WARNING -> "The key is overridden by another entry.";
+      case TranslationValidator.KEY_OVERRIDES_AND_IS_OVERRIDDEN_WARNING -> "The key overrides an inherited entry and is itself overridden by another entry.";
+      case TranslationValidator.TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING -> "This text will be removed and the inherited text becomes active.";
+      default -> "The key is not valid.";
+    };
   }
 }

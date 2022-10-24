@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -34,7 +34,7 @@ public class StyledTextField extends TextField {
   private P_SuffixListener m_suffixListener;
   private String m_readOnlyPrefix;
   private String m_readOnlySuffix;
-  private final OptimisticLock m_revalLock = new OptimisticLock();
+  private final OptimisticLock m_revealLock = new OptimisticLock();
 
   /**
    * Creates a new {@link StyledTextField} with a label and no image.
@@ -180,12 +180,12 @@ public class StyledTextField extends TextField {
      * A regex may contain several placeholders marked as #0# ... #xx#. This method is used to replace the placeholders.
      *
      * @param regex
-     *          the regex containing the exactly same amount of placeholders as the replacements conatins items.
+     *          the regex containing the exactly same amount of placeholders as the replacements contains items.
      * @param replacements
      *          the array of replacements
      * @return replaced regex expression.
      */
-    private String replace(String regex, String... replacements) {
+    private static String replace(String regex, String... replacements) {
       var sb = new StringBuilder(regex);
       for (var i = 0; i < replacements.length; i++) {
         var index = 0;
@@ -213,25 +213,21 @@ public class StyledTextField extends TextField {
     @SuppressWarnings({"squid:SwitchLastCaseIsDefaultCheck", "SuspiciousNameCombination"})
     public void handleEvent(Event event) {
       try {
-        if (m_revalLock.acquire()) {
+        if (m_revealLock.acquire()) {
           var textSelection = getTextComponent().getSelection();
           var suffixMatcher = m_preSuffixPattern.matcher(getTextComponent().getText());
           if (suffixMatcher.find()) {
             switch (event.type) {
-              case SWT.Verify:
+              case SWT.Verify -> {
                 if (event.character == SWT.BS) {
                   event.doit = !(textSelection.x - 1 < suffixMatcher.end(1) && textSelection.x == textSelection.y);
                 }
                 if (event.character == SWT.DEL) {
                   event.doit = !(textSelection.x + 1 > suffixMatcher.start(2) && textSelection.x == textSelection.y);
                 }
-                break;
-              case SWT.Modify:
-                updateStyleRanges();
-                break;
-              case SWT.KeyDown:
-              case SWT.MouseDown:
-              case SWT.Selection:
+              }
+              case SWT.Modify -> updateStyleRanges();
+              case SWT.KeyDown, SWT.MouseDown, SWT.Selection -> {
                 var selection = getTextComponent().getSelection();
                 if (selection.x < suffixMatcher.end(1)) {
                   selection.x = suffixMatcher.end(1);
@@ -250,22 +246,21 @@ public class StyledTextField extends TextField {
                 if (!event.doit) {
                   getTextComponent().setSelection(selection);
                 }
-                break;
-              case SWT.FocusIn:
+              }
+              case SWT.FocusIn -> {
                 var x = getTextComponent().getSelection().x;
                 if (x < suffixMatcher.end(1) || x > suffixMatcher.start(2)) {
                   getTextComponent().setSelection(suffixMatcher.end(1));
                 }
-                break;
+              }
             }
           }
 
         }
       }
       finally {
-        m_revalLock.release();
+        m_revealLock.release();
       }
-
     }
 
     String getPrefix() {
@@ -278,7 +273,7 @@ public class StyledTextField extends TextField {
 
     void setSuffix(String postfix) {
       try {
-        if (m_revalLock.acquire()) {
+        if (m_revealLock.acquire()) {
           if (postfix == null) {
             postfix = "";
           }
@@ -300,14 +295,14 @@ public class StyledTextField extends TextField {
         }
       }
       finally {
-        m_revalLock.release();
+        m_revealLock.release();
       }
 
     }
 
     void setPrefix(String prefix) {
       try {
-        if (m_revalLock.acquire()) {
+        if (m_revealLock.acquire()) {
           if (prefix == null) {
             prefix = "";
           }
@@ -329,7 +324,7 @@ public class StyledTextField extends TextField {
         }
       }
       finally {
-        m_revalLock.release();
+        m_revealLock.release();
       }
 
     }

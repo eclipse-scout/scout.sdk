@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -245,28 +245,18 @@ public final class JavaTypes {
       return null;
     }
     var fqnStr = fqn.toString();
-    switch (fqnStr) {
-      case _boolean:
-        return Boolean;
-      case _char:
-        return Character;
-      case _byte:
-        return Byte;
-      case _short:
-        return Short;
-      case _int:
-        return Integer;
-      case _long:
-        return Long;
-      case _float:
-        return Float;
-      case _double:
-        return Double;
-      case _void:
-        return Void;
-      default:
-        return fqnStr;
-    }
+    return switch (fqnStr) {
+      case _boolean -> Boolean;
+      case _char -> Character;
+      case _byte -> Byte;
+      case _short -> Short;
+      case _int -> Integer;
+      case _long -> Long;
+      case _float -> Float;
+      case _double -> Double;
+      case _void -> Void;
+      default -> fqnStr;
+    };
   }
 
   /**
@@ -283,28 +273,18 @@ public final class JavaTypes {
       return null;
     }
     var fqnStr = fqn.toString();
-    switch (fqnStr) {
-      case Boolean:
-        return _boolean;
-      case Character:
-        return _char;
-      case Byte:
-        return _byte;
-      case Short:
-        return _short;
-      case Integer:
-        return _int;
-      case Long:
-        return _long;
-      case Float:
-        return _float;
-      case Double:
-        return _double;
-      case Void:
-        return _void;
-      default:
-        return fqnStr;
-    }
+    return switch (fqnStr) {
+      case Boolean -> _boolean;
+      case Character -> _char;
+      case Byte -> _byte;
+      case Short -> _short;
+      case Integer -> _int;
+      case Long -> _long;
+      case Float -> _float;
+      case Double -> _double;
+      case Void -> _void;
+      default -> fqnStr;
+    };
   }
 
   /**
@@ -318,20 +298,10 @@ public final class JavaTypes {
     if (fqn == null) {
       return false;
     }
-    switch (fqn.toString()) {
-      case _boolean:
-      case _char:
-      case _byte:
-      case _short:
-      case _int:
-      case _long:
-      case _float:
-      case _double:
-      case _void:
-        return true;
-      default:
-        return false;
-    }
+    return switch (fqn.toString()) {
+      case _boolean, _char, _byte, _short, _int, _long, _float, _double, _void -> true;
+      default -> false;
+    };
   }
 
   /**
@@ -373,33 +343,15 @@ public final class JavaTypes {
       return null;
     }
 
-    switch (dataType.toString()) {
-      case _boolean:
-      case Boolean:
-        return "false";
-      case _byte:
-      case Byte:
-      case _char:
-      case Character:
-      case _int:
-      case Integer:
-      case _short:
-      case Short:
-        return "0";
-      case _double:
-      case Double:
-        return "0.0";
-      case _float:
-      case Float:
-        return "0.0f";
-      case _long:
-      case Long:
-        return "0L";
-      case _void:
-        return null;
-      default:
-        return "null";
-    }
+    return switch (dataType.toString()) {
+      case _boolean, Boolean -> "false";
+      case _byte, Byte, _char, Character, _int, Integer, _short, Short -> "0";
+      case _double, Double -> "0.0";
+      case _float, Float -> "0.0f";
+      case _long, Long -> "0L";
+      case _void -> null;
+      default -> "null";
+    };
   }
 
   /**
@@ -468,7 +420,7 @@ public final class JavaTypes {
   }
 
   /**
-   * Returns an unique identifier for a method with given name and given parameter types. The identifier looks like
+   * Returns a unique identifier for a method with given name and given parameter types. The identifier looks like
    * '{@code methodName(dataTypeOfParam1,dataTypeOfParam2)}'.
    * 
    * @param method
@@ -484,7 +436,7 @@ public final class JavaTypes {
   }
 
   /**
-   * Returns an unique identifier for a method with given name and given parameter types. The identifier looks like
+   * Returns a unique identifier for a method with given name and given parameter types. The identifier looks like
    * '{@code methodName(dataTypeOfParam1,dataTypeOfParam2)}'.
    *
    * @param methodName
@@ -510,7 +462,7 @@ public final class JavaTypes {
   }
 
   /**
-   * Returns an unique identifier for the given {@link Method}. The identifier looks like
+   * Returns a unique identifier for the given {@link Method}. The identifier looks like
    * '{@code methodName(dataTypeOfParam1,dataTypeOfParam2)}'. Only the type erasure is used.
    *
    * @param method
@@ -522,7 +474,7 @@ public final class JavaTypes {
   }
 
   /**
-   * Returns an unique identifier for the given {@link Method}. The identifier looks like
+   * Returns a unique identifier for the given {@link Method}. The identifier looks like
    * '{@code methodName(dataTypeOfParam1,dataTypeOfParam2)}'.
    *
    * @param method

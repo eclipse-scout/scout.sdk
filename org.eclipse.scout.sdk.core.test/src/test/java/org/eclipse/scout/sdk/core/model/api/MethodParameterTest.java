@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.model.api;
 
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,7 +31,7 @@ public class MethodParameterTest {
     var childClassType = env.requireType(ChildClass.class.getName());
     assertEquals(3, childClassType.methods().stream().count());
     var method = childClassType.methods().item(1).orElseThrow();
-    var methodInChildClassParams = method.parameters().stream().collect(toList());
+    var methodInChildClassParams = method.parameters().stream().toList();
     assertEquals(2, methodInChildClassParams.size());
 
     var firstParam = methodInChildClassParams.get(0);
@@ -63,7 +62,7 @@ public class MethodParameterTest {
     var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
     assertEquals(2, baseClassType.methods().stream().count());
     var method = baseClassType.methods().first().orElseThrow();
-    var methodInBaseClassParams = method.parameters().stream().collect(toList());
+    var methodInBaseClassParams = method.parameters().stream().toList();
     assertEquals(1, methodInBaseClassParams.size());
 
     var runnableParam = methodInBaseClassParams.get(0);

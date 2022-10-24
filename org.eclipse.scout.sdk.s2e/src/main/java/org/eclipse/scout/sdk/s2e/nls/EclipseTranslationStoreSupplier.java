@@ -77,7 +77,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
   private static Stream<ITranslationStore> visibleTranslationStores(IJavaProject jp, EclipseEnvironment env, EclipseProgress progress) {
     progress.init(20, "Search properties text provider services.");
 
-    var dynamicNlsTextProviderServices = resolveSubClasses(jp, IScoutApi::AbstractDynamicNlsTextProviderService, env, progress.newChild(10)).collect(toList());
+    var dynamicNlsTextProviderServices = resolveSubClasses(jp, IScoutApi::AbstractDynamicNlsTextProviderService, env, progress.newChild(10)).toList();
     var loopProgress = progress
         .newChild(10)
         .setWorkRemaining(dynamicNlsTextProviderServices.size());
@@ -226,8 +226,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     Collection<ITranslationPropertiesFile> translationFiles = new ArrayList<>();
     var fileNamePrefix = store.service().filePrefix();
     for (var o : textFolder.getNonJavaResources()) {
-      if (o instanceof IStorage) {
-        var f = (IStorage) o;
+      if (o instanceof IStorage f) {
         parseLanguageFromFileName(f.getName(), fileNamePrefix)
             .map(lang -> new ReadOnlyTranslationFile(() -> contentsOf(f), lang, f))
             .ifPresent(translationFiles::add);

@@ -408,7 +408,6 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     setAvailableVersions(singletonList(IMavenConstants.LATEST));
   }
 
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private void setAvailableVersions(List<String> versions) {
     m_scoutVersions.clear();
     m_scoutVersions.addAll(versions);

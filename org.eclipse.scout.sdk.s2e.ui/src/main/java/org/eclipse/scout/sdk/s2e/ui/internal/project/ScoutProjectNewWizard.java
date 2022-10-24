@@ -119,8 +119,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
 
       // by default remove all wrong proposals so that only one proposal by execution-id remains -> default selection can choose and is correct by default.
       for (var entry : discoveryRequest.getAllProposals().entrySet()) {
-        if (entry.getKey() instanceof MojoExecutionMappingRequirement) {
-          var req = (MojoExecutionMappingRequirement) entry.getKey();
+        if (entry.getKey()instanceof MojoExecutionMappingRequirement req) {
           if ("default-compile".equals(req.getExecutionId()) || "default-testCompile".equals(req.getExecutionId())) {
             var proposals = entry.getValue();
             if (proposals != null && proposals.size() > 1) {

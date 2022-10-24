@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -147,16 +147,14 @@ public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
     var resource = root.getResource();
     if (resource != null && resource.exists()) {
       // check file
-      if (resource instanceof IFile) {
-        var f = (IFile) resource;
+      if (resource instanceof IFile f) {
         var charset = f.getCharset(true);
         if (isValidEncoding(charset, root)) {
           return charset;
         }
       }
-      else if (resource instanceof IContainer) {
+      else if (resource instanceof IContainer c) {
         // check folder
-        var c = (IContainer) resource;
         var charset = c.getDefaultCharset(true);
         if (isValidEncoding(charset, root)) {
           return charset;

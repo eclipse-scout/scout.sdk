@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.model.api;
 
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.testing.CoreTestingUtils.registerCompilationUnit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -107,7 +106,7 @@ public class FieldTest {
   @Test
   public void testConstantValues(IJavaEnvironment env) {
     var constantTestClass = env.requireType(ConstantTestClass.class.getName());
-    var fields = constantTestClass.fields().stream().collect(toList());
+    var fields = constantTestClass.fields().stream().toList();
     assertEquals(4, fields.size());
     assertFalse(fields.get(0).constantValue().isPresent());
     assertEquals(MetaValueType.String, fields.get(1).constantValue().orElseThrow().type());

@@ -202,7 +202,6 @@ class TransactionManager constructor(val project: Project, val transactionName: 
      * @param progress The [IdeaProgress] for progress indication
      * @return true if all [TransactionMember]s have been committed successfully
      */
-    @Suppress("unused")
     fun checkpoint(progress: IdeaProgress?) = synchronized(this) { finishTransactionImpl(true, progress.toIdea()) }
 
     /**

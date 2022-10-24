@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.model.api;
 
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -29,21 +28,21 @@ public class TypeParameterTest {
   @Test
   public void testChildClassTypeParams(IJavaEnvironment env) {
     var childClassType = env.requireType(ChildClass.class.getName());
-    var typeParameters = childClassType.typeParameters().collect(toList());
+    var typeParameters = childClassType.typeParameters().toList();
     assertEquals(1, typeParameters.size());
 
     var param = typeParameters.get(0);
     assertEquals("X", param.elementName());
     assertEquals(childClassType, param.declaringMember());
 
-    var bounds = param.bounds().collect(toList());
+    var bounds = param.bounds().toList();
     assertEquals(3, bounds.size());
     assertEquals(AbstractList.class.getName(), bounds.get(0).name());
     assertEquals(Runnable.class.getName(), bounds.get(1).name());
     assertEquals(Serializable.class.getName(), bounds.get(2).name());
-    var expectedParmSrc = "X extends AbstractList<String> & Runnable & Serializable";
-    assertEquals(expectedParmSrc, param.toWorkingCopy().toJavaSource().toString());
-    assertEquals(expectedParmSrc, param.source().orElseThrow().asCharSequence().toString());
+    var expectedParamSrc = "X extends AbstractList<String> & Runnable & Serializable";
+    assertEquals(expectedParamSrc, param.toWorkingCopy().toJavaSource().toString());
+    assertEquals(expectedParamSrc, param.source().orElseThrow().asCharSequence().toString());
 
     var abstractListBound = bounds.get(0);
     assertEquals(String.class.getName(), abstractListBound.typeArguments().findAny().orElseThrow().name());
@@ -68,7 +67,7 @@ public class TypeParameterTest {
   @Test
   public void testBaseClassTypeParams(IJavaEnvironment env) {
     var baseClassType = env.requireType(ChildClass.class.getName()).requireSuperClass();
-    var typeParameters = baseClassType.typeParameters().collect(toList());
+    var typeParameters = baseClassType.typeParameters().toList();
     assertEquals(2, typeParameters.size());
 
     var param = typeParameters.get(0);

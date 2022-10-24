@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -71,9 +71,7 @@ public class ImportValidatorTest {
         new ImportValidator(collector).useReference("d.e.f.TopLevelAnother$MyClassThree< java.lang.Long >$InnerClass<org.test.Boolean>$SecondInner<java.util.Map<java.lang.Long[][][], java.test.Whatever$Other[]>>$ThirdInner");
     assertEquals("MyClassThree<Long>$InnerClass<Boolean>$SecondInner<Map<Long[][][],Other[]>>$ThirdInner", result);
 
-    var collectedImports = collector.getImports()
-        .map(StringBuilder::toString)
-        .collect(toList());
+    var collectedImports = collector.getImports().map(StringBuilder::toString).toList();
 
     assertEquals(5, collectedImports.size());
     assertEquals("java.lang.Long", collectedImports.get(0));
@@ -265,8 +263,7 @@ public class ImportValidatorTest {
     assertEquals("Entry<? extends Serializable,Set<? extends Inner>>", ref);
 
     var collectedImports = iv.getImports()
-        .map(StringBuilder::toString)
-        .collect(toList());
+        .map(StringBuilder::toString).toList();
 
     assertEquals(4, collectedImports.size());
     assertTrue(collectedImports.contains("java.util.Map.Entry"));

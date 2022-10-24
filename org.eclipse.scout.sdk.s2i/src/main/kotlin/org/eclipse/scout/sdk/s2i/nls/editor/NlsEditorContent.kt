@@ -56,7 +56,6 @@ import java.util.regex.Pattern
 import javax.swing.Icon
 import javax.swing.JComponent
 import javax.swing.event.DocumentEvent
-import kotlin.streams.toList
 
 class NlsEditorContent(val project: Project, val translationManager: TranslationManager, val primaryStore: ITranslationStore) : JBPanel<NlsEditorContent>(GridBagLayout()) {
 
@@ -171,7 +170,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
 
     private fun createToolbar(): JComponent {
         val toolbar = ActionManager.getInstance().createActionToolbar(ActionPlaces.EDITOR_TOOLBAR, createToolbarActionGroup(), false)
-        toolbar.setTargetComponent(this)
+        toolbar.targetComponent = this
         return toolbar.component
     }
 
@@ -218,6 +217,8 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
             e.presentation.isVisible = !hideWhenDisabled || e.presentation.isEnabled
         }
 
+        override fun getActionUpdateThread() = ActionUpdateThread.EDT
+
         override fun actionPerformed(e: AnActionEvent) {
             val translation = m_table.selectedTranslations().firstOrNull() ?: return
             val language = m_table.selectedLanguages().firstOrNull()
@@ -230,6 +231,8 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
         override fun update(e: AnActionEvent) {
             e.presentation.isEnabled = primaryStore.isEditable
         }
+
+        override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
         override fun actionPerformed(e: AnActionEvent) = TranslationNewDialogOpenAction(primaryStore).actionPerformed(e)
     }
@@ -260,6 +263,8 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
             }
         }
 
+        override fun getActionUpdateThread() = ActionUpdateThread.EDT
+
         override fun actionPerformed(e: AnActionEvent) {
             val toDelete = m_table.selectedTranslations()
                 .map { it.key() }
@@ -273,6 +278,8 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
             e.presentation.isEnabled = m_table.selectedTranslations().size == 1
             e.presentation.isVisible = !hideWhenDisabled || e.presentation.isEnabled
         }
+
+        override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
         override fun actionPerformed(e: AnActionEvent) {
             val selection = m_table.selectedTranslations()
@@ -322,6 +329,8 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
             e.presentation.isEnabled = primaryStore.isEditable
         }
 
+        override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
         override fun actionPerformed(e: AnActionEvent) = LanguageNewDialog(project, primaryStore, translationManager).show()
     }
 
@@ -337,6 +346,9 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
         override fun update(e: AnActionEvent) {
             e.presentation.isEnabled = primaryStore.isEditable
         }
+
+        override fun getActionUpdateThread() = ActionUpdateThread.BGT
+
 
         override fun actionPerformed(e: AnActionEvent) {
             val descriptor = FileChooserDescriptor(true, false, false, false, false, false)
@@ -413,6 +425,8 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
         override fun update(e: AnActionEvent) {
             e.presentation.isEnabled = m_table.visibleRowCount() > 0
         }
+
+        override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
         override fun actionPerformed(e: AnActionEvent) {
             val fileSaverDescriptor = FileSaverDescriptor(message("export.translations"), message("export.translations.desc"), "xlsx")

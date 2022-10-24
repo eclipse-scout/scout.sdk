@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -89,13 +89,14 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
   }
 
   /**
-   * Exclude classpaths containing Scout SDK dependencies itself
+   * Exclude classpath containing Scout SDK dependencies itself
    *
    * @return this
    */
   public T withoutScoutSdk() {
     excludeIfContains("wsdl4j");
     exclude(".*" + Pattern.quote(".scout.sdk.") + ".*target/.*\\.jar");
+    exclude(".*ecj-.*\\.jar");
     return exclude(".*" + Pattern.quote(".scout.sdk.") + ".*target/classes");
   }
 
@@ -119,7 +120,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
   }
 
   /**
-   * Exclude all classpaths that match the specified regular expression.
+   * Exclude all classpath that match the specified regular expression.
    *
    * @param regex
    *          file path pattern with '/' as delimiter. Must not be {@code null}.
@@ -133,7 +134,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
   }
 
   /**
-   * Exclude all classpaths that contain the specified {@link String}.
+   * Exclude all classpath that contain the specified {@link String}.
    * 
    * @param string
    *          All paths (having '/' as delimiter) containing this {@link String} are excluded from the classpath.
@@ -146,7 +147,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
   /**
    * Include all classpath that match the specified regular expression.
    * <p>
-   * Implementation note: By default all paths are included. Therefore this method just moves items from the list of
+   * Implementation note: By default all paths are included. Therefore, this method just moves items from the list of
    * excludes (see {@link #exclude(String)}).
    *
    * @param regex
@@ -201,7 +202,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
   }
 
   /**
-   * Exclude source classpaths that match the specified regular expression.
+   * Exclude source classpath that match the specified regular expression.
    *
    * @param regex
    *          file path pattern with '/' as delimiter. Must not be {@code null}.
@@ -385,7 +386,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
       else {
         var extension = CoreUtils.extensionOf(path);
         if ("jar".equals(extension) || "zip".equals(extension)) {
-          var fileName = path.getFileName().toString(); // no lower case here! Otherwise case sensitive filesystem may not find the file anymore!
+          var fileName = path.getFileName().toString(); // no lower case here! Otherwise, case-sensitive filesystem may not find the file anymore!
           fileName = fileName.substring(0, fileName.length() - 4) + "-sources" + fileName.substring(fileName.length() - 4);
           filterAndAppendSourcePath(path.getParent().resolve(fileName), collector);
         }

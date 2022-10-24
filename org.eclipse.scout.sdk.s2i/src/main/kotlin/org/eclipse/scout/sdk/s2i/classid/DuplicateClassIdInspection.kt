@@ -59,7 +59,7 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
             .filter { d -> d != myName }
             .joinToString()
         val message = EclipseScoutBundle.message("duplicate.classid.value", othersWithSameValue)
-        val quickFix = ChangeClassIdValueQuickFix(annotation)
+        val quickFix = ChangeClassIdValueQuickFix()
         return manager.createProblemDescriptor(annotation.psiAnnotation, message, isOnTheFly, arrayOf(quickFix), ProblemHighlightType.ERROR)
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -845,8 +845,7 @@ class ProposalPopup extends Window {
     public void update(ViewerCell cell) {
       var element = cell.getElement();
       var text = new StyledString(getText(element, Objects.equals(m_selectedProposal, element)));
-      if (cell.getColumnIndex() == 0 && m_wrappedLabelProvider instanceof ISearchRangeConsumer) {
-        var labelProvider = (ISearchRangeConsumer) m_wrappedLabelProvider;
+      if (cell.getColumnIndex() == 0 && m_wrappedLabelProvider instanceof ISearchRangeConsumer labelProvider) {
         var matchingRegions = labelProvider.getMatchRanges(element);
         if (matchingRegions != null && matchingRegions.length > 0) {
           for (var i = 0; i < matchingRegions.length - 1; i += 2) {

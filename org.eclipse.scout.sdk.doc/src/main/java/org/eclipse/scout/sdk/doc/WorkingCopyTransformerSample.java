@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ */
 package org.eclipse.scout.sdk.doc;
 
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
@@ -57,15 +67,11 @@ public class WorkingCopyTransformerSample {
           ITransformInput<IMethod, IMethodGenerator<?, ?>> in) {
         var templateMethod = in.model(); // <2>
         var defaultGenerator = in.requestDefaultWorkingCopy(); // <3>
-        switch (templateMethod.elementName()) {
-          case "toString":
-            return defaultGenerator.withBody(b -> b.returnClause()
-                .stringLiteral("SampleCloseable class").semicolon()); // <4>
-          case "close":
-            return defaultGenerator.withoutThrowable(f -> true); // <5>
-          default:
-            return defaultGenerator;
-        }
+        return switch (templateMethod.elementName()) {
+          case "toString" -> defaultGenerator.withBody(b -> b.returnClause().stringLiteral("SampleCloseable class").semicolon()); // <4>
+          case "close" -> defaultGenerator.withoutThrowable(f -> true); // <5>
+          default -> defaultGenerator;
+        };
       }
     };
 

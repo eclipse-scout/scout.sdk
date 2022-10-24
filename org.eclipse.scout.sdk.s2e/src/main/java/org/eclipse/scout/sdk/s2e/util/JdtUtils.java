@@ -228,8 +228,7 @@ public final class JdtUtils {
             @Override
             public void acceptSearchMatch(SearchMatch match) {
               var element = match.getElement();
-              if (element instanceof IType) {
-                var t = (IType) element;
+              if (element instanceof IType t) {
                 if (t.getFullyQualifiedName().contains(fqn)) {
                   matchList.add(t);
                 }
@@ -383,8 +382,7 @@ public final class JdtUtils {
         if (monitor != null && monitor.isCanceled()) {
           throw new OperationCanceledException("annotated types search canceled.");
         }
-        if (match.getElement() instanceof IType) {
-          var t = (IType) match.getElement();
+        if (match.getElement()instanceof IType t) {
           result.add(t);
         }
       }

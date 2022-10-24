@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,14 +37,11 @@ public class ClasspathEntryImplementor implements IClasspathEntry {
 
   @Override
   public ClasspathContentKind kind() {
-    switch (m_spi.getMode()) {
-      case ClasspathSpi.MODE_SOURCE:
-        return ClasspathContentKind.SOURCE;
-      case ClasspathSpi.MODE_BINARY:
-        return ClasspathContentKind.BINARY;
-      default:
-        return ClasspathContentKind.MIXED;
-    }
+    return switch (m_spi.getMode()) {
+      case ClasspathSpi.MODE_SOURCE -> ClasspathContentKind.SOURCE;
+      case ClasspathSpi.MODE_BINARY -> ClasspathContentKind.BINARY;
+      default -> ClasspathContentKind.MIXED;
+    };
   }
 
   @Override

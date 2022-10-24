@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -117,7 +117,7 @@ public class StringsTest {
     var testFile = Files.createTempFile("scoutSdkTestFile", ".txt");
     try {
       // write test content
-      Files.write(testFile, testFileContent.getBytes(StandardCharsets.UTF_8), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+      Files.writeString(testFile, testFileContent, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 
       assertEquals(testFileContent, fromFile(testFile, StandardCharsets.UTF_8).toString());
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 
@@ -47,7 +46,7 @@ public class JaxWsModuleNewHelperTest {
     try {
       var pom = dir.resolve(MODULE_FOLDER + '/' + IMavenConstants.POM);
       Files.createDirectories(pom.getParent());
-      Files.write(pom, xml.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+      Files.writeString(pom, xml, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
       var result = JaxWsModuleNewHelper.getParentPomOf(pom);
       if (result == null) {
         if (expectedPath == null) {

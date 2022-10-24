@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -46,7 +46,7 @@ public class StreamSourceBuilderTest {
       assertEquals(0, out.toByteArray().length); // the generated content must not yet be flushed to the stream -> buffered
     }
 
-    var generated = new String(out.toByteArray(), StandardCharsets.UTF_8); // here the output is flushed and available
+    var generated = out.toString(StandardCharsets.UTF_8); // here the output is flushed and available
     assertEquals("publicclassTestClass{publicstaticbooleantestMethod(){}}//commenttest", removeWhitespace(generated));
   }
 }

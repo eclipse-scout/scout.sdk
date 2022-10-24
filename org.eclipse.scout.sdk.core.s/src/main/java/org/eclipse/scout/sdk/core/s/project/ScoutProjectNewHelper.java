@@ -164,7 +164,7 @@ public final class ScoutProjectNewHelper {
       var nodesToRemove = IntStream.range(0, childNodes.getLength())
           .mapToObj(childNodes::item)
           .filter(n -> isNodeToRemove(n, targetDirectoryName))
-          .collect(toList());
+          .toList();
       nodesToRemove.forEach(modules::removeChild);
 
       Ensure.isTrue(modules.getChildNodes().getLength() == 1, "Parent module is missing in root pom.");

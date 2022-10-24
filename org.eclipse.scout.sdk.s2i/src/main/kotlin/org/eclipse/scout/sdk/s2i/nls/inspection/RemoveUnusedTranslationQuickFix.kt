@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2i.nls.inspection
 
+import com.intellij.codeInsight.intention.preview.IntentionPreviewInfo
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
 import com.intellij.openapi.project.Project
@@ -40,6 +41,8 @@ class RemoveUnusedTranslationQuickFix(val key: String, val store: ITranslationSt
             }
         }
     }
+
+    override fun generatePreview(project: Project, previewDescriptor: ProblemDescriptor): IntentionPreviewInfo = IntentionPreviewInfo.EMPTY
 
     private fun removeTranslation(env: IEnvironment, progress: IProgress) {
         val singleStoreManager = Translations.createManager(Stream.of(store)).orElse(null) ?: return

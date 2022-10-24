@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -134,8 +134,7 @@ public class AstInnerTypeGetterBuilder extends AstMethodBuilder<AstInnerTypeGett
     if (links != null && isCreateLinks()) {
       ITrackedNodePosition methodPos = new WrappedTrackedNodePosition(getFactory().getRewrite().track(get().getName()), getReadOnlyPrefix().length(), -getReadOnlyPrefix().length() - getReadOnlySuffix().length());
       ASTNode returnTypeNode = getReturnType();
-      if (returnTypeNode instanceof QualifiedType) {
-        var t = (QualifiedType) returnTypeNode;
+      if (returnTypeNode instanceof QualifiedType t) {
         returnTypeNode = t.getName();
       }
       ITrackedNodePosition returnNamePos = new WrappedTrackedNodePosition(getFactory().getRewrite().track(returnTypeNode), 0, -getReadOnlySuffix().length());

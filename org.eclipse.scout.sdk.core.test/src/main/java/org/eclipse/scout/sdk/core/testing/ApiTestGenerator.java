@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.testing;
 
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Strings.toStringLiteral;
 
 import java.beans.Introspector;
@@ -79,7 +78,7 @@ public class ApiTestGenerator {
   }
 
   public static void createAnnotationsAsserts(IAnnotatable annotatable, StringBuilder source, String annotatableRef) {
-    var annotations = annotatable.annotations().stream().collect(toList());
+    var annotations = annotatable.annotations().stream().toList();
     var string = annotations.stream()
         .map(a -> a.type().reference())
         .map(annotationRef -> "assertAnnotation(" + annotatableRef + ", \"" + annotationRef + "\");" + NL)
@@ -139,7 +138,7 @@ public class ApiTestGenerator {
             .append(NL));
 
     // interfaces
-    var interfaces = type.superInterfaces().collect(toList());
+    var interfaces = type.superInterfaces().toList();
     if (!interfaces.isEmpty()) {
       source.append("assertHasSuperInterfaces(").append(typeVarName).append(", new String[]{");
       for (var i = 0; i < interfaces.size(); i++) {
@@ -155,7 +154,7 @@ public class ApiTestGenerator {
 
     // fields
     source.append("// fields of ").append(type.elementName()).append(NL);
-    var fields = type.fields().stream().collect(toList());
+    var fields = type.fields().stream().toList();
     source.append("assertEquals(").append(fields.size()).append(", ").append(typeVarName).append(".fields().stream().count(), \"field count of '").append(type.name()).append("'\");").append(NL);
     for (var f : fields) {
       var fieldVarName = getMemberName(f.elementName());
@@ -165,12 +164,12 @@ public class ApiTestGenerator {
     source.append(NL);
 
     // methods
-    var methods = type.methods().stream().collect(toList());
+    var methods = type.methods().stream().toList();
     source.append("assertEquals(").append(methods.size()).append(", ").append(typeVarName).append(".methods().stream().count(), \"method count of '").append(type.name()).append("'\");").append(NL);
     for (var method : methods) {
       var methodVarName = getMemberName(method.elementName());
       source.append("var ").append(methodVarName).append(" = ").append("assertMethodExist(").append(typeVarName).append(", \"").append(method.elementName()).append('"');
-      var parameterTypes = method.parameters().stream().collect(toList());
+      var parameterTypes = method.parameters().stream().toList();
       if (!parameterTypes.isEmpty()) {
         source.append(parameterTypes.stream()
             .map(parameterType -> toStringLiteral(parameterType.dataType().reference()))
@@ -182,7 +181,7 @@ public class ApiTestGenerator {
     source.append(NL);
 
     // inner types
-    var innerTypes = type.innerTypes().stream().collect(toList());
+    var innerTypes = type.innerTypes().stream().toList();
     source.append("assertEquals(").append(innerTypes.size()).append(", ")
         .append(typeVarName).append(".innerTypes().stream().count(), \"inner types count of '").append(type.elementName()).append("'\");").append(NL);
     for (var innerType : innerTypes) {

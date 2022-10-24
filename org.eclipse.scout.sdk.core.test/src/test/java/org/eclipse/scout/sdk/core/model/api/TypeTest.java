@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -220,7 +220,7 @@ public class TypeTest {
     assertEquals(baseClassType, baseClassType.innerTypes().item(1).orElseThrow().declaringType().orElseThrow());
 
     // type arguments
-    var typeArguments = baseClassType.typeArguments().collect(toList());
+    var typeArguments = baseClassType.typeArguments().toList();
     assertEquals(2, typeArguments.size());
     var firstTypeArg = typeArguments.get(0);
     assertTrue(firstTypeArg.isParameterType());
@@ -338,11 +338,11 @@ public class TypeTest {
     assertEquals(0, innerClass2.innerTypes().stream().count());
 
     // type arguments
-    var typeArguments = innerClass2.typeArguments().collect(toList());
+    var typeArguments = innerClass2.typeArguments().toList();
     assertEquals(0, typeArguments.size());
 
     // super type arguments
-    var superTypeArguments = innerClass2.requireSuperClass().typeArguments().collect(toList());
+    var superTypeArguments = innerClass2.requireSuperClass().typeArguments().toList();
     assertEquals(1, superTypeArguments.size());
     var firstTypeArg = superTypeArguments.get(0);
     assertFalse(firstTypeArg.isParameterType());

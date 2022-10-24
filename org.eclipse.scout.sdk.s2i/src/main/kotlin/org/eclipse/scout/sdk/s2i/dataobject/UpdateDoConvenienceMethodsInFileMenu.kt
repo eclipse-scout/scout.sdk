@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2i.dataobject
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -25,6 +26,8 @@ class UpdateDoConvenienceMethodsInFileMenu : AnAction(message("update.dataobject
     override fun update(event: AnActionEvent) {
         event.presentation.isEnabled = getActiveFile(event) != null
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun actionPerformed(event: AnActionEvent) {
         val file = getActiveFile(event) ?: return

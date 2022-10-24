@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -62,7 +62,7 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
   /**
    * @param properties
    *          The initial property map. May be {@code null}.
-   * @return A new {@link PropertiesGenerator} pre filled with the given properties.
+   * @return A new {@link PropertiesGenerator} pre-filled with the given properties.
    */
   public static PropertiesGenerator create(Map<String, String> properties) {
     return create(properties, null);
@@ -74,14 +74,14 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
    * @param headerLines
    *          The header lines to add before the first properties. The lines are added as provided. To add comments the
    *          lines must include a comment char (#).
-   * @return A new {@link PropertiesGenerator} pre filled with the given properties and header lines.
+   * @return A new {@link PropertiesGenerator} pre-filled with the given properties and header lines.
    */
   public static PropertiesGenerator create(Map<String, String> properties, Collection<String> headerLines) {
     return new PropertiesGenerator(properties, headerLines);
   }
 
   /**
-   * Creates a new {@link PropertiesGenerator} pre filled with the properties and header lines from the
+   * Creates a new {@link PropertiesGenerator} pre-filled with the properties and header lines from the
    * {@link InputStream} given.
    * 
    * @param in
@@ -153,7 +153,7 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
     String content;
     try (var out = new ByteArrayOutputStream()) {
       prop.store(out, null);
-      content = out.toString(ENCODING.name());
+      content = out.toString(ENCODING);
     }
     catch (IOException e) {
       throw new SdkException("Error encoding properties", e);

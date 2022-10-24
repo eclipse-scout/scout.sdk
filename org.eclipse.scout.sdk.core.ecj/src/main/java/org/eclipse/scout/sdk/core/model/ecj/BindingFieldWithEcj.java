@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -136,8 +136,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   protected Object resolveExpressionOf(BindingFieldWithEcj field) {
     var origBinding = field.m_binding.original();
     var refBinding = origBinding.declaringClass;
-    if (refBinding instanceof SourceTypeBinding) {
-      var stb = (SourceTypeBinding) refBinding;
+    if (refBinding instanceof SourceTypeBinding stb) {
       var initEx = stb.scope.referenceContext.declarationOf(origBinding).initialization;
       return compileExpression(initEx, stb.scope, javaEnvWithEcj());
     }

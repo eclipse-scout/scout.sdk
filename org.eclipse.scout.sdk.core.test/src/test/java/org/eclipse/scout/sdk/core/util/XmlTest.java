@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -67,12 +66,14 @@ public class XmlTest {
     var xmlString = Xml.writeDocument(xml, false).toString();
     assertEquals(xmlContent, xmlString);
 
-    var expected = normalizeWhitespace("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n" +
-        "<root>\n" +
-        "  <!--comment-->\n" +
-        "  <element>whatever</element>\n" +
-        "  <element>another</element>\n" +
-        "</root>\n");
+    var expected = normalizeWhitespace("""
+        <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+        <root>
+          <!--comment-->
+          <element>whatever</element>
+          <element>another</element>
+        </root>
+        """);
     var xmlStringFormatted = normalizeWhitespace(Xml.writeDocument(xml, true));
     assertEquals(expected, xmlStringFormatted);
   }
@@ -100,7 +101,7 @@ public class XmlTest {
   public void testGet() throws IOException {
     var xml = Files.createTempFile("XmlTest", ".xml");
     try {
-      Files.write(xml, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><root></root>".getBytes(StandardCharsets.UTF_8));
+      Files.writeString(xml, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><root></root>");
       var document = Xml.get(xml);
       assertNotNull(document);
       document = Xml.get(xml.toUri().toURL());

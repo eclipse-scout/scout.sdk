@@ -410,8 +410,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
     //noinspection RedundantExplicitVariableType
     IJavaElementGenerator<?> declaringGenerator = declaringGenerator().orElse(null);
-    if (declaringGenerator instanceof ITypeGenerator) {
-      var declaringTypeGenerator = (ITypeGenerator<?>) declaringGenerator;
+    if (declaringGenerator instanceof ITypeGenerator<?> declaringTypeGenerator) {
       // use super types from declaring (surrounding) type generator
       return existsMethodInSuperHierarchy(declaringTypeGenerator.getHierarchyType(context), methodId);
     }

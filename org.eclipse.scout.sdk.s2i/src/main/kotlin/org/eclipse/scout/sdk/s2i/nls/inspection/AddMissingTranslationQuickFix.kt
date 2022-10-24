@@ -10,6 +10,7 @@
  */
 package org.eclipse.scout.sdk.s2i.nls.inspection
 
+import com.intellij.codeInsight.intention.preview.IntentionPreviewInfo
 import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInspection.LocalQuickFix
 import com.intellij.codeInspection.ProblemDescriptor
@@ -60,9 +61,11 @@ class AddMissingTranslationQuickFix(val key: String) : LocalQuickFix {
         ApplicationManager.getApplication().invokeLater { showStoreChooser(module, spec, manager) }
     }
 
+    override fun generatePreview(project: Project, previewDescriptor: ProblemDescriptor): IntentionPreviewInfo = IntentionPreviewInfo.EMPTY
+
     private fun showStoreChooser(module: Module, spec: TranslationLanguageSpec, manager: TranslationManager?) {
         val stores = manager?.allEditableStores()?.collect(toList())
-        if (stores == null || stores.isEmpty()) {
+        if (stores.isNullOrEmpty()) {
             SdkLog.warning("Cannot create missing translation because no editable text provider service could be found in module '{}'.", module.name)
             return
         }
@@ -121,7 +124,7 @@ class AddMissingTranslationQuickFix(val key: String) : LocalQuickFix {
     }
 
     private inner class TranslationStorePopupStep(val project: Project, val manager: TranslationManager, val spec: TranslationLanguageSpec, val stores: MutableList<ITranslationStore>) :
-            BaseListPopupStep<ITranslationStore>(message("create.new.translation.in"), stores, AllIcons.Nodes.Services) {
+        BaseListPopupStep<ITranslationStore>(message("create.new.translation.in"), stores, AllIcons.Nodes.Services) {
 
         init {
             defaultOptionIndex = 0

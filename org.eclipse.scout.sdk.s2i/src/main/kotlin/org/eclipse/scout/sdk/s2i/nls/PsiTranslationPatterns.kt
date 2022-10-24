@@ -13,9 +13,7 @@ package org.eclipse.scout.sdk.s2i.nls
 import com.intellij.codeInsight.AnnotationUtil
 import com.intellij.codeInsight.AnnotationUtil.isAnnotated
 import com.intellij.patterns.*
-import com.intellij.patterns.PsiJavaPatterns.psiElement
 import com.intellij.patterns.PsiJavaPatterns.psiExpression
-import com.intellij.patterns.StandardPatterns.or
 import com.intellij.patterns.XmlPatterns.xmlAttribute
 import com.intellij.patterns.XmlPatterns.xmlTag
 import com.intellij.psi.*
@@ -24,12 +22,10 @@ import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl
 import com.intellij.psi.xml.XmlAttributeValue
 import com.intellij.util.ArrayUtil
 import com.intellij.util.ProcessingContext
-import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.nls.Translations
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.core.util.Strings
-import java.util.*
 
 /**
  * The JS patterns are in [org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJs] because the dependency to the JS module is optional!
@@ -44,7 +40,7 @@ object PsiTranslationPatterns {
     /**
      * A pattern selecting all arguments passed to Java methods having the @NlsKey annotation. This pattern is valid for .java files.
      */
-    val JAVA_NLS_KEY_PATTERN = or(javaNlsKeyArgumentPattern(), javaTextsGetPattern() /* legacy case */)
+    val JAVA_NLS_KEY_PATTERN = javaNlsKeyArgumentPattern()
 
     private fun getTranslationKeyFromJava(element: PsiElement?): String? {
         val key = resolveExpressionToString(element) {
@@ -109,52 +105,6 @@ object PsiTranslationPatterns {
             return psiExpression().and(patternsForAllScoutVersions[0])
         }
         return psiExpression().andOr(*patternsForAllScoutVersions)
-    }
-
-    /**
-     * To support Scout version < 10.0.40 where the @NlsKey annotation did not exist yet.
-     * Can be removed if only Scout versions >= 10.0.40 are supported.
-     */
-    private fun javaTextsGetPattern(): PsiJavaElementPattern.Capture<PsiElement> {
-        val patternsForAllScoutVersions = ScoutApi.allKnown()
-            .map { it.TEXTS() }
-            .distinct()
-            .map { javaTextsGetPattern(it) }
-            .toArray<ElementPattern<PsiLiteralExpression>> { len -> arrayOfNulls(len) }
-        if (patternsForAllScoutVersions.size == 1) {
-            return psiElement().and(patternsForAllScoutVersions[0])
-        }
-        return psiElement().andOr(*patternsForAllScoutVersions)
-    }
-
-    private fun javaTextsGetPattern(texts: IScoutVariousApi.TEXTS): ElementPattern<PsiLiteralExpression> {
-        val stringFqn = String::class.java.name
-        val localeFqn = Locale::class.java.name
-        val wildcardArgument = ".."
-        val getWithoutLocale = PsiJavaPatterns.psiMethod()
-            .withName(texts.methodName)
-            .definedInClass(texts.fqn())
-            .withParameters(stringFqn, wildcardArgument)
-        val getWithLocale = PsiJavaPatterns.psiMethod()
-            .withName(texts.methodName)
-            .definedInClass(texts.fqn())
-            .withParameters(localeFqn, stringFqn, wildcardArgument)
-        val getWithFallbackWithoutLocale = PsiJavaPatterns.psiMethod()
-            .withName(texts.withFallbackMethodName)
-            .definedInClass(texts.fqn())
-            .withParameters(stringFqn, stringFqn, wildcardArgument)
-        val getWithFallbackWithLocale = PsiJavaPatterns.psiMethod()
-            .withName(texts.withFallbackMethodName)
-            .definedInClass(texts.fqn())
-            .withParameters(localeFqn, stringFqn, stringFqn, wildcardArgument)
-        return or(
-            PsiJavaPatterns.literalExpression().methodCallParameter(0, getWithoutLocale),
-            PsiJavaPatterns.literalExpression().methodCallParameter(1, getWithLocale),
-            PsiJavaPatterns.literalExpression().methodCallParameter(0, getWithFallbackWithoutLocale),
-            PsiJavaPatterns.literalExpression().methodCallParameter(1, getWithFallbackWithoutLocale),
-            PsiJavaPatterns.literalExpression().methodCallParameter(1, getWithFallbackWithLocale),
-            PsiJavaPatterns.literalExpression().methodCallParameter(2, getWithFallbackWithLocale)
-        )
     }
 
     private class ArgumentToMethodParameterHavingAnnotation(val annotationFqn: String) : PatternCondition<PsiExpression>("argumentToMethodParameterHavingAnnotation=$annotationFqn") {

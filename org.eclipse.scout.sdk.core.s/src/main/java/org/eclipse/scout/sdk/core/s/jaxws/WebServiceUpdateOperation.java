@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.s.jaxws;
 
 import static java.util.Collections.unmodifiableCollection;
-import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -115,7 +114,7 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
           var exceptions = methodBuilder.throwablesFunc()
               .map(func -> func.apply(context))
               .filter(Objects::nonNull)
-              .collect(toList());
+              .toList();
           methodBuilder.withoutThrowable(element -> true); // remove all existing exceptions
           for (var exc : exceptions) {
             methodBuilder.withThrowable(newPackage + JavaTypes.C_DOT + exc.simpleName());

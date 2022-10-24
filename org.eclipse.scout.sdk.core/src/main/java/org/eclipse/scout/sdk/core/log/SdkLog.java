@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -16,6 +16,7 @@ import static org.eclipse.scout.sdk.core.util.Strings.repeat;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.logging.Level;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -39,7 +40,7 @@ public final class SdkLog {
    */
   public static final Level DEFAULT_LOG_LEVEL = Level.WARNING;
 
-  private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+  private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
   static Clock clock = Clock.systemDefaultZone();
   private static volatile Level curLevel = getInitialLogLevel();
 
@@ -65,9 +66,9 @@ public final class SdkLog {
    * @param msg
    *          The message to log. May be {@code null}.
    * @param args
-   *          Arguments to use for logging. May be {@code null}. If the message contains place holders
-   *          ({@value MessageFormatter#ARG_REPLACE_PATTERN}), the arguments are used to fill the place holders. If
-   *          there are more arguments than place holders in the message, the remaining arguments are searched for
+   *          Arguments to use for logging. May be {@code null}. If the message contains placeholders
+   *          ({@value MessageFormatter#ARG_REPLACE_PATTERN}), the arguments are used to fill the placeholders. If there
+   *          are more arguments than placeholders in the message, the remaining arguments are searched for
    *          {@link Throwable}s whose stack trace is logged as well (see examples above).
    */
   public static void log(Level level, CharSequence msg, Object... args) {
@@ -296,13 +297,13 @@ public final class SdkLog {
   }
 
   /**
-   * Returns the object given if at least the given {@link Level} is active. Otherwise it returns {@code null}.
+   * Returns the object given if at least the given {@link Level} is active. Otherwise, it returns {@code null}.
    * 
    * @param t
    *          The object
    * @param level
    *          The level
-   * @return the object given if at least the given {@link Level} is active. Otherwise it returns {@code null}.
+   * @return the object given if at least the given {@link Level} is active. Otherwise, it returns {@code null}.
    */
   public static <T> T onLevel(T t, Level level) {
     if (isLevelEnabled(level)) {

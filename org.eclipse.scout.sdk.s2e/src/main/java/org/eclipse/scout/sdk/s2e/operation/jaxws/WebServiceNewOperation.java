@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -148,7 +148,6 @@ public class WebServiceNewOperation extends AbstractWebServiceNewOperation {
           var newAttributes = Arrays.stream(origAttributes)
               .filter(attrib -> !IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS.equals(attrib.getName()))
               .collect(toList());
-          //noinspection CallToNumericToString
           newAttributes.add(JavaCore.newClasspathAttribute(IClasspathAttribute.IGNORE_OPTIONAL_PROBLEMS, Boolean.TRUE.toString()));
           newEntries.add(JavaCore.newSourceEntry(entry.getPath(), entry.getInclusionPatterns(), entry.getExclusionPatterns(), entry.getOutputLocation(), newAttributes.toArray(new IClasspathAttribute[0])));
         }

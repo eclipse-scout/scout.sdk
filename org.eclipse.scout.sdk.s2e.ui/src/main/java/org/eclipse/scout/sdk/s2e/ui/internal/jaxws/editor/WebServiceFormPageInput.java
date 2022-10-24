@@ -281,8 +281,7 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
         if (entryPointApi.authenticationElementName().equals(mvp.getMemberName())) {
           var value = mvp.getValue();
           // load Auth
-          if (value instanceof IAnnotation) {
-            var authentication = (IAnnotation) value;
+          if (value instanceof IAnnotation authentication) {
 
             for (var authElement : authentication.getMemberValuePairs()) {
               if (getScoutApi().Authentication().methodElementName().equals(authElement.getMemberName()) && authElement.getValueKind() == IMemberValuePair.K_ANNOTATION) {
@@ -297,8 +296,7 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
         else if (entryPointApi.handlerChainElementName().equals(mvp.getMemberName())) {
           // load handlers
           var value = mvp.getValue();
-          if (value instanceof Object[]) {
-            var values = (Object[]) value;
+          if (value instanceof Object[] values) {
             Collection<IAnnotation> handlers = Arrays.stream(values)
                 .filter(o -> o instanceof IAnnotation)
                 .map(o -> (IAnnotation) o)

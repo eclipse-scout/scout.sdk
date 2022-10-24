@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ public class FormGeneratorTest {
   @Test
   public void testFullFormStack(IJavaEnvironment env) {
     // permission
-    PermissionGenerator<?> permGenerator = new PermissionGenerator<>()
+    var permGenerator = new PermissionGenerator<>()
         .withElementName("MyPermission")
         .withPackageName("org.eclipse.scout.sdk.core.s.test.shared");
     assertEqualsRefFile(env, REF_FILE_FOLDER + "FormTest1.txt", permGenerator);
@@ -56,7 +56,7 @@ public class FormGeneratorTest {
     var createdFormData = assertNoCompileErrors(env, formDataGenerator);
 
     // service interface
-    ServiceInterfaceGenerator<?> svcIfcGenerator = new ServiceInterfaceGenerator<>()
+    var svcIfcGenerator = new ServiceInterfaceGenerator<>()
         .withElementName("IMyFormService")
         .withPackageName("org.eclipse.scout.sdk.core.s.test.shared")
         .withMethod(MethodGenerator.create()
@@ -101,7 +101,7 @@ public class FormGeneratorTest {
     assertNoCompileErrors(env, svcImplGenerator);
 
     // form
-    FormGenerator<?> formGenerator = new FormGenerator<>()
+    var formGenerator = new FormGenerator<>()
         .withElementName("MyForm")
         .withPackageName("org.eclipse.scout.sdk.core.s.test.client")
         .withSuperClassFrom(IScoutApi.class, api -> api.AbstractForm().fqn())

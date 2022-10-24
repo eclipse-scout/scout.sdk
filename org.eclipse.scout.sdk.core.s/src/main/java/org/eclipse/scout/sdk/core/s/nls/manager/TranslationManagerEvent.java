@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -176,24 +176,16 @@ public final class TranslationManagerEvent {
   }
 
   static String typeName(int type) {
-    switch (type) {
-      case TYPE_NEW_TRANSLATION:
-        return "NewTranslation";
-      case TYPE_KEY_CHANGED:
-        return "KeyChange";
-      case TYPE_REMOVE_TRANSLATION:
-        return "RemoveTranslation";
-      case TYPE_NEW_LANGUAGE:
-        return "NewLanguage";
-      case TYPE_RELOAD:
-        return "Reload";
-      case TYPE_UPDATE_TRANSLATION:
-        return "UpdateTranslation";
-      case TYPE_FLUSH:
-        return "Flush";
-      default:
-        throw newFail("Unknown event type '{}'.", type);
-    }
+    return switch (type) {
+      case TYPE_NEW_TRANSLATION -> "NewTranslation";
+      case TYPE_KEY_CHANGED -> "KeyChange";
+      case TYPE_REMOVE_TRANSLATION -> "RemoveTranslation";
+      case TYPE_NEW_LANGUAGE -> "NewLanguage";
+      case TYPE_RELOAD -> "Reload";
+      case TYPE_UPDATE_TRANSLATION -> "UpdateTranslation";
+      case TYPE_FLUSH -> "Flush";
+      default -> throw newFail("Unknown event type '{}'.", type);
+    };
   }
 
   @Override

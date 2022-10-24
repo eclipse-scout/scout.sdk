@@ -15,10 +15,7 @@ import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil
 import com.intellij.ide.ui.newItemPopup.NewItemPopupUtil
 import com.intellij.ide.ui.newItemPopup.NewItemSimplePopupPanel
 import com.intellij.ide.util.EditorHelper
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
-import com.intellij.openapi.actionSystem.LangDataKeys
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.PackageIndex
@@ -55,6 +52,8 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
 
         createPopup(dir).showCenteredInCurrentWindow(project)
     }
+
+    override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun update(e: AnActionEvent) {
         super.update(e)

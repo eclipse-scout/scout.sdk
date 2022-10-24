@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
@@ -70,7 +69,7 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
    *          The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
    * @param dataType
    *          The datatype of the DoNode. If the kind is {@link DataObjectNodeKind#LIST}, {@link DataObjectNodeKind#SET}
-   *          or {@link DataObjectNodeKind#COLLECTION} the datatype always describes the type of an element without the
+   *          or {@link DataObjectNodeKind#COLLECTION} the datatype always describes the type of element without the
    *          collection type itself. Must not be {@code null} or blank.
    * @return The created {@link IScoutMethodGenerator}.
    */
@@ -129,39 +128,22 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
 
   static String buildDoNodeMethod(DataObjectNodeKind kind, IJavaBuilderContext ctx) {
     var scoutApi = ctx.requireApi(IScoutApi.class);
-    switch (kind) {
-      case VALUE:
-        return scoutApi.DoEntity().doValueMethodName();
-      case LIST:
-        return scoutApi.DoEntity().doListMethodName();
-      case COLLECTION:
-        return scoutApi.requireApi(IScout22DoApi.class).DoEntity().doCollectionMethodName();
-      case SET:
-        return scoutApi.requireApi(IScout22DoApi.class).DoEntity().doSetMethodName();
-      default:
-        throw newFail("Unsupported DoNode kind '{}'.", kind);
-    }
+    return switch (kind) {
+      case VALUE -> scoutApi.DoEntity().doValueMethodName();
+      case LIST -> scoutApi.DoEntity().doListMethodName();
+      case COLLECTION -> scoutApi.requireApi(IScout22DoApi.class).DoEntity().doCollectionMethodName();
+      case SET -> scoutApi.requireApi(IScout22DoApi.class).DoEntity().doSetMethodName();
+    };
   }
 
   static String buildDoNodeType(DataObjectNodeKind kind, Function<IJavaBuilderContext, String> dataType, IJavaBuilderContext ctx) {
     var scoutApi = ctx.requireApi(IScoutApi.class);
-    ITypeNameSupplier type;
-    switch (kind) {
-      case VALUE:
-        type = scoutApi.DoValue();
-        break;
-      case LIST:
-        type = scoutApi.DoList();
-        break;
-      case COLLECTION:
-        type = scoutApi.requireApi(IScout22DoApi.class).DoCollection();
-        break;
-      case SET:
-        type = scoutApi.requireApi(IScout22DoApi.class).DoSet();
-        break;
-      default:
-        throw newFail("Unsupported DoNode kind '{}'.", kind);
-    }
+    var type = switch (kind) {
+      case VALUE -> scoutApi.DoValue();
+      case LIST -> scoutApi.DoList();
+      case COLLECTION -> scoutApi.requireApi(IScout22DoApi.class).DoCollection();
+      case SET -> scoutApi.requireApi(IScout22DoApi.class).DoSet();
+    };
     return type.fqn() + JavaTypes.C_GENERIC_START + dataType.apply(ctx) + JavaTypes.C_GENERIC_END;
   }
 
@@ -456,7 +438,7 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
    *          The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
    * @param dataTypeRef
    *          The datatype of the DoNode. If the kind is {@link DataObjectNodeKind#LIST}, {@link DataObjectNodeKind#SET}
-   *          or {@link DataObjectNodeKind#COLLECTION} the datatype always describes the type of an element without the
+   *          or {@link DataObjectNodeKind#COLLECTION} the datatype always describes the type of element without the
    *          collection type itself. Must not be {@code null} or blank.
    * @param isInherited
    *          {@code true} if the node is inherited from a super class (see {@link DataObjectNode#isInherited()}).
@@ -489,7 +471,7 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
    *          The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
    * @param dataTypeRef
    *          The datatype of the DoNode. If the kind is {@link DataObjectNodeKind#LIST}, {@link DataObjectNodeKind#SET}
-   *          or {@link DataObjectNodeKind#COLLECTION} the datatype always describes the type of an element without the
+   *          or {@link DataObjectNodeKind#COLLECTION} the datatype always describes the type of element without the
    *          collection type itself. Must not be {@code null} or blank.
    * @param isInherited
    *          {@code true} if the node is inherited from a super class (see {@link DataObjectNode#isInherited()}).
@@ -528,20 +510,12 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
       return Stream.of(chainedSetterCollection, chainedSetterArray);
     }
 
-    String getterCollectionFqn;
-    switch (kind) {
-      case LIST:
-        getterCollectionFqn = List.class.getName();
-        break;
-      case SET:
-        getterCollectionFqn = Set.class.getName();
-        break;
-      case COLLECTION:
-        getterCollectionFqn = Collection.class.getName();
-        break;
-      default:
-        throw newFail("Unsupported DoNode kind of '{}'.", name);
-    }
+    var getterCollectionFqn = switch (kind) {
+      case LIST -> List.class.getName();
+      case SET -> Set.class.getName();
+      case COLLECTION -> Collection.class.getName();
+      default -> throw newFail("Unsupported DoNode kind of '{}'.", name);
+    };
 
     var collectionGetterReturnTypeReference = getterCollectionFqn + JavaTypes.C_GENERIC_START + dataTypeRef + JavaTypes.C_GENERIC_END;
     var collectionGetter = createDoNodeGetter(name, collectionGetterReturnTypeReference, owner);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -94,12 +94,12 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
     private fun buildCache(forceReload: Boolean = false): Boolean {
         val newTranslations = translationManager.allTranslations().collect(toList())
         val newLanguages = newTranslations.stream()
-                .filter { acceptTranslationFilter(it) }
-                .flatMap { it.languagesOfAllStores() }
-                .distinct()
-                .filter { acceptLanguageFilter(it) }
-                .sorted()
-                .collect(toList())
+            .filter { acceptTranslationFilter(it) }
+            .flatMap { it.languagesOfAllStores() }
+            .distinct()
+            .filter { acceptLanguageFilter(it) }
+            .sorted()
+            .collect(toList())
 
         if (forceReload || m_translations == null || m_languages != newLanguages) {
             m_translations = newTranslations
@@ -168,8 +168,8 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
         val newCellValue = Strings.trim(aValue?.toString())?.toString()
         if (columnIndex == KEY_COLUMN_INDEX) {
             return selectedTranslation.stores()
-                    .mapToInt { validateKey(translationManager, it, newCellValue, singleton(selectedTranslation.key())) }
-                    .max().orElse(OK)
+                .mapToInt { validateKey(translationManager, it, newCellValue, singleton(selectedTranslation.key())) }
+                .max().orElse(OK)
         }
         if (columnIndex == DEFAULT_LANGUAGE_COLUMN_INDEX) {
             return validateDefaultText(newCellValue, selectedTranslation)
@@ -230,10 +230,10 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
                 return emptyList() // full reload. No single rows affected
             }
             return events.stream()
-                    .mapToInt { updateViewModel(it) }
-                    .filter { it >= 0 }
-                    .distinct()
-                    .toList()
+                .mapToInt { updateViewModel(it) }
+                .filter { it >= 0 }
+                .distinct()
+                .toList()
         }
 
         private fun updateViewModel(event: TranslationManagerEvent) = when (event.type()) {
@@ -245,6 +245,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
                 buildCache()
                 -1
             }
+
             else -> -1
         }
 
@@ -259,12 +260,12 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
         }
 
         private fun translationsUpdated(event: TranslationManagerEvent) = event.translation()
-                .map { rowForTranslationWithKey(it.key()) }
-                .filter { it >= 0 }
-                .map {
-                    fireTableRowsUpdated(it, it)
-                    return@map it
-                }.orElse(-1)
+            .map { rowForTranslationWithKey(it.key()) }
+            .filter { it >= 0 }
+            .map {
+                fireTableRowsUpdated(it, it)
+                return@map it
+            }.orElse(-1)
 
         private fun translationsAdded(event: TranslationManagerEvent) = event.translation().map {
             val translations = translations()

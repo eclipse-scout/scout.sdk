@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.model.api;
 
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.HashMap;
@@ -80,10 +79,7 @@ public class PropertyBean {
    * @see <a href="https://www.oracle.com/java/technologies/javase/javabeans-spec.html">JavaBeans Spec</a>
    */
   public static Stream<PropertyBean> of(IType type) {
-    var methods = type.methods()
-        .withFlags(Flags.AccPublic).stream()
-        .collect(toList());
-
+    var methods = type.methods().withFlags(Flags.AccPublic).stream().toList();
     Map<String, PropertyBean> beans = new HashMap<>();
     for (var m : methods) {
       var getterName = getterName(m);
@@ -125,7 +121,7 @@ public class PropertyBean {
    * @param context
    *          Context information to compute the data types from which the setter name depends.
    * @return An {@link Optional} containing the property name if the given {@link IMethodGenerator} is a valid getter.
-   *         Otherwise an empty {@link Optional} is returned.
+   *         Otherwise, an empty {@link Optional} is returned.
    */
   public static Optional<String> getterName(IMethodGenerator<?, ?> m, IJavaBuilderContext context) {
     return propertyNameOf(m, false, context);
@@ -136,7 +132,7 @@ public class PropertyBean {
    *
    * @param m
    *          The {@link IMethod} to check. Must not be {@code null}.
-   * @return An {@link Optional} containing the property name if the given {@link IMethod} is a valid getter. Otherwise
+   * @return An {@link Optional} containing the property name if the given {@link IMethod} is a valid getter. Otherwise,
    *         an empty {@link Optional} is returned.
    */
   public static Optional<String> getterName(IMethod m) {
@@ -178,7 +174,7 @@ public class PropertyBean {
    * @param context
    *          Context information to compute the data types from which the setter name depends.
    * @return An {@link Optional} containing the property name if the given {@link IMethodGenerator} is a valid setter.
-   *         Otherwise an empty {@link Optional} is returned.
+   *         Otherwise, an empty {@link Optional} is returned.
    */
   public static Optional<String> setterName(IMethodGenerator<?, ?> m, IJavaBuilderContext context) {
     return propertyNameOf(m, true, context);
@@ -189,7 +185,7 @@ public class PropertyBean {
    *
    * @param m
    *          The {@link IMethod} to check. Must not be {@code null}.
-   * @return An {@link Optional} containing the property name if the given {@link IMethod} is a valid setter. Otherwise
+   * @return An {@link Optional} containing the property name if the given {@link IMethod} is a valid setter. Otherwise,
    *         an empty {@link Optional} is returned.
    */
   public static Optional<String> setterName(IMethod m) {

@@ -107,7 +107,8 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
         }
 
         private fun <T> createReadAction(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: () -> T): NonBlockingReadAction<T> {
-            var action = ReadAction.nonBlocking(callable).expireWith(project)
+            val disposable = EclipseScoutBundle.derivedResourceManager(project)
+            var action = ReadAction.nonBlocking(callable).expireWith(disposable)
             if (progress != null) {
                 action = action.wrapProgress(progress)
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.generator;
 
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.generator.ISourceGenerator.empty;
 import static org.eclipse.scout.sdk.core.generator.ISourceGenerator.raw;
 import static org.eclipse.scout.sdk.core.imports.ImportCollector.createImportDeclaration;
@@ -93,9 +92,9 @@ public final class SimpleGenerators {
     var generators = Arrays.stream(metaArray)
         .map(m -> createMetaValueGenerator(m, transformer))
         .map(g -> g.generalize(ExpressionBuilder::create))
-        .collect(toList());
+        .toList();
 
-    // use newlines on multi-dimensional arrays and annotation arrays only
+    // use newlines on multidimensional arrays and annotation arrays only
     var useNewlines = metaArray.length > 0 && (metaArray[0].type() == MetaValueType.Array || metaArray[0].type() == MetaValueType.Annotation);
     return b -> b.array(generators.stream(), useNewlines);
   }

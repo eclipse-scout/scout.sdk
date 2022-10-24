@@ -41,13 +41,12 @@ import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
 import java.util.Collections.emptyList
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
-import kotlin.streams.toList
 
 
 class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceManager, SettingsChangedListener {
 
     private val m_updateHandlerFactories = HashMap<Class<*>, DerivedResourceHandlerFactory>() // use a map so that there is always only one factory of the same type
-    private val m_delayedProcessor = DelayedBuffer<SearchScope>(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true) { events ->
+    private val m_delayedProcessor = DelayedBuffer(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true) { events ->
         scheduleUpdate(union(events))
     }
     private var m_busConnection: MessageBusConnection? = null
@@ -118,9 +117,9 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         SdkLog.debug("Check for derived resource updates in scope $scope")
         val start = System.currentTimeMillis()
         val handlers = m_updateHandlerFactories.values
-                .parallelStream()
-                .flatMap { executeDerivedResourceHandlerFactory(it, scope) }
-                .toList()
+            .parallelStream()
+            .flatMap { executeDerivedResourceHandlerFactory(it, scope) }
+            .toList()
         SdkLog.debug("Derived resource handler creation took {}ms. Number of created handlers: {}", System.currentTimeMillis() - start, handlers.size)
         if (handlers.isNotEmpty() && !progress.indicator.isCanceled) {
             executeAllHandlersAndWait(handlers, env, progress)
@@ -194,7 +193,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         }
 
         // to save memory the running transaction is committed in chunk blocks
-        // bigger chunks are faster (less events in the IDE) but require more memory to store the transaction members
+        // bigger chunks are faster (fewer events in the IDE) but require more memory to store the transaction members
         val chunkSize = TransactionManager.BULK_UPDATE_LIMIT
         if (transaction.size() < chunkSize) {
             return

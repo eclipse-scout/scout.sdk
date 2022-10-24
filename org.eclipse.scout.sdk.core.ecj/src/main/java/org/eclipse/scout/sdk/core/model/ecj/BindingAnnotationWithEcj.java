@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -158,13 +158,11 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
   static Map<String, AnnotationElementSpi> buildAnnotationElementMap(Object annotation, AnnotationSpi owner, JavaEnvironmentWithEcj env) {
     TypeBinding annotationType;
     Object[] explicitValues;
-    if (annotation instanceof Annotation) {
-      var binding = (Annotation) annotation;
+    if (annotation instanceof Annotation binding) {
       explicitValues = binding.memberValuePairs();
       annotationType = binding.type.resolvedType;
     }
-    else if (annotation instanceof AnnotationBinding) {
-      var binding = (AnnotationBinding) annotation;
+    else if (annotation instanceof AnnotationBinding binding) {
       explicitValues = binding.getElementValuePairs();
       annotationType = binding.getAnnotationType();
     }

@@ -295,7 +295,6 @@ public class ProposalTextField extends TextField {
     return proposals.stream().anyMatch(isEqual(proposal));
   }
 
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private synchronized void acceptProposalInternal(Object proposal, boolean closeProposalPopup) {
     if (proposal instanceof ISeparatorProposal) {
       return;
@@ -397,7 +396,6 @@ public class ProposalTextField extends TextField {
     }
   }
 
-  @SuppressWarnings("MethodOnlyUsedFromInnerClass")
   private synchronized void updateProposals() {
     var pattern = getText();
     var index = getSelection().x;

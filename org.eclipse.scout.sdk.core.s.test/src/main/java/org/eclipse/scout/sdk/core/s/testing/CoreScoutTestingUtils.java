@@ -17,13 +17,11 @@ import static org.mockito.Mockito.mock;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.eclipse.scout.sdk.core.apidef.ApiVersion;
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
@@ -88,9 +86,9 @@ public final class CoreScoutTestingUtils {
   /**
    * @return The archetype version that belongs to the {@link #currentScoutVersion()}.
    *         <p>
-   *         The archetype version for numbers <= 11 is based on the SDK version which uses more number segments to
-   *         fulfill the OSGi version requirements. While {@code 11.0-SNAPSHOT} is valid maven version, for OSGi at
-   *         least three numbers are required. Therefore {@code 11.0.0-SNAPSHOT} is the matching SDK version.
+   *         The archetype version for numbers <= 11 is based on the SDK version which uses number segments to fulfill
+   *         the OSGi version requirements. While {@code 11.0-SNAPSHOT} is valid maven version, for OSGi at least three
+   *         numbers are required. Therefore {@code 11.0.0-SNAPSHOT} is the matching SDK version.
    *         <p>
    *         For versions > 11 the archetypes use the same version schema as the RT.
    */
@@ -163,7 +161,7 @@ public final class CoreScoutTestingUtils {
       var dependenciesElement = Xml.firstChildElement(pom.getDocumentElement(), IMavenConstants.DEPENDENCIES)
           .orElseThrow(() -> newFail("Pom '{}' does not contain a '{}' element.", pomFile, IMavenConstants.DEPENDENCIES));
 
-      // add jaxws Metro as test-dependency because the default implementor specific is Metro and it must be present so that the test platform can be started
+      // add jaxws Metro as test-dependency because the default implementor specific is Metro, and it must be present so that the test platform can be started
       var metroDependencyElement = pom.createElement(IMavenConstants.DEPENDENCY);
       var metroGroupIdElement = pom.createElement(IMavenConstants.GROUP_ID);
       metroGroupIdElement.setTextContent("com.sun.xml.ws");
@@ -246,17 +244,11 @@ public final class CoreScoutTestingUtils {
     var modelType = clientEnv.requireType(modelFqn);
 
     // build source
-    Optional<ICompilationUnitGenerator<?>> cuSrc;
-    switch (dtoType) {
-      case ROW_DATA:
-        cuSrc = DtoGeneratorFactory.createTableRowDataGenerator(modelType, sharedEnv);
-        break;
-      case PAGE_DATA:
-        cuSrc = DtoGeneratorFactory.createPageDataGenerator(modelType, sharedEnv);
-        break;
-      default:
-        cuSrc = DtoGeneratorFactory.createFormDataGenerator(modelType, sharedEnv);
-    }
+    var cuSrc = switch (dtoType) {
+      case ROW_DATA -> DtoGeneratorFactory.createTableRowDataGenerator(modelType, sharedEnv);
+      case PAGE_DATA -> DtoGeneratorFactory.createPageDataGenerator(modelType, sharedEnv);
+      default -> DtoGeneratorFactory.createFormDataGenerator(modelType, sharedEnv);
+    };
 
     // ensure it compiles and get model of dto
     return assertNoCompileErrors(sharedEnv, cuSrc.orElseThrow(() -> new IllegalArgumentException("cannot create DTO for model Type " + modelFqn)));

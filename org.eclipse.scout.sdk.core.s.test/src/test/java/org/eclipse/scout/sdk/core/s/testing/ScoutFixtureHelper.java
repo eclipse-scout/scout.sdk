@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -113,7 +113,7 @@ public final class ScoutFixtureHelper {
     public ScoutJavaEnvironmentWithEcjBuilder<?> get() {
       var withClient = m_withClient || m_withUi;
 
-      ScoutJavaEnvironmentWithEcjBuilder<?> builder = new ScoutJavaEnvironmentWithEcjBuilder<>()
+      var builder = new ScoutJavaEnvironmentWithEcjBuilder<>()
           .withScoutServer(m_withServer)
           .withScoutClient(withClient)
           .withScoutHtmlUi(m_withUi);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -104,7 +104,7 @@ public class CharSequenceInputStreamTest {
 
   private static void testCharsetMismatchInfiniteLoop(String csName) throws IOException {
     // Input is UTF-8 bytes: 0xE0 0xB2 0xA0
-    char[] inputChars = {(char) 0xE0, (char) 0xB2, (char) 0xA0};
+    var inputChars = new char[]{(char) 0xE0, (char) 0xB2, (char) 0xA0};
     var charset = Charset.forName(csName); // infinite loop for US-ASCII, UTF-8 OK
     try (InputStream stream = new CharSequenceInputStream(new String(inputChars), charset, 512)) {
       //noinspection StatementWithEmptyBody

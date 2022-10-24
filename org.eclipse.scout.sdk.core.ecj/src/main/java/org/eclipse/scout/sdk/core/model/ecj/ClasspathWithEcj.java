@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -83,16 +83,12 @@ public class ClasspathWithEcj extends AbstractSpiElement<IClasspathEntry> implem
   }
 
   private String modeName() {
-    switch (getMode()) {
-      case MODE_SOURCE:
-        return "SOURCE";
-      case MODE_BINARY:
-        return "BINARY";
-      case MODE_SOURCE | MODE_BINARY:
-        return "SOURCE & BINARY";
-      default:
-        throw new SdkException("Unknown mode: {}", getMode());
-    }
+    return switch (getMode()) {
+      case MODE_SOURCE -> "SOURCE";
+      case MODE_BINARY -> "BINARY";
+      case MODE_SOURCE | MODE_BINARY -> "SOURCE & BINARY";
+      default -> throw new SdkException("Unknown mode: {}", getMode());
+    };
   }
 
   @Override

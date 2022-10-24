@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -63,8 +63,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
     else if (owner instanceof FieldSpi) {
       m_ownerInLevelFinder = level -> level.fields().withName(owner.getElementName()).first();
     }
-    else if (owner instanceof MethodParameterSpi) {
-      var param = (MethodParameterSpi) owner;
+    else if (owner instanceof MethodParameterSpi param) {
       m_ownerInLevelFinder = getMethodLookup(param.getDeclaringMethod())
           .andThen(method -> method
               .flatMap(m -> ((IMethod) m).parameters().item(param.getIndex())));

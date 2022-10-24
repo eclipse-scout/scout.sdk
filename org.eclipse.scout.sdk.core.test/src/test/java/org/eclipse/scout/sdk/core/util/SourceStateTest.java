@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -31,11 +31,12 @@ public class SourceStateTest {
   }
 
   private static char[] getLineCommentSrc(char stringDelim) {
-    return MessageFormatter.arrayFormat("public class test {\n" +
-        "  String a = {}inSt\\{}ringComment://no line comment{};\n" +
-        "  // line comment\r\n" +
-        "  int nextLine = 4;\n" +
-        "}", stringDelim, stringDelim, stringDelim).message().toCharArray();
+    return MessageFormatter.arrayFormat("""
+        public class test {
+          String a = {}inSt\\{}ringComment://no line comment{};
+          // line comment\r
+          int nextLine = 4;
+        }""", stringDelim, stringDelim, stringDelim).message().toCharArray();
   }
 
   @Test
@@ -183,11 +184,13 @@ public class SourceStateTest {
   }
 
   private static char[] getBlockCommentSrc(char stringDelim) {
-    return MessageFormatter.arrayFormat("public class test {\n" +
-        "  String a = {}inSt\\{}ringComment:/*no block comment*/{};\n" +
-        "  /* block comment */\n" + //75
-        "  int nextLine = 4;\n" +
-        "}", stringDelim, stringDelim, stringDelim).message().toCharArray();
+    //75
+    return MessageFormatter.arrayFormat("""
+        public class test {
+          String a = {}inSt\\{}ringComment:/*no block comment*/{};
+          /* block comment */
+          int nextLine = 4;
+        }""", stringDelim, stringDelim, stringDelim).message().toCharArray();
   }
 
   @Test
@@ -201,13 +204,14 @@ public class SourceStateTest {
 
   @Test
   public void testJavaDoc() {
-    var src = ("/****\n" +
-        " * multi block\n" +
-        " ****/\n" +
-        "code\n" +
-        "/****\n" +
-        " * multi block\n" +
-        " */x").toCharArray();
+    var src = ("""
+        /****
+         * multi block
+         ****/
+        code
+        /****
+         * multi block
+         */x""").toCharArray();
 
     assertEquals(State.ABOUT_TO_ENTER_COMMENT, parse(src, 0));
     assertEquals(State.IN_BLOCK_COMMENT, parse(src, 5));
@@ -243,10 +247,12 @@ public class SourceStateTest {
   @Test
   public void testLineCommentRemovingBlockComment() {
     var src =
-        ("// line comment\n" +
-            "// /*\n" +
-            "12343/12\n" +
-            "// */\n").toCharArray();
+        ("""
+            // line comment
+            // /*
+            12343/12
+            // */
+            """).toCharArray();
 
     assertEquals(State.ABOUT_TO_ENTER_COMMENT, parse(src, 0));
     assertEquals(State.IN_LINE_COMMENT, parse(src, 1));

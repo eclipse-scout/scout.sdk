@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,7 +10,6 @@
  */
 package org.eclipse.scout.sdk.core.model.api;
 
-import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -35,7 +34,7 @@ import org.junit.jupiter.api.Test;
 public class ClasspathEntryTest {
   @Test
   public void testApiAndSpi(IJavaEnvironment env) {
-    var path = env.classpath().collect(toList());
+    var path = env.classpath().toList();
     var first = path.get(0);
     var second = path.get(1);
     var last = path.get(path.size() - 1);
@@ -62,7 +61,7 @@ public class ClasspathEntryTest {
   }
 
   @Test
-  @SuppressWarnings({"unlikely-arg-type", "SimplifiableJUnitAssertion", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "EqualsWithItself"})
+  @SuppressWarnings({"unlikely-arg-type", "SimplifiableJUnitAssertion", "ConstantConditions", "EqualsBetweenInconvertibleTypes", "EqualsWithItself", "DuplicateExpressions"})
   public void testEntry() {
     var a = new ClasspathEntry(Paths.get("a", "a.jar"), ClasspathSpi.MODE_BINARY, StandardCharsets.UTF_8.name());
     var b = new ClasspathEntry(Paths.get("b", "b.jar"), ClasspathSpi.MODE_BINARY, StandardCharsets.UTF_8.name());

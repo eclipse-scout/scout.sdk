@@ -41,10 +41,9 @@ public class TranslationProposalComputer implements IJavaCompletionProposalCompu
 
   @Override
   public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
-    if (!(context instanceof JavaContentAssistInvocationContext)) {
+    if (!(context instanceof JavaContentAssistInvocationContext javaContext)) {
       return emptyList();
     }
-    var javaContext = (JavaContentAssistInvocationContext) context;
     return computeProposals(javaContext);
   }
 

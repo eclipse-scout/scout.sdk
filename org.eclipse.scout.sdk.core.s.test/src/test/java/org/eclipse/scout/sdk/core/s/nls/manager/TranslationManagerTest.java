@@ -16,7 +16,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationStoreSupplierExtension.testingManager;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationTestsHelper.createStore;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -164,7 +163,7 @@ public class TranslationManagerTest {
     assertTrue(manager.primaryEditableStore().orElseThrow().containsLanguage(addLang));
 
     assertEquals(4, eventProtocol.size());
-    var newLangEvents = eventProtocol.stream().filter(e -> e.type() == TranslationManagerEvent.TYPE_NEW_LANGUAGE).collect(toList());
+    var newLangEvents = eventProtocol.stream().filter(e -> e.type() == TranslationManagerEvent.TYPE_NEW_LANGUAGE).toList();
     assertEquals(2, newLangEvents.size());
   }
 
@@ -314,7 +313,7 @@ public class TranslationManagerTest {
         createStore("a", 100.00d, entries02),
         createStore("b", 200.00d, false, entries01)));
     manager.changeKey(key2, key1);
-    assertTrue(manager.translation(key2).isEmpty()); // old key does not longer exist
+    assertTrue(manager.translation(key2).isEmpty()); // old key does no longer exist
 
     // existing read-only entry and renamed one have been merged to one manager
     assertEquals(Map.of(Language.LANGUAGE_DEFAULT, "text_def_02", en, "text_en"), manager.translation(key1).orElseThrow().texts());

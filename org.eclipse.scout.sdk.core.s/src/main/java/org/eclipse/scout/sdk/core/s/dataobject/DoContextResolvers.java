@@ -74,7 +74,7 @@ public final class DoContextResolvers {
     var bestMatch = -1;
     IType result = null;
     var ref = ISdkConstants.REGEX_DOT.split(refPackage);
-    var namespaces = candidates.collect(toList());
+    var namespaces = candidates.toList();
     for (var candidate : namespaces) {
       var curMatch = numSegmentsEquals(ref, ISdkConstants.REGEX_DOT.split(candidate.containingPackage().elementName()));
       if (curMatch > bestMatch) {

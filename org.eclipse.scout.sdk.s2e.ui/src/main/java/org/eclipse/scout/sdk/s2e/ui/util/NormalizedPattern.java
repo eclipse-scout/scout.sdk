@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -47,15 +47,11 @@ public class NormalizedPattern {
     var length = searchString.length();
     var last = searchString.charAt(length - 1);
     if (searchString.indexOf(ANY_STRING) != -1 || searchString.indexOf(ANY_CHAR) != -1) {
-      switch (last) {
-        case END_SYMBOL:
-        case BLANK:
-          return new NormalizedPattern(searchString.substring(0, length - 1), SearchPattern.R_PATTERN_MATCH);
-        case ANY_STRING:
-          return new NormalizedPattern(searchString, SearchPattern.R_PATTERN_MATCH);
-        default:
-          return new NormalizedPattern(searchString + ANY_STRING, SearchPattern.R_PATTERN_MATCH);
-      }
+      return switch (last) {
+        case END_SYMBOL, BLANK -> new NormalizedPattern(searchString.substring(0, length - 1), SearchPattern.R_PATTERN_MATCH);
+        case ANY_STRING -> new NormalizedPattern(searchString, SearchPattern.R_PATTERN_MATCH);
+        default -> new NormalizedPattern(searchString + ANY_STRING, SearchPattern.R_PATTERN_MATCH);
+      };
     }
 
     if (last == END_SYMBOL || last == BLANK) {

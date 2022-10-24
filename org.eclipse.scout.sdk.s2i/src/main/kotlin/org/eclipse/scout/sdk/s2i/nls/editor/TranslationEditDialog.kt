@@ -16,10 +16,9 @@ import org.eclipse.scout.sdk.core.s.nls.Translation
 import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
-import kotlin.streams.toList
 
-class TranslationEditDialog(project: Project, val translation: IStackedTranslation, manager: TranslationManager, initialLanguageShown: Language? = null)
-    : AbstractTranslationDialog(project, translation.languagesOfAllStores().toList(), manager, translation.key(), initialLanguageShown) {
+class TranslationEditDialog(project: Project, val translation: IStackedTranslation, manager: TranslationManager, initialLanguageShown: Language? = null) :
+    AbstractTranslationDialog(project, translation.languagesOfAllStores().toList(), manager, translation.key(), initialLanguageShown) {
 
     init {
         title = EclipseScoutBundle.message("edit.translation.x", translation.key())

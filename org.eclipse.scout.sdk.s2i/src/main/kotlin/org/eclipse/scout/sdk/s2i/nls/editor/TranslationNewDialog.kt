@@ -18,10 +18,8 @@ import org.eclipse.scout.sdk.core.s.nls.TranslationValidator
 import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
-import kotlin.streams.toList
 
-class TranslationNewDialog(project: Project, val store: ITranslationStore, manager: TranslationManager, initialKey: String? = null)
-    : AbstractTranslationDialog(project, store.languages().toList(), manager, initialKey) {
+class TranslationNewDialog(project: Project, val store: ITranslationStore, manager: TranslationManager, initialKey: String? = null) : AbstractTranslationDialog(project, store.languages().toList(), manager, initialKey) {
 
     private var m_createdTranslation: IStackedTranslation? = null
 

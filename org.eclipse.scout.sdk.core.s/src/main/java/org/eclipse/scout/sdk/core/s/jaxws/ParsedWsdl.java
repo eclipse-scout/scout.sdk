@@ -201,8 +201,8 @@ public class ParsedWsdl {
     m_services.put(service, source);
   }
 
-  protected String putReferencedResource(URI absolutePath, URI pathFromWsdlRoot) throws UnsupportedEncodingException {
-    return m_referencedResourceUris.put(absolutePath.normalize(), URLDecoder.decode(pathFromWsdlRoot.toString(), StandardCharsets.UTF_8.name()));
+  protected String putReferencedResource(URI absolutePath, URI pathFromWsdlRoot) {
+    return m_referencedResourceUris.put(absolutePath.normalize(), URLDecoder.decode(pathFromWsdlRoot.toString(), StandardCharsets.UTF_8));
   }
 
   @SuppressWarnings("unchecked")
@@ -342,7 +342,7 @@ public class ParsedWsdl {
   }
 
   @SuppressWarnings("unchecked")
-  protected static void parseWsdlRec(Definition def, URI rootDefUri, URI relPath, ParsedWsdl collector, boolean loadSchemas) throws UnsupportedEncodingException {
+  protected static void parseWsdlRec(Definition def, URI rootDefUri, URI relPath, ParsedWsdl collector, boolean loadSchemas) {
     Map<String, List<Import>> imports = def.getImports();
     for (var iv : imports.values()) {
       for (var i : iv) {
@@ -385,7 +385,7 @@ public class ParsedWsdl {
   }
 
   @SuppressWarnings("unchecked")
-  protected static void parseSchemasRec(Schema s, URI rootUri, URI relPath, ParsedWsdl collector) throws UnsupportedEncodingException {
+  protected static void parseSchemasRec(Schema s, URI rootUri, URI relPath, ParsedWsdl collector) {
     if (s == null) {
       return;
     }
@@ -420,7 +420,7 @@ public class ParsedWsdl {
         }
 
         if (pathAbsolute.isAbsolute()) {
-          // its an absolute path -> not possible to make relative
+          // it's an absolute path -> not possible to make relative
           pathRelativeToRoot = pathAbsolute;
         }
         else {

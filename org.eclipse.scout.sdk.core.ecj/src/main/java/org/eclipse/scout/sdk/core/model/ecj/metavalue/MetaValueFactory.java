@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -187,29 +187,18 @@ public final class MetaValueFactory {
       return createNull();
     }
 
-    switch (c.typeID()) {
-      case TypeIds.T_int:
-        return new ConstantMetaValue(c, MetaValueType.Int);
-      case TypeIds.T_null:
-        return createNull();
-      case TypeIds.T_byte:
-        return new ConstantMetaValue(c, MetaValueType.Byte);
-      case TypeIds.T_short:
-        return new ConstantMetaValue(c, MetaValueType.Short);
-      case TypeIds.T_char:
-        return new ConstantMetaValue(c, MetaValueType.Char);
-      case TypeIds.T_float:
-        return new ConstantMetaValue(c, MetaValueType.Float);
-      case TypeIds.T_double:
-        return new ConstantMetaValue(c, MetaValueType.Double);
-      case TypeIds.T_boolean:
-        return new ConstantMetaValue(c, MetaValueType.Bool);
-      case TypeIds.T_long:
-        return new ConstantMetaValue(c, MetaValueType.Long);
-      case TypeIds.T_JavaLangString:
-        return new ConstantMetaValue(c, MetaValueType.String);
-      default:
-        return createUnknown(c);
-    }
+    return switch (c.typeID()) {
+      case TypeIds.T_int -> new ConstantMetaValue(c, MetaValueType.Int);
+      case TypeIds.T_null -> createNull();
+      case TypeIds.T_byte -> new ConstantMetaValue(c, MetaValueType.Byte);
+      case TypeIds.T_short -> new ConstantMetaValue(c, MetaValueType.Short);
+      case TypeIds.T_char -> new ConstantMetaValue(c, MetaValueType.Char);
+      case TypeIds.T_float -> new ConstantMetaValue(c, MetaValueType.Float);
+      case TypeIds.T_double -> new ConstantMetaValue(c, MetaValueType.Double);
+      case TypeIds.T_boolean -> new ConstantMetaValue(c, MetaValueType.Bool);
+      case TypeIds.T_long -> new ConstantMetaValue(c, MetaValueType.Long);
+      case TypeIds.T_JavaLangString -> new ConstantMetaValue(c, MetaValueType.String);
+      default -> createUnknown(c);
+    };
   }
 }

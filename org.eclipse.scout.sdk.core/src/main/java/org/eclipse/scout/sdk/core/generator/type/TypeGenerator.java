@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -413,7 +413,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractMe
     var delimiter = buildQualifier[1];
     if (delimiter == null) {
       var lastDotPos = qualifier.lastIndexOf(JavaTypes.C_DOT);
-      var isInnerType = lastDotPos > 0 && lastDotPos < qualifier.length() && Character.isUpperCase(qualifier.charAt(lastDotPos + 1));
+      var isInnerType = lastDotPos > 0 && Character.isUpperCase(qualifier.charAt(lastDotPos + 1));
       if (isInnerType) {
         delimiter = "$";
       }

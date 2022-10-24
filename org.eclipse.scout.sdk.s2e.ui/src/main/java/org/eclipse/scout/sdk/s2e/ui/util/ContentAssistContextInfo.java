@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -61,7 +61,7 @@ public class ContentAssistContextInfo {
    */
   @SuppressWarnings("pmd:NPathComplexity")
   public static ContentAssistContextInfo build(ContentAssistInvocationContext context, String callingPluginId, IProgressMonitor monitor) {
-    if (!(context instanceof JavaContentAssistInvocationContext)) {
+    if (!(context instanceof JavaContentAssistInvocationContext javaContext)) {
       return null;
     }
 
@@ -70,7 +70,6 @@ public class ContentAssistContextInfo {
       return null;
     }
 
-    var javaContext = (JavaContentAssistInvocationContext) context;
     var compilationUnit = javaContext.getCompilationUnit();
     if (!JdtUtils.exists(compilationUnit) || !JdtUtils.exists(compilationUnit.getJavaProject())) {
       return null;

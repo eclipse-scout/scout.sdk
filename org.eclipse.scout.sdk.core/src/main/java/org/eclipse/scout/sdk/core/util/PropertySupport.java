@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -214,8 +214,7 @@ public class PropertySupport {
   }
 
   public void addPropertyChangeListener(@SuppressWarnings("TypeMayBeWeakened") PropertyChangeListener listener) {
-    if (listener instanceof PropertyChangeListenerProxy) {
-      var proxy = (PropertyChangeListenerProxy) listener;
+    if (listener instanceof PropertyChangeListenerProxy proxy) {
       addPropertyChangeListener(proxy.getPropertyName(), proxy.getListener());
       return;
     }
@@ -229,8 +228,7 @@ public class PropertySupport {
   }
 
   public boolean removePropertyChangeListener(@SuppressWarnings("TypeMayBeWeakened") PropertyChangeListener listener) {
-    if (listener instanceof PropertyChangeListenerProxy) {
-      var proxy = (PropertyChangeListenerProxy) listener;
+    if (listener instanceof PropertyChangeListenerProxy proxy) {
       // Call two argument remove method.
       return removePropertyChangeListener(proxy.getPropertyName(), proxy.getListener());
     }

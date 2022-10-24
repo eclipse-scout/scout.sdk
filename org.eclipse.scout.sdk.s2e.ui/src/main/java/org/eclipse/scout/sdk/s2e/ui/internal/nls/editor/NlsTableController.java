@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -133,26 +133,30 @@ public class NlsTableController extends ViewerComparator {
   @SuppressWarnings("squid:SwitchLastCaseIsDefaultCheck")
   protected boolean handleTranslationManagerEvent(TranslationManagerEvent event) {
     switch (event.type()) {
-      case TranslationManagerEvent.TYPE_NEW_TRANSLATION:
+      case TranslationManagerEvent.TYPE_NEW_TRANSLATION -> {
         var newTranslation = event.translation().orElseThrow();
         m_translationList.add(new TranslationTableEntry(newTranslation));
         reveal(newTranslation.key());
         updateReferenceCountInTable();
         return true;
-      case TranslationManagerEvent.TYPE_REMOVE_TRANSLATION:
+      }
+      case TranslationManagerEvent.TYPE_REMOVE_TRANSLATION -> {
         translationToTableEntry(event.translation().orElseThrow()).ifPresent(m_translationList::remove);
         updateReferenceCountInTable();
         return false;
-      case TranslationManagerEvent.TYPE_NEW_LANGUAGE:
+      }
+      case TranslationManagerEvent.TYPE_NEW_LANGUAGE -> {
         if (!allLanguages().contains(event.language().orElseThrow())) {
           // only refresh the full table if a new column has been added.
           m_view.getDisplay().asyncExec(() -> preservingSelectionDo(this::rebind));
         }
         return false;
-      case TranslationManagerEvent.TYPE_RELOAD:
+      }
+      case TranslationManagerEvent.TYPE_RELOAD -> {
         m_view.getDisplay().asyncExec(() -> preservingSelectionDo(this::rebind));
         return false;
-      case TranslationManagerEvent.TYPE_KEY_CHANGED:
+      }
+      case TranslationManagerEvent.TYPE_KEY_CHANGED -> {
         m_translations.stream()
             .filter(t -> t.unwrap().key().equals(event.key().orElse(null)))
             .findAny()
@@ -162,12 +166,14 @@ public class NlsTableController extends ViewerComparator {
         reveal(translationWitNewKey.key());
         updateReferenceCountInTable();
         return true;
-      case TranslationManagerEvent.TYPE_UPDATE_TRANSLATION:
+      }
+      case TranslationManagerEvent.TYPE_UPDATE_TRANSLATION -> {
         var changedTranslation = event.translation().orElseThrow();
         for (var i = NUM_NON_LANGUAGE_COLS; i < m_observedColumns.length; i++) {
           m_observedColumns[i].fireChange(changedTranslation);
         }
         return true;
+      }
     }
     return false;
   }
@@ -502,7 +508,7 @@ public class NlsTableController extends ViewerComparator {
 
   /**
    * Use a translation entry with a unique id so that the hashCode does not change when the wrapped entry's hashCode
-   * changes. Otherwise we cannot find it anymore (because we do hashLookup in the table).
+   * changes. Otherwise, we cannot find it anymore (because we do hashLookup in the table).
    */
   private static final class TranslationTableEntry {
     private final IStackedTranslation m_entry;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -251,8 +251,7 @@ public final class SpiWithEcjUtils {
     if (b instanceof VoidTypeBinding) {
       return env.createVoidType();
     }
-    if (b instanceof WildcardBinding) {
-      var wb = (WildcardBinding) b;
+    if (b instanceof WildcardBinding wb) {
       var allBounds = wb.allBounds();
       if (allBounds == null) {
         // wildcard only binding: <?>
@@ -529,8 +528,7 @@ public final class SpiWithEcjUtils {
       }
       return DefaultProblem.EMPTY_VALUES;
     }
-    if (expression instanceof UnaryExpression) {
-      var ue = (UnaryExpression) expression;
+    if (expression instanceof UnaryExpression ue) {
       var inner = ue.expression;
       if (inner instanceof Literal) {
         var id = getTypeIdForLiteral((Literal) inner);
@@ -557,8 +555,7 @@ public final class SpiWithEcjUtils {
       }
       return val;
     }
-    if (expression instanceof Annotation) {
-      var annotation = (Annotation) expression;
+    if (expression instanceof Annotation annotation) {
       var compilerAnnotation = annotation.getCompilerAnnotation();
       if (compilerAnnotation == null) {
         synchronized (env.lock()) {
@@ -577,8 +574,7 @@ public final class SpiWithEcjUtils {
         else if (expression instanceof QualifiedNameReference) {
           var tokens = ((QualifiedNameReference) expression).tokens;
           var baseType = scopeForTypeLookup.getType(tokens, tokens.length - 1);
-          if (baseType instanceof ReferenceBinding) {
-            var ref = (ReferenceBinding) baseType;
+          if (baseType instanceof ReferenceBinding ref) {
             var field = ref.getField(tokens[tokens.length - 1], true);
             if (field != null) {
               return field;
@@ -619,9 +615,8 @@ public final class SpiWithEcjUtils {
       // type
       return MetaValueFactory.createFromType(bindingToType(env, (TypeBinding) compiledValue, () -> (TypeBinding) compiledValueSupplier.get()));
     }
-    if (compiledValue instanceof FieldBinding) {
+    if (compiledValue instanceof FieldBinding fb) {
       // enum constants
-      var fb = (FieldBinding) compiledValue;
       var type = bindingToType(env, fb.declaringClass, () -> withNewElement(FieldBinding.class, f -> f.declaringClass, compiledValueSupplier));
       var name = new String(fb.name);
       if (type != null) {
@@ -633,9 +628,8 @@ public final class SpiWithEcjUtils {
       }
       return MetaValueFactory.createUnknown("ENUM " + fb.declaringClass.debugName() + '#' + name);
     }
-    if (compiledValue instanceof AnnotationBinding) {
+    if (compiledValue instanceof AnnotationBinding a) {
       // annotation binding
-      var a = (AnnotationBinding) compiledValue;
       return MetaValueFactory.createFromAnnotation(env.createBindingAnnotation(owner, a));
     }
     if (compiledValue.getClass().isArray()) {

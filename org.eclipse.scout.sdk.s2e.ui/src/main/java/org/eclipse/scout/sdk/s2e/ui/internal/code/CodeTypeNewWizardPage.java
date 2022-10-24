@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -9,8 +9,6 @@
  *     BSI Business Systems Integration AG - initial API and implementation
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.code;
-
-import static java.util.stream.Collectors.toList;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -107,16 +105,12 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
   }
 
   protected static String getTypeArgLabel(int index) {
-    switch (index) {
-      case 0:
-        return "First Argument";
-      case 1:
-        return "Second Argument";
-      case 2:
-        return "Third Argument";
-      default:
-        throw new SdkException("unsupported index: " + index);
-    }
+    return switch (index) {
+      case 0 -> "First Argument";
+      case 1 -> "Second Argument";
+      case 2 -> "Third Argument";
+      default -> throw new SdkException("unsupported index: " + index);
+    };
   }
 
   @Override
@@ -146,12 +140,12 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
       }
     }
     else {
-      var typeParameters = m_provider.toScoutType(superType).typeParameters().collect(toList());
+      var typeParameters = m_provider.toScoutType(superType).typeParameters().toList();
       for (var i = 0; i < NUM_ARG_FIELDS; i++) {
         var typeParamAvailable = typeParameters.size() > i;
         m_typeArgFields[i].setEnabled(typeParamAvailable);
         if (typeParamAvailable) {
-          var bounds = typeParameters.get(i).bounds().collect(toList());
+          var bounds = typeParameters.get(i).bounds().toList();
           var typeContentProvider = (StrictHierarchyTypeContentProvider) m_typeArgFields[i].getContentProvider();
           if (bounds.isEmpty()) {
             typeContentProvider.setBaseClassFqn(null);
@@ -227,7 +221,7 @@ public class CodeTypeNewWizardPage extends AbstractCompilationUnitNewWizardPage 
 
     if (codeTypeIdArg.isParameterType()) {
       // it is a type parameter. So the super class does not define the data type. We must check in our type argument fields
-      var typeParameters = superType.typeParameters().collect(toList());
+      var typeParameters = superType.typeParameters().toList();
       var index = IntStream.range(0, typeParameters.size())
           .filter(i -> typeParameters.get(i).elementName().equals(codeTypeIdArg.elementName()))
           .findFirst()

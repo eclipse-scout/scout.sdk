@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,14 +37,19 @@ public class JavaEnvironmentTest {
     var packageName = "org.test";
     var fileName = "TestClass.java";
 
-    var firstSrc = "package org.test;\n\n"
-        + "public class TestClass {\n"
-        + "}\n";
+    var firstSrc = """
+        package org.test;
 
-    var secondSrc = "package org.test;\n\n"
-        + "public class TestClass {\n"
-        + "int a = 0;"
-        + "}\n";
+        public class TestClass {
+        }
+        """;
+
+    var secondSrc = """
+        package org.test;
+
+        public class TestClass {
+        int a = 0;}
+        """;
 
     var reload = env.registerCompilationUnitOverride(firstSrc, packageName, fileName);
     assertFalse(reload);

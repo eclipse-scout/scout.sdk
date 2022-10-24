@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,28 +37,18 @@ class ConstantMetaValue extends AbstractMetaValue {
    * @return The constant value in the type defined by this instance (m_type)
    */
   Object getInternalObject() {
-    switch (type()) {
-      case Bool:
-        return m_constant.booleanValue();
-      case Byte:
-        return m_constant.byteValue();
-      case Char:
-        return m_constant.charValue();
-      case Double:
-        return m_constant.doubleValue();
-      case Float:
-        return m_constant.floatValue();
-      case Int:
-        return m_constant.intValue();
-      case Long:
-        return m_constant.longValue();
-      case Short:
-        return m_constant.shortValue();
-      case String:
-        return m_constant.stringValue();
-      default:
-        return m_constant;
-    }
+    return switch (type()) {
+      case Bool -> m_constant.booleanValue();
+      case Byte -> m_constant.byteValue();
+      case Char -> m_constant.charValue();
+      case Double -> m_constant.doubleValue();
+      case Float -> m_constant.floatValue();
+      case Int -> m_constant.intValue();
+      case Long -> m_constant.longValue();
+      case Short -> m_constant.shortValue();
+      case String -> m_constant.stringValue();
+      default -> m_constant;
+    };
   }
 
   @Override

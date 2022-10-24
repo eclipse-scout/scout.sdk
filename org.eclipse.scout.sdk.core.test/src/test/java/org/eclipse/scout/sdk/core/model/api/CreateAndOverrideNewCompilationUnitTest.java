@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -43,12 +43,14 @@ public class CreateAndOverrideNewCompilationUnitTest {
     var cu = registerCompilationUnit(env, cuSrc).requireCompilationUnit();
 
     var expected =
-        "package a.b.c;\n" +
-            "public class BaseClass {\n" +
-            "  public FooBar run() {\n" +
-            "    System.out.println(\"base class\");\n" +
-            "  }\n" +
-            "}\n";
+        """
+            package a.b.c;
+            public class BaseClass {
+              public FooBar run() {
+                System.out.println("base class");
+              }
+            }
+            """;
     assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().orElseThrow().asCharSequence()));
     assertFalse(env.compileErrors("a.b.c.BaseClass").isEmpty());
 
@@ -65,12 +67,14 @@ public class CreateAndOverrideNewCompilationUnitTest {
     var cuSrc = createBaseClass();
     var cu = registerCompilationUnit(env, cuSrc).requireCompilationUnit();
     var expected =
-        "package a.b.c;\n" +
-            "public class BaseClass {\n" +
-            "  public void run() {\n" +
-            "    System.out.println(\"base class\");\n" +
-            "  }\n" +
-            "}\n";
+        """
+            package a.b.c;
+            public class BaseClass {
+              public void run() {
+                System.out.println("base class");
+              }
+            }
+            """;
     assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().orElseThrow().asCharSequence()));
 
     //now read the type from the env
@@ -89,15 +93,17 @@ public class CreateAndOverrideNewCompilationUnitTest {
     cu = registerCompilationUnit(env, cuSrc).requireCompilationUnit();
 
     var expected =
-        "package a.b.c.d;\n" +
-            "import a.b.c.BaseClass;\n" +
-            "public class SubClass extends BaseClass {\n" +
-            "  @Override\n" +
-            "  public void run() {\n" +
-            "    super.run();\n" +
-            "    System.out.println(\"sub class\");\n" +
-            "  }\n" +
-            "}\n";
+        """
+            package a.b.c.d;
+            import a.b.c.BaseClass;
+            public class SubClass extends BaseClass {
+              @Override
+              public void run() {
+                super.run();
+                System.out.println("sub class");
+              }
+            }
+            """;
     assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().orElseThrow().asCharSequence()));
   }
 
@@ -118,13 +124,14 @@ public class CreateAndOverrideNewCompilationUnitTest {
     cuSrc.mainType().orElseThrow().methods().findAny().orElseThrow().withBody(b -> b.append("System.out.println(\"modified base class\");"));
     cu = registerCompilationUnit(env, cuSrc).requireCompilationUnit();
 
-    var expected = "" +
-        "package a.b.c;\n" +
-        "public class BaseClass {\n" +
-        "  public void run() {\n" +
-        "    System.out.println(\"modified base class\");\n" +
-        "  }\n" +
-        "}\n";
+    var expected = """
+        package a.b.c;
+        public class BaseClass {
+          public void run() {
+            System.out.println("modified base class");
+          }
+        }
+        """;
     assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().orElseThrow().asCharSequence()));
 
     // now read the type from the env
@@ -136,13 +143,14 @@ public class CreateAndOverrideNewCompilationUnitTest {
     cuSrc.mainType().orElseThrow().methods().findAny().orElseThrow().withBody(b -> b.append("System.out.println(\"again modified base class\");"));
     cu = registerCompilationUnit(env, cuSrc).requireCompilationUnit();
 
-    expected = "" +
-        "package a.b.c;\n" +
-        "public class BaseClass {\n" +
-        "  public void run() {\n" +
-        "    System.out.println(\"again modified base class\");\n" +
-        "  }\n" +
-        "}\n";
+    expected = """
+        package a.b.c;
+        public class BaseClass {
+          public void run() {
+            System.out.println("again modified base class");
+          }
+        }
+        """;
     assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().orElseThrow().asCharSequence()));
 
     // now read the type from the env

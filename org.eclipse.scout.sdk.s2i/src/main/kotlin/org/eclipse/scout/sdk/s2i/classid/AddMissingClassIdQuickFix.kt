@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.requireScoutApi
 
-
 open class AddMissingClassIdQuickFix : LocalQuickFix {
 
     val quickFixName = EclipseScoutBundle.message("add.missing.classid.annotation")
@@ -34,7 +33,7 @@ open class AddMissingClassIdQuickFix : LocalQuickFix {
 
     override fun applyFix(project: Project, descriptor: ProblemDescriptor) {
         val psiClass = PsiTreeUtil.getParentOfType(descriptor.psiElement, PsiClass::class.java)
-                ?: throw Ensure.newFail("No class found to add @ClassId. Element: '{}'.", descriptor.psiElement)
+            ?: throw Ensure.newFail("No class found to add @ClassId. Element: '{}'.", descriptor.psiElement)
         val classId = psiClass.requireScoutApi().ClassId()
         val classIdFqn = classId.fqn()
         if (psiClass.hasAnnotation(classIdFqn)) {
