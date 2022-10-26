@@ -74,14 +74,18 @@ class JsModelValueCompletionContributor : CompletionContributor() {
         }
 
         private fun withJsImportIfNecessary(lookupElement: LookupElementBuilder, place: PsiElement, jsProperty: JsModelProperty): LookupElementBuilder {
-            val targetScoutJsModule = jsProperty.scoutJsModule
-            if (!jsProperty.dataType.isCustomType() && (!targetScoutJsModule.useClassReference || (jsProperty.dataType != JsModelProperty.JsPropertyDataType.WIDGET && jsProperty.name != JsModel.OBJECT_TYPE_PROPERTY_NAME))) return lookupElement
-            val targetJsModel = targetScoutJsModule.jsModel
-            val type = if (targetScoutJsModule.useClassReference && (jsProperty.dataType == JsModelProperty.JsPropertyDataType.WIDGET || jsProperty.name == JsModel.OBJECT_TYPE_PROPERTY_NAME)) {
+            val scoutJsModule = jsProperty.scoutJsModule
+            if (!jsProperty.dataType.isCustomType() && (!scoutJsModule.useClassReference || (jsProperty.dataType != JsModelProperty.JsPropertyDataType.WIDGET && jsProperty.name != JsModel.OBJECT_TYPE_PROPERTY_NAME))) {
+                return lookupElement
+            }
+
+            val targetJsModel = scoutJsModule.jsModel
+            val type = if (scoutJsModule.useClassReference && (jsProperty.dataType == JsModelProperty.JsPropertyDataType.WIDGET || jsProperty.name == JsModel.OBJECT_TYPE_PROPERTY_NAME)) {
                 lookupElement.getUserData(SELECTED_ELEMENT)
             } else {
                 targetJsModel.element(jsProperty.dataType.type)
             } ?: return lookupElement
+
             val originalHandler = lookupElement.insertHandler
             var importName = type.name
             val firstDot = importName.indexOf('.')
@@ -90,7 +94,7 @@ class JsModelValueCompletionContributor : CompletionContributor() {
             return lookupElement.withInsertHandler { context, item ->
                 originalHandler?.handleInsert(context, item)
 
-                val targetModuleMainFile = PsiManager.getInstance(context.project).findFile(targetScoutJsModule.mainFile) ?: return@withInsertHandler
+                val targetModuleMainFile = PsiManager.getInstance(context.project).findFile(type.scoutJsModule.mainFile) ?: return@withInsertHandler
                 ES6ImportPsiUtil.insertJSImport(place, importName, ES6ImportPsiUtil.ImportExportType.SPECIFIER, targetModuleMainFile, context.editor)
             }
         }
