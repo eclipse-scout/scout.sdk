@@ -21,9 +21,11 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.PackageIndex
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.util.text.StringUtil
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiNameHelper
@@ -38,6 +40,7 @@ import org.eclipse.scout.sdk.core.util.Strings.capitalize
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.util.SourceFolderHelper
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.function.BiConsumer
@@ -129,7 +132,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
                 return@callInIdeaEnvironment null
             }
 
-            var pkg = fileIndex.getPackageNameByDirectory(dir.virtualFile)
+            var pkg = getPackageNameByDirectory(dir.virtualFile, fileIndex, project)
             val lastIndexOf = name.lastIndexOf(".")
             if (lastIndexOf > 0) pkg += "." + name.substring(0, lastIndexOf)
             val elementName = capitalize(name.substring(lastIndexOf + 1, name.length)).toString()
@@ -151,6 +154,19 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
             SdkLog.error("Error creating {}.", text, it)
             null
         }
+    }
+
+    protected fun getPackageNameByDirectory(dir: VirtualFile, fileIndex: ProjectFileIndex, project: Project): String? {
+        // can be removed as soon as IJ 2022.3 is the latest supported version
+        return CompatibilityMethodCaller<String?>()
+            .withCandidate(PackageIndex::class.java.name, "getPackageNameByDirectory", VirtualFile::class.java.name) {
+                // for IJ >= 2022.3: use PackageIndex
+                it.invoke(PackageIndex.getInstance(project), dir)
+            }
+            .withCandidate(ProjectFileIndex::class.java.name, "getPackageNameByDirectory", VirtualFile::class.java.name) {
+                // for IJ <= 2022.2 use ProjectFileIndex
+                it.invoke(fileIndex, dir)
+            }.invoke()
     }
 
     protected open fun openPsiInEditorLater(project: Project, psiSupplier: () -> PsiClass?) {

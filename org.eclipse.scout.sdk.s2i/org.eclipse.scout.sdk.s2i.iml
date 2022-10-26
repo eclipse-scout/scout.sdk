@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="org.eclipse.scout.sdk.s2i" external.linked.project.path="$MODULE_DIR$" external.system.id="GRADLE" external.system.module.group="org.eclipse.scout.sdk.s2i" external.system.module.version="12.0.0-SNAPSHOT" type="PLUGIN_MODULE" version="4">
+<module external.linked.project.id="org.eclipse.scout.sdk.s2i" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/../../bsi.crm.sdk/com.bsiag.crm.sdk.s2i" external.system.id="GRADLE" external.system.module.group="org.eclipse.scout.sdk.s2i" external.system.module.version="12.0.0-SNAPSHOT" type="PLUGIN_MODULE" version="4">
   <component name="DevKit.ModuleBuildProperties" url="file://$MODULE_DIR$/src/main/resources/META-INF/plugin.xml" />
   <component name="FacetManager">
     <facet type="kotlin-language" name="Kotlin">
@@ -20,15 +20,12 @@
           </option>
           <option name="pluginClasspaths">
             <array>
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-jvm/1.5.32/461f8d11e1320ddbed9955f4b3dbedb8363c6f00/kotlin-scripting-jvm-1.5.32.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-common/1.5.32/1fbf15205d5137538bc26b1fb961040ec205b1e9/kotlin-scripting-common-1.5.32.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-jvm/1.5.0/d8cebccdcddd029022aa8646a5a953ff88b13ac8/kotlinx-coroutines-core-jvm-1.5.0.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.5.0/65fbc439df2e4aad1f3769762d54534f1b564090/kotlin-stdlib-jdk8-1.5.0.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.5.0/f61904618ea7be07a66e0545ffe8dc2c70a19b77/kotlin-stdlib-jdk7-1.5.0.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.5.32/a1f8a73f899b85e6eb4337dff7e81b8b914bd2c9/kotlin-stdlib-1.5.32.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-jvm/1.7.10/c1e3bade3e9795023867dce31404736995037e4f/kotlin-scripting-jvm-1.7.10.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-scripting-common/1.7.10/bddf009658701ba5fb98e40e7877dcce7d8695ee/kotlin-scripting-common-1.7.10.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.7.10/d2abf9e77736acc4450dc4a3f707fa2c10f5099d/kotlin-stdlib-1.7.10.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.7.10/bac80c520d0a9e3f3673bc2658c6ed02ef45a76a/kotlin-stdlib-common-1.7.10.jar" />
               <option value="$MAVEN_REPOSITORY$/org/jetbrains/annotations/13.0/annotations-13.0.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.5.32/8befc4a20c17094a148f1409c1bac163bc3ca630/kotlin-stdlib-common-1.5.32.jar" />
-              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/1.5.32/ce05875278f70fb752ebb4ff79f81d9589be2852/kotlin-script-runtime-1.5.32.jar" />
+              <option value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-script-runtime/1.7.10/c99c87a6988d8fd8d5142e9ed5c9f34a7cf561ee/kotlin-script-runtime-1.7.10.jar" />
             </array>
           </option>
           <option name="errors">
@@ -57,7 +54,53 @@
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.ecj" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" scope="TEST" />
-    <orderEntry type="library" name="Gradle: org.apache.poi:poi-ooxml:5.2.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.poi:poi-ooxml:5.2.3" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.jetbrains:annotations:23.0.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-dependency-resolver:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:completion-ranking-java-0.3.4:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:debugger-memory-agent-1.0.35:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:ecj-4.16:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java-api:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java-impl:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:javac2:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jdkAnnotations:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jgoodies-common-1.4.0:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-builders-6:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-builders:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-javac-extension-1:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-launcher:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jshell-protocol:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-resolver-connector-basic-1.3.3:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-resolver-transport-file-1.3.3:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-resolver-transport-http-1.3.3:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:nekohtml-1.9.22:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:platform-impl:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:sa-jdwp-1.19:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:artifact-resolver-m2:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:artifact-resolver-m3:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:artifact-resolver-m31:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:lucene-core-2.4.1:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-event-listener:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-jps:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-server-api:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven2-server:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven3-server-common:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven3-server:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven30-server:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven36-server:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:plexus-archiver-3.0.3:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:copyright:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:properties:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:completion-ranking-js-0.1.3:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:completion-ranking-typescript-0.2.3:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:JavaScriptLanguage:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:semver4j-2.2.0:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:repository-search:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-model:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css-openapi:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css:ideaIU-IU-212.5457.46-withSources" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:platform-images:ideaIU-IU-212.5457.46-withSources" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:3rd-party:2021.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:asm-7.1:2021.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:asm-analysis-7.1:2021.2.3" level="project" />
@@ -164,75 +207,27 @@
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:ant-testutil:2021.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:ant-xz:2021.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:ant:2021.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-dependency-resolver:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:completion-ranking-java-0.3.4:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:debugger-memory-agent-1.0.35:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:ecj-4.16:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java-api:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java-impl:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:javac2:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jdkAnnotations:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jgoodies-common-1.4.0:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-builders-6:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-builders:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-javac-extension-1:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jps-launcher:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:jshell-protocol:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-resolver-connector-basic-1.3.3:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-resolver-transport-file-1.3.3:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-resolver-transport-http-1.3.3:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:nekohtml-1.9.22:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:platform-impl:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:sa-jdwp-1.19:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:artifact-resolver-m2:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:artifact-resolver-m3:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:artifact-resolver-m31:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:lucene-core-2.4.1:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-event-listener:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-jps:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-server-api:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven2-server:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven3-server-common:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven3-server:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven30-server:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven36-server:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:plexus-archiver-3.0.3:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:copyright:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:properties:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:completion-ranking-js-0.1.3:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:completion-ranking-typescript-0.2.3:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:JavaScriptLanguage:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:semver4j-2.2.0:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:repository-search:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:maven-model:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css-openapi:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:css:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:platform-images:ideaIU-IU-212.5457.46-withSources" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.32" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-reflect:1.5.32" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.32" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.5.32" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.jetbrains:annotations:23.0.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse.scout.sdk:org.eclipse.scout.sdk.core:12.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Gradle: wsdl4j:wsdl4j:1.6.2" level="project" />
     <orderEntry type="library" name="Gradle: org.eclipse.jdt:ecj:3.30.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.apache.poi:poi:5.2.2" level="project" />
-    <orderEntry type="library" name="Gradle: org.apache.poi:poi-ooxml-lite:5.2.2" level="project" />
-    <orderEntry type="library" name="Gradle: org.apache.xmlbeans:xmlbeans:5.0.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.poi:poi:5.2.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.poi:poi-ooxml-lite:5.2.3" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.xmlbeans:xmlbeans:5.1.1" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.commons:commons-compress:1.21" level="project" />
     <orderEntry type="library" name="Gradle: commons-io:commons-io:2.11.0" level="project" />
     <orderEntry type="library" name="Gradle: com.github.virtuald:curvesapi:1.07" level="project" />
-    <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-api:2.17.2" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-api:2.18.0" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.commons:commons-collections4:4.4" level="project" />
     <orderEntry type="library" name="Gradle: commons-codec:commons-codec:1.15" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.commons:commons-math3:3.6.1" level="project" />
     <orderEntry type="library" name="Gradle: com.zaxxer:SparseBitSet:1.2" level="project" />
-    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.5.32" level="project" />
+    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.7.10" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.jetbrains:annotations:13.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.mockito:mockito-core:4.6.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.sdk:org.eclipse.scout.sdk.core.test:12.0.0-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.mockito:mockito-core:4.8.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.client:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy:1.12.10" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy-agent:1.12.10" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy:1.12.16" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy-agent:1.12.16" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.security:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:23.1-SNAPSHOT" level="project" />

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -13,16 +13,13 @@ package org.eclipse.scout.sdk.s2i.template.js
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.lang.ecmascript6.actions.ES6AddImportExecutor
 import com.intellij.lang.ecmascript6.psi.impl.ES6ImportPsiUtil
-import com.intellij.lang.ecmascript6.psi.impl.ES6ImportPsiUtil.CreateImportExportInfo
 import com.intellij.lang.javascript.patterns.JSPatterns.jsProperty
 import com.intellij.lang.javascript.psi.JSArrayLiteralExpression
-import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiManager
 import com.intellij.util.ProcessingContext
-import org.eclipse.scout.sdk.core.s.IWebConstants
 import org.eclipse.scout.sdk.s2i.model.js.JsModel
 import org.eclipse.scout.sdk.s2i.model.js.JsModelProperty
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.PropertyCompletionInfo
@@ -37,7 +34,7 @@ class JsModelValueCompletionContributor : CompletionContributor() {
         // normal value completion
         extend(CompletionType.BASIC, propertyElementPattern(), JsModelValueCompletionProvider())
 
-        // value completion when within an array (to add an additional array element)
+        // value completion when within an array (to add an array element)
         extend(CompletionType.BASIC, psiElement().withSuperParent(2, psiElement(JSArrayLiteralExpression::class.java).withParent(jsProperty())), JsModelValueCompletionProvider())
     }
 
@@ -69,14 +66,14 @@ class JsModelValueCompletionContributor : CompletionContributor() {
             return jsModel.valuesForProperty(jsProperty).map {
                 val lookupElement = createLookupElement(it.displayText, it.element, jsProperty, completionInfo)
                 if (!completionInfo.isInLiteral) {
-                    withJsImportIfNecessary(lookupElement, completionInfo.property.containingFile.originalFile, jsModel, jsProperty)
+                    withJsImportIfNecessary(lookupElement, completionInfo.property.containingFile.originalFile, jsProperty)
                 } else {
                     lookupElement
                 }
             }
         }
 
-        private fun withJsImportIfNecessary(lookupElement: LookupElementBuilder, place: PsiElement, thisJsModel: JsModel, jsProperty: JsModelProperty): LookupElementBuilder {
+        private fun withJsImportIfNecessary(lookupElement: LookupElementBuilder, place: PsiElement, jsProperty: JsModelProperty): LookupElementBuilder {
             val targetScoutJsModule = jsProperty.scoutJsModule
             if (!jsProperty.dataType.isCustomType() && (!targetScoutJsModule.useClassReference || (jsProperty.dataType != JsModelProperty.JsPropertyDataType.WIDGET && jsProperty.name != JsModel.OBJECT_TYPE_PROPERTY_NAME))) return lookupElement
             val targetJsModel = targetScoutJsModule.jsModel
@@ -85,26 +82,16 @@ class JsModelValueCompletionContributor : CompletionContributor() {
             } else {
                 targetJsModel.element(jsProperty.dataType.type)
             } ?: return lookupElement
-            val containingFile = place.containingFile.virtualFile
-            val thisModule = thisJsModel.containingModule(containingFile) ?: return lookupElement
-            val targetModule = type.scoutJsModule
             val originalHandler = lookupElement.insertHandler
+            var importName = type.name
+            val firstDot = importName.indexOf('.')
+            if (firstDot > 0) importName = importName.take(firstDot)
 
             return lookupElement.withInsertHandler { context, item ->
                 originalHandler?.handleInsert(context, item)
-                val moduleOrNamespaceName = if (thisModule == targetModule) {
-                    val relPath = VfsUtilCore.findRelativePath(containingFile, thisModule.mainFile, VfsUtilCore.VFS_SEPARATOR_CHAR) ?: targetModule.name
-                    relPath.removeSuffix(IWebConstants.JS_FILE_SUFFIX)
-                } else {
-                    targetModule.name
-                }
-                var importName = type.name
-                val firstDot = importName.indexOf('.')
-                if (firstDot > 0) importName = importName.take(firstDot)
-                val executor = ES6AddImportExecutor(context.editor, place)
 
-                val info = CreateImportExportInfo(importName, ES6ImportPsiUtil.ImportExportType.SPECIFIER)
-                executor.createImportOrUseExisting(info, null, moduleOrNamespaceName)
+                val targetModuleMainFile = PsiManager.getInstance(context.project).findFile(targetScoutJsModule.mainFile) ?: return@withInsertHandler
+                ES6ImportPsiUtil.insertJSImport(place, importName, ES6ImportPsiUtil.ImportExportType.SPECIFIER, targetModuleMainFile, context.editor)
             }
         }
     }

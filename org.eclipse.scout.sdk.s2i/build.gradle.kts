@@ -46,7 +46,7 @@ plugins {
     id("java")
     id("maven-publish")
     id("idea")
-    id("org.jetbrains.intellij") version "1.6.0"
+    id("org.jetbrains.intellij") version "1.9.0"
     kotlin("jvm") version "1.5.32"
     id("net.linguica.maven-settings") version "0.5" // for maven settings
 }
@@ -62,10 +62,10 @@ repositories {
 dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", scoutSdkVersion)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.ecj", scoutSdkVersion)
-    api("org.apache.poi", "poi-ooxml", "5.2.2")
+    api("org.apache.poi", "poi-ooxml", "5.2.3")
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    testImplementation("org.mockito", "mockito-core", "4.6.1")
+    testImplementation("org.mockito", "mockito-core", "4.8.1")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", scoutSdkVersion)
 }
@@ -91,7 +91,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IU-2021.2.4", "IU-2021.3.3", "IU-2022.1.2", "IU-2022.2"))
+        ideVersions.set(listOf("IU-2021.2.4", "IU-2021.3.3", "IU-2022.1.4", "IU-2022.2.3", "IU-2022.3"))
         subsystemsToCheck.set("without-android")
         failureLevel.set(FailureLevel.ALL)
     }
