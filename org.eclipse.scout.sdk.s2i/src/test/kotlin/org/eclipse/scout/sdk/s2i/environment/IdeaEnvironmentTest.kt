@@ -37,7 +37,7 @@ class IdeaEnvironmentTest : AbstractTestCaseWithRunningClasspathModule() {
         // Sometimes this check is faster than our async worker threads are parked in the pool (even the future is already completed).
         // Therefore, give the workers some time (after the future completion) to be parked in the pool.
         try {
-            Thread.sleep(4000)
+            Thread.sleep(1000)
         } catch (ie: InterruptedException) {
             SdkLog.debug("Interrupted while waiting for workers to be parked.", ie)
         }
