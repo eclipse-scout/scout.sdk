@@ -31,17 +31,13 @@ class IdeaEnvironmentTest : AbstractTestCaseWithRunningClasspathModule() {
         waitForWorkerThreadsFinished()
     }
 
-    @Suppress("DEPRECATION")
     private fun waitForWorkerThreadsFinished() {
         // IJ test runner uses ThreadTracker.checkLeak() in tearDown() to let the test fail if there are leaking threads detected.
         // A thread is considered leaking if it is new (since the test start) and not parked in the pool at the end of the test.
-        Thread.getAllStackTraces().keys.stream()
-            .filter { it.name.contains("ForkJoinPool.commonPool-worker") }
-            .forEach { it.stop() }
-
-        // Give the workers some time to finish.
+        // Sometimes this check is faster than our async worker threads are parked in the pool (even the future is already completed).
+        // Therefore, give the workers some time (after the future completion) to be parked in the pool.
         try {
-            Thread.sleep(1000)
+            Thread.sleep(4000)
         } catch (ie: InterruptedException) {
             SdkLog.debug("Interrupted while waiting for workers to be parked.", ie)
         }
