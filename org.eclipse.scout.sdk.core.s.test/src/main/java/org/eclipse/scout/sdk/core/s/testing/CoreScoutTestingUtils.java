@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.core.apidef.ApiVersion;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
+import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -77,8 +78,7 @@ public final class CoreScoutTestingUtils {
     var targetDirectory = Files.createTempDirectory(CoreScoutTestingUtils.class.getSimpleName() + "-projectDir");
 
     // The testing runner does not make use of the environment and the progress: pass empty mocks
-    //noinspection AccessOfSystemProperties
-    ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", System.getProperty("java.specification.version"),
+    ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_GROUP_ID, PROJECT_ARTIFACT_ID, "Display Name", javaVersionForArchetypes(),
         ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, archetypeArtifactId, archetypeVersion(), mock(IEnvironment.class), mock(IProgress.class));
     return targetDirectory;
   }
@@ -112,6 +112,13 @@ public final class CoreScoutTestingUtils {
       numberSegments = new int[]{numberSegments[0], numberSegments[1], 0};
     }
     return new ApiVersion(numberSegments, version.suffix()).asString();
+  }
+
+  static String javaVersionForArchetypes() {
+    var supportedJavaVersions = new JavaEnvironmentWithEcjBuilder<>()
+        .withoutScoutSdk()
+        .call(e -> e.requireApi(IScoutApi.class).supportedJavaVersions());
+    return Integer.toString(supportedJavaVersions[supportedJavaVersions.length - 1]);
   }
 
   /**
