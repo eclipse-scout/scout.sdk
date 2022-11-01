@@ -67,7 +67,6 @@
       **/src/test/fixture/**/*,
       **/src/test/client/**/*,
       **/src/test/shared/**/*,
-      **/src/main/resources/archetype-resources/**/*,
       **/src/main/java/org/eclipse/scout/sdk/s2e/ui/**/*,
       **/src/main/java/org/eclipse/scout/sdk/s2e/doc/**/*,
       **/src/main/java/org/eclipse/scout/sdk/doc/**/*,
