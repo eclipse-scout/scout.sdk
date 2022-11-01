@@ -164,6 +164,8 @@
     <org.eclipse.equinox.simpleconfigurator.manipulator>2.2.0</org.eclipse.equinox.simpleconfigurator.manipulator>
     <org.eclipse.equinox.p2.repository>2.6.200</org.eclipse.equinox.p2.repository>
     <org.eclipse.equinox.frameworkadmin>2.2.100</org.eclipse.equinox.frameworkadmin>
+    <org.eclipse.equinox.p2.artifact.repository>1.4.500</org.eclipse.equinox.p2.artifact.repository>
+    <org.eclipse.equinox.p2.jarprocessor>1.2.300</org.eclipse.equinox.p2.jarprocessor>
 
     <icu4j>67.1</icu4j>
     <ecj>3.31.0</ecj>
@@ -655,6 +657,16 @@
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.frameworkadmin</artifactId>
         <version>${org.eclipse.equinox.frameworkadmin}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.equinox.p2.artifact.repository</artifactId>
+        <version>${org.eclipse.equinox.p2.artifact.repository}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.equinox.p2.jarprocessor</artifactId>
+        <version>${org.eclipse.equinox.p2.jarprocessor}</version>
       </dependency>
 
       <dependency>
