@@ -28,7 +28,7 @@ plugins {
     id("maven-publish")
     id("idea")
     id("org.jetbrains.intellij") version "1.9.0"
-    kotlin("jvm") version "1.7.21"
+    kotlin("jvm") version "1.7.20"
     id("net.linguica.maven-settings") version "0.5" // for maven settings
 }
 
