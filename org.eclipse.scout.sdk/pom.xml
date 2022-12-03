@@ -41,7 +41,7 @@
 
   <properties>
     <scout.osgi.version>12.0.0</scout.osgi.version>
-    <org.eclipse.scout.rt_version>23.1-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>22.0-SNAPSHOT</org.eclipse.scout.rt_version>
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.sdk/target/jacoco-all.exec</master_coverage_jacoco_destFile>
     <master_test_forkCount>1</master_test_forkCount>

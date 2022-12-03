@@ -155,6 +155,7 @@
         <dependency>
           <groupId>org.eclipse.scout.rt</groupId>
           <artifactId>org.eclipse.scout.rt.chart.ui.html</artifactId>
+          <scope>test</scope>
         </dependency>
       </dependencies>
     </profile>
@@ -162,7 +163,8 @@
       <id>add-datamodel.client-dependency-for-default-build</id>
       <activation>
         <property>
-          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (23.1) -->
+          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (22.0) -->
+          <!-- Same dependency as below (22.0 property given) -->
           <name>!org.eclipse.scout.rt_version</name>
         </property>
       </activation>
@@ -170,6 +172,7 @@
         <dependency>
           <groupId>org.eclipse.scout.rt</groupId>
           <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
+          <scope>test</scope>
         </dependency>
       </dependencies>
     </profile>
@@ -178,6 +181,7 @@
       <activation>
         <property>
           <!-- add dependency for the scout version 22.0 -->
+          <!-- Same dependency as above for the default case (no property given) -->
           <name>org.eclipse.scout.rt_version</name>
           <value>22.0-SNAPSHOT</value>
         </property>
@@ -186,6 +190,7 @@
         <dependency>
           <groupId>org.eclipse.scout.rt</groupId>
           <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
+          <scope>test</scope>
         </dependency>
       </dependencies>
     </profile>
