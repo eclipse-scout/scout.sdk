@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.s2i.template.js
 
 import org.eclipse.scout.sdk.s2i.model.js.JsModel
 
-class LayerJsModelCompletionContributorTest : JsModelCompletionContributorTest() {
+class LayerJsModelCompletionContributorTest : AbstractJsModelCompletionContributorTest() {
 
     override fun getDirectory(): String = LAYER_NAMESPACE
 

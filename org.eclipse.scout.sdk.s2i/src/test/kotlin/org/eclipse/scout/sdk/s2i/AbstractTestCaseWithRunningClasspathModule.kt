@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2020 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,15 +29,20 @@ abstract class AbstractTestCaseWithRunningClasspathModule : JavaCodeInsightFixtu
         LanguageLevelProjectExtension.getInstance(project).languageLevel = m_javaLanguageLevel
     }
 
+    override fun tearDown() {
+        IdeaTestingHelper.removeThreadTracker(myFixture)
+        super.tearDown()
+    }
+
     override fun tuneFixture(moduleBuilder: JavaModuleFixtureBuilder<*>) {
         super.tuneFixture(moduleBuilder)
 
         val jreHome = m_jreInfo.jreHome()
         moduleBuilder
-                .addJdk(jreHome.toString())
-                .setLanguageLevel(m_javaLanguageLevel)
+            .addJdk(jreHome.toString())
+            .setLanguageLevel(m_javaLanguageLevel)
         runningUserClassPath(jreHome)
-                .filter { it.isFile() }
-                .forEach { moduleBuilder.addLibrary(it.fileName.toString(), it.toString()) }
+            .filter { it.isFile() }
+            .forEach { moduleBuilder.addLibrary(it.fileName.toString(), it.toString()) }
     }
 }

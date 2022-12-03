@@ -18,10 +18,11 @@ import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase
 import junit.framework.AssertionFailedError
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils.removeWhitespace
+import org.eclipse.scout.sdk.s2i.IdeaTestingHelper
 import org.eclipse.scout.sdk.s2i.model.js.*
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 
-abstract class JsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase() {
+abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase() {
 
     companion object {
         const val NODE_MODULES_DIR = "node_modules"
@@ -87,6 +88,11 @@ abstract class JsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase
         myFixture.copyDirectoryToProject("./${getDirectory()}", ".")
         getDependencies().forEach { myFixture.copyDirectoryToProject("./${it.first}", "./$NODE_MODULES_DIR/${it.second}") }
         myFixture.copyDirectoryToProject("./models", "./$MODELS_DIR")
+    }
+
+    override fun tearDown() {
+        IdeaTestingHelper.removeThreadTracker(myFixture)
+        super.tearDown()
     }
 
     protected abstract fun getDirectory(): String
