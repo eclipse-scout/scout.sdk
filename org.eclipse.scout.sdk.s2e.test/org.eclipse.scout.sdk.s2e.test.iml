@@ -116,7 +116,7 @@
     <orderEntry type="library" name="Maven: jakarta.jws:jakarta.jws-api:2.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.jboss:jandex:2.4.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: io.smallrye:jandex:3.0.5" level="project" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.ui.html:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.client:23.1-SNAPSHOT" level="project" />
