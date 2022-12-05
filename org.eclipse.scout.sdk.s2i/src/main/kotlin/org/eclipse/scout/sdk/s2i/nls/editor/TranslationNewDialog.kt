@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -18,8 +18,9 @@ import org.eclipse.scout.sdk.core.s.nls.TranslationValidator
 import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
+import java.util.stream.Collectors.toList
 
-class TranslationNewDialog(project: Project, val store: ITranslationStore, manager: TranslationManager, initialKey: String? = null) : AbstractTranslationDialog(project, store.languages().toList(), manager, initialKey) {
+class TranslationNewDialog(project: Project, val store: ITranslationStore, manager: TranslationManager, initialKey: String? = null) : AbstractTranslationDialog(project, store.languages().collect(toList()), manager, initialKey) {
 
     private var m_createdTranslation: IStackedTranslation? = null
 

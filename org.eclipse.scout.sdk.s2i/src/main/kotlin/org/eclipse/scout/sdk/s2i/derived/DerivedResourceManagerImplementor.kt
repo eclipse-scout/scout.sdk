@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
 import java.util.Collections.emptyList
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
-
+import java.util.stream.Collectors.toList
 
 class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceManager, SettingsChangedListener {
 
@@ -119,7 +119,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         val handlers = m_updateHandlerFactories.values
             .parallelStream()
             .flatMap { executeDerivedResourceHandlerFactory(it, scope) }
-            .toList()
+            .collect(toList())
         SdkLog.debug("Derived resource handler creation took {}ms. Number of created handlers: {}", System.currentTimeMillis() - start, handlers.size)
         if (handlers.isNotEmpty() && !progress.indicator.isCanceled) {
             executeAllHandlersAndWait(handlers, env, progress)

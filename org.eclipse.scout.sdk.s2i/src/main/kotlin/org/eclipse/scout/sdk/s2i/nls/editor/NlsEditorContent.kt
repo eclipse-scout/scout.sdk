@@ -53,6 +53,7 @@ import java.text.NumberFormat
 import java.util.concurrent.TimeUnit
 import java.util.function.Predicate
 import java.util.regex.Pattern
+import java.util.stream.Collectors.toList
 import javax.swing.Icon
 import javax.swing.JComponent
 import javax.swing.event.DocumentEvent
@@ -238,7 +239,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
     }
 
     private inner class TranslationNewActionGroup : AbstractStoresAction(message("create.new.translation.in.service"), message("create.new.translation.in"),
-        AllIcons.CodeStyle.AddNewSectionRule, translationManager.allEditableStores().toList(), { TranslationNewDialogOpenAction(it) })
+        AllIcons.CodeStyle.AddNewSectionRule, translationManager.allEditableStores().collect(toList()), { TranslationNewDialogOpenAction(it) })
 
     private inner class TranslationNewDialogOpenAction(private val store: ITranslationStore) : DumbAwareAction(store.service().type().elementName()) {
         override fun actionPerformed(e: AnActionEvent) {
@@ -293,7 +294,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
                 .map { it.store() }
                 .toList()
             if (stores.isEmpty()) {
-                stores = selectedTranslation.stores().toList()
+                stores = selectedTranslation.stores().collect(toList())
             }
 
             val servicesLocateAction = if (stores.size == 1) TranslationServiceLocateAction(stores[0]) else TranslationServicesLocateAction(stores)

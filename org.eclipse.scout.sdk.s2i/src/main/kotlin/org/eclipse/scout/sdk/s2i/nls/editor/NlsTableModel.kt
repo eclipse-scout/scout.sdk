@@ -181,7 +181,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
     private inner class ManagerListener : ITranslationManagerListener, EventListenerList.IWeakEventListener {
 
         override fun managerChanged(events: Stream<TranslationManagerEvent>) {
-            val allEvents = events.toList()
+            val allEvents = events.collect(toList())
             val application = ApplicationManager.getApplication()
             if (application.isDispatchThread) {
                 handleEvents(allEvents)
