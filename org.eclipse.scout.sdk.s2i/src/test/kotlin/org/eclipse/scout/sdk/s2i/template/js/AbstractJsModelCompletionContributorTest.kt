@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.core.testing.CoreTestingUtils.removeWhitespace
 import org.eclipse.scout.sdk.s2i.model.js.*
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 
-abstract class JsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase() {
+abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase() {
 
     companion object {
         const val NODE_MODULES_DIR = "node_modules"
