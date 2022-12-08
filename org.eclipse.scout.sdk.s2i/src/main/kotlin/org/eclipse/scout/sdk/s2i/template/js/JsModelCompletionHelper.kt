@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -194,8 +194,8 @@ object JsModelCompletionHelper {
             JsModelProperty.JsPropertyDataType.STRING -> valueSrc.appendWrapping(stringLiteralDelimiter, stringLiteralDelimiter)
             JsModelProperty.JsPropertyDataType.WIDGET -> valueSrc.appendWrapping("{", "}")
             JsModelProperty.JsPropertyDataType.TEXT_KEY -> valueSrc.appendWrapping(
-                stringLiteralDelimiter + TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX,
-                TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX + stringLiteralDelimiter
+                stringLiteralDelimiter + TranslationPatterns.JsModelTextKeyPattern.MODEL_TEXT_KEY_PREFIX,
+                TranslationPatterns.JsModelTextKeyPattern.MODEL_TEXT_KEY_SUFFIX + stringLiteralDelimiter
             )
         }
         // property value

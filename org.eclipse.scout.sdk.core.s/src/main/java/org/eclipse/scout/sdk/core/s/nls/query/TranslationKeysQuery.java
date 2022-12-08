@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope;
-import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.JsonTextKeyPattern;
+import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.JsModelTextKeyPattern;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryMatch;
 import org.eclipse.scout.sdk.core.s.util.search.IFileQuery;
@@ -66,7 +66,7 @@ public class TranslationKeysQuery implements IFileQuery {
     }
 
     var fileContent = input.fileContent();
-    Stream.of(TRANSLATION_LITERAL_PATTERN, JsonTextKeyPattern.REGEX)
+    Stream.of(TRANSLATION_LITERAL_PATTERN, JsModelTextKeyPattern.REGEX)
         .flatMap(pat -> pat.matcher(fileContent).results())
         .map(r -> toMatch(input, r))
         .forEach(m -> m_result.computeIfAbsent(input.file(), k -> new HashSet<>()).add(m));

@@ -250,7 +250,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
     }
 
     protected open fun getNameCompletionTextKeyExpectedFileContents() =
-        arrayOf(", $LABEL_PROPERTY_NAME: '${TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX}$TEMPLATE_COMPLETION_CONTENT${TranslationPatterns.JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX}'")
+        arrayOf(", $LABEL_PROPERTY_NAME: '${TranslationPatterns.JsModelTextKeyPattern.MODEL_TEXT_KEY_PREFIX}$TEMPLATE_COMPLETION_CONTENT${TranslationPatterns.JsModelTextKeyPattern.MODEL_TEXT_KEY_SUFFIX}'")
 
     fun testNameCompletionUnknownObject() {
         myFixture.configureByFile(NAME_COMPLETION_UNKNOWN_OBJECT_FILE)

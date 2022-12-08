@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -41,7 +41,7 @@ public final class TranslationPatterns {
   @SuppressWarnings("StaticCollection")
   private static final Map<Class<? extends AbstractTranslationPattern>, AbstractTranslationPattern> PATTERN_MAP = new HashMap<>();
   static {
-    Stream.of(JavaTextsGetPattern.INSTANCE, JsSessionTextPattern.INSTANCE, JsonTextKeyPattern.INSTANCE, HtmlScoutMessagePattern.INSTANCE)
+    Stream.of(JavaTextsGetPattern.INSTANCE, JsSessionTextPattern.INSTANCE, TsSessionTextPattern.INSTANCE, JsModelTextKeyPattern.INSTANCE, TsModelTextKeyPattern.INSTANCE, HtmlScoutMessagePattern.INSTANCE)
         .forEach(TranslationPatterns::registerPattern);
   }
 
@@ -125,12 +125,12 @@ public final class TranslationPatterns {
     }
   }
 
-  public static final class JsSessionTextPattern extends AbstractTranslationPattern {
+  public static class JsSessionTextPattern extends AbstractTranslationPattern {
 
     public static final AbstractTranslationPattern INSTANCE = new JsSessionTextPattern();
     public static final Pattern REGEX = Pattern.compile("session\\.text\\((['`\"]?)(" + NLS_KEY_PAT + ")(['`\"]?)\\s*[,)]");
 
-    private JsSessionTextPattern() {
+    protected JsSessionTextPattern() {
     }
 
     @Override
@@ -149,14 +149,27 @@ public final class TranslationPatterns {
     }
   }
 
-  public static final class JsonTextKeyPattern extends AbstractTranslationPattern {
+  public static class TsSessionTextPattern extends JsSessionTextPattern {
 
-    public static final String JSON_TEXT_KEY_PREFIX = "${textKey:";
-    public static final String JSON_TEXT_KEY_SUFFIX = "}";
-    public static final AbstractTranslationPattern INSTANCE = new JsonTextKeyPattern();
-    public static final Pattern REGEX = Pattern.compile(Pattern.quote(JSON_TEXT_KEY_PREFIX) + '(' + NLS_KEY_PAT + ')');
+    public static final AbstractTranslationPattern INSTANCE = new TsSessionTextPattern();
 
-    private JsonTextKeyPattern() {
+    protected TsSessionTextPattern() {
+    }
+
+    @Override
+    public String fileExtension() {
+      return IWebConstants.TS_FILE_EXTENSION;
+    }
+  }
+
+  public static class JsModelTextKeyPattern extends AbstractTranslationPattern {
+
+    public static final String MODEL_TEXT_KEY_PREFIX = "${textKey:";
+    public static final String MODEL_TEXT_KEY_SUFFIX = "}";
+    public static final AbstractTranslationPattern INSTANCE = new JsModelTextKeyPattern();
+    public static final Pattern REGEX = Pattern.compile(Pattern.quote(MODEL_TEXT_KEY_PREFIX) + '(' + NLS_KEY_PAT + ')');
+
+    protected JsModelTextKeyPattern() {
     }
 
     @Override
@@ -185,7 +198,16 @@ public final class TranslationPatterns {
     }
   }
 
-  public static final class JavaTextsGetPattern extends AbstractTranslationPattern {
+  public static class TsModelTextKeyPattern extends JsModelTextKeyPattern {
+    public static final AbstractTranslationPattern INSTANCE = new TsModelTextKeyPattern();
+
+    @Override
+    public String fileExtension() {
+      return IWebConstants.TS_FILE_EXTENSION;
+    }
+  }
+
+  public static class JavaTextsGetPattern extends AbstractTranslationPattern {
 
     public static final AbstractTranslationPattern INSTANCE = new JavaTextsGetPattern();
     public static final Pattern REGEX = Pattern.compile(computeTextsGetRegex());
@@ -202,7 +224,7 @@ public final class TranslationPatterns {
       return texts.simpleName() + "\\." + texts.getMethodName() + "\\((?:[a-zA-Z0-9_]+,\\s*)?(\")?(" + NLS_KEY_PAT + ")(\")?\\s*[,)]";
     }
 
-    private JavaTextsGetPattern() {
+    protected JavaTextsGetPattern() {
     }
 
     @Override
@@ -221,14 +243,14 @@ public final class TranslationPatterns {
     }
   }
 
-  public static final class HtmlScoutMessagePattern extends AbstractTranslationPattern {
+  public static class HtmlScoutMessagePattern extends AbstractTranslationPattern {
 
     public static final String ATTRIBUTE_NAME = "key";
     public static final String SCOUT_MESSAGE_TAG_NAME = "scout:message";
     public static final AbstractTranslationPattern INSTANCE = new HtmlScoutMessagePattern();
     public static final Pattern REGEX = Pattern.compile("\\s+" + ATTRIBUTE_NAME + "=['\"](" + NLS_KEY_PAT + ")[\"']"); // there is no 'key' attribute in html. so no need to check for the scout:message tag
 
-    private HtmlScoutMessagePattern() {
+    protected HtmlScoutMessagePattern() {
     }
 
     @Override

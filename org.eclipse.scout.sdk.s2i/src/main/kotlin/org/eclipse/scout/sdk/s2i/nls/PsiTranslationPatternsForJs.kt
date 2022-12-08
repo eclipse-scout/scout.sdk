@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2021 BSI Business Systems Integration AG.
+ * Copyright (c) 2010-2022 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -25,7 +25,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.util.ProcessingContext
 import org.eclipse.scout.sdk.core.s.nls.Translations
-import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.JsonTextKeyPattern
+import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.JsModelTextKeyPattern
 import org.eclipse.scout.sdk.core.util.Strings
 
 /**
@@ -56,7 +56,7 @@ object PsiTranslationPatternsForJs {
 
     private fun sessionTextPattern() = jsExpression().and(isJsCallArgument("session", "text", 0))
 
-    private fun textKeyPattern() = jsLiteralExpression().withText(surroundedByIgnoringQuotes(JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX, JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX, true))
+    private fun textKeyPattern() = jsLiteralExpression().withText(surroundedByIgnoringQuotes(JsModelTextKeyPattern.MODEL_TEXT_KEY_PREFIX, JsModelTextKeyPattern.MODEL_TEXT_KEY_SUFFIX, true))
 
     private fun surroundedByIgnoringQuotes(prefix: CharSequence, suffix: CharSequence, unescape: Boolean): StringPattern {
         return string().with(object : PatternCondition<String>("surroundedBy=$prefix$suffix") {
@@ -69,8 +69,8 @@ object PsiTranslationPatternsForJs {
 
     private fun getTranslationKeyOfLiteral(element: JSLiteralExpression): String? {
         var text = element.stringValue ?: return null
-        val jsonPrefix = JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX
-        val jsonSuffix = JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX
+        val jsonPrefix = JsModelTextKeyPattern.MODEL_TEXT_KEY_PREFIX
+        val jsonSuffix = JsModelTextKeyPattern.MODEL_TEXT_KEY_SUFFIX
         if (text.startsWith(jsonPrefix) && text.endsWith(jsonSuffix)) {
             text = text.substring(jsonPrefix.length, text.length - jsonSuffix.length)
         }
@@ -98,7 +98,7 @@ object PsiTranslationPatternsForJs {
 
         override fun decorateTranslationKey(nlsKey: String) =
                 if (TEXT_KEY_PATTERN.accepts(element) || TEXT_KEY_PATTERN.accepts(element.parent))
-                    JsonTextKeyPattern.JSON_TEXT_KEY_PREFIX + nlsKey + JsonTextKeyPattern.JSON_TEXT_KEY_SUFFIX
+                    JsModelTextKeyPattern.MODEL_TEXT_KEY_PREFIX + nlsKey + JsModelTextKeyPattern.MODEL_TEXT_KEY_SUFFIX
                 else
                     nlsKey
 

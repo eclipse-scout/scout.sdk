@@ -18,6 +18,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 import org.eclipse.scout.sdk.core.s.ISdkConstants
+import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.util.Strings.escapeHtml
@@ -55,7 +56,7 @@ abstract class AbstractNlsDocumentationProvider : AbstractDocumentationProvider(
 
     private fun generateDoc(translation: IStackedTranslation): String {
         val storeNames = translation.stores()
-            .map { it.service().type().elementName().removeSuffix(ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE) }
+            .map { shortenStoreName(it) }
             .collect(joining(", "))
         val doc = StringBuilder()
             .append(DocumentationMarkup.CONTENT_START)
@@ -69,6 +70,13 @@ abstract class AbstractNlsDocumentationProvider : AbstractDocumentationProvider(
         }
         doc.append(DocumentationMarkup.SECTIONS_END)
         return doc.toString()
+    }
+
+    private fun shortenStoreName(store: ITranslationStore): String {
+        val storeClassName = store.service().type().elementName()
+        return if (storeClassName.length > ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE.length)
+            storeClassName.removeSuffix(ISdkConstants.SUFFIX_TEXT_PROVIDER_SERVICE)
+        else storeClassName
     }
 
     protected abstract fun translationKeyOf(element: PsiElement?): String?

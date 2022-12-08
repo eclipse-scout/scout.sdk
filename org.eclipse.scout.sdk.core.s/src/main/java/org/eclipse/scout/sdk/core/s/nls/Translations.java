@@ -435,6 +435,7 @@ public final class Translations {
     static {
       FILE_TYPE_MAPPING.put(JavaTypes.JAVA_FILE_EXTENSION, DependencyScope.JAVA);
       FILE_TYPE_MAPPING.put(IWebConstants.JS_FILE_EXTENSION, DependencyScope.NODE);
+      FILE_TYPE_MAPPING.put(IWebConstants.TS_FILE_EXTENSION, DependencyScope.NODE);
       FILE_TYPE_MAPPING.put(IWebConstants.HTML_FILE_EXTENSION, DependencyScope.JAVA); // message tags are evaluated on the Java backend
     }
 
@@ -443,7 +444,7 @@ public final class Translations {
      * 
      * @param name
      *          A file name, file path or file extension (with or without dot). E.g. "MyClass.java" or "java" or "html"
-     *          or "path/to/MyFile.js".
+     *          or "path/to/MyFile.js" or "path/to/MyFile.ts".
      * @return An {@link Optional} holding the {@link DependencyScope} if the given name is supported. An empty
      *         {@link Optional} otherwise.
      */
