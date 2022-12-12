@@ -152,10 +152,10 @@
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.http-client:google-http-client-apache-v2:1.42.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.http-client:google-http-client:1.42.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.apache.httpcomponents:httpclient:4.5.13" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.jboss:jandex:2.4.0.Final" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: io.smallrye:jandex:3.0.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.quartz-scheduler:quartz:2.3.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.32" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:slf4j-api:1.7.32" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:jcl-over-slf4j:2.0.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:slf4j-api:2.0.4" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.junit.platform:junit-platform-engine:1.9.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.opentest4j:opentest4j:1.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.junit.platform:junit-platform-commons:1.9.1" level="project" />
