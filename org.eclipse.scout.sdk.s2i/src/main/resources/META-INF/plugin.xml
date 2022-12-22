@@ -32,7 +32,7 @@
             <ul>
               <li>Editor for Scout nls files</li>
               <li>Inspections for missing and unused translations</li>
-              <li>Code completion for Scout translation keys in Java, JavaScript and HTML</li>
+              <li>Code completion for Scout translation keys in Java, TypeScript, JavaScript and HTML</li>
               <li>Tooltip documentation for Scout translation keys</li>
               <li>Code folding support for Scout translations with configurable display language</li>
             </ul>

@@ -207,7 +207,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     });
 
     m_javaScriptButton = new Button(uiLangBox, SWT.RADIO);
-    m_javaScriptButton.setText("JavaScript");
+    m_javaScriptButton.setText("TypeScript / JavaScript");
     m_javaScriptButton.setSelection(isUseJsClient());
     m_javaScriptButton.addSelectionListener(new SelectionAdapter() {
       @Override
