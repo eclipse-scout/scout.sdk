@@ -1,12 +1,30 @@
-## Instructions how-to build
+# Instructions how to build
 
-As the we have default maven modules with pom dependencies and also (plugins), a feature and a repository with p2 dependencies where we need a tycho-build we need two build steps.
+The Repository consists of 4 parts
 
-So follow these 2 steps to get the update site:
+1. Core modules
+2. Eclipse feature and P2 update-site
+3. IntelliJ plugin
+4. Updatesite Maven plugin
+
+## Build the core modules and the updatesite Maven plugin
+
+execute the following Maven command in the root directory:
 
 	mvn clean install
+
+## Build the Eclipse feature and the P2 update-site
+
+After the core modules build, execute the following additional Maven command in the root directory:
+
 	mvn clean install -Dp2
 
-Now you have the update-site here:
+This creates the P2 update-site here: org.eclipse.scout.sdk-repository/target/org.eclipse.scout.sdk-repository-*.zip
 
- * org.eclipse.scout.sdk-repository/target/org.eclipse.scout.sdk-repository-*.zip
+## Build the IntelliJ plugin
+
+After the core modules build, execute the following Gradle command in the directory org.eclipse.scout.sdk.s2i
+
+	clean buildPlugin -s -i --warning-mode=all
+
+This creates the plugin here: org.eclipse.scout.sdk.s2i/build/distributions/org.eclipse.scout.sdk.s2i-*.zip
