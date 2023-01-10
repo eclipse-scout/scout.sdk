@@ -9,10 +9,10 @@
           <option name="jvmTarget" value="1.8" />
           <option name="languageVersion" value="1.7" />
           <option name="apiVersion" value="1.7" />
-          <option name="pluginOptions">
+          <option name="pluginClasspaths">
             <array />
           </option>
-          <option name="pluginClasspaths">
+          <option name="pluginOptions">
             <array />
           </option>
         </compilerArguments>
@@ -39,7 +39,7 @@
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.ecj" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" scope="TEST" />
     <orderEntry type="library" name="Gradle: org.apache.poi:poi-ooxml:5.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.jetbrains:annotations:23.0.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.jetbrains:annotations:23.1.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-dependency-resolver:ideaIU-IU-222.4345.14-withSources" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:debugger-memory-agent:ideaIU-IU-222.4345.14-withSources" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java-impl:ideaIU-IU-222.4345.14-withSources" level="project" />
@@ -136,10 +136,10 @@
     <orderEntry type="library" name="Gradle: commons-codec:commons-codec:1.15" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.commons:commons-math3:3.6.1" level="project" />
     <orderEntry type="library" name="Gradle: com.zaxxer:SparseBitSet:1.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.mockito:mockito-core:4.9.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.mockito:mockito-core:4.11.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.client:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy:1.12.16" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy-agent:1.12.16" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy:1.12.19" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy-agent:1.12.19" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.security:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:23.1-SNAPSHOT" level="project" />

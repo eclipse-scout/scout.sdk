@@ -12,23 +12,22 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-core:3.8.6" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-model:3.8.6" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-settings:3.8.6" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-settings-builder:3.8.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-core:3.8.7" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-model:3.8.7" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-settings:3.8.7" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-settings-builder:3.8.7" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.codehaus.plexus:plexus-sec-dispatcher:2.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.codehaus.plexus:plexus-cipher:2.0" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-builder-support:3.8.6" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-repository-metadata:3.8.6" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-artifact:3.8.6" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-model-builder:3.8.6" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-resolver-provider:3.8.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-builder-support:3.8.7" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-repository-metadata:3.8.7" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-artifact:3.8.7" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-model-builder:3.8.7" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-resolver-provider:3.8.7" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven.resolver:maven-resolver-impl:1.6.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven.resolver:maven-resolver-api:1.6.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven.resolver:maven-resolver-spi:1.6.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven.resolver:maven-resolver-util:1.6.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven.shared:maven-shared-utils:3.3.4" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: commons-io:commons-io:2.6" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.sisu:org.eclipse.sisu.plexus:0.3.5" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.annotation:javax.annotation-api:1.2" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.sisu:org.eclipse.sisu.inject:0.3.5" level="project" />
@@ -47,7 +46,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.codehaus.plexus:plexus-component-annotations:2.1.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.commons:commons-lang3:3.8.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:1.7.36" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-plugin-api:3.8.6" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-plugin-api:3.8.7" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven.plugin-tools:maven-plugin-annotations:3.7.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.9.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />
