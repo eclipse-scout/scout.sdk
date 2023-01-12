@@ -9,7 +9,7 @@
     "type": "git",
     "url": "https://git.eclipse.org/c/scout/org.eclipse.scout.rt.git"
   },
-  "license": "EPL-1.0",
+  "license": "EPL-2.0",
   "devDependencies": {
     "@bsi-sdk/testdependency": "0.0.1"
   }
