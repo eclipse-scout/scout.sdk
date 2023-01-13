@@ -19,6 +19,7 @@ import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.PackageIndex
 import com.intellij.openapi.roots.ProjectFileIndex
+import com.intellij.openapi.roots.SourceFolder
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VirtualFile
@@ -34,9 +35,11 @@ import org.eclipse.scout.sdk.core.s.util.ITier
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
 import org.eclipse.scout.sdk.core.util.Strings.capitalize
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
+import org.eclipse.scout.sdk.s2i.containingSourceFolder
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.util.SourceFolderHelper
 import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller
+import org.jetbrains.jps.model.java.JavaSourceRootType
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.function.BiConsumer
@@ -59,7 +62,6 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
         val dataContext = e.dataContext
         val presentation = e.presentation
         val file = LangDataKeys.VIRTUAL_FILE.getData(dataContext)
-
         if (file == null || !file.isDirectory) {
             presentation.isEnabledAndVisible = false
             return
@@ -71,16 +73,16 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
             return
         }
 
-        val fileIndex = ProjectFileIndex.getInstance(project)
-        val sourceFolder = fileIndex.getSourceFolder(file)
-
-        if (sourceFolder == null || sourceFolder.isTestSource) {
+        val sourceFolder = file.containingSourceFolder(project)
+        if (sourceFolder == null || !isValidSourceFolder(sourceFolder)) {
             presentation.isEnabledAndVisible = false
             return
         }
 
         presentation.isEnabledAndVisible = true
     }
+
+    protected fun isValidSourceFolder(sourceFolder: SourceFolder) = !sourceFolder.isTestSource && sourceFolder.rootType == JavaSourceRootType.SOURCE
 
     protected fun createPopup(dir: PsiDirectory): JBPopup {
         val contentPanel = NewItemSimplePopupPanel()
@@ -92,7 +94,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
             if (errorMessage != null) {
                 contentPanel.setError(errorMessage)
             } else {
-                createElement(name, dir)
+                createElement(dir, name)
                 popup.closeOk(it)
             }
         }
@@ -113,24 +115,22 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
         return errorMessage
     }
 
-    protected fun createElement(name: String, dir: PsiDirectory) {
+    protected fun createElement(dir: PsiDirectory, name: String) {
         IdeaEnvironment.callInIdeaEnvironment(dir.project, description) { env, progress ->
             val project = env.project
-            val fileIndex = ProjectFileIndex.getInstance(project)
-            val sourceFolder = fileIndex.getSourceFolder(dir.virtualFile)
-
-            if (sourceFolder?.isTestSource == true) {
+            val sourceFolder = dir.virtualFile.containingSourceFolder(project)
+            if (sourceFolder == null || !isValidSourceFolder(sourceFolder)) {
                 SdkLog.warning("No source folder could be determined for location '{}'", dir.virtualFile)
                 return@callInIdeaEnvironment null
             }
 
-            val sourceFolderHelper = SourceFolderHelper(project, sourceFolder!!) { env.findClasspathEntry(it) }
+            val sourceFolderHelper = SourceFolderHelper(project, sourceFolder) { env.findClasspathEntry(it) }
 
             if (!validateSourceFolderHelper(sourceFolderHelper, dir)) {
                 return@callInIdeaEnvironment null
             }
 
-            var pkg = getPackageNameByDirectory(dir.virtualFile, fileIndex, project)
+            var pkg = getPackageNameByDirectory(dir.virtualFile, project)
             val lastIndexOf = name.lastIndexOf(".")
             if (lastIndexOf > 0) pkg += "." + name.substring(0, lastIndexOf)
             val elementName = capitalize(name.substring(lastIndexOf + 1, name.length)).toString()
@@ -154,7 +154,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
         }
     }
 
-    protected fun getPackageNameByDirectory(dir: VirtualFile, fileIndex: ProjectFileIndex, project: Project): String? {
+    protected fun getPackageNameByDirectory(dir: VirtualFile, project: Project): String? {
         // can be removed as soon as IJ 2022.3 is the latest supported version
         return CompatibilityMethodCaller<String?>()
             .withCandidate(PackageIndex::class.java.name, "getPackageNameByDirectory", VirtualFile::class.java.name) {
@@ -163,7 +163,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
             }
             .withCandidate(ProjectFileIndex::class.java.name, "getPackageNameByDirectory", VirtualFile::class.java.name) {
                 // for IJ <= 2022.2 use ProjectFileIndex
-                it.invoke(fileIndex, dir)
+                it.invoke(ProjectFileIndex.getInstance(project), dir)
             }.invoke()
     }
 

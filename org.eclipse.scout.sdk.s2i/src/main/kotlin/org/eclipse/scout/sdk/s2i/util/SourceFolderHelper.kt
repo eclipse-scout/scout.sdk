@@ -13,7 +13,6 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
-import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.SourceFolder
 import com.intellij.openapi.vfs.VirtualFile
 import com.jetbrains.rd.util.first
@@ -24,8 +23,8 @@ import org.eclipse.scout.sdk.core.s.util.ITier
 import org.eclipse.scout.sdk.core.s.util.TierTree
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.Strings
+import org.eclipse.scout.sdk.s2i.sourceFolders
 import org.jetbrains.jps.model.java.JavaSourceRootType
-import java.util.*
 
 class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, tierOfModule: ((Module) -> ITier<*>?)? = null, val findClasspathEntry: (VirtualFile?) -> IClasspathEntry?) {
 
@@ -271,15 +270,9 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, t
             modules: Sequence<Module>,
             test: Boolean
         ): Pair<SourceFolder, IClasspathEntry>? {
-            val fileIndex = ProjectFileIndex.getInstance(sourceFolderHelperInfo.project)
-
             val lookupName = reference.getTier(sourceFolderHelperInfo.tierOfModule)?.convert(tier, reference.name) ?: reference.name
-
             val sourceFoldersSorted = modules
-                .flatMap {
-                    ModuleRootManager.getInstance(it).sourceRoots.asSequence()
-                }
-                .mapNotNull { fileIndex.getSourceFolder(it) }
+                .flatMap { it.sourceFolders() }
                 .filter { it.rootType is JavaSourceRootType && it.isTestSource == test }
                 .filter { !isGeneratedSourceFolder(it) }
                 .map { it to Strings.levenshteinDistance(it.contentEntry.rootModel.module.name, lookupName) }
@@ -346,12 +339,7 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, t
                 return sourceFolder
             }
             val module = sourceFolder.contentEntry.rootModel.module
-            val project = module.project
-            val fileIndex = ProjectFileIndex.getInstance(project)
-            val sourceRoots = ModuleRootManager.getInstance(module)?.sourceRoots ?: return null
-
-            return sourceRoots.asSequence()
-                .mapNotNull { fileIndex.getSourceFolder(it) }
+            return module.sourceFolders()
                 .firstOrNull { sourceFolderCondition(it) }
         }
     }
