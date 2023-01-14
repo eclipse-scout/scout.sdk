@@ -12,7 +12,10 @@ package org.eclipse.scout.sdk.s2i.util
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.roots.*
+import com.intellij.openapi.roots.ContentEntry
+import com.intellij.openapi.roots.ModuleRootManager
+import com.intellij.openapi.roots.ModuleRootModel
+import com.intellij.openapi.roots.SourceFolder
 import com.intellij.openapi.vfs.VirtualFile
 import junit.framework.TestCase
 import org.eclipse.scout.sdk.core.ISourceFolders
@@ -23,18 +26,16 @@ import org.eclipse.scout.sdk.core.s.util.ITier
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
 import org.jetbrains.jps.model.java.JavaSourceRootType
 import org.mockito.ArgumentMatchers.same
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import java.nio.file.Path
 import java.util.*
 import java.util.stream.Stream
-import kotlin.collections.HashMap
 
 class SourceFolderHelperTest : TestCase() {
 
     private val m_project = mock(Project::class.java, "project")
     private val m_moduleManager = mock(ModuleManager::class.java, "moduleManager")
-    private val m_projectFileIndex = mock(ProjectFileIndex::class.java, "projectFileIndex")
 
     private val m_findClasspathEntryMap: MutableMap<VirtualFile, IClasspathEntry> = HashMap()
     private val m_findClasspathEntry: (VirtualFile?) -> IClasspathEntry? = { m_findClasspathEntryMap[it] }
@@ -148,7 +149,7 @@ class SourceFolderHelperTest : TestCase() {
     private val m_subSubServerTestSourceFolder = mock(SourceFolder::class.java, "subSubServerTestSourceFolder")
     private val m_subSubServerTestClasspathEntry = mock(IClasspathEntry::class.java, "subSubServerTestClasspathEntry")
 
-    private val m_moduleSourceRootsMap: MutableMap<Module, MutableList<VirtualFile>> = HashMap()
+    private val m_moduleSourceRootsMap: MutableMap<Module, MutableList<SourceFolder>> = HashMap()
 
     init {
         initProject()
@@ -159,7 +160,6 @@ class SourceFolderHelperTest : TestCase() {
     }
 
     private fun initProject() {
-        `when`(m_project.getService(same(ProjectFileIndex::class.java))).thenAnswer { m_projectFileIndex }
         `when`(m_project.getComponent(same(ModuleManager::class.java))).thenAnswer { m_moduleManager }
     }
 
@@ -373,6 +373,7 @@ class SourceFolderHelperTest : TestCase() {
 
         val ce: ContentEntry = mock(ContentEntry::class.java, "$sf - ContentEntry")
         `when`(sf.contentEntry).thenAnswer { ce }
+        `when`(ce.sourceFolders).thenAnswer { m_moduleSourceRootsMap[m]?.toTypedArray() }
 
         val rm: ModuleRootModel = mock(ModuleRootModel::class.java, "$sf - ModuleRootModel")
         `when`(ce.rootModel).thenAnswer { rm }
@@ -380,12 +381,11 @@ class SourceFolderHelperTest : TestCase() {
 
         val mrm: ModuleRootManager = mock(ModuleRootManager::class.java, "$m - ModuleRootManager")
         `when`(m.getComponent(same(ModuleRootManager::class.java))).thenAnswer { mrm }
-        `when`(mrm.sourceRoots).thenAnswer { m_moduleSourceRootsMap[m]?.toTypedArray() }
+        `when`(mrm.contentEntries).thenAnswer { arrayOf(ce) }
 
         val vf = mock(VirtualFile::class.java, "$sf - VirtualFile")
         `when`(vf.path).thenAnswer { "$m/$pathSuffix" }
-        m_moduleSourceRootsMap.computeIfAbsent(m) { ArrayList() }.add(vf)
-        `when`(m_projectFileIndex.getSourceFolder(same(vf))).thenAnswer { sf }
+        m_moduleSourceRootsMap.computeIfAbsent(m) { ArrayList() }.add(sf)
         `when`(sf.file).thenAnswer { vf }
 
         m_findClasspathEntryMap[vf] = cpe
