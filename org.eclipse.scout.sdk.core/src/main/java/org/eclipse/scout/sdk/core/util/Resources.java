@@ -167,7 +167,7 @@ public final class Resources {
 
   static InputStream doHttpGetWithRetry(URI uri) throws IOException, InterruptedException {
     IOException exception = null;
-    var numRetries = 3; // retry 3 times as some resources might be temporary unavailable
+    var numRetries = 5; // retry 5 times as some resources might be temporary unavailable
     for (var attempt = 1; attempt <= numRetries; attempt++) {
       try {
         return doHttpGet(uri);
@@ -181,10 +181,17 @@ public final class Resources {
         exception = e;
       }
       if (attempt < numRetries) {
-        Thread.sleep(attempt * 500L); // quick wait between retries (500ms, 1s)
+        Thread.sleep(getSleepTimeAfterAttempt(attempt)); // quick wait between retries
       }
     }
     throw exception;
+  }
+
+  @SuppressWarnings({"UnsecureRandomNumberGeneration", "NumericCastThatLosesPrecision"})
+  static long getSleepTimeAfterAttempt(int attempt) {
+    var baseTimeout = attempt * 300L;
+    var randomOffset = (long) (Math.random() * 200);
+    return baseTimeout + randomOffset;
   }
 
   static InputStream doHttpGet(URI uri) throws IOException, InterruptedException {
