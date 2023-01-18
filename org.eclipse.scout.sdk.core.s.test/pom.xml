@@ -19,7 +19,6 @@
   </parent>
 
   <artifactId>org.eclipse.scout.sdk.core.s.test</artifactId>
-  <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
@@ -29,7 +28,7 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.scout.sdk.core.test</artifactId>
+      <artifactId>org.eclipse.scout.sdk.core.java.test</artifactId>
     </dependency>
 
     <!-- For embedded Maven execution -->

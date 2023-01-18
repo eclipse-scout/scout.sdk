@@ -37,7 +37,7 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.scout.sdk.core.ecj</artifactId>
+      <artifactId>org.eclipse.scout.sdk.core.java.ecj</artifactId>
       <exclusions>
         <exclusion>
           <groupId>org.eclipse.jdt</groupId>

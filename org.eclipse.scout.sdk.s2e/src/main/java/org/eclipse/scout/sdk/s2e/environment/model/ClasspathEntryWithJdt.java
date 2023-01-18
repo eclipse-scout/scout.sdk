@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.s2e.environment.model;
 import java.nio.file.Path;
 
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.scout.sdk.core.model.ecj.ClasspathEntry;
+import org.eclipse.scout.sdk.core.java.ecj.ClasspathEntry;
 
 /**
  * <h3>{@link ClasspathEntryWithJdt}</h3>

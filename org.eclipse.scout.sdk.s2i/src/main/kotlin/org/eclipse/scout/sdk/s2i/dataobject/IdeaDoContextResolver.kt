@@ -16,11 +16,11 @@ import com.intellij.openapi.startup.StartupActivity
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiModifier
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
-import org.eclipse.scout.sdk.core.model.api.IType
-import org.eclipse.scout.sdk.core.s.apidef.IScout22DoApi
-import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment
+import org.eclipse.scout.sdk.core.java.model.api.IType
 import org.eclipse.scout.sdk.core.s.dataobject.DoContextResolvers
+import org.eclipse.scout.sdk.core.s.java.apidef.IScout22DoApi
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
 import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import java.util.stream.Stream

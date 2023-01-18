@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  * <h3>{@link AbstractSourceBuilder}</h3>
@@ -83,7 +82,7 @@ public abstract class AbstractSourceBuilder<TYPE extends ISourceBuilder<TYPE>> i
 
   @Override
   public TYPE space() {
-    return append(JavaTypes.C_SPACE);
+    return append(' ');
   }
 
   @Override

@@ -9,13 +9,13 @@
  */
 package org.eclipse.scout.sdk.core.s.structured;
 
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.junit.jupiter.api.Test;
 
 import formdata.client.ui.desktop.outline.pages.ExtendedTablePage;

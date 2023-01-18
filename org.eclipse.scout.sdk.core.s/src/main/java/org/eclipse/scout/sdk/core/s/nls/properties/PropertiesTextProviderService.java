@@ -17,16 +17,16 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.core.model.api.IMethod;
-import org.eclipse.scout.sdk.core.model.api.ISourceRange;
-import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.JavaUtils;
+import org.eclipse.scout.sdk.core.java.model.api.IMethod;
+import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutAbstractApi.AbstractDynamicNlsTextProviderService;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutAbstractApi.AbstractDynamicNlsTextProviderService;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.nls.TextProviderService;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  * <h3>{@link PropertiesTextProviderService}</h3>
@@ -70,7 +70,7 @@ public class PropertiesTextProviderService extends TextProviderService {
         .first()
         .flatMap(IMethod::sourceOfBody)
         .map(ISourceRange::asCharSequence)
-        .map(CoreUtils::removeComments)
+        .map(JavaUtils::removeComments)
         .map(REGEX_RESOURCE_BUNDLE_GETTER::matcher)
         .filter(Matcher::find)
         .map(m -> m.group(1))

@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.s.dto.table;
 
-import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
+import static org.eclipse.scout.sdk.core.java.model.api.Flags.isAbstract;
 
 import java.beans.Introspector;
 import java.io.Serializable;
@@ -18,22 +18,22 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
-import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.generator.field.FieldGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.MethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
+import org.eclipse.scout.sdk.core.java.model.api.IField;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.api.MetaValueType;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.Flags;
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IJavaElement;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.api.MetaValueType;
-import org.eclipse.scout.sdk.core.s.annotation.ColumnDataAnnotation;
-import org.eclipse.scout.sdk.core.s.annotation.ColumnDataAnnotation.SdkColumnCommand;
 import org.eclipse.scout.sdk.core.s.dto.AbstractDtoGenerator;
+import org.eclipse.scout.sdk.core.s.java.annotation.ColumnDataAnnotation;
+import org.eclipse.scout.sdk.core.s.java.annotation.ColumnDataAnnotation.SdkColumnCommand;
 import org.eclipse.scout.sdk.core.s.util.ScoutTypeComparators;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  * <h3>{@link TableRowDataGenerator}</h3>

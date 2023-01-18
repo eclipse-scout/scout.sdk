@@ -19,12 +19,12 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.java.JavaUtils;
+import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.ISourceRange;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -62,7 +62,7 @@ public class UiTextContributor {
     return type()
         .source()
         .map(ISourceRange::asCharSequence)
-        .map(CoreUtils::removeComments)
+        .map(JavaUtils::removeComments)
         .flatMap(Strings::notBlank)
         .map(src -> loadAllKeys(src, progress))
         .orElseGet(this::noKeysFound);

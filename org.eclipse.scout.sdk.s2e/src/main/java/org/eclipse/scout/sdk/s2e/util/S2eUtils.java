@@ -48,7 +48,7 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
-import org.eclipse.scout.sdk.core.model.api.internal.JavaEnvironmentImplementor;
+import org.eclipse.scout.sdk.core.java.model.api.internal.JavaEnvironmentImplementor;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
@@ -95,7 +95,7 @@ public final class S2eUtils {
    */
   public static PropertySupport propertyMap(IJavaProject p, Path targetPath) {
     var context = new PropertySupport(2);
-    context.setProperty(IBuilderContext.PROPERTY_JAVA_MODULE, p);
+    context.setProperty(IBuilderContext.PROPERTY_MODULE, p);
     context.setProperty(IBuilderContext.PROPERTY_TARGET_PATH, targetPath);
     return context;
   }

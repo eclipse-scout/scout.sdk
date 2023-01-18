@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.util;
 import static java.nio.CharBuffer.wrap;
 
 /**
- * Utility class to determine the state of a certain position in Java or JavaScript sources.<br/>
+ * Utility class to determine the state of a certain position in Java or JavaScript/TypeScript sources.<br/>
  * It is possible to query if a certain index is within a comment (line or block) or within a string or char literal.
  */
 @SuppressWarnings("HardcodedLineSeparator")
@@ -160,7 +160,7 @@ public final class SourceState {
   }
 
   /**
-   * Describes the state of a character position within Java or JavaScript source.
+   * Describes the state of a character position within Java or JavaScript/TypeScript source.
    */
   public enum State {
     /**
@@ -214,7 +214,7 @@ public final class SourceState {
    * Gets the {@link State} of the given position within the source specified.
    * 
    * @param src
-   *          The Java or JavaScript source. Must not be {@code null}.
+   *          The Java or JavaScript/TypeScript source. Must not be {@code null}.
    * @param pos
    *          The position (zero based index) within the source.
    * @return The source {@link State} at the index given.
@@ -236,7 +236,7 @@ public final class SourceState {
    * state.
    * 
    * @param src
-   *          The Java or JavaScript source. Must not be {@code null}.
+   *          The Java or JavaScript/TypeScript source. Must not be {@code null}.
    * @param pos
    *          The position (zero based index) within the source.
    * @return {@code true} if the specified index is within a {@link String} or {@link Character} literal. Also returns
@@ -270,7 +270,7 @@ public final class SourceState {
    * state.
    *
    * @param src
-   *          The Java or JavaScript source. Must not be {@code null}.
+   *          The Java or JavaScript/TypeScript source. Must not be {@code null}.
    * @param pos
    *          The position (zero based index) within the source.
    * @return {@code true} if the specified index is not within a {@link String} or {@link Character} literal and not
@@ -300,7 +300,7 @@ public final class SourceState {
   /**
    * Checks if the given position within the source specified is in a comment.<br/>
    * The starting slashes, ending slashes and stars are considered to be part of the comment.<br/>
-   * This is different than the {@link State} enums itself where the ending character never belongs to the just ending
+   * This is different from the {@link State} enums itself where the ending character never belongs to the just ending
    * state.
    *
    * @param src

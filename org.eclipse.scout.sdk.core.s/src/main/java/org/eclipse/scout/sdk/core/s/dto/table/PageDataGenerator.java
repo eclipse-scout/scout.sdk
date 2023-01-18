@@ -9,11 +9,11 @@
  */
 package org.eclipse.scout.sdk.core.s.dto.table;
 
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.dto.AbstractTableBeanGenerator;
+import org.eclipse.scout.sdk.core.s.java.annotation.DataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**

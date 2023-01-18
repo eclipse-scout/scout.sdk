@@ -20,8 +20,9 @@ import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.PrimitiveType;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 
 /**
@@ -110,7 +111,7 @@ public class AstCodeBuilder extends AstTypeBuilder<AstCodeBuilder> {
     var iCodeType = getFactory().getScoutApi().ICodeType();
     return scoutType.resolveTypeParamValue(iCodeType.codeIdTypeParamIndex(), iCodeType.fqn())
         .flatMap(Stream::findFirst)
-        .map(org.eclipse.scout.sdk.core.model.api.IType::name)
+        .map(IType::name)
         .orElse(JavaTypes.Integer);
   }
 

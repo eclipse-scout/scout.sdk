@@ -10,10 +10,10 @@
 package org.eclipse.scout.sdk.s2i.derived
 
 import com.intellij.psi.PsiClass
+import org.eclipse.scout.sdk.core.java.model.api.IClasspathEntry
+import org.eclipse.scout.sdk.core.java.model.api.IType
+import org.eclipse.scout.sdk.core.java.model.api.MissingTypeException
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
-import org.eclipse.scout.sdk.core.model.api.IType
-import org.eclipse.scout.sdk.core.model.api.MissingTypeException
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceInput
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction

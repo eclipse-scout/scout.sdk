@@ -11,9 +11,9 @@ package org.eclipse.scout.sdk.core.s.derived;
 
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.api.IClasspathEntry;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 
 /**
@@ -26,8 +26,8 @@ public interface IDerivedResourceInput {
   Optional<IType> getSourceType(IEnvironment env);
 
   /**
-   * Does not search in the {@link IJavaEnvironment} of the given {@link IType}. Instead returns the "closest" (minimal)
-   * {@link IJavaEnvironment} in which the given {@link IType} is included.
+   * Does not search in the {@link IJavaEnvironment} of the given {@link IType}. Instead, returns the "closest"
+   * (minimal) {@link IJavaEnvironment} in which the given {@link IType} is included.
    *
    * @param t
    *          The {@link IType} for which the source folder should be returned.

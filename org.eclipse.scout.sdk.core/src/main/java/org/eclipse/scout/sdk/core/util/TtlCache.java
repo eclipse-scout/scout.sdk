@@ -45,7 +45,7 @@ public class TtlCache<K, V> {
    * Creates a new cache instance.
    *
    * @param ttl
-   *          The ttl (time-to-live) for cached items. A ttl <= 0 means the items will stay in the cache for ever (no
+   *          The ttl (time-to-live) for cached items. A ttl <= 0 means the items will stay in the cache forever (no
    *          ttl).
    * @param timeUnit
    *          The {@link TimeUnit} of the ttl. Must not be {@code null}.
@@ -58,7 +58,7 @@ public class TtlCache<K, V> {
    * Creates a new cache instance.
    * 
    * @param ttl
-   *          The ttl (time-to-live) for cached items. A ttl <= 0 means the items will stay in the cache for ever (no
+   *          The ttl (time-to-live) for cached items. A ttl <= 0 means the items will stay in the cache forever (no
    *          ttl).
    * @param timeUnit
    *          The {@link TimeUnit} of the ttl. Must not be {@code null}.

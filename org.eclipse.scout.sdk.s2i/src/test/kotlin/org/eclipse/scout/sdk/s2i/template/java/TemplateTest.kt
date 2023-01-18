@@ -12,10 +12,9 @@ package org.eclipse.scout.sdk.s2i.template.java
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.impl.LookupImpl
 import junit.framework.AssertionFailedError
-import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder
+import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentWithEcjBuilder
+import org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions
 import org.eclipse.scout.sdk.core.s.classid.ClassIds
-import org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors
-import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.AbstractTestCaseWithRunningClasspathModule
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
@@ -178,12 +177,12 @@ class TemplateTest : AbstractTestCaseWithRunningClasspathModule() {
     }
 
     private fun doCompletionAndAssertNoCompileErrors(testClassName: String, finishLookupName: String) {
-        val psiFile = myFixture.configureByFile(testClassName + JavaTypes.JAVA_FILE_SUFFIX)
+        val psiFile = myFixture.configureByFile(testClassName + org.eclipse.scout.sdk.core.java.JavaTypes.JAVA_FILE_SUFFIX)
         myFixture.complete(CompletionType.BASIC, 1)
         val lookupElementToSelect = myFixture.lookupElements
-                ?.filter { it.getUserData(TemplateHelper.SCOUT_LOOKUP_ELEMENT_MARKER) ?: false }
-                ?.first { it.lookupString == finishLookupName }
-                ?: throw AssertionFailedError("No LookupElement with name '$finishLookupName' found in completion list.")
+            ?.filter { it.getUserData(TemplateHelper.SCOUT_LOOKUP_ELEMENT_MARKER) ?: false }
+            ?.first { it.lookupString == finishLookupName }
+            ?: throw AssertionFailedError("No LookupElement with name '$finishLookupName' found in completion list.")
         val lookup = myFixture.lookup as LookupImpl
         lookup.finishLookup('\n', lookupElementToSelect)
         assertNoCompileErrors(testClassName, psiFile.text)
@@ -192,12 +191,12 @@ class TemplateTest : AbstractTestCaseWithRunningClasspathModule() {
     private fun assertNoCompileErrors(simpleName: String, source: String) {
         // exclude IntelliJ jars as these are not required
         JavaEnvironmentWithEcjBuilder.create()
-                .withoutScoutSdk()
-                .excludeIfContains("/com.jetbrains.intellij.idea/")
-                .excludeIfContains("/org.jetbrains.kotlin/")
-                .excludeIfContains("/xml-apis/xml-apis/") // because also present in the JRE
-                .accept {
-                    assertNoCompileErrors(it, source, null, simpleName)
-                }
+            .withoutScoutSdk()
+            .excludeIfContains("/com.jetbrains.intellij.idea/")
+            .excludeIfContains("/org.jetbrains.kotlin/")
+            .excludeIfContains("/xml-apis/xml-apis/") // because also present in the JRE
+            .accept {
+                SdkJavaAssertions.assertNoCompileErrors(it, source, null, simpleName)
+            }
     }
 }

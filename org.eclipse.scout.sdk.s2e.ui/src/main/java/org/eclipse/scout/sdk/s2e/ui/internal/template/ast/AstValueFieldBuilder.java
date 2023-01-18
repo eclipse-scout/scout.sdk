@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
 
 /**
  * <h3>{@link AstValueFieldBuilder}</h3>

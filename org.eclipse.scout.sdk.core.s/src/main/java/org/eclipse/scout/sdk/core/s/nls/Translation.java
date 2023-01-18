@@ -55,7 +55,7 @@ public class Translation implements ITranslation {
    *          The {@link Language} that should be modified. Must not be {@code null}.
    * @param text
    *          If the text is {@code null} the specified {@link Language} is removed for this {@link ITranslation}.
-   *          Otherwise the specified text is stored for the given {@link Language}. If there was already a text entry
+   *          Otherwise, the specified text is stored for the given {@link Language}. If there was already a text entry
    *          for this {@link Language} it is replaced.
    */
   public void putText(Language lang, String text) {

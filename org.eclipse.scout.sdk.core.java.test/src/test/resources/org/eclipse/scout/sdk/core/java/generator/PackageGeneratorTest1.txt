@@ -1,0 +1,8 @@
+/*
+* pck block comment
+*/
+@PackageAnnotation(testAttrib = "testValue")
+package test.pck;
+
+import org.eclipse.scout.sdk.core.java.fixture.sub.PackageAnnotation;
+

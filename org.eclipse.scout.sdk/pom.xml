@@ -26,17 +26,27 @@
   <description>Eclipse Scout SDK</description>
 
   <modules>
+    <!-- core -->
     <module>../org.eclipse.scout.sdk.core</module>
-    <module>../org.eclipse.scout.sdk.core.ecj</module>
     <module>../org.eclipse.scout.sdk.core.test</module>
+
+    <!-- Java support -->
+    <module>../org.eclipse.scout.sdk.core.java</module>
+    <module>../org.eclipse.scout.sdk.core.java.ecj</module>
+    <module>../org.eclipse.scout.sdk.core.java.test</module>
+
+    <!-- Scout support -->
     <module>../org.eclipse.scout.sdk.core.s</module>
     <module>../org.eclipse.scout.sdk.core.s.test</module>
-    <module>../org.eclipse.scout.sdk.doc</module>
 
+    <!-- Eclipse integration -->
     <module>../org.eclipse.scout.sdk.s2e</module>
     <module>../org.eclipse.scout.sdk.s2e.test</module>
     <module>../org.eclipse.scout.sdk.s2e.doc</module>
     <module>../org.eclipse.scout.sdk.s2e.ui</module>
+
+    <!-- documentation -->
+    <module>../org.eclipse.scout.sdk.doc</module>
   </modules>
 
   <properties>
@@ -193,7 +203,17 @@
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
-        <artifactId>org.eclipse.scout.sdk.core.ecj</artifactId>
+        <artifactId>org.eclipse.scout.sdk.core.java</artifactId>
+        <version>13.0.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk</groupId>
+        <artifactId>org.eclipse.scout.sdk.core.java.ecj</artifactId>
+        <version>13.0.0-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk</groupId>
+        <artifactId>org.eclipse.scout.sdk.core.java.test</artifactId>
         <version>13.0.0-SNAPSHOT</version>
       </dependency>
 
@@ -202,7 +222,6 @@
         <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
         <version>13.0.0-SNAPSHOT</version>
       </dependency>
-
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s.test</artifactId>

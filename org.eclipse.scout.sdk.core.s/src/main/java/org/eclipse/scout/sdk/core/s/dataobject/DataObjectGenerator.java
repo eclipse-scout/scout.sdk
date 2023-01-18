@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.s.dataobject;
 
-import static org.eclipse.scout.sdk.core.s.generator.method.ScoutDoMethodGenerator.createConvenienceMethods;
+import static org.eclipse.scout.sdk.core.s.java.generator.method.ScoutDoMethodGenerator.createConvenienceMethods;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.LinkedHashMap;
@@ -19,20 +19,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
-import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContextFunction;
-import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
-import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
-import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.java.builder.IJavaBuilderContext;
+import org.eclipse.scout.sdk.core.java.builder.JavaBuilderContextFunction;
+import org.eclipse.scout.sdk.core.java.generator.annotation.AnnotationGenerator;
+import org.eclipse.scout.sdk.core.java.generator.field.FieldGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode.DataObjectNodeKind;
-import org.eclipse.scout.sdk.core.s.generator.method.ScoutDoMethodGenerator;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutAnnotationApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.generator.method.ScoutDoMethodGenerator;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**

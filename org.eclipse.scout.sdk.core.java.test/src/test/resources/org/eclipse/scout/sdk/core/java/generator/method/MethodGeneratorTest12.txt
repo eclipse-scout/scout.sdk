@@ -1,0 +1,46 @@
+/**
+* Default Testing Comment for
+* CompilationUnit TestClassWithOrder.java
+*/
+package a.b.x;
+
+import java.util.Set;
+
+import org.eclipse.scout.sdk.core.java.fixture.AbstractClass;
+import org.eclipse.scout.sdk.core.java.fixture.Long;
+
+/**
+* Default Testing Comment for
+* Type TestClassWithOrder
+*/
+public class TestClassWithOrder extends AbstractClass {
+@Override
+protected void voidMethod() {
+// TODO [anonymous] Auto-generated method stub.
+}
+@Override
+public String methodWithoutArgs() {
+// TODO [anonymous] Auto-generated method stub.
+return null;
+}
+@Override
+public Set<String> get(Set<String> t) {
+// TODO [anonymous] Auto-generated method stub.
+return null;
+}
+@Override
+protected int methodWithOverload(int a, String b) throws RuntimeException {
+// TODO [anonymous] Auto-generated method stub.
+return 0;
+}
+@Override
+protected int methodWithArgs(int a, String b, Set<String> c) throws RuntimeException {
+// TODO [anonymous] Auto-generated method stub.
+return 0;
+}
+@Override
+protected int methodWithOverload(int a, String b, Long c) throws RuntimeException {
+// TODO [anonymous] Auto-generated method stub.
+return 0;
+}
+}

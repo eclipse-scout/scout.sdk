@@ -12,12 +12,12 @@ package org.eclipse.scout.sdk.doc;
 import static java.util.stream.Collectors.joining;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
+import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IMethodParameter;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.Flags;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
 
 @SuppressWarnings("MethodMayBeStatic")
 public class PrintMethodParamTypes {

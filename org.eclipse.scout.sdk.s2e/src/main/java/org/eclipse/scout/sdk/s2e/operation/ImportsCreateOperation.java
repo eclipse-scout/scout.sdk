@@ -16,7 +16,7 @@ import java.util.function.BiConsumer;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.core.imports.IImportCollector;
+import org.eclipse.scout.sdk.core.java.imports.IImportCollector;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;

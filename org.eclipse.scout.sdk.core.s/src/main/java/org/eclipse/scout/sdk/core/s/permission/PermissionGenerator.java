@@ -11,12 +11,12 @@ package org.eclipse.scout.sdk.core.s.permission;
 
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
-import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
-import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
-import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.java.generator.IJavaElementGenerator;
+import org.eclipse.scout.sdk.core.java.generator.field.FieldGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.MethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 
 /**
  * <h3>{@link PermissionGenerator}</h3>

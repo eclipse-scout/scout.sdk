@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.stream.IntStream;
 
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -135,7 +134,7 @@ public class SdkLogTest {
   public void testLogOfObjectWithToStringThrowingException() {
     runWithPrivateLogger(Level.WARNING, logContent -> {
       SdkLog.error("Msg: {}", new ClassWithToStringThrowingNpeFixture());
-      assertEqualsWithTime("[SEVERE]  Msg: [FAILED toString() of class " + SdkLogTest.class.getName() + JavaTypes.C_DOLLAR + ClassWithToStringThrowingNpeFixture.class.getSimpleName() + ']', logContent.toString());
+      assertEqualsWithTime("[SEVERE]  Msg: [FAILED toString() of class " + SdkLogTest.class.getName() + '$' + ClassWithToStringThrowingNpeFixture.class.getSimpleName() + ']', logContent.toString());
       SdkConsole.clear();
     });
   }

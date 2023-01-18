@@ -23,7 +23,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.jdt.internal.corext.dom.Bindings;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.AstNodeFactory;
 import org.eclipse.scout.sdk.s2e.ui.internal.template.ast.WrappedTrackedNodePosition;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;

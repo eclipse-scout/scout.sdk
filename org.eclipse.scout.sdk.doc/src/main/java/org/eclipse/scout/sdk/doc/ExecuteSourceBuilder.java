@@ -16,11 +16,11 @@ import java.nio.file.Paths;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.JavaSourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.expression.ExpressionBuilder;
+import org.eclipse.scout.sdk.core.java.builder.JavaSourceBuilder;
+import org.eclipse.scout.sdk.core.java.builder.expression.ExpressionBuilder;
+import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
 
 @SuppressWarnings({"MethodMayBeStatic"})
 public class ExecuteSourceBuilder {

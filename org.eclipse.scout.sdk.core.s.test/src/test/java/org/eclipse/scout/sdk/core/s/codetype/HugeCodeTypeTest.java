@@ -13,12 +13,12 @@ import static org.eclipse.scout.sdk.core.util.Strings.isBlank;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.testing.CoreJavaTestingUtils;
+import org.eclipse.scout.sdk.core.java.testing.context.ExtendWithJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
-import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Test;
 
 import formdata.shared.services.process.replace.HugeCodeType;
@@ -50,7 +50,7 @@ public class HugeCodeTypeTest {
         .withCodeTypeIdDataType(String.class.getName())
         .withIdValueBuilder(b -> b.stringLiteral("id_value"))
         .withSuperClass(superType);
-    var newType = CoreTestingUtils.registerCompilationUnit(codeType.javaEnvironment(), ctg);
+    var newType = CoreJavaTestingUtils.registerCompilationUnit(codeType.javaEnvironment(), ctg);
 
     assertTrue(newType.source().orElseThrow().asCharSequence().length() < 400); // assert the huge one has been replaced with an empty code type
   }

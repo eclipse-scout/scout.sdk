@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.nls.proposal;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.scout.sdk.core.java.JavaUtils;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
@@ -59,7 +60,7 @@ public class TranslationNewProposal extends AbstractTranslationProposal {
       proposalFieldText = "";
     }
     else {
-      proposalFieldText = Strings.fromStringLiteral('"' + searchText + '"').toString();
+      proposalFieldText = JavaUtils.fromStringLiteral('"' + searchText + '"').toString();
     }
 
     var key = m_manager.generateNewKey(proposalFieldText);

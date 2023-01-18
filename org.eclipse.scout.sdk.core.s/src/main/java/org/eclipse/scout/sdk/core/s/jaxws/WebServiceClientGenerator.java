@@ -13,22 +13,22 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.util.Locale;
 
-import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
-import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
-import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
-import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.generator.annotation.AnnotationGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.MethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.MethodOverrideGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.TypeGenerator;
+import org.eclipse.scout.sdk.core.java.model.api.IMethod;
+import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer.ITransformInput;
+import org.eclipse.scout.sdk.core.java.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutAbstractApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.builder.java.body.ScoutMethodBodyBuilder;
-import org.eclipse.scout.sdk.core.transformer.IWorkingCopyTransformer.ITransformInput;
-import org.eclipse.scout.sdk.core.transformer.SimpleWorkingCopyTransformerBuilder;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutAbstractApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.builder.body.ScoutMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**

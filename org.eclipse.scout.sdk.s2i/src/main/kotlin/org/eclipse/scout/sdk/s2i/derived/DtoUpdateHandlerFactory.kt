@@ -14,10 +14,10 @@ import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.search.SearchScope
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
-import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
 import org.eclipse.scout.sdk.s2i.findAllTypesAnnotatedWith
 import kotlin.streams.asSequence
 

@@ -10,8 +10,7 @@
 package org.eclipse.scout.sdk.core.s.testing.context;
 
 import static java.util.stream.Collectors.toCollection;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
-import static org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension.createJavaEnvironmentUsingBuilder;
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertNoCompileErrors;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -28,20 +27,21 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.java.ISourceFolders;
+import org.eclipse.scout.sdk.core.java.builder.JavaBuilderContext;
+import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentWithEcjBuilder;
+import org.eclipse.scout.sdk.core.java.model.CompilationUnitInfoWithClasspath;
+import org.eclipse.scout.sdk.core.java.model.api.IClasspathEntry;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.spi.JavaEnvironmentSpi;
+import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.java.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.CompilationUnitInfoWithClasspath;
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
-import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
-import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler;
@@ -224,7 +224,7 @@ public class TestingEnvironment extends AbstractEnvironment {
         .withAbsoluteSourcePath(root.resolve(ISourceFolders.GENERATED_WS_IMPORT_SOURCE_FOLDER).toString())
         .withAbsoluteSourcePath(root.resolve(ISourceFolders.GENERATED_ANNOTATIONS_SOURCE_FOLDER).toString())
         .withAbsoluteSourcePath(root.resolve(IScoutSourceFolders.GENERATED_SOURCE_FOLDER).toString());
-    return createJavaEnvironmentUsingBuilder(javaEnvBuilder)
+    return JavaEnvironmentExtension.createJavaEnvironmentUsingBuilder(javaEnvBuilder)
         .map(this::registerJavaEnvironment);
   }
 

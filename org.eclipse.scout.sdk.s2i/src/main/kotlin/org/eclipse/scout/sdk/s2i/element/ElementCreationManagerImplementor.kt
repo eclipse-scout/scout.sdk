@@ -9,16 +9,16 @@
  */
 package org.eclipse.scout.sdk.s2i.element
 
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
+import org.eclipse.scout.sdk.core.java.JavaTypes
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.s.ISdkConstants
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.codetype.CodeTypeNewOperation
 import org.eclipse.scout.sdk.core.s.entity.EntityNewOperation
 import org.eclipse.scout.sdk.core.s.form.FormNewOperation
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.lookupcall.LookupCallNewOperation
 import org.eclipse.scout.sdk.core.s.page.PageNewOperation
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
-import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.util.SourceFolderHelper
 
 class ElementCreationManagerImplementor : ElementCreationManager {

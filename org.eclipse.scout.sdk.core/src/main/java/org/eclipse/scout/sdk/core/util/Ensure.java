@@ -240,7 +240,7 @@ public final class Ensure {
    * @param b
    *          the value to be tested against.
    * @throws IllegalArgumentException
-   *           if a is not same as b.
+   *           if "a" is not same as "b".
    */
   public static void same(Object a, Object b) {
     same(a, b, "Values are not the same: [{}, {}].", a, b);
@@ -258,7 +258,7 @@ public final class Ensure {
    * @param msgArgs
    *          The arguments to be placed into the formatting anchors of the given message. See {@link MessageFormatter}.
    * @throws IllegalArgumentException
-   *           if a is not same as b.
+   *           if "a" is not same as "b".
    */
   public static void same(Object a, Object b, CharSequence msg, Object... msgArgs) {
     if (a != b) {
@@ -273,7 +273,7 @@ public final class Ensure {
    *          The object to test.
    * @param type
    *          The type to test against.
-   * @return The given object casted to the given type.
+   * @return The given object cast to the given type.
    * @throws IllegalArgumentException
    *           if the object or the type is {@code null} or if the object is not {@code instanceof} the given type.
    * @see Class#cast(Object)
@@ -294,7 +294,7 @@ public final class Ensure {
    *          if the assertion fails.
    * @param msgArgs
    *          The arguments to be placed into the formatting anchors of the given message. See {@link MessageFormatter}.
-   * @return The given object casted to the given type.
+   * @return The given object cast to the given type.
    * @throws IllegalArgumentException
    *           if the object or the type is {@code null} or if the object is not {@code instanceof} the given type.
    * @see Class#cast(Object)

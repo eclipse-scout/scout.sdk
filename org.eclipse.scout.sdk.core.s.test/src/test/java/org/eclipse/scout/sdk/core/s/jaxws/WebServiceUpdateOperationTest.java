@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
+import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -26,7 +27,6 @@ import org.eclipse.scout.sdk.core.s.jaxws.WebServiceUpdateOperation.WebServiceIm
 import org.eclipse.scout.sdk.core.s.testing.CoreScoutTestingUtils;
 import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 

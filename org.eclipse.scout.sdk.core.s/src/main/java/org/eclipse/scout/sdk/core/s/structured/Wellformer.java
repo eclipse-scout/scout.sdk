@@ -13,11 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IJavaElement;
-import org.eclipse.scout.sdk.core.model.api.IMember;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
-import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.api.IField;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
+import org.eclipse.scout.sdk.core.java.model.api.IMember;
+import org.eclipse.scout.sdk.core.java.model.api.IMethod;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.structured.IStructuredType.Categories;
 
 /**

@@ -27,11 +27,11 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.FileContentUtilCore
 import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
-import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.dto.AbstractDtoGenerator
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
-import org.eclipse.scout.sdk.core.s.util.DelayedBuffer
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
+import org.eclipse.scout.sdk.core.util.DelayedBuffer
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction

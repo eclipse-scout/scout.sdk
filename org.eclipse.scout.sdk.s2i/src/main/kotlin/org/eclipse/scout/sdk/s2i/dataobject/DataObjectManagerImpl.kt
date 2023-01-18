@@ -12,14 +12,14 @@ package org.eclipse.scout.sdk.s2i.dataobject
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiModifier
 import com.intellij.psi.search.SearchScope
+import org.eclipse.scout.sdk.core.java.model.api.IType
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.model.api.IType
-import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectModel
 import org.eclipse.scout.sdk.core.s.dataobject.DoConvenienceMethodsUpdateOperation
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment

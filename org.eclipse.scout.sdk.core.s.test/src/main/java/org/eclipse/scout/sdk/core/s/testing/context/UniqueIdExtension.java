@@ -11,8 +11,8 @@ package org.eclipse.scout.sdk.core.s.testing.context;
 
 import java.util.function.Function;
 
+import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.s.uniqueid.UniqueIds;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;

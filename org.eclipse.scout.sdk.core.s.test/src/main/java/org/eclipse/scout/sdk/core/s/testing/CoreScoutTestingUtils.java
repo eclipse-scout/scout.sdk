@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.s.testing;
 
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertNoCompileErrors;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.mockito.Mockito.mock;
 
@@ -20,15 +20,15 @@ import java.nio.file.Path;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.eclipse.scout.sdk.core.apidef.ApiVersion;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
+import org.eclipse.scout.sdk.core.java.apidef.ApiVersion;
+import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentWithEcjBuilder;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsModuleNewHelper;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.testing.maven.MavenCliRunner;

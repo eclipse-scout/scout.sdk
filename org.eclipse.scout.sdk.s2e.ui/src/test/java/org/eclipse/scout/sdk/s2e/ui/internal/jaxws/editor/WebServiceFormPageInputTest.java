@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 import java.nio.file.Paths;
 
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.junit.jupiter.api.Test;
 
 public class WebServiceFormPageInputTest {

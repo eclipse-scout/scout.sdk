@@ -21,9 +21,10 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.model.api.IField;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
-import org.eclipse.scout.sdk.core.model.api.PropertyBean;
+import org.eclipse.scout.sdk.core.java.model.api.IField;
+import org.eclipse.scout.sdk.core.java.model.api.IMethod;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.s.structured.StructuredType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
@@ -193,7 +194,7 @@ public class AstInnerTypeGetterBuilder extends AstMethodBuilder<AstInnerTypeGett
         }
       }
     }
-    else if (methodSibling instanceof org.eclipse.scout.sdk.core.model.api.IType) {
+    else if (methodSibling instanceof IType) {
       var elemName = methodSibling.elementName();
       return Arrays.stream(declaringType.getTypes())
           .filter(innerType -> elemName.equals(innerType.getName().getIdentifier()))

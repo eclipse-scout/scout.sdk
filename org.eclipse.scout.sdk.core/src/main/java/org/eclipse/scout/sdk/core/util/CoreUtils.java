@@ -41,22 +41,17 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 public final class CoreUtils {
 
   private static final Pattern PATH_SEGMENT_SPLIT_PATTERN = Pattern.compile("/");
-  @SuppressWarnings("HardcodedLineSeparator")
-  private static final Pattern REGEX_COMMENT_REMOVE_1 = Pattern.compile("//.*?\r\n");
-  @SuppressWarnings("HardcodedLineSeparator")
-  private static final Pattern REGEX_COMMENT_REMOVE_2 = Pattern.compile("//.*?\n");
-  private static final Pattern REGEX_COMMENT_REMOVE_3 = Pattern.compile("(?s)/\\*.*?\\*/");
   private static final ThreadLocal<String> CURRENT_USER_NAME = ThreadLocal.withInitial(() -> null);
 
   private CoreUtils() {
   }
 
   /**
-   * Returns the user name of the current thread. If the current thread has no user name set, the system property is
+   * Returns the username of the current thread. If the current thread has no username set, the system property is
    * returned.<br>
-   * Use {@link CoreUtils#setUsernameForThread(String)} to define the user name for the current thread.
+   * Use {@link CoreUtils#setUsernameForThread(String)} to define the username for the current thread.
    *
-   * @return The user name of the thread or the system if no user name is defined on the thread.
+   * @return The username of the thread or the system if no username is defined on the thread.
    */
   public static String getUsername() {
     var name = CURRENT_USER_NAME.get();
@@ -68,34 +63,15 @@ public final class CoreUtils {
   }
 
   /**
-   * Sets the user name that should be returned by {@link CoreUtils#getUsername()} for the current thread.
+   * Sets the username that should be returned by {@link CoreUtils#getUsername()} for the current thread.
    *
    * @param newUsernameForCurrentThread
-   *          the new user name
+   *          the new username
    */
   public static void setUsernameForThread(String newUsernameForCurrentThread) {
     setThreadLocal(CURRENT_USER_NAME, newUsernameForCurrentThread);
   }
 
-  /**
-   * Removes all comments in the given java source.
-   *
-   * @param methodBody
-   *          The java source
-   * @return The source with all comments (single line & multi line) removed.
-   */
-  public static String removeComments(CharSequence methodBody) {
-    if (methodBody == null) {
-      return null;
-    }
-    if (Strings.isBlank(methodBody)) {
-      return methodBody.toString();
-    }
-    var retVal = REGEX_COMMENT_REMOVE_1.matcher(methodBody).replaceAll("");
-    retVal = REGEX_COMMENT_REMOVE_2.matcher(retVal).replaceAll("");
-    retVal = REGEX_COMMENT_REMOVE_3.matcher(retVal).replaceAll("");
-    return retVal;
-  }
 
   /**
    * Deletes the given file or folder.<br>
@@ -367,7 +343,7 @@ public final class CoreUtils {
    * @param o
    *          The {@link Object} for which the {@link String} representation should be returned.
    * @return An {@link Optional} holding the value of {@link Object#toString()} if it has been overwritten and could be
-   *         invoked successfully. Otherwise an empty {@link Optional} is returned.
+   *         invoked successfully. Otherwise, an empty {@link Optional} is returned.
    */
   @SuppressWarnings("squid:S1181")
   public static Optional<String> toStringIfOverwritten(Object o) {
@@ -414,7 +390,7 @@ public final class CoreUtils {
    * @param text
    *          The text to set
    * @param ownershipLostCallback
-   *          An optional callback invoked if the owner ship of the clipboard is lost.
+   *          An optional callback invoked if the ownership of the clipboard is lost.
    * @return {@code true} if the text has been successfully set to the system clipboard.
    */
   public static boolean setTextToClipboard(String text, ClipboardOwner ownershipLostCallback) {
@@ -443,7 +419,7 @@ public final class CoreUtils {
    * @param method
    *          The method in the interface to call.
    * @param args
-   *          The arguments to pass to the the method.
+   *          The arguments to pass to the method.
    * @return The result of the method call
    * @throws RuntimeException
    *           if the called method threw a {@link RuntimeException}

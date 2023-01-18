@@ -15,12 +15,12 @@ import java.util.stream.Stream;
 
 import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.apidef.IScout22DoApi;
-import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.dataobject.DoContextResolvers;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScout22DoApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.environment.model.JavaEnvironmentWithJdt;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;

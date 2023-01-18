@@ -43,21 +43,21 @@ import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.builder.JavaBuilderContext;
+import org.eclipse.scout.sdk.core.java.model.CompilationUnitInfoWithClasspath;
+import org.eclipse.scout.sdk.core.java.model.api.IClasspathEntry;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.CompilationUnitInfoWithClasspath;
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.s.environment.AbstractEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.environment.model.ClasspathWithJdt;
 import org.eclipse.scout.sdk.s2e.environment.model.JavaEnvironmentWithJdt;
@@ -272,7 +272,7 @@ public class EclipseEnvironment extends AbstractEnvironment {
 
   /**
    * Converts the specified {@link org.eclipse.jdt.core.IType} to an {@link IType}. If the corresponding
-   * {@link IJavaProject} has no {@link IJavaEnvironment} associated yet, a new one will be created. Otherwise the
+   * {@link IJavaProject} has no {@link IJavaEnvironment} associated yet, a new one will be created. Otherwise, the
    * existing {@link IJavaEnvironment} will be used.
    *
    * @param jdtType
@@ -299,7 +299,7 @@ public class EclipseEnvironment extends AbstractEnvironment {
 
   /**
    * Converts the specified {@link IPackageFragmentRoot} to an {@link IClasspathEntry}. If the corresponding
-   * {@link IJavaProject} has no {@link IJavaEnvironment} associated yet, a new one will be created. Otherwise the
+   * {@link IJavaProject} has no {@link IJavaEnvironment} associated yet, a new one will be created. Otherwise, the
    * existing {@link IJavaEnvironment} will be used.
    *
    * @param root

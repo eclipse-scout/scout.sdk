@@ -9,16 +9,16 @@
  */
 package org.eclipse.scout.sdk.s2i.template.java
 
+import org.eclipse.scout.sdk.core.java.JavaUtils
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
-import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.template.VariableDescriptor
 
 open class DescendantAbstractClassesEnumVariableAdapter(val name: String) : (TemplateEngine) -> VariableDescriptor? {
 
     override fun invoke(context: TemplateEngine): VariableDescriptor? {
         val superClassInfo = context.templateDescriptor.superClassInfo() ?: throw newFail("No super class info specified for variable '{}'.", name)
-        val baseFqn = Strings.toStringLiteral(superClassInfo.baseFqn)
-        val defaultValue = Strings.toStringLiteral(superClassInfo.defaultValue)
+        val baseFqn = JavaUtils.toStringLiteral(superClassInfo.baseFqn)
+        val defaultValue = JavaUtils.toStringLiteral(superClassInfo.defaultValue)
         return VariableDescriptor(name, "${DescendantAbstractClassesEnumMacro.NAME}($baseFqn, $defaultValue)", defaultValue.toString())
     }
 }

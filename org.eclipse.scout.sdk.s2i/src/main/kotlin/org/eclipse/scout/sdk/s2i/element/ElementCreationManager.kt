@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.element
 
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.s2i.util.SourceFolderHelper

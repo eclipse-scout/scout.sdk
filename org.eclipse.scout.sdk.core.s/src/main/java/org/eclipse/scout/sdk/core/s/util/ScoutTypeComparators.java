@@ -13,8 +13,8 @@ import static java.util.Comparator.comparing;
 
 import java.util.Comparator;
 
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.java.annotation.OrderAnnotation;
 
 /**
  * Holds scout {@link Comparator}s comparing {@link IType}s

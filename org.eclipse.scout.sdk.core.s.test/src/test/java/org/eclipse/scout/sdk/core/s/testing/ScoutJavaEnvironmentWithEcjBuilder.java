@@ -11,7 +11,7 @@ package org.eclipse.scout.sdk.core.s.testing;
 
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
+import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentWithEcjBuilder;
 
 /**
  * <h3>{@link ScoutJavaEnvironmentWithEcjBuilder}</h3>

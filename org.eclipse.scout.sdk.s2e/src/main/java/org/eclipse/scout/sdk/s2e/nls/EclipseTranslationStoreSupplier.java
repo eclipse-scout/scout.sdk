@@ -38,11 +38,11 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
+import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStoreSupplier;
 import org.eclipse.scout.sdk.core.s.nls.properties.EditableTranslationFile;
@@ -86,7 +86,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
         .flatMap(Optional::stream);
   }
 
-  private static Stream<org.eclipse.scout.sdk.core.model.api.IType> resolveSubClasses(IJavaProject jp, Function<IScoutApi, ITypeNameSupplier> nameFunction, EclipseEnvironment env, EclipseProgress progress) {
+  private static Stream<org.eclipse.scout.sdk.core.java.model.api.IType> resolveSubClasses(IJavaProject jp, Function<IScoutApi, ITypeNameSupplier> nameFunction, EclipseEnvironment env, EclipseProgress progress) {
     var scoutApi = ApiHelper.scoutApiFor(jp, env);
     if (scoutApi.isEmpty()) {
       return Stream.empty();
@@ -97,13 +97,13 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
   }
 
   @Override
-  public Optional<ITranslationStore> createStoreForService(org.eclipse.scout.sdk.core.model.api.IType textService, IProgress progress) {
+  public Optional<ITranslationStore> createStoreForService(org.eclipse.scout.sdk.core.java.model.api.IType textService, IProgress progress) {
     progress.init(1, "Search properties text provider service.");
     return createTranslationStore(textService, progress);
   }
 
   @Override
-  public Stream<org.eclipse.scout.sdk.core.model.api.IType> visibleTextContributorsForJavaModule(Path modulePath, IEnvironment env, IProgress progress) {
+  public Stream<org.eclipse.scout.sdk.core.java.model.api.IType> visibleTextContributorsForJavaModule(Path modulePath, IEnvironment env, IProgress progress) {
     progress.init(20, "Search UiTextContributors.");
     var e = EclipseEnvironment.narrow(env);
     var p = toScoutProgress(progress);
@@ -112,7 +112,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
         .orElseGet(Stream::empty);
   }
 
-  private static Optional<ITranslationStore> createTranslationStore(org.eclipse.scout.sdk.core.model.api.IType textProviderServiceType, IProgress progress) {
+  private static Optional<ITranslationStore> createTranslationStore(org.eclipse.scout.sdk.core.java.model.api.IType textProviderServiceType, IProgress progress) {
     return PropertiesTextProviderService.create(textProviderServiceType)
         .map(PropertiesTranslationStore::new)
         .filter(s -> loadStore(s, progress.newChild(1)))

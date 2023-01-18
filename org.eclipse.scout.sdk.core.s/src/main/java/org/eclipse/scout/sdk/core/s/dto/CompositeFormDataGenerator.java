@@ -9,17 +9,17 @@
  */
 package org.eclipse.scout.sdk.core.s.dto;
 
-import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
-import org.eclipse.scout.sdk.core.model.api.Flags;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.api.PropertyBean;
-import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.s.dto.form.FormDataGenerator;
 import org.eclipse.scout.sdk.core.s.dto.table.TableFieldDataGenerator;
 import org.eclipse.scout.sdk.core.s.dto.table.TableRowDataGenerator;
-import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
+import org.eclipse.scout.sdk.core.s.java.annotation.FormDataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.java.generator.method.ScoutMethodGenerator;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**

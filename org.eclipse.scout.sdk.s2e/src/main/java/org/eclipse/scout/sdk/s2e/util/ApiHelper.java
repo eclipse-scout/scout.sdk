@@ -17,10 +17,10 @@ import java.util.function.Function;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.scout.sdk.core.apidef.ApiVersion;
-import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
+import org.eclipse.scout.sdk.core.java.apidef.ApiVersion;
+import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 
 public final class ApiHelper {

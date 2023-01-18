@@ -21,10 +21,10 @@ import com.intellij.psi.impl.source.tree.java.PsiLiteralExpressionImpl
 import com.intellij.psi.xml.XmlAttributeValue
 import com.intellij.util.ArrayUtil
 import com.intellij.util.ProcessingContext
-import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
+import org.eclipse.scout.sdk.core.java.JavaUtils
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.nls.Translations
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
-import org.eclipse.scout.sdk.core.util.Strings
 
 /**
  * The JS patterns are in [org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJs] because the dependency to the JS module is optional!
@@ -126,7 +126,7 @@ object PsiTranslationPatterns {
 
     class JavaTranslationSpec(element: PsiElement) : TranslationLanguageSpec(element, Translations.DependencyScope.JAVA, "\"", PsiTranslationPatterns::getTranslationKeyFromJava) {
         override fun createNewLiteral(text: String): PsiElement {
-            val literalValue = Strings.toStringLiteral(decorateTranslationKey(text), stringDelimiter, true).toString()
+            val literalValue = JavaUtils.toStringLiteral(decorateTranslationKey(text), stringDelimiter, true).toString()
             return JavaPsiFacade.getElementFactory(element.project).createExpressionFromText(literalValue, element)
         }
     }

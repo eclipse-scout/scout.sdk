@@ -10,7 +10,7 @@
 package org.eclipse.scout.sdk.s2i.dataobject
 
 import com.intellij.psi.search.SearchScope
-import org.eclipse.scout.sdk.core.model.api.IType
+import org.eclipse.scout.sdk.core.java.model.api.IType
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectModel
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 

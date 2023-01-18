@@ -18,7 +18,7 @@ import com.intellij.patterns.PsiJavaPatterns.psiElement
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ProcessingContext
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.scoutApi
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper

@@ -11,13 +11,13 @@ package org.eclipse.scout.sdk.s2i.template.java
 
 import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiClass
-import org.eclipse.scout.sdk.core.apidef.Api
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.java.JavaTypes
+import org.eclipse.scout.sdk.core.java.JavaUtils
+import org.eclipse.scout.sdk.core.java.apidef.Api
 import org.eclipse.scout.sdk.core.s.classid.ClassIds
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.uniqueid.UniqueIds
 import org.eclipse.scout.sdk.core.util.Ensure
-import org.eclipse.scout.sdk.core.util.JavaTypes
-import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.util.VelocityRunner
 import java.util.Collections.emptyList
@@ -42,23 +42,23 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
 
     private val m_resolvedTypeArgs = HashMap<Pair<String, Int>, String>()
     private val m_superClassBase = templateDescriptor.superClassInfo()
-            ?.baseFqn
-            ?.let { context.module.findTypeByName(it) }
+        ?.baseFqn
+        ?.let { context.module.findTypeByName(it) }
     val menuTypes: List<String> = menuTypeMapping().entries
-            .firstOrNull { context.declaringClass.isInstanceOf(it.key) }
-            ?.value ?: emptyList()
+        .firstOrNull { context.declaringClass.isInstanceOf(it.key) }
+        ?.value ?: emptyList()
     val keyStrokes = getKeyStrokeOptions()
 
     fun buildTemplate(): String {
         val templateSource = VelocityRunner()
-                .withProperties(buildScoutRtConstants())
-                .withProperty(TemplateDescriptor.PREDEFINED_CONSTANT_IN_EXTENSION, context.declaringClass.isInstanceOf(context.scoutApi.IExtension()))
-                .withProperty(TemplateDescriptor.PREDEFINED_CONSTANT_MENU_SUPPORTED, menuTypes.isNotEmpty())
-                .withPostProcessor(DECLARING_TYPE_ARG_REGEX, this::resolveDeclaringTypeArgument)
-                .withPostProcessor(UNIQUE_ID_REGEX) { UniqueIds.next(it.group(1)) }
-                .withPostProcessor(ENCLOSING_INSTANCE_FQN_REGEX, this::resolveEnclosingInstanceFqn)
-                .withPostProcessor(CLASS_ID_REGEX) { ClassIds.next(context.declaringClass.qualifiedName) }
-                .eval(templateDescriptor.source())
+            .withProperties(buildScoutRtConstants())
+            .withProperty(TemplateDescriptor.PREDEFINED_CONSTANT_IN_EXTENSION, context.declaringClass.isInstanceOf(context.scoutApi.IExtension()))
+            .withProperty(TemplateDescriptor.PREDEFINED_CONSTANT_MENU_SUPPORTED, menuTypes.isNotEmpty())
+            .withPostProcessor(DECLARING_TYPE_ARG_REGEX, this::resolveDeclaringTypeArgument)
+            .withPostProcessor(UNIQUE_ID_REGEX) { UniqueIds.next(it.group(1)) }
+            .withPostProcessor(ENCLOSING_INSTANCE_FQN_REGEX, this::resolveEnclosingInstanceFqn)
+            .withPostProcessor(CLASS_ID_REGEX) { ClassIds.next(context.declaringClass.qualifiedName) }
+            .eval(templateDescriptor.source())
 
         val classId = createClassIdAnnotationIfNecessary() ?: ""
         val order = createOrderAnnotationIfNecessary() ?: ""
@@ -79,8 +79,8 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
     private fun buildScoutRtConstants(): Map<String, String> {
         val result = HashMap<String, String>()
         Api.dump(context.scoutApi)
-                .map { flattenRtConstants(it.key, it.value.values) }
-                .forEach { result.putAll(it) }
+            .map { flattenRtConstants(it.key, it.value.values) }
+            .forEach { result.putAll(it) }
         return result
     }
 
@@ -95,17 +95,20 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
     private fun getKeyStrokeOptions(): List<String> {
         val iKeyStroke = context.scoutApi.IKeyStroke().fqn()
         val fKeys = (1..12).map { "$iKeyStroke.F$it" }
-        val actionKeys = listOf("$iKeyStroke.ENTER", "$iKeyStroke.INSERT", "$iKeyStroke.DELETE",
-                "$iKeyStroke.ESCAPE", "$iKeyStroke.SPACE", "$iKeyStroke.TAB", "$iKeyStroke.BACKSPACE")
+        val actionKeys = listOf(
+            "$iKeyStroke.ENTER", "$iKeyStroke.INSERT", "$iKeyStroke.DELETE",
+            "$iKeyStroke.ESCAPE", "$iKeyStroke.SPACE", "$iKeyStroke.TAB", "$iKeyStroke.BACKSPACE"
+        )
         val cursors = listOf("$iKeyStroke.LEFT", "$iKeyStroke.RIGHT", "$iKeyStroke.UP", "$iKeyStroke.DOWN")
         val ctrl = "$iKeyStroke.CONTROL"
         val shift = "$iKeyStroke.SHIFT"
         val alt = "$iKeyStroke.ALT"
         val combinedSamples = listOf(
-                "$ctrl, \"C\"",
-                "$ctrl, $shift, \"E\"",
-                "$alt, $iKeyStroke.F11")
-                .map { "${context.scoutApi.AbstractAction().fqn()}.${context.scoutApi.AbstractAction().combineKeyStrokesMethodName()}($it)" }
+            "$ctrl, \"C\"",
+            "$ctrl, $shift, \"E\"",
+            "$alt, $iKeyStroke.F11"
+        )
+            .map { "${context.scoutApi.AbstractAction().fqn()}.${context.scoutApi.AbstractAction().combineKeyStrokesMethodName()}($it)" }
         return fKeys + actionKeys + cursors + combinedSamples
     }
 
@@ -158,7 +161,7 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
     private fun resolveEnclosingInstanceFqn(match: MatchResult): String {
         val queryType = match.group(1)
         return context.declaringClass.findEnclosingClass(queryType, context.scoutApi, true)
-                ?.qualifiedName ?: ""
+            ?.qualifiedName ?: ""
     }
 
     private fun resolveDeclaringTypeArgument(match: MatchResult): String {
@@ -168,8 +171,8 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
         val type = m_resolvedTypeArgs.computeIfAbsent(typeArgDeclaringClassFqn to typeArgIndex) {
             val owner = context.declaringClass.findEnclosingClass(typeArgDeclaringClassFqn, context.scoutApi, true)
             owner?.resolveTypeArgument(typeArgIndex, typeArgDeclaringClassFqn)
-                    ?.getCanonicalText(false)
-                    ?: Object::class.java.name
+                ?.getCanonicalText(false)
+                ?: Object::class.java.name
         }
         return when (postProcessing) {
             VALUE_OPTION_BOX -> JavaTypes.boxPrimitive(type)
@@ -187,14 +190,14 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
         val project = context.module.project
         val first = OrderAnnotation.valueOf(siblings[0], project, context.scoutApi)
         val second = OrderAnnotation.valueOf(siblings[1], project, context.scoutApi)
-        val orderValue = org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.convertToJavaSource(org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.getNewViewOrderValue(first, second))
+        val orderValue = org.eclipse.scout.sdk.core.s.java.annotation.OrderAnnotation.convertToJavaSource(org.eclipse.scout.sdk.core.s.java.annotation.OrderAnnotation.getNewViewOrderValue(first, second))
         val orderAnnotationFqn = context.scoutApi.Order().fqn()
         return "@$orderAnnotationFqn($orderValue)"
     }
 
     private fun findOrderSiblings(): Array<PsiClass?> {
         val orderDefinitionType = templateDescriptor.orderDefinitionType()
-                ?: throw Ensure.newFail("Super class supports the Order annotation but no order annotation definition type has been specified.")
+            ?: throw Ensure.newFail("Super class supports the Order annotation but no order annotation definition type has been specified.")
         val candidates = context.declaringClass.innerClasses.filter { it.isInstanceOf(orderDefinitionType) }
 
         var prev: PsiClass? = null
@@ -211,7 +214,7 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
         if (!isClassIdSupported() || !ClassIds.isAutomaticallyCreateClassIdAnnotation()) {
             return null
         }
-        val classIdValue = Strings.toStringLiteral(ClassIds.next(context.declaringClass.qualifiedName)) ?: return null
+        val classIdValue = JavaUtils.toStringLiteral(ClassIds.next(context.declaringClass.qualifiedName)) ?: return null
         val classIdFqn = context.scoutApi.ClassId().fqn()
         return "@$classIdFqn($classIdValue)"
     }

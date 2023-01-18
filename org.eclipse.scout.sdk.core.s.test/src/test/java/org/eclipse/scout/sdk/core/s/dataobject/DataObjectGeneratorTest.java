@@ -9,16 +9,16 @@
  */
 package org.eclipse.scout.sdk.core.s.dataobject;
 
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFile;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertEqualsRefFile;
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertNoCompileErrors;
 
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.testing.apidef.ApiRequirement;
+import org.eclipse.scout.sdk.core.java.testing.apidef.EnabledFor;
+import org.eclipse.scout.sdk.core.java.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode.DataObjectNodeKind;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.apidef.ApiRequirement;
-import org.eclipse.scout.sdk.core.testing.apidef.EnabledFor;
-import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.junit.jupiter.api.Test;
 
 import dataobject.context.FixtureTypeVersions.SdkFixture_1_0_0_0;

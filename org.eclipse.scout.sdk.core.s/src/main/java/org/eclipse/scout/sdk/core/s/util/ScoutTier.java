@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.s.util;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 
 /**
  * <h3>{@link ScoutTier}</h3> Helper class to detect and convert scout tiers.

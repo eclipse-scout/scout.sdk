@@ -32,6 +32,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsUtils;
 import org.eclipse.scout.sdk.core.s.jaxws.WebServiceUpdateOperation;
@@ -40,7 +41,6 @@ import org.eclipse.scout.sdk.core.s.jaxws.WebServiceUpdateOperation.EntryPointDe
 import org.eclipse.scout.sdk.core.s.jaxws.WebServiceUpdateOperation.WebServiceClientUpdate;
 import org.eclipse.scout.sdk.core.s.jaxws.WebServiceUpdateOperation.WebServiceImplementationUpdate;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;

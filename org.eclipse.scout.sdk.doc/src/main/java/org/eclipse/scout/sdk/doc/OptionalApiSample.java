@@ -9,10 +9,10 @@
  */
 package org.eclipse.scout.sdk.doc;
 
-import org.eclipse.scout.sdk.core.apidef.Api;
-import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.java.apidef.Api;
+import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 
 @SuppressWarnings("MethodMayBeStatic")
 public class OptionalApiSample {

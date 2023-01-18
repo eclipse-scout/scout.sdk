@@ -16,8 +16,8 @@ import com.intellij.codeInspection.ProblemHighlightType
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiTypeParameter
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
-import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.isInstanceOf

@@ -14,7 +14,6 @@ import java.util.function.Function;
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.body.MethodBodyBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
@@ -50,9 +49,7 @@ public interface ISourceGenerator<BUILDER extends ISourceBuilder<?>> {
    *
    * @param fromGenericToSpecificBuilder
    *          The function to call when the passed generic {@link ISourceBuilder} needs to be converted to the specific
-   *          one this {@link ISourceGenerator} requires. Must not be {@code null}.<br>
-   *          Typically this is one of the #create methods of the specific source builders (e.g.
-   *          {@link MethodBodyBuilder#create(ISourceBuilder)}).
+   *          one this {@link ISourceGenerator} requires. Must not be {@code null}.
    * @return A generalized version of this {@link ISourceGenerator}.
    */
   default ISourceGenerator<ISourceBuilder<?>> generalize(Function<ISourceBuilder<?>, BUILDER> fromGenericToSpecificBuilder) {
@@ -64,9 +61,7 @@ public interface ISourceGenerator<BUILDER extends ISourceBuilder<?>> {
    *
    * @param fromGenericToSpecificBuilder
    *          The function to call when the passed generic {@link ISourceBuilder} needs to be converted to the specific
-   *          one this {@link ISourceGenerator} requires. Must not be {@code null}.<br>
-   *          Typically this is one of the #create methods of the specific source builders (e.g.
-   *          {@link MethodBodyBuilder#create(ISourceBuilder)}).
+   *          one this {@link ISourceGenerator} requires. Must not be {@code null}.
    * @param context
    *          The {@link IBuilderContext} to use during the generation process. Must not be {@code null}.
    * @return A {@link StringBuilder} holding the content of the created source.

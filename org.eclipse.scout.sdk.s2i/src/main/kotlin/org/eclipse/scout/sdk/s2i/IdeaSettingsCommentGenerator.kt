@@ -23,15 +23,15 @@ import com.maddyhome.idea.copyright.pattern.EntityUtil
 import com.maddyhome.idea.copyright.pattern.VelocityHelper
 import com.maddyhome.idea.copyright.util.FileTypeUtil
 import org.eclipse.scout.sdk.core.builder.IBuilderContext
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder
-import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder
-import org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi
-import org.eclipse.scout.sdk.core.builder.java.comment.JavaElementCommentBuilder
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator
-import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator
-import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator
+import org.eclipse.scout.sdk.core.java.builder.body.IMethodBodyBuilder
+import org.eclipse.scout.sdk.core.java.builder.comment.ICommentBuilder
+import org.eclipse.scout.sdk.core.java.builder.comment.IDefaultElementCommentGeneratorSpi
+import org.eclipse.scout.sdk.core.java.builder.comment.JavaElementCommentBuilder
+import org.eclipse.scout.sdk.core.java.generator.compilationunit.ICompilationUnitGenerator
+import org.eclipse.scout.sdk.core.java.generator.field.IFieldGenerator
+import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator
+import org.eclipse.scout.sdk.core.java.generator.type.ITypeGenerator
 import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
@@ -49,13 +49,13 @@ open class IdeaSettingsCommentGenerator : IDefaultElementCommentGeneratorSpi, St
 
     override fun createCompilationUnitComment(target: ICompilationUnitGenerator<*>): ISourceGenerator<ICommentBuilder<*>> {
         return ISourceGenerator {
-            val module: Module = it.context().properties().getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, Module::class.java) ?: return@ISourceGenerator
+            val module: Module = it.context().properties().getProperty(IBuilderContext.PROPERTY_MODULE, Module::class.java) ?: return@ISourceGenerator
             val project = module.project
             val fileTemplateManager = FileTemplateManager.getInstance(project)
             val copyrightManager = CopyrightManager.getInstance(project)
             val psiManager = PsiManager.getInstance(project)
 
-            val targetPath: Path? = it.context().properties().getProperty(IBuilderContext.PROPERTY_TARGET_PATH, Path::class.java)
+            val targetPath: Path = it.context().properties().getProperty(IBuilderContext.PROPERTY_TARGET_PATH, Path::class.java)
             val copyrightNotice = computeCopyrightNoticeFor(targetPath, psiManager, module, copyrightManager)
             val fileHeader = computeFileHeaderTemplateFor(target, fileTemplateManager)
 

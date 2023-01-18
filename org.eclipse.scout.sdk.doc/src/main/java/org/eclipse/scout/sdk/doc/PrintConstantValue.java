@@ -9,10 +9,10 @@
  */
 package org.eclipse.scout.sdk.doc;
 
-import org.eclipse.scout.sdk.core.ISourceFolders;
+import org.eclipse.scout.sdk.core.java.ISourceFolders;
+import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentWithEcjBuilder;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
 
 @SuppressWarnings({"MethodMayBeStatic", "UtilityClassWithoutPrivateConstructor", "squid:S1118"})
 public class PrintConstantValue {

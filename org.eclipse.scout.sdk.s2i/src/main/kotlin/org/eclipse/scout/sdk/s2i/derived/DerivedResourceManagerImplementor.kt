@@ -21,13 +21,13 @@ import com.intellij.psi.search.GlobalSearchScope.fileScope
 import com.intellij.psi.search.SearchScope
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.messages.MessageBusConnection
+import org.eclipse.scout.sdk.core.java.JavaTypes
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture
-import org.eclipse.scout.sdk.core.s.util.DelayedBuffer
-import org.eclipse.scout.sdk.core.util.JavaTypes
+import org.eclipse.scout.sdk.core.util.DelayedBuffer
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment

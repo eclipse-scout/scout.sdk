@@ -9,18 +9,18 @@
  */
 package org.eclipse.scout.sdk.core.s.dto;
 
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertAnnotation;
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldExist;
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldType;
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodExist;
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
+import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertAnnotation;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldExist;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertFieldType;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasFlags;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertHasSuperClass;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodExist;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertMethodReturnType;
-import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertTypeExists;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.junit.jupiter.api.Test;
 
 import formdata.client.ui.forms.AnnotationCopyTestForm;

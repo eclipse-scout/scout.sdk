@@ -11,7 +11,7 @@ package org.eclipse.scout.sdk.core.s.nls;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
-import static org.eclipse.scout.sdk.core.util.JavaTypes.simpleName;
+import static org.eclipse.scout.sdk.core.java.JavaTypes.simpleName;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 public final class TranslationTestsHelper {

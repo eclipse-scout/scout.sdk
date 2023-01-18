@@ -12,15 +12,13 @@ package org.eclipse.scout.sdk.s2i.environment.model
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.vfs.VirtualFile
-import org.eclipse.scout.sdk.core.model.ecj.ClasspathEntry
-import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcj
-import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi
+import org.eclipse.scout.sdk.core.java.ecj.ClasspathEntry
+import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentWithEcj
 import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.util.*
 
 
 open class JavaEnvironmentWithIdea(val module: Module) : JavaEnvironmentWithEcj(javaHomeOf(module), classpathOf(module), null) {
@@ -29,19 +27,19 @@ open class JavaEnvironmentWithIdea(val module: Module) : JavaEnvironmentWithEcj(
         protected fun javaHomeOf(module: Module): Path {
             val moduleRootManager = module.rootManager
             val sdkPath = moduleRootManager.sdk?.homePath
-                    ?: throw SdkException("Cannot find JRE in module '{}'.", module.name)
+                ?: throw SdkException("Cannot find JRE in module '{}'.", module.name)
             val sdkRoot = Paths.get(sdkPath)
             return arrayOf("jre", "jre64", "jbr")
-                    .map { sdkRoot.resolve(it) }
-                    .filter { Files.isDirectory(it) }
-                    .firstOrNull { Files.isReadable(it) } ?: sdkRoot
+                .map { sdkRoot.resolve(it) }
+                .filter { Files.isDirectory(it) }
+                .firstOrNull { Files.isReadable(it) } ?: sdkRoot
         }
 
         protected fun classpathOf(module: Module): Collection<ClasspathEntry> {
             val manager = module.rootManager
             val result = ArrayList<ClasspathEntry>()
-            manager.orderEntries().withoutSdk().allSourceRoots.mapNotNullTo(result) { toClasspathEntry(it, ClasspathSpi.MODE_SOURCE) }
-            manager.orderEntries().withoutSdk().allLibrariesAndSdkClassesRoots.mapNotNullTo(result) { toClasspathEntry(it, ClasspathSpi.MODE_BINARY) }
+            manager.orderEntries().withoutSdk().allSourceRoots.mapNotNullTo(result) { toClasspathEntry(it, org.eclipse.scout.sdk.core.java.model.spi.ClasspathSpi.MODE_SOURCE) }
+            manager.orderEntries().withoutSdk().allLibrariesAndSdkClassesRoots.mapNotNullTo(result) { toClasspathEntry(it, org.eclipse.scout.sdk.core.java.model.spi.ClasspathSpi.MODE_BINARY) }
             return result
         }
 

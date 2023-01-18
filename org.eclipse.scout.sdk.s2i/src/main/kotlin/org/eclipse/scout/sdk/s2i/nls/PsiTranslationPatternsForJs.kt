@@ -23,6 +23,7 @@ import com.intellij.patterns.StringPattern
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.util.ProcessingContext
+import org.eclipse.scout.sdk.core.java.JavaUtils
 import org.eclipse.scout.sdk.core.s.nls.Translations
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns.JsModelTextKeyPattern
 import org.eclipse.scout.sdk.core.util.Strings
@@ -47,8 +48,8 @@ object PsiTranslationPatternsForJs {
 
     private fun resolveConstant(element: PsiElement?): JSLiteralExpression? {
         val constant = (element as? PsiReference)
-                ?.takeIf { ANY_JS_PATTERN.accepts(it) }
-                ?.resolve() as? JSInitializerOwner
+            ?.takeIf { ANY_JS_PATTERN.accepts(it) }
+            ?.resolve() as? JSInitializerOwner
         val literal = constant?.initializer as? JSLiteralExpression
         return literal?.takeIf { it.isStringLiteral }
     }
@@ -60,7 +61,7 @@ object PsiTranslationPatternsForJs {
     private fun surroundedByIgnoringQuotes(prefix: CharSequence, suffix: CharSequence, unescape: Boolean): StringPattern {
         return string().with(object : PatternCondition<String>("surroundedBy=$prefix$suffix") {
             override fun accepts(str: String, context: ProcessingContext): Boolean {
-                val text = if (unescape) Strings.fromStringLiteral(str) else Strings.withoutQuotes(str)
+                val text = if (unescape) JavaUtils.fromStringLiteral(str) else Strings.withoutQuotes(str)
                 return Strings.startsWith(text, prefix) && Strings.endsWith(text, suffix)
             }
         })
@@ -81,8 +82,8 @@ object PsiTranslationPatternsForJs {
 
     private fun isJsCallArgument(qualifierName: String, functionName: String, argumentIndex: Int): ElementPattern<PsiElement> {
         return and(
-                jsArgument(functionName, argumentIndex),
-                psiElement().withSuperParent(2, jsCallExpression().with(MethodExpressionQualifier(qualifierName)))
+            jsArgument(functionName, argumentIndex),
+            psiElement().withSuperParent(2, jsCallExpression().with(MethodExpressionQualifier(qualifierName)))
         )
     }
 
@@ -96,13 +97,13 @@ object PsiTranslationPatternsForJs {
     class JsTranslationSpec(element: PsiElement) : TranslationLanguageSpec(element, Translations.DependencyScope.NODE, "'", PsiTranslationPatternsForJs::getTranslationKeyFromJs) {
 
         override fun decorateTranslationKey(nlsKey: String) =
-                if (TEXT_KEY_PATTERN.accepts(element) || TEXT_KEY_PATTERN.accepts(element.parent))
-                    JsModelTextKeyPattern.MODEL_TEXT_KEY_PREFIX + nlsKey + JsModelTextKeyPattern.MODEL_TEXT_KEY_SUFFIX
-                else
-                    nlsKey
+            if (TEXT_KEY_PATTERN.accepts(element) || TEXT_KEY_PATTERN.accepts(element.parent))
+                JsModelTextKeyPattern.MODEL_TEXT_KEY_PREFIX + nlsKey + JsModelTextKeyPattern.MODEL_TEXT_KEY_SUFFIX
+            else
+                nlsKey
 
         override fun createNewLiteral(text: String): PsiElement {
-            val literalValue = Strings.toStringLiteral(decorateTranslationKey(text), stringDelimiter, true).toString()
+            val literalValue = JavaUtils.toStringLiteral(decorateTranslationKey(text), stringDelimiter, true).toString()
             return JSPsiElementFactory.createJSExpression(literalValue, element)
         }
     }

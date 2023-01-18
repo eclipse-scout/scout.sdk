@@ -9,16 +9,16 @@
  */
 package org.eclipse.scout.sdk.doc;
 
-import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
-import org.eclipse.scout.sdk.core.generator.typeparam.TypeParameterGenerator;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.RunningJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.SdkAssertions;
-import org.eclipse.scout.sdk.core.testing.apidef.ApiRequirement;
-import org.eclipse.scout.sdk.core.testing.apidef.EnabledFor;
-import org.eclipse.scout.sdk.core.testing.context.DefaultCommentGeneratorExtension;
-import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentFactories.RunningJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.java.generator.method.MethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.java.generator.typeparam.TypeParameterGenerator;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions;
+import org.eclipse.scout.sdk.core.java.testing.apidef.ApiRequirement;
+import org.eclipse.scout.sdk.core.java.testing.apidef.EnabledFor;
+import org.eclipse.scout.sdk.core.java.testing.context.DefaultCommentGeneratorExtension;
+import org.eclipse.scout.sdk.core.java.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.doc.OptionalApiSample.IJavaApi;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,7 +42,7 @@ public class ExampleTest {
         .withMethod(MethodGenerator.create()
             .withReturnType(typeParamName)
             .withElementName("sequence"));
-    SdkAssertions.assertNoCompileErrors(javaEnvironment, generator); // <2>
+    SdkJavaAssertions.assertNoCompileErrors(javaEnvironment, generator); // <2>
   }
 }
 // end::exampleTest[]

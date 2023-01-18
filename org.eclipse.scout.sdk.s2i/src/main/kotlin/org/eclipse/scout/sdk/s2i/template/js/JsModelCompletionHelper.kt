@@ -36,6 +36,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.elementType
 import com.intellij.util.ThrowableRunnable
 import icons.JavaScriptPsiIcons
+import org.eclipse.scout.sdk.core.java.JavaUtils
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.containingModule
@@ -251,7 +252,7 @@ object JsModelCompletionHelper {
         if (TemplateImpl.INTERNAL_VARS_SET.contains(name)) {
             return
         }
-        val defaultValue = Strings.toStringLiteral(defaultValueProvider(name)).toString()
+        val defaultValue = JavaUtils.toStringLiteral(defaultValueProvider(name)).toString()
         target.addVariable(name, descriptor.expression, defaultValue, true)
     }
 

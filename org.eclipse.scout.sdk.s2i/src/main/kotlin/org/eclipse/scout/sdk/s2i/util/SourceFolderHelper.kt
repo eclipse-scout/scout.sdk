@@ -16,8 +16,8 @@ import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.roots.SourceFolder
 import com.intellij.openapi.vfs.VirtualFile
 import com.jetbrains.rd.util.first
-import org.eclipse.scout.sdk.core.ISourceFolders
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
+import org.eclipse.scout.sdk.core.java.ISourceFolders
+import org.eclipse.scout.sdk.core.java.model.api.IClasspathEntry
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders
 import org.eclipse.scout.sdk.core.s.util.ITier
 import org.eclipse.scout.sdk.core.s.util.TierTree

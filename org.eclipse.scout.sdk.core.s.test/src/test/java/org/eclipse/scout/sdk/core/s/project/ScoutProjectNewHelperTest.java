@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
-import org.eclipse.scout.sdk.core.apidef.Api;
-import org.eclipse.scout.sdk.core.apidef.ApiVersion;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.java.apidef.Api;
+import org.eclipse.scout.sdk.core.java.apidef.ApiVersion;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

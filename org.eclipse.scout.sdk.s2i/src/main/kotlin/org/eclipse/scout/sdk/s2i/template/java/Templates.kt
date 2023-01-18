@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.s2i.template.java
 import com.intellij.psi.PsiClass
 import com.intellij.psi.util.InheritanceUtil
 import com.intellij.util.containers.ContainerUtil.emptyList
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
-import org.eclipse.scout.sdk.core.s.apidef.ScoutModelHierarchy
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutModelHierarchy
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 
 object Templates {

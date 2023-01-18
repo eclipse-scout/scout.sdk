@@ -13,11 +13,11 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.sdk.core.ISourceFolders;
+import org.eclipse.scout.sdk.core.java.ISourceFolders;
+import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentWithEcjBuilder;
+import org.eclipse.scout.sdk.core.java.model.annotation.GeneratedAnnotation;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.annotation.GeneratedAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcjBuilder;
 
 @SuppressWarnings({"MethodMayBeStatic"})
 public class PrintAnnotationElementValues {

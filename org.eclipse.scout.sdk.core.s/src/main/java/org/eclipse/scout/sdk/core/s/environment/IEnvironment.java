@@ -13,18 +13,18 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.ISourceFolders;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
-import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
-import org.eclipse.scout.sdk.core.model.api.IJavaElement;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.java.ISourceFolders;
+import org.eclipse.scout.sdk.core.java.builder.IJavaBuilderContext;
+import org.eclipse.scout.sdk.core.java.generator.IJavaElementGenerator;
+import org.eclipse.scout.sdk.core.java.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.java.model.api.IClasspathEntry;
+import org.eclipse.scout.sdk.core.java.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
 
 /**
@@ -101,7 +101,7 @@ public interface IEnvironment extends AutoCloseable {
    *          The source folder in which the new Java file should be created. Must not be {@code null}.
    *          {@link IClasspathEntry#isSourceFolder()} must be {@code true}.
    * @param progress
-   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          The {@link IProgress} monitor. Typically, a {@link IProgress#newChild(int)} should be passed to this
    *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
    *          argument. May be {@code null} if no progress indication is required.
    * @return The created {@link IType} within the specified {@link ICompilationUnitGenerator} that has the same
@@ -132,7 +132,7 @@ public interface IEnvironment extends AutoCloseable {
    *          The source folder in which the new Java file should be created. Must not be {@code null}.
    *          {@link IClasspathEntry#isSourceFolder()} must be {@code true}.
    * @param progress
-   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          The {@link IProgress} monitor. Typically, a {@link IProgress#newChild(int)} should be passed to this
    *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
    *          argument. May be {@code null} if no progress indication is required.
    * @return An {@link IFuture} that can be used to access the created {@link IType} within the specified
@@ -153,7 +153,7 @@ public interface IEnvironment extends AutoCloseable {
    *          The existing {@link ICompilationUnit} that should be overwritten. It must not be {@code null} and must be
    *          a non {@link ICompilationUnit#isSynthetic() synthetic} compilation unit stored in a source folder.
    * @param progress
-   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          The {@link IProgress} monitor. Typically, a {@link IProgress#newChild(int)} should be passed to this
    *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
    *          argument. May be {@code null} if no progress indication is required.
    * @return The updated main {@link IType} within the specified {@link ICompilationUnit}.
@@ -178,7 +178,7 @@ public interface IEnvironment extends AutoCloseable {
    *          The existing {@link ICompilationUnit} that should be overwritten. It must not be {@code null} and must be
    *          a non {@link ICompilationUnit#isSynthetic() synthetic} compilation unit stored in a source folder.
    * @param progress
-   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          The {@link IProgress} monitor. Typically, a {@link IProgress#newChild(int)} should be passed to this
    *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
    *          argument. May be {@code null} if no progress indication is required.
    * @return The updated main {@link IType} within the specified {@link ICompilationUnit}.
@@ -199,7 +199,7 @@ public interface IEnvironment extends AutoCloseable {
    *          The file {@link Path} relative to the source folder in which the compilation unit should be created. e.g.
    *          {@code org/eclipse/scout/MyClass.java}.
    * @param progress
-   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          The {@link IProgress} monitor. Typically, a {@link IProgress#newChild(int)} should be passed to this
    *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
    *          argument. May be {@code null} if no progress indication is required.
    * @return The created main {@link IType} within the specified file.
@@ -227,7 +227,7 @@ public interface IEnvironment extends AutoCloseable {
    *          The file {@link Path} relative to the source folder in which the compilation unit should be created. e.g.
    *          {@code org/eclipse/scout/MyClass.java}.
    * @param progress
-   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          The {@link IProgress} monitor. Typically, a {@link IProgress#newChild(int)} should be passed to this
    *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
    *          argument. May be {@code null} if no progress indication is required.
    * @return The created main {@link IType} within the specified file.
@@ -260,7 +260,7 @@ public interface IEnvironment extends AutoCloseable {
    * @param filePath
    *          The absolute path to the file to write. Must not be {@code null}.
    * @param progress
-   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          The {@link IProgress} monitor. Typically, a {@link IProgress#newChild(int)} should be passed to this
    *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
    *          argument. May be {@code null} if no progress indication is required.
    * @throws RuntimeException
@@ -277,7 +277,7 @@ public interface IEnvironment extends AutoCloseable {
    * @param filePath
    *          The absolute path to the file to write. Must not be {@code null}.
    * @param progress
-   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          The {@link IProgress} monitor. Typically, a {@link IProgress#newChild(int)} should be passed to this
    *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
    *          argument. May be {@code null} if no progress indication is required.
    * @throws RuntimeException
@@ -305,7 +305,7 @@ public interface IEnvironment extends AutoCloseable {
    * @param filePath
    *          The absolute path to the file to write. Must not be {@code null}.
    * @param progress
-   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          The {@link IProgress} monitor. Typically, a {@link IProgress#newChild(int)} should be passed to this
    *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
    *          argument. May be {@code null} if no progress indication is required.
    * @return An {@link IFuture} that can be used to wait until the file has been written. If there was an exception
@@ -333,7 +333,7 @@ public interface IEnvironment extends AutoCloseable {
    * @param filePath
    *          The absolute path to the file to write. Must not be {@code null}.
    * @param progress
-   *          The {@link IProgress} monitor. Typically a {@link IProgress#newChild(int)} should be passed to this
+   *          The {@link IProgress} monitor. Typically, a {@link IProgress#newChild(int)} should be passed to this
    *          method. The write operation will call {@link IProgress#init(int, CharSequence, Object...)} on the
    *          argument. May be {@code null} if no progress indication is required.
    * @return An {@link IFuture} that can be used to wait until the file has been written. If there was an exception

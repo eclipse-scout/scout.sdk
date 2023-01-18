@@ -24,7 +24,7 @@ import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBRadioButton
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.ui.JBUI
-import org.eclipse.scout.sdk.core.apidef.ApiVersion
+import org.eclipse.scout.sdk.core.java.apidef.ApiVersion
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants

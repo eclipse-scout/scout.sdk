@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.s.dto;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
 import static org.eclipse.scout.sdk.core.testing.SdkAssertions.assertEqualsRefFile;
 
-import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.junit.jupiter.api.Test;
 
 import formdata.client.ui.forms.SimpleForm;

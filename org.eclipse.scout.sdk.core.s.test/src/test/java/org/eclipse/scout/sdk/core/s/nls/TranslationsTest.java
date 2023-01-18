@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.junit.jupiter.api.Test;
 
 public class TranslationsTest {

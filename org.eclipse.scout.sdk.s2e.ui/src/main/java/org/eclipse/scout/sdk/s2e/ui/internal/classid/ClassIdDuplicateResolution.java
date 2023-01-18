@@ -18,7 +18,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
-import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
+import org.eclipse.scout.sdk.core.s.java.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.environment.EclipseProgress;

@@ -13,7 +13,6 @@ import static org.eclipse.scout.sdk.core.util.CoreUtils.extensionOf;
 import static org.eclipse.scout.sdk.core.util.CoreUtils.getParentURI;
 import static org.eclipse.scout.sdk.core.util.CoreUtils.isDoubleDifferent;
 import static org.eclipse.scout.sdk.core.util.CoreUtils.relativizeURI;
-import static org.eclipse.scout.sdk.core.util.CoreUtils.removeComments;
 import static org.eclipse.scout.sdk.core.util.CoreUtils.toStringIfOverwritten;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -100,18 +99,6 @@ public class CoreUtilsTest {
     assertEquals(new URI("one/two/three/"), getParentURI(new URI("one/two/three/file.ext")));
     assertEquals(new URI(""), getParentURI(new URI("one")));
     assertEquals(new URI(""), getParentURI(new URI("one/")));
-  }
-
-  @Test
-  public void testRemoveComments() {
-    assertEquals("  ", removeComments("  "));
-    assertNull(removeComments(null));
-    assertEquals("first\nsecond", removeComments("first\n/* comment \n multi line \n */second"));
-    assertEquals("first\nsecond", removeComments("first\n/* comment \n * multi line \n */second"));
-    assertEquals("first second", removeComments("first /* comment \n multi line \n */second"));
-    assertEquals("first\n\nsecond", removeComments("first\n/* comment \n multi line \n */\nsecond"));
-    assertEquals("first\n \nsecond", removeComments("first\n// comment single line \n \nsecond"));
-    assertEquals("first\n second", removeComments("first\n// comment single line \n second"));
   }
 
   @Test

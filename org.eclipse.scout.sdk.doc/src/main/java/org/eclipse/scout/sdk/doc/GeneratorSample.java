@@ -17,22 +17,22 @@ import java.util.AbstractList;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
-import org.eclipse.scout.sdk.core.builder.java.JavaSourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
-import org.eclipse.scout.sdk.core.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
-import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
-import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.method.MethodOverrideGenerator;
-import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
-import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.builder.JavaBuilderContext;
+import org.eclipse.scout.sdk.core.java.builder.JavaSourceBuilder;
+import org.eclipse.scout.sdk.core.java.builder.body.IMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.java.generator.IJavaElementGenerator;
+import org.eclipse.scout.sdk.core.java.generator.annotation.AnnotationGenerator;
+import org.eclipse.scout.sdk.core.java.generator.field.FieldGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.MethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.MethodOverrideGenerator;
+import org.eclipse.scout.sdk.core.java.generator.methodparam.MethodParameterGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 @SuppressWarnings({"MethodMayBeStatic"})
 public class GeneratorSample {

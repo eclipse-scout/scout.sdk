@@ -33,10 +33,10 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.scout.sdk.core.java.ecj.ClasspathEntry;
+import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentWithEcj;
+import org.eclipse.scout.sdk.core.java.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.ecj.ClasspathEntry;
-import org.eclipse.scout.sdk.core.model.ecj.JavaEnvironmentWithEcj;
-import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -87,7 +87,7 @@ public class JavaEnvironmentWithJdt extends JavaEnvironmentWithEcj {
         if (javaInstallLocation != null) {
           var javaInstallPath = javaInstallLocation.toPath();
           if (Files.isDirectory(javaInstallPath.resolve("jre/lib"))) {
-            // the install location points to a JDK that contains a JRE! Use the JRE as Java home
+            // the installation location points to a JDK that contains a JRE! Use the JRE as Java home
             return javaInstallPath.resolve("jre");
           }
           return javaInstallPath;

@@ -10,9 +10,9 @@
 package org.eclipse.scout.sdk.s2i.util
 
 import com.intellij.openapi.module.Module
-import org.eclipse.scout.sdk.core.apidef.IApiSpecification
+import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification
+import org.eclipse.scout.sdk.core.java.apidef.OptApiFunction
 import org.eclipse.scout.sdk.core.s.util.ITier
-import org.eclipse.scout.sdk.core.apidef.OptApiFunction
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.findTypeByName
 import java.util.*

@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.s2i.classid
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiAnnotation
 import com.intellij.psi.PsiClass
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.AbstractClassAnnotation

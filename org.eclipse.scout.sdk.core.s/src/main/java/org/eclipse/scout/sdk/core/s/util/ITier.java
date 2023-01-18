@@ -12,10 +12,10 @@ package org.eclipse.scout.sdk.core.s.util;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.OptApiFunction;
-import org.eclipse.scout.sdk.core.model.api.IJavaElement;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.java.apidef.OptApiFunction;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 public interface ITier<A extends IApiSpecification> extends Predicate<IJavaElement> {

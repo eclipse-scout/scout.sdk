@@ -11,9 +11,10 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" />
     <orderEntry type="library" name="Maven: wsdl4j:wsdl4j:1.6.2" level="project" />
-    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.ecj" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.ecj" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.launching:3.19.700" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.resources:3.18.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core:3.31.0" level="project" />

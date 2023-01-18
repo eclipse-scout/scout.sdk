@@ -54,7 +54,7 @@ public final class Strings {
   }
 
   /**
-   * Checks if the two arrays have the same content comparing the character case sensitive.
+   * Checks if the two arrays have the same content comparing the character case-sensitive.
    *
    * <pre>
    *   first=null & second=null -> true
@@ -98,7 +98,7 @@ public final class Strings {
    * @param second
    *          The second array
    * @param isCaseSensitive
-   *          specifies whether or not the equality should be case sensitive
+   *          specifies whether the equality should be case-sensitive
    * @return {@code true} if the two arrays are identical character by character according to the value of
    *         isCaseSensitive or if both are {@code null}.
    */
@@ -126,7 +126,7 @@ public final class Strings {
   }
 
   /**
-   * Checks if the two {@link CharSequence}s have the same content comparing the character case sensitive.
+   * Checks if the two {@link CharSequence}s have the same content comparing the character case-sensitive.
    *
    * <pre>
    *   first=null & second=null -> true
@@ -169,7 +169,7 @@ public final class Strings {
    * @param second
    *          The second {@link CharSequence}
    * @param isCaseSensitive
-   *          specifies whether or not the equality should be case sensitive
+   *          specifies whether the equality should be case-sensitive
    * @return {@code true} if the two sequences are identical character by character according to the value of
    *         isCaseSensitive or if both are {@code null}.
    */
@@ -355,14 +355,14 @@ public final class Strings {
   }
 
   /**
-   * Like {@link #indexOf(char[], char[], int, int, boolean)} but performs a case sensitive search in the full array.
+   * Like {@link #indexOf(char[], char[], int, int, boolean)} but performs a case-sensitive search in the full array.
    */
   public static int indexOf(char[] toBeFound, char[] searchIn) {
     return indexOf(toBeFound, searchIn, 0);
   }
 
   /**
-   * Like {@link #indexOf(char[], char[], int, int, boolean)} but performs a case sensitive search from the given start
+   * Like {@link #indexOf(char[], char[], int, int, boolean)} but performs a case-sensitive search from the given start
    * (inclusive) to the end of the array.
    */
   public static int indexOf(char[] toBeFound, char[] searchIn, int start) {
@@ -370,7 +370,7 @@ public final class Strings {
   }
 
   /**
-   * Like {@link #indexOf(char[], char[], int, int, boolean)} but performs a case sensitive search.
+   * Like {@link #indexOf(char[], char[], int, int, boolean)} but performs a case-sensitive search.
    */
   public static int indexOf(char[] toBeFound, char[] searchIn, int start, int end) {
     return indexOf(toBeFound, searchIn, start, end, true);
@@ -419,7 +419,7 @@ public final class Strings {
    * @param end
    *          the end index (exclusive) describing where in searchIn to stop searching.
    * @param isCaseSensitive
-   *          describes if the comparation should be case sensitive or not.
+   *          describes if the comparison should be case-sensitive or not.
    * @return the first index in searchIn for which the toBeFound array is a matching followup array or -1 if it cannot
    *         be found.
    * @throws NullPointerException
@@ -433,6 +433,7 @@ public final class Strings {
     if (toBeFoundLength == 0) {
       return 0;
     }
+    //noinspection IfStatementWithIdenticalBranches
     if (isCaseSensitive) {
       arrayLoop: for (int i = start, max = end - toBeFoundLength + 1; i < max; i++) {
         if (searchIn[i] == toBeFound[0]) {
@@ -873,230 +874,6 @@ public final class Strings {
   }
 
   /**
-   * Converts the given input string literal into the representing original string.<br>
-   * Escaped character sequences e.g. {@code "\n"} are un-escaped and results in e.g. a new-line character.<br>
-   * Leading and trailing single-quotes, double-quotes and backticks are removed. <br>
-   * This is the inverse function of {@link #toStringLiteral(CharSequence)}.
-   * <p>
-   * Example:
-   * 
-   * <pre>
-   *     A string with the following content (quotes are content of the string):
-   *     "line 1\nline2" 
-   *     is converted to:
-   *     line 1
-   *     line 2
-   * </pre>
-   *
-   * @param literal
-   *          The literal with optional leading and ending quotes (single, double or backtick) or {@code null}.
-   * @return the un-escaped string or {@code null} if the input is {@code null}.
-   */
-  @SuppressWarnings({"HardcodedLineSeparator", "squid:ForLoopCounterChangedCheck"})
-  public static CharSequence fromStringLiteral(CharSequence literal) {
-    if (literal == null) {
-      return null;
-    }
-    var s = withoutQuotes(literal);
-    var length = s.length();
-    var buffer = new StringBuilder(length);
-    var escaped = false;
-    for (var idx = 0; idx < length; idx++) {
-      var ch = s.charAt(idx);
-      if (!escaped) {
-        if (ch == '\\') {
-          escaped = true;
-        }
-        else {
-          buffer.append(ch);
-        }
-      }
-      else {
-        var octalEscapeMaxLength = 2;
-        switch (ch) {
-          case 'n':
-            buffer.append('\n');
-            break;
-          case 'r':
-            buffer.append('\r');
-            break;
-          case 'b':
-            buffer.append('\b');
-            break;
-          case 't':
-            buffer.append('\t');
-            break;
-          case 'f':
-            buffer.append('\f');
-            break;
-          case '\'':
-            buffer.append('\'');
-            break;
-          case '\"':
-            buffer.append('\"');
-            break;
-          case '\\':
-            buffer.append('\\');
-            break;
-          case 'u':
-            if (idx + 4 < length) {
-              try {
-                var code = Integer.parseInt(s, idx + 1, idx + 5, 16);
-                //noinspection AssignmentToForLoopParameter
-                idx += 4;
-                //noinspection NumericCastThatLosesPrecision
-                buffer.append((char) code);
-              }
-              catch (NumberFormatException e) {
-                buffer.append("\\u");
-              }
-            }
-            else {
-              buffer.append("\\u");
-            }
-            break;
-          case '0':
-          case '1':
-          case '2':
-          case '3':
-            octalEscapeMaxLength = 3;
-            //noinspection fallthrough
-          case '4':
-          case '5':
-          case '6':
-          case '7':
-            var escapeEnd = idx + 1;
-            while (escapeEnd < length && escapeEnd < idx + octalEscapeMaxLength && isOctalDigit(s.charAt(escapeEnd))) {
-              escapeEnd++;
-            }
-            try {
-              //noinspection NumericCastThatLosesPrecision
-              buffer.append((char) Integer.parseInt(s, idx, escapeEnd, 8));
-            }
-            catch (NumberFormatException e) {
-              throw new IllegalStateException("Couldn't parse " + s.subSequence(idx, escapeEnd), e); // shouldn't happen
-            }
-            //noinspection AssignmentToForLoopParameter
-            idx = escapeEnd - 1;
-            break;
-          default:
-            buffer.append(ch);
-            break;
-        }
-        escaped = false;
-      }
-    }
-    if (escaped) {
-      buffer.append('\\');
-    }
-    return buffer;
-  }
-
-  private static boolean isOctalDigit(char c) {
-    //noinspection CharacterComparison
-    return '0' <= c && c <= '7';
-  }
-
-  /**
-   * Converts the given {@link CharSequence} into a string literal with leading and ending double-quotes including
-   * escaping of the given string content.<br>
-   * This is the inverse function of {@link #fromStringLiteral(CharSequence)}.
-   * <p>
-   * Example:
-   * 
-   * <pre>
-   *         A string with the following content:
-   *         >line 1
-   *         line 2<
-   *         is converted to  (quotes are content of the string):
-   *         >"line 1\nline 2"<
-   * </pre>
-   * 
-   * @param s
-   *          the string to convert or {@code null}.
-   * @return the literal string ready to be directly inserted into Java source or {@code null} if the input string is
-   *         {@code null}.
-   */
-  public static CharSequence toStringLiteral(CharSequence s) {
-    return toStringLiteral(s, "\"", true);
-  }
-
-  /**
-   * Converts the given {@link CharSequence} into a string literal including escaping of the given string content.
-   * Optionally the resulting {@link CharSequence} is surrounded with the string delimiter.<br>
-   * This is the inverse function of {@link #fromStringLiteral(CharSequence)}.
-   * 
-   * @param s
-   *          the string to convert or {@code null}.
-   * @param stringDelimiter
-   *          The string delimiter (e.g. " or '). The corresponding character will be escaped.
-   * @param surroundWithStringDelimiter
-   *          Specifies if the resulting {@link CharSequence} should be surrounded with the stringDelimiter given.
-   * @return the literal string or {@code null} if the input string is {@code null}.
-   */
-  @SuppressWarnings({"HardcodedLineSeparator", "squid:S881" /* -- operators should not be mixed with other operators */})
-  public static CharSequence toStringLiteral(CharSequence s, CharSequence stringDelimiter, boolean surroundWithStringDelimiter) {
-    if (s == null) {
-      return null;
-    }
-    var length = s.length();
-    var buffer = new StringBuilder(length * 2);
-    if (surroundWithStringDelimiter && stringDelimiter != null) {
-      buffer.append(stringDelimiter); // opening delimiter
-    }
-    for (var idx = 0; idx < length; idx++) {
-      var ch = s.charAt(idx);
-      switch (ch) {
-        case '\b':
-          buffer.append("\\b");
-          break;
-        case '\t':
-          buffer.append("\\t");
-          break;
-        case '\n':
-          buffer.append("\\n");
-          break;
-        case '\f':
-          buffer.append("\\f");
-          break;
-        case '\r':
-          buffer.append("\\r");
-          break;
-        default:
-          if (ch == '\\') {
-            buffer.append("\\\\");
-          }
-          else if (stringDelimiter != null && indexOf(ch, stringDelimiter) > -1) {
-            buffer.append("\\").append(ch);
-          }
-          else if (!isPrintableUnicode(ch)) {
-            var hexCode = Integer.toHexString(ch).toUpperCase(Locale.US);
-            buffer.append("\\u");
-            var paddingCount = 4 - hexCode.length();
-            while (paddingCount-- > 0) {
-              buffer.append(0);
-            }
-            buffer.append(hexCode);
-          }
-          else {
-            buffer.append(ch);
-          }
-      }
-    }
-    if (surroundWithStringDelimiter && stringDelimiter != null) {
-      buffer.append(stringDelimiter); // closing delimiter
-    }
-    return buffer;
-  }
-
-  @SuppressWarnings("squid:S1067") // Reduce the number of conditional operators
-  private static boolean isPrintableUnicode(char c) {
-    var t = Character.getType(c);
-    return t != Character.UNASSIGNED && t != Character.LINE_SEPARATOR && t != Character.PARAGRAPH_SEPARATOR
-        && t != Character.CONTROL && t != Character.FORMAT && t != Character.PRIVATE_USE && t != Character.SURROGATE;
-  }
-
-  /**
    * Removes leading or trailing double quotes ("), single quotes (') or back ticks (`) from the input.
    *
    * @param literal
@@ -1109,7 +886,7 @@ public final class Strings {
 
   /**
    * Removes leading and trailing quotes (if existing) from the literal given.<br>
-   * Only the first quotes are removed. If there are nested quotes, the are part of the result.
+   * Only the first quotes are removed. If there are nested quotes, they are part of the result.
    *
    * @param literal
    *          The literal from which the quotes should be removed.
@@ -1149,7 +926,7 @@ public final class Strings {
    * @param name
    *          The name to handle.
    * @return null if the input is null, an empty string if the given string is empty or only contains white spaces.
-   *         Otherwise the input string is returned with the first character modified to upper case.
+   *         Otherwise, the input string is returned with the first character modified to upper case.
    */
   public static CharSequence capitalize(CharSequence name) {
     if (isEmpty(name) || Character.isUpperCase(name.charAt(0))) {
@@ -1175,7 +952,7 @@ public final class Strings {
   }
 
   /**
-   * Ensures the given names all start with an lower case character.<br>
+   * Ensures the given names all start with a lower case character.<br>
    *
    * @param names
    *          The names to handle.
@@ -1287,7 +1064,7 @@ public final class Strings {
 
     var start = 0;
 
-    // get a good guess on the size of the result buffer so it doesn't have to double if it goes over a bit
+    // get a good guess on the size of the result buffer, so it doesn't have to double if it goes over a bit
     var increase = getLengthIncreaseGuess(text, searchList, replacementList);
     var result = new StringBuilder(text.length() + increase);
     while (textIndex != INDEX_NOT_FOUND) {
@@ -1520,7 +1297,7 @@ public final class Strings {
   }
 
   /**
-   * Tests if the string specified ends with the specified suffix (case sensitive).
+   * Tests if the string specified ends with the specified suffix (case-sensitive).
    *
    * @param string
    *          The {@link CharSequence}, may be {@code null}.
@@ -1602,7 +1379,7 @@ public final class Strings {
    * @param value
    *          The {@link CharSequence} to wrap
    * @return If the given {@link CharSequence} is neither {@code null} nor of length zero, an {@link Optional} holding
-   *         the value. Otherwise an empty {@link Optional} is returned.
+   *         the value. Otherwise, an empty {@link Optional} is returned.
    * @see #isEmpty(CharSequence)
    */
   public static <T extends CharSequence> Optional<T> notEmpty(T value) {
@@ -1618,7 +1395,7 @@ public final class Strings {
    * @param value
    *          The {@link CharSequence} to wrap
    * @return An {@link Optional} holding the value if the given {@link CharSequence} contains visible characters.
-   *         Otherwise an empty {@link Optional} is returned.
+   *         Otherwise, an empty {@link Optional} is returned.
    * @see #isBlank(CharSequence)
    */
   public static <T extends CharSequence> Optional<T> notBlank(T value) {
@@ -1719,13 +1496,13 @@ public final class Strings {
   }
 
   /**
-   * Removes the given suffix from the given string. If the given string does not end with given suffix (case
-   * sensitive), the string is returned unchanged.
+   * Removes the given suffix from the given string. If the given string does not end with given suffix
+   * (case-sensitive), the string is returned unchanged.
    *
    * @param string
    *          The string in which the suffix should be removed. May be {@code null}, then {@code null} is returned.
    * @param suffix
-   *          The suffix to remove (case sensitive) or {@code null} if nothing should be removed.
+   *          The suffix to remove (case-sensitive) or {@code null} if nothing should be removed.
    * @return The string with the suffix removed.
    */
   public static String removeSuffix(String string, CharSequence suffix) {
@@ -1741,7 +1518,7 @@ public final class Strings {
    * @param suffix
    *          The suffix to remove or {@code null} if nothing should be removed.
    * @param isCaseSensitive
-   *          Specifies if the suffix should match case sensitive or not.
+   *          Specifies if the suffix should match case-sensitive or not.
    * @return The string with the suffix removed.
    */
   public static String removeSuffix(String string, CharSequence suffix, boolean isCaseSensitive) {
@@ -1752,13 +1529,13 @@ public final class Strings {
   }
 
   /**
-   * Removes the given prefix from the given string. If the given string does not start with given prefix (case
-   * sensitive), the string is returned unchanged.
+   * Removes the given prefix from the given string. If the given string does not start with given prefix
+   * (case-sensitive), the string is returned unchanged.
    *
    * @param string
    *          The string in which the prefix should be removed. May be {@code null}, then {@code null} is returned.
    * @param prefix
-   *          The prefix to remove (case sensitive) or {@code null} if nothing should be removed.
+   *          The prefix to remove (case-sensitive) or {@code null} if nothing should be removed.
    * @return The string with the prefix removed.
    */
   public static String removePrefix(String string, CharSequence prefix) {
@@ -1774,7 +1551,7 @@ public final class Strings {
    * @param prefix
    *          The prefix to remove or {@code null} if nothing should be removed.
    * @param isCaseSensitive
-   *          Specifies if the prefix should match case sensitive or not.
+   *          Specifies if the prefix should match case-sensitive or not.
    * @return The string with the prefix removed.
    */
   public static String removePrefix(String string, CharSequence prefix, boolean isCaseSensitive) {

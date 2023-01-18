@@ -18,7 +18,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.pom.java.LanguageLevel
-import org.eclipse.scout.sdk.core.s.apidef.ScoutApi
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
 
 class PostfixCompletionInstaller : StartupActivity, DumbAware {
     override fun runActivity(project: Project) {

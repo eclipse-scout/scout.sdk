@@ -53,7 +53,7 @@ public class SourceCollector<T extends ISourceGenerator<ISourceBuilder<?>>> impl
       m_appender = (a, b) -> target.append(b);
     }
 
-    m_finisher = identity(); // by default we don't want any finisher. Only after we had the first item we want to print a suffix
+    m_finisher = identity(); // by default, we don't want any finisher. Only after we had the first item we want to print a suffix
     if (hasSuffix) {
       m_characteristics = emptySet();
     }

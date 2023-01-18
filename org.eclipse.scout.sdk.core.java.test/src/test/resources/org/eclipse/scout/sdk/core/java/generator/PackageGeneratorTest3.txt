@@ -1,0 +1,6 @@
+// single line comment
+@PackageAnnotation(testAttrib = "changedValue")
+package other.container;
+
+import org.eclipse.scout.sdk.core.java.fixture.sub.PackageAnnotation;
+

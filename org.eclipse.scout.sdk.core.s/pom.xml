@@ -19,14 +19,13 @@
   </parent>
 
   <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
-  <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.scout.sdk.core</artifactId>
+      <artifactId>org.eclipse.scout.sdk.core.java</artifactId>
     </dependency>
     <!-- for WSDL parsing (JAX-WS) -->
     <dependency>

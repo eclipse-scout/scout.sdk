@@ -9,8 +9,8 @@
  */
 package org.eclipse.scout.sdk.doc;
 
-import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.MethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.doc.OptionalApiSample.IJavaApi;
 
 public final class GeneratorWithApiSample {

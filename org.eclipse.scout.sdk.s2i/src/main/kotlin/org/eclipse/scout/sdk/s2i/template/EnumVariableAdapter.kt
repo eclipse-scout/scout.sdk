@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.template
 
-import org.eclipse.scout.sdk.core.util.Strings
+import org.eclipse.scout.sdk.core.java.JavaUtils
 
 open class EnumVariableAdapter<C>(val name: String, val enumMacroName: CharSequence? = null, val optionsSupplier: (C) -> Iterable<CharSequence>) : (C) -> VariableDescriptor? {
 
@@ -17,9 +17,9 @@ open class EnumVariableAdapter<C>(val name: String, val enumMacroName: CharSeque
 
     override fun invoke(context: C): VariableDescriptor {
         val options = optionsSupplier(context)
-        val defaultValue = Strings.toStringLiteral(options.firstOrNull())?.toString() ?: ""
+        val defaultValue = JavaUtils.toStringLiteral(options.firstOrNull())?.toString() ?: ""
         return VariableDescriptor(name, toEnum(options, enumMacroName ?: "enum"), defaultValue)
     }
 
-    protected fun toEnum(options: Iterable<CharSequence>, enumMacroName: CharSequence) = options.joinToString(", ", "$enumMacroName(", ")") { Strings.toStringLiteral(it) }
+    protected fun toEnum(options: Iterable<CharSequence>, enumMacroName: CharSequence) = options.joinToString(", ", "$enumMacroName(", ")") { JavaUtils.toStringLiteral(it) }
 }

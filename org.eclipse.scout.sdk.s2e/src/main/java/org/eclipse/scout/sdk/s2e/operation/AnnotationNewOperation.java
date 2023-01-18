@@ -26,18 +26,18 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
-import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
-import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext;
-import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
-import org.eclipse.scout.sdk.core.imports.CompilationUnitScopedImportCollector;
-import org.eclipse.scout.sdk.core.imports.IImportCollector;
-import org.eclipse.scout.sdk.core.imports.IImportValidator;
-import org.eclipse.scout.sdk.core.imports.ImportCollector;
-import org.eclipse.scout.sdk.core.imports.ImportValidator;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.JavaUtils;
+import org.eclipse.scout.sdk.core.java.builder.IJavaBuilderContext;
+import org.eclipse.scout.sdk.core.java.builder.JavaBuilderContext;
+import org.eclipse.scout.sdk.core.java.generator.annotation.IAnnotationGenerator;
+import org.eclipse.scout.sdk.core.java.imports.CompilationUnitScopedImportCollector;
+import org.eclipse.scout.sdk.core.java.imports.IImportCollector;
+import org.eclipse.scout.sdk.core.java.imports.IImportValidator;
+import org.eclipse.scout.sdk.core.java.imports.ImportCollector;
+import org.eclipse.scout.sdk.core.java.imports.ImportValidator;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
@@ -106,7 +106,7 @@ public class AnnotationNewOperation implements BiConsumer<EclipseEnvironment, Ec
     while (lineInfo.getOffset() >= lastLineStart) {
       var lineSource = sourceDocument.get(lineInfo.getOffset(), lineInfo.getLength());
       if (lineSource != null) {
-        lineSource = Strings.trim(CoreUtils.removeComments(lineSource)).toString();
+        lineSource = Strings.trim(JavaUtils.removeComments(lineSource)).toString();
         if (!lineSource.isEmpty()) {
           if (!isInBlockComment && lineSource.endsWith("*/")) {
             isInBlockComment = true;

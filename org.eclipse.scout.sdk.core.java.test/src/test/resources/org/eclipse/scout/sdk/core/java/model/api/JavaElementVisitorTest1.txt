@@ -1,0 +1,62 @@
+ChildClass.java 0 {
+  org.eclipse.scout.sdk.core.java.fixture 0 {
+  }
+  IOException 1 {
+  }
+  Serializable 2 {
+  }
+  AbstractList 3 {
+  }
+  HashMap 4 {
+  }
+  List 5 {
+  }
+  Set 6 {
+  }
+  ChildClass 7 {
+    TestAnnotation 0 {
+      values 0 {
+      }
+      en 1 {
+      }
+      inner 2 {
+      }
+    }
+    X 1 {
+    }
+    myString 2 {
+    }
+    m_test 3 {
+      TestAnnotation 0 {
+        values 0 {
+        }
+        en 1 {
+        }
+        inner 2 {
+        }
+      }
+    }
+    ChildClass 4 {
+    }
+    methodInChildClass 5 {
+      TestAnnotation 0 {
+        values 0 {
+        }
+        en 1 {
+        }
+        inner 2 {
+        }
+      }
+      firstParam 1 {
+      }
+      secondParam 2 {
+      }
+    }
+    firstCase 6 {
+      SuppressWarnings 0 {
+        value 0 {
+        }
+      }
+    }
+  }
+}

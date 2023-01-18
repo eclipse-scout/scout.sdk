@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.s.dto;
 
-import org.eclipse.scout.sdk.core.generator.type.SortedMemberEntry;
+import org.eclipse.scout.sdk.core.java.generator.type.SortedMemberEntry;
 
 /**
  * Factory to create member sort order objects for DTOs

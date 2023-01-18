@@ -11,11 +11,11 @@ package org.eclipse.scout.sdk.core.s.form;
 
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.builder.java.body.IScoutMethodBodyBuilder;
-import org.eclipse.scout.sdk.core.s.builder.java.body.ScoutMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.java.builder.body.IMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.builder.body.IScoutMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.s.java.builder.body.ScoutMethodBodyBuilder;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**

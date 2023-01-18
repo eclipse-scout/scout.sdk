@@ -68,7 +68,7 @@ object TranslationManagerLoader {
      * [ModalLoader.queue] starts the computation. During the computation a modal progress indicator is displayed to the user.
      *
      * @param nlsFile The *.nls file that should be loaded
-     * @param project The [Project] in which it should loaded
+     * @param project The [Project] in which it should be loaded
      * @param scope The [DependencyScope] to consider when resolving the visible [ITranslationStore] instances. The resulting [TranslationManager] contains the stores as found according to the scope given. If null, all scopes are searched.
      * @param title An optional title to display in the modal progress bar
      */
@@ -80,7 +80,7 @@ object TranslationManagerLoader {
     /**
      * Loads the [TranslationManager] for the given [Module].
      *
-     * The load is executed synchronously and may take some time. Therefore it is recommended to use [createModalLoader] instead which executes the load asynchronously showing a progress bar.
+     * The load is executed synchronously and may take some time. Therefore, it is recommended to use [createModalLoader] instead which executes the load asynchronously showing a progress bar.
      * @param module The module for which the manager should be created.
      * @param scope The [DependencyScope] to consider when resolving the visible [ITranslationStore] instances. The resulting [TranslationManager] contains the stores as found according to the scope given. If null, all scopes are searched.
      * @param useCache Specifies if the application wide short living TTL cache should be asked before computing a new manager. Default is false.
@@ -91,7 +91,7 @@ object TranslationManagerLoader {
     /**
      * Loads the [TranslationManagerLoaderResult] for the given [Module].
      *
-     * The load is executed synchronously and may take some time. Therefore it is recommended to use [createModalLoader] instead which executes the load asynchronously showing a progress bar.
+     * The load is executed synchronously and may take some time. Therefore, it is recommended to use [createModalLoader] instead which executes the load asynchronously showing a progress bar.
      * @param module The module for which the manager should be created.
      * @param scope The [DependencyScope] to consider when resolving the visible [ITranslationStore] instances. The resulting [TranslationManager] contains the stores as found according to the scope given. If null, all scopes are searched.
      * @param useCache Specifies if the application wide short living TTL cache should be asked before computing a new manager. Default is false.

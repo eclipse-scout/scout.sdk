@@ -15,8 +15,9 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 
 /**
@@ -81,7 +82,7 @@ public class AstRadioButtonBuilder extends AstTypeBuilder<AstRadioButtonBuilder>
     var iValueField = getFactory().getScoutApi().IValueField();
     return scoutType.resolveTypeParamValue(iValueField.valueTypeParamIndex(), iValueField.fqn())
         .flatMap(Stream::findFirst)
-        .map(org.eclipse.scout.sdk.core.model.api.IType::name)
+        .map(IType::name)
         .orElse(Object.class.getName());
   }
 

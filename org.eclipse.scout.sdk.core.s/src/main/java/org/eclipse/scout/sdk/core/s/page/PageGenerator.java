@@ -9,31 +9,31 @@
  */
 package org.eclipse.scout.sdk.core.s.page;
 
-import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
+import static org.eclipse.scout.sdk.core.java.model.api.Flags.isAbstract;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
-import org.eclipse.scout.sdk.core.builder.java.body.MethodBodyBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
-import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
-import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
-import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
-import org.eclipse.scout.sdk.core.generator.typeparam.TypeParameterGenerator;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.builder.IJavaBuilderContext;
+import org.eclipse.scout.sdk.core.java.builder.body.IMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.java.builder.body.MethodBodyBuilder;
+import org.eclipse.scout.sdk.core.java.generator.annotation.AnnotationGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.MethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.methodparam.MethodParameterGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.TypeGenerator;
+import org.eclipse.scout.sdk.core.java.generator.typeparam.TypeParameterGenerator;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.builder.java.body.IScoutMethodBodyBuilder;
-import org.eclipse.scout.sdk.core.s.builder.java.body.ScoutMethodBodyBuilder;
-import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
-import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.builder.body.IScoutMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.s.java.builder.body.ScoutMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.s.java.generator.annotation.ScoutAnnotationGenerator;
+import org.eclipse.scout.sdk.core.s.java.generator.method.ScoutMethodGenerator;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**

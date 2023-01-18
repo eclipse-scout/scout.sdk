@@ -10,11 +10,11 @@
 package org.eclipse.scout.sdk.s2i.template.java
 
 import com.intellij.codeInsight.template.impl.TemplateImpl
+import org.eclipse.scout.sdk.core.java.JavaUtils
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.Strings
-import org.eclipse.scout.sdk.core.util.Strings.toStringLiteral
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.template.BoolVariableAdapter
 import org.eclipse.scout.sdk.s2i.template.EnumVariableAdapter
@@ -75,10 +75,10 @@ class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader
     fun withBoolVariable(name: String, defaultValue: Boolean) = withVariable(name, BoolVariableAdapter(name, defaultValue.toString()))
 
     fun withNlsVariable(name: String, defaultValue: String? = null) = withVariable(name) {
-        VariableDescriptor(name, "complete()" /* call the NlsCompletionContributorForJava */, toStringLiteral(defaultValue)?.toString())
+        VariableDescriptor(name, "complete()" /* call the NlsCompletionContributorForJava */, JavaUtils.toStringLiteral(defaultValue)?.toString())
     }
 
-    fun withVariable(name: String, value: String) = withVariable(name) { VariableDescriptor(name, null, toStringLiteral(value)?.toString()) }
+    fun withVariable(name: String, value: String) = withVariable(name) { VariableDescriptor(name, null, JavaUtils.toStringLiteral(value)?.toString()) }
     fun withVariable(name: String, variableAdapter: (TemplateEngine) -> VariableDescriptor?) = apply {
         Ensure.isFalse(TemplateImpl.INTERNAL_VARS_SET.contains(name), "Variable name '{}' is reserved for internal use.", name)
         m_variables[name] = variableAdapter
@@ -96,7 +96,9 @@ class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader
     fun withOrderDefinitionType(fqn: String) = apply { m_orderDefinitionType = fqn }
     fun orderDefinitionType() = m_orderDefinitionType
 
-    fun withInnerTypeGetterInfo(containerFqn: String, methodName: String, lookupType: InnerTypeGetterLookupType = InnerTypeGetterLookupType.CLOSEST) = apply { m_innerTypeGetterInfos.add(InnerTypeGetterInfo(containerFqn, methodName, lookupType)) }
+    fun withInnerTypeGetterInfo(containerFqn: String, methodName: String, lookupType: InnerTypeGetterLookupType = InnerTypeGetterLookupType.CLOSEST) =
+        apply { m_innerTypeGetterInfos.add(InnerTypeGetterInfo(containerFqn, methodName, lookupType)) }
+
     fun innerTypeGetterInfos(): Set<InnerTypeGetterInfo> = m_innerTypeGetterInfos
 
     fun source(): String = m_source.computeIfAbsentAndGet {

@@ -32,7 +32,7 @@ import org.eclipse.swt.graphics.Image;
 public class TranslationStoreContentProvider extends AbstractContentProviderAdapter {
 
   private final TranslationManager m_manager;
-  private final Map<org.eclipse.scout.sdk.core.model.api.IType, IType> m_jdtTypeCache;
+  private final Map<org.eclipse.scout.sdk.core.java.model.api.IType, IType> m_jdtTypeCache;
 
   public TranslationStoreContentProvider(TranslationManager manager) {
     m_manager = Ensure.notNull(manager);

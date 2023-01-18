@@ -14,8 +14,7 @@ import com.intellij.pom.java.LanguageLevel
 import com.intellij.testFramework.builders.JavaModuleFixtureBuilder
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase
 import com.intellij.util.io.isFile
-import org.eclipse.scout.sdk.core.model.ecj.JreInfo
-import org.eclipse.scout.sdk.core.model.ecj.JreInfo.runningUserClassPath
+import org.eclipse.scout.sdk.core.java.ecj.JreInfo
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 
 abstract class AbstractTestCaseWithRunningClasspathModule : JavaCodeInsightFixtureTestCase() {
@@ -33,10 +32,10 @@ abstract class AbstractTestCaseWithRunningClasspathModule : JavaCodeInsightFixtu
 
         val jreHome = m_jreInfo.jreHome()
         moduleBuilder
-                .addJdk(jreHome.toString())
-                .setLanguageLevel(m_javaLanguageLevel)
-        runningUserClassPath(jreHome)
-                .filter { it.isFile() }
-                .forEach { moduleBuilder.addLibrary(it.fileName.toString(), it.toString()) }
+            .addJdk(jreHome.toString())
+            .setLanguageLevel(m_javaLanguageLevel)
+        JreInfo.runningUserClassPath(jreHome)
+            .filter { it.isFile() }
+            .forEach { moduleBuilder.addLibrary(it.fileName.toString(), it.toString()) }
     }
 }

@@ -19,12 +19,12 @@ import org.eclipse.scout.sdk.core.util.PropertySupport;
 public interface IBuilderContext {
 
   /**
-   * Context property for the java project module that is used to resolve imports and in which the source of the
-   * generator will be stored.
+   * Context property for the module that is used to resolve imports and in which the source of the generator will be
+   * stored.
    *
    * @see IBuilderContext#properties()
    */
-  String PROPERTY_JAVA_MODULE = "javaModule";
+  String PROPERTY_MODULE = "module";
 
   /**
    * Context property for the absolute target {@link java.nio.file.Path} in which the source of the generator will be

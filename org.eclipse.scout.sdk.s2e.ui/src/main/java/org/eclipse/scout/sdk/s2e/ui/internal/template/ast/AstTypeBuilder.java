@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
-import static org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation.convertToJavaSource;
+import static org.eclipse.scout.sdk.core.s.java.annotation.OrderAnnotation.convertToJavaSource;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,10 +22,10 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
-import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.s.java.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.util.ast.AstUtils;
 

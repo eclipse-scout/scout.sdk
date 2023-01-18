@@ -9,9 +9,6 @@
  */
 package formdata.shared;
 
-/**
- *
- */
 public class TestRunnable implements Runnable {
 
   @Override

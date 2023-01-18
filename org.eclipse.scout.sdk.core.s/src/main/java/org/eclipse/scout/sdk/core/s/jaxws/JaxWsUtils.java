@@ -23,9 +23,9 @@ import java.util.stream.IntStream;
 
 import javax.xml.xpath.XPathExpressionException;
 
-import org.eclipse.scout.sdk.core.ISourceFolders;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
+import org.eclipse.scout.sdk.core.java.ISourceFolders;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
@@ -158,7 +158,7 @@ public final class JaxWsUtils {
   }
 
   /**
-   * Gets all contents of the &lt;bindingFile&gt; tags of the the given WSDL within the given pom.xml.
+   * Gets all contents of the &lt;bindingFile&gt; tags of the given WSDL within the given pom.xml.
    *
    * @param pom
    *          The pom.xml {@link Document}.

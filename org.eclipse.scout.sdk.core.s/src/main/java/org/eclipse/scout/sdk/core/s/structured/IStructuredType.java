@@ -11,7 +11,7 @@ package org.eclipse.scout.sdk.core.s.structured;
 
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.model.api.IJavaElement;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
 
 /**
  * <h3>{@link IStructuredType}</h3>

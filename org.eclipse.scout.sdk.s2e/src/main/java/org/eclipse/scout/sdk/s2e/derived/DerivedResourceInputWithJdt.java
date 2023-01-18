@@ -11,10 +11,10 @@ package org.eclipse.scout.sdk.s2e.derived;
 
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.java.model.api.IClasspathEntry;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.api.MissingTypeException;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.api.MissingTypeException;
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceInput;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.util.Ensure;

@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.environment
 
-import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator
+import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.s2i.AbstractTestCaseWithRunningClasspathModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment

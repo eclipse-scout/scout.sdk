@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.s.nls.TextProviderService;
 
 /**
  * Represents a stack of {@link ITranslationEntry} instances having the same key. The stack is build based on the @Order
- * annotation value of the text provider service the entry belongs to (see {@link ITranslationEntry#store()}.<br>
+ * annotation value of the text provider service the entry belongs to (see {@link ITranslationEntry#store()}).<br>
  * The texts of this translation consist of all entries merged according to the stack order (first entry for a language
  * defines the text for that language).
  */
@@ -74,7 +74,7 @@ public interface IStackedTranslation extends ITranslation {
   /**
    * @param language
    *          The {@link Language} for which the {@link ITranslationEntry} should be returned.
-   * @return The {@link ITranslationEntry} from which this translation contains the the text for the given language.
+   * @return The {@link ITranslationEntry} from which this translation contains the text for the given language.
    *         This method respects overwritten texts and only returns the entry of the "winner text".
    */
   Optional<ITranslationEntry> entry(Language language);

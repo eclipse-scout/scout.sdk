@@ -11,11 +11,11 @@ package org.eclipse.scout.sdk.core.s.lookupcall;
 
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
-import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
-import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
-import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.generator.field.FieldGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.s.java.generator.annotation.ScoutAnnotationGenerator;
+import org.eclipse.scout.sdk.core.s.java.generator.method.ScoutMethodGenerator;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**

@@ -23,14 +23,14 @@ import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.s.IWebConstants;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi;
-import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutVariousApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.util.search.FileQueryInput;
 import org.eclipse.scout.sdk.core.s.util.search.FileRange;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 public final class TranslationPatterns {
@@ -101,7 +101,7 @@ public final class TranslationPatterns {
     }
 
     protected static boolean isKeyInCode(CharSequence content, int offset) {
-      /* the start index itself is inside of the string literal and therefore never in the code. subtract two (one to get to the string delimiter and one to get to the char before */
+      /* the start index itself is inside the string literal and therefore never in the code. subtract two (one to get to the string delimiter and one to get to the char before */
       var posBeforeKeyMatch = offset - 2;
       return isInCode(content, posBeforeKeyMatch);
     }

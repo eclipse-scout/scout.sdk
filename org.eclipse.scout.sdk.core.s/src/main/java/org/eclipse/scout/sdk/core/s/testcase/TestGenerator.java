@@ -12,16 +12,16 @@ package org.eclipse.scout.sdk.core.s.testcase;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.eclipse.scout.sdk.core.apidef.ApiFunction;
-import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
-import org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder;
-import org.eclipse.scout.sdk.core.builder.java.comment.CommentBuilder;
-import org.eclipse.scout.sdk.core.builder.java.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
-import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
-import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
+import org.eclipse.scout.sdk.core.java.apidef.ApiFunction;
+import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
+import org.eclipse.scout.sdk.core.java.builder.IJavaSourceBuilder;
+import org.eclipse.scout.sdk.core.java.builder.comment.CommentBuilder;
+import org.eclipse.scout.sdk.core.java.builder.expression.IExpressionBuilder;
+import org.eclipse.scout.sdk.core.java.generator.field.FieldGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.s.java.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**

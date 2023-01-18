@@ -11,11 +11,13 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s.test" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" />
     <orderEntry type="library" name="Maven: wsdl4j:wsdl4j:1.6.2" level="project" />
-    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" />
-    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.ecj" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.test" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.ecj" />
     <orderEntry type="library" name="Maven: org.eclipse.jdt:ecj:3.31.0" level="project" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" />
     <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.9.1" level="project" />
     <orderEntry type="library" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-commons:1.9.1" level="project" />

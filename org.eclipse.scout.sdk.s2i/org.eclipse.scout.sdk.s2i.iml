@@ -35,9 +35,11 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="jdk" jdkName="IntelliJ IDEA IU-222.4345.14" jdkType="IDEA JDK" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.ecj" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s" />
-    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.ecj" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" scope="TEST" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.test" scope="TEST" />
     <orderEntry type="library" name="Gradle: org.apache.poi:poi-ooxml:5.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.jetbrains:annotations:24.0.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-dependency-resolver:ideaIU-IU-222.4345.14-withSources" level="project" />
@@ -122,7 +124,6 @@
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:util_rt:2022.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:winp:2022.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:ant:2022.2.3" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse.scout.sdk:org.eclipse.scout.sdk.core:13.0.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Gradle: wsdl4j:wsdl4j:1.6.2" level="project" />
     <orderEntry type="library" name="Gradle: org.eclipse.jdt:ecj:3.31.0" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.poi:poi:5.2.3" level="project" />

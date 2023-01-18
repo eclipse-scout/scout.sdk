@@ -33,8 +33,8 @@ import com.intellij.psi.codeStyle.JavaCodeStyleSettings
 import com.intellij.psi.util.InheritanceUtil.findEnclosingInstanceInScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ThrowableRunnable
-import org.eclipse.scout.sdk.core.model.api.PropertyBean
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.java.model.api.PropertyBean
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.containingModule
@@ -62,7 +62,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
 
     /**
      * The templates do not work if the setting "InsertInnerClassImports" is active.
-     * Therefore execute the template with temporary settings (see [CodeStyleSettingsManager.setTemporarySettings]).
+     * Therefore, execute the template with temporary settings (see [CodeStyleSettingsManager.setTemporarySettings]).
      * The temporary settings will be removed again in the [TemplateListener].
      */
     private fun startTemplateWithTempSettings(template: TemplateImpl, editor: Editor) {

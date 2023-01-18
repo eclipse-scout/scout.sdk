@@ -19,14 +19,13 @@
   </parent>
 
   <artifactId>org.eclipse.scout.sdk.core.test</artifactId>
-  <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.scout.sdk.core.ecj</artifactId>
+      <artifactId>org.eclipse.scout.sdk.core</artifactId>
     </dependency>
 
     <!-- Test Dependencies -->
@@ -55,37 +54,4 @@
       <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
   </dependencies>
-
-  <profiles>
-    <profile>
-      <id>fixture_test_src_folder</id>
-      <activation>
-        <file>
-          <exists>${basedir}/src/test/fixture</exists>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-test-source</id>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <phase>generate-sources</phase>
-                <configuration>
-                  <sources>
-                    <source>src/test/fixture</source>
-                  </sources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

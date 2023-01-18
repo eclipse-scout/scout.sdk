@@ -26,7 +26,7 @@ public interface IDerivedResourceHandler {
    *          The {@link IProgress indicator} to report progress and handle cancellation. Must not be {@code null}.
    * @return A {@link Collection} of all asynchronous write operations that have been scheduled by the handler. The
    *         implementation must ensure that ALL async tasks scheduled by this handler will be returned by this method
-   *         call even though there might be an exception inside. Otherwise the caller cannot ensure to wait for the
+   *         call even though there might be an exception inside. Otherwise, the caller cannot ensure to wait for the
    *         already scheduled tasks which might the async task to fail because the underlying transaction and
    *         {@link IEnvironment} have been closed.
    */

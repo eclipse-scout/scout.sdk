@@ -9,11 +9,11 @@
  */
 package org.eclipse.scout.sdk.core.s.nls;
 
-import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
-import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
+import org.eclipse.scout.sdk.core.s.java.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  * <h3>{@link TextProviderService}</h3>

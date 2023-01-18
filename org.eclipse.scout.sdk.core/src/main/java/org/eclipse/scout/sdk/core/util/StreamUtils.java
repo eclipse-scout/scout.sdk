@@ -48,7 +48,7 @@ public final class StreamUtils {
    * Converts the given {@link Enumeration} into a {@link Stream}. The {@link Enumeration} is evaluated lazy by the
    * {@link Stream}.<br>
    * Because {@link Enumeration Enumerations} cannot be reset a fresh instance should be passed to this method.
-   * Otherwise the resulting {@link Stream} only processes the remaining elements of the {@link Enumeration}.
+   * Otherwise, the resulting {@link Stream} only processes the remaining elements of the {@link Enumeration}.
    * 
    * @param e
    *          The {@link Enumeration} to convert. Must not be {@code null}.

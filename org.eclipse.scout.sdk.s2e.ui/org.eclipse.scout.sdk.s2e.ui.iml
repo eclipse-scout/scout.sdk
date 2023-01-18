@@ -12,9 +12,10 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.s2e" scope="PROVIDED" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s" scope="PROVIDED" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java" scope="PROVIDED" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: wsdl4j:wsdl4j:1.6.2" level="project" />
-    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.ecj" scope="PROVIDED" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.ecj" scope="PROVIDED" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.s2e.doc" scope="PROVIDED" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.jdt:org.eclipse.jdt.launching:3.19.700" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.resources:3.18.0" level="project" />
@@ -134,6 +135,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.121.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.swt:3.121.0" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s.test" scope="TEST" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.test" scope="TEST" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" scope="TEST" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-api:5.9.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />

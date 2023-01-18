@@ -12,9 +12,9 @@ package org.eclipse.scout.sdk.s2i
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.java.JavaTypes
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.FinalValue
-import org.eclipse.scout.sdk.core.util.JavaTypes
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 
 abstract class AbstractClassAnnotation protected constructor(val psiClass: PsiClass, val psiAnnotation: PsiAnnotation, val project: Project, val scoutApi: IScoutApi) {

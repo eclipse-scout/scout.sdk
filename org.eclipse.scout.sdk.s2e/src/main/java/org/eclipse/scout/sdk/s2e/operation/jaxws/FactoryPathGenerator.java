@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutVariousApi.JaxWsConstants;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutVariousApi.JaxWsConstants;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**

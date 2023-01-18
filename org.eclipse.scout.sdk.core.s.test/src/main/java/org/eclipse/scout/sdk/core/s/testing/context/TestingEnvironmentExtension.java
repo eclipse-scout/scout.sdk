@@ -9,9 +9,9 @@
  */
 package org.eclipse.scout.sdk.core.s.testing.context;
 
-import static org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension.createJavaEnvironmentUsingBuilder;
+import static org.eclipse.scout.sdk.core.java.testing.context.JavaEnvironmentExtension.createJavaEnvironmentUsingBuilder;
 
-import org.eclipse.scout.sdk.core.testing.context.AbstractContextExtension;
+import org.eclipse.scout.sdk.core.java.testing.context.AbstractContextExtension;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
 /**

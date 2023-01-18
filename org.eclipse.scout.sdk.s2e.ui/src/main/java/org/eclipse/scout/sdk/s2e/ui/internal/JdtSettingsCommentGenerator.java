@@ -37,20 +37,20 @@ import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.TemplateVariable;
 import org.eclipse.jface.text.templates.TemplateVariableResolver;
-import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
-import org.eclipse.scout.sdk.core.builder.java.IJavaBuilderContext;
-import org.eclipse.scout.sdk.core.builder.java.comment.ICommentBuilder;
-import org.eclipse.scout.sdk.core.builder.java.comment.IDefaultElementCommentGeneratorSpi;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.generator.field.IFieldGenerator;
-import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.generator.methodparam.IMethodParameterGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
-import org.eclipse.scout.sdk.core.model.api.PropertyBean;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
+import org.eclipse.scout.sdk.core.java.builder.IJavaBuilderContext;
+import org.eclipse.scout.sdk.core.java.builder.comment.ICommentBuilder;
+import org.eclipse.scout.sdk.core.java.builder.comment.IDefaultElementCommentGeneratorSpi;
+import org.eclipse.scout.sdk.core.java.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.java.generator.field.IFieldGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.methodparam.IMethodParameterGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.java.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.PropertySupport;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -78,7 +78,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       if (!isAutomaticallyAddComments(builderCtx)) {
         return;
       }
-      var ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
+      var ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_MODULE, IJavaProject.class);
       var template = getCodeTemplate(CodeTemplateContextType.FILECOMMENT_ID, ownerProject);
       if (template != null) {
         TemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, b.context().lineDelimiter());
@@ -107,7 +107,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       if (!isAutomaticallyAddComments(builderCtx)) {
         return;
       }
-      var ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
+      var ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_MODULE, IJavaProject.class);
       var template = getCodeTemplate(CodeTemplateContextType.TYPECOMMENT_ID, ownerProject);
       if (template == null) {
         return;
@@ -154,7 +154,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       if (!isAutomaticallyAddComments(contextProperties)) {
         return;
       }
-      var ownerProject = contextProperties.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
+      var ownerProject = contextProperties.getProperty(IBuilderContext.PROPERTY_MODULE, IJavaProject.class);
       var paramNames = target.parameters()
           .map(IMethodParameterGenerator::elementName)
           .flatMap(Optional::stream)
@@ -260,7 +260,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       if (!isAutomaticallyAddComments(builderCtx)) {
         return;
       }
-      var ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
+      var ownerProject = builderCtx.getProperty(IBuilderContext.PROPERTY_MODULE, IJavaProject.class);
       var template = getCodeTemplate(CodeTemplateContextType.FIELDCOMMENT_ID, ownerProject);
       if (template != null) {
         TemplateContext templateContext = new CodeTemplateContext(template.getContextTypeId(), ownerProject, builderContext.lineDelimiter());
@@ -287,7 +287,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
     if (map == null) {
       return false;
     }
-    var jp = map.getProperty(IBuilderContext.PROPERTY_JAVA_MODULE, IJavaProject.class);
+    var jp = map.getProperty(IBuilderContext.PROPERTY_MODULE, IJavaProject.class);
     if (jp == null) {
       return false;
     }

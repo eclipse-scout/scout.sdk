@@ -13,15 +13,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
-import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutInterfaceApi;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.dto.DtoGeneratorFactory;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.java.annotation.DataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.java.annotation.FormDataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutInterfaceApi;
 
 /**
  * <h3>{@link DtoUpdateHandler}</h3>

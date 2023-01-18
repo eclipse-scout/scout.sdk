@@ -17,13 +17,13 @@ import com.intellij.openapi.startup.StartupActivity
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiModifier
-import org.eclipse.scout.sdk.core.apidef.ITypeNameSupplier
+import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment
+import org.eclipse.scout.sdk.core.java.model.api.IType
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
-import org.eclipse.scout.sdk.core.model.api.IType
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStoreSupplier
 import org.eclipse.scout.sdk.core.s.nls.Translations

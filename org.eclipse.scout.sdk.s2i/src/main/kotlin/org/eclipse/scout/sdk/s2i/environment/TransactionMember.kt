@@ -16,7 +16,7 @@ import java.nio.file.Path
  *
  * When running in a transaction scope (see [TransactionManager.callInNewTransaction]) members may be added to the transaction using [TransactionManager.register] (the current manager can be retrieved using [TransactionManager.current]).
  *
- * If all the code within the transaction scope is executed without throwing exceptions, the transaction tries to commit all members registered. Otherwise they are discarded and nothing is done.
+ * If all the code within the transaction scope is executed without throwing exceptions, the transaction tries to commit all members registered. Otherwise, they are discarded and nothing is done.
  */
 interface TransactionMember {
 

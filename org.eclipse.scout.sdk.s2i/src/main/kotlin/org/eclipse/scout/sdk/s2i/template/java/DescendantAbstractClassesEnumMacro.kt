@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.s2i.findTypeByName
 import org.eclipse.scout.sdk.s2i.newSubTypeHierarchy
 
 /**
- * Macro providing all abstract sub classes of a root class.
+ * Macro providing all abstract subclasses of a root class.
  */
 class DescendantAbstractClassesEnumMacro : Macro() {
 

@@ -11,8 +11,8 @@ package org.eclipse.scout.sdk.s2i.util
 
 import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiElement
-import org.eclipse.scout.sdk.core.apidef.IApiSpecification
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment

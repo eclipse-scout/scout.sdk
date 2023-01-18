@@ -18,14 +18,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.model.CompilationUnitInfo;
-import org.eclipse.scout.sdk.core.model.CompilationUnitInfoWithClasspath;
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry;
-import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
+import org.eclipse.scout.sdk.core.java.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.java.model.CompilationUnitInfo;
+import org.eclipse.scout.sdk.core.java.model.CompilationUnitInfoWithClasspath;
+import org.eclipse.scout.sdk.core.java.model.api.IClasspathEntry;
+import org.eclipse.scout.sdk.core.java.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 public abstract class AbstractEnvironment implements IEnvironment {

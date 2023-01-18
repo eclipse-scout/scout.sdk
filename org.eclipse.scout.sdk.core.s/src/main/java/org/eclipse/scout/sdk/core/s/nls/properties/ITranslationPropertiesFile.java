@@ -13,9 +13,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.nls.Language;
 
 /**
@@ -70,8 +70,8 @@ public interface ITranslationPropertiesFile {
    * @param key
    *          The key to modify. Must not be blank.
    * @param text
-   *          The new text. If it is {@code null} the corresponding key is removed. Otherwise the new text is registered
-   *          for the specified key.
+   *          The new text. If it is {@code null} the corresponding key is removed. Otherwise, the new text is
+   *          registered for the specified key.
    * @return {@code true} if the file was updated. {@code false} otherwise.
    */
   boolean setTranslation(String key, String text);

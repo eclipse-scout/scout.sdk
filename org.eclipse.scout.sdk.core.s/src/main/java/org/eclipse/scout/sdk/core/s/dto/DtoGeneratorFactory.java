@@ -11,19 +11,19 @@ package org.eclipse.scout.sdk.core.s.dto;
 
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.builder.java.comment.IJavaElementCommentBuilder;
-import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
-import org.eclipse.scout.sdk.core.generator.compilationunit.CompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.generator.compilationunit.ICompilationUnitGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
-import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.java.builder.comment.IJavaElementCommentBuilder;
+import org.eclipse.scout.sdk.core.java.generator.annotation.AnnotationGenerator;
+import org.eclipse.scout.sdk.core.java.generator.compilationunit.CompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.java.generator.compilationunit.ICompilationUnitGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.dto.table.PageDataGenerator;
 import org.eclipse.scout.sdk.core.s.dto.table.TableFieldDataGenerator;
 import org.eclipse.scout.sdk.core.s.dto.table.TableRowDataGenerator;
+import org.eclipse.scout.sdk.core.s.java.annotation.DataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.java.annotation.FormDataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 
 /**
  * Contains utilities for DTO creation

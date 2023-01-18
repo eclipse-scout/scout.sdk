@@ -20,7 +20,6 @@
 
   <groupId>org.eclipse.scout.sdk.s2e</groupId>
   <artifactId>org.eclipse.scout.sdk.s2e.test</artifactId>
-  <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>

@@ -11,7 +11,7 @@ package org.eclipse.scout.sdk.s2e.derived;
 
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
+import static org.eclipse.scout.sdk.core.java.model.api.Flags.isPublic;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,10 +26,10 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutAnnotationApi;
-import org.eclipse.scout.sdk.core.s.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.derived.DtoUpdateHandler;
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutAnnotationApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;

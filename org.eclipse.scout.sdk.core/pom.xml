@@ -19,6 +19,5 @@
   </parent>
 
   <artifactId>org.eclipse.scout.sdk.core</artifactId>
-  <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
 </project>

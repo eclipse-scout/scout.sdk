@@ -9,18 +9,18 @@
  */
 package org.eclipse.scout.sdk.core.s.dto;
 
-import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
-import static org.eclipse.scout.sdk.core.util.JavaTypes.arrayMarker;
+import static org.eclipse.scout.sdk.core.java.JavaTypes.arrayMarker;
+import static org.eclipse.scout.sdk.core.java.model.api.Flags.isAbstract;
 
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
-import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
-import org.eclipse.scout.sdk.core.generator.field.FieldGenerator;
-import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.methodparam.MethodParameterGenerator;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.builder.body.IMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.java.generator.annotation.AnnotationGenerator;
+import org.eclipse.scout.sdk.core.java.generator.field.FieldGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.MethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.methodparam.MethodParameterGenerator;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.dto.table.TableRowDataGenerator;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 
 /**
  * <h3>{@link AbstractTableBeanGenerator}</h3>

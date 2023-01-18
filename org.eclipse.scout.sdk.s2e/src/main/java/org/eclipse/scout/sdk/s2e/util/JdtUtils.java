@@ -10,10 +10,10 @@
 package org.eclipse.scout.sdk.s2e.util;
 
 import static java.util.Collections.emptySet;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isAbstract;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isDeprecated;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isInterface;
-import static org.eclipse.scout.sdk.core.model.api.Flags.isPublic;
+import static org.eclipse.scout.sdk.core.java.model.api.Flags.isAbstract;
+import static org.eclipse.scout.sdk.core.java.model.api.Flags.isDeprecated;
+import static org.eclipse.scout.sdk.core.java.model.api.Flags.isInterface;
+import static org.eclipse.scout.sdk.core.java.model.api.Flags.isPublic;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -57,8 +57,8 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 

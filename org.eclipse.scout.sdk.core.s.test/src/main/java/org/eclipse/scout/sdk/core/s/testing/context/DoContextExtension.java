@@ -9,18 +9,18 @@
  */
 package org.eclipse.scout.sdk.core.s.testing.context;
 
-import static org.eclipse.scout.sdk.core.testing.context.AbstractContextExtension.findAnnotationContext;
+import static org.eclipse.scout.sdk.core.java.testing.context.AbstractContextExtension.findAnnotationContext;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.model.api.Flags;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.java.testing.context.ExtendWithJavaEnvironmentFactory;
+import org.eclipse.scout.sdk.core.java.testing.context.JavaEnvironmentExtension;
 import org.eclipse.scout.sdk.core.s.dataobject.DoContextResolvers;
 import org.eclipse.scout.sdk.core.s.dataobject.DoContextResolvers.IDoContextResolver;
-import org.eclipse.scout.sdk.core.testing.context.ExtendWithJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.testing.context.JavaEnvironmentExtension;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;

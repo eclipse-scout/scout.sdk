@@ -20,7 +20,7 @@ import com.intellij.psi.PsiTreeChangeAdapter
 import com.intellij.psi.PsiTreeChangeEvent
 import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.s.util.DelayedBuffer
+import org.eclipse.scout.sdk.core.util.DelayedBuffer
 import org.eclipse.scout.sdk.s2i.containingModule
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit

@@ -24,8 +24,8 @@ import java.util.function.Consumer;
 import javax.wsdl.WSDLException;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.eclipse.scout.sdk.core.ISourceFolders;
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.ISourceFolders;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;

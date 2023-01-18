@@ -112,7 +112,7 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
   }
 
   /**
-   * Waits until all of the futures specified have completed. A future is completed if it ends successfully, threw an
+   * Waits until all the futures specified have completed. A future is completed if it ends successfully, threw an
    * exception or was canceled.<br>
    * Futures that end exceptionally are logged with level error. The log is only written when all the futures have
    * completed.

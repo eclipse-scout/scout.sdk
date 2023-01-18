@@ -13,10 +13,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-import org.eclipse.scout.sdk.core.model.api.IMethod;
-import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.apidef.IScout22DoApi;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.java.model.api.IMethod;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScout22DoApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
@@ -45,7 +45,7 @@ public class DataObjectNode {
      * If it is the {@code DoList} type, {@link #LIST} is returned.<br>
      * If it is the {@code DoSet} type, {@link #SET} is returned.<br>
      * If it is the {@code DoCollection} type, {@link #COLLECTION} is returned.<br>
-     * Otherwise an empty optional is returned.
+     * Otherwise, an empty optional is returned.
      * 
      * @param type
      *          The {@link IType} to check or {@code null}.

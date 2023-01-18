@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.s.form;
 
-import static org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator.createOrder;
+import static org.eclipse.scout.sdk.core.s.java.generator.annotation.ScoutAnnotationGenerator.createOrder;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.eclipse.scout.sdk.core.util.Strings.capitalize;
 import static org.eclipse.scout.sdk.core.util.Strings.removeSuffix;
@@ -19,22 +19,22 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
-import org.eclipse.scout.sdk.core.apidef.IApiSpecification;
-import org.eclipse.scout.sdk.core.builder.java.body.IMethodBodyBuilder;
-import org.eclipse.scout.sdk.core.generator.annotation.AnnotationGenerator;
-import org.eclipse.scout.sdk.core.generator.annotation.IAnnotationGenerator;
-import org.eclipse.scout.sdk.core.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.generator.method.MethodGenerator;
-import org.eclipse.scout.sdk.core.generator.type.ITypeGenerator;
-import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
-import org.eclipse.scout.sdk.core.generator.type.TypeGenerator;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.java.builder.body.IMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.java.generator.annotation.AnnotationGenerator;
+import org.eclipse.scout.sdk.core.java.generator.annotation.IAnnotationGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.method.MethodGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
-import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
-import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
-import org.eclipse.scout.sdk.core.s.generator.method.ScoutMethodGenerator;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.s.java.annotation.FormDataAnnotation.SdkCommand;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.generator.annotation.ScoutAnnotationGenerator;
+import org.eclipse.scout.sdk.core.s.java.generator.method.ScoutMethodGenerator;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**

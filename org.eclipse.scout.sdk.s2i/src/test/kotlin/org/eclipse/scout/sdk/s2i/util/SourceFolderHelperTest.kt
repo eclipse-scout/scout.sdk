@@ -18,9 +18,9 @@ import com.intellij.openapi.roots.ModuleRootModel
 import com.intellij.openapi.roots.SourceFolder
 import com.intellij.openapi.vfs.VirtualFile
 import junit.framework.TestCase
-import org.eclipse.scout.sdk.core.ISourceFolders
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
+import org.eclipse.scout.sdk.core.java.ISourceFolders
+import org.eclipse.scout.sdk.core.java.model.api.IClasspathEntry
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders
 import org.eclipse.scout.sdk.core.s.util.ITier
 import org.eclipse.scout.sdk.core.s.util.ScoutTier

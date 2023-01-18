@@ -73,13 +73,13 @@ public interface IProgress {
    * Initializes this {@link IProgress} with the specified name and total work ticks.
    *
    * @param totalWork
-   *          the total number of work units into which the main task is been subdivided.
+   *          the total number of work units into which the main task has been subdivided.
    * @param name
    *          The task description
    * @param args
    *          Optional arguments to use for replacing the hooks in the name. May be {@code null}. If the name contains
-   *          place holders ({@value MessageFormatter#ARG_REPLACE_PATTERN}), the arguments are used to fill the place
-   *          holders.
+   *          placeholders ({@value MessageFormatter#ARG_REPLACE_PATTERN}), the arguments are used to fill the
+   *          placeholders.
    * @return this instance.
    */
   IProgress init(int totalWork, CharSequence name, Object... args);

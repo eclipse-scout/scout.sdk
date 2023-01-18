@@ -23,14 +23,14 @@ import org.eclipse.scout.sdk.core.builder.BuilderContext
 import org.eclipse.scout.sdk.core.builder.IBuilderContext
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder
 import org.eclipse.scout.sdk.core.builder.MemorySourceBuilder
-import org.eclipse.scout.sdk.core.builder.java.JavaBuilderContext
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator
+import org.eclipse.scout.sdk.core.java.builder.JavaBuilderContext
+import org.eclipse.scout.sdk.core.java.model.CompilationUnitInfoWithClasspath
+import org.eclipse.scout.sdk.core.java.model.api.IClasspathEntry
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment
+import org.eclipse.scout.sdk.core.java.model.api.IType
+import org.eclipse.scout.sdk.core.java.model.spi.JavaEnvironmentSpi
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.model.CompilationUnitInfoWithClasspath
-import org.eclipse.scout.sdk.core.model.api.IClasspathEntry
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment
-import org.eclipse.scout.sdk.core.model.api.IType
-import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi
 import org.eclipse.scout.sdk.core.s.environment.AbstractEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IFuture
 import org.eclipse.scout.sdk.core.s.environment.IProgress
@@ -181,7 +181,7 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
     override fun runGenerator(generator: ISourceGenerator<ISourceBuilder<*>>, context: IJavaEnvironment, filePath: Path): StringBuilder {
         val env = context.unwrap() as JavaEnvironmentWithIdea
         val props = PropertySupport(2)
-        props.setProperty(IBuilderContext.PROPERTY_JAVA_MODULE, env.module)
+        props.setProperty(IBuilderContext.PROPERTY_MODULE, env.module)
         props.setProperty(IBuilderContext.PROPERTY_TARGET_PATH, filePath)
 
         // must be \n! see https://www.jetbrains.org/intellij/sdk/docs/basics/architectural_overview/modifying_psi.html

@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ITrackedNodePosition;
-import org.eclipse.scout.sdk.core.util.JavaTypes;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
 
 /**
  * <h3>{@link AstLongFieldBuilder}</h3>

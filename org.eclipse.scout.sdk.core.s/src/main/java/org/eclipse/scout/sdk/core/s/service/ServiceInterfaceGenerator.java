@@ -9,9 +9,9 @@
  */
 package org.eclipse.scout.sdk.core.s.service;
 
-import org.eclipse.scout.sdk.core.generator.type.PrimaryTypeGenerator;
-import org.eclipse.scout.sdk.core.s.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.generator.annotation.ScoutAnnotationGenerator;
+import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.generator.annotation.ScoutAnnotationGenerator;
 
 /**
  * <h3>{@link ServiceInterfaceGenerator}</h3>
