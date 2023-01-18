@@ -84,7 +84,7 @@ public final class MavenArtifactVersions {
     try {
       var g = URLEncoder.encode(groupId, StandardCharsets.UTF_8);
       var a = URLEncoder.encode(artifactId, StandardCharsets.UTF_8);
-      var uri = new URI("https://search.maven.org/solrsearch/select?q=g:" + g + "+AND+a:" + a + "&core=gav&rows=200&wt=xml");
+      var uri = new URI("https://search.maven.org/solrsearch/select?q=g:" + g + "+AND+a:" + a + "&core=gav&rows=100&wt=xml");
       var dom = Xml.get(uri);
       return Xml.evaluateXPath("result/doc/str[@name='v']", dom.getDocumentElement()).stream()
           .map(Node::getTextContent)
