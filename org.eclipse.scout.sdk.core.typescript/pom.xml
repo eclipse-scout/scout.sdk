@@ -18,23 +18,13 @@
     <relativePath>../org.eclipse.scout.sdk</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
+  <artifactId>org.eclipse.scout.sdk.core.typescript</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
   <dependencies>
-    <!-- Build Dependencies -->
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.scout.sdk.core.java</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.scout.sdk.core.typescript</artifactId>
-    </dependency>
-    <!-- for WSDL parsing (JAX-WS) -->
-    <dependency>
-      <groupId>wsdl4j</groupId>
-      <artifactId>wsdl4j</artifactId>
+      <artifactId>org.eclipse.scout.sdk.core</artifactId>
     </dependency>
   </dependencies>
 </project>

@@ -35,6 +35,9 @@
     <module>../org.eclipse.scout.sdk.core.java.ecj</module>
     <module>../org.eclipse.scout.sdk.core.java.test</module>
 
+    <!-- TypeScript support -->
+    <module>../org.eclipse.scout.sdk.core.typescript</module>
+
     <!-- Scout support -->
     <module>../org.eclipse.scout.sdk.core.s</module>
     <module>../org.eclipse.scout.sdk.core.s.test</module>
@@ -214,6 +217,12 @@
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.java.test</artifactId>
+        <version>13.0.0-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.scout.sdk</groupId>
+        <artifactId>org.eclipse.scout.sdk.core.typescript</artifactId>
         <version>13.0.0-SNAPSHOT</version>
       </dependency>
 

@@ -38,6 +38,7 @@
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.ecj" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s" />
+    <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.typescript" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" scope="TEST" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.test" scope="TEST" />
     <orderEntry type="library" name="Gradle: org.apache.poi:poi-ooxml:5.2.3" level="project" />
