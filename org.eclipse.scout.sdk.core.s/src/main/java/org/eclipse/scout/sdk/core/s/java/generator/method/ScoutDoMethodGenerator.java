@@ -36,7 +36,7 @@ import org.eclipse.scout.sdk.core.java.model.api.IMethod;
 import org.eclipse.scout.sdk.core.java.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.PropertyBean;
-import org.eclipse.scout.sdk.core.java.model.api.query.AbstractQuery;
+import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode;
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode.DataObjectNodeKind;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScout22DoApi;

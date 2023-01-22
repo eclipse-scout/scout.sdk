@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.spliterator.InnerTypeSpliterator;
+import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 
 /**
  * <h3>{@link AbstractInnerTypeQuery}</h3> Inner types query that by default returns the given {@link IType} list.

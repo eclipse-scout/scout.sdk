@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.java.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.java.model.api.spliterator.WrappingSpliterator;
 import org.eclipse.scout.sdk.core.java.model.spi.MethodSpi;
+import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 
 /**
  * <h3>{@link MethodParameterQuery}</h3> Method parameter query that by default returns all parameters of a method.

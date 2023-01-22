@@ -32,7 +32,6 @@ import org.eclipse.jdt.internal.compiler.lookup.TypeVariableBinding;
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IMethod;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.MethodImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.MethodParameterSpi;
@@ -41,6 +40,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> implements MethodSpi {
   private final BindingTypeWithEcj m_declaringType;
@@ -51,9 +51,9 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   private final FinalValue<List<TypeSpi>> m_exceptions;
   private final FinalValue<List<MethodParameterSpi>> m_arguments;
   private final FinalValue<List<TypeParameterSpi>> m_typeParameters;
-  private final FinalValue<ISourceRange> m_source;
-  private final FinalValue<ISourceRange> m_bodySource;
-  private final FinalValue<ISourceRange> m_javaDocSource;
+  private final FinalValue<SourceRange> m_source;
+  private final FinalValue<SourceRange> m_bodySource;
+  private final FinalValue<SourceRange> m_javaDocSource;
   private final FinalValue<String> m_methodId;
   private int m_flags;
 
@@ -216,7 +216,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
       var decl = sourceMethodOf(m_binding);
       if (decl == null) {
@@ -227,7 +227,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   }
 
   @Override
-  public ISourceRange getSourceOfBody() {
+  public SourceRange getSourceOfBody() {
     return m_bodySource.computeIfAbsentAndGet(() -> {
       var decl = sourceMethodOf(m_binding);
       if (decl == null) {
@@ -238,7 +238,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   }
 
   @Override
-  public ISourceRange getJavaDoc() {
+  public SourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
       var decl = sourceMethodOf(m_binding);
       if (decl == null) {
@@ -249,7 +249,7 @@ public class BindingMethodWithEcj extends AbstractMemberWithEcj<IMethod> impleme
   }
 
   @Override
-  public ISourceRange getSourceOfDeclaration() {
+  public SourceRange getSourceOfDeclaration() {
     return createSourceRange(sourceMethodOf(m_binding), m_declaringType.getCompilationUnit(), javaEnvWithEcj());
   }
 }

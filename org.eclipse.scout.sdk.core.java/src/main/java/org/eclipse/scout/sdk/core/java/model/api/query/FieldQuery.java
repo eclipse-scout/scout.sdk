@@ -18,6 +18,7 @@ import org.eclipse.scout.sdk.core.java.model.api.IField;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.spliterator.HierarchicalStreamBuilder;
 import org.eclipse.scout.sdk.core.java.model.api.spliterator.WrappingSpliterator;
+import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 
 /**
  * <h3>{@link FieldQuery}</h3> Field query that by default returns all {@link IField}s directly declared on the owner.

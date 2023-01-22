@@ -78,7 +78,6 @@ import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.ecj.metavalue.MetaValueFactory;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IMetaValue;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractSpiElement;
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotatableSpi;
@@ -92,6 +91,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 public final class SpiWithEcjUtils {
@@ -159,7 +159,7 @@ public final class SpiWithEcjUtils {
         .collect(toList());
   }
 
-  static ISourceRange createSourceRange(ASTNode node, CompilationUnitSpi cu, JavaEnvironmentWithEcj env) {
+  static SourceRange createSourceRange(ASTNode node, CompilationUnitSpi cu, JavaEnvironmentWithEcj env) {
     if (node == null) {
       return null;
     }

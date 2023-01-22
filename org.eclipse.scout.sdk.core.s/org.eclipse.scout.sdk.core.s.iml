@@ -12,6 +12,7 @@
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.typescript" />
+    <orderEntry type="library" name="Maven: org.glassfish:jakarta.json:2.0.1" level="project" />
     <orderEntry type="library" name="Maven: wsdl4j:wsdl4j:1.6.2" level="project" />
   </component>
 </module>

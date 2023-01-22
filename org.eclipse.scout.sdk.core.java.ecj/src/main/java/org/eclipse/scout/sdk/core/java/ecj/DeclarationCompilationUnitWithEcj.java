@@ -29,7 +29,6 @@ import org.eclipse.jdt.internal.compiler.lookup.Scope;
 import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.java.model.api.ICompilationUnit;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.CompilationUnitImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.ClasspathSpi;
@@ -38,6 +37,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEcj<ICompilationUnit> implements CompilationUnitSpi {
   private final CompilationUnitDeclaration m_astNode;
@@ -46,8 +46,8 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
   private final FinalValue<TypeSpi> m_mainType;
   private final FinalValue<List<DeclarationTypeWithEcj>> m_types;
   private final FinalValue<List<DeclarationImportWithEcj>> m_imports;
-  private final FinalValue<ISourceRange> m_source;
-  private final FinalValue<ISourceRange> m_javaDocSource;
+  private final FinalValue<SourceRange> m_source;
+  private final FinalValue<SourceRange> m_javaDocSource;
   private final FinalValue<Path> m_absolutePath;
   private final FinalValue<ClasspathSpi> m_containingClasspathFolder;
 
@@ -240,12 +240,12 @@ public class DeclarationCompilationUnitWithEcj extends AbstractJavaElementWithEc
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> createSourceRange(m_astNode, this, javaEnvWithEcj()));
   }
 
   @Override
-  public ISourceRange getJavaDoc() {
+  public SourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
       var doc = m_astNode.javadoc;
       if (doc != null) {

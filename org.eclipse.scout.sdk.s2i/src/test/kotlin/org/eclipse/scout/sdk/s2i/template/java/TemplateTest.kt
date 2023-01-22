@@ -19,7 +19,6 @@ import org.eclipse.scout.sdk.s2i.AbstractTestCaseWithRunningClasspathModule
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 
-
 class TemplateTest : AbstractTestCaseWithRunningClasspathModule() {
 
     override fun getTestDataPath() = "src/test/resources/template/java"

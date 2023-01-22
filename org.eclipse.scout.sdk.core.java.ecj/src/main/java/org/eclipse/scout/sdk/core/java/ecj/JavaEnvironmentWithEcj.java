@@ -60,8 +60,6 @@ import org.eclipse.jdt.internal.compiler.lookup.TypeVariableBinding;
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.ecj.SourcePositionComparators.MethodBindingComparator;
 import org.eclipse.scout.sdk.core.java.model.CompilationUnitInfo;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
-import org.eclipse.scout.sdk.core.java.model.api.internal.SourceRange;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotationElementSpi;
@@ -75,6 +73,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -410,7 +409,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
    *         <li>class in jar and source attachment to jar is defined</li>
    *         </ul>
    */
-  public ISourceRange getSource(CompilationUnitSpi cu, int start, int end) {
+  public SourceRange getSource(CompilationUnitSpi cu, int start, int end) {
     if (!(cu instanceof DeclarationCompilationUnitWithEcj)) {
       return null;
     }
@@ -421,7 +420,7 @@ public class JavaEnvironmentWithEcj extends AbstractJavaEnvironment implements A
       return null;
     }
 
-    return new SourceRange(CharBuffer.wrap(src, start, end - start + 1), start, end);
+    return new SourceRange(CharBuffer.wrap(src, start, end - start + 1), start);
   }
 
   @SuppressWarnings("squid:S1168")

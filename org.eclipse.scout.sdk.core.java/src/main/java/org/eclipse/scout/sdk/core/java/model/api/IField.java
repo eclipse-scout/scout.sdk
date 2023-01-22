@@ -14,6 +14,7 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.java.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.java.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link IField}</h3> Represents a field in a java type.
@@ -44,7 +45,7 @@ public interface IField extends IMember {
    *
    * @return The initializer source.
    */
-  Optional<ISourceRange> sourceOfInitializer();
+  Optional<SourceRange> sourceOfInitializer();
 
   /**
    * @return The {@link IType} this {@link IField} is declared in.

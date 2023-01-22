@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.spliterator.SuperTypeHierarchySpliterator;
+import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 
 /**
  * <h3>{@link SuperTypeQuery}</h3>

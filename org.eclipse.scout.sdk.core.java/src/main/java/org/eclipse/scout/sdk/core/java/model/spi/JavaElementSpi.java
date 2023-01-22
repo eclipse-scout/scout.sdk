@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.java.model.spi;
 import org.eclipse.scout.sdk.core.java.model.api.IBreadthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.java.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
@@ -31,7 +31,7 @@ public interface JavaElementSpi {
    */
   String getElementName();
 
-  ISourceRange getSource();
+  SourceRange getSource();
 
   IJavaElement wrap();
 

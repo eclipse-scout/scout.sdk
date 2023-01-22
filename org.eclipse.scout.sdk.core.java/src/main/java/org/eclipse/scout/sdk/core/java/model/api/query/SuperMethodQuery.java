@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.java.model.api.IMethod;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.spliterator.HierarchicalStreamBuilder;
+import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 
 /**
  * <h3>{@link SuperMethodQuery}</h3> Super method query that by default returns all {@link IMethod}s of all super

@@ -20,7 +20,6 @@ import org.eclipse.scout.sdk.core.java.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.java.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.java.model.api.IPackage;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.IUnresolvedType;
 import org.eclipse.scout.sdk.core.java.model.api.internal.UnresolvedTypeImplementor.UnresolvedTypeSpi;
@@ -28,6 +27,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.AbstractSpiElement;
 import org.eclipse.scout.sdk.core.java.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 public class UnresolvedTypeImplementor extends AbstractJavaElementImplementor<UnresolvedTypeSpi> implements IUnresolvedType {
@@ -120,7 +120,7 @@ public class UnresolvedTypeImplementor extends AbstractJavaElementImplementor<Un
     }
 
     @Override
-    public ISourceRange getSource() {
+    public SourceRange getSource() {
       if (m_type == null) {
         return null;
       }

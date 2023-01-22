@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.java.model.api;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotationElementSpi;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link IAnnotationElement}</h3>
@@ -54,9 +55,9 @@ public interface IAnnotationElement extends IJavaElement {
    * <li>@Annotation(anno = @Generated("g3")) -> sourceOfExpression() = "@Generated("g1")"</li>
    * </ul>
    *
-   * @return The {@link ISourceRange} of the value expression of this {@link IAnnotationElement}.
+   * @return The {@link SourceRange} of the value expression of this {@link IAnnotationElement}.
    */
-  Optional<ISourceRange> sourceOfExpression();
+  Optional<SourceRange> sourceOfExpression();
 
   @Override
   AnnotationElementSpi unwrap();

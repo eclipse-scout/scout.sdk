@@ -7,7 +7,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.typescript.model.api;
 
-public interface ITypeScriptElement {
+// noinspection JSUnusedGlobalSymbols
+export function utilFunc() {
+}
+
+// noinspection JSUnusedGlobalSymbols
+export default {
+  utilFunc
 }

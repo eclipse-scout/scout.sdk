@@ -27,7 +27,6 @@ import org.eclipse.jdt.internal.compiler.ast.Initializer;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.java.model.api.IField;
 import org.eclipse.scout.sdk.core.java.model.api.IMetaValue;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.FieldImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.FieldSpi;
@@ -35,6 +34,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> implements FieldSpi {
   private final DeclarationTypeWithEcj m_declaringType;
@@ -44,9 +44,9 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   private final FinalValue<TypeSpi> m_type;
   private final FinalValue<List<DeclarationAnnotationWithEcj>> m_annotations;
   private final FinalValue<IMetaValue> m_constRef;
-  private final FinalValue<ISourceRange> m_source;
-  private final FinalValue<ISourceRange> m_initSource;
-  private final FinalValue<ISourceRange> m_javaDocSource;
+  private final FinalValue<SourceRange> m_source;
+  private final FinalValue<SourceRange> m_initSource;
+  private final FinalValue<SourceRange> m_javaDocSource;
   private int m_flags;
 
   protected DeclarationFieldWithEcj(AbstractJavaEnvironment env, DeclarationTypeWithEcj declaringType, FieldDeclaration astNode) {
@@ -149,12 +149,12 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> javaEnvWithEcj().getSource(m_declaringType.getCompilationUnit(), m_astNode.declarationSourceStart, m_astNode.declarationSourceEnd));
   }
 
   @Override
-  public ISourceRange getSourceOfInitializer() {
+  public SourceRange getSourceOfInitializer() {
     return m_initSource.computeIfAbsentAndGet(() -> {
       var cu = m_declaringType.getCompilationUnit();
       if (m_astNode instanceof Initializer) {
@@ -166,7 +166,7 @@ public class DeclarationFieldWithEcj extends AbstractMemberWithEcj<IField> imple
   }
 
   @Override
-  public ISourceRange getJavaDoc() {
+  public SourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> createSourceRange(m_astNode.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj()));
   }
 }

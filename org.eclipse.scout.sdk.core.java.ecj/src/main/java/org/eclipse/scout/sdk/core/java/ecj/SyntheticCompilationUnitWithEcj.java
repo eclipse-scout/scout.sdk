@@ -17,7 +17,6 @@ import java.util.List;
 
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.model.api.ICompilationUnit;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.CompilationUnitImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.ClasspathSpi;
@@ -25,6 +24,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.ImportSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class SyntheticCompilationUnitWithEcj extends AbstractJavaElementWithEcj<ICompilationUnit> implements CompilationUnitSpi {
   private final TypeSpi m_mainType;
@@ -94,12 +94,12 @@ public class SyntheticCompilationUnitWithEcj extends AbstractJavaElementWithEcj<
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return null;
   }
 
   @Override
-  public ISourceRange getJavaDoc() {
+  public SourceRange getJavaDoc() {
     return null;
   }
 }

@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.model.api.IBreadthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.java.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.java.model.api.IMethod;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
@@ -60,9 +60,9 @@ public interface MethodSpi extends MemberSpi {
    */
   boolean isConstructor();
 
-  ISourceRange getSourceOfBody();
+  SourceRange getSourceOfBody();
 
-  ISourceRange getSourceOfDeclaration();
+  SourceRange getSourceOfDeclaration();
 
   @Override
   default TreeVisitResult acceptPreOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {

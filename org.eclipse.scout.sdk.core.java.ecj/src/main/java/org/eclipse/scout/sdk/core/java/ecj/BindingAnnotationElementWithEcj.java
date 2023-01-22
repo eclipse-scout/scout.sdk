@@ -19,14 +19,13 @@ import org.eclipse.jdt.internal.compiler.lookup.ElementValuePair;
 import org.eclipse.scout.sdk.core.java.ecj.metavalue.MetaValueFactory;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.java.model.api.IMetaValue;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.AnnotationElementImplementor;
-import org.eclipse.scout.sdk.core.java.model.api.internal.SourceRange;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<IAnnotationElement> implements AnnotationElementSpi {
   private final AnnotationSpi m_declaringAnnotation;
@@ -34,8 +33,8 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
   private final String m_name;
   private final boolean m_syntheticDefaultValue;
   private final FinalValue<IMetaValue> m_value;
-  private final FinalValue<ISourceRange> m_source;
-  private final FinalValue<ISourceRange> m_expressionSource;
+  private final FinalValue<SourceRange> m_source;
+  private final FinalValue<SourceRange> m_expressionSource;
   private final FinalValue<MemberValuePair> m_memberValuePair;
 
   protected BindingAnnotationElementWithEcj(AbstractJavaEnvironment env, AnnotationSpi owner, ElementValuePair bindingPair, boolean syntheticDefaultValue) {
@@ -100,13 +99,13 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
       var pairDecl = memberValuePair();
       if (pairDecl == null) {
         return null;
       }
-      return new SourceRange(pairDecl.toString(), pairDecl.sourceStart, pairDecl.sourceEnd);
+      return new SourceRange(pairDecl.toString(), pairDecl.sourceStart);
     });
   }
 
@@ -119,11 +118,11 @@ public class BindingAnnotationElementWithEcj extends AbstractJavaElementWithEcj<
   }
 
   @Override
-  public ISourceRange getSourceOfExpression() {
+  public SourceRange getSourceOfExpression() {
     return m_expressionSource.computeIfAbsentAndGet(() -> {
       var expr = getValueExpression();
       if (expr != null) {
-        return new SourceRange(expr.toString(), expr.sourceStart, expr.sourceEnd);
+        return new SourceRange(expr.toString(), expr.sourceStart);
       }
       return null;
     });

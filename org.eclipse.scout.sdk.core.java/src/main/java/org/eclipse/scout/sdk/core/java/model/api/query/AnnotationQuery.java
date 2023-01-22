@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**

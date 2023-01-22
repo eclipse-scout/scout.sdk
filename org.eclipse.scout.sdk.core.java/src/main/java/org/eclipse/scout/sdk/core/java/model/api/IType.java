@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.core.java.model.api.query.MethodQuery;
 import org.eclipse.scout.sdk.core.java.model.api.query.SuperTypeQuery;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link IType}</h3>
@@ -116,7 +117,7 @@ public interface IType extends IMember {
   /**
    * @return the source of the static initializer with the {@code static} keyword and the leading and trailing brackets.
    */
-  Optional<ISourceRange> sourceOfStaticInitializer();
+  Optional<SourceRange> sourceOfStaticInitializer();
 
   /**
    * Gets if this {@link IType} represents a primitive type.

@@ -28,7 +28,6 @@ import org.eclipse.scout.sdk.core.java.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.java.model.api.IImport;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.java.model.api.IPackage;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.query.AnnotationQuery;
 import org.eclipse.scout.sdk.core.java.model.api.query.FieldQuery;
@@ -39,6 +38,7 @@ import org.eclipse.scout.sdk.core.java.model.api.spliterator.WrappingSpliterator
 import org.eclipse.scout.sdk.core.java.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 @SuppressWarnings("squid:S2160")
@@ -73,7 +73,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
 
   @Override
   public Stream<? extends IJavaElement> children() {
-    Comparator<IJavaElement> c = Comparator.comparing(e -> e.source().map(ISourceRange::start).orElse(0));
+    Comparator<IJavaElement> c = Comparator.comparing(e -> e.source().map(SourceRange::start).orElse(0));
     return Stream.of(fields().stream(), methods().stream(), innerTypes().stream(), typeParameters(), annotations().stream())
         .flatMap(f -> f)
         .sorted(c);
@@ -144,7 +144,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
   }
 
   @Override
-  public Optional<ISourceRange> sourceOfStaticInitializer() {
+  public Optional<SourceRange> sourceOfStaticInitializer() {
     return Optional.ofNullable(m_spi.getSourceOfStaticInitializer());
   }
 

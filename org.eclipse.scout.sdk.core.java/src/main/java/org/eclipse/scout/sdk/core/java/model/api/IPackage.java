@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.java.generator.PackageGenerator;
 import org.eclipse.scout.sdk.core.java.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link IPackage}</h3> Represents a package declaration in an {@link ICompilationUnit}.
@@ -61,7 +62,7 @@ public interface IPackage extends IAnnotatable {
    * @return Always returns an empty {@link Optional}.
    */
   @Override
-  Optional<ISourceRange> source();
+  Optional<SourceRange> source();
 
   @Override
   PackageSpi unwrap();

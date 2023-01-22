@@ -18,13 +18,12 @@ import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
 import org.eclipse.scout.sdk.core.java.ecj.metavalue.MetaValueFactory;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.java.model.api.IMetaValue;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.AnnotationElementImplementor;
-import org.eclipse.scout.sdk.core.java.model.api.internal.SourceRange;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class DeclarationAnnotationElementWithEcj extends AbstractJavaElementWithEcj<IAnnotationElement> implements AnnotationElementSpi {
   private final AnnotationSpi m_declaringAnnotation;
@@ -32,8 +31,8 @@ public class DeclarationAnnotationElementWithEcj extends AbstractJavaElementWith
   private final String m_name;
   private final boolean m_syntheticDefaultValue;
   private final FinalValue<IMetaValue> m_value;
-  private final FinalValue<ISourceRange> m_source;
-  private final FinalValue<ISourceRange> m_expressionSource;
+  private final FinalValue<SourceRange> m_source;
+  private final FinalValue<SourceRange> m_expressionSource;
 
   protected DeclarationAnnotationElementWithEcj(AbstractJavaEnvironment env, AnnotationSpi declaringAnnotation, MemberValuePair astNode, boolean syntheticDefaultValue) {
     super(env);
@@ -90,18 +89,18 @@ public class DeclarationAnnotationElementWithEcj extends AbstractJavaElementWith
   }
 
   @Override
-  public ISourceRange getSource() {
-    return m_source.computeIfAbsentAndGet(() -> new SourceRange(m_astNode.toString(), m_astNode.sourceStart, m_astNode.sourceEnd));
+  public SourceRange getSource() {
+    return m_source.computeIfAbsentAndGet(() -> new SourceRange(m_astNode.toString(), m_astNode.sourceStart));
   }
 
   @Override
-  public ISourceRange getSourceOfExpression() {
+  public SourceRange getSourceOfExpression() {
     return m_expressionSource.computeIfAbsentAndGet(() -> {
       var expr = m_astNode.value;
       if (expr == null) {
         return null;
       }
-      return new SourceRange(expr.toString(), expr.sourceStart, expr.sourceEnd);
+      return new SourceRange(expr.toString(), expr.sourceStart);
     });
   }
 }

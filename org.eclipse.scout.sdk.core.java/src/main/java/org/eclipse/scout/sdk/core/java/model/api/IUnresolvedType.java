@@ -14,6 +14,7 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.java.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.java.model.api.internal.UnresolvedTypeImplementor.UnresolvedTypeSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link IUnresolvedType}</h3> Represents a java data type which may not yet exist on the classpath.<br>
@@ -72,11 +73,11 @@ public interface IUnresolvedType extends IJavaElement {
   UnresolvedTypeSpi unwrap();
 
   /**
-   * @return The {@link ISourceRange} of this {@link IUnresolvedType} if it {@link #exists()} and the underlying
+   * @return The {@link SourceRange} of this {@link IUnresolvedType} if it {@link #exists()} and the underlying
    *         {@link #type()} has source attached.
    */
   @Override
-  Optional<ISourceRange> source();
+  Optional<SourceRange> source();
 
   @Override
   ITypeGenerator<?> toWorkingCopy();

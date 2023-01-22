@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.java.model.api.query;
+package org.eclipse.scout.sdk.core.model.query;
 
 import java.util.Optional;
 import java.util.stream.Stream;

@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IMember;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 
 /**
@@ -68,7 +68,7 @@ public interface MemberSpi extends AnnotatableSpi {
    */
   boolean hasTypeParameters();
 
-  ISourceRange getJavaDoc();
+  SourceRange getJavaDoc();
 
   @Override
   IMember wrap();

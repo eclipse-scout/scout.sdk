@@ -13,8 +13,8 @@ import java.util.List;
 
 import org.eclipse.scout.sdk.core.java.model.api.IBreadthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.java.model.api.IDepthFirstJavaElementVisitor;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
@@ -78,7 +78,7 @@ public interface TypeSpi extends MemberSpi {
   /**
    * @return the source of the static initializer.
    */
-  ISourceRange getSourceOfStaticInitializer();
+  SourceRange getSourceOfStaticInitializer();
 
   /**
    * Gets all direct member {@link TypeSpi}s of this {@link TypeSpi} in the order as they appear in the source or class

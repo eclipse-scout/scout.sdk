@@ -40,7 +40,6 @@ import org.eclipse.jdt.internal.compiler.lookup.TypeVariableBinding;
 import org.eclipse.scout.sdk.core.java.ecj.SourcePositionComparators.FieldBindingComparator;
 import org.eclipse.scout.sdk.core.java.ecj.SourcePositionComparators.MethodBindingComparator;
 import org.eclipse.scout.sdk.core.java.ecj.SourcePositionComparators.TypeBindingComparator;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.MissingTypeException;
 import org.eclipse.scout.sdk.core.java.model.api.internal.TypeImplementor;
@@ -53,6 +52,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   private final ReferenceBinding m_binding;
@@ -71,9 +71,9 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   private final FinalValue<List<FieldSpi>> m_fields;
   private final FinalValue<SourceTypeBinding> m_sourceTypeBindingRef;
   private final FinalValue<CompilationUnitSpi> m_unit;
-  private final FinalValue<ISourceRange> m_source;
-  private final FinalValue<ISourceRange> m_javaDocSource;
-  private final FinalValue<ISourceRange> m_staticInitSource;
+  private final FinalValue<SourceRange> m_source;
+  private final FinalValue<SourceRange> m_javaDocSource;
+  private final FinalValue<SourceRange> m_staticInitSource;
   private final Supplier<? extends ReferenceBinding> m_newElementLookupStrategy;
   private int m_flags;
 
@@ -395,7 +395,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
       var reference = nvl(m_binding.original(), m_binding);
       if (reference instanceof SourceTypeBinding) {
@@ -407,7 +407,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   }
 
   @Override
-  public ISourceRange getSourceOfStaticInitializer() {
+  public SourceRange getSourceOfStaticInitializer() {
     return m_staticInitSource.computeIfAbsentAndGet(() -> {
       if (m_binding instanceof SourceTypeBinding) {
         var decl = ((SourceTypeBinding) m_binding).scope.referenceContext;
@@ -422,7 +422,7 @@ public class BindingTypeWithEcj extends AbstractTypeWithEcj {
   }
 
   @Override
-  public ISourceRange getJavaDoc() {
+  public SourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
       if (m_binding instanceof SourceTypeBinding) {
         var decl = ((SourceTypeBinding) m_binding).scope.referenceContext;

@@ -1,0 +1,6 @@
+{
+  "name": "@eclipse-scout/sdk-minimal-module",
+  "version": "23.1.0-snapshot",
+  "main": "./src/main-index.ts",
+  "module": "./src/module-index.ts"
+}

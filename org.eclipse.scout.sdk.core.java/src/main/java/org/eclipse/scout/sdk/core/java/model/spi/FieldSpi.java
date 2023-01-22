@@ -13,7 +13,7 @@ import org.eclipse.scout.sdk.core.java.model.api.IBreadthFirstJavaElementVisitor
 import org.eclipse.scout.sdk.core.java.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.java.model.api.IField;
 import org.eclipse.scout.sdk.core.java.model.api.IMetaValue;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
@@ -38,7 +38,7 @@ public interface FieldSpi extends MemberSpi {
    */
   TypeSpi getDataType();
 
-  ISourceRange getSourceOfInitializer();
+  SourceRange getSourceOfInitializer();
 
   @Override
   default TreeVisitResult acceptPreOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {

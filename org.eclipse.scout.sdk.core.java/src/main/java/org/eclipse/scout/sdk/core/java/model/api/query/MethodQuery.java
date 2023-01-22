@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.core.java.model.api.IMethod;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.spliterator.HierarchicalStreamBuilder;
 import org.eclipse.scout.sdk.core.java.model.api.spliterator.WrappingSpliterator;
+import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 
 /**
  * <h3>{@link MethodQuery}</h3> Method query that by default returns all {@link IMethod}s in an {@link IType}.

@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.core.java.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.java.model.api.IImport;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.java.model.api.IPackage;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.query.InnerTypeQuery;
 import org.eclipse.scout.sdk.core.java.model.api.spliterator.WrappingSpliterator;
@@ -31,6 +30,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class CompilationUnitImplementor extends AbstractJavaElementImplementor<CompilationUnitSpi> implements ICompilationUnit {
 
@@ -94,7 +94,7 @@ public class CompilationUnitImplementor extends AbstractJavaElementImplementor<C
   }
 
   @Override
-  public Optional<ISourceRange> javaDoc() {
+  public Optional<SourceRange> javaDoc() {
     return Optional.ofNullable(m_spi.getJavaDoc());
   }
 

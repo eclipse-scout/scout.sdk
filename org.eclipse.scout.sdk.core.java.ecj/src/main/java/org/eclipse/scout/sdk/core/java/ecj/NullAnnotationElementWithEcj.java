@@ -14,12 +14,12 @@ import static org.eclipse.scout.sdk.core.java.ecj.SpiWithEcjUtils.findNewAnnotat
 import org.eclipse.scout.sdk.core.java.ecj.metavalue.MetaValueFactory;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.java.model.api.IMetaValue;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.AnnotationElementImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class NullAnnotationElementWithEcj extends AbstractJavaElementWithEcj<IAnnotationElement> implements AnnotationElementSpi {
 
@@ -65,12 +65,12 @@ public class NullAnnotationElementWithEcj extends AbstractJavaElementWithEcj<IAn
   }
 
   @Override
-  public ISourceRange getSourceOfExpression() {
+  public SourceRange getSourceOfExpression() {
     return null;
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return null;
   }
 }

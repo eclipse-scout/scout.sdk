@@ -13,12 +13,12 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.java.model.api.IMember;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.java.model.api.spliterator.WrappingSpliterator;
 import org.eclipse.scout.sdk.core.java.model.spi.MemberSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public abstract class AbstractMemberImplementor<SPI extends MemberSpi> extends AbstractAnnotatableImplementor<SPI> implements IMember {
 
@@ -48,7 +48,7 @@ public abstract class AbstractMemberImplementor<SPI extends MemberSpi> extends A
   }
 
   @Override
-  public Optional<ISourceRange> javaDoc() {
+  public Optional<SourceRange> javaDoc() {
     return Optional.ofNullable(m_spi.getJavaDoc());
   }
 }

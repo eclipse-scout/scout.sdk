@@ -17,8 +17,8 @@ import org.eclipse.scout.sdk.core.java.generator.AbstractAnnotatableGenerator;
 import org.eclipse.scout.sdk.core.java.generator.IJavaElementGenerator;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IMember;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link AbstractMemberGenerator}</h3>
@@ -37,7 +37,7 @@ public abstract class AbstractMemberGenerator<TYPE extends IMemberGenerator<TYPE
     super(member, transformer);
     withFlags(member.flags());
     member.javaDoc()
-        .map(ISourceRange::asCharSequence)
+        .map(SourceRange::asCharSequence)
         .<ISourceGenerator<IJavaElementCommentBuilder<?>>> map(s -> b -> b.append(s).nl())
         .ifPresent(this::withComment);
   }

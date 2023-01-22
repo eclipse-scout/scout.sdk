@@ -32,10 +32,10 @@ import org.eclipse.scout.sdk.core.java.generator.SimpleGenerators;
 import org.eclipse.scout.sdk.core.java.generator.member.AbstractMemberGenerator;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IField;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.transformer.DefaultWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.java.transformer.SimpleWorkingCopyTransformerBuilder;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -56,7 +56,7 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
     super(field, transformer);
     withDataType(field.dataType().reference())
         .withValue(field.sourceOfInitializer()
-            .map(ISourceRange::asCharSequence)
+            .map(SourceRange::asCharSequence)
             .<ISourceGenerator<IExpressionBuilder<?>>> map(ISourceGenerator::raw)
             .orElseGet(() -> field.constantValue()
                 .map(mv -> SimpleGenerators.createMetaValueGenerator(mv, transformer))

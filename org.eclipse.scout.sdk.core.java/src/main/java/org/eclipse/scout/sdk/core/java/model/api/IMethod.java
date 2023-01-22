@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.java.model.api.query.MethodParameterQuery;
 import org.eclipse.scout.sdk.core.java.model.api.query.SuperMethodQuery;
 import org.eclipse.scout.sdk.core.java.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link IMethod}</h3> Represents a method declaration.
@@ -70,10 +71,10 @@ public interface IMethod extends IMember {
    *
    * @return The source of the method body.
    */
-  Optional<ISourceRange> sourceOfBody();
+  Optional<SourceRange> sourceOfBody();
 
   /**
-   * Gets the {@link ISourceRange} of the method declaration.<br>
+   * Gets the {@link SourceRange} of the method declaration.<br>
    * This is the range from the method name to the end of the {@code throws} declaration.
    * <p>
    * Note: Preceding modifiers (e.g. like {@code public}), the return type, annotations or comments (like javadoc) are
@@ -97,7 +98,7 @@ public interface IMethod extends IMember {
    * 
    * @return An Optional holding the source range of the method declaration section.
    */
-  Optional<ISourceRange> sourceOfDeclaration();
+  Optional<SourceRange> sourceOfDeclaration();
 
   @Override
   MethodSpi unwrap();

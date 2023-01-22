@@ -16,7 +16,7 @@ import java.util.Map;
 import org.eclipse.scout.sdk.core.java.model.api.IBreadthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.java.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.java.model.api.IDepthFirstJavaElementVisitor;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
@@ -87,7 +87,7 @@ public interface CompilationUnitSpi extends JavaElementSpi {
    */
   TypeSpi findTypeBySimpleName(String simpleName);
 
-  ISourceRange getJavaDoc();
+  SourceRange getJavaDoc();
 
   @Override
   default TreeVisitResult acceptPreOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {

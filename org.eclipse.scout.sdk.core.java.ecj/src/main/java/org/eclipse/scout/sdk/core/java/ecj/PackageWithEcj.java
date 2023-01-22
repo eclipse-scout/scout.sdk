@@ -13,13 +13,13 @@ import java.util.List;
 
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.model.api.IPackage;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.PackageImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 public class PackageWithEcj extends AbstractJavaElementWithEcj<IPackage> implements PackageSpi {
@@ -48,7 +48,7 @@ public class PackageWithEcj extends AbstractJavaElementWithEcj<IPackage> impleme
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return null;
   }
 

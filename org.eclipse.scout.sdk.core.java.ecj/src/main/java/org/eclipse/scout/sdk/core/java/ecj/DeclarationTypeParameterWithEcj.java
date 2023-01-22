@@ -24,7 +24,6 @@ import org.eclipse.jdt.internal.compiler.lookup.BlockScope;
 import org.eclipse.jdt.internal.compiler.lookup.ClassScope;
 import org.eclipse.jdt.internal.compiler.lookup.Scope;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.java.model.api.internal.TypeParameterImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
@@ -33,6 +32,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link DeclarationTypeParameterWithEcj}</h3>
@@ -45,7 +45,7 @@ public class DeclarationTypeParameterWithEcj extends AbstractJavaElementWithEcj<
   private final int m_index;
   private final String m_name;
   private final FinalValue<List<TypeSpi>> m_bounds;
-  private final FinalValue<ISourceRange> m_source;
+  private final FinalValue<SourceRange> m_source;
 
   protected DeclarationTypeParameterWithEcj(AbstractJavaEnvironment env, AbstractMemberWithEcj<?> declaringMember, TypeParameter astNode, int index) {
     super(env);
@@ -143,7 +143,7 @@ public class DeclarationTypeParameterWithEcj extends AbstractJavaElementWithEcj<
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
       var cu = declaringTypeOf(this).getCompilationUnit();
       var decl = m_astNode;

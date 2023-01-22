@@ -20,13 +20,13 @@ import java.util.List;
 import org.eclipse.jdt.internal.compiler.ast.Argument;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.java.model.api.IMethodParameter;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.MethodParameterImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link DeclarationMethodParameterWithEcj}</h3>
@@ -40,7 +40,7 @@ public class DeclarationMethodParameterWithEcj extends AbstractJavaElementWithEc
   private final FinalValue<String> m_name;
   private final FinalValue<TypeSpi> m_dataType;
   private final FinalValue<List<DeclarationAnnotationWithEcj>> m_annotations;
-  private final FinalValue<ISourceRange> m_source;
+  private final FinalValue<SourceRange> m_source;
   private int m_flags;
 
   protected DeclarationMethodParameterWithEcj(AbstractJavaEnvironment env, DeclarationMethodWithEcj declaringMethod, Argument astNode, int index) {
@@ -111,7 +111,7 @@ public class DeclarationMethodParameterWithEcj extends AbstractJavaElementWithEc
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
       var cu = m_declaringMethod.getDeclaringType().getCompilationUnit();
       var decl = m_astNode;

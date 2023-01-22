@@ -25,7 +25,6 @@ import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.java.model.api.IField;
 import org.eclipse.scout.sdk.core.java.model.api.IMetaValue;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.FieldImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.FieldSpi;
@@ -33,6 +32,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implements FieldSpi {
   private final AbstractTypeWithEcj m_declaringType;
@@ -41,9 +41,9 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   private final FinalValue<TypeSpi> m_type;
   private final FinalValue<List<BindingAnnotationWithEcj>> m_annotations;
   private final FinalValue<IMetaValue> m_constRef;
-  private final FinalValue<ISourceRange> m_source;
-  private final FinalValue<ISourceRange> m_initializerSource;
-  private final FinalValue<ISourceRange> m_javaDocSource;
+  private final FinalValue<SourceRange> m_source;
+  private final FinalValue<SourceRange> m_initializerSource;
+  private final FinalValue<SourceRange> m_javaDocSource;
   private int m_flags;
 
   protected BindingFieldWithEcj(AbstractJavaEnvironment env, AbstractTypeWithEcj declaringType, FieldBinding binding) {
@@ -150,7 +150,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
       var decl = m_binding.sourceField();
       if (decl == null) {
@@ -161,7 +161,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   }
 
   @Override
-  public ISourceRange getSourceOfInitializer() {
+  public SourceRange getSourceOfInitializer() {
     return m_initializerSource.computeIfAbsentAndGet(() -> {
       var decl = m_binding.sourceField();
       if (decl == null) {
@@ -172,7 +172,7 @@ public class BindingFieldWithEcj extends AbstractMemberWithEcj<IField> implement
   }
 
   @Override
-  public ISourceRange getJavaDoc() {
+  public SourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> {
       var decl = m_binding.sourceField();
       if (decl == null) {

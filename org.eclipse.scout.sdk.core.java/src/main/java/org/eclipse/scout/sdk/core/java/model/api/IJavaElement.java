@@ -18,6 +18,7 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.java.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
@@ -47,7 +48,7 @@ public interface IJavaElement {
    *         <li>class in jar and source attachment to jar is defined</li>
    *         </ul>
    */
-  Optional<ISourceRange> source();
+  Optional<SourceRange> source();
 
   /**
    * Unwraps the java element into its underlying SPI class.

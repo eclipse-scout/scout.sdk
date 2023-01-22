@@ -22,7 +22,6 @@ import org.eclipse.jdt.internal.compiler.lookup.ArrayBinding;
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.internal.TypeImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
@@ -34,6 +33,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link BindingArrayTypeWithEcj}</h3>
@@ -198,17 +198,17 @@ public class BindingArrayTypeWithEcj extends AbstractTypeWithEcj {
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return null;
   }
 
   @Override
-  public ISourceRange getSourceOfStaticInitializer() {
+  public SourceRange getSourceOfStaticInitializer() {
     return null;
   }
 
   @Override
-  public ISourceRange getJavaDoc() {
+  public SourceRange getJavaDoc() {
     return null;
   }
 }

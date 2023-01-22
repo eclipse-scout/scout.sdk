@@ -54,13 +54,13 @@ import org.eclipse.scout.sdk.core.java.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.java.generator.typeparam.ITypeParameterGenerator;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IMethod;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.java.transformer.DefaultWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.java.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -111,7 +111,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
 
     if (canHaveBody(method.flags())) {
       m_body = method.sourceOfBody()
-          .map(ISourceRange::asCharSequence)
+          .map(SourceRange::asCharSequence)
           .<ISourceGenerator<BODY>> map(ISourceGenerator::raw)
           .orElse(null);
     }

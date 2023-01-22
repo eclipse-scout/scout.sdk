@@ -20,9 +20,9 @@ import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.java.model.api.IMetaValue;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class AnnotationElementImplementor extends AbstractJavaElementImplementor<AnnotationElementSpi> implements IAnnotationElement {
 
@@ -46,7 +46,7 @@ public class AnnotationElementImplementor extends AbstractJavaElementImplementor
   }
 
   @Override
-  public Optional<ISourceRange> sourceOfExpression() {
+  public Optional<SourceRange> sourceOfExpression() {
     return Optional.ofNullable(m_spi.getSourceOfExpression());
   }
 

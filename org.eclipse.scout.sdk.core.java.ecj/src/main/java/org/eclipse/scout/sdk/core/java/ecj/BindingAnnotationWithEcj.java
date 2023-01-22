@@ -27,7 +27,6 @@ import org.eclipse.jdt.internal.compiler.lookup.ElementValuePair;
 import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.AnnotationImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.AnnotatableSpi;
@@ -36,13 +35,14 @@ import org.eclipse.scout.sdk.core.java.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnotation> implements AnnotationSpi {
   private final AnnotatableSpi m_owner;
   private final AnnotationBinding m_binding;
   private final FinalValue<Map<String, AnnotationElementSpi>> m_values; //sorted
   private final FinalValue<TypeSpi> m_type;
-  private final FinalValue<ISourceRange> m_source;
+  private final FinalValue<SourceRange> m_source;
   private final FinalValue<Annotation> m_annotationDeclaration;
 
   protected BindingAnnotationWithEcj(AbstractJavaEnvironment env, AnnotatableSpi owner, AnnotationBinding binding) {
@@ -193,7 +193,7 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
       var decl = annotationDeclaration();
       if (decl == null) {

@@ -72,7 +72,6 @@ public final class CoreUtils {
     setThreadLocal(CURRENT_USER_NAME, newUsernameForCurrentThread);
   }
 
-
   /**
    * Deletes the given file or folder.<br>
    * In case the given {@link Path} is a folder the contents of the folder are deleted recursively.<br>
@@ -130,8 +129,6 @@ public final class CoreUtils {
    *           if there is an error moving the directory
    */
   public static void moveDirectory(Path sourceDir, Path targetDir) throws IOException {
-    Ensure.notNull(sourceDir);
-    Ensure.notNull(targetDir);
     Ensure.isDirectory(sourceDir);
     Ensure.isDirectory(targetDir);
 

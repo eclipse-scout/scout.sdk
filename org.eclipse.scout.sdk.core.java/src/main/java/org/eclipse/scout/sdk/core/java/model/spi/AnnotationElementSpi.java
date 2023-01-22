@@ -13,7 +13,7 @@ import org.eclipse.scout.sdk.core.java.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.java.model.api.IBreadthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.java.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.java.model.api.IMetaValue;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 /**
@@ -43,7 +43,7 @@ public interface AnnotationElementSpi extends JavaElementSpi {
    */
   boolean isDefaultValue();
 
-  ISourceRange getSourceOfExpression();
+  SourceRange getSourceOfExpression();
 
   @Override
   default TreeVisitResult acceptPreOrder(IDepthFirstJavaElementVisitor visitor, int level, int index) {

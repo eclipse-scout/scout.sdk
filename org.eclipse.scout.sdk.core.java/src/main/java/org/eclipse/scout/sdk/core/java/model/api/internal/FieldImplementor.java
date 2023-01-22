@@ -18,11 +18,11 @@ import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IField;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.java.model.api.IMetaValue;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.query.AnnotationQuery;
 import org.eclipse.scout.sdk.core.java.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class FieldImplementor extends AbstractMemberImplementor<FieldSpi> implements IField {
 
@@ -51,7 +51,7 @@ public class FieldImplementor extends AbstractMemberImplementor<FieldSpi> implem
   }
 
   @Override
-  public Optional<ISourceRange> sourceOfInitializer() {
+  public Optional<SourceRange> sourceOfInitializer() {
     return Optional.ofNullable(m_spi.getSourceOfInitializer());
   }
 

@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.internal.TypeImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
@@ -26,6 +25,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link WildcardOnlyTypeWithEcj}</h3>
@@ -154,17 +154,17 @@ public class WildcardOnlyTypeWithEcj extends AbstractTypeWithEcj {
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return null;
   }
 
   @Override
-  public ISourceRange getSourceOfStaticInitializer() {
+  public SourceRange getSourceOfStaticInitializer() {
     return null;
   }
 
   @Override
-  public ISourceRange getJavaDoc() {
+  public SourceRange getJavaDoc() {
     return null;
   }
 

@@ -20,13 +20,13 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.JavaUtils;
 import org.eclipse.scout.sdk.core.java.model.api.IMethod;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutAbstractApi.AbstractDynamicNlsTextProviderService;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.nls.TextProviderService;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link PropertiesTextProviderService}</h3>
@@ -69,7 +69,7 @@ public class PropertiesTextProviderService extends TextProviderService {
         .withSuperClasses(true)
         .first()
         .flatMap(IMethod::sourceOfBody)
-        .map(ISourceRange::asCharSequence)
+        .map(SourceRange::asCharSequence)
         .map(JavaUtils::removeComments)
         .map(REGEX_RESOURCE_BUNDLE_GETTER::matcher)
         .filter(Matcher::find)

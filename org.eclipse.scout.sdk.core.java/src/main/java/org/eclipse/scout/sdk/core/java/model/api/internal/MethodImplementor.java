@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.java.model.api.IMethod;
 import org.eclipse.scout.sdk.core.java.model.api.IMethodParameter;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.query.AnnotationQuery;
 import org.eclipse.scout.sdk.core.java.model.api.query.MethodParameterQuery;
@@ -31,6 +30,7 @@ import org.eclipse.scout.sdk.core.java.model.api.spliterator.WrappingSpliterator
 import org.eclipse.scout.sdk.core.java.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> implements IMethod {
 
@@ -72,12 +72,12 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> impl
   }
 
   @Override
-  public Optional<ISourceRange> sourceOfBody() {
+  public Optional<SourceRange> sourceOfBody() {
     return Optional.ofNullable(m_spi.getSourceOfBody());
   }
 
   @Override
-  public Optional<ISourceRange> sourceOfDeclaration() {
+  public Optional<SourceRange> sourceOfDeclaration() {
     return Optional.ofNullable(m_spi.getSourceOfDeclaration());
   }
 

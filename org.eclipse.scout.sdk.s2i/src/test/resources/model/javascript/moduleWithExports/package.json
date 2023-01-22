@@ -1,0 +1,5 @@
+{
+  "name": "@eclipse-scout/sdk-export-js",
+  "version": "23.1.0-snapshot",
+  "main": "./src/index.js"
+}

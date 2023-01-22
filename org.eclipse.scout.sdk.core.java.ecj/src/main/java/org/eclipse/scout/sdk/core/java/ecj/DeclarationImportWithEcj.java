@@ -12,16 +12,16 @@ package org.eclipse.scout.sdk.core.java.ecj;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ast.ImportReference;
 import org.eclipse.scout.sdk.core.java.model.api.IImport;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.ImportImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.ImportSpi;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class DeclarationImportWithEcj extends AbstractJavaElementWithEcj<IImport> implements ImportSpi {
   private final ImportReference m_astNode;
   private final DeclarationCompilationUnitWithEcj m_cu;
-  private final FinalValue<ISourceRange> m_source;
+  private final FinalValue<SourceRange> m_source;
   private final FinalValue<String> m_fqName;
   private final FinalValue<String> m_simpleName;
   private final FinalValue<String> m_qualifier;
@@ -94,7 +94,7 @@ public class DeclarationImportWithEcj extends AbstractJavaElementWithEcj<IImport
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> javaEnvWithEcj().getSource(m_cu, m_astNode.declarationSourceStart, m_astNode.declarationSourceEnd));
   }
 }

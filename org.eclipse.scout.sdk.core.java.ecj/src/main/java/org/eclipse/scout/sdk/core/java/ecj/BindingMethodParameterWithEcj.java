@@ -19,13 +19,13 @@ import java.util.List;
 import org.eclipse.jdt.internal.compiler.lookup.AnnotationBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.java.model.api.IMethodParameter;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.MethodParameterImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class BindingMethodParameterWithEcj extends AbstractJavaElementWithEcj<IMethodParameter> implements MethodParameterSpi {
   private final BindingMethodWithEcj m_declaringMethod;
@@ -34,7 +34,7 @@ public class BindingMethodParameterWithEcj extends AbstractJavaElementWithEcj<IM
   private final int m_flags;
   private final char[] m_name;
   private final FinalValue<TypeSpi> m_dataType;
-  private final FinalValue<ISourceRange> m_source;
+  private final FinalValue<SourceRange> m_source;
   private final FinalValue<String> m_nameAsString;
   private final FinalValue<List<BindingAnnotationWithEcj>> m_annotations;
 
@@ -115,7 +115,7 @@ public class BindingMethodParameterWithEcj extends AbstractJavaElementWithEcj<IM
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> {
       var declMethod = sourceMethodOf(m_declaringMethod);
       if (declMethod != null) {

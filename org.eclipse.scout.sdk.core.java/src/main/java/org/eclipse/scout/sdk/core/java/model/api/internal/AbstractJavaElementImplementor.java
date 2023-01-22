@@ -19,9 +19,9 @@ import org.eclipse.scout.sdk.core.java.model.api.IBreadthFirstJavaElementVisitor
 import org.eclipse.scout.sdk.core.java.model.api.IDepthFirstJavaElementVisitor;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.visitor.DefaultDepthFirstVisitor;
 import org.eclipse.scout.sdk.core.util.visitor.DepthFirstVisitorTypeAdapter;
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor;
@@ -52,7 +52,7 @@ public abstract class AbstractJavaElementImplementor<SPI extends JavaElementSpi>
   }
 
   @Override
-  public Optional<ISourceRange> source() {
+  public Optional<SourceRange> source() {
     return Optional.ofNullable(m_spi.getSource());
   }
 
@@ -131,7 +131,7 @@ public abstract class AbstractJavaElementImplementor<SPI extends JavaElementSpi>
   @Override
   public String toString() {
     return source()
-        .map(ISourceRange::asCharSequence)
+        .map(SourceRange::asCharSequence)
         .map(CharSequence::toString)
         .orElseGet(() -> toWorkingCopy().toSource(JavaSourceBuilder::create, new BuilderContext()).toString());
   }

@@ -42,11 +42,11 @@ import org.eclipse.scout.sdk.core.java.generator.type.SortedMemberEntry;
 import org.eclipse.scout.sdk.core.java.imports.CompilationUnitScopedImportCollector;
 import org.eclipse.scout.sdk.core.java.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.java.model.api.IImport;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.transformer.DefaultWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.java.transformer.SimpleWorkingCopyTransformerBuilder;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
@@ -92,7 +92,7 @@ public class CompilationUnitGenerator<TYPE extends ICompilationUnitGenerator<TYP
         .collect(toList());
     m_footerSourceBuilders = new ArrayList<>();
     cu.javaDoc()
-        .map(ISourceRange::asCharSequence)
+        .map(SourceRange::asCharSequence)
         .<ISourceGenerator<IJavaElementCommentBuilder<?>>> map(s -> b -> {
           b.append(s);
           if (!Strings.endsWith(s, b.context().lineDelimiter())) {

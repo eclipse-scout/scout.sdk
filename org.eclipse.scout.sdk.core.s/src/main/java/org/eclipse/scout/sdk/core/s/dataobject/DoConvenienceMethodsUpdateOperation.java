@@ -39,7 +39,6 @@ import org.eclipse.scout.sdk.core.java.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IMethod;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
@@ -50,6 +49,7 @@ import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.java.generator.annotation.ScoutAnnotationGenerator;
 import org.eclipse.scout.sdk.core.s.java.generator.method.IScoutMethodGenerator;
 import org.eclipse.scout.sdk.core.s.java.generator.method.ScoutDoMethodGenerator;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.SourceState;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -160,7 +160,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
     var paramSource = m
         .parameters().stream()
         .map(p -> p.source().orElseThrow())
-        .map(ISourceRange::asCharSequence)
+        .map(SourceRange::asCharSequence)
         .collect(toList());
     return createMethodIdentifier(m.elementName(), paramSource);
   }

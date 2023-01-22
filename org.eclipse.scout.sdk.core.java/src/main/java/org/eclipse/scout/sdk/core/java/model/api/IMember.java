@@ -15,6 +15,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.java.generator.member.IMemberGenerator;
 import org.eclipse.scout.sdk.core.java.model.spi.MemberSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link IMember}</h3> Represents Java elements that are members.
@@ -70,9 +71,9 @@ public interface IMember extends IAnnotatable {
    * <p>
    * It starts with '/**' and ends with '&#42;/' including these start and end delimiters.
    *
-   * @return The {@link ISourceRange} for the java doc of this {@link IMember}.
+   * @return The {@link SourceRange} for the java doc of this {@link IMember}.
    */
-  Optional<ISourceRange> javaDoc();
+  Optional<SourceRange> javaDoc();
 
   @Override
   MemberSpi unwrap();

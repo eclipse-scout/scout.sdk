@@ -30,7 +30,6 @@ import org.eclipse.jdt.internal.compiler.lookup.Binding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.model.api.IMethod;
-import org.eclipse.scout.sdk.core.java.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.java.model.api.internal.MethodImplementor;
 import org.eclipse.scout.sdk.core.java.model.spi.AbstractJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.spi.MethodParameterSpi;
@@ -39,6 +38,7 @@ import org.eclipse.scout.sdk.core.java.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> implements MethodSpi {
   private final DeclarationTypeWithEcj m_declaringType;
@@ -49,9 +49,9 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
   private final FinalValue<String> m_name;
   private final FinalValue<List<TypeSpi>> m_exceptions;
   private final FinalValue<List<TypeParameterSpi>> m_typeParameters;
-  private final FinalValue<ISourceRange> m_source;
-  private final FinalValue<ISourceRange> m_bodySource;
-  private final FinalValue<ISourceRange> m_javaDocSource;
+  private final FinalValue<SourceRange> m_source;
+  private final FinalValue<SourceRange> m_bodySource;
+  private final FinalValue<SourceRange> m_javaDocSource;
   private final FinalValue<String> m_methodId;
   private int m_flags;
 
@@ -204,22 +204,22 @@ public class DeclarationMethodWithEcj extends AbstractMemberWithEcj<IMethod> imp
   }
 
   @Override
-  public ISourceRange getSource() {
+  public SourceRange getSource() {
     return m_source.computeIfAbsentAndGet(() -> javaEnvWithEcj().getSource(m_declaringType.getCompilationUnit(), m_astNode.declarationSourceStart, m_astNode.declarationSourceEnd));
   }
 
   @Override
-  public ISourceRange getSourceOfBody() {
+  public SourceRange getSourceOfBody() {
     return m_bodySource.computeIfAbsentAndGet(() -> javaEnvWithEcj().getSource(m_declaringType.getCompilationUnit(), m_astNode.bodyStart, m_astNode.bodyEnd));
   }
 
   @Override
-  public ISourceRange getJavaDoc() {
+  public SourceRange getJavaDoc() {
     return m_javaDocSource.computeIfAbsentAndGet(() -> createSourceRange(m_astNode.javadoc, m_declaringType.getCompilationUnit(), javaEnvWithEcj()));
   }
 
   @Override
-  public ISourceRange getSourceOfDeclaration() {
+  public SourceRange getSourceOfDeclaration() {
     return createSourceRange(m_astNode, m_declaringType.getCompilationUnit(), javaEnvWithEcj());
   }
 }

@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.core.java.generator.compilationunit.ICompilationUni
 import org.eclipse.scout.sdk.core.java.model.api.query.InnerTypeQuery;
 import org.eclipse.scout.sdk.core.java.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
+import org.eclipse.scout.sdk.core.util.SourceRange;
 
 /**
  * <h3>{@link ICompilationUnit}</h3> Represents a compilation unit usually defined by a .java file.
@@ -100,9 +101,9 @@ public interface ICompilationUnit extends IJavaElement {
    * Gets the java doc source of this {@link ICompilationUnit}. This is the java doc added on top of the java file
    * (before the imports).
    *
-   * @return The {@link ISourceRange} for the java doc of this {@link ICompilationUnit}.
+   * @return The {@link SourceRange} for the java doc of this {@link ICompilationUnit}.
    */
-  Optional<ISourceRange> javaDoc();
+  Optional<SourceRange> javaDoc();
 
   /**
    * Gets the classpath relative path of this {@link ICompilationUnit}.
