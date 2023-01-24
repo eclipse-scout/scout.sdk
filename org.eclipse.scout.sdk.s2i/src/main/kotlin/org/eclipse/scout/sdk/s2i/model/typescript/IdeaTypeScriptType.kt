@@ -9,6 +9,18 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptObjectType
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptPropertySignature
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeAlias
+import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 
-open class IdeaTypeScriptType(ideaModule: IdeaNodeModule, typeScriptType: TypeScriptTypeAlias) : IdeaJavaScriptClass(ideaModule, typeScriptType)
+open class IdeaTypeScriptType(ideaModule: IdeaNodeModule, val typeScriptType: TypeScriptTypeAlias) : IdeaJavaScriptClass(ideaModule, typeScriptType) {
+
+    override fun collectFields(collector: MutableCollection<FieldSpi>) {
+        val objectType = typeScriptType.typeDeclaration as? TypeScriptObjectType ?: return
+        objectType.children.asSequence()
+            .mapNotNull { it as? TypeScriptPropertySignature }
+            .map { IdeaJavaScriptField(ideaModule, it) }
+            .forEach { collector.add(it) }
+    }
+}

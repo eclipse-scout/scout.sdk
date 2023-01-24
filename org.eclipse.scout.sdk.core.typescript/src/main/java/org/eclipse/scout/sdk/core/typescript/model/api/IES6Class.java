@@ -9,9 +9,16 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.util.Optional;
+
+import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 
 public interface IES6Class extends INodeElement {
   @Override
   ES6ClassSpi spi();
+
+  FieldQuery fields();
+
+  Optional<IField> field(String name);
 }

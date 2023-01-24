@@ -9,16 +9,12 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
-import java.util.Optional;
-
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
-import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
-import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
-import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi;
 
-public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implements IES6Class {
-  public ES6ClassImplementor(ES6ClassSpi spi) {
+public class FieldImplementor extends AbstractNodeElement<FieldSpi> implements IField {
+  public FieldImplementor(FieldSpi spi) {
     super(spi);
   }
 
@@ -28,14 +24,7 @@ public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implem
   }
 
   @Override
-  public FieldQuery fields() {
-    return new FieldQuery(spi());
-  }
-
-  @Override
-  public Optional<IField> field(String name) {
-    return fields()
-        .withName(name)
-        .first();
+  public boolean isOptional() {
+    return spi().isOptional();
   }
 }

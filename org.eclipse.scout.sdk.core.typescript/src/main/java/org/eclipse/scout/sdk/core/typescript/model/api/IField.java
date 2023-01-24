@@ -7,17 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.typescript.model.spi;
+package org.eclipse.scout.sdk.core.typescript.model.api;
 
-import java.util.List;
+import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi;
 
-import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
-
-public interface ES6ClassSpi extends NodeElementSpi {
+public interface IField extends INodeElement {
   @Override
-  IES6Class api();
+  FieldSpi spi();
 
-  String name();
-
-  List<FieldSpi> fields();
+  boolean isOptional();
 }

@@ -7,17 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.typescript.model.spi;
 
-import java.util.List;
+// noinspection JSUnusedGlobalSymbols
+interface SomeInterface {
+  myNumber: number;
+  myBoolean: boolean;
+  myStringOpt?: string;
+  myAnyOpt?: any;
+  myObject: object;
 
-import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
-
-public interface ES6ClassSpi extends NodeElementSpi {
-  @Override
-  IES6Class api();
-
-  String name();
-
-  List<FieldSpi> fields();
+  someFunc(): number;
 }
