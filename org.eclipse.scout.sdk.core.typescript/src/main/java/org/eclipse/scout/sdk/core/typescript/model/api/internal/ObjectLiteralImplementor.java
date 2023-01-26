@@ -9,7 +9,10 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi;
 
@@ -21,5 +24,26 @@ public class ObjectLiteralImplementor extends AbstractNodeElement<ObjectLiteralS
   @Override
   public String name() {
     return spi().name();
+  }
+
+  @Override
+  public Optional<IConstantValue> property(String name) {
+    return Optional.ofNullable(spi().properties().get(name));
+  }
+
+  @Override
+  public Optional<IObjectLiteral> propertyAsObjectLiteral(String name) {
+    return propertyAs(name, IObjectLiteral.class);
+  }
+
+  @Override
+  public Optional<String> propertyAsString(String name) {
+    return propertyAs(name, String.class);
+  }
+
+  @Override
+  public <T> Optional<T> propertyAs(String name, Class<T> type) {
+    return property(name)
+        .flatMap(v -> v.convertTo(type));
   }
 }

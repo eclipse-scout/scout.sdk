@@ -15,11 +15,13 @@ import org.eclipse.scout.sdk.core.typescript.model.api.internal.VariableImplemen
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.VariableSpi
 
-open class IdeaJavaScriptVariable(protected val ideaModule: IdeaNodeModule, protected val javaScriptVariable: JSVariable) : AbstractNodeElementSpi<IVariable>(ideaModule), VariableSpi {
-    
+open class IdeaJavaScriptVariable(protected val ideaModule: IdeaNodeModule, internal val javaScriptVariable: JSVariable) : AbstractNodeElementSpi<IVariable>(ideaModule), VariableSpi {
+
     override fun createApi() = VariableImplementor(this)
 
     override fun source() = ideaModule.sourceFor(javaScriptVariable)
 
     override fun name() = javaScriptVariable.name
+
+    override fun constantValue() = IdeaConstantValue(ideaModule, javaScriptVariable.initializer)
 }

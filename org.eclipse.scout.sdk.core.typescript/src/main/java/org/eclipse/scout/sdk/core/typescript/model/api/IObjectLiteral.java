@@ -9,9 +9,19 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi;
 
 public interface IObjectLiteral extends INodeElement {
   @Override
   ObjectLiteralSpi spi();
+
+  Optional<IConstantValue> property(String name);
+
+  Optional<IObjectLiteral> propertyAsObjectLiteral(String name);
+
+  Optional<String> propertyAsString(String name);
+
+  <T> Optional<T> propertyAs(String name, Class<T> type);
 }

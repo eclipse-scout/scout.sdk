@@ -9,6 +9,9 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import java.util.Map;
+
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 
 public interface ObjectLiteralSpi extends NodeElementSpi {
@@ -16,4 +19,6 @@ public interface ObjectLiteralSpi extends NodeElementSpi {
   IObjectLiteral api();
 
   String name();
+
+  Map<String, IConstantValue> properties();
 }

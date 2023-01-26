@@ -11,15 +11,17 @@ package org.eclipse.scout.sdk.core.typescript.model.api;
 
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.typescript.model.spi.VariableSpi;
+public interface IConstantValue {
+  <T> Optional<T> convertTo(Class<T> expectedType);
 
-public interface IVariable extends INodeElement {
-  @Override
-  VariableSpi spi();
+  ConstantValueType type();
 
-  IConstantValue constantValue();
-
-  Optional<IObjectLiteral> objectLiteralValue();
-
-  Optional<String> stringValue();
+  enum ConstantValueType {
+    ObjectLiteral,
+    Boolean,
+    Numeric,
+    String,
+    Array,
+    Unknown
+  }
 }

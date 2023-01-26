@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.JSAssignmentExpression
 import com.intellij.lang.javascript.psi.JSExpressionStatement
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptEnum
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.lang.javascript.psi.util.JSClassUtils
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
@@ -31,6 +32,8 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
 
     override fun name() = javaScriptClass.name
 
+    override fun isEnum() = javaScriptClass is TypeScriptEnum
+
     override fun fields(): List<FieldSpi> = m_fields.computeIfAbsentAndGet {
         val collector: MutableList<FieldSpi> = ArrayList()
         collectFields(collector)
@@ -39,7 +42,6 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
 
     protected open fun collectFields(collector: MutableCollection<FieldSpi>) {
         javaScriptClass.fields.asSequence()
-            .filterNotNull()
             .filter { !JSClassUtils.isStaticMethodOrField(it) }
             .map { IdeaJavaScriptField(ideaModule, it) }
             .forEach { collector.add(it) }
@@ -47,9 +49,8 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
         val block = javaScriptClass.constructor?.block ?: return
         block.statementListItems.asSequence()
             .filter { it is JSExpressionStatement }
-            .map { it.children.asSequence().firstNotNullOfOrNull { child -> child as? JSAssignmentExpression } }
-            .map { IdeaJavaScriptAssignmentExpressionAsField.parse(ideaModule, it) }
-            .filterNotNull()
+            .mapNotNull { it.children.asSequence().firstNotNullOfOrNull { child -> child as? JSAssignmentExpression } }
+            .mapNotNull { IdeaJavaScriptAssignmentExpressionAsField.parse(ideaModule, it) }
             .forEach { collector.add(it) }
     }
 }

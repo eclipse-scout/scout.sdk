@@ -19,5 +19,7 @@ public interface ES6ClassSpi extends NodeElementSpi {
 
   String name();
 
+  boolean isEnum();
+
   List<FieldSpi> fields();
 }

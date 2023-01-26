@@ -20,5 +20,7 @@ public interface IES6Class extends INodeElement {
 
   FieldQuery fields();
 
+  boolean isEnum();
+
   Optional<IField> field(String name);
 }

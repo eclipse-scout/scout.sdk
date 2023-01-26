@@ -9,7 +9,11 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
+import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.typescript.model.api.IVariable;
 import org.eclipse.scout.sdk.core.typescript.model.spi.VariableSpi;
 
@@ -21,5 +25,20 @@ public class VariableImplementor extends AbstractNodeElement<VariableSpi> implem
   @Override
   public String name() {
     return spi().name();
+  }
+
+  @Override
+  public IConstantValue constantValue() {
+    return spi().constantValue();
+  }
+
+  @Override
+  public Optional<IObjectLiteral> objectLiteralValue() {
+    return constantValue().convertTo(IObjectLiteral.class);
+  }
+
+  @Override
+  public Optional<String> stringValue() {
+    return constantValue().convertTo(String.class);
   }
 }

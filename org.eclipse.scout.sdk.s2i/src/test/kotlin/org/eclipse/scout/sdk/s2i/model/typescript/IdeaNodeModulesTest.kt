@@ -16,34 +16,32 @@ import org.eclipse.scout.sdk.s2i.model.AbstractModelTest
 class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImports") {
 
     fun testResolveReferencedElement() {
-        val testClass = myIdeaNodeModule.export("TestClass").orElseThrow().referencedElement()
+        val testClass = myIdeaNodeModule.export("TestClass").orElseThrow().referencedElement() as IES6Class
         assertEquals("@eclipse-scout/sdk-external-imports-js", testClass.containingModule().name())
 
-        // TODO [fsh]: Use field access of testClass as soon as implemented instead of using the psi directly
-        val testClassPsi = (testClass.spi() as IdeaJavaScriptClass).javaScriptClass
-        val externalField = testClassPsi.fields.first { it.name == "external" }
-        val localField = testClassPsi.fields.first { it.name == "local" }
-        val wildField = testClassPsi.fields.first { it.name == "wild" }
-        val aliasField = testClassPsi.fields.first { it.name == "alias" }
+        val external = testClass.field("external").orElseThrow().spi() as IdeaJavaScriptField
+        val local = testClass.field("local").orElseThrow().spi() as IdeaJavaScriptField
+        val wild = testClass.field("wild").orElseThrow().spi() as IdeaJavaScriptField
+        val alias = testClass.field("alias").orElseThrow().spi() as IdeaJavaScriptField
 
-        val externalElement = myNodeModules.resolveReferencedElement(externalField) as IES6Class
+        val externalElement = myNodeModules.resolveReferencedElement(external.javaScriptField) as IES6Class
         assertEquals("NamedDefaultClass", externalElement.name())
         assertEquals("NamedClazz", externalElement.exportAlias().orElseThrow())
         assertEquals("@eclipse-scout/sdk-export-js", externalElement.containingModule().name())
 
-        val localElement = myNodeModules.resolveReferencedElement(localField) as IES6Class
+        val localElement = myNodeModules.resolveReferencedElement(local.javaScriptField) as IES6Class
         assertEquals("LocalClass", localElement.name())
         assertEquals("LocalClass", localElement.exportAlias().orElseThrow())
         assertEquals("@eclipse-scout/sdk-external-imports-js", localElement.containingModule().name())
         assertSame(testClass.containingModule(), localElement.containingModule())
 
-        val wildElement = myNodeModules.resolveReferencedElement(wildField) as IES6Class
+        val wildElement = myNodeModules.resolveReferencedElement(wild.javaScriptField) as IES6Class
         assertEquals("WildcardClass", wildElement.name())
         assertEquals("WildcardClass", wildElement.exportAlias().orElseThrow())
         assertEquals("@eclipse-scout/sdk-export-js", wildElement.containingModule().name())
         assertSame(externalElement.containingModule(), wildElement.containingModule())
 
-        val aliasElement = myNodeModules.resolveReferencedElement(aliasField) as IES6Class
+        val aliasElement = myNodeModules.resolveReferencedElement(alias.javaScriptField) as IES6Class
         assertEquals("AnotherClass", aliasElement.name())
         assertEquals("AnotherClass", aliasElement.exportAlias().orElseThrow())
         assertEquals("@eclipse-scout/sdk-export-js", aliasElement.containingModule().name())

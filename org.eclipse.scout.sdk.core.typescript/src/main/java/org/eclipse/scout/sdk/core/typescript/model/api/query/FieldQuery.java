@@ -49,13 +49,8 @@ public class FieldQuery extends AbstractQuery<IField> {
   @Override
   protected Stream<IField> createStream() {
     var name = getName();
-    if (name == null) {
-      return es6Class().fields().stream()
-          .map(FieldSpi::api);
-    }
-
     return es6Class().fields().stream()
-        .filter(field -> name.equals(field.name()))
+        .filter(field -> name == null || name.equals(field.name()))
         .map(FieldSpi::api);
   }
 }

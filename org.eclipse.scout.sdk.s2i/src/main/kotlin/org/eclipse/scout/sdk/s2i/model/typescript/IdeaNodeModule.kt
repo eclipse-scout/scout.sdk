@@ -11,6 +11,8 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.ecmascript6.psi.ES6ExportDeclaration
 import com.intellij.lang.ecmascript6.psi.ES6ExportDefaultAssignment
+import com.intellij.lang.ecmascript6.psi.ES6ImportExportSpecifierAlias
+import com.intellij.lang.ecmascript6.psi.JSExportAssignment
 import com.intellij.lang.javascript.JSTokenTypes
 import com.intellij.lang.javascript.inspections.JSRecursiveWalkingElementSkippingNestedFunctionsVisitor
 import com.intellij.lang.javascript.psi.*
@@ -25,6 +27,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
+import com.intellij.psi.PsiReference
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeModuleImplementor
@@ -34,6 +37,7 @@ import org.eclipse.scout.sdk.core.util.SourceRange
 import java.nio.CharBuffer
 import java.util.*
 import java.util.Collections.unmodifiableMap
+import java.util.concurrent.ConcurrentHashMap
 
 open class IdeaNodeModule(val project: Project, private val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
 
@@ -41,6 +45,7 @@ open class IdeaNodeModule(val project: Project, private val nodeModuleDir: Virtu
     private val m_mainPsi = FinalValue<JSFile>()
     private val m_packageJsonSpi = FinalValue<PackageJsonSpi>()
     private val m_exports = FinalValue<Map<String, ExportFromSpi>>()
+    private val m_elements = ConcurrentHashMap<JSElement, NodeElementSpi?>()
 
     override fun containingModule() = this
 
@@ -132,43 +137,58 @@ open class IdeaNodeModule(val project: Project, private val nodeModuleDir: Virtu
         if (candidate is JSAttributeList) {
             val attributeOwner = candidate.parent as? JSElement
             if (attributeOwner is JSVarStatement) {
-                return attributeOwner.variables.asList()
+                return attributeOwner.variables
+                    .mapNotNull { resolveReferenceTarget(it) }
             }
             candidate = attributeOwner
         }
         if (candidate is ES6ExportDefaultAssignment) {
             candidate = if (candidate.namedElement == null) candidate.expression else candidate.namedElement
         }
-        return candidate?.let { listOf(it) } ?: emptyList()
+        return resolveReferenceTarget(candidate)?.let { listOf(it) } ?: emptyList()
     }
 
-    internal fun createSpiForPsi(psi: JSElement): NodeElementSpi? {
-        if (psi is TypeScriptClass) {
-            return IdeaTypeScriptClass(this, psi)
+    internal fun resolveReferenceTarget(element: JSElement?): JSElement? {
+        var ref = element as? PsiReference ?: return element
+        while (true) {
+            var refTarget = ref.resolve()
+            if (refTarget === ref) return ref as? JSElement // self-reference (e.g. 'undefined')
+            if (refTarget is JSField) refTarget = refTarget.initializer
+            if (refTarget is JSPrefixExpression) refTarget = refTarget.expression
+            if (refTarget is ES6ImportExportSpecifierAlias) refTarget = refTarget.findAliasedElement()
+            if (refTarget is JSExportAssignment) refTarget = refTarget.stubSafeElement
+            if (refTarget !is PsiReference) return refTarget as? JSElement // last reference found
+            ref = refTarget // resolve next reference
         }
-        if (psi is TypeScriptInterface) {
-            return IdeaTypeScriptInterface(this, psi)
+    }
+
+    internal fun createSpiForPsi(psi: JSElement) = m_elements.computeIfAbsent(psi) {
+        if (it is TypeScriptClass) {
+            return@computeIfAbsent IdeaTypeScriptClass(this, it)
         }
-        if (psi is TypeScriptFunction) {
-            return IdeaTypeScriptFunction(this, psi)
+        if (it is TypeScriptInterface) {
+            return@computeIfAbsent IdeaTypeScriptInterface(this, it)
         }
-        if (psi is TypeScriptTypeAlias) {
-            return IdeaTypeScriptType(this, psi)
+        if (it is TypeScriptFunction) {
+            return@computeIfAbsent IdeaTypeScriptFunction(this, it)
         }
-        if (psi is JSClass) {
-            return IdeaJavaScriptClass(this, psi)
+        if (it is TypeScriptTypeAlias) {
+            return@computeIfAbsent IdeaTypeScriptType(this, it)
         }
-        if (psi is JSFunction) {
-            return IdeaJavaScriptFunction(this, psi)
+        if (it is JSClass) {
+            return@computeIfAbsent IdeaJavaScriptClass(this, it)
         }
-        if (psi is JSObjectLiteralExpression) {
-            return IdeaJavaScriptObjectLiteral(this, psi)
+        if (it is JSFunction) {
+            return@computeIfAbsent IdeaJavaScriptFunction(this, it)
         }
-        if (psi is JSVariable) {
-            return IdeaJavaScriptVariable(this, psi)
+        if (it is JSObjectLiteralExpression) {
+            return@computeIfAbsent IdeaJavaScriptObjectLiteral(this, it)
+        }
+        if (it is JSVariable) {
+            return@computeIfAbsent IdeaJavaScriptVariable(this, it)
         }
         SdkLog.warning("Unsupported type: '" + psi::class.java.name + "' called '" + psi.name + "'.")
-        return null
+        return@computeIfAbsent null
     }
 
     fun mainFile(): VirtualFile? = m_mainFile.computeIfAbsentAndGet {

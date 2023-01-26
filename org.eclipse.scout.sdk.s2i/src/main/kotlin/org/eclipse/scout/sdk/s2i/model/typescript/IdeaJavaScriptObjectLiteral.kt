@@ -10,16 +10,31 @@
 package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.ObjectLiteralImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi
+import org.eclipse.scout.sdk.core.util.FinalValue
+import java.util.*
 
-open class IdeaJavaScriptObjectLiteral(protected val ideaModule: IdeaNodeModule, protected val jsObjectLiteral: JSObjectLiteralExpression) : AbstractNodeElementSpi<IObjectLiteral>(ideaModule), ObjectLiteralSpi {
-    
+open class IdeaJavaScriptObjectLiteral(protected val ideaModule: IdeaNodeModule, internal val jsObjectLiteral: JSObjectLiteralExpression) : AbstractNodeElementSpi<IObjectLiteral>(ideaModule), ObjectLiteralSpi {
+
+    private val m_properties = FinalValue<Map<String, IConstantValue>>()
+
     override fun createApi() = ObjectLiteralImplementor(this)
 
     override fun source() = ideaModule.sourceFor(jsObjectLiteral)
 
-    override fun name() = ""
+    override fun name() = "" // anonymous
+
+    override fun properties(): Map<String, IConstantValue> = m_properties.computeIfAbsentAndGet {
+        return@computeIfAbsentAndGet Collections.unmodifiableMap(collectProperties())
+    }
+
+    fun collectProperties(): Map<String, IConstantValue> {
+        return jsObjectLiteral.properties
+            .mapNotNull { it.name?.let { name -> name to IdeaConstantValue(ideaModule, it.value) } }
+            .toMap()
+    }
 }

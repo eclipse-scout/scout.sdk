@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ExportFromSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
 
-open class IdeaExportFrom(protected val ideaModule: IdeaNodeModule, protected val exportDeclaration: JSElement, private val name: String, private val exportedElement: NodeElementSpi) : AbstractNodeElementSpi<IExportFrom>(ideaModule),
+open class IdeaExportFrom(protected val ideaModule: IdeaNodeModule, internal val exportDeclaration: JSElement, private val name: String, private val exportedElement: NodeElementSpi) : AbstractNodeElementSpi<IExportFrom>(ideaModule),
     ExportFromSpi {
 
     override fun createApi() = ExportFromImplementor(this)

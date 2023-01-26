@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IVariable;
 
 public interface VariableSpi extends NodeElementSpi {
@@ -16,4 +17,6 @@ public interface VariableSpi extends NodeElementSpi {
   IVariable api();
 
   String name();
+
+  IConstantValue constantValue();
 }

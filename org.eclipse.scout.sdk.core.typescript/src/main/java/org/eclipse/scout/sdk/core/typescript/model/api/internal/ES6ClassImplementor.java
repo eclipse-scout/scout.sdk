@@ -33,6 +33,11 @@ public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implem
   }
 
   @Override
+  public boolean isEnum() {
+    return spi().isEnum();
+  }
+
+  @Override
   public Optional<IField> field(String name) {
     return fields()
         .withName(name)
