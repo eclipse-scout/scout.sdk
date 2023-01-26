@@ -37,19 +37,19 @@ import org.eclipse.scout.sdk.core.util.SourceRange
 import java.nio.CharBuffer
 import java.util.*
 import java.util.Collections.unmodifiableMap
-import java.util.concurrent.ConcurrentHashMap
 
-open class IdeaNodeModule(val project: Project, private val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
+class IdeaNodeModule(val project: Project, private val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
+
+    var spiFactory = IdeaSpiFactory(this)
 
     private val m_mainFile = FinalValue<VirtualFile>()
     private val m_mainPsi = FinalValue<JSFile>()
     private val m_packageJsonSpi = FinalValue<PackageJsonSpi>()
     private val m_exports = FinalValue<Map<String, ExportFromSpi>>()
-    private val m_elements = ConcurrentHashMap<JSElement, NodeElementSpi?>()
 
     override fun containingModule() = this
 
-    override fun packageJson(): PackageJsonSpi = m_packageJsonSpi.computeIfAbsentAndGet { IdeaPackageJson(this, nodeModuleDir) }
+    override fun packageJson(): PackageJsonSpi = m_packageJsonSpi.computeIfAbsentAndGet { spiFactory.createPackageJson(nodeModuleDir) }
 
     override fun createApi() = NodeModuleImplementor(this, packageJson())
 
@@ -86,7 +86,6 @@ open class IdeaNodeModule(val project: Project, private val nodeModuleDir: Virtu
                 ?.resolveReferencedElements()
                 ?.mapNotNull { it as? JSFile }
                 ?.flatMap { findAllExportedElements(it) }
-                ?.distinct()
                 ?.mapNotNull { createIdeaExportFrom(exportDeclaration, it) }
                 ?: emptyList()
         }
@@ -105,7 +104,7 @@ open class IdeaNodeModule(val project: Project, private val nodeModuleDir: Virtu
 
     internal fun createIdeaExportFrom(exportDeclaration: JSElement, referencedElement: JSElement, exportAlias: String? = referencedElement.name): IdeaExportFrom? {
         val exportName = exportAlias ?: return null // cannot re-export an anonymous element
-        return createSpiForPsi(referencedElement)?.let { IdeaExportFrom(this, exportDeclaration, exportName, it) }
+        return createSpiForPsi(referencedElement)?.let { spiFactory.createExportFrom(exportDeclaration, exportName, it) }
     }
 
     internal fun findAllExportedElements(file: JSFile): Set<JSElement> {
@@ -162,34 +161,35 @@ open class IdeaNodeModule(val project: Project, private val nodeModuleDir: Virtu
         }
     }
 
-    internal fun createSpiForPsi(psi: JSElement) = m_elements.computeIfAbsent(psi) {
-        if (it is TypeScriptClass) {
-            return@computeIfAbsent IdeaTypeScriptClass(this, it)
+    fun createSpiForPsi(psi: JSElement): NodeElementSpi? {
+        if (psi is TypeScriptClass) {
+            return spiFactory.createTypeScriptClass(psi)
         }
-        if (it is TypeScriptInterface) {
-            return@computeIfAbsent IdeaTypeScriptInterface(this, it)
+        if (psi is TypeScriptInterface) {
+            return spiFactory.createTypeScriptInterface(psi)
         }
-        if (it is TypeScriptFunction) {
-            return@computeIfAbsent IdeaTypeScriptFunction(this, it)
+        if (psi is TypeScriptFunction) {
+            return spiFactory.createTypeScriptFunction(psi)
         }
-        if (it is TypeScriptTypeAlias) {
-            return@computeIfAbsent IdeaTypeScriptType(this, it)
+        if (psi is TypeScriptTypeAlias) {
+            return spiFactory.createTypeScriptTypeAlias(psi)
         }
-        if (it is JSClass) {
-            return@computeIfAbsent IdeaJavaScriptClass(this, it)
+        if (psi is JSClass) {
+            return spiFactory.createJavaScriptClass(psi)
         }
-        if (it is JSFunction) {
-            return@computeIfAbsent IdeaJavaScriptFunction(this, it)
+        if (psi is JSFunction) {
+            return spiFactory.createJavaScriptFunction(psi)
         }
-        if (it is JSObjectLiteralExpression) {
-            return@computeIfAbsent IdeaJavaScriptObjectLiteral(this, it)
+        if (psi is JSObjectLiteralExpression) {
+            return spiFactory.createObjectLiteralExpression(psi)
         }
-        if (it is JSVariable) {
-            return@computeIfAbsent IdeaJavaScriptVariable(this, it)
+        if (psi is JSVariable) {
+            return spiFactory.createJavaScriptVariable(psi)
         }
         SdkLog.warning("Unsupported type: '" + psi::class.java.name + "' called '" + psi.name + "'.")
-        return@computeIfAbsent null
+        return null
     }
+
 
     fun mainFile(): VirtualFile? = m_mainFile.computeIfAbsentAndGet {
         val packageJson = packageJson().api()

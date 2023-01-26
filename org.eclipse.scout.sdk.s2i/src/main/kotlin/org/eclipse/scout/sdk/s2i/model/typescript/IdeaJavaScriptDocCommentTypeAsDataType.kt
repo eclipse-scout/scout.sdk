@@ -11,11 +11,11 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.jsdoc.JSDocComment
 
-open class IdeaJavaScriptDocCommentTypeAsDataType protected constructor(type: String) : IdeaJavaScriptDocCommentAsDataType(type) {
+open class IdeaJavaScriptDocCommentTypeAsDataType internal constructor(type: String) : IdeaJavaScriptDocCommentAsDataType(type) {
     companion object {
-        fun parse(comment: JSDocComment?): IdeaJavaScriptDocCommentTypeAsDataType? {
+        fun parse(ideaNodeModule: IdeaNodeModule, comment: JSDocComment?): IdeaJavaScriptDocCommentTypeAsDataType? {
             val type = comment?.type ?: return null
-            return IdeaJavaScriptDocCommentTypeAsDataType(type)
+            return ideaNodeModule.spiFactory.createJavaScriptDocCommentTypeAsDataType(type)
         }
     }
 }

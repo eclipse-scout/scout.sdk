@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
+import com.intellij.lang.javascript.psi.JSExpression
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
@@ -34,7 +35,12 @@ open class IdeaJavaScriptObjectLiteral(protected val ideaModule: IdeaNodeModule,
 
     fun collectProperties(): Map<String, IConstantValue> {
         return jsObjectLiteral.properties
-            .mapNotNull { it.name?.let { name -> name to IdeaConstantValue(ideaModule, it.value) } }
+            .mapNotNull { createMapping(it.name, it.value) }
             .toMap()
+    }
+
+    private fun createMapping(name: String?, expression: JSExpression?): Pair<String, IdeaConstantValue>? {
+        if (name == null || expression == null) return null
+        return name to ideaModule.spiFactory.createConstantValue(expression)
     }
 }

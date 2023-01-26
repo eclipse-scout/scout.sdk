@@ -20,6 +20,6 @@ open class IdeaTypeScriptClass(ideaModule: IdeaNodeModule, typeScriptClass: Type
         javaScriptClass.fields.asSequence()
             .mapNotNull { it as? TypeScriptField }
             .filter { !JSClassUtils.isStaticMethodOrField(it) }
-            .map { IdeaJavaScriptField(ideaModule, it) }
+            .map { ideaModule.spiFactory.createJavaScriptField(it) }
             .forEach { collector.add(it) }
 }

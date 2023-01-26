@@ -20,7 +20,7 @@ open class IdeaTypeScriptType(ideaModule: IdeaNodeModule, val typeScriptType: Ty
         val objectType = typeScriptType.typeDeclaration as? TypeScriptObjectType ?: return
         objectType.children.asSequence()
             .mapNotNull { it as? TypeScriptPropertySignature }
-            .map { IdeaJavaScriptField(ideaModule, it) }
+            .map { ideaModule.spiFactory.createJavaScriptField(it) }
             .forEach { collector.add(it) }
     }
 }

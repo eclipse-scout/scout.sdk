@@ -31,6 +31,6 @@ open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, interna
     override fun isOptional(): Boolean = (javaScriptField as? JSOptionalOwner)?.isOptional ?: false
 
     override fun dataType(): DataTypeSpi? = m_dataType.computeIfAbsentAndGet {
-        javaScriptField.jsType?.let { IdeaJavaScriptType(it) }
+        javaScriptField.jsType?.let { ideaModule.spiFactory.createJavaScriptType(it) }
     }
 }

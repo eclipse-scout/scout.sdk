@@ -18,6 +18,6 @@ open class IdeaTypeScriptInterface(ideaModule: IdeaNodeModule, typeScriptInterfa
     override fun collectFields(collector: MutableCollection<FieldSpi>) =
         javaScriptClass.fields.asSequence()
             .mapNotNull { it as? TypeScriptPropertySignature }
-            .map { IdeaJavaScriptField(ideaModule, it) }
+            .map { ideaModule.spiFactory.createJavaScriptField(it) }
             .forEach { collector.add(it) }
 }

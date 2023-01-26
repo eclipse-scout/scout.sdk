@@ -43,7 +43,7 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     protected open fun collectFields(collector: MutableCollection<FieldSpi>) {
         javaScriptClass.fields.asSequence()
             .filter { !JSClassUtils.isStaticMethodOrField(it) }
-            .map { IdeaJavaScriptField(ideaModule, it) }
+            .map { ideaModule.spiFactory.createJavaScriptField(it) }
             .forEach { collector.add(it) }
 
         val block = javaScriptClass.constructor?.block ?: return

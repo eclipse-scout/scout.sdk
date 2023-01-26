@@ -72,7 +72,7 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
         val componentType = expectedType.componentType
         val result = java.lang.reflect.Array.newInstance(componentType, expressions.size) as Array<Any?>
         for (i in expressions.indices) {
-            val value = IdeaConstantValue(ideaModule, expressions[i])
+            val value = ideaModule.spiFactory.createConstantValue(expressions[i])
             if (IConstantValue::class.java == componentType) {
                 result[i] = value
             } else {
@@ -136,6 +136,6 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
 
     protected fun tryConvertToObjectLiteral(): IObjectLiteral? {
         val literal = element as? JSObjectLiteralExpression ?: return null
-        return IdeaJavaScriptObjectLiteral(ideaModule, literal).api()
+        return ideaModule.spiFactory.createObjectLiteralExpression(literal).api()
     }
 }

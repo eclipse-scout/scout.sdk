@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
+import org.eclipse.scout.sdk.s2i.model.typescript.IdeaSpiFactory
 import org.mockito.Mockito
 
 abstract class AbstractES6ClassTest(val fixturePath: String) : BasePlatformTestCase() {
@@ -28,6 +29,7 @@ abstract class AbstractES6ClassTest(val fixturePath: String) : BasePlatformTestC
 
     override fun setUp() {
         super.setUp()
+        Mockito.`when`(ideaModule.spiFactory).thenReturn(IdeaSpiFactory(ideaModule))
         psiFile = myFixture.configureByFile(fixturePath)
     }
 

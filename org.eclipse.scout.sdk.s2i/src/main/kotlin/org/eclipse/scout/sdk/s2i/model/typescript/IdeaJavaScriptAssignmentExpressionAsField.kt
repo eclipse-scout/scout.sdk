@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 
-open class IdeaJavaScriptAssignmentExpressionAsField protected constructor(val ideaModule: IdeaNodeModule, val javaScriptAssignmentExpression: JSAssignmentExpression, val javaScriptReferenceExpression: JSReferenceExpression) :
+open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(val ideaModule: IdeaNodeModule, val javaScriptAssignmentExpression: JSAssignmentExpression, val javaScriptReferenceExpression: JSReferenceExpression) :
     AbstractNodeElementSpi<IField>(ideaModule), FieldSpi {
 
     private val m_javaScriptExpressionStatement = FinalValue<JSExpressionStatement?>()
@@ -39,14 +39,14 @@ open class IdeaJavaScriptAssignmentExpressionAsField protected constructor(val i
 
     override fun dataType(): DataTypeSpi? = m_dataType.computeIfAbsentAndGet {
         val comment = javaScriptExpressionStatement()?.children?.firstNotNullOfOrNull { it as? JSDocComment } ?: return@computeIfAbsentAndGet null
-        return@computeIfAbsentAndGet IdeaJavaScriptDocCommentTypeAsDataType.parse(comment)
+        return@computeIfAbsentAndGet IdeaJavaScriptDocCommentTypeAsDataType.parse(ideaModule, comment)
     }
 
     companion object {
         fun parse(ideaModule: IdeaNodeModule, assignment: JSAssignmentExpression?): IdeaJavaScriptAssignmentExpressionAsField? {
             val reference: JSReferenceExpression = assignment?.definitionExpression?.expression as? JSReferenceExpression ?: return null
             if (reference.qualifier !is JSThisExpression) return null
-            return IdeaJavaScriptAssignmentExpressionAsField(ideaModule, assignment, reference)
+            return ideaModule.spiFactory.createJavaScriptAssignmentExpressionAsField(assignment, reference)
         }
     }
 }
