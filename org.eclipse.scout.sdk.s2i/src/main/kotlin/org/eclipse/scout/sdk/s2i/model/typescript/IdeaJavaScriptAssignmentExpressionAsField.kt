@@ -10,14 +10,22 @@
 package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.JSAssignmentExpression
+import com.intellij.lang.javascript.psi.JSExpressionStatement
 import com.intellij.lang.javascript.psi.JSReferenceExpression
 import com.intellij.lang.javascript.psi.JSThisExpression
+import com.intellij.lang.javascript.psi.jsdoc.JSDocComment
 import org.eclipse.scout.sdk.core.typescript.model.api.IField
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.FieldImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
+import org.eclipse.scout.sdk.core.util.FinalValue
 
-open class IdeaJavaScriptAssignmentExpressionAsField protected constructor(val ideaModule: IdeaNodeModule, val javaScriptAssignmentExpression: JSAssignmentExpression, val javaScriptReferenceExpression: JSReferenceExpression): AbstractNodeElementSpi<IField>(ideaModule), FieldSpi {
+open class IdeaJavaScriptAssignmentExpressionAsField protected constructor(val ideaModule: IdeaNodeModule, val javaScriptAssignmentExpression: JSAssignmentExpression, val javaScriptReferenceExpression: JSReferenceExpression) :
+    AbstractNodeElementSpi<IField>(ideaModule), FieldSpi {
+
+    private val m_javaScriptExpressionStatement = FinalValue<JSExpressionStatement?>()
+    private val m_dataType = FinalValue<DataTypeSpi?>()
 
     override fun createApi() = FieldImplementor(this)
 
@@ -26,6 +34,13 @@ open class IdeaJavaScriptAssignmentExpressionAsField protected constructor(val i
     override fun name() = javaScriptReferenceExpression.referenceName
 
     override fun isOptional(): Boolean = false
+
+    protected fun javaScriptExpressionStatement() = m_javaScriptExpressionStatement.computeIfAbsentAndGet { javaScriptAssignmentExpression.parent as? JSExpressionStatement }
+
+    override fun dataType(): DataTypeSpi? = m_dataType.computeIfAbsentAndGet {
+        val comment = javaScriptExpressionStatement()?.children?.firstNotNullOfOrNull { it as? JSDocComment } ?: return@computeIfAbsentAndGet null
+        return@computeIfAbsentAndGet IdeaJavaScriptDocCommentTypeAsDataType.parse(comment)
+    }
 
     companion object {
         fun parse(ideaModule: IdeaNodeModule, assignment: JSAssignmentExpression?): IdeaJavaScriptAssignmentExpressionAsField? {

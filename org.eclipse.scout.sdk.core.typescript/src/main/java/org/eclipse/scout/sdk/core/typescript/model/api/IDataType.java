@@ -7,14 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+package org.eclipse.scout.sdk.core.typescript.model.api;
 
-// noinspection JSUnusedGlobalSymbols
-type SomeType = {
-  myStringOpt?: string;
-  myNumber: number;
-  myBoolean: boolean;
-  myUndefined: undefined;
-  myNull: null;
-  myObject: object;
-  myAnyOpt?: any;
-};
+import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
+
+public interface IDataType {
+
+  DataTypeSpi spi();
+
+  String name();
+
+  boolean isPrimitive();
+}

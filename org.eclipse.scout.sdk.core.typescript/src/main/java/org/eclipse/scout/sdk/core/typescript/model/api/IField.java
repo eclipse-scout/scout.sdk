@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi;
 
 public interface IField extends INodeElement {
@@ -16,4 +18,6 @@ public interface IField extends INodeElement {
   FieldSpi spi();
 
   boolean isOptional();
+
+  Optional<IDataType> dataType();
 }

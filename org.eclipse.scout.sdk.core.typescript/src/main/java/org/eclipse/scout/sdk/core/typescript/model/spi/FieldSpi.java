@@ -18,4 +18,6 @@ public interface FieldSpi extends NodeElementSpi {
   String name();
 
   boolean isOptional();
+
+  DataTypeSpi dataType();
 }

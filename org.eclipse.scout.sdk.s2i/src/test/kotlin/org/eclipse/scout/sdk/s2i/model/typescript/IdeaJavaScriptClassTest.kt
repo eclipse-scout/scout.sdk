@@ -10,12 +10,13 @@
 package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
-import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.s2i.model.AbstractES6ClassTest
 
 class IdeaJavaScriptClassTest : AbstractES6ClassTest("model/javascript/es6class/SomeClass.js") {
 
-    override fun createES6ClassSpi(): ES6ClassSpi = IdeaJavaScriptClass(ideaModule, findChildOfType(JSClass::class.java))
+    override fun createES6ClassSpi() = IdeaJavaScriptClass(ideaModule, findChildOfType(JSClass::class.java))
 
-    override fun isAssertOptional(): Boolean = false
+    override fun isOptionalPossible() = false
+
+    override fun isDataTypePresentForAllFields() = false
 }

@@ -13,15 +13,18 @@ class SomeClass {
 
   constructor() {
     /**
-     * @type {boolean}
+     *  @type {string}
      */
-    this.myBoolean = null;
     this.myStringOpt = "null";
-    this.myAnyOpt = null;
+    /** @type {boolean} */
+    this.myBoolean = false;
+    this.myUndefined = undefined;
+    this.myNull = null;
     /**
      * @type {object}
      */
-    this.myObject = null;
+    this.myObject = {};
+    this.myAnyOpt = null;
   }
 
   /**

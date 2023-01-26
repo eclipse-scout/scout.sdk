@@ -9,8 +9,12 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
+import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi;
 
 public class FieldImplementor extends AbstractNodeElement<FieldSpi> implements IField {
@@ -26,5 +30,10 @@ public class FieldImplementor extends AbstractNodeElement<FieldSpi> implements I
   @Override
   public boolean isOptional() {
     return spi().isOptional();
+  }
+
+  @Override
+  public Optional<IDataType> dataType() {
+    return Optional.ofNullable(spi().dataType()).map(DataTypeSpi::api);
   }
 }

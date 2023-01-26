@@ -10,12 +10,13 @@
 
 // noinspection JSUnusedGlobalSymbols
 class SomeClass {
-  myBoolean: boolean;
   myStringOpt?: string;
-  myAnyOpt?: any;
-  myObject: object;
-
   myNumber = 5;
+  myBoolean: boolean;
+  myUndefined: undefined;
+  myNull: null;
+  myObject: object;
+  myAnyOpt?: any;
 
   static MY_ENUM = 'myEnum';
 

@@ -10,11 +10,13 @@
 
 // noinspection JSUnusedGlobalSymbols
 interface SomeInterface {
+  myStringOpt?: string;
   myNumber: number;
   myBoolean: boolean;
-  myStringOpt?: string;
-  myAnyOpt?: any;
+  myUndefined: undefined;
+  myNull: null;
   myObject: object;
+  myAnyOpt?: any;
 
   someFunc(): number;
 }

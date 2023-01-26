@@ -13,6 +13,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
@@ -40,20 +41,30 @@ abstract class AbstractES6ClassTest(val fixturePath: String) : BasePlatformTestC
 
     protected abstract fun createES6ClassSpi(): ES6ClassSpi
 
-    protected open fun isAssertOptional(): Boolean = true
+    protected open fun isOptionalPossible(): Boolean = true
 
-    protected fun assertES6Class(es6Class: IES6Class, assertOptional: Boolean = isAssertOptional()) {
-        assertEquals(5, es6Class.fields().stream().count())
-        assertField(es6Class, "myNumber", false)
-        assertField(es6Class, "myBoolean", false)
-        assertField(es6Class, "myStringOpt", assertOptional)
-        assertField(es6Class, "myAnyOpt", assertOptional)
-        assertField(es6Class, "myObject", false)
+    protected open fun isDataTypePresentForAllFields(): Boolean = true
+
+    protected fun assertES6Class(es6Class: IES6Class, optionalPossible: Boolean = isOptionalPossible(), dataTypePresentForAllFields: Boolean = isDataTypePresentForAllFields()) {
+        assertEquals(7, es6Class.fields().stream().count())
+        assertField(es6Class, "myStringOpt", optionalPossible, TypeScriptTypes._string)
+        assertField(es6Class, "myNumber", false, TypeScriptTypes._number)
+        assertField(es6Class, "myBoolean", false, TypeScriptTypes._boolean)
+        assertField(es6Class, "myUndefined", false, if (dataTypePresentForAllFields) TypeScriptTypes._undefined else null)
+        assertField(es6Class, "myNull", false, if (dataTypePresentForAllFields) TypeScriptTypes._null else null)
+        assertField(es6Class, "myObject", false, TypeScriptTypes._object)
+        assertField(es6Class, "myAnyOpt", optionalPossible, if (dataTypePresentForAllFields) TypeScriptTypes._any else null)
     }
 
-    protected fun assertField(es6Class: IES6Class, name: String, optional: Boolean) {
+    protected fun assertField(es6Class: IES6Class, name: String, optional: Boolean, dataType: String?) {
         val field = es6Class.field(name).orElse(null)
         assertNotNull(field)
         assertEquals(optional, field.isOptional)
+        if (dataType != null) {
+            assertEquals(dataType, field.dataType().orElseThrow().name())
+            assertEquals(TypeScriptTypes.isPrimitive(dataType), field.dataType().orElseThrow().isPrimitive)
+        } else {
+            assertTrue(field.dataType().isEmpty)
+        }
     }
 }

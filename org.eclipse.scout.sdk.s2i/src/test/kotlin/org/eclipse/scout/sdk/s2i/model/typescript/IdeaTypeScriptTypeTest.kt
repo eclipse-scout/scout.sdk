@@ -10,10 +10,9 @@
 package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeAlias
-import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.s2i.model.AbstractES6ClassTest
 
 class IdeaTypeScriptTypeTest : AbstractES6ClassTest("model/typescript/es6class/SomeType.ts") {
 
-    override fun createES6ClassSpi(): ES6ClassSpi = IdeaTypeScriptType(ideaModule, findChildOfType(TypeScriptTypeAlias::class.java))
+    override fun createES6ClassSpi() = IdeaTypeScriptType(ideaModule, findChildOfType(TypeScriptTypeAlias::class.java))
 }
