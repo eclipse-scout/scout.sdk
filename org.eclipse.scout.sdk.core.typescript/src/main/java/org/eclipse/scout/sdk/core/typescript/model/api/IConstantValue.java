@@ -14,6 +14,18 @@ import java.util.Optional;
 public interface IConstantValue {
   <T> Optional<T> convertTo(Class<T> expectedType);
 
+  default Optional<String> asString() {
+    return convertTo(String.class);
+  }
+
+  default Optional<IES6Class> asES6Class() {
+    return convertTo(IES6Class.class);
+  }
+
+  default Optional<IObjectLiteral> asObjectLiteral() {
+    return convertTo(IObjectLiteral.class);
+  }
+
   ConstantValueType type();
 
   enum ConstantValueType {
@@ -21,6 +33,7 @@ public interface IConstantValue {
     Boolean,
     Numeric,
     String,
+    ES6Class,
     Array,
     Unknown
   }

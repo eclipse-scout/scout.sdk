@@ -28,7 +28,7 @@ class IdeaNodeModules {
     fun create(project: Project, nodeModuleDir: VirtualFile) = getOrCreateModule(project, nodeModuleDir)
 
     fun resolveReferencedElement(element: JSElement): NodeElementSpi? {
-        val reference = PsiTreeUtil.findChildOfType(element, JSReferenceExpression::class.java) ?: return null
+        val reference = PsiTreeUtil.findChildOfType(element, JSReferenceExpression::class.java, false) ?: return null
         var referencedElement = reference.resolve()
         if (referencedElement is ES6ImportSpecifierAlias) {
             referencedElement = referencedElement.findAliasedElement()

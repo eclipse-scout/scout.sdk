@@ -8,6 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export * from './LocalClass';
-export * from './TestClass';
-export * from './WithTypeRef';
+import {NamedClazz, WildcardClass, AnotherClass as WithAlias} from '@eclipse-scout/sdk-export-js';
+import {LocalClass} from 'index';
+
+export const WithTypeRef = {
+  named: NamedClazz,
+  wild: WildcardClass,
+  alias: WithAlias,
+  local: LocalClass
+};

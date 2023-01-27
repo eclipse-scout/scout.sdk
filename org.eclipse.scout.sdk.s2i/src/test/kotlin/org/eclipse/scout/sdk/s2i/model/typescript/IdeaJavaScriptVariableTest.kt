@@ -25,7 +25,7 @@ class IdeaJavaScriptVariableTest : AbstractModelTest("javascript/moduleWithEnums
         val enumValue = hAlign.objectLiteralValue().orElseThrow()
 
         val leftProperty = enumValue.property("LEFT").orElseThrow()
-        assertEquals("left", leftProperty.convertTo(String::class.java).orElseThrow())
+        assertEquals("left", leftProperty.asString().orElseThrow())
         assertEquals(IConstantValue.ConstantValueType.String, leftProperty.type())
 
         val rightProperty = enumValue.property("RIGHT").orElseThrow()
@@ -70,8 +70,8 @@ class IdeaJavaScriptVariableTest : AbstractModelTest("javascript/moduleWithEnums
         assertEquals(IConstantValue.ConstantValueType.Boolean, bProperty.type())
 
         val undef = enumValue.property("UNDEF").orElseThrow()
-        assertEquals(IConstantValue.ConstantValueType.Unknown, undef.type())
-        assertTrue(undef.convertTo(IObjectLiteral::class.java).isEmpty)
+        assertEquals(IConstantValue.ConstantValueType.ES6Class, undef.type())
+        assertTrue(undef.asObjectLiteral().isEmpty)
 
         val arr = enumValue.property("ARR").orElseThrow()
         assertEquals(IConstantValue.ConstantValueType.Array, arr.type())

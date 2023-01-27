@@ -9,11 +9,9 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
-import com.intellij.lang.javascript.psi.JSArrayLiteralExpression
-import com.intellij.lang.javascript.psi.JSElement
-import com.intellij.lang.javascript.psi.JSLiteralExpression
-import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
+import com.intellij.lang.javascript.psi.*
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
 import java.math.BigInteger
 import java.util.*
@@ -29,6 +27,8 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
         } else {
             converted = when (expectedType) {
                 IObjectLiteral::class.java -> tryConvertToObjectLiteral()
+
+                IES6Class::class.java -> tryConvertToES6Class()
 
                 String::class.java,
                 java.lang.String::class.java -> tryConvertToString()
@@ -58,11 +58,19 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
     override fun type(): IConstantValue.ConstantValueType {
         if (element is JSObjectLiteralExpression) return IConstantValue.ConstantValueType.ObjectLiteral
         if (element is JSArrayLiteralExpression) return IConstantValue.ConstantValueType.Array
+        if (element is JSReferenceExpression) return IConstantValue.ConstantValueType.ES6Class
+
+        // literal values
         if (element !is JSLiteralExpression) return IConstantValue.ConstantValueType.Unknown
         if (element.isStringLiteral) return IConstantValue.ConstantValueType.String
         if (element.isBooleanLiteral) return IConstantValue.ConstantValueType.Boolean
         if (element.isNumericLiteral) return IConstantValue.ConstantValueType.Numeric
         return IConstantValue.ConstantValueType.Unknown
+    }
+
+    protected fun tryConvertToES6Class(): IES6Class? {
+        val reference = element as? JSReferenceExpression ?: return null
+        return ideaModule.moduleContext.resolveReferencedElement(reference)?.api() as? IES6Class
     }
 
     @Suppress("UNCHECKED_CAST")
