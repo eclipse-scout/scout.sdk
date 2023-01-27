@@ -9,9 +9,13 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi;
 
 public interface IFunction extends INodeElement {
   @Override
   FunctionSpi spi();
+
+  Optional<IObjectLiteral> resultingObjectLiteral();
 }

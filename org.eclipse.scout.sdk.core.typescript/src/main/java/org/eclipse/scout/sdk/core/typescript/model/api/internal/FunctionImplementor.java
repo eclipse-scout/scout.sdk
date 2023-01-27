@@ -9,9 +9,13 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
+import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi;
 
 public class FunctionImplementor extends AbstractNodeElement<FunctionSpi> implements IFunction {
   public FunctionImplementor(FunctionSpi spi) {
@@ -21,5 +25,11 @@ public class FunctionImplementor extends AbstractNodeElement<FunctionSpi> implem
   @Override
   public String name() {
     return spi().name();
+  }
+
+  @Override
+  public Optional<IObjectLiteral> resultingObjectLiteral() {
+    return spi().resultingObjectLiteral()
+        .map(ObjectLiteralSpi::api);
   }
 }

@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi;
 
@@ -34,6 +35,11 @@ public class ObjectLiteralImplementor extends AbstractNodeElement<ObjectLiteralS
   @Override
   public Optional<IObjectLiteral> propertyAsObjectLiteral(String name) {
     return propertyAs(name, IObjectLiteral.class);
+  }
+
+  @Override
+  public Optional<IES6Class> propertyAsES6Class(String name) {
+    return propertyAs(name, IES6Class.class);
   }
 
   @Override

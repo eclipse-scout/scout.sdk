@@ -11,10 +11,20 @@
 import {NamedClazz, WildcardClass, AnotherClass as WithAlias} from '@eclipse-scout/sdk-export-js';
 import {LocalClass} from 'index';
 
-// noinspection JSUnusedGlobalSymbols
-export const WithTypeRef = {
-  named: NamedClazz,
-  wild: WildcardClass,
-  alias: WithAlias,
-  local: LocalClass
-};
+export default () => ({
+  objectType: WildcardClass,
+  fields: [
+    {
+      id: 'First',
+      objectType: NamedClazz
+    },
+    {
+      id: 'Second',
+      objectType: WithAlias
+    },
+    {
+      id: 'Third',
+      objectType: LocalClass
+    }
+  ]
+});

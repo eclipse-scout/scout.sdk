@@ -23,5 +23,7 @@ public interface IObjectLiteral extends INodeElement {
 
   Optional<String> propertyAsString(String name);
 
+  Optional<IES6Class> propertyAsES6Class(String name);
+
   <T> Optional<T> propertyAs(String name, Class<T> type);
 }

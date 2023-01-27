@@ -9,9 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
-import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
-import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
-import org.eclipse.scout.sdk.core.typescript.model.api.IVariable
+import org.eclipse.scout.sdk.core.typescript.model.api.*
 import org.eclipse.scout.sdk.s2i.model.AbstractModelTest
 
 
@@ -69,5 +67,17 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
         val local = literal.property("local").orElseThrow()
         assertEquals(IConstantValue.ConstantValueType.ES6Class, local.type())
         assertEquals("LocalClass", local.asES6Class().orElseThrow().name())
+    }
+
+    fun testObjectLiteralInArrow() {
+        val arrow = myIdeaNodeModule.export("SampleModel").orElseThrow().referencedElement() as IFunction
+        val literal = arrow.resultingObjectLiteral().orElseThrow()
+        assertEquals("WildcardClass", literal.propertyAsES6Class("objectType").orElseThrow().name())
+        val fields = literal.propertyAs("fields", Array<IObjectLiteral>::class.java).orElseThrow()
+        assertEquals(3, fields.size)
+
+        assertEquals("NamedDefaultClass", fields[0].propertyAsES6Class("objectType").orElseThrow().name())
+        assertEquals("AnotherClass", fields[1].propertyAsES6Class("objectType").orElseThrow().name())
+        assertEquals("LocalClass", fields[2].propertyAsES6Class("objectType").orElseThrow().name())
     }
 }

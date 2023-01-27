@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
 
 public interface FunctionSpi extends NodeElementSpi {
@@ -16,4 +18,6 @@ public interface FunctionSpi extends NodeElementSpi {
   IFunction api();
 
   String name();
+
+  Optional<ObjectLiteralSpi> resultingObjectLiteral();
 }
