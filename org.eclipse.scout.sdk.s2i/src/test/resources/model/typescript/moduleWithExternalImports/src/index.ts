@@ -9,3 +9,6 @@
  */
 
 export * from './ClassWithSupers';
+export * from './SomeClass';
+export * from './SomeInterface';
+export * from './SomeType';

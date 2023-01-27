@@ -58,7 +58,7 @@ class IdeaSpiFactory(val ideaNodeModules: IdeaNodeModules) {
         IdeaJavaScriptAssignmentExpressionAsField(module, psi, jsReferenceExpression)
     }
 
-    fun createJavaScriptDocCommentTypeAsDataType(type: String) = getOrCreate(type) { IdeaJavaScriptDocCommentTypeAsDataType(type) }
+    fun createJavaScriptDocCommentAsDataType(type: String) = getOrCreate(type) { IdeaJavaScriptDocCommentAsDataType(type) }
 
     fun createJavaScriptType(jsType: JSType) = getOrCreate(jsType) { IdeaJavaScriptType(it) }
 

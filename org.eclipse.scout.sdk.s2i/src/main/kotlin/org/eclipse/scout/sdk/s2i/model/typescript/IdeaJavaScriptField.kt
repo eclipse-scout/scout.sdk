@@ -40,6 +40,6 @@ open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, interna
     }
 
     override fun dataType() = m_dataType.computeIfAbsentAndGet {
-        javaScriptField.jsType?.let { ideaModule.spiFactory.createJavaScriptType(it) }
+        javaScriptField.jsType?.let { IdeaJavaScriptType.parse(ideaModule, it) }
     }
 }

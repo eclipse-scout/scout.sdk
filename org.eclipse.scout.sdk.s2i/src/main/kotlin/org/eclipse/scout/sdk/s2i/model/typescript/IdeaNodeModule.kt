@@ -38,9 +38,9 @@ import java.nio.CharBuffer
 import java.util.*
 import java.util.Collections.unmodifiableMap
 
-class IdeaNodeModule(val project: Project, val moduleContext: IdeaNodeModules, private val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
+class IdeaNodeModule(val project: Project, val moduleInventory: IdeaNodeModules, private val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
 
-    var spiFactory = moduleContext.spiFactory
+    var spiFactory = moduleInventory.spiFactory
     private val m_mainFile = FinalValue<VirtualFile>()
     private val m_mainPsi = FinalValue<JSFile>()
     private val m_packageJsonSpi = FinalValue<PackageJsonSpi>()

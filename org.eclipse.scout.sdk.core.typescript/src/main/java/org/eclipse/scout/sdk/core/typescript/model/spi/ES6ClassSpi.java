@@ -14,15 +14,18 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 
-public interface ES6ClassSpi extends NodeElementSpi {
+public interface ES6ClassSpi extends NodeElementSpi, DataTypeSpi {
   @Override
   IES6Class api();
-
-  String name();
 
   boolean isEnum();
 
   List<FieldSpi> fields();
+
+  @Override
+  default boolean isPrimitive() {
+    return false;
+  }
 
   Optional<ES6ClassSpi> superClass();
 

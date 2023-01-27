@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 
-public interface IES6Class extends INodeElement {
+public interface IES6Class extends INodeElement, IDataType {
   @Override
   ES6ClassSpi spi();
 

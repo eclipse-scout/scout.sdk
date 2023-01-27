@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
@@ -43,5 +44,10 @@ public class ConstantValueAdapter implements IConstantValue {
   @Override
   public ConstantValueType type() {
     return ConstantValueType.ObjectLiteral;
+  }
+
+  @Override
+  public Optional<IDataType> dataType() {
+    return Optional.empty();
   }
 }

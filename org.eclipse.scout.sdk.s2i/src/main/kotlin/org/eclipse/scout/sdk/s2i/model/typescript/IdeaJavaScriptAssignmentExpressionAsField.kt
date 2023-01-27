@@ -47,8 +47,9 @@ open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(val id
     protected fun javaScriptExpressionStatement() = m_javaScriptExpressionStatement.computeIfAbsentAndGet { javaScriptAssignmentExpression.parent as? JSExpressionStatement }
 
     override fun dataType(): DataTypeSpi? = m_dataType.computeIfAbsentAndGet {
-        val comment = javaScriptExpressionStatement()?.children?.firstNotNullOfOrNull { it as? JSDocComment } ?: return@computeIfAbsentAndGet null
-        return@computeIfAbsentAndGet IdeaJavaScriptDocCommentTypeAsDataType.parse(ideaModule, comment)
+        val comment = javaScriptExpressionStatement()?.children?.firstNotNullOfOrNull { it as? JSDocComment }
+        comment?.let { return@computeIfAbsentAndGet IdeaJavaScriptDocCommentAsDataType.parseType(ideaModule, it) }
+        return@computeIfAbsentAndGet constantValue().dataType().orElse(null)?.spi()
     }
 
     companion object {

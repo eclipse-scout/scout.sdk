@@ -13,12 +13,13 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 
-public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implements IES6Class {
+public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implements IES6Class, IDataType {
   public ES6ClassImplementor(ES6ClassSpi spi) {
     super(spi);
   }
@@ -60,5 +61,10 @@ public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implem
     return fields()
         .withName(name)
         .first();
+  }
+
+  @Override
+  public boolean isPrimitive() {
+    return spi().isPrimitive();
   }
 }

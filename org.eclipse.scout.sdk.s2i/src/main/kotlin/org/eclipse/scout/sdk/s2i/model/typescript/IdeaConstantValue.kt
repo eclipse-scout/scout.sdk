@@ -10,7 +10,9 @@
 package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.*
+import com.intellij.lang.javascript.psi.resolve.JSTypeEvaluator
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
 import org.eclipse.scout.sdk.core.util.FinalValue
@@ -20,6 +22,7 @@ import java.util.*
 open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal val element: JSElement?) : IConstantValue {
 
     private val m_type = FinalValue<IConstantValue.ConstantValueType>()
+    private val m_dataType = FinalValue<IDataType?>()
 
     override fun <T : Any> convertTo(expectedType: Class<T>?): Optional<T> {
         if (expectedType == null) return Optional.empty()
@@ -62,6 +65,7 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
         if (element is JSObjectLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.ObjectLiteral
         if (element is JSArrayLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Array
         if (element is JSReferenceExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.ES6Class
+        if (element is JSNewExpression && element.methodExpression is JSReferenceExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.ES6Class
 
         // literal values
         if (element !is JSLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Unknown
@@ -71,9 +75,25 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
         return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Unknown
     }
 
+    override fun dataType() = Optional.ofNullable(m_dataType.computeIfAbsentAndGet {
+        when (type()) {
+            IConstantValue.ConstantValueType.Boolean,
+            IConstantValue.ConstantValueType.Numeric,
+            IConstantValue.ConstantValueType.String -> (element as? JSExpression)?.let { JSTypeEvaluator.getTypeFromConstant(it) }?.let { ideaModule.spiFactory.createJavaScriptType(it) }?.api()
+
+            IConstantValue.ConstantValueType.ES6Class -> tryConvertToES6Class()
+
+            IConstantValue.ConstantValueType.ObjectLiteral,
+            IConstantValue.ConstantValueType.Array,
+            IConstantValue.ConstantValueType.Unknown -> null
+        }
+    })
+
     protected fun tryConvertToES6Class(): IES6Class? {
-        val reference = element as? JSReferenceExpression ?: return null
-        return ideaModule.moduleContext.resolveReferencedElement(reference)?.api() as? IES6Class
+        val reference = element as? JSReferenceExpression
+            ?: (element as? JSNewExpression)?.methodExpression as? JSReferenceExpression
+            ?: return null
+        return ideaModule.moduleInventory.resolveReferencedElement(reference)?.api() as? IES6Class
     }
 
     @Suppress("UNCHECKED_CAST")

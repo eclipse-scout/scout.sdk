@@ -9,13 +9,15 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
+import com.intellij.lang.ecmascript6.psi.ES6ImportSpecifier
 import com.intellij.lang.ecmascript6.psi.ES6ImportSpecifierAlias
 import com.intellij.lang.javascript.psi.JSElement
-import com.intellij.lang.javascript.psi.JSReferenceExpression
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
+import com.intellij.psi.PsiQualifiedReferenceElement
+import com.intellij.psi.PsiReference
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
@@ -29,7 +31,16 @@ class IdeaNodeModules {
     fun create(project: Project, nodeModuleDir: VirtualFile) = getOrCreateModule(project, nodeModuleDir)
 
     fun resolveReferencedElement(element: JSElement): NodeElementSpi? {
-        val reference = PsiTreeUtil.findChildOfType(element, JSReferenceExpression::class.java, false) ?: return null
+        val reference = PsiTreeUtil.findChildOfType(element, PsiQualifiedReferenceElement::class.java, false) ?: return null
+        return resolveReference(reference)
+    }
+
+    fun resolveImport(importSpecifier: ES6ImportSpecifier): NodeElementSpi? {
+        val reference = importSpecifier.reference ?: return null
+        return resolveReference(reference)
+    }
+
+    private fun resolveReference(reference: PsiReference): NodeElementSpi? {
         var referencedElement = reference.resolve()
         if (referencedElement is ES6ImportSpecifierAlias) {
             referencedElement = referencedElement.findAliasedElement()

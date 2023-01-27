@@ -9,6 +9,7 @@
  */
 
 export * from './LocalClass';
+export * from './SomeClass';
 export * from './TestClass';
 export * from './WithTypeRef';
 // noinspection JSUnusedGlobalSymbols

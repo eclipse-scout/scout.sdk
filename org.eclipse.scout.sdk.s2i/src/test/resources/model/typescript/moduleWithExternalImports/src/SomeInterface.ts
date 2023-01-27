@@ -8,15 +8,19 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+// @ts-expect-error
+import {WildcardClass as WildcardClassAlias} from '@eclipse-scout/sdk-export-ts';
+
 // noinspection JSUnusedGlobalSymbols
-interface SomeInterface {
-  myStringOpt?: string;
-  myNumber: number;
-  myBoolean: boolean;
-  myUndefined: undefined;
-  myNull: null;
-  myObject: object;
-  myAnyOpt?: any;
+export interface SomeInterface {
+  myStringDef?: string;
+  myNumberDef: number;
+  myBooleanDef: boolean;
+  myUndefinedDef: undefined;
+  myNullDef: null;
+  myObjectDef: object;
+  myAnyDef?: any;
+  myRefDef: WildcardClassAlias;
 
   someFunc(): number;
 }

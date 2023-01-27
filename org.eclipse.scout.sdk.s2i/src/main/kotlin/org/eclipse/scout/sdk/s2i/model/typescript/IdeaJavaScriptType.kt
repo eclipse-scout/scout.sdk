@@ -9,7 +9,9 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
+import com.intellij.lang.javascript.psi.JSElement
 import com.intellij.lang.javascript.psi.JSType
+import com.intellij.lang.javascript.psi.types.JSUtilType
 import com.intellij.lang.javascript.psi.types.primitives.JSNullType
 import com.intellij.lang.javascript.psi.types.primitives.JSPrimitiveType
 import com.intellij.lang.javascript.psi.types.primitives.JSUndefinedType
@@ -29,4 +31,17 @@ open class IdeaJavaScriptType(protected val javaScriptType: JSType) : DataTypeSp
     override fun name() = javaScriptType.typeText
 
     override fun isPrimitive() = (javaScriptType as? JSPrimitiveType)?.isPrimitive ?: (javaScriptType is JSUndefinedType || javaScriptType is JSNullType)
+
+    companion object {
+
+        fun parse(ideaModule: IdeaNodeModule, type: JSType): DataTypeSpi {
+            (type as? JSUtilType)?.let { return ideaModule.spiFactory.createJavaScriptType(it) }
+
+            (type.sourceElement as? JSElement)
+                ?.let { (ideaModule.moduleInventory.resolveReferencedElement(it) as? DataTypeSpi) }
+                ?.let { return it }
+
+            return ideaModule.spiFactory.createJavaScriptType(type)
+        }
+    }
 }

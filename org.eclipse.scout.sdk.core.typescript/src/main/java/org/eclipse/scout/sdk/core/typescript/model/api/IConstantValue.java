@@ -28,6 +28,8 @@ public interface IConstantValue {
 
   ConstantValueType type();
 
+  Optional<IDataType> dataType();
+
   enum ConstantValueType {
     ObjectLiteral,
     Boolean,
