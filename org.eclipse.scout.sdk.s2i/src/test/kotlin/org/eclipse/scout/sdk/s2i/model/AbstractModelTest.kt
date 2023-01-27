@@ -37,7 +37,7 @@ abstract class AbstractModelTest(val fixturePath: String) : BasePlatformTestCase
 
         val module = myFixture.module
         val moduleRoot = module.rootManager.contentRoots.first()
-        myIdeaNodeModule = myNodeModules.create(module.project, moduleRoot) ?: throw IllegalArgumentException("'$moduleRoot' is no valid node module root.")
+        myIdeaNodeModule = myNodeModules.create(module.project, moduleRoot)?.api() ?: throw IllegalArgumentException("'$moduleRoot' is no valid node module root.")
         myIdeaNodeModule.packageJson().jsonObject("dependencies").ifPresent {
             npmInstall(it.keys)
         }

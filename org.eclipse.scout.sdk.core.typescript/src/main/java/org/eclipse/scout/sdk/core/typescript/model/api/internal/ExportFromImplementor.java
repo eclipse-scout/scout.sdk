@@ -33,6 +33,6 @@ public class ExportFromImplementor extends AbstractNodeElement<ExportFromSpi> im
 
   @Override
   public INodeElement referencedElement() {
-    return spi().element().api();
+    return spi().referencedElement().api();
   }
 }

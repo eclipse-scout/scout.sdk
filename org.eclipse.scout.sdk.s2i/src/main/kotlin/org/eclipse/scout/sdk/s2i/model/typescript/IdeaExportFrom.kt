@@ -25,5 +25,5 @@ open class IdeaExportFrom(protected val ideaModule: IdeaNodeModule, internal val
 
     override fun name() = name
 
-    override fun element() = exportedElement
+    override fun referencedElement() = exportedElement
 }

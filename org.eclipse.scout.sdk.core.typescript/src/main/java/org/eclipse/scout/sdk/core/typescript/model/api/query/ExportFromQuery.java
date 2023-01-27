@@ -59,7 +59,7 @@ public class ExportFromQuery extends AbstractQuery<IExportFrom> {
 
   protected boolean test(ExportFromSpi exportFrom) {
     var element = element();
-    return element == null || element.spi() == exportFrom.element();
+    return element == null || element.spi() == exportFrom.referencedElement();
   }
 
   @Override

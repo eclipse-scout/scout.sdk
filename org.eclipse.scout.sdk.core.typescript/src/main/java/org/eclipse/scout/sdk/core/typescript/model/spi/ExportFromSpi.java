@@ -17,5 +17,5 @@ public interface ExportFromSpi extends NodeElementSpi {
 
   String name();
 
-  NodeElementSpi element();
+  NodeElementSpi referencedElement();
 }
