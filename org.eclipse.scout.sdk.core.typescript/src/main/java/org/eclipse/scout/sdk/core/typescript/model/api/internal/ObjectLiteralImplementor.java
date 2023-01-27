@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
@@ -28,8 +29,23 @@ public class ObjectLiteralImplementor extends AbstractNodeElement<ObjectLiteralS
   }
 
   @Override
+  public Optional<IConstantValue> find(CharSequence jsonPointer) {
+    return find(JsonPointer.compile(jsonPointer));
+  }
+
+  @Override
+  public Optional<IConstantValue> find(JsonPointer pointer) {
+    return Optional.ofNullable(pointer.find(new ConstantValueAdapter(this)));
+  }
+
+  @Override
+  public Map<String, IConstantValue> properties() {
+    return spi().properties();
+  }
+
+  @Override
   public Optional<IConstantValue> property(String name) {
-    return Optional.ofNullable(spi().properties().get(name));
+    return Optional.ofNullable(properties().get(name));
   }
 
   @Override

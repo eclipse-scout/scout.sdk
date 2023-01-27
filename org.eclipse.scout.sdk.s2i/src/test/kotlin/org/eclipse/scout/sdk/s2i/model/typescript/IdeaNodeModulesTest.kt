@@ -48,6 +48,31 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
         assertSame(externalElement.containingModule(), aliasElement.containingModule())
     }
 
+    fun testJsonPointer() {
+        val arrow = myIdeaNodeModule.export("SampleModel").orElseThrow().referencedElement() as IFunction
+        val literal = arrow.resultingObjectLiteral().orElseThrow()
+
+        // sub elements
+        assertEquals("Third", literal.find("/fields/2/id").orElseThrow().asString().orElseThrow())
+        assertEquals("WildcardClass", literal.find("/objectType").orElseThrow().asES6Class().orElseThrow().name())
+        assertEquals(3, literal.find("/fields/1/subElements/0/arrItem/2").orElseThrow().convertTo(Int::class.java).orElseThrow())
+        assertEquals(3, literal.find("/fields/1/subElements/0/arrItem/2/").orElseThrow().convertTo(Int::class.java).orElseThrow())
+        assertEquals(4, literal.find("/fields/1/subElements/1/numberITem").orElseThrow().convertTo(Int::class.java).orElseThrow())
+
+        // with escaped keys
+        assertEquals("keyWithTilde", literal.find("/fields/1/m~0n").orElseThrow().asString().orElseThrow()) // ~0 = /
+        assertEquals("keyWithSlash", literal.find("/fields/1/a~1b").orElseThrow().asString().orElseThrow()) // ~1 = ~
+
+        // root element
+        assertSame(literal, literal.find("").orElseThrow().convertTo(IObjectLiteral::class.java).orElseThrow())
+        assertSame(literal, literal.find(null as CharSequence?).orElseThrow().convertTo(IObjectLiteral::class.java).orElseThrow())
+
+        // not found elements
+        assertTrue(literal.find("/fields/1/subElements33/0/arrItem/2").isEmpty)
+        assertTrue(literal.find("/fields/1/subElements/100").isEmpty)
+        assertTrue(literal.find("/fields/2/id/3/test").isEmpty)
+    }
+
     fun testObjectLiteralReferences() {
         val withTypeRef = myIdeaNodeModule.export("WithTypeRef").orElseThrow().referencedElement() as IVariable
         val literal = withTypeRef.objectLiteralValue().orElseThrow()

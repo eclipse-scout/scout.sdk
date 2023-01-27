@@ -1143,12 +1143,11 @@ public final class Strings {
    * @see #hasText(CharSequence)
    */
   public static boolean isBlank(CharSequence cs) {
-    int strLen;
-    if (cs == null || (strLen = cs.length()) == 0) {
+    if (cs == null || cs.isEmpty()) {
       return true;
     }
     //noinspection Convert2streamapi
-    for (var i = 0; i < strLen; i++) {
+    for (var i = 0; i < cs.length(); i++) {
       if (!isInvisible(cs.charAt(i))) {
         return false;
       }

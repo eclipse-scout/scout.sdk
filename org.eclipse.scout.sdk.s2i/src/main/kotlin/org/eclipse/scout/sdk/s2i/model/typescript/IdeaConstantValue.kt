@@ -13,10 +13,13 @@ import com.intellij.lang.javascript.psi.*
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
+import org.eclipse.scout.sdk.core.util.FinalValue
 import java.math.BigInteger
 import java.util.*
 
 open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal val element: JSElement?) : IConstantValue {
+
+    private val m_type = FinalValue<IConstantValue.ConstantValueType>()
 
     override fun <T : Any> convertTo(expectedType: Class<T>?): Optional<T> {
         if (expectedType == null) return Optional.empty()
@@ -55,17 +58,17 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
         return Optional.ofNullable(converted as T?)
     }
 
-    override fun type(): IConstantValue.ConstantValueType {
-        if (element is JSObjectLiteralExpression) return IConstantValue.ConstantValueType.ObjectLiteral
-        if (element is JSArrayLiteralExpression) return IConstantValue.ConstantValueType.Array
-        if (element is JSReferenceExpression) return IConstantValue.ConstantValueType.ES6Class
+    override fun type(): IConstantValue.ConstantValueType = m_type.computeIfAbsentAndGet {
+        if (element is JSObjectLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.ObjectLiteral
+        if (element is JSArrayLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Array
+        if (element is JSReferenceExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.ES6Class
 
         // literal values
-        if (element !is JSLiteralExpression) return IConstantValue.ConstantValueType.Unknown
-        if (element.isStringLiteral) return IConstantValue.ConstantValueType.String
-        if (element.isBooleanLiteral) return IConstantValue.ConstantValueType.Boolean
-        if (element.isNumericLiteral) return IConstantValue.ConstantValueType.Numeric
-        return IConstantValue.ConstantValueType.Unknown
+        if (element !is JSLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Unknown
+        if (element.isStringLiteral) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.String
+        if (element.isBooleanLiteral) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Boolean
+        if (element.isNumericLiteral) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Numeric
+        return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Unknown
     }
 
     protected fun tryConvertToES6Class(): IES6Class? {

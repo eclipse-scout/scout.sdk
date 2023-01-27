@@ -9,13 +9,21 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.internal.JsonPointer;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi;
 
 public interface IObjectLiteral extends INodeElement {
   @Override
   ObjectLiteralSpi spi();
+
+  Map<String, IConstantValue> properties();
+
+  Optional<IConstantValue> find(JsonPointer pointer);
+
+  Optional<IConstantValue> find(CharSequence jsonPointer);
 
   Optional<IConstantValue> property(String name);
 

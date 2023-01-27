@@ -20,7 +20,16 @@ export default () => ({
     },
     {
       id: 'Second',
-      objectType: WithAlias
+      objectType: WithAlias,
+      subElements: [
+        {
+          arrItem: [1, 2, 3]
+        }, {
+          numberITem: 4
+        }
+      ],
+      "a/b": "keyWithSlash",
+      "m~n": "keyWithTilde"
     },
     {
       id: 'Third',

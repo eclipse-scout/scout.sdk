@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
  */
 public final class CoreUtils {
 
-  private static final Pattern PATH_SEGMENT_SPLIT_PATTERN = Pattern.compile("/");
+  public static final Pattern PATH_SEGMENT_SPLIT_PATTERN = Pattern.compile("/");
   private static final ThreadLocal<String> CURRENT_USER_NAME = ThreadLocal.withInitial(() -> null);
 
   private CoreUtils() {
