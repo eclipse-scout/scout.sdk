@@ -9,3 +9,4 @@
  */
 
 export * from './TopLevelEnumsTs';
+export * from './EnumLikeType';

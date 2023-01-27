@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 
 public interface FieldSpi extends NodeElementSpi {
@@ -19,5 +20,8 @@ public interface FieldSpi extends NodeElementSpi {
 
   boolean isOptional();
 
+  IConstantValue constantValue();
+
   DataTypeSpi dataType();
+
 }

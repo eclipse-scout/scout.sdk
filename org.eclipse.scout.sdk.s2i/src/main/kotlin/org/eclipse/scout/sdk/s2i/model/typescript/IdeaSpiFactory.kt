@@ -40,6 +40,8 @@ class IdeaSpiFactory(val ideaNodeModule: IdeaNodeModule) {
 
     fun createJavaScriptField(jsField: JSField) = getOrCreate(jsField, FieldSpi::class.java) { IdeaJavaScriptField(ideaNodeModule, it) }
 
+    fun createRecordField(property: JSRecordType.PropertySignature) = getOrCreate(property, FieldSpi::class.java) { IdeaRecordField(ideaNodeModule, it) }
+
     fun createJavaScriptVariable(jsVariable: JSVariable) = getOrCreate(jsVariable, VariableSpi::class.java) { IdeaJavaScriptVariable(ideaNodeModule, it) }
 
     fun createConstantValue(jsElement: JSElement?) = getOrCreate(jsElement, IConstantValue::class.java) { IdeaConstantValue(ideaNodeModule, it) }

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
@@ -35,5 +36,10 @@ public class FieldImplementor extends AbstractNodeElement<FieldSpi> implements I
   @Override
   public Optional<IDataType> dataType() {
     return Optional.ofNullable(spi().dataType()).map(DataTypeSpi::api);
+  }
+
+  @Override
+  public IConstantValue constantValue() {
+    return spi().constantValue();
   }
 }

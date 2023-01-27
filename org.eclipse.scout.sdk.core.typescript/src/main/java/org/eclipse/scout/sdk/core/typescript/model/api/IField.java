@@ -20,4 +20,6 @@ public interface IField extends INodeElement {
   boolean isOptional();
 
   Optional<IDataType> dataType();
+
+  IConstantValue constantValue();
 }

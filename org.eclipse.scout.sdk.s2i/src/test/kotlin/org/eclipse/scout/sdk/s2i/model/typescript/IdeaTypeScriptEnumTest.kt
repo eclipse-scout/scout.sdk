@@ -21,4 +21,19 @@ class IdeaTypeScriptEnumTest : AbstractModelTest("typescript/moduleWithEnums") {
         assertEquals("TRACE", logLevel.field("TRACE").orElseThrow().name())
     }
 
+    fun testEnumLikeTypeAlias() {
+        val constEnumType = myIdeaNodeModule.export("ConstEnumType").orElseThrow().referencedElement() as IES6Class
+        assertEquals("FIRST", constEnumType.field("FIRST").orElseThrow().name())
+        assertEquals("FIRST: 'a'", constEnumType.field("FIRST").orElseThrow().source().orElseThrow().asCharSequence().toString())
+        assertFalse(constEnumType.field("SECOND").orElseThrow().isOptional)
+        assertEquals("c", constEnumType.field("THIRD").orElseThrow().constantValue().asString().orElseThrow())
+        assertEquals("\"c\"", constEnumType.field("THIRD").orElseThrow().dataType().orElseThrow().name())
+
+        val noConstEnumType = myIdeaNodeModule.export("NoConstEnumType").orElseThrow().referencedElement() as IES6Class
+        assertEquals("first", noConstEnumType.field("first").orElseThrow().name())
+        assertEquals("first: 1", noConstEnumType.field("first").orElseThrow().source().orElseThrow().asCharSequence().toString())
+        assertFalse(noConstEnumType.field("second").orElseThrow().isOptional)
+        assertEquals(3, noConstEnumType.field("third").orElseThrow().constantValue().convertTo(Int::class.java).orElseThrow())
+        assertEquals("3", noConstEnumType.field("third").orElseThrow().dataType().orElseThrow().name())
+    }
 }

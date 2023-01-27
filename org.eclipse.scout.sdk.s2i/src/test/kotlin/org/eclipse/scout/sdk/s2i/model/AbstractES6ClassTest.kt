@@ -47,7 +47,7 @@ abstract class AbstractES6ClassTest(val fixturePath: String) : BasePlatformTestC
 
     protected open fun isDataTypePresentForAllFields(): Boolean = true
 
-    protected fun assertES6Class(es6Class: IES6Class, optionalPossible: Boolean = isOptionalPossible(), dataTypePresentForAllFields: Boolean = isDataTypePresentForAllFields()) {
+    protected open fun assertES6Class(es6Class: IES6Class, optionalPossible: Boolean = isOptionalPossible(), dataTypePresentForAllFields: Boolean = isDataTypePresentForAllFields()) {
         assertEquals(7, es6Class.fields().stream().count())
         assertField(es6Class, "myStringOpt", optionalPossible, TypeScriptTypes._string)
         assertField(es6Class, "myNumber", false, TypeScriptTypes._number)
@@ -58,7 +58,7 @@ abstract class AbstractES6ClassTest(val fixturePath: String) : BasePlatformTestC
         assertField(es6Class, "myAnyOpt", optionalPossible, if (dataTypePresentForAllFields) TypeScriptTypes._any else null)
     }
 
-    protected fun assertField(es6Class: IES6Class, name: String, optional: Boolean, dataType: String?) {
+    protected open fun assertField(es6Class: IES6Class, name: String, optional: Boolean, dataType: String?) {
         val field = es6Class.field(name).orElse(null)
         assertNotNull(field)
         assertEquals(optional, field.isOptional)
