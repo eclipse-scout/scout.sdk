@@ -16,6 +16,7 @@ import com.intellij.lang.javascript.psi.JSThisExpression
 import com.intellij.lang.javascript.psi.jsdoc.JSDocComment
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IField
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.FieldImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
@@ -35,7 +36,9 @@ open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(val id
 
     override fun name() = javaScriptReferenceExpression.referenceName
 
-    override fun isOptional(): Boolean = false
+    override fun isOptional() = false
+
+    override fun hasModifier(modifier: Modifier) = false
 
     override fun constantValue(): IConstantValue = m_constantValue.computeIfAbsentAndGet {
         ideaModule.spiFactory.createConstantValue(javaScriptAssignmentExpression.rOperand)

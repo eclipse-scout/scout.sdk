@@ -15,6 +15,7 @@ import com.intellij.lang.javascript.psi.types.JSWrapperType
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IField
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.FieldImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
@@ -32,6 +33,8 @@ open class IdeaRecordField(protected val ideaModule: IdeaNodeModule, internal va
     override fun source() = ideaModule.sourceFor(getJsProperty())
 
     override fun name() = property.memberName
+
+    override fun hasModifier(modifier: Modifier?) = false
 
     override fun isOptional() = property.isOptional
 

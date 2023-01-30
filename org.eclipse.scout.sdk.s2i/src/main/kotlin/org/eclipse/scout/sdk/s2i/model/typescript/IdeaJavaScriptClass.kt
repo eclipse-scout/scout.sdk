@@ -13,7 +13,6 @@ import com.intellij.lang.javascript.psi.JSAssignmentExpression
 import com.intellij.lang.javascript.psi.JSExpressionStatement
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptEnum
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
-import com.intellij.lang.javascript.psi.util.JSClassUtils
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.ES6ClassImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
@@ -42,7 +41,6 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
 
     protected open fun collectFields(collector: MutableCollection<FieldSpi>) {
         javaScriptClass.fields.asSequence()
-            .filter { !JSClassUtils.isStaticMethodOrField(it) }
             .map { ideaModule.spiFactory.createJavaScriptField(it) }
             .forEach { collector.add(it) }
 

@@ -11,12 +11,15 @@ package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 
 public interface FieldSpi extends NodeElementSpi {
   @Override
   IField api();
 
   String name();
+
+  boolean hasModifier(Modifier modifier);
 
   boolean isOptional();
 

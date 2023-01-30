@@ -15,6 +15,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaSpiFactory
@@ -48,7 +49,7 @@ abstract class AbstractES6ClassTest(val fixturePath: String) : BasePlatformTestC
     protected open fun isDataTypePresentForAllFields(): Boolean = true
 
     protected open fun assertES6Class(es6Class: IES6Class, optionalPossible: Boolean = isOptionalPossible(), dataTypePresentForAllFields: Boolean = isDataTypePresentForAllFields()) {
-        assertEquals(7, es6Class.fields().stream().count())
+        assertEquals(7, es6Class.fields().withoutModifier(Modifier.STATIC).stream().count())
         assertField(es6Class, "myStringOpt", optionalPossible, TypeScriptTypes._string)
         assertField(es6Class, "myNumber", false, TypeScriptTypes._number)
         assertField(es6Class, "myBoolean", false, TypeScriptTypes._boolean)

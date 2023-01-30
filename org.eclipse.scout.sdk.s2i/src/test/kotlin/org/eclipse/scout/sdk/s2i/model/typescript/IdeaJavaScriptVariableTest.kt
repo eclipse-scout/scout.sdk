@@ -9,9 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
-import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
-import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
-import org.eclipse.scout.sdk.core.typescript.model.api.IVariable
+import org.eclipse.scout.sdk.core.typescript.model.api.*
 import org.eclipse.scout.sdk.s2i.model.AbstractModelTest
 import org.junit.Assert
 import java.math.BigDecimal
@@ -83,6 +81,23 @@ class IdeaJavaScriptVariableTest : AbstractModelTest("javascript/moduleWithEnums
         val constArrValue = arr.convertTo(Array<IConstantValue>::class.java).orElseThrow()[1]
         assertEquals(IConstantValue.ConstantValueType.Array, constArrValue.type())
         assertEquals("b", constArrValue.convertTo(Array<IConstantValue>::class.java).orElseThrow()[1].convertTo(String::class.java).orElseThrow())
+    }
+
+    fun testNestedEnumJs() {
+        val enumInClass = myIdeaNodeModule.export("EnumInClass").orElseThrow().referencedElement() as IES6Class
+        val enums = enumInClass.fields()
+            .withModifier(Modifier.STATIC)
+            .stream()
+            .filter { it.constantValue().type() == IConstantValue.ConstantValueType.ObjectLiteral }
+            .toList()
+        assertEquals(1, enums.size)
+        val nestedEnum = enums[0]
+        assertEquals("NestedEnum", nestedEnum.name())
+        val valueOfC = nestedEnum.constantValue()
+            .asObjectLiteral().orElseThrow()
+            .property("c").orElseThrow()
+            .convertTo(Int::class.java).orElseThrow()
+        assertEquals(2, valueOfC)
     }
 
     fun testMultiEnumJs() {

@@ -14,4 +14,5 @@ export {default as HAlign} from './HAlign';
 // noinspection JSUnusedGlobalSymbols
 export {default as enums} from './enums';
 export {Severity, RoundingMode} from './enums';
-
+// noinspection JSUnusedGlobalSymbols
+export {default as EnumInClass} from './EnumInClass'

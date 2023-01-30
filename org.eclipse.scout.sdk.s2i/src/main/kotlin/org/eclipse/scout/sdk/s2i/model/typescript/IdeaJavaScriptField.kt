@@ -13,6 +13,7 @@ import com.intellij.lang.javascript.psi.JSField
 import com.intellij.lang.javascript.psi.JSOptionalOwner
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IField
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.FieldImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
@@ -29,6 +30,8 @@ open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, interna
     override fun source() = ideaModule.sourceFor(javaScriptField)
 
     override fun name() = javaScriptField.name
+
+    override fun hasModifier(modifier: Modifier) = javaScriptField.hasModifier(modifier.toModifierType())
 
     override fun isOptional(): Boolean = (javaScriptField as? JSOptionalOwner)?.isOptional ?: false
 

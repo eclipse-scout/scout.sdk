@@ -19,6 +19,8 @@ public interface IField extends INodeElement {
 
   boolean isOptional();
 
+  boolean hasModifier(Modifier modifier);
+
   Optional<IDataType> dataType();
 
   IConstantValue constantValue();
