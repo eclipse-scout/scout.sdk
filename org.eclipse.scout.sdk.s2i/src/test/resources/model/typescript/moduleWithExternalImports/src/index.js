@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AnotherClass as WithAlias} from '@eclipse-scout/sdk-export-js';
-
-export class LocalClass extends WithAlias {
-}
+export * from './LocalClass';
+export * from './TestClass';
+export * from './WithTypeRef';
+// noinspection JSUnusedGlobalSymbols
+export {default as SampleModel} from './SampleModel';

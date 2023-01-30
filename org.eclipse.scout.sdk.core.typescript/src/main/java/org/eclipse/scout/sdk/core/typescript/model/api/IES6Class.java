@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
@@ -21,6 +22,12 @@ public interface IES6Class extends INodeElement {
   FieldQuery fields();
 
   boolean isEnum();
+
+  Optional<IES6Class> superClass();
+
+  Stream<IES6Class> supers();
+
+  Stream<IES6Class> superInterfaces();
 
   Optional<IField> field(String name);
 }

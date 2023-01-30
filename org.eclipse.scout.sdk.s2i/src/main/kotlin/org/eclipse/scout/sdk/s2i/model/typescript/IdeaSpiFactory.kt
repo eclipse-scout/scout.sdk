@@ -16,53 +16,61 @@ import com.intellij.lang.javascript.psi.ecma6.TypeScriptInterface
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeAlias
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiElement
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
-import org.eclipse.scout.sdk.core.typescript.model.spi.*
+import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
+import org.eclipse.scout.sdk.core.util.SdkException
 import java.util.concurrent.ConcurrentHashMap
 
-class IdeaSpiFactory(val ideaNodeModule: IdeaNodeModule) {
+class IdeaSpiFactory(val ideaNodeModules: IdeaNodeModules) {
 
-    private val m_elements = ConcurrentHashMap<Pair<Class<*>, Any?>, Any?>()
+    private val m_elements = ConcurrentHashMap<Any?, Any?>()
 
-    fun createTypeScriptClass(tsClass: TypeScriptClass) = getOrCreate(tsClass, ES6ClassSpi::class.java) { IdeaTypeScriptClass(ideaNodeModule, it) }
+    fun createTypeScriptClass(tsClass: TypeScriptClass) = getOrCreate(tsClass) { module, psi -> IdeaTypeScriptClass(module, psi) }
 
-    fun createTypeScriptInterface(tsInterface: TypeScriptInterface) = getOrCreate(tsInterface, ES6ClassSpi::class.java) { IdeaTypeScriptInterface(ideaNodeModule, it) }
+    fun createTypeScriptInterface(tsInterface: TypeScriptInterface) = getOrCreate(tsInterface) { module, psi -> IdeaTypeScriptInterface(module, psi) }
 
-    fun createTypeScriptFunction(tsFunction: TypeScriptFunction) = getOrCreate(tsFunction, FunctionSpi::class.java) { IdeaTypeScriptFunction(ideaNodeModule, it) }
+    fun createTypeScriptFunction(tsFunction: TypeScriptFunction) = getOrCreate(tsFunction) { module, psi -> IdeaTypeScriptFunction(module, psi) }
 
-    fun createTypeScriptTypeAlias(tsTypeAlias: TypeScriptTypeAlias) = getOrCreate(tsTypeAlias, ES6ClassSpi::class.java) { IdeaTypeScriptType(ideaNodeModule, it) }
+    fun createTypeScriptTypeAlias(tsTypeAlias: TypeScriptTypeAlias) = getOrCreate(tsTypeAlias) { module, psi -> IdeaTypeScriptType(module, psi) }
 
-    fun createJavaScriptClass(jsClass: JSClass) = getOrCreate(jsClass, ES6ClassSpi::class.java) { IdeaJavaScriptClass(ideaNodeModule, it) }
+    fun createJavaScriptClass(jsClass: JSClass) = getOrCreate(jsClass) { module, psi -> IdeaJavaScriptClass(module, psi) }
 
-    fun createJavaScriptFunction(jsFunction: JSFunction) = getOrCreate(jsFunction, FunctionSpi::class.java) { IdeaJavaScriptFunction(ideaNodeModule, it) }
+    fun createJavaScriptFunction(jsFunction: JSFunction) = getOrCreate(jsFunction) { module, psi -> IdeaJavaScriptFunction(module, psi) }
 
-    fun createObjectLiteralExpression(jsObjectLiteral: JSObjectLiteralExpression) = getOrCreate(jsObjectLiteral, ObjectLiteralSpi::class.java) { IdeaJavaScriptObjectLiteral(ideaNodeModule, it) }
+    fun createObjectLiteralExpression(jsObjectLiteral: JSObjectLiteralExpression) = getOrCreate(jsObjectLiteral) { module, psi -> IdeaJavaScriptObjectLiteral(module, psi) }
 
-    fun createJavaScriptField(jsField: JSField) = getOrCreate(jsField, FieldSpi::class.java) { IdeaJavaScriptField(ideaNodeModule, it) }
+    fun createJavaScriptField(jsField: JSField) = getOrCreate(jsField) { module, psi -> IdeaJavaScriptField(module, psi) }
 
-    fun createRecordField(property: JSRecordType.PropertySignature) = getOrCreate(property, FieldSpi::class.java) { IdeaRecordField(ideaNodeModule, it) }
+    fun createRecordField(property: JSRecordType.PropertySignature, module: IdeaNodeModule) = getOrCreate(property, module) { m, psi -> IdeaRecordField(m, psi) }
 
-    fun createJavaScriptVariable(jsVariable: JSVariable) = getOrCreate(jsVariable, VariableSpi::class.java) { IdeaJavaScriptVariable(ideaNodeModule, it) }
+    fun createJavaScriptVariable(jsVariable: JSVariable) = getOrCreate(jsVariable) { module, psi -> IdeaJavaScriptVariable(module, psi) }
 
-    fun createConstantValue(jsElement: JSElement?) = getOrCreate(jsElement, IConstantValue::class.java) { IdeaConstantValue(ideaNodeModule, it) }
+    fun createConstantValue(jsElement: JSElement?, module: IdeaNodeModule) = getOrCreate(jsElement to IConstantValue::class.java, module) { m, _ -> IdeaConstantValue(m, jsElement) }
 
-    fun createExportFrom(exportDeclaration: JSElement, exportName: String, referencedElement: NodeElementSpi) = getOrCreate(referencedElement, ExportFromSpi::class.java) {
-        IdeaExportFrom(ideaNodeModule, exportDeclaration, exportName, it)
+    fun createExportFrom(exportDeclaration: JSElement, exportName: String, referencedElement: NodeElementSpi) = getOrCreate(exportDeclaration to exportName, exportDeclaration) { module, _ ->
+        IdeaExportFrom(module, exportDeclaration, exportName, referencedElement)
     }
 
-    fun createPackageJson(moduleDir: VirtualFile) = getOrCreate(moduleDir, PackageJsonSpi::class.java) { IdeaPackageJson(ideaNodeModule, it) }
+    fun createPackageJson(moduleDir: VirtualFile, module: IdeaNodeModule) = getOrCreate(moduleDir, module) { m, psi -> IdeaPackageJson(m, psi) }
 
-    fun createJavaScriptAssignmentExpressionAsField(jsAssignmentExpression: JSAssignmentExpression, jsReferenceExpression: JSReferenceExpression) = getOrCreate(jsAssignmentExpression, FieldSpi::class.java) {
-        IdeaJavaScriptAssignmentExpressionAsField(ideaNodeModule, it, jsReferenceExpression)
+    fun createJavaScriptAssignmentExpressionAsField(jsAssignmentExpression: JSAssignmentExpression, jsReferenceExpression: JSReferenceExpression) = getOrCreate(jsAssignmentExpression) { module, psi ->
+        IdeaJavaScriptAssignmentExpressionAsField(module, psi, jsReferenceExpression)
     }
 
-    fun createJavaScriptDocCommentTypeAsDataType(type: String) = getOrCreate(type, DataTypeSpi::class.java) { IdeaJavaScriptDocCommentTypeAsDataType(it) }
+    fun createJavaScriptDocCommentTypeAsDataType(type: String) = getOrCreate(type) { IdeaJavaScriptDocCommentTypeAsDataType(type) }
 
-    fun createJavaScriptType(jsType: JSType) = getOrCreate(jsType, DataTypeSpi::class.java) { IdeaJavaScriptType(it) }
+    fun createJavaScriptType(jsType: JSType) = getOrCreate(jsType) { IdeaJavaScriptType(it) }
 
-    private fun <ID, R> getOrCreate(identifier: ID, typeClass: Class<*>, factory: (ID) -> R): R {
-        val key = typeClass to identifier
-        @Suppress("UNCHECKED_CAST")
-        return m_elements.computeIfAbsent(key) { factory(identifier) } as R
+    private fun <ID : PsiElement, R> getOrCreate(psi: ID, factory: (IdeaNodeModule, ID) -> R) = getOrCreate(psi, psi, factory)
+
+    private fun <ID, R> getOrCreate(identifier: ID, psi: PsiElement, factory: (IdeaNodeModule, ID) -> R) = getOrCreate(identifier) {
+        val module = ideaNodeModules.findContainingModule(psi) ?: throw SdkException("Cannot find module for psi '{}'.", psi)
+        factory(module, it)
     }
+
+    private fun <ID, R> getOrCreate(identifier: ID, module: IdeaNodeModule, factory: (IdeaNodeModule, ID) -> R) = getOrCreate(identifier) { factory(module, it) }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <ID, R> getOrCreate(identifier: ID, factory: (ID) -> R) = m_elements.computeIfAbsent(identifier) { factory(identifier) } as R
 }

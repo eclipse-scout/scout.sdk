@@ -1,0 +1,7 @@
+{
+  "name": "@eclipse-scout/sdk-external-imports-ts",
+  "version": "23.1.0-snapshot",
+  "dependencies": {
+    "@eclipse-scout/sdk-export-ts": "23.1.0-snapshot"
+  }
+}

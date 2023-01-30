@@ -33,6 +33,17 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
 
     override fun isEnum() = javaScriptClass is TypeScriptEnum
 
+    override fun superInterfaces(): List<ES6ClassSpi> {
+        return javaScriptClass.implementedInterfaces
+            .mapNotNull { ideaModule.createSpiForPsi(it) as? ES6ClassSpi }
+    }
+
+    override fun superClass(): Optional<ES6ClassSpi> {
+        val superClass = javaScriptClass.superClasses.firstOrNull() ?: return Optional.empty()
+        val superClassSpi = ideaModule.createSpiForPsi(superClass) as? ES6ClassSpi
+        return Optional.ofNullable(superClassSpi)
+    }
+
     override fun fields(): List<FieldSpi> = m_fields.computeIfAbsentAndGet {
         val collector: MutableList<FieldSpi> = ArrayList()
         collectFields(collector)

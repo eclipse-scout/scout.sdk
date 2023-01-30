@@ -24,5 +24,6 @@ export function wildcardFunc() {
 // noinspection JSUnusedGlobalSymbols
 export const wildcardVar = {};
 
+// noinspection JSUnusedGlobalSymbols
 export class AnotherClass {
 }

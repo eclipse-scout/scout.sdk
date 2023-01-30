@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
@@ -35,6 +36,23 @@ public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implem
   @Override
   public boolean isEnum() {
     return spi().isEnum();
+  }
+
+  @Override
+  public Optional<IES6Class> superClass() {
+    return spi().superClass().map(ES6ClassSpi::api);
+  }
+
+  @Override
+  public Stream<IES6Class> supers() {
+    return Stream.concat(spi().superClass().stream(), spi().superInterfaces().stream())
+        .map(ES6ClassSpi::api);
+  }
+
+  @Override
+  public Stream<IES6Class> superInterfaces() {
+    return spi().superInterfaces().stream()
+        .map(ES6ClassSpi::api);
   }
 
   @Override

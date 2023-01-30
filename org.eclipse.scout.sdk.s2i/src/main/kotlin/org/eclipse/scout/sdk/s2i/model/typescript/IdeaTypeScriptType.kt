@@ -33,7 +33,7 @@ open class IdeaTypeScriptType(ideaModule: IdeaNodeModule, val typeScriptType: Ty
             val parsedType = typeScriptType.parsedTypeDeclaration ?: return
             val recordType = firstChildOfType(parsedType, TypeScriptTypeOfJSTypeImpl::class.java)?.substitute() as? JSRecordType ?: return
             recordType.properties
-                .forEach { collector.add(ideaModule.spiFactory.createRecordField(it)) }
+                .forEach { collector.add(ideaModule.spiFactory.createRecordField(it, ideaModule)) }
         }
     }
 

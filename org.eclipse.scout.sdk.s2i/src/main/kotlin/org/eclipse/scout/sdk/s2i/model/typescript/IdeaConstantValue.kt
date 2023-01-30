@@ -83,7 +83,7 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
         val componentType = expectedType.componentType
         val result = java.lang.reflect.Array.newInstance(componentType, expressions.size) as Array<Any?>
         for (i in expressions.indices) {
-            val value = ideaModule.spiFactory.createConstantValue(expressions[i])
+            val value = ideaModule.spiFactory.createConstantValue(expressions[i], ideaModule)
             if (IConstantValue::class.java == componentType) {
                 result[i] = value
             } else {

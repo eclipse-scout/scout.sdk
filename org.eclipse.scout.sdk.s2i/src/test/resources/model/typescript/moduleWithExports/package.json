@@ -1,4 +1,5 @@
 {
   "name": "@eclipse-scout/sdk-export-ts",
-  "version": "23.1.0-snapshot"
+  "version": "23.1.0-snapshot",
+  "main": "./src/index.ts"
 }

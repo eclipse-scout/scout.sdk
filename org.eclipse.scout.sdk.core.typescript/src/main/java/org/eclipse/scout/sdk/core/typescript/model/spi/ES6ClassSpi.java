@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 
@@ -22,4 +23,8 @@ public interface ES6ClassSpi extends NodeElementSpi {
   boolean isEnum();
 
   List<FieldSpi> fields();
+
+  Optional<ES6ClassSpi> superClass();
+
+  List<ES6ClassSpi> superInterfaces();
 }

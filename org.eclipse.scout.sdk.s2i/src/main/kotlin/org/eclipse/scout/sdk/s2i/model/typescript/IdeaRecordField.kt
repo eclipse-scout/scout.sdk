@@ -45,7 +45,7 @@ open class IdeaRecordField(protected val ideaModule: IdeaNodeModule, internal va
     }
 
     override fun constantValue(): IConstantValue = m_constantValue.computeIfAbsentAndGet {
-        ideaModule.spiFactory.createConstantValue(getJsProperty()?.value)
+        ideaModule.spiFactory.createConstantValue(getJsProperty()?.value, ideaModule)
     }
 
     protected fun getJsProperty() = m_jsProperty.computeIfAbsentAndGet {

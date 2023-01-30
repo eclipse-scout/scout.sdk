@@ -40,8 +40,7 @@ import java.util.Collections.unmodifiableMap
 
 class IdeaNodeModule(val project: Project, val moduleContext: IdeaNodeModules, private val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
 
-    var spiFactory = IdeaSpiFactory(this)
-
+    var spiFactory = moduleContext.spiFactory
     private val m_mainFile = FinalValue<VirtualFile>()
     private val m_mainPsi = FinalValue<JSFile>()
     private val m_packageJsonSpi = FinalValue<PackageJsonSpi>()
@@ -49,7 +48,7 @@ class IdeaNodeModule(val project: Project, val moduleContext: IdeaNodeModules, p
 
     override fun containingModule() = this
 
-    override fun packageJson(): PackageJsonSpi = m_packageJsonSpi.computeIfAbsentAndGet { spiFactory.createPackageJson(nodeModuleDir) }
+    override fun packageJson(): PackageJsonSpi = m_packageJsonSpi.computeIfAbsentAndGet { spiFactory.createPackageJson(nodeModuleDir, this) }
 
     override fun createApi() = NodeModuleImplementor(this, packageJson())
 

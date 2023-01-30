@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AnotherClass as WithAlias} from '@eclipse-scout/sdk-export-js';
+import {NamedClazz as WithAlias, NamedInterface as Ifc, WildcardInterface} from '@eclipse-scout/sdk-export-ts';
 
-export class LocalClass extends WithAlias {
+// noinspection JSUnusedGlobalSymbols
+export class ClassWithSupers extends WithAlias implements Ifc, WildcardInterface {
 }

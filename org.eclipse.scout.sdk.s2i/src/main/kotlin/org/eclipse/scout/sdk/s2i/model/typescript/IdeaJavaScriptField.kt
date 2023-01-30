@@ -36,7 +36,7 @@ open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, interna
     override fun isOptional(): Boolean = (javaScriptField as? JSOptionalOwner)?.isOptional ?: false
 
     override fun constantValue(): IConstantValue = m_constantValue.computeIfAbsentAndGet {
-        ideaModule.spiFactory.createConstantValue(javaScriptField.initializer)
+        ideaModule.spiFactory.createConstantValue(javaScriptField.initializer, ideaModule)
     }
 
     override fun dataType() = m_dataType.computeIfAbsentAndGet {

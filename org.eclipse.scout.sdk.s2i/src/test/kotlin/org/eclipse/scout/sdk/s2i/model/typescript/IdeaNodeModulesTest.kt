@@ -48,6 +48,13 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
         assertSame(externalElement.containingModule(), aliasElement.containingModule())
     }
 
+    fun testSuperClass() {
+        val testClass = myIdeaNodeModule.export("LocalClass").orElseThrow().referencedElement() as IES6Class
+        val superClass = testClass.superClass().orElseThrow()
+        assertEquals("AnotherClass", superClass.name())
+        assertEquals("@eclipse-scout/sdk-export-js", superClass.containingModule().name())
+    }
+
     fun testJsonPointer() {
         val arrow = myIdeaNodeModule.export("SampleModel").orElseThrow().referencedElement() as IFunction
         val literal = arrow.resultingObjectLiteral().orElseThrow()

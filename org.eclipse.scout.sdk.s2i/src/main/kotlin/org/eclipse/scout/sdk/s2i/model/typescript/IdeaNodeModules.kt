@@ -14,15 +14,16 @@ import com.intellij.lang.javascript.psi.JSElement
 import com.intellij.lang.javascript.psi.JSReferenceExpression
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiNamedElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
-import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi
 
 class IdeaNodeModules {
 
-    private val m_modules = HashMap<VirtualFile, NodeModuleSpi>()
+    val spiFactory = IdeaSpiFactory(this)
+    private val m_modules = HashMap<VirtualFile, IdeaNodeModule>()
     private val m_packageJsonLocationByFile = HashMap<VirtualFile, VirtualFile?>()
 
     fun create(project: Project, nodeModuleDir: VirtualFile) = getOrCreateModule(project, nodeModuleDir)
@@ -33,10 +34,14 @@ class IdeaNodeModules {
         if (referencedElement is ES6ImportSpecifierAlias) {
             referencedElement = referencedElement.findAliasedElement()
         }
+        val containingModule = findContainingModule(referencedElement) ?: return null
         val name = (referencedElement as? PsiNamedElement)?.name ?: return null
-        val file = referencedElement.containingFile?.virtualFile ?: return null
-        val module = getOrCreateModule(element.project, file) ?: return null
-        return module.exports()[name]?.referencedElement()
+        return containingModule.exports()[name]?.referencedElement()
+    }
+
+    fun findContainingModule(element: PsiElement?): IdeaNodeModule? {
+        val file = element?.containingFile?.virtualFile ?: return null
+        return getOrCreateModule(element.project, file)
     }
 
     private fun findParentPackageJson(file: VirtualFile) = m_packageJsonLocationByFile.computeIfAbsent(file) { resolveParentPackageJson(file) }
@@ -53,7 +58,7 @@ class IdeaNodeModules {
         return null
     }
 
-    private fun getOrCreateModule(project: Project, file: VirtualFile): NodeModuleSpi? {
+    private fun getOrCreateModule(project: Project, file: VirtualFile): IdeaNodeModule? {
         val packageJsonFile = findParentPackageJson(file) ?: return null
         return m_modules.computeIfAbsent(packageJsonFile) { IdeaNodeModule(project, this, it.parent) }
     }
