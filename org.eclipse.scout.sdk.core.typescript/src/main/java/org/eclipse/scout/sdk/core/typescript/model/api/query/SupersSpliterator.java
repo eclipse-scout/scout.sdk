@@ -7,19 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.java.model.api.spliterator;
+package org.eclipse.scout.sdk.core.typescript.model.api.query;
 
-import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 import org.eclipse.scout.sdk.core.util.SuperHierarchySpliterator;
 
-/**
- * <h3>{@link SuperTypeHierarchySpliterator}</h3>
- *
- * @since 6.1.0
- */
-public class SuperTypeHierarchySpliterator extends SuperHierarchySpliterator<IType> {
-
-  public SuperTypeHierarchySpliterator(IType startType, boolean includeSuperClasses, boolean includeSuperInterfaces, boolean includeStartType) {
+public class SupersSpliterator extends SuperHierarchySpliterator<ES6ClassSpi> {
+  public SupersSpliterator(ES6ClassSpi startType, boolean includeSuperClasses, boolean includeSuperInterfaces, boolean includeStartType) {
     super(startType, includeSuperClasses, includeSuperInterfaces, includeStartType);
   }
 }

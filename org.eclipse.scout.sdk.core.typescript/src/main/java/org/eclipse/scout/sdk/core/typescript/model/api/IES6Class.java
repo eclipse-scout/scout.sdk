@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FunctionQuery;
+import org.eclipse.scout.sdk.core.typescript.model.api.query.SupersQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 
 public interface IES6Class extends INodeElement, IDataType {
@@ -28,9 +29,13 @@ public interface IES6Class extends INodeElement, IDataType {
 
   Optional<IES6Class> superClass();
 
-  Stream<IES6Class> supers();
+  SupersQuery supers();
 
   Stream<IES6Class> superInterfaces();
+
+  boolean isInterface();
+
+  boolean isInstanceOf(String className);
 
   Optional<IField> field(String name);
 

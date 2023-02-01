@@ -1214,6 +1214,23 @@ public final class Strings {
     return startsWith(str, prefix, true);
   }
 
+  public static boolean startsWith(CharSequence str, char c) {
+    return startsWith(str, c, true);
+  }
+
+  public static boolean startsWith(CharSequence str, char c, boolean isCaseSensitive) {
+    if (str == null || str.isEmpty()) {
+      return false;
+    }
+    var first = str.charAt(0);
+    var prefix = c;
+    if (!isCaseSensitive) {
+      prefix = Character.toLowerCase(prefix);
+      first = Character.toLowerCase(first);
+    }
+    return first == prefix;
+  }
+
   /**
    * Checks if str starts with the given prefix
    *

@@ -19,7 +19,9 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FunctionQuery;
+import org.eclipse.scout.sdk.core.typescript.model.api.query.SupersQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implements IES6Class, IDataType {
   public ES6ClassImplementor(ES6ClassSpi spi) {
@@ -42,6 +44,19 @@ public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implem
   }
 
   @Override
+  public boolean isInterface() {
+    return spi().isInterface();
+  }
+
+  @Override
+  public boolean isInstanceOf(String className) {
+    if (Strings.isBlank(className)) {
+      return false;
+    }
+    return supers().withName(className).existsAny();
+  }
+
+  @Override
   public FunctionQuery functions() {
     return new FunctionQuery(spi());
   }
@@ -59,14 +74,13 @@ public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implem
   }
 
   @Override
-  public Stream<IES6Class> supers() {
-    return Stream.concat(spi().superClass().stream(), spi().superInterfaces().stream())
-        .map(ES6ClassSpi::api);
+  public SupersQuery supers() {
+    return new SupersQuery(spi());
   }
 
   @Override
   public Stream<IES6Class> superInterfaces() {
-    return spi().superInterfaces().stream()
+    return spi().superInterfaces()
         .map(ES6ClassSpi::api);
   }
 

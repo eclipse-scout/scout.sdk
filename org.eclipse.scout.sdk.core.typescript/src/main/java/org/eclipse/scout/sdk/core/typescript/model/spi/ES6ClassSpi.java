@@ -10,11 +10,11 @@
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+import org.eclipse.scout.sdk.core.util.SuperHierarchySpliterator.ISuperHierarchyElement;
 
-public interface ES6ClassSpi extends NodeElementSpi, DataTypeSpi {
+public interface ES6ClassSpi extends NodeElementSpi, DataTypeSpi, ISuperHierarchyElement<ES6ClassSpi> {
   @Override
   IES6Class api();
 
@@ -28,8 +28,4 @@ public interface ES6ClassSpi extends NodeElementSpi, DataTypeSpi {
   default boolean isPrimitive() {
     return false;
   }
-
-  Optional<ES6ClassSpi> superClass();
-
-  List<ES6ClassSpi> superInterfaces();
 }

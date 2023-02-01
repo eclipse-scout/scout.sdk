@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.core.java.model.api.query.SuperTypeQuery;
 import org.eclipse.scout.sdk.core.java.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer;
 import org.eclipse.scout.sdk.core.util.SourceRange;
+import org.eclipse.scout.sdk.core.util.SuperHierarchySpliterator.ISuperHierarchyElement;
 
 /**
  * <h3>{@link IType}</h3>
@@ -30,7 +31,7 @@ import org.eclipse.scout.sdk.core.util.SourceRange;
  *
  * @since 5.1.0
  */
-public interface IType extends IMember {
+public interface IType extends IMember, ISuperHierarchyElement<IType> {
 
   /**
    * Gets the {@link IPackage} of this {@link IType}.<br>
@@ -84,6 +85,7 @@ public interface IType extends IMember {
    * @return The super {@link IType}.
    * @see #requireSuperClass()
    */
+  @Override
   Optional<IType> superClass();
 
   /**
@@ -101,6 +103,7 @@ public interface IType extends IMember {
    *
    * @return A {@link Stream} containing the direct super interfaces of this {@link IType}.
    */
+  @Override
   Stream<IType> superInterfaces();
 
   /**
@@ -180,7 +183,7 @@ public interface IType extends IMember {
    * Same as {@link #compilationUnit()} but throws an {@link IllegalArgumentException} if this {@link IType} is a
    * primitive-, array- or wildcard type as these types do not have a compilation unit.
    *
-   * @return The {@link ICompilationUnit} of this {@link IType} (may be a synthetic compilation unit for binary types).
+   * @return The {@link ICompilationUnit} of this {@link IType} (maybe a synthetic compilation unit for binary types).
    * @throws IllegalArgumentException
    *           if this type is a primitive-, array- or wildcard-type.
    * @see #compilationUnit()
@@ -195,6 +198,7 @@ public interface IType extends IMember {
   /**
    * @return {@code true} if this {@link IType} is an interface, {@code false} otherwise.
    */
+  @Override
   boolean isInterface();
 
   /**

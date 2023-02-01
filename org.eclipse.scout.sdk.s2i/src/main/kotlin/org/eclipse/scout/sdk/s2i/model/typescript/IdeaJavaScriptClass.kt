@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptEnum
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptInterface
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.ES6ClassImplementor
@@ -19,6 +20,7 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import java.util.*
+import java.util.stream.Stream
 
 open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, internal val javaScriptClass: JSClass) : AbstractNodeElementSpi<IES6Class>(ideaModule), ES6ClassSpi {
 
@@ -35,16 +37,18 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
 
     override fun isEnum() = javaScriptClass is TypeScriptEnum
 
+    override fun isInterface() = javaScriptClass is TypeScriptInterface
+
     override fun functions(): List<FunctionSpi> = m_functions.computeIfAbsentAndGet {
         val functions = javaScriptClass.functions.map { ideaModule.spiFactory.createJavaScriptFunction(it) }
         return@computeIfAbsentAndGet Collections.unmodifiableList(functions)
     }
 
-    override fun superInterfaces(): List<ES6ClassSpi> = m_superInterfaces.computeIfAbsentAndGet {
+    override fun superInterfaces(): Stream<ES6ClassSpi> = m_superInterfaces.computeIfAbsentAndGet {
         val superInterfaces = javaScriptClass.implementedInterfaces
             .mapNotNull { ideaModule.createSpiForPsi(it) as? ES6ClassSpi }
         return@computeIfAbsentAndGet Collections.unmodifiableList(superInterfaces)
-    }
+    }.stream()
 
     override fun superClass(): Optional<ES6ClassSpi> = m_superClass.computeIfAbsentAndGet {
         val superClass = javaScriptClass.superClasses.firstOrNull() ?: return@computeIfAbsentAndGet Optional.empty()

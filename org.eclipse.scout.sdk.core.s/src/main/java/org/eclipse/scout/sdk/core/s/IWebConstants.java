@@ -27,6 +27,11 @@ public interface IWebConstants {
   String JS_FILE_SUFFIX = '.' + JS_FILE_EXTENSION;
 
   /**
+   * The file suffix for TypeScript files. Value is '{@code .ts}'.
+   */
+  String TS_FILE_SUFFIX = '.' + TS_FILE_EXTENSION;
+
+  /**
    * The file extension for HTML files. Value is '{@code html}'.
    */
   String HTML_FILE_EXTENSION = "html";
