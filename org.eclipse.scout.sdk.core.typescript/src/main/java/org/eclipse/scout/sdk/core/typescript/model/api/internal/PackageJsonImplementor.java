@@ -10,6 +10,9 @@
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
 import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,6 +22,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
 import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 import jakarta.json.Json;
@@ -47,6 +51,18 @@ public class PackageJsonImplementor extends AbstractNodeElement<PackageJsonSpi> 
     }
   }
 
+  protected static CharSequence loadContent(Path file) {
+    if (!Files.isRegularFile(file)) {
+      return null;
+    }
+    try {
+      return Strings.fromFile(file, StandardCharsets.UTF_8);
+    }
+    catch (IOException e) {
+      throw new SdkException("Unable to read '{}'.", file, e);
+    }
+  }
+
   @Override
   public Path location() {
     return directory().resolve(FILE_NAME);
@@ -60,6 +76,13 @@ public class PackageJsonImplementor extends AbstractNodeElement<PackageJsonSpi> 
   @Override
   public Optional<String> main() {
     return m_main.computeIfAbsentAndGet(this::computeMain);
+  }
+
+  @Override
+  public Optional<CharSequence> mainContent() {
+    return main()
+        .map(main -> directory().resolve(main))
+        .map(PackageJsonImplementor::loadContent);
   }
 
   protected Optional<String> computeMain() {

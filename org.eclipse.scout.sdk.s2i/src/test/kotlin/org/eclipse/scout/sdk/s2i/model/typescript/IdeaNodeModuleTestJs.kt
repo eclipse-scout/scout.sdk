@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.s2i.model.AbstractModelTest
 
 class IdeaNodeModuleTestJs : AbstractModelTest("javascript/moduleWithExports") {
@@ -27,7 +28,8 @@ class IdeaNodeModuleTestJs : AbstractModelTest("javascript/moduleWithExports") {
                 "WildcardDefaultClass as WildcardDefaultClass",
                 "wildcardFunc as wildcardFunc",
                 "wildcardVar as wildcardVar",
-                "AnotherClass as AnotherClass"
+                "AnotherClass as AnotherClass",
+                "ClassWithFunctions as ClassWithFunctions"
             ), exports
         )
     }
@@ -70,6 +72,13 @@ class IdeaNodeModuleTestJs : AbstractModelTest("javascript/moduleWithExports") {
         assertEquals(350, namedClazzSourceRange.start())
         assertEquals(376, namedClazzSourceRange.end())
         assertEquals(27, namedClazzSourceRange.length())
+    }
+
+    fun testFunctions() {
+        val classWithFunctions = myIdeaNodeModule.export("ClassWithFunctions").orElseThrow().referencedElement() as IES6Class
+        assertEquals("constructor", classWithFunctions.function("constructor").orElseThrow().name())
+        assertEquals("_init", classWithFunctions.function("_init").orElseThrow().name())
+        assertEquals("myOtherFunction", classWithFunctions.function("myOtherFunction").orElseThrow().name())
     }
 
     fun testSourceOfFunction() {

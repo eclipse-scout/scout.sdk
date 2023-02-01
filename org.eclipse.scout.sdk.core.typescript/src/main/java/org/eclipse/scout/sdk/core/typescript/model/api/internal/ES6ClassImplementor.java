@@ -16,7 +16,9 @@ import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
+import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
+import org.eclipse.scout.sdk.core.typescript.model.api.query.FunctionQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 
 public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implements IES6Class, IDataType {
@@ -37,6 +39,18 @@ public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implem
   @Override
   public boolean isEnum() {
     return spi().isEnum();
+  }
+
+  @Override
+  public FunctionQuery functions() {
+    return new FunctionQuery(spi());
+  }
+
+  @Override
+  public Optional<IFunction> function(String name) {
+    return functions()
+        .withName(name)
+        .first();
   }
 
   @Override

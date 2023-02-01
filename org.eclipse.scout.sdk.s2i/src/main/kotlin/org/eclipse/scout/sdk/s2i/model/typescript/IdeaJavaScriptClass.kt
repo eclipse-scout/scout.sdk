@@ -18,12 +18,16 @@ import org.eclipse.scout.sdk.core.typescript.model.api.internal.ES6ClassImplemen
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import java.util.*
 
 open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, internal val javaScriptClass: JSClass) : AbstractNodeElementSpi<IES6Class>(ideaModule), ES6ClassSpi {
 
     private val m_fields = FinalValue<List<FieldSpi>>()
+    private val m_superInterfaces = FinalValue<List<ES6ClassSpi>>()
+    private val m_superClass = FinalValue<Optional<ES6ClassSpi>>()
+    private val m_functions = FinalValue<List<FunctionSpi>>()
 
     override fun createApi() = ES6ClassImplementor(this)
 
@@ -33,15 +37,21 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
 
     override fun isEnum() = javaScriptClass is TypeScriptEnum
 
-    override fun superInterfaces(): List<ES6ClassSpi> {
-        return javaScriptClass.implementedInterfaces
-            .mapNotNull { ideaModule.createSpiForPsi(it) as? ES6ClassSpi }
+    override fun functions(): List<FunctionSpi> = m_functions.computeIfAbsentAndGet {
+        val functions = javaScriptClass.functions.map { ideaModule.spiFactory.createJavaScriptFunction(it) }
+        return@computeIfAbsentAndGet Collections.unmodifiableList(functions)
     }
 
-    override fun superClass(): Optional<ES6ClassSpi> {
-        val superClass = javaScriptClass.superClasses.firstOrNull() ?: return Optional.empty()
+    override fun superInterfaces(): List<ES6ClassSpi> = m_superInterfaces.computeIfAbsentAndGet {
+        val superInterfaces = javaScriptClass.implementedInterfaces
+            .mapNotNull { ideaModule.createSpiForPsi(it) as? ES6ClassSpi }
+        return@computeIfAbsentAndGet Collections.unmodifiableList(superInterfaces)
+    }
+
+    override fun superClass(): Optional<ES6ClassSpi> = m_superClass.computeIfAbsentAndGet {
+        val superClass = javaScriptClass.superClasses.firstOrNull() ?: return@computeIfAbsentAndGet Optional.empty()
         val superClassSpi = ideaModule.createSpiForPsi(superClass) as? ES6ClassSpi
-        return Optional.ofNullable(superClassSpi)
+        return@computeIfAbsentAndGet Optional.ofNullable(superClassSpi)
     }
 
     override fun fields(): List<FieldSpi> = m_fields.computeIfAbsentAndGet {

@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
+import org.eclipse.scout.sdk.core.typescript.model.api.query.FunctionQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 
 public interface IES6Class extends INodeElement, IDataType {
@@ -20,6 +21,8 @@ public interface IES6Class extends INodeElement, IDataType {
   ES6ClassSpi spi();
 
   FieldQuery fields();
+
+  FunctionQuery functions();
 
   boolean isEnum();
 
@@ -30,4 +33,7 @@ public interface IES6Class extends INodeElement, IDataType {
   Stream<IES6Class> superInterfaces();
 
   Optional<IField> field(String name);
+
+  Optional<IFunction> function(String name);
+
 }

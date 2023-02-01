@@ -22,7 +22,6 @@ import com.intellij.lang.javascript.psi.ecma6.TypeScriptInterface
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeAlias
 import com.intellij.lang.javascript.psi.ecmal4.JSAttributeList
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
@@ -38,7 +37,7 @@ import java.nio.CharBuffer
 import java.util.*
 import java.util.Collections.unmodifiableMap
 
-class IdeaNodeModule(val project: Project, val moduleInventory: IdeaNodeModules, private val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
+class IdeaNodeModule(val moduleInventory: IdeaNodeModules, private val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
 
     var spiFactory = moduleInventory.spiFactory
     private val m_mainFile = FinalValue<VirtualFile>()
@@ -207,7 +206,7 @@ class IdeaNodeModule(val project: Project, val moduleInventory: IdeaNodeModules,
 
     fun mainPsi(): JSFile? = m_mainPsi.computeIfAbsentAndGet {
         return@computeIfAbsentAndGet mainFile()?.let {
-            PsiManager.getInstance(project).findFile(it) as? JSFile // TypeScript files are also JSFiles
+            PsiManager.getInstance(moduleInventory.project).findFile(it) as? JSFile // TypeScript files are also JSFiles
         }
     }
 
@@ -216,7 +215,7 @@ class IdeaNodeModule(val project: Project, val moduleInventory: IdeaNodeModules,
     internal fun sourceFor(element: PsiElement?): Optional<SourceRange> {
         val sourceRange = element
             ?.containingFile
-            ?.let { PsiDocumentManager.getInstance(project).getDocument(it) }
+            ?.let { PsiDocumentManager.getInstance(moduleInventory.project).getDocument(it) }
             ?.let {
                 val range = element.textRange
                 val elementSrc = CharBuffer.wrap(it.charsSequence, range.startOffset, range.endOffset)

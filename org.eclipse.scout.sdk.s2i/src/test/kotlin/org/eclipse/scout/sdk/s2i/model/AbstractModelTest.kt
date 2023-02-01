@@ -26,7 +26,7 @@ abstract class AbstractModelTest(val fixturePath: String) : BasePlatformTestCase
     protected val allFixturesRoot: Path = Paths.get("").toAbsolutePath().resolve(testDataPath)
     protected val myFixtureRoot: Path = allFixturesRoot.resolve(fixturePath)
     protected val myNodeModulesRoot: Path = myFixtureRoot.resolve("node_modules")
-    protected val myNodeModules = IdeaNodeModules()
+    protected lateinit var myNodeModules: IdeaNodeModules
     protected lateinit var myIdeaNodeModule: INodeModule
 
     override fun getTestDataPath() = "src/test/resources/model"
@@ -37,7 +37,8 @@ abstract class AbstractModelTest(val fixturePath: String) : BasePlatformTestCase
 
         val module = myFixture.module
         val moduleRoot = module.rootManager.contentRoots.first()
-        myIdeaNodeModule = myNodeModules.create(module.project, moduleRoot)?.api() ?: throw IllegalArgumentException("'$moduleRoot' is no valid node module root.")
+        myNodeModules = IdeaNodeModules(module.project)
+        myIdeaNodeModule = myNodeModules.create(moduleRoot)?.api() ?: throw IllegalArgumentException("'$moduleRoot' is no valid node module root.")
         myIdeaNodeModule.packageJson().jsonObject("dependencies").ifPresent {
             npmInstall(it.keys)
         }

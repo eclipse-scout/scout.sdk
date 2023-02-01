@@ -22,6 +22,8 @@ public interface ES6ClassSpi extends NodeElementSpi, DataTypeSpi {
 
   List<FieldSpi> fields();
 
+  List<FunctionSpi> functions();
+
   @Override
   default boolean isPrimitive() {
     return false;

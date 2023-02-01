@@ -31,6 +31,8 @@ public interface IPackageJson extends INodeElement {
 
   Optional<String> main();
 
+  Optional<CharSequence> mainContent();
+
   Optional<String> jsonString(String... pathSegments);
 
   Optional<? extends JsonObject> jsonObject(String... pathSegments);

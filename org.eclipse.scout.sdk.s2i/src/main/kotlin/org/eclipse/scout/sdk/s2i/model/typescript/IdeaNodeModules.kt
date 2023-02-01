@@ -22,13 +22,18 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
 
-class IdeaNodeModules {
+class IdeaNodeModules(val project: Project) {
 
     val spiFactory = IdeaSpiFactory(this)
     private val m_modules = HashMap<VirtualFile, IdeaNodeModule>()
     private val m_packageJsonLocationByFile = HashMap<VirtualFile, VirtualFile?>()
 
-    fun create(project: Project, nodeModuleDir: VirtualFile) = getOrCreateModule(project, nodeModuleDir)
+    fun create(nodeModuleDir: VirtualFile) = getOrCreateModule(nodeModuleDir)
+
+    fun clear() {
+        m_modules.clear()
+        m_packageJsonLocationByFile.clear()
+    }
 
     fun resolveReferencedElement(element: JSElement): NodeElementSpi? {
         val reference = PsiTreeUtil.findChildOfType(element, PsiQualifiedReferenceElement::class.java, false) ?: return null
@@ -52,7 +57,7 @@ class IdeaNodeModules {
 
     fun findContainingModule(element: PsiElement?): IdeaNodeModule? {
         val file = element?.containingFile?.virtualFile ?: return null
-        return getOrCreateModule(element.project, file)
+        return getOrCreateModule(file)
     }
 
     private fun findParentPackageJson(file: VirtualFile) = m_packageJsonLocationByFile.computeIfAbsent(file) { resolveParentPackageJson(file) }
@@ -69,8 +74,8 @@ class IdeaNodeModules {
         return null
     }
 
-    private fun getOrCreateModule(project: Project, file: VirtualFile): IdeaNodeModule? {
+    private fun getOrCreateModule(file: VirtualFile): IdeaNodeModule? {
         val packageJsonFile = findParentPackageJson(file) ?: return null
-        return m_modules.computeIfAbsent(packageJsonFile) { IdeaNodeModule(project, this, it.parent) }
+        return m_modules.computeIfAbsent(packageJsonFile) { IdeaNodeModule(this, it.parent) }
     }
 }

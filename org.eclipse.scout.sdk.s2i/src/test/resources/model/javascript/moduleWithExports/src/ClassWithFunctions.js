@@ -9,9 +9,13 @@
  */
 
 // noinspection JSUnusedGlobalSymbols
-export {default as NamedClazz, namedFunc, namedVar} from './NamedExported';
-export * from './SampleModel'; // does not really export anything (anonymous function)
-// noinspection JSUnusedGlobalSymbols
-export {default as utils} from './Util';
-export * from './WildcardExported';
-export * from './ClassWithFunctions';
+export class ClassWithFunctions {
+  constructor() {
+  }
+
+  _init() {
+  }
+
+  myOtherFunction() {
+  }
+}

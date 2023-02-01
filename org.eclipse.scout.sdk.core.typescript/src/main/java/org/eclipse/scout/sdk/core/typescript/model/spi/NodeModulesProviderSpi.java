@@ -7,9 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+package org.eclipse.scout.sdk.core.typescript.model.spi;
 
-// noinspection JSUnusedGlobalSymbols
-export {default as namedFunc, NamedClass as NamedClazz, NamedInterface, NamedType, namedVar as NamedObj} from './NamedExported';
-export * from './WildcardExported';
-export * from './SampleModel';
-export * from './ClassWithFunctions';
+import java.nio.file.Path;
+import java.util.Optional;
+
+public interface NodeModulesProviderSpi {
+  Optional<NodeModuleSpi> create(Path nodeModuleDir);
+}

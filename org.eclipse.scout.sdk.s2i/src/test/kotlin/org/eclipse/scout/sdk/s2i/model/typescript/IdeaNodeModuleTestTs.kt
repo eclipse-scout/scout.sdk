@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.s2i.model.AbstractModelTest
 
 class IdeaNodeModuleTestTs : AbstractModelTest("typescript/moduleWithExports") {
@@ -30,7 +31,8 @@ class IdeaNodeModuleTestTs : AbstractModelTest("typescript/moduleWithExports") {
                 "WildcardInterface as WildcardInterface",
                 "WildcardType as WildcardType",
                 "wildcardVar as wildcardVar",
-                "SampleWidgetMap as SampleWidgetMap"
+                "SampleWidgetMap as SampleWidgetMap",
+                "ClassWithFunctions as ClassWithFunctions"
             ), exports
         )
     }
@@ -69,5 +71,12 @@ class IdeaNodeModuleTestTs : AbstractModelTest("typescript/moduleWithExports") {
         assertEquals("export type NamedType = {\n  myProperty: boolean\n};", namedTypeSourceRange)
         val wildcardType = myIdeaNodeModule.export("WildcardType").orElseThrow().referencedElement().source().orElseThrow().asCharSequence().toString()
         assertEquals("export type WildcardType = {\n  myProperty: boolean\n};", wildcardType)
+    }
+
+    fun testFunctions() {
+        val classWithFunctions = myIdeaNodeModule.export("ClassWithFunctions").orElseThrow().referencedElement() as IES6Class
+        assertEquals("constructor", classWithFunctions.function("constructor").orElseThrow().name())
+        assertEquals("_init", classWithFunctions.function("_init").orElseThrow().name())
+        assertEquals("myOtherFunction", classWithFunctions.function("myOtherFunction").orElseThrow().name())
     }
 }
