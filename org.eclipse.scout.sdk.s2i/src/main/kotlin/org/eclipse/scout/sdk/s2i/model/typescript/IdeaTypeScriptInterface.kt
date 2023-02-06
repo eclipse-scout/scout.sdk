@@ -10,14 +10,5 @@
 package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptInterface
-import com.intellij.lang.javascript.psi.ecma6.TypeScriptPropertySignature
-import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 
-open class IdeaTypeScriptInterface(ideaModule: IdeaNodeModule, typeScriptInterface: TypeScriptInterface) : IdeaJavaScriptClass(ideaModule, typeScriptInterface) {
-
-    override fun collectFields(collector: MutableCollection<FieldSpi>) =
-        javaScriptClass.fields.asSequence()
-            .mapNotNull { it as? TypeScriptPropertySignature }
-            .map { ideaModule.spiFactory.createJavaScriptField(it) }
-            .forEach { collector.add(it) }
-}
+open class IdeaTypeScriptInterface(ideaModule: IdeaNodeModule, typeScriptInterface: TypeScriptInterface) : IdeaJavaScriptClass(ideaModule, typeScriptInterface)

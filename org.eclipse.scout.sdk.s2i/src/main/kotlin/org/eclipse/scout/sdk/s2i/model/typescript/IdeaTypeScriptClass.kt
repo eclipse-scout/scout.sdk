@@ -10,14 +10,5 @@
 package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptClass
-import com.intellij.lang.javascript.psi.ecma6.TypeScriptField
-import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 
-open class IdeaTypeScriptClass(ideaModule: IdeaNodeModule, typeScriptClass: TypeScriptClass) : IdeaJavaScriptClass(ideaModule, typeScriptClass) {
-
-    override fun collectFields(collector: MutableCollection<FieldSpi>) =
-        javaScriptClass.fields.asSequence()
-            .mapNotNull { it as? TypeScriptField }
-            .map { ideaModule.spiFactory.createJavaScriptField(it) }
-            .forEach { collector.add(it) }
-}
+open class IdeaTypeScriptClass(ideaModule: IdeaNodeModule, typeScriptClass: TypeScriptClass) : IdeaJavaScriptClass(ideaModule, typeScriptClass)

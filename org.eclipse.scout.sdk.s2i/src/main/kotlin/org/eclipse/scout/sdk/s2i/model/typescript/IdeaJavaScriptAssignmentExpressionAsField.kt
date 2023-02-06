@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 import com.intellij.lang.javascript.psi.JSAssignmentExpression
 import com.intellij.lang.javascript.psi.JSExpressionStatement
 import com.intellij.lang.javascript.psi.JSReferenceExpression
-import com.intellij.lang.javascript.psi.JSThisExpression
 import com.intellij.lang.javascript.psi.jsdoc.JSDocComment
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IField
@@ -50,13 +49,5 @@ open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(val id
         val comment = javaScriptExpressionStatement()?.children?.firstNotNullOfOrNull { it as? JSDocComment }
         comment?.let { return@computeIfAbsentAndGet IdeaJavaScriptDocCommentAsDataType.parseType(ideaModule, it) }
         return@computeIfAbsentAndGet constantValue().dataType().orElse(null)?.spi()
-    }
-
-    companion object {
-        fun parse(ideaModule: IdeaNodeModule, assignment: JSAssignmentExpression?): IdeaJavaScriptAssignmentExpressionAsField? {
-            val reference: JSReferenceExpression = assignment?.definitionExpression?.expression as? JSReferenceExpression ?: return null
-            if (reference.qualifier !is JSThisExpression) return null
-            return ideaModule.spiFactory.createJavaScriptAssignmentExpressionAsField(assignment, reference)
-        }
     }
 }

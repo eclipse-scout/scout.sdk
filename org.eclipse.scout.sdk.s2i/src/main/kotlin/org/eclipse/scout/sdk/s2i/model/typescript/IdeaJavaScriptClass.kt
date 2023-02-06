@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
-import com.intellij.lang.javascript.psi.JSAssignmentExpression
-import com.intellij.lang.javascript.psi.JSExpressionStatement
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptEnum
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
@@ -54,22 +52,5 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
         return@computeIfAbsentAndGet Optional.ofNullable(superClassSpi)
     }
 
-    override fun fields(): List<FieldSpi> = m_fields.computeIfAbsentAndGet {
-        val collector: MutableList<FieldSpi> = ArrayList()
-        collectFields(collector)
-        return@computeIfAbsentAndGet Collections.unmodifiableList(collector)
-    }
-
-    protected open fun collectFields(collector: MutableCollection<FieldSpi>) {
-        javaScriptClass.fields.asSequence()
-            .map { ideaModule.spiFactory.createJavaScriptField(it) }
-            .forEach { collector.add(it) }
-
-        val block = javaScriptClass.constructor?.block ?: return
-        block.statementListItems.asSequence()
-            .filter { it is JSExpressionStatement }
-            .mapNotNull { it.children.asSequence().firstNotNullOfOrNull { child -> child as? JSAssignmentExpression } }
-            .mapNotNull { IdeaJavaScriptAssignmentExpressionAsField.parse(ideaModule, it) }
-            .forEach { collector.add(it) }
-    }
+    override fun fields(): List<FieldSpi> = m_fields.computeIfAbsentAndGet { ideaModule.fieldFactory.collectFields(javaScriptClass) }
 }

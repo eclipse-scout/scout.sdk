@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.s2i.model.typescript
+package org.eclipse.scout.sdk.s2i.model.typescript.factory
 
 import com.intellij.lang.javascript.psi.*
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptClass
@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralDataTypeSpi
 import org.eclipse.scout.sdk.core.util.SdkException
+import org.eclipse.scout.sdk.s2i.model.typescript.*
 import java.util.concurrent.ConcurrentHashMap
 
 class IdeaSpiFactory(val ideaNodeModules: IdeaNodeModules) {

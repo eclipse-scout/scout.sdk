@@ -40,6 +40,7 @@ import java.util.Collections.unmodifiableMap
 class IdeaNodeModule(val moduleInventory: IdeaNodeModules, private val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
 
     var spiFactory = moduleInventory.spiFactory
+    var fieldFactory = moduleInventory.fieldFactory
     private val m_mainFile = FinalValue<VirtualFile>()
     private val m_mainPsi = FinalValue<JSFile>()
     private val m_packageJsonSpi = FinalValue<PackageJsonSpi>()
