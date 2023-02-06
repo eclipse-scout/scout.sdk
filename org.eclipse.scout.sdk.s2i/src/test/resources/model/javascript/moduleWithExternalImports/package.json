@@ -2,6 +2,7 @@
   "name": "@eclipse-scout/sdk-external-imports-js",
   "version": "23.1.0-snapshot",
   "dependencies": {
-    "@eclipse-scout/sdk-export-js": "23.1.0-snapshot"
+    "@eclipse-scout/sdk-export-js": "23.1.0-snapshot",
+    "@eclipse-scout/sdk-enums-js": "23.1.0-snapshot"
   }
 }

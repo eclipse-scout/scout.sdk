@@ -10,22 +10,57 @@
 package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.*
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptAsExpression
 import com.intellij.lang.javascript.psi.resolve.JSTypeEvaluator
+import com.intellij.lang.javascript.psi.types.JSLiteralType
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
+import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import java.math.BigInteger
 import java.util.*
 
 open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal val element: JSElement?) : IConstantValue {
 
+    private val m_unwrappedElement = FinalValue<JSElement?>()
+    private val m_referencedES6Class = FinalValue<ES6ClassSpi?>()
+    private val m_referencedConstantValue = FinalValue<IdeaConstantValue?>()
+
     private val m_type = FinalValue<IConstantValue.ConstantValueType>()
     private val m_dataType = FinalValue<IDataType?>()
 
+    fun unwrappedElement() = m_unwrappedElement.computeIfAbsentAndGet {
+        val unwrappedElement = unwrapTypeScriptAsExpression(element)
+        unwrapJSNewExpression(unwrappedElement)
+    }
+
+    protected fun unwrapTypeScriptAsExpression(element: JSElement?) = if (element is TypeScriptAsExpression) element.expression else element
+
+    protected fun unwrapJSNewExpression(element: JSElement?) = if (element is JSNewExpression) element.methodExpression else element
+
+    fun referencedES6Class() = m_referencedES6Class.computeIfAbsentAndGet {
+        (unwrappedElement() as? JSReferenceExpression)?.let { ideaModule.moduleInventory.resolveReferencedElement(it) as? ES6ClassSpi }
+    }
+
+    fun referencedConstantValue() = m_referencedConstantValue.computeIfAbsentAndGet {
+        referencedES6Class()?.let { return@computeIfAbsentAndGet null }
+        (unwrappedElement() as? JSReferenceExpression)
+            ?.let {
+                val reference = ideaModule.resolveReferenceTarget(it)
+                if (reference === it) return@computeIfAbsentAndGet null
+                reference
+            }
+            ?.let { if (it is JSProperty) it.value else it }
+            ?.let { ideaModule.moduleInventory.findContainingModule(it)?.let { containingModule -> it to containingModule } }
+            ?.let { ideaModule.spiFactory.createConstantValue(it.first, it.second) }
+    }
+
     override fun <T : Any> convertTo(expectedType: Class<T>?): Optional<T> {
         if (expectedType == null) return Optional.empty()
+
+        referencedConstantValue()?.convertTo(expectedType)?.let { return it }
 
         val converted: Any?
         if (expectedType.isArray) {
@@ -62,24 +97,42 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
     }
 
     override fun type(): IConstantValue.ConstantValueType = m_type.computeIfAbsentAndGet {
-        if (element is JSObjectLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.ObjectLiteral
-        if (element is JSArrayLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Array
-        if (element is JSReferenceExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.ES6Class
-        if (element is JSNewExpression && element.methodExpression is JSReferenceExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.ES6Class
+        val unwrappedElement = unwrappedElement()
+        if (unwrappedElement is JSObjectLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.ObjectLiteral
+        if (unwrappedElement is JSArrayLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Array
+        referencedES6Class()?.let { return@computeIfAbsentAndGet IConstantValue.ConstantValueType.ES6Class }
+        referencedConstantValue()?.let { return@computeIfAbsentAndGet it.type() }
 
         // literal values
-        if (element !is JSLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Unknown
-        if (element.isStringLiteral) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.String
-        if (element.isBooleanLiteral) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Boolean
-        if (element.isNumericLiteral) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Numeric
+        if (unwrappedElement !is JSLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Unknown
+        if (unwrappedElement.isStringLiteral) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.String
+        if (unwrappedElement.isBooleanLiteral) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Boolean
+        if (unwrappedElement.isNumericLiteral) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Numeric
         return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Unknown
     }
 
-    override fun dataType() = Optional.ofNullable(m_dataType.computeIfAbsentAndGet {
+    override fun dataType(): Optional<IDataType> = Optional.ofNullable(m_dataType.computeIfAbsentAndGet {
+        referencedConstantValue()
+            ?.let { it.element?.parent as? JSProperty }
+            ?.let { it.parent as? JSObjectLiteralExpression }
+            ?.let {
+                val name = when (val parent = it.parent) {
+                    is JSFieldVariable -> parent.name
+                    is JSProperty -> parent.name
+                    else -> null
+                } ?: return@let null
+                return@computeIfAbsentAndGet ideaModule.spiFactory.createObjectLiteralDataType(name, it).api()
+            }
+
+        referencedConstantValue()?.let { return@computeIfAbsentAndGet it.dataType().orElse(null) }
+
         when (type()) {
             IConstantValue.ConstantValueType.Boolean,
             IConstantValue.ConstantValueType.Numeric,
-            IConstantValue.ConstantValueType.String -> (element as? JSExpression)?.let { JSTypeEvaluator.getTypeFromConstant(it) }?.let { ideaModule.spiFactory.createJavaScriptType(it) }?.api()
+            IConstantValue.ConstantValueType.String -> (unwrappedElement() as? JSExpression)
+                ?.let { JSTypeEvaluator.getTypeFromConstant(it) }
+                ?.let { if (it is JSLiteralType) it.asPrimitiveType() else it }
+                ?.let { ideaModule.spiFactory.createJavaScriptType(it) }?.api()
 
             IConstantValue.ConstantValueType.ES6Class -> tryConvertToES6Class()
 
@@ -89,16 +142,11 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
         }
     })
 
-    protected fun tryConvertToES6Class(): IES6Class? {
-        val reference = element as? JSReferenceExpression
-            ?: (element as? JSNewExpression)?.methodExpression as? JSReferenceExpression
-            ?: return null
-        return ideaModule.moduleInventory.resolveReferencedElement(reference)?.api() as? IES6Class
-    }
+    protected fun tryConvertToES6Class(): IES6Class? = referencedES6Class()?.api()
 
     @Suppress("UNCHECKED_CAST")
     protected fun <T> tryConvertToArray(expectedType: Class<T>): Array<Any?>? {
-        val arrayLiteral = element as? JSArrayLiteralExpression ?: return null
+        val arrayLiteral = unwrappedElement() as? JSArrayLiteralExpression ?: return null
         val expressions = arrayLiteral.expressions
         val componentType = expectedType.componentType
         val result = java.lang.reflect.Array.newInstance(componentType, expressions.size) as Array<Any?>
@@ -114,12 +162,12 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
     }
 
     protected fun tryConvertToString(): String? {
-        val literal = element as? JSLiteralExpression ?: return null
+        val literal = unwrappedElement() as? JSLiteralExpression ?: return null
         return literal.takeIf { it.isStringLiteral }?.stringValue
     }
 
     protected fun tryConvertToNumber(requestedNumberType: Class<*>): Any? {
-        val literal = element as? JSLiteralExpression ?: return null
+        val literal = unwrappedElement() as? JSLiteralExpression ?: return null
         val value = literal.takeIf { it.isNumericLiteral }?.value ?: return null
 
         // currently number can only return BigInteger, Long or Double.
@@ -161,12 +209,12 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
     }
 
     protected fun tryConvertToBoolean(): Boolean? {
-        val literal = element as? JSLiteralExpression ?: return null
+        val literal = unwrappedElement() as? JSLiteralExpression ?: return null
         return literal.takeIf { it.isBooleanLiteral }?.value as? Boolean
     }
 
     protected fun tryConvertToObjectLiteral(): IObjectLiteral? {
-        val literal = element as? JSObjectLiteralExpression ?: return null
+        val literal = unwrappedElement() as? JSObjectLiteralExpression ?: return null
         return ideaModule.spiFactory.createObjectLiteralExpression(literal).api()
     }
 }

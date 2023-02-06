@@ -22,31 +22,48 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
     }
 
     protected fun assertES6Class(es6Class: IES6Class) {
-        assertEquals(if (isAssignmentPossible()) 16 else 8, es6Class.fields().withoutModifier(Modifier.STATIC).stream().count())
+        assertEquals(if (isAssignmentPossible()) 18 else 8, es6Class.fields().withoutModifier(Modifier.STATIC).stream().count())
 
-        assertField(myString(), es6Class)
-        assertField(myNumber(), es6Class)
-        assertField(myBoolean(), es6Class)
-        assertField(myUndefined(), es6Class)
-        assertField(myNull(), es6Class)
-        assertField(myObject(), es6Class)
-        assertField(myAny(), es6Class)
-        assertField(myRef(), es6Class)
-    }
-
-    protected fun assertField(expectedField: ExpectedField, es6Class: IES6Class) {
-        expectedField.infer = false
-
-        var field = es6Class.field(expectedField.name()).orElse(null)
-        assertNotNull(field)
-        assertEquals(expectedField.optional(), field.isOptional)
-        assertDataType(expectedField, field)
+        assertFieldDefAndInfer(myString(), es6Class)
+        assertFieldDefAndInfer(myNumber(), es6Class)
+        assertFieldDefAndInfer(myBoolean(), es6Class)
+        assertFieldDefAndInfer(myUndefined(), es6Class)
+        assertFieldDefAndInfer(myNull(), es6Class)
+        assertFieldDefAndInfer(myObject(), es6Class)
+        assertFieldDefAndInfer(myAny(), es6Class)
+        assertFieldDefAndInfer(myRef(), es6Class)
 
         if (!isAssignmentPossible()) return
 
-        expectedField.infer = true
+        assertFieldInfer(myStaticStringRef(), es6Class)
+        assertFieldInfer(myEnumRef(), es6Class)
 
-        field = es6Class.field(expectedField.name()).orElse(null)
+        assertEquals(3, es6Class.fields().withModifier(Modifier.STATIC).stream().count())
+
+        assertFieldDefAndInfer(myStaticString(), es6Class)
+        assertFieldInfer(myEnum(), es6Class)
+    }
+
+    protected fun assertFieldDefAndInfer(expectedField: ExpectedField, es6Class: IES6Class) {
+        assertFieldDef(expectedField, es6Class)
+
+        if (!isAssignmentPossible()) return
+
+        assertFieldInfer(expectedField, es6Class)
+    }
+
+    protected fun assertFieldDef(expectedField: ExpectedField, es6Class: IES6Class) {
+        expectedField.infer = false
+        assertField(expectedField, es6Class)
+    }
+
+    protected fun assertFieldInfer(expectedField: ExpectedField, es6Class: IES6Class) {
+        expectedField.infer = true
+        assertField(expectedField, es6Class)
+    }
+
+    protected fun assertField(expectedField: ExpectedField, es6Class: IES6Class) {
+        val field = es6Class.field(expectedField.name()).orElse(null)
         assertNotNull(field)
         assertEquals(expectedField.optional(), field.isOptional)
         assertDataType(expectedField, field)
@@ -94,6 +111,14 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
     protected open fun myAny() = ExpectedField("myAny", true, TypeScriptTypes._any)
 
     protected open fun myRef() = ExpectedField("myRef", false, "WildcardClass", true)
+
+    protected open fun myStaticString() = ExpectedField("myStaticString", false, TypeScriptTypes._string)
+
+    protected open fun myEnum() = ExpectedField("myEnum", false, TypeScriptTypes._object)
+
+    protected open fun myStaticStringRef() = ExpectedField("myStaticStringRef", false, TypeScriptTypes._string)
+
+    protected open fun myEnumRef() = ExpectedField("myEnumRef", false, "myEnum")
 
     protected inner class ExpectedField(val name: String, val optional: Boolean, val dataTypeName: String, val isES6Class: Boolean = false) {
 

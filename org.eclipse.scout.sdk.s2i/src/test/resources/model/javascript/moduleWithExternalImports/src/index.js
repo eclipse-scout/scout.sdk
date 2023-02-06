@@ -14,3 +14,4 @@ export * from './TestClass';
 export * from './WithTypeRef';
 // noinspection JSUnusedGlobalSymbols
 export {default as SampleModel} from './SampleModel';
+export * from './ReferencedConstants';

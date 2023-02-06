@@ -14,7 +14,7 @@ import {LocalClass} from 'index';
 // noinspection JSUnusedGlobalSymbols
 export class TestClass {
   external = new NamedClazz();
-  wild = new WildcardClass();
+  static wild = new WildcardClass();
   alias = new WithAlias();
   local = new LocalClass();
 }

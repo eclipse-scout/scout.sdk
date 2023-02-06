@@ -68,7 +68,7 @@ class IdeaJavaScriptVariableTest : AbstractModelTest("javascript/moduleWithEnums
         assertEquals(IConstantValue.ConstantValueType.Boolean, bProperty.type())
 
         val undef = enumValue.property("UNDEF").orElseThrow()
-        assertEquals(IConstantValue.ConstantValueType.ES6Class, undef.type())
+        assertEquals(IConstantValue.ConstantValueType.Unknown, undef.type())
         assertTrue(undef.asObjectLiteral().isEmpty)
 
         val arr = enumValue.property("ARR").orElseThrow()

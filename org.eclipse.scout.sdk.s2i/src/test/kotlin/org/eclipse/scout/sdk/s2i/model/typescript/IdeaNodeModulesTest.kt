@@ -112,4 +112,28 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
         assertEquals("AnotherClass", fields[1].propertyAsES6Class("objectType").orElseThrow().name())
         assertEquals("LocalClass", fields[2].propertyAsES6Class("objectType").orElseThrow().name())
     }
+
+    fun testReferencedConstantValues() {
+        val referencedValue = myIdeaNodeModule.export("ReferencedValue").orElseThrow().referencedElement() as IVariable
+        assertEquals("staticString", referencedValue.stringValue().orElseThrow())
+
+        val referencedValueProp = myIdeaNodeModule.export("ReferencedValueProp").orElseThrow().referencedElement() as IVariable
+        assertEquals("HALF_UP", referencedValueProp.stringValue().orElseThrow())
+
+        val referencedEnum = myIdeaNodeModule.export("ReferencedEnum").orElseThrow().referencedElement() as IVariable
+        val referencedEnumObjectLiteral = referencedEnum.objectLiteralValue().orElseThrow()
+        assertEquals(6, referencedEnumObjectLiteral.properties().size)
+        assertEquals(2, referencedEnumObjectLiteral.property("c").orElseThrow().convertTo(Int::class.java).orElseThrow())
+
+        val referencedEnumProp = myIdeaNodeModule.export("ReferencedEnumProp").orElseThrow().referencedElement() as IVariable
+        val referencedEnumPropObjectLiteral = referencedEnumProp.objectLiteralValue().orElseThrow()
+        assertEquals(2, referencedEnumPropObjectLiteral.properties().size)
+        assertFalse(referencedEnumPropObjectLiteral.property("b").orElseThrow().convertTo(Boolean::class.java).orElseThrow())
+
+        val referencedType = myIdeaNodeModule.export("ReferencedType").orElseThrow().referencedElement() as IVariable
+        assertEquals("WildcardClass", referencedType.constantValue().asES6Class().orElseThrow().name())
+
+        val referencedTypeProp = myIdeaNodeModule.export("ReferencedTypeProp").orElseThrow().referencedElement() as IVariable
+        assertEquals("WildcardClass", referencedTypeProp.constantValue().asES6Class().orElseThrow().name())
+    }
 }

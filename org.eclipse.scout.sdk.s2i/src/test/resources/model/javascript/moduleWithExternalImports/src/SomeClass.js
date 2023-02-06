@@ -18,7 +18,7 @@ export class SomeClass {
      *  @type {string}
      */
     this.myStringDef = null;
-    this.myStringInfer = "string";
+    this.myStringInfer = 'string';
 
     /** @type {boolean} */
     this.myBooleanDef = null;
@@ -51,7 +51,20 @@ export class SomeClass {
   myNumberDef = null;
   myNumberInfer = 42;
 
-  static MY_ENUM = 'myEnum';
+  myStaticStringRefInfer = SomeClass.myStaticStringDef;
+  myEnumRefInfer = SomeClass.myEnumInfer.b;
+
+  /**
+   * @type {string}
+   */
+  static myStaticStringDef = 'staticString';
+  static myStaticStringInfer = 'staticString';
+
+  static myEnumInfer = {
+    a: 1,
+    b: 2,
+    c: 3
+  };
 
   someFunc() {
     return 3;

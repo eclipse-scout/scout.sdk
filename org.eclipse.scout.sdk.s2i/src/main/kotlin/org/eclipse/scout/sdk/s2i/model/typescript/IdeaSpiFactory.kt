@@ -18,7 +18,9 @@ import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
+import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralDataTypeSpi
 import org.eclipse.scout.sdk.core.util.SdkException
 import java.util.concurrent.ConcurrentHashMap
 
@@ -61,6 +63,10 @@ class IdeaSpiFactory(val ideaNodeModules: IdeaNodeModules) {
     fun createJavaScriptDocCommentAsDataType(type: String) = getOrCreate(type) { IdeaJavaScriptDocCommentAsDataType(type) }
 
     fun createJavaScriptType(jsType: JSType) = getOrCreate(jsType) { IdeaJavaScriptType(it) }
+
+    fun createObjectLiteralDataType(name: String, jsObjectLiteral: JSObjectLiteralExpression) = createObjectLiteralDataType(name, createObjectLiteralExpression(jsObjectLiteral).api())
+
+    fun createObjectLiteralDataType(name: String, objectLiteral: IObjectLiteral) = getOrCreate(name to objectLiteral) { ObjectLiteralDataTypeSpi(name, objectLiteral) }
 
     private fun <ID : PsiElement, R> getOrCreate(psi: ID, factory: (IdeaNodeModule, ID) -> R) = getOrCreate(psi, psi, factory)
 

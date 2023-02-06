@@ -14,7 +14,7 @@ import {WildcardClass as WildcardClassAlias} from '@eclipse-scout/sdk-export-ts'
 // noinspection JSUnusedGlobalSymbols
 export class SomeClass {
   myStringDef?: string;
-  myStringInfer? = "string";
+  myStringInfer? = 'string';
 
   myNumberDef: number;
   myNumberInfer = 42;
@@ -37,7 +37,17 @@ export class SomeClass {
   myRefDef: WildcardClassAlias;
   myRefInfer = new WildcardClassAlias();
 
-  static MY_ENUM = 'myEnum';
+  myStaticStringRefInfer = SomeClass.myStaticStringDef;
+  myEnumRefInfer = SomeClass.myEnumInfer.b;
+
+  static myStaticStringDef: string = 'staticString' as const;
+  static myStaticStringInfer = 'staticString' as const;
+
+  static myEnumInfer = {
+    a: 1,
+    b: 2,
+    c: 3
+  } as const;
 
   someFunc(): number {
     return 3;
