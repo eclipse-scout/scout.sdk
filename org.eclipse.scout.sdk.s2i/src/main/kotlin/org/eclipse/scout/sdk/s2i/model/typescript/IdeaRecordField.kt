@@ -11,7 +11,6 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.JSProperty
 import com.intellij.lang.javascript.psi.JSRecordType.PropertySignature
-import com.intellij.lang.javascript.psi.types.JSWrapperType
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IField
@@ -39,9 +38,7 @@ open class IdeaRecordField(protected val ideaModule: IdeaNodeModule, internal va
     override fun isOptional() = property.isOptional
 
     override fun dataType() = m_dataType.computeIfAbsentAndGet {
-        var jsType = property.jsType ?: return@computeIfAbsentAndGet null
-        if (jsType is JSWrapperType) jsType = jsType.originalType
-        return@computeIfAbsentAndGet jsType.let { ideaModule.spiFactory.createJavaScriptType(it) }
+        ideaModule.dataTypeFactory.createDataType(property)
     }
 
     override fun constantValue(): IConstantValue = m_constantValue.computeIfAbsentAndGet {

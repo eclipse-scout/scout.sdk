@@ -21,6 +21,7 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
+import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaDataTypeSpiFactory
 import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaFieldSpiFactory
 import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaSpiFactory
 
@@ -28,6 +29,7 @@ class IdeaNodeModules(val project: Project) {
 
     val spiFactory = IdeaSpiFactory(this)
     val fieldFactory = IdeaFieldSpiFactory(this)
+    val dataTypeFactory = IdeaDataTypeSpiFactory(this)
     private val m_modules = HashMap<VirtualFile, IdeaNodeModule>()
     private val m_packageJsonLocationByFile = HashMap<VirtualFile, VirtualFile?>()
 

@@ -11,8 +11,6 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.*
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptAsExpression
-import com.intellij.lang.javascript.psi.resolve.JSTypeEvaluator
-import com.intellij.lang.javascript.psi.types.JSLiteralType
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
@@ -112,34 +110,7 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
     }
 
     override fun dataType(): Optional<IDataType> = Optional.ofNullable(m_dataType.computeIfAbsentAndGet {
-        referencedConstantValue()
-            ?.let { it.element?.parent as? JSProperty }
-            ?.let { it.parent as? JSObjectLiteralExpression }
-            ?.let {
-                val name = when (val parent = it.parent) {
-                    is JSFieldVariable -> parent.name
-                    is JSProperty -> parent.name
-                    else -> null
-                } ?: return@let null
-                return@computeIfAbsentAndGet ideaModule.spiFactory.createObjectLiteralDataType(name, it).api()
-            }
-
-        referencedConstantValue()?.let { return@computeIfAbsentAndGet it.dataType().orElse(null) }
-
-        when (type()) {
-            IConstantValue.ConstantValueType.Boolean,
-            IConstantValue.ConstantValueType.Numeric,
-            IConstantValue.ConstantValueType.String -> (unwrappedElement() as? JSExpression)
-                ?.let { JSTypeEvaluator.getTypeFromConstant(it) }
-                ?.let { if (it is JSLiteralType) it.asPrimitiveType() else it }
-                ?.let { ideaModule.spiFactory.createJavaScriptType(it) }?.api()
-
-            IConstantValue.ConstantValueType.ES6Class -> tryConvertToES6Class()
-
-            IConstantValue.ConstantValueType.ObjectLiteral,
-            IConstantValue.ConstantValueType.Array,
-            IConstantValue.ConstantValueType.Unknown -> null
-        }
+        ideaModule.dataTypeFactory.createDataType(this)?.api()
     })
 
     protected fun tryConvertToES6Class(): IES6Class? = referencedES6Class()?.api()

@@ -11,8 +11,6 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.JSField
 import com.intellij.lang.javascript.psi.JSOptionalOwner
-import com.intellij.lang.javascript.psi.types.JSWrapperType
-import com.intellij.lang.javascript.psi.types.evaluable.JSQualifiedReferenceType
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IField
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
@@ -42,9 +40,6 @@ open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, interna
     }
 
     override fun dataType() = m_dataType.computeIfAbsentAndGet {
-        if (javaScriptField.jsType is JSWrapperType || javaScriptField.jsType is JSQualifiedReferenceType) {
-            constantValue().dataType().orElse(null)?.let { return@computeIfAbsentAndGet it.spi() }
-        }
-        javaScriptField.jsType?.let { IdeaJavaScriptType.parse(ideaModule, it) }
+        ideaModule.dataTypeFactory.createDataType(javaScriptField, this::constantValue)
     }
 }

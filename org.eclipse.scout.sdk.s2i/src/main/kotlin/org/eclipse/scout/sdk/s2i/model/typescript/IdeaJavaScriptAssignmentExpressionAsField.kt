@@ -10,9 +10,7 @@
 package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.JSAssignmentExpression
-import com.intellij.lang.javascript.psi.JSExpressionStatement
 import com.intellij.lang.javascript.psi.JSReferenceExpression
-import com.intellij.lang.javascript.psi.jsdoc.JSDocComment
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IField
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
@@ -25,7 +23,6 @@ import org.eclipse.scout.sdk.core.util.FinalValue
 open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(val ideaModule: IdeaNodeModule, val javaScriptAssignmentExpression: JSAssignmentExpression, val javaScriptReferenceExpression: JSReferenceExpression) :
     AbstractNodeElementSpi<IField>(ideaModule), FieldSpi {
 
-    private val m_javaScriptExpressionStatement = FinalValue<JSExpressionStatement?>()
     private val m_dataType = FinalValue<DataTypeSpi?>()
     private val m_constantValue = FinalValue<IConstantValue>()
 
@@ -43,11 +40,7 @@ open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(val id
         ideaModule.spiFactory.createConstantValue(javaScriptAssignmentExpression.rOperand, ideaModule)
     }
 
-    protected fun javaScriptExpressionStatement() = m_javaScriptExpressionStatement.computeIfAbsentAndGet { javaScriptAssignmentExpression.parent as? JSExpressionStatement }
-
     override fun dataType(): DataTypeSpi? = m_dataType.computeIfAbsentAndGet {
-        val comment = javaScriptExpressionStatement()?.children?.firstNotNullOfOrNull { it as? JSDocComment }
-        comment?.let { return@computeIfAbsentAndGet IdeaJavaScriptDocCommentAsDataType.parseType(ideaModule, it) }
-        return@computeIfAbsentAndGet constantValue().dataType().orElse(null)?.spi()
+        ideaModule.dataTypeFactory.createDataType(javaScriptAssignmentExpression, this::constantValue)
     }
 }

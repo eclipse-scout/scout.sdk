@@ -41,6 +41,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, private val nodeModul
 
     var spiFactory = moduleInventory.spiFactory
     var fieldFactory = moduleInventory.fieldFactory
+    var dataTypeFactory = moduleInventory.dataTypeFactory
     private val m_mainFile = FinalValue<VirtualFile>()
     private val m_mainPsi = FinalValue<JSFile>()
     private val m_packageJsonSpi = FinalValue<PackageJsonSpi>()
