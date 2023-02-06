@@ -12,21 +12,16 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 import com.intellij.lang.javascript.psi.JSAssignmentExpression
 import com.intellij.lang.javascript.psi.JSReferenceExpression
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
-import org.eclipse.scout.sdk.core.typescript.model.api.IField
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
-import org.eclipse.scout.sdk.core.typescript.model.api.internal.FieldImplementor
-import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractFieldSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
-import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 
 open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(val ideaModule: IdeaNodeModule, val javaScriptAssignmentExpression: JSAssignmentExpression, val javaScriptReferenceExpression: JSReferenceExpression) :
-    AbstractNodeElementSpi<IField>(ideaModule), FieldSpi {
+    AbstractFieldSpi(ideaModule) {
 
     private val m_dataType = FinalValue<DataTypeSpi?>()
     private val m_constantValue = FinalValue<IConstantValue>()
-
-    override fun createApi() = FieldImplementor(this)
 
     override fun source() = ideaModule.sourceFor(javaScriptAssignmentExpression)
 
@@ -40,7 +35,7 @@ open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(val id
         ideaModule.spiFactory.createConstantValue(javaScriptAssignmentExpression.rOperand, ideaModule)
     }
 
-    override fun dataType(): DataTypeSpi? = m_dataType.computeIfAbsentAndGet {
+    override fun dataTypeImpl(): DataTypeSpi? = m_dataType.computeIfAbsentAndGet {
         ideaModule.dataTypeFactory.createDataType(javaScriptAssignmentExpression, this::constantValue)
     }
 }

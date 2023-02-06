@@ -17,6 +17,8 @@ import com.intellij.lang.javascript.psi.types.JSLiteralType
 import com.intellij.lang.javascript.psi.types.JSUtilType
 import com.intellij.lang.javascript.psi.types.JSWrapperType
 import com.intellij.lang.javascript.psi.types.evaluable.JSQualifiedReferenceType
+import com.intellij.lang.javascript.psi.types.primitives.JSNullType
+import com.intellij.lang.javascript.psi.types.primitives.JSUndefinedType
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
@@ -54,8 +56,9 @@ class IdeaDataTypeSpiFactory(val ideaNodeModules: IdeaNodeModules) {
         return typeOwner.jsType?.let { createDataType(it) }
     }
 
-    private fun createDataType(type: JSType): DataTypeSpi {
+    private fun createDataType(type: JSType): DataTypeSpi? {
         if (type is JSWrapperType) return createDataType(type.originalType)
+        if (type.isJavaScript && (type is JSNullType || type is JSUndefinedType)) return null
         (type as? JSUtilType)?.let { return ideaNodeModules.spiFactory.createJavaScriptType(it) }
 
         (type.sourceElement as? JSElement)

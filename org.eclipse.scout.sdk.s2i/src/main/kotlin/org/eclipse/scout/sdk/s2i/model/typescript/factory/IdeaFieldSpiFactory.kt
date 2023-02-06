@@ -105,7 +105,12 @@ class IdeaFieldSpiFactory(val ideaNodeModules: IdeaNodeModules) {
         }
 
         fun collect(field: FieldSpi) {
-            map[field.name()] = field
+            map.compute(field.name()) { _, existingField ->
+                existingField?.let {
+                    it.addAdditionalField(field)
+                    it
+                } ?: field
+            }
         }
 
         fun collectTypeScriptFields(elements: Array<out PsiElement>) {

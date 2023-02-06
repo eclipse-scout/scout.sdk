@@ -12,20 +12,15 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 import com.intellij.lang.javascript.psi.JSField
 import com.intellij.lang.javascript.psi.JSOptionalOwner
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
-import org.eclipse.scout.sdk.core.typescript.model.api.IField
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
-import org.eclipse.scout.sdk.core.typescript.model.api.internal.FieldImplementor
-import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractFieldSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
-import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 
-open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, internal val javaScriptField: JSField) : AbstractNodeElementSpi<IField>(ideaModule), FieldSpi {
+open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, internal val javaScriptField: JSField) : AbstractFieldSpi(ideaModule) {
 
     private val m_dataType = FinalValue<DataTypeSpi?>()
     private val m_constantValue = FinalValue<IConstantValue>()
-
-    override fun createApi() = FieldImplementor(this)
 
     override fun source() = ideaModule.sourceFor(javaScriptField)
 
@@ -39,7 +34,7 @@ open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, interna
         ideaModule.spiFactory.createConstantValue(javaScriptField.initializer, ideaModule)
     }
 
-    override fun dataType() = m_dataType.computeIfAbsentAndGet {
+    override fun dataTypeImpl() = m_dataType.computeIfAbsentAndGet {
         ideaModule.dataTypeFactory.createDataType(javaScriptField, this::constantValue)
     }
 }

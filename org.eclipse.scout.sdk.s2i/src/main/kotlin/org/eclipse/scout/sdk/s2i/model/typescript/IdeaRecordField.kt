@@ -13,21 +13,16 @@ import com.intellij.lang.javascript.psi.JSProperty
 import com.intellij.lang.javascript.psi.JSRecordType.PropertySignature
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
-import org.eclipse.scout.sdk.core.typescript.model.api.IField
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
-import org.eclipse.scout.sdk.core.typescript.model.api.internal.FieldImplementor
-import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractFieldSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
-import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 
-open class IdeaRecordField(protected val ideaModule: IdeaNodeModule, internal val property: PropertySignature) : AbstractNodeElementSpi<IField>(ideaModule), FieldSpi {
+open class IdeaRecordField(protected val ideaModule: IdeaNodeModule, internal val property: PropertySignature) : AbstractFieldSpi(ideaModule) {
 
     private val m_dataType = FinalValue<DataTypeSpi?>()
     private val m_jsProperty = FinalValue<JSProperty?>()
     private val m_constantValue = FinalValue<IConstantValue>()
-
-    override fun createApi() = FieldImplementor(this)
 
     override fun source() = ideaModule.sourceFor(getJsProperty())
 
@@ -37,7 +32,7 @@ open class IdeaRecordField(protected val ideaModule: IdeaNodeModule, internal va
 
     override fun isOptional() = property.isOptional
 
-    override fun dataType() = m_dataType.computeIfAbsentAndGet {
+    override fun dataTypeImpl() = m_dataType.computeIfAbsentAndGet {
         ideaModule.dataTypeFactory.createDataType(property)
     }
 

@@ -24,6 +24,8 @@ export class SomeClass {
     this.myBooleanDef = null;
     this.myBooleanInfer = false;
 
+    this.myNumberInfer = null;
+
     /** @type {undefined} */
     this.myUndefinedDef = null;
     this.myUndefinedInfer = undefined;
@@ -50,6 +52,8 @@ export class SomeClass {
    */
   myNumberDef = null;
   myNumberInfer = 42;
+
+  myBooleanInfer = null;
 
   myStaticStringRefInfer = SomeClass.myStaticStringDef;
   myEnumRefInfer = SomeClass.myEnumInfer.b;
