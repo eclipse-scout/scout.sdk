@@ -15,16 +15,11 @@ import com.intellij.lang.javascript.psi.types.primitives.JSPrimitiveType
 import com.intellij.lang.javascript.psi.types.primitives.JSUndefinedType
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.DataTypeImplementor
-import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
-import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractDataTypeSpi
 
-open class IdeaJavaScriptType(protected val javaScriptType: JSType) : DataTypeSpi {
+open class IdeaJavaScriptType(protected val javaScriptType: JSType) : AbstractDataTypeSpi<IDataType>() {
 
-    private val m_api = FinalValue<IDataType>()
-
-    override fun api(): IDataType = m_api.computeIfAbsentAndGet { createApi() }
-
-    protected fun createApi() = DataTypeImplementor(this)
+    override fun createApi() = DataTypeImplementor(this)
 
     override fun name() = javaScriptType.typeText
 

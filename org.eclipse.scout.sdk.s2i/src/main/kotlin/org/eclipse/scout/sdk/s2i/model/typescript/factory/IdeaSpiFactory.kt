@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralDataTypeSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.SimpleDataTypeSpi
 import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.s2i.model.typescript.*
 import java.util.concurrent.ConcurrentHashMap
@@ -61,7 +62,7 @@ class IdeaSpiFactory(val ideaNodeModules: IdeaNodeModules) {
         IdeaJavaScriptAssignmentExpressionAsField(module, psi, jsReferenceExpression)
     }
 
-    fun createJavaScriptDocCommentAsDataType(type: String) = getOrCreate(type) { IdeaJavaScriptDocCommentAsDataType(type) }
+    fun createSimpleDataType(type: String) = getOrCreate(type) { SimpleDataTypeSpi(type) }
 
     fun createJavaScriptType(jsType: JSType) = getOrCreate(jsType) { IdeaJavaScriptType(it) }
 

@@ -9,19 +9,17 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
-import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.DataTypeImplementor;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
-public class ObjectLiteralDataTypeSpi extends AbstractDataTypeSpi<IDataType> {
+public class SimpleDataTypeSpi extends AbstractDataTypeSpi<IDataType> {
 
-  private final String m_name;
-  private final IObjectLiteral m_objectLiteral;
+  private final String m_dataType;
 
-  public ObjectLiteralDataTypeSpi(String name, IObjectLiteral objectLiteral) {
-    m_name = Ensure.notNull(name);
-    m_objectLiteral = Ensure.notNull(objectLiteral);
+  public SimpleDataTypeSpi(String dataType) {
+    m_dataType = Ensure.notNull(dataType);
   }
 
   @Override
@@ -31,15 +29,11 @@ public class ObjectLiteralDataTypeSpi extends AbstractDataTypeSpi<IDataType> {
 
   @Override
   public String name() {
-    return m_name;
+    return m_dataType;
   }
 
   @Override
   public boolean isPrimitive() {
-    return false;
-  }
-
-  public IObjectLiteral objectLiteral() {
-    return m_objectLiteral;
+    return TypeScriptTypes.isPrimitive(m_dataType);
   }
 }

@@ -81,6 +81,8 @@ class IdeaDataTypeSpiFactory(val ideaNodeModules: IdeaNodeModules) {
         return property.jsType?.let { createDataType(it) }
     }
 
+    fun createDataType(dataType: String): DataTypeSpi = ideaNodeModules.spiFactory.createSimpleDataType(dataType)
+
     fun createJSDocCommentDataType(comment: JSDocComment, getDataType: (JSDocComment) -> String?): DataTypeSpi? {
         val dataType = getDataType(comment) ?: return null
 
@@ -91,7 +93,7 @@ class IdeaDataTypeSpiFactory(val ideaNodeModules: IdeaNodeModules) {
             ?.let { ideaNodeModules.resolveImport(it) as? DataTypeSpi }
             ?.let { return it }
 
-        return ideaNodeModules.spiFactory.createJavaScriptDocCommentAsDataType(dataType)
+        return createDataType(dataType)
     }
 
     fun createJSDocCommentTypeDataType(comment: JSDocComment) = createJSDocCommentDataType(comment) { it.type }
