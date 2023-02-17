@@ -11,7 +11,6 @@ package org.eclipse.scout.sdk.s2i.template.js
 
 import com.intellij.codeInsight.completion.*
 import com.intellij.util.ProcessingContext
-import org.eclipse.scout.sdk.s2i.model.js.JsModel
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.createLookupElement
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.propertyElementPattern
 
@@ -25,16 +24,17 @@ class JsModelNameCompletionContributor : CompletionContributor() {
         override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
             val completionInfo = JsModelCompletionHelper.getPropertyNameInfo(parameters, result) ?: return
             if (completionInfo.objectType == null) return
-            val elements = getPropertyNameElements(completionInfo)
+            val elements = getPropertyNameElements(completionInfo) ?: return
             if (elements.isNotEmpty()) {
                 result.addAllElements(elements)
                 result.stopHere()
             }
         }
 
-        private fun getPropertyNameElements(completionInfo: JsModelCompletionHelper.PropertyCompletionInfo) = JsModel().build(completionInfo.module)
-            .properties(completionInfo.objectType).values
-            .filter { !completionInfo.siblingPropertyNames.contains(it.name) }
-            .map { createLookupElement(it.name, it, it, completionInfo) }
+        private fun getPropertyNameElements(completionInfo: JsModelCompletionHelper.PropertyCompletionInfo) = completionInfo.scoutJsModel()
+            ?.scoutObject(completionInfo.objectType)
+            ?.properties()
+            ?.filter { !completionInfo.siblingPropertyNames.contains(it.key) }
+            ?.map { createLookupElement(it.key, it.value, completionInfo) }
     }
 }

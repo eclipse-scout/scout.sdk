@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.template.js
 
-import org.eclipse.scout.sdk.s2i.model.js.JsModel
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
 
 class ScoutJsModelCompletionContributorTest : AbstractJsModelCompletionContributorTest() {
 
@@ -19,11 +19,11 @@ class ScoutJsModelCompletionContributorTest : AbstractJsModelCompletionContribut
 
     override fun getValueCompletionWidgetExpectedFileContents() =
         arrayOf(
-            "$ONLY_HERE_PROPERTY_NAME: { ${JsModel.ID_PROPERTY_NAME}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${JsModel.OBJECT_TYPE_PROPERTY_NAME}: $STRING_FIELD_NAME }",
+            "$ONLY_HERE_PROPERTY_NAME: { ${ScoutJsModel.ID_PROPERTY_NAME}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME}: $STRING_FIELD_NAME }",
             getImportFileContent(STRING_FIELD_NAME, "../index")
         )
 
-    override fun getValueCompletionObjectTypeExpectedFileContents_Widget() = getValueCompletionObjectTypeExpectedFileContents(JsModel.WIDGET_CLASS_NAME, JsModel.WIDGET_CLASS_NAME, "../index")
+    override fun getValueCompletionObjectTypeExpectedFileContents_Widget() = getValueCompletionObjectTypeExpectedFileContents(ScoutJsModel.WIDGET_CLASS_NAME, ScoutJsModel.WIDGET_CLASS_NAME, "../index")
 
-    override fun getValueCompletionEnumExpectedFileContents() = arrayOf("$STATE_PROPERTY_NAME: $WIDGET_STATE_B ", getImportFileContent(JsModel.WIDGET_CLASS_NAME, "../index"))
+    override fun getValueCompletionEnumExpectedFileContents() = arrayOf("$STATE_PROPERTY_NAME: $WIDGET_STATE_B ", getImportFileContent(ScoutJsModel.WIDGET_CLASS_NAME, "../index"))
 }

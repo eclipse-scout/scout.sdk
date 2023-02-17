@@ -32,6 +32,8 @@ class IdeaPackageJson(private val ideaModule: IdeaNodeModule, private val module
     override fun existsFile(relPath: String) = moduleDir.findFileByRelativePath(relPath) != null
 
     override fun dependencies(): Collection<NodeModuleSpi> = m_dependencies.computeIfAbsentAndGet {
+        // FIXME parser: only collect dependencies (not dev, peer, optional, bundled)
+        //  optional: collect different types of dependencies (parametrize), see PackageJsonDependency
         collectVisibleNodeModules(HashMap(), ideaModule.moduleInventory.project, moduleDir).asSequence()
             .mapNotNull { it.virtualFile }
             .mapNotNull { ideaModule.moduleInventory.getOrCreateModule(it) }

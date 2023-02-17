@@ -20,6 +20,7 @@ import com.intellij.psi.PsiTreeChangeAdapter
 import com.intellij.psi.PsiTreeChangeEvent
 import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
 import org.eclipse.scout.sdk.core.util.DelayedBuffer
 import org.eclipse.scout.sdk.s2i.containingModule
 import java.util.concurrent.ConcurrentHashMap
@@ -27,13 +28,13 @@ import java.util.concurrent.TimeUnit
 
 class JsModuleCacheImplementor(val project: Project) : Disposable {
 
-    private val m_moduleCache = ConcurrentHashMap<VirtualFile, JsModule>()
+    private val m_moduleCache = ConcurrentHashMap<VirtualFile, ScoutJsModel>()
     private val m_delayedProcessor = DelayedBuffer(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true, this::processFileEvents)
     private var m_listenerRegistered = false
 
     fun getModule(file: VirtualFile) = file.canonicalFile?.let { m_moduleCache[it] }
 
-    fun putModule(file: VirtualFile, module: JsModule) {
+    fun putModule(file: VirtualFile, module: ScoutJsModel) {
         startListeningIfNecessary() // only start listening for js file changes if there are cached elements.
         file.canonicalFile?.let { m_moduleCache[it] = module }
     }
@@ -63,18 +64,18 @@ class JsModuleCacheImplementor(val project: Project) : Disposable {
     }
 
     private fun processFileEvents(events: List<PsiFile>) = events
-            .asSequence()
-            .distinct() // events for the same file: only process once for each file
-            .mapNotNull { moduleRootOf(it) }
-            .distinct() // events for the same module: only process once for each module
-            .forEach { remove(it) }
+        .asSequence()
+        .distinct() // events for the same file: only process once for each file
+        .mapNotNull { moduleRootOf(it) }
+        .distinct() // events for the same module: only process once for each module
+        .forEach { remove(it) }
 
     private fun moduleRootOf(file: PsiFile) = file.containingModule()?.guessModuleDir()
 
     private fun remove(file: VirtualFile) = file.canonicalFile?.let {
         val removed = m_moduleCache.remove(it)
         if (removed != null) {
-            SdkLog.debug("Removed {} cache entry for '{}': '{}' (having root '{}').", JsModel::class.java.simpleName, it, removed, removed.moduleRoot)
+            SdkLog.debug("Removed {} cache entry for '{}': '{}' (having root '{}').", JsModel::class.java.simpleName, it, removed, removed.nodeModule()?.packageJson()?.directory())
         }
     }
 }

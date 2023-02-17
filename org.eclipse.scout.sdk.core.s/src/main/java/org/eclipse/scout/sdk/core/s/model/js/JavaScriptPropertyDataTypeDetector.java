@@ -115,7 +115,7 @@ public class JavaScriptPropertyDataTypeDetector {
 
     @Override
     protected ScoutJsPropertyType getType() {
-      return new ScoutJsPropertyType(null /* todo: use string data-type */);
+      return new ScoutJsPropertyType(ScoutJsModel.DATA_TYPE_STRING);
     }
   }
 
@@ -129,7 +129,7 @@ public class JavaScriptPropertyDataTypeDetector {
 
     @Override
     protected ScoutJsPropertyType getType() {
-      return new ScoutJsPropertyType(null /* todo: use widget data-type */);
+      return new ScoutJsPropertyType(ScoutJsModel.DATA_TYPE_WIDGET);
     }
   }
 
@@ -143,7 +143,7 @@ public class JavaScriptPropertyDataTypeDetector {
 
     @Override
     protected ScoutJsPropertyType getType() {
-      return new ScoutJsPropertyType(null /* todo: use string data-type */, ScoutJsPropertySubType.TEXT_KEY);
+      return new ScoutJsPropertyType(ScoutJsModel.DATA_TYPE_STRING, ScoutJsPropertySubType.TEXT_KEY);
     }
   }
 }

@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js;
 
+import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toUnmodifiableMap;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
@@ -21,23 +23,30 @@ import org.eclipse.scout.sdk.core.util.FinalValue;
 
 public class TypeScriptScoutObject implements IScoutJsObject {
 
+  private final ScoutJsModel m_scoutJsModel;
   private final IES6Class m_class;
   private final IES6Class m_model;
   private final FinalValue<Map<String, ScoutJsProperty>> m_properties;
 
-  protected TypeScriptScoutObject(IES6Class clazz, IES6Class model) {
+  protected TypeScriptScoutObject(ScoutJsModel scoutJsModel, IES6Class clazz, IES6Class model) {
+    m_scoutJsModel = scoutJsModel;
     m_class = clazz;
     m_model = model;
     m_properties = new FinalValue<>();
   }
 
-  public static Optional<IScoutJsObject> create(IES6Class clazz) {
+  public static Optional<IScoutJsObject> create(ScoutJsModel scoutJsModel, IES6Class clazz) {
     return Optional.ofNullable(clazz)
         .flatMap(c -> c.field("model")
             .flatMap(IField::dataType)
-            .filter(m -> m instanceof IES6Class)
-            .map(m -> (IES6Class) m)
-            .map(m -> new TypeScriptScoutObject(c, m)));
+            .filter(IES6Class.class::isInstance)
+            .map(IES6Class.class::cast)
+            .map(m -> new TypeScriptScoutObject(scoutJsModel, c, m)));
+  }
+
+  @Override
+  public ScoutJsModel scoutJsModel() {
+    return m_scoutJsModel;
   }
 
   @Override
@@ -51,9 +60,17 @@ public class TypeScriptScoutObject implements IScoutJsObject {
   }
 
   protected Map<String, ScoutJsProperty> parseProperties() {
-    return model().fields().stream()
-        .flatMap(p -> p.dataType().map(dt -> new ScoutJsProperty(p, new ScoutJsPropertyType(dt))).stream())
-        .collect(toUnmodifiableMap(p -> p.field().name(), identity()));
+    var result = model().fields().stream()
+        .flatMap(p -> p.dataType().map(dt -> new ScoutJsProperty(this, p, new ScoutJsPropertyType(dt))).stream())
+        .collect(toMap(ScoutJsProperty::name, identity()));
+
+    declaringClass().supers().withSuperInterfaces(false).stream()
+        .map(scoutJsModel()::scoutObject)
+        .filter(Objects::nonNull)
+        .forEach(scoutObject -> scoutObject.properties()
+            .forEach((propertyName, inheritedProperty) -> result.compute(propertyName, (__, lower) -> chooseProperty(inheritedProperty, lower))));
+
+    return unmodifiableMap(result);
   }
 
   public IES6Class model() {
