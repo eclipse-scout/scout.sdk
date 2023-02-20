@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
@@ -29,6 +30,8 @@ public interface PackageJsonSpi extends NodeElementSpi {
   Path containingDir();
 
   boolean existsFile(String relPath);
+
+  Collection<NodeModuleSpi> dependencies();
 
   @Override
   default Optional<SourceRange> source() {

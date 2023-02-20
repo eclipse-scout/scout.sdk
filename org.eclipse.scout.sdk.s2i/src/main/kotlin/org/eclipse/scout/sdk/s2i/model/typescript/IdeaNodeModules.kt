@@ -79,7 +79,7 @@ class IdeaNodeModules(val project: Project) {
         return null
     }
 
-    private fun getOrCreateModule(file: VirtualFile): IdeaNodeModule? {
+    internal fun getOrCreateModule(file: VirtualFile): IdeaNodeModule? {
         val packageJsonFile = findParentPackageJson(file) ?: return null
         return m_modules.computeIfAbsent(packageJsonFile) { IdeaNodeModule(this, it.parent) }
     }

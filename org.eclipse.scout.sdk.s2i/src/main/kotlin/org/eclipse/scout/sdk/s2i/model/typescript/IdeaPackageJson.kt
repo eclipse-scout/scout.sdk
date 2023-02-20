@@ -9,14 +9,19 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
+import com.intellij.javascript.nodejs.NodeModuleSearchUtil.collectVisibleNodeModules
 import com.intellij.openapi.vfs.VirtualFile
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.PackageJsonImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi
+import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
 
-class IdeaPackageJson(ideaModule: IdeaNodeModule, private val moduleDir: VirtualFile) : AbstractNodeElementSpi<IPackageJson>(ideaModule), PackageJsonSpi {
+class IdeaPackageJson(private val ideaModule: IdeaNodeModule, private val moduleDir: VirtualFile) : AbstractNodeElementSpi<IPackageJson>(ideaModule), PackageJsonSpi {
+
+    private val m_dependencies = FinalValue<Collection<NodeModuleSpi>>()
 
     override fun createApi() = PackageJsonImplementor(this)
 
@@ -25,4 +30,11 @@ class IdeaPackageJson(ideaModule: IdeaNodeModule, private val moduleDir: Virtual
     override fun containingDir() = moduleDir.resolveLocalPath()
 
     override fun existsFile(relPath: String) = moduleDir.findFileByRelativePath(relPath) != null
+
+    override fun dependencies(): Collection<NodeModuleSpi> = m_dependencies.computeIfAbsentAndGet {
+        collectVisibleNodeModules(HashMap(), ideaModule.moduleInventory.project, moduleDir).asSequence()
+            .mapNotNull { it.virtualFile }
+            .mapNotNull { ideaModule.moduleInventory.getOrCreateModule(it) }
+            .toSet()
+    }
 }

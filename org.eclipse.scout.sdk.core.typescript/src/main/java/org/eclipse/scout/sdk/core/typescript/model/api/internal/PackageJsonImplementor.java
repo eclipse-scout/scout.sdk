@@ -18,7 +18,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
+import org.eclipse.scout.sdk.core.typescript.model.api.query.DependencyQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -143,6 +145,18 @@ public class PackageJsonImplementor extends AbstractNodeElement<PackageJsonSpi> 
   @Override
   public String name() {
     return m_name;
+  }
+
+  @Override
+  public DependencyQuery dependencies() {
+    return new DependencyQuery(spi());
+  }
+
+  @Override
+  public Optional<INodeModule> dependency(String name) {
+    return dependencies()
+        .withName(name)
+        .first();
   }
 
   @Override

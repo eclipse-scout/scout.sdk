@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import static java.util.Collections.emptySet;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.PackageJsonImplementor;
@@ -50,5 +53,11 @@ public class LocalPackageJsonSpi extends AbstractNodeElementSpi<IPackageJson> im
   @Override
   public boolean existsFile(String relPath) {
     return Files.exists(containingDir().resolve(relPath));
+  }
+
+  @Override
+  public Collection<NodeModuleSpi> dependencies() {
+    // simple local implementation cannot parse dependencies
+    return emptySet();
   }
 }
