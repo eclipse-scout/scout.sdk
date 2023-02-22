@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.SimpleDataTypeSpi;
 
 public interface IDataType {
 
@@ -18,4 +19,8 @@ public interface IDataType {
   String name();
 
   boolean isPrimitive();
+
+  static IDataType createSimple(String dataType) {
+    return new SimpleDataTypeSpi(dataType).api();
+  }
 }

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.typescript.model.api;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.SimpleFieldSpi;
 
 public interface IField extends INodeElement {
   @Override
@@ -24,4 +25,12 @@ public interface IField extends INodeElement {
   Optional<IDataType> dataType();
 
   IConstantValue constantValue();
+
+  static IField createSimple(String name, String dataType) {
+    return createSimple(name, IDataType.createSimple(dataType));
+  }
+
+  static IField createSimple(String name, IDataType dataType) {
+    return new SimpleFieldSpi(name, dataType != null ? dataType.spi() : null).api();
+  }
 }
