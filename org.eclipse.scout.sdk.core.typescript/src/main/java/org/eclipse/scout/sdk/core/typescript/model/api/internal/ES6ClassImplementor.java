@@ -53,7 +53,15 @@ public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implem
     if (Strings.isBlank(className)) {
       return false;
     }
-    return supers().withName(className).existsAny();
+    return supers().withName(className).withSelf(true).existsAny();
+  }
+
+  @Override
+  public boolean isInstanceOf(IES6Class es6Class) {
+    if (es6Class == null || Strings.isBlank(es6Class.name())) {
+      return false;
+    }
+    return supers().withName(es6Class.name()).withSelf(true).stream().anyMatch(es6Class::equals);
   }
 
   @Override

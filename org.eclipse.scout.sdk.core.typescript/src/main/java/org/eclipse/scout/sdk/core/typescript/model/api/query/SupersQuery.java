@@ -20,7 +20,7 @@ public class SupersQuery extends AbstractQuery<IES6Class> {
 
   private final ES6ClassSpi m_es6ClassSpi;
 
-  private boolean m_includeSelf = true;
+  private boolean m_includeSelf = false;
   private boolean m_includeSuperClasses = true;
   private boolean m_includeSuperInterfaces = true;
 

@@ -37,8 +37,9 @@ public interface IES6Class extends INodeElement, IDataType {
 
   boolean isInstanceOf(String className);
 
+  boolean isInstanceOf(IES6Class es6Class);
+
   Optional<IField> field(String name);
 
   Optional<IFunction> function(String name);
-
 }
