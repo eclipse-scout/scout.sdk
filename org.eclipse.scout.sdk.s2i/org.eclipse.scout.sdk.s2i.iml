@@ -39,7 +39,7 @@
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.ecj" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" scope="TEST" />
     <orderEntry type="library" name="Gradle: org.apache.poi:poi-ooxml:5.2.3" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.jetbrains:annotations:23.1.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.jetbrains:annotations:24.0.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:aether-dependency-resolver:ideaIU-IU-222.4345.14-withSources" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:debugger-memory-agent:ideaIU-IU-222.4345.14-withSources" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: unzipped.com.jetbrains.plugins:java-impl:ideaIU-IU-222.4345.14-withSources" level="project" />
