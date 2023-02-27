@@ -1,0 +1,7 @@
+{
+  "name": "@sdk/testing",
+  "version": "23.1.0-snapshot",
+  "dependencies": {
+    "@sdk/core": "23.1.0-snapshot"
+  }
+}

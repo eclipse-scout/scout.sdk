@@ -80,8 +80,7 @@ class IdeaNodeModules(val project: Project) {
     }
 
     internal fun getOrCreateModule(file: VirtualFile): IdeaNodeModule? {
-        // FIXME parser: if VirtualFile contains a link -> resolve it
-        val packageJsonFile = findParentPackageJson(file) ?: return null
+        val packageJsonFile = file.canonicalFile?.let { findParentPackageJson(it) } ?: return null
         return m_modules.computeIfAbsent(packageJsonFile) { IdeaNodeModule(this, it.parent) }
     }
 }

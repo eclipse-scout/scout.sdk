@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.s2i.model.typescript
+package org.eclipse.scout.sdk.s2i.model.typescript.util
 
 import com.intellij.lang.javascript.psi.ecmal4.JSAttributeList.ModifierType
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier

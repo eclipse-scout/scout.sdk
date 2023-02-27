@@ -1,0 +1,10 @@
+{
+  "name": "@sdk/project",
+  "version": "23.1.0-snapshot",
+  "dependencies": {
+    "@sdk/layer": "23.1.0-snapshot"
+  },
+  "devDependencies": {
+    "@sdk/testing": "23.1.0-snapshot"
+  }
+}

@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractFieldSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.s2i.model.typescript.util.toModifierType
 
 open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, internal val javaScriptField: JSField) : AbstractFieldSpi(ideaModule) {
 

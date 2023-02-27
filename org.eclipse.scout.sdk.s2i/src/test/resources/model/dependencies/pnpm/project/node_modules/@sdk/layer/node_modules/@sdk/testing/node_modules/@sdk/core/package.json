@@ -1,0 +1,7 @@
+{
+  "name": "@sdk/core",
+  "version": "23.1.0-snapshot",
+  "dependencies": {
+    "jquery": "3.6.3"
+  }
+}
