@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {WildcardClass as WildcardClassAlias} from '@eclipse-scout/sdk-export-js';
+import {WildcardClass as WildcardClassAlias, AnotherClass} from '@eclipse-scout/sdk-export-js';
 
 // noinspection JSUnusedGlobalSymbols
 export class SomeClass {
@@ -44,13 +44,17 @@ export class SomeClass {
 
     /** @type {WildcardClassAlias} */
     this.myRefDef = null;
+    this.myRefInfer = new AnotherClass();
     this.myRefInfer = new WildcardClassAlias();
+    this.myRefInfer = new AnotherClass();
 
     /**
      *  @type {string[][]}
      */
     this.myStringArrayDef = null;
+    this.myStringArrayInfer = [[]];
     this.myStringArrayInfer = [['string']];
+    this.myStringArrayInfer = null;
 
     /**
      * @type {number[]}

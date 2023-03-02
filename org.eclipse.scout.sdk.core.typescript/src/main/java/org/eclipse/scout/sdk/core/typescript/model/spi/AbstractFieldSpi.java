@@ -9,16 +9,10 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.FieldImplementor;
 
 public abstract class AbstractFieldSpi extends AbstractNodeElementSpi<IField> implements FieldSpi {
-
-  private final List<FieldSpi> m_additionalFields = new ArrayList<>();
 
   protected AbstractFieldSpi(NodeModuleSpi module) {
     super(module);
@@ -27,15 +21,5 @@ public abstract class AbstractFieldSpi extends AbstractNodeElementSpi<IField> im
   @Override
   protected IField createApi() {
     return new FieldImplementor(this);
-  }
-
-  @Override
-  public List<FieldSpi> getAdditionalFields() {
-    return Collections.unmodifiableList(m_additionalFields);
-  }
-
-  @Override
-  public boolean addAdditionalField(FieldSpi field) {
-    return m_additionalFields.add(field);
   }
 }

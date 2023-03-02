@@ -35,7 +35,7 @@ open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, interna
         ideaModule.spiFactory.createConstantValue(javaScriptField.initializer, ideaModule)
     }
 
-    override fun dataTypeImpl() = m_dataType.computeIfAbsentAndGet {
+    override fun dataType() = m_dataType.computeIfAbsentAndGet {
         ideaModule.dataTypeFactory.createDataType(javaScriptField, this::constantValue)
     }
 }

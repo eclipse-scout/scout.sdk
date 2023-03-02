@@ -48,7 +48,7 @@ public class SimpleFieldSpi extends AbstractFieldSpi {
   }
 
   @Override
-  public DataTypeSpi dataTypeImpl() {
+  public DataTypeSpi dataType() {
     return m_dataType;
   }
 

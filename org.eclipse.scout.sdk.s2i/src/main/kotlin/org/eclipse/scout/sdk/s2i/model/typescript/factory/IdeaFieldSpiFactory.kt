@@ -15,6 +15,10 @@ import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.lang.javascript.psi.types.TypeScriptTypeOfJSTypeImpl
 import com.intellij.psi.PsiElement
 import kotlinx.collections.immutable.toImmutableList
+import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType
+import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModules
@@ -46,6 +50,43 @@ class IdeaFieldSpiFactory(val ideaNodeModules: IdeaNodeModules) {
     }
 
     private fun createField(property: JSRecordType.PropertySignature, module: IdeaNodeModule): FieldSpi = ideaNodeModules.spiFactory.createRecordField(property, module)
+
+    /* **************************************************************************
+     * CHOOSE FIELDS
+     * *************************************************************************/
+
+    private fun chooseField(field1: FieldSpi, field2: FieldSpi): FieldSpi {
+        val dataType1 = field1.dataType() ?: return field2
+        val dataType2 = field2.dataType() ?: return field1
+
+        chooseField(field1 to dataType1, field2 to dataType2)?.let { return it }
+
+        if (dataType1.dataTypeFlavor() === IDataType.DataTypeFlavor.Array && dataType2.dataTypeFlavor() === IDataType.DataTypeFlavor.Array) {
+            if (dataType1.arrayDimension() != dataType2.arrayDimension()) return field1
+
+            val componentDataType1 = dataType1.componentDataTypes().findFirst().orElse(null) ?: return field2
+            val componentDataType2 = dataType1.componentDataTypes().findFirst().orElse(null) ?: return field1
+
+            chooseField(field1 to componentDataType1, field2 to componentDataType2)?.let { return it }
+        }
+
+        return field1
+    }
+
+    private fun chooseField(fieldDataTypePair1: Pair<FieldSpi, DataTypeSpi>, fieldDataTypePair2: Pair<FieldSpi, DataTypeSpi>): FieldSpi? {
+        val (field1, dataType1) = fieldDataTypePair1
+        val (field2, dataType2) = fieldDataTypePair2
+
+        if (dataType1.name() === TypeScriptTypes._any) return field2
+        if (dataType2.name() === TypeScriptTypes._any) return field1
+
+        if (dataType1 is ES6ClassSpi && dataType2 is ES6ClassSpi) {
+            if (dataType2.api().isInstanceOf(dataType1.api())) return field2
+            return field1
+        }
+
+        return null
+    }
 
     /* **************************************************************************
      * COLLECT FIELDS
@@ -106,10 +147,7 @@ class IdeaFieldSpiFactory(val ideaNodeModules: IdeaNodeModules) {
 
         fun collect(field: FieldSpi) {
             map.compute(field.name()) { _, existingField ->
-                existingField?.let {
-                    it.addAdditionalField(field)
-                    it
-                } ?: field
+                existingField?.let { chooseField(it, field) } ?: field
             }
         }
 

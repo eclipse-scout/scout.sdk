@@ -32,7 +32,7 @@ open class IdeaRecordField(protected val ideaModule: IdeaNodeModule, internal va
 
     override fun isOptional() = property.isOptional
 
-    override fun dataTypeImpl() = m_dataType.computeIfAbsentAndGet {
+    override fun dataType() = m_dataType.computeIfAbsentAndGet {
         ideaModule.dataTypeFactory.createDataType(property)
     }
 

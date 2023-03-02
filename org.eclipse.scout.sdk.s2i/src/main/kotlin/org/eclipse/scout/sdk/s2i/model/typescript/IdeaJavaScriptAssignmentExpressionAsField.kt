@@ -35,7 +35,7 @@ open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(val id
         ideaModule.spiFactory.createConstantValue(javaScriptAssignmentExpression.rOperand, ideaModule)
     }
 
-    override fun dataTypeImpl(): DataTypeSpi? = m_dataType.computeIfAbsentAndGet {
+    override fun dataType(): DataTypeSpi? = m_dataType.computeIfAbsentAndGet {
         ideaModule.dataTypeFactory.createDataType(javaScriptAssignmentExpression, this::constantValue)
     }
 }

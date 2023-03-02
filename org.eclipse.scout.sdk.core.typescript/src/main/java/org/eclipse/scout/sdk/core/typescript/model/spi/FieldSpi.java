@@ -9,9 +9,6 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
-import java.util.List;
-import java.util.Objects;
-
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
@@ -28,20 +25,5 @@ public interface FieldSpi extends NodeElementSpi {
 
   IConstantValue constantValue();
 
-  default DataTypeSpi dataType() {
-    var dataType = dataTypeImpl();
-    if (dataType == null) {
-      dataType = getAdditionalFields().stream()
-          .map(FieldSpi::dataType)
-          .filter(Objects::nonNull)
-          .findFirst().orElse(null);
-    }
-    return dataType;
-  }
-
-  List<FieldSpi> getAdditionalFields();
-
-  boolean addAdditionalField(FieldSpi field);
-
-  DataTypeSpi dataTypeImpl();
+  DataTypeSpi dataType();
 }

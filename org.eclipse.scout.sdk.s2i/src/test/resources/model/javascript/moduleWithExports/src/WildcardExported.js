@@ -9,7 +9,7 @@
  */
 
 // noinspection JSUnusedGlobalSymbols
-export class WildcardClass {
+export class WildcardClass extends AnotherClass {
 }
 
 // noinspection JSUnusedGlobalSymbols
