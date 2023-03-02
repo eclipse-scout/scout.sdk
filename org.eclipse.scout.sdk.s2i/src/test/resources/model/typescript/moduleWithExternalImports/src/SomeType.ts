@@ -21,4 +21,6 @@ export type SomeType = {
   myObjectDef: object;
   myAnyDef?: any;
   myRefDef: WildcardClassAlias;
+  myStringArrayDef?: string[][];
+  myNumberArrayDef: number[];
 };

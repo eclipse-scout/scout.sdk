@@ -9,7 +9,10 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import java.util.stream.Stream;
+
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 
 public interface DataTypeSpi {
 
@@ -18,4 +21,16 @@ public interface DataTypeSpi {
   String name();
 
   boolean isPrimitive();
+
+  default DataTypeFlavor dataTypeFlavor() {
+    return DataTypeFlavor.Single;
+  }
+
+  default Stream<DataTypeSpi> componentDataTypes() {
+    return Stream.empty();
+  }
+
+  default int arrayDimension() {
+    return 0;
+  }
 }

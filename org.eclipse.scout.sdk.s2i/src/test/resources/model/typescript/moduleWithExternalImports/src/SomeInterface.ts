@@ -21,6 +21,8 @@ export interface SomeInterface {
   myObjectDef: object;
   myAnyDef?: any;
   myRefDef: WildcardClassAlias;
+  myStringArrayDef?: string[][];
+  myNumberArrayDef: number[];
 
   someFunc(): number;
 }

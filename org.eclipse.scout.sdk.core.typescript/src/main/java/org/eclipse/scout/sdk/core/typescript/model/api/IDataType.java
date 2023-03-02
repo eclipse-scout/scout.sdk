@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.util.stream.Stream;
+
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.SimpleDataTypeSpi;
 
@@ -19,6 +21,24 @@ public interface IDataType {
   String name();
 
   boolean isPrimitive();
+
+  default DataTypeFlavor dataTypeFlavor() {
+    return spi().dataTypeFlavor();
+  }
+
+  default Stream<IDataType> componentDataTypes() {
+    return spi().componentDataTypes()
+        .map(DataTypeSpi::api);
+  }
+
+  default int arrayDimension() {
+    return spi().arrayDimension();
+  }
+
+  enum DataTypeFlavor {
+    Single,
+    Array
+  }
 
   static IDataType createSimple(String dataType) {
     return new SimpleDataTypeSpi(dataType).api();

@@ -45,6 +45,20 @@ export class SomeClass {
     /** @type {WildcardClassAlias} */
     this.myRefDef = null;
     this.myRefInfer = new WildcardClassAlias();
+
+    /**
+     *  @type {string[][]}
+     */
+    this.myStringArrayDef = null;
+    this.myStringArrayInfer = [['string']];
+
+    /**
+     * @type {number[]}
+     */
+    this.myNumberArrayDef = null;
+    this.myNumberArrayInfer = [42];
+
+    this.myArrayInfer = [];
   }
 
   /**

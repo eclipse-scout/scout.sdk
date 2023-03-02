@@ -19,9 +19,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
-import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
-import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralDataTypeSpi
-import org.eclipse.scout.sdk.core.typescript.model.spi.SimpleDataTypeSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.*
 import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.s2i.model.typescript.*
 import java.util.concurrent.ConcurrentHashMap
@@ -69,6 +67,8 @@ class IdeaSpiFactory(val ideaNodeModules: IdeaNodeModules) {
     fun createObjectLiteralDataType(name: String, jsObjectLiteral: JSObjectLiteralExpression) = createObjectLiteralDataType(name, createObjectLiteralExpression(jsObjectLiteral).api())
 
     fun createObjectLiteralDataType(name: String, objectLiteral: IObjectLiteral) = getOrCreate(name to objectLiteral) { ObjectLiteralDataTypeSpi(name, objectLiteral) }
+
+    fun createArrayDataType(componentDataType: DataTypeSpi?, arrayDimension: Int): SimpleCompositeDataTypeSpi = getOrCreate(componentDataType to arrayDimension) { SimpleCompositeDataTypeSpi.createArray(componentDataType, arrayDimension) }
 
     private fun <ID : PsiElement, R> getOrCreate(psi: ID, factory: (IdeaNodeModule, ID) -> R) = getOrCreate(psi, psi, factory)
 

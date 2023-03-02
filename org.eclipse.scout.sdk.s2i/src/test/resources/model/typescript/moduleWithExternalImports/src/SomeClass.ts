@@ -40,6 +40,14 @@ export class SomeClass {
   myStaticStringRefInfer = SomeClass.myStaticStringDef;
   myEnumRefInfer = SomeClass.myEnumInfer.b;
 
+  myStringArrayDef?: string[][];
+  myStringArrayInfer? = [['string']];
+
+  myNumberArrayDef: number[];
+  myNumberArrayInfer = [42];
+
+  myArrayInfer = [];
+
   static myStaticStringDef: string = 'staticString' as const;
   static myStaticStringInfer = 'staticString' as const;
 
