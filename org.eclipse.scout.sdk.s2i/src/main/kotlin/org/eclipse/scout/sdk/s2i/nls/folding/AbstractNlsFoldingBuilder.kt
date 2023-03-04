@@ -49,13 +49,13 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
 
     override fun buildFoldRegions(root: PsiElement, document: Document, quick: Boolean): Array<FoldingDescriptor> {
         if (quick || !isFoldingOn()) {
-            return FoldingDescriptor.EMPTY
+            return emptyArray()
         }
         val start = System.currentTimeMillis()
-        val scope = root.translationDependencyScope() ?: return FoldingDescriptor.EMPTY
-        val module = root.containingModule() ?: return FoldingDescriptor.EMPTY
+        val scope = root.translationDependencyScope() ?: return emptyArray()
+        val module = root.containingModule() ?: return emptyArray()
         val project = root.project
-        val manager = TranslationManagerLoader.createManager(module, scope, true) ?: return FoldingDescriptor.EMPTY
+        val manager = TranslationManagerLoader.createManager(module, scope, true) ?: return emptyArray()
         m_javaLangStringType = PsiType.getTypeByName(CommonClassNames.JAVA_LANG_STRING, project, allScope(project))
         m_requestedLanguage = ScoutSettings.getTranslationLanguage(project)
         val result = buildFoldRegions(root, manager).toTypedArray()
@@ -75,11 +75,11 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
 
         if (element is PsiMethodCallExpression) {
             val textArgs = element.argumentList.expressions
-                    .filter { it.type == m_javaLangStringType }
-                    .drop(1)
-                    .map { it.text }
-                    .map { PLACEHOLDER_START_CHAR + limitLength(it, PLACEHOLDER_MAX_LEN) + PLACEHOLDER_END_CHAR }
-                    .toTypedArray()
+                .filter { it.type == m_javaLangStringType }
+                .drop(1)
+                .map { it.text }
+                .map { PLACEHOLDER_START_CHAR + limitLength(it, PLACEHOLDER_MAX_LEN) + PLACEHOLDER_END_CHAR }
+                .toTypedArray()
             if (textArgs.isNotEmpty()) {
                 text = replacePlaceholders(text, textArgs)
             }
