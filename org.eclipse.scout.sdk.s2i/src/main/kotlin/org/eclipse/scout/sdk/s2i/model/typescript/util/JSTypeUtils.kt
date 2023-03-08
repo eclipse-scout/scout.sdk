@@ -12,25 +12,22 @@ package org.eclipse.scout.sdk.s2i.model.typescript.util
 import com.intellij.lang.javascript.psi.JSType
 import com.intellij.lang.javascript.psi.types.JSRecursiveTypeVisitor
 
-class JSTypeUtils {
+object JSTypeUtils {
 
-    companion object {
-
-        fun <T : JSType> firstChildOfType(startType: JSType, t: Class<T>): T? {
-            var result: T? = null
-            val visitor: JSRecursiveTypeVisitor = object : JSRecursiveTypeVisitor(false) {
-                override fun visitJSType(type: JSType) {
-                    if (result == null && t.isAssignableFrom(type::class.java)) {
-                        @Suppress("UNCHECKED_CAST")
-                        result = type as T
-                    }
-                    if (result == null) {
-                        super.visitJSType(type)
-                    }
+    fun <T : JSType> firstChildOfType(startType: JSType, t: Class<T>): T? {
+        var result: T? = null
+        val visitor: JSRecursiveTypeVisitor = object : JSRecursiveTypeVisitor(false) {
+            override fun visitJSType(type: JSType) {
+                if (result == null && t.isAssignableFrom(type::class.java)) {
+                    @Suppress("UNCHECKED_CAST")
+                    result = type as T
+                }
+                if (result == null) {
+                    super.visitJSType(type)
                 }
             }
-            visitor.visitJSType(startType)
-            return result
         }
+        visitor.visitJSType(startType)
+        return result
     }
 }

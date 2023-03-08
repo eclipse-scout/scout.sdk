@@ -33,15 +33,14 @@ import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeModuleImplem
 import org.eclipse.scout.sdk.core.typescript.model.spi.*
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.SourceRange
+import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaSpiFactory
 import java.nio.CharBuffer
 import java.util.*
 import java.util.Collections.unmodifiableMap
 
-class IdeaNodeModule(val moduleInventory: IdeaNodeModules, private val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
+class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
 
-    var spiFactory = moduleInventory.spiFactory
-    var fieldFactory = moduleInventory.fieldFactory
-    var dataTypeFactory = moduleInventory.dataTypeFactory
+    val spiFactory = IdeaSpiFactory(this)
     private val m_mainFile = FinalValue<VirtualFile>()
     private val m_mainPsi = FinalValue<JSFile>()
     private val m_packageJsonSpi = FinalValue<PackageJsonSpi>()
@@ -49,7 +48,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, private val nodeModul
 
     override fun containingModule() = this
 
-    override fun packageJson(): PackageJsonSpi = m_packageJsonSpi.computeIfAbsentAndGet { spiFactory.createPackageJson(nodeModuleDir, this) }
+    override fun packageJson(): PackageJsonSpi = m_packageJsonSpi.computeIfAbsentAndGet { spiFactory.createPackageJson(nodeModuleDir) }
 
     override fun createApi() = NodeModuleImplementor(this, packageJson())
 

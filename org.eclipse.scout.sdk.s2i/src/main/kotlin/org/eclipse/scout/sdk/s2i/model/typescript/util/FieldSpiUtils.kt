@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.s2i.model.typescript.factory
+package org.eclipse.scout.sdk.s2i.model.typescript.util
 
 import com.intellij.lang.javascript.psi.*
 import com.intellij.lang.javascript.psi.ecma6.*
@@ -21,35 +21,33 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
-import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModules
-import org.eclipse.scout.sdk.s2i.model.typescript.util.JSTypeUtils
 
-class IdeaFieldSpiFactory(val ideaNodeModules: IdeaNodeModules) {
+object FieldSpiUtils {
 
     /* **************************************************************************
      * CREATE FIELDS
      * *************************************************************************/
 
-    fun createField(element: JSElement): FieldSpi? {
+    fun createField(element: JSElement, module: IdeaNodeModule): FieldSpi? {
         if (element is JSField) {
-            return createField(element)
+            return createField(element, module)
         }
         if (element is JSAssignmentExpression) {
-            createField(element)?.let { return it }
+            createField(element, module)?.let { return it }
         }
 
         return null
     }
 
-    private fun createField(field: JSField): FieldSpi = ideaNodeModules.spiFactory.createJavaScriptField(field)
+    private fun createField(field: JSField, module: IdeaNodeModule): FieldSpi = module.spiFactory.createJavaScriptField(field)
 
-    private fun createField(assignment: JSAssignmentExpression): FieldSpi? {
+    private fun createField(assignment: JSAssignmentExpression, module: IdeaNodeModule): FieldSpi? {
         val reference: JSReferenceExpression = assignment.definitionExpression?.expression as? JSReferenceExpression ?: return null
         if (reference.qualifier !is JSThisExpression) return null
-        return ideaNodeModules.spiFactory.createJavaScriptAssignmentExpressionAsField(assignment, reference)
+        return module.spiFactory.createJavaScriptAssignmentExpressionAsField(assignment, reference)
     }
 
-    private fun createField(property: JSRecordType.PropertySignature, module: IdeaNodeModule): FieldSpi = ideaNodeModules.spiFactory.createRecordField(property, module)
+    private fun createField(property: JSRecordType.PropertySignature, module: IdeaNodeModule): FieldSpi = module.spiFactory.createRecordField(property)
 
     /* **************************************************************************
      * CHOOSE FIELDS
@@ -92,8 +90,8 @@ class IdeaFieldSpiFactory(val ideaNodeModules: IdeaNodeModules) {
      * COLLECT FIELDS
      * *************************************************************************/
 
-    fun collectFields(element: JSElement): List<FieldSpi> {
-        val collector = FieldCollector()
+    fun collectFields(element: JSElement, module: IdeaNodeModule): List<FieldSpi> {
+        val collector = FieldCollector(module)
         if (element is TypeScriptTypeAlias) {
             collectFields(collector, element)
             return collector.fields()
@@ -113,9 +111,8 @@ class IdeaFieldSpiFactory(val ideaNodeModules: IdeaNodeModules) {
             // type alias with referenced fields (enum like)
             val parsedType = typeAlias.parsedTypeDeclaration ?: return
             val recordType = JSTypeUtils.firstChildOfType(parsedType, TypeScriptTypeOfJSTypeImpl::class.java)?.substitute() as? JSRecordType ?: return
-            val module = ideaNodeModules.findContainingModule(typeAlias) ?: return
             recordType.properties
-                .forEach { collector.collect(createField(it, module)) }
+                .forEach { collector.collect(createField(it, collector.module)) }
         }
     }
 
@@ -135,14 +132,14 @@ class IdeaFieldSpiFactory(val ideaNodeModules: IdeaNodeModules) {
             .forEach { collector.collect(it) }
     }
 
-    private inner class FieldCollector {
+    private class FieldCollector(val module: IdeaNodeModule) {
 
         val map = HashMap<String, FieldSpi>()
 
         fun fields(): List<FieldSpi> = map.values.toImmutableList()
 
         fun collect(element: JSElement) {
-            createField(element)?.let { collect(it) }
+            createField(element, module)?.let { collect(it) }
         }
 
         fun collect(field: FieldSpi) {

@@ -12,8 +12,6 @@ package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
-import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
@@ -23,14 +21,9 @@ import org.eclipse.scout.sdk.core.typescript.model.api.query.SupersQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 import org.eclipse.scout.sdk.core.util.Strings;
 
-public class ES6ClassImplementor extends AbstractNodeElement<ES6ClassSpi> implements IES6Class, IDataType {
+public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implements IES6Class {
   public ES6ClassImplementor(ES6ClassSpi spi) {
     super(spi);
-  }
-
-  @Override
-  public String name() {
-    return spi().name();
   }
 
   @Override

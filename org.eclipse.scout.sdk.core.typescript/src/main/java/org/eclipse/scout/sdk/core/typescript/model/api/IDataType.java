@@ -14,11 +14,10 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.SimpleDataTypeSpi;
 
-public interface IDataType {
+public interface IDataType extends INodeElement {
 
+  @Override
   DataTypeSpi spi();
-
-  String name();
 
   boolean isPrimitive();
 
@@ -41,6 +40,6 @@ public interface IDataType {
   }
 
   static IDataType createSimple(String dataType) {
-    return new SimpleDataTypeSpi(dataType).api();
+    return new SimpleDataTypeSpi(null, dataType).api();
   }
 }

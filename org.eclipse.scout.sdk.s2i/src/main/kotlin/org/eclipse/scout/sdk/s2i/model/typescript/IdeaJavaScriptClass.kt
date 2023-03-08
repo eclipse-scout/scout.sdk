@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.s2i.model.typescript.util.FieldSpiUtils
 import java.util.*
 import java.util.stream.Stream
 
@@ -46,15 +47,21 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
 
     override fun superInterfaces(): Stream<ES6ClassSpi> = m_superInterfaces.computeIfAbsentAndGet {
         val superInterfaces = javaScriptClass.implementedInterfaces
-            .mapNotNull { ideaModule.createSpiForPsi(it) as? ES6ClassSpi }
+            .mapNotNull {
+                val module = ideaModule.moduleInventory.findContainingModule(it) ?: return@mapNotNull null
+                module.createSpiForPsi(it) as? ES6ClassSpi
+            }
         return@computeIfAbsentAndGet Collections.unmodifiableList(superInterfaces)
     }.stream()
 
     override fun superClass(): Optional<ES6ClassSpi> = m_superClass.computeIfAbsentAndGet {
         val superClass = javaScriptClass.superClasses.firstOrNull() ?: return@computeIfAbsentAndGet Optional.empty()
-        val superClassSpi = ideaModule.createSpiForPsi(superClass) as? ES6ClassSpi
+        val module = ideaModule.moduleInventory.findContainingModule(superClass) ?: return@computeIfAbsentAndGet Optional.empty()
+        val superClassSpi = module.createSpiForPsi(superClass) as? ES6ClassSpi
         return@computeIfAbsentAndGet Optional.ofNullable(superClassSpi)
     }
 
-    override fun fields(): List<FieldSpi> = m_fields.computeIfAbsentAndGet { ideaModule.fieldFactory.collectFields(javaScriptClass) }
+    override fun fields(): List<FieldSpi> = m_fields.computeIfAbsentAndGet {
+        FieldSpiUtils.collectFields(javaScriptClass, ideaModule)
+    }
 }

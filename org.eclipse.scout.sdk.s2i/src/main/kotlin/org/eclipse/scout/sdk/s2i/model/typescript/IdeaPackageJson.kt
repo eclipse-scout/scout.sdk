@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
-import org.eclipse.scout.sdk.s2i.model.typescript.util.NodeModuleUtils.Companion.findDependenciesInNodeModulesDirs
+import org.eclipse.scout.sdk.s2i.model.typescript.util.NodeModuleUtils
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
 
 class IdeaPackageJson(private val ideaModule: IdeaNodeModule, private val moduleDir: VirtualFile) : AbstractNodeElementSpi<IPackageJson>(ideaModule), PackageJsonSpi {
@@ -32,7 +32,7 @@ class IdeaPackageJson(private val ideaModule: IdeaNodeModule, private val module
     override fun existsFile(relPath: String) = moduleDir.findFileByRelativePath(relPath) != null
 
     override fun dependencies(): Collection<NodeModuleSpi> = m_dependencies.computeIfAbsentAndGet {
-        findDependenciesInNodeModulesDirs(moduleDir).asSequence()
+        NodeModuleUtils.findDependenciesInNodeModulesDirs(moduleDir).asSequence()
             .mapNotNull { ideaModule.moduleInventory.getOrCreateModule(it) }
             .toSet()
     }

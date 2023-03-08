@@ -14,7 +14,7 @@ import java.util.List;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.util.SuperHierarchySpliterator.ISuperHierarchyElement;
 
-public interface ES6ClassSpi extends NodeElementSpi, DataTypeSpi, ISuperHierarchyElement<ES6ClassSpi> {
+public interface ES6ClassSpi extends DataTypeSpi, ISuperHierarchyElement<ES6ClassSpi> {
   @Override
   IES6Class api();
 

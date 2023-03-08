@@ -21,15 +21,9 @@ import com.intellij.psi.PsiReference
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
-import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaDataTypeSpiFactory
-import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaFieldSpiFactory
-import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaSpiFactory
 
 class IdeaNodeModules(val project: Project) {
 
-    val spiFactory = IdeaSpiFactory(this)
-    val fieldFactory = IdeaFieldSpiFactory(this)
-    val dataTypeFactory = IdeaDataTypeSpiFactory(this)
     private val m_modules = HashMap<VirtualFile, IdeaNodeModule>()
     private val m_packageJsonLocationByFile = HashMap<VirtualFile, VirtualFile?>()
 
@@ -81,6 +75,51 @@ class IdeaNodeModules(val project: Project) {
 
     internal fun getOrCreateModule(file: VirtualFile): IdeaNodeModule? {
         val packageJsonFile = file.canonicalFile?.let { findParentPackageJson(it) } ?: return null
-        return m_modules.computeIfAbsent(packageJsonFile) { IdeaNodeModule(this, it.parent) }
+        return m_modules.computeIfAbsent(packageJsonFile.parent) { IdeaNodeModule(this, it) }
+    }
+
+    internal fun getModules(): Collection<IdeaNodeModule> = m_modules.values.toSet()
+
+    fun remove(vf: VirtualFile): Collection<IdeaNodeModule> {
+        val modules = m_modules
+            .filter { vf.path.startsWith(it.key.path) }
+            .map { it.value }
+
+        if (modules.isEmpty()) return emptySet()
+
+        return remove(modules)
+    }
+
+    fun remove(module: IdeaNodeModule) = remove(setOf(module))
+
+    fun remove(modules: Collection<IdeaNodeModule>): Collection<IdeaNodeModule> {
+        val dependentModules = collectDependentModules(modules)
+
+        // remove everything that is mapped to a module contained in dependentModules
+        m_modules.values.removeIf { it in dependentModules }
+
+        return dependentModules
+    }
+
+    private fun collectDependentModules(modules: Collection<IdeaNodeModule>): Collection<IdeaNodeModule> {
+        val remainingModules = m_modules.values.toMutableSet()
+
+        val result = mutableSetOf<IdeaNodeModule>()
+        var current = modules.filter { it in remainingModules }.toSet()
+
+        while (current.isNotEmpty()) {
+            // add to result
+            result.addAll(current)
+
+            // remove from remaining modules
+            remainingModules.removeAll(current)
+
+            // all modules with a dependency on one of the current modules
+            current = remainingModules
+                .filter { it.packageJson().dependencies().any { dependency -> dependency in current } }
+                .toSet()
+        }
+
+        return result
     }
 }

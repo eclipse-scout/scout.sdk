@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractFieldSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 
 open class IdeaRecordField(protected val ideaModule: IdeaNodeModule, internal val property: PropertySignature) : AbstractFieldSpi(ideaModule) {
 
@@ -33,11 +34,11 @@ open class IdeaRecordField(protected val ideaModule: IdeaNodeModule, internal va
     override fun isOptional() = property.isOptional
 
     override fun dataType() = m_dataType.computeIfAbsentAndGet {
-        ideaModule.dataTypeFactory.createDataType(property)
+        DataTypeSpiUtils.createDataType(property, ideaModule)
     }
 
     override fun constantValue(): IConstantValue = m_constantValue.computeIfAbsentAndGet {
-        ideaModule.spiFactory.createConstantValue(getJsProperty()?.value, ideaModule)
+        ideaModule.spiFactory.createConstantValue(getJsProperty()?.value)
     }
 
     protected fun getJsProperty() = m_jsProperty.computeIfAbsentAndGet {

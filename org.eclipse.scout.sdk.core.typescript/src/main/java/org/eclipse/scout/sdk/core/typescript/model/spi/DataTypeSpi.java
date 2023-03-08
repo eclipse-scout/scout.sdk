@@ -14,8 +14,9 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 
-public interface DataTypeSpi {
+public interface DataTypeSpi extends NodeElementSpi {
 
+  @Override
   IDataType api();
 
   String name();

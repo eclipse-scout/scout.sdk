@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.s2i.model.typescript.factory
+package org.eclipse.scout.sdk.s2i.model.typescript.util
 
 import com.intellij.lang.ecmascript6.psi.ES6ImportDeclaration
 import com.intellij.lang.javascript.psi.*
@@ -24,41 +24,41 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaConstantValue
-import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModules
+import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
 
-class IdeaDataTypeSpiFactory(val ideaNodeModules: IdeaNodeModules) {
+object DataTypeSpiUtils {
 
-    fun createDataType(element: JSElement, constantValue: () -> IConstantValue? = { null }): DataTypeSpi? {
+    fun createDataType(element: JSElement, module: IdeaNodeModule, constantValue: () -> IConstantValue? = { null }): DataTypeSpi? {
         if (element is JSAssignmentExpression) {
-            createDataType(element)?.let { return it }
+            createDataType(element, module)?.let { return it }
         }
         if (element is JSTypeOwner) {
-            createDataType(element as JSTypeOwner, constantValue)?.let { return it }
+            createDataType(element as JSTypeOwner, module, constantValue)?.let { return it }
         }
         if (element is JSType) {
-            return createDataType(element as JSType)
+            return createDataType(element as JSType, module)
         }
         if (element is JSObjectLiteralExpression) {
-            createDataType(element)?.let { return it }
+            createDataType(element, module)?.let { return it }
         }
         return getDataType(constantValue)
     }
 
-    private fun createDataType(assignment: JSAssignmentExpression): DataTypeSpi? {
+    private fun createDataType(assignment: JSAssignmentExpression, module: IdeaNodeModule): DataTypeSpi? {
         val expression = assignment.parent as? JSExpressionStatement ?: return null
         val comment = expression.children.firstNotNullOfOrNull { it as? JSDocComment } ?: return null
-        return createJSDocCommentTypeDataType(comment)
+        return createJSDocCommentTypeDataType(comment, module)
     }
 
-    private fun createDataType(typeOwner: JSTypeOwner, constantValue: () -> IConstantValue?): DataTypeSpi? {
+    private fun createDataType(typeOwner: JSTypeOwner, module: IdeaNodeModule, constantValue: () -> IConstantValue?): DataTypeSpi? {
         if (typeOwner.jsType is JSWrapperType || typeOwner.jsType is JSQualifiedReferenceType) {
             getDataType(constantValue)?.let { return it }
         }
-        return typeOwner.jsType?.let { createDataType(it) }
+        return typeOwner.jsType?.let { createDataType(it, module) }
     }
 
-    private fun createDataType(type: JSType): DataTypeSpi? {
-        if (type is JSWrapperType) return createDataType(type.originalType)
+    private fun createDataType(type: JSType, module: IdeaNodeModule): DataTypeSpi? {
+        if (type is JSWrapperType) return createDataType(type.originalType, module)
         if (type.isJavaScript && (type is JSNullType || type is JSUndefinedType)) return null
         if (type is JSArrayType) {
             var arrayDimension = 0
@@ -67,31 +67,31 @@ class IdeaDataTypeSpiFactory(val ideaNodeModules: IdeaNodeModules) {
                 arrayDimension++
                 currentType = (currentType as JSArrayType).type
             } while (currentType is JSArrayType)
-            return ideaNodeModules.spiFactory.createArrayDataType(currentType?.let { createDataType(it) }, arrayDimension)
+            return module.spiFactory.createArrayDataType(currentType?.let { createDataType(it, module) }, arrayDimension)
         }
-        (type as? JSUtilType)?.let { return ideaNodeModules.spiFactory.createJavaScriptType(it) }
+        (type as? JSUtilType)?.let { return module.spiFactory.createJavaScriptType(it) }
 
         (type.sourceElement as? JSElement)
-            ?.let { (ideaNodeModules.resolveReferencedElement(it) as? DataTypeSpi) }
+            ?.let { (module.moduleInventory.resolveReferencedElement(it) as? DataTypeSpi) }
             ?.let { return it }
 
-        return ideaNodeModules.spiFactory.createJavaScriptType(type)
+        return module.spiFactory.createJavaScriptType(type)
     }
 
-    private fun createDataType(objectLiteral: JSObjectLiteralExpression): DataTypeSpi? {
+    private fun createDataType(objectLiteral: JSObjectLiteralExpression, module: IdeaNodeModule): DataTypeSpi? {
         val name = when (val parent = objectLiteral.parent) {
             is JSFieldVariable -> parent.name
             is JSProperty -> parent.name
             else -> null
         } ?: return null
-        return ideaNodeModules.spiFactory.createObjectLiteralDataType(name, objectLiteral)
+        return module.spiFactory.createObjectLiteralDataType(name, objectLiteral)
     }
 
-    fun createDataType(property: JSRecordType.PropertySignature): DataTypeSpi? {
-        return property.jsType?.let { createDataType(it) }
+    fun createDataType(property: JSRecordType.PropertySignature, module: IdeaNodeModule): DataTypeSpi? {
+        return property.jsType?.let { createDataType(it, module) }
     }
 
-    fun createDataType(dataType: String): DataTypeSpi? =
+    fun createDataType(dataType: String, module: IdeaNodeModule): DataTypeSpi? =
         if (dataType.endsWith("[]")) {
             var arrayDimension = 0
             var currentType = dataType
@@ -99,35 +99,35 @@ class IdeaDataTypeSpiFactory(val ideaNodeModules: IdeaNodeModules) {
                 arrayDimension++
                 currentType = currentType.substring(0, currentType.length - 2)
             } while (currentType.endsWith("[]"))
-            ideaNodeModules.spiFactory.createArrayDataType(
-                if (currentType.isEmpty()) null else ideaNodeModules.spiFactory.createSimpleDataType(currentType),
+            module.spiFactory.createArrayDataType(
+                if (currentType.isEmpty()) null else module.spiFactory.createSimpleDataType(currentType),
                 arrayDimension
             )
         } else if (dataType.isNotEmpty())
-            ideaNodeModules.spiFactory.createSimpleDataType(dataType)
+            module.spiFactory.createSimpleDataType(dataType)
         else
             null
 
-    fun createJSDocCommentDataType(comment: JSDocComment, getDataType: (JSDocComment) -> String?): DataTypeSpi? {
+    private fun createJSDocCommentDataType(comment: JSDocComment, module: IdeaNodeModule, getDataType: (JSDocComment) -> String?): DataTypeSpi? {
         val dataType = getDataType(comment) ?: return null
 
         PsiTreeUtil.getChildrenOfType(comment.containingFile, ES6ImportDeclaration::class.java)
             ?.asSequence()
             ?.flatMap { it.importSpecifiers.asSequence() }
             ?.firstOrNull { it.declaredName == dataType }
-            ?.let { ideaNodeModules.resolveImport(it) as? DataTypeSpi }
+            ?.let { module.moduleInventory.resolveImport(it) as? DataTypeSpi }
             ?.let { return it }
 
-        return createDataType(dataType)
+        return createDataType(dataType, module)
     }
 
-    fun createJSDocCommentTypeDataType(comment: JSDocComment) = createJSDocCommentDataType(comment) { it.type }
+    private fun createJSDocCommentTypeDataType(comment: JSDocComment, module: IdeaNodeModule) = createJSDocCommentDataType(comment, module) { it.type }
 
     fun createDataType(constantValue: IdeaConstantValue): DataTypeSpi? {
         constantValue.referencedConstantValue()
             ?.let { it.element?.parent as? JSProperty }
             ?.let { it.parent as? JSObjectLiteralExpression }
-            ?.let { createDataType(it) }
+            ?.let { createDataType(it, constantValue.ideaModule) }
             ?.let { return it }
 
         constantValue.referencedConstantValue()?.let { return it.dataType().orElse(null)?.spi() }
@@ -138,7 +138,7 @@ class IdeaDataTypeSpiFactory(val ideaNodeModules: IdeaNodeModules) {
             IConstantValue.ConstantValueType.String -> (constantValue.unwrappedElement() as? JSExpression)
                 ?.let { JSTypeEvaluator.getTypeFromConstant(it) }
                 ?.let { if (it is JSLiteralType) it.asPrimitiveType() else it }
-                ?.let { createDataType(it) }
+                ?.let { createDataType(it, constantValue.ideaModule) }
 
             IConstantValue.ConstantValueType.ES6Class -> constantValue.asES6Class().orElse(null)?.spi()
 
@@ -149,7 +149,7 @@ class IdeaDataTypeSpiFactory(val ideaNodeModules: IdeaNodeModules) {
                     arrayDimension++
                     currentConstantValue = currentConstantValue!!.convertTo(Array<IConstantValue>::class.java).orElse(null)?.firstOrNull()
                 } while (currentConstantValue?.type() == IConstantValue.ConstantValueType.Array)
-                ideaNodeModules.spiFactory.createArrayDataType(currentConstantValue?.let { getDataType(it) }, arrayDimension)
+                constantValue.ideaModule.spiFactory.createArrayDataType(currentConstantValue?.let { getDataType(it) }, arrayDimension)
             }
 
             IConstantValue.ConstantValueType.ObjectLiteral,

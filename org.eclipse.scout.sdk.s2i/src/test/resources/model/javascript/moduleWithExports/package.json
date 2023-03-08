@@ -1,5 +1,8 @@
 {
   "name": "@eclipse-scout/sdk-export-js",
   "version": "23.1.0-snapshot",
-  "main": "./src/index.js"
+  "main": "./src/index.js",
+  "dependencies": {
+    "@eclipse-scout/sdk-enums-js": "23.1.0-snapshot"
+  }
 }

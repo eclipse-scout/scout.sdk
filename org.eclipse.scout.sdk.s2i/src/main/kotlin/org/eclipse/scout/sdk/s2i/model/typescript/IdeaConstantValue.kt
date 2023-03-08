@@ -17,10 +17,11 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import java.math.BigInteger
 import java.util.*
 
-open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal val element: JSElement?) : IConstantValue {
+open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val element: JSElement?) : IConstantValue {
 
     private val m_unwrappedElement = FinalValue<JSElement?>()
     private val m_referencedES6Class = FinalValue<ES6ClassSpi?>()
@@ -52,7 +53,7 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
             }
             ?.let { if (it is JSProperty) it.value else it }
             ?.let { ideaModule.moduleInventory.findContainingModule(it)?.let { containingModule -> it to containingModule } }
-            ?.let { ideaModule.spiFactory.createConstantValue(it.first, it.second) }
+            ?.let { it.second.spiFactory.createConstantValue(it.first) }
     }
 
     override fun <T : Any> convertTo(expectedType: Class<T>?): Optional<T> {
@@ -110,7 +111,7 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
     }
 
     override fun dataType(): Optional<IDataType> = Optional.ofNullable(m_dataType.computeIfAbsentAndGet {
-        ideaModule.dataTypeFactory.createDataType(this)?.api()
+        DataTypeSpiUtils.createDataType(this)?.api()
     })
 
     protected fun tryConvertToES6Class(): IES6Class? = referencedES6Class()?.api()
@@ -122,7 +123,7 @@ open class IdeaConstantValue(protected val ideaModule: IdeaNodeModule, internal 
         val componentType = expectedType.componentType
         val result = java.lang.reflect.Array.newInstance(componentType, expressions.size) as Array<Any?>
         for (i in expressions.indices) {
-            val value = ideaModule.spiFactory.createConstantValue(expressions[i], ideaModule)
+            val value = ideaModule.spiFactory.createConstantValue(expressions[i])
             if (IConstantValue::class.java == componentType) {
                 result[i] = value
             } else {

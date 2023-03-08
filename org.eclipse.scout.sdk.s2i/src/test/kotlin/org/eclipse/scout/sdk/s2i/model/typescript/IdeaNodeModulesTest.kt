@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
+import com.intellij.openapi.vfs.VirtualFile
 import org.eclipse.scout.sdk.core.typescript.model.api.*
 import org.eclipse.scout.sdk.s2i.model.AbstractModelTest
 
@@ -135,5 +136,127 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
 
         val referencedTypeProp = myIdeaNodeModule.export("ReferencedTypeProp").orElseThrow().referencedElement() as IVariable
         assertEquals("WildcardClass", referencedTypeProp.constantValue().asES6Class().orElseThrow().name())
+    }
+
+    fun testRemoveModulesByDir() {
+        val enumsModuleDir = myFixture.findFileInTempDir("node_modules/@eclipse-scout/sdk-enums-js")
+        val exportModuleDir = myFixture.findFileInTempDir("node_modules/@eclipse-scout/sdk-export-js")
+        val importModuleDir = myFixture.findFileInTempDir("")
+
+        testRemoveModules(enumsModuleDir, exportModuleDir, importModuleDir)
+    }
+
+    fun testRemoveModulesByFile() {
+        val enumsModuleFile = myFixture.findFileInTempDir("node_modules/@eclipse-scout/sdk-enums-js/src/enums.js")
+        val exportModuleFile = myFixture.findFileInTempDir("node_modules/@eclipse-scout/sdk-export-js/src/Util.js")
+        val importModuleFile = myFixture.findFileInTempDir("src/SomeClass.js")
+
+        testRemoveModules(enumsModuleFile, exportModuleFile, importModuleFile)
+    }
+
+    fun testRemoveModulesByModule() {
+        val enumsModuleName = "@eclipse-scout/sdk-enums-js"
+        val exportModuleName = "@eclipse-scout/sdk-export-js"
+        val importModuleName = "@eclipse-scout/sdk-external-imports-js"
+
+        val enumsModuleDir = myFixture.findFileInTempDir("node_modules/$enumsModuleName")
+        val exportModuleDir = myFixture.findFileInTempDir("node_modules/$exportModuleName")
+        val importModuleDir = myFixture.findFileInTempDir("")
+
+        createModules(setOf(enumsModuleDir))
+        val notExistingEnumsModule = getModule(enumsModuleName)
+        removeModule(notExistingEnumsModule)
+        assertTrue(notExistingEnumsModule !in myNodeModules.getModules())
+
+        testRemoveModules(
+            enumsModuleDir, exportModuleDir, importModuleDir,
+            enumsModuleName, exportModuleName, importModuleName,
+            notExistingEnumsModule
+        )
+    }
+
+    private fun testRemoveModules(
+        enumsModuleFile: VirtualFile, exportModuleFile: VirtualFile, importModuleFile: VirtualFile,
+        enumsModuleToRemove: Any = enumsModuleFile, exportModuleToRemove: Any = exportModuleFile, importModuleToRemove: Any = importModuleFile,
+        notExistingModuleToRemove: Any = enumsModuleToRemove
+    ) {
+        val enumsModuleName = "@eclipse-scout/sdk-enums-js"
+        val exportModuleName = "@eclipse-scout/sdk-export-js"
+        val importModuleName = "@eclipse-scout/sdk-external-imports-js"
+
+        // create all 3 modules
+        // -> all 3 modules exist
+        createAndAssertModules(setOf(enumsModuleFile, exportModuleFile, importModuleFile), setOf(enumsModuleName, exportModuleName, importModuleName))
+        // remove importModule, it has no dependent modules
+        // -> only importModule is removed, enumsModule and exportModule remain
+        removeAndAssertModules(importModuleToRemove, setOf(importModuleName), setOf(enumsModuleName, exportModuleName))
+
+        // create importModule again
+        // -> all 3 modules exist
+        createAndAssertModules(setOf(importModuleFile), setOf(enumsModuleName, exportModuleName, importModuleName))
+        // remove exportModule, importModule dependents on it
+        // -> exportModule and importModule are removed, only enumsModule remains
+        removeAndAssertModules(exportModuleToRemove, setOf(exportModuleName, importModuleName), setOf(enumsModuleName))
+
+        // create exportModule and importModule again
+        // -> all 3 modules exist
+        createAndAssertModules(setOf(exportModuleFile, importModuleFile), setOf(enumsModuleName, exportModuleName, importModuleName))
+        // remove enumsModule, exportModule and importModule dependent on it
+        // -> all 3 modules are removed, no module remains
+        removeAndAssertModules(enumsModuleToRemove, setOf(enumsModuleName, exportModuleName, importModuleName), emptySet())
+
+        // create only exportModule
+        // -> only exportModule exists
+        createAndAssertModules(setOf(exportModuleFile), setOf(exportModuleName))
+        // remove a not existing module
+        // -> no module is removed, exportModule remains
+        removeAndAssertModules(notExistingModuleToRemove, emptySet(), setOf(exportModuleName))
+
+        // create only enumsModule
+        // -> enumsModule and exportModule exist
+        createAndAssertModules(setOf(enumsModuleFile), setOf(enumsModuleName, exportModuleName))
+        // remove enumsModule, exportModule and importModule dependent on it, but importModule was not created yet
+        // -> enumsModule and exportModule are removed, no module remains
+        removeAndAssertModules(enumsModuleToRemove, setOf(enumsModuleName, exportModuleName), emptySet())
+    }
+
+    private fun createModules(vfs: Collection<VirtualFile>) {
+        vfs.forEach { myNodeModules.getOrCreateModule(it) }
+    }
+
+    private fun getModule(moduleName: String) = myNodeModules.getModules().first { it.packageJson().api().name() == moduleName }
+
+    private fun removeModule(module: IdeaNodeModule): Collection<IdeaNodeModule> {
+        return myNodeModules.remove(module)
+    }
+
+    private fun removeModule(moduleName: String): Collection<IdeaNodeModule> {
+        return removeModule(getModule(moduleName))
+    }
+
+    private fun removeModule(vf: VirtualFile): Collection<IdeaNodeModule> {
+        return myNodeModules.remove(vf)
+    }
+
+    private fun assertModules(expectedModuleNames: Set<String>, modules: Collection<IdeaNodeModule> = myNodeModules.getModules()) {
+        assertEquals(expectedModuleNames.size, modules.size)
+        assertEquals(expectedModuleNames, modules.map { it.packageJson().api().name() }.toSet())
+    }
+
+    private fun createAndAssertModules(modulesToCreate: Collection<VirtualFile>, expectedModuleNames: Set<String>) {
+        createModules(modulesToCreate)
+        assertModules(expectedModuleNames)
+    }
+
+    private fun removeAndAssertModules(moduleToRemove: Any, expectedRemovedModuleNames: Set<String>, expectedRemainingModuleNames: Set<String>) {
+        assertModules(
+            expectedRemovedModuleNames, when (moduleToRemove) {
+                is IdeaNodeModule -> removeModule(moduleToRemove)
+                is String -> removeModule(moduleToRemove)
+                is VirtualFile -> removeModule(moduleToRemove)
+                else -> emptySet()
+            }
+        )
+        assertModules(expectedRemainingModuleNames)
     }
 }

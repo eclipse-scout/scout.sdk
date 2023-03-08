@@ -9,21 +9,14 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
-import org.eclipse.scout.sdk.core.util.Ensure;
 
-public class DataTypeImplementor implements IDataType {
+public class DataTypeImplementor<SPI extends DataTypeSpi> extends AbstractNodeElement<SPI> implements IDataType {
 
-  private final DataTypeSpi m_spi;
-
-  public DataTypeImplementor(DataTypeSpi spi) {
-    m_spi = Ensure.notNull(spi);
-  }
-
-  @Override
-  public DataTypeSpi spi() {
-    return m_spi;
+  public DataTypeImplementor(SPI spi) {
+    super(spi);
   }
 
   @Override

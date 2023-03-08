@@ -23,5 +23,5 @@ open class IdeaJavaScriptVariable(protected val ideaModule: IdeaNodeModule, inte
 
     override fun name() = javaScriptVariable.name
 
-    override fun constantValue() = ideaModule.spiFactory.createConstantValue(javaScriptVariable.initializer, ideaModule)
+    override fun constantValue() = ideaModule.spiFactory.createConstantValue(javaScriptVariable.initializer)
 }

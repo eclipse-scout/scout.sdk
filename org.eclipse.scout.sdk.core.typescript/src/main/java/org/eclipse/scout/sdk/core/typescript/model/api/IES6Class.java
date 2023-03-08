@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.query.FunctionQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.SupersQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 
-public interface IES6Class extends INodeElement, IDataType {
+public interface IES6Class extends IDataType {
   @Override
   ES6ClassSpi spi();
 
