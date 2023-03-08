@@ -42,6 +42,11 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.internal.launching.StandardVMType;
+import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.IVMInstall2;
+import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -53,6 +58,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.osgi.framework.Version;
 
 /**
  * <h3>{@link MavenBuildOperation}</h3>
@@ -245,6 +251,14 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
     // not supported yet: "M2_PROFILES" and "M2_USER_SETTINGS"
     workingCopy.setAttribute(M2_PROPERTIES, build.getPropertiesAsList());
 
+    if (build.getGoals().stream().anyMatch(MavenBuild.GOAL_ARCHETYPE_GENERATE::equals)) {
+      var vm = getDefaultJvm();
+      if (vm != null) {
+        var path = Path.fromOSString(vm.getInstallLocation().toString()).toPortableString();
+        workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_JRE_CONTAINER_PATH, path);
+      }
+    }
+
     setGoals(workingCopy, build.getGoals());
 
     var container = getWorkspaceContainer();
@@ -252,6 +266,23 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
     setJreContainerPath(workingCopy, container);
 
     return workingCopy;
+  }
+
+  protected static IVMInstall getDefaultJvm() {
+    var defaultVm = JavaRuntime.getDefaultVMInstall();
+    if (defaultVm != null && StandardVMType.ID_STANDARD_VM_TYPE.equals(defaultVm.getVMInstallType().getName())) {
+      return defaultVm;
+    }
+
+    IVMInstall2 result = null;
+    for (var candidate : JavaRuntime.getVMInstallType(StandardVMType.ID_STANDARD_VM_TYPE).getVMInstalls()) {
+      if (candidate instanceof IVMInstall2 vm2) {
+        if (result == null || new Version(vm2.getJavaVersion()).compareTo(new Version(result.getJavaVersion())) > 0) {
+          result = vm2;
+        }
+      }
+    }
+    return (IVMInstall) result;
   }
 
   protected static void setJreContainerPath(ILaunchConfigurationWorkingCopy workingCopy, IResource container) throws CoreException {
