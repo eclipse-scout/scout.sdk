@@ -21,8 +21,8 @@ public class SyntheticFieldSpi extends AbstractFieldSpi {
   private final String m_name;
   private final DataTypeSpi m_dataType;
 
-  public SyntheticFieldSpi(String name, DataTypeSpi dataType, NodeElementSpi owner) {
-    super(owner.containingModule());
+  protected SyntheticFieldSpi(NodeModuleSpi module, String name, DataTypeSpi dataType) {
+    super(module);
     m_name = Ensure.notBlank(name);
     m_dataType = Ensure.notNull(dataType);
   }

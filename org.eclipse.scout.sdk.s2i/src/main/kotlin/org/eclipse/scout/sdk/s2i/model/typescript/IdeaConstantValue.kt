@@ -53,7 +53,7 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
             }
             ?.let { if (it is JSProperty) it.value else it }
             ?.let { ideaModule.moduleInventory.findContainingModule(it)?.let { containingModule -> it to containingModule } }
-            ?.let { it.second.spiFactory.createConstantValue(it.first) }
+            ?.let { it.second.nodeElementFactory().createConstantValue(it.first) }
     }
 
     override fun <T : Any> convertTo(expectedType: Class<T>?): Optional<T> {
@@ -123,7 +123,7 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
         val componentType = expectedType.componentType
         val result = java.lang.reflect.Array.newInstance(componentType, expressions.size) as Array<Any?>
         for (i in expressions.indices) {
-            val value = ideaModule.spiFactory.createConstantValue(expressions[i])
+            val value = ideaModule.nodeElementFactory().createConstantValue(expressions[i])
             if (IConstantValue::class.java == componentType) {
                 result[i] = value
             } else {
@@ -187,6 +187,6 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
 
     protected fun tryConvertToObjectLiteral(): IObjectLiteral? {
         val literal = unwrappedElement() as? JSObjectLiteralExpression ?: return null
-        return ideaModule.spiFactory.createObjectLiteralExpression(literal).api()
+        return ideaModule.nodeElementFactory().createObjectLiteralExpression(literal).api()
     }
 }

@@ -10,7 +10,6 @@
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -23,33 +22,16 @@ import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType> implements DataTypeSpi {
 
-  private final DataTypeFlavor m_dataTypeFlavor;
+  private final DataTypeFlavor m_flavor;
   private final Collection<DataTypeSpi> m_componentDataTypes;
   private final int m_arrayDimension;
   private final FinalValue<String> m_name = new FinalValue<>();
 
-  protected SimpleCompositeDataTypeSpi(NodeModuleSpi module, DataTypeFlavor dataTypeFlavor, Collection<DataTypeSpi> componentDataTypes, int arrayDimension) {
+  protected SimpleCompositeDataTypeSpi(NodeModuleSpi module, DataTypeFlavor flavor, Collection<DataTypeSpi> componentDataTypes, int arrayDimension) {
     super(module);
-    m_dataTypeFlavor = Ensure.notNull(dataTypeFlavor);
+    m_flavor = Ensure.notNull(flavor);
     m_componentDataTypes = componentDataTypes;
     m_arrayDimension = arrayDimension;
-  }
-
-  public static DataTypeSpi createArray(NodeModuleSpi module, DataTypeSpi componentDataType, int arrayDimension) {
-    if (arrayDimension < 1) {
-      return componentDataType;
-    }
-
-    var newDimension = arrayDimension;
-    var leafComponentType = componentDataType;
-    if (componentDataType != null && componentDataType.flavor() == DataTypeFlavor.Array) {
-      newDimension += componentDataType.arrayDimension();
-      leafComponentType = componentDataType.componentDataTypes().findAny().orElseThrow();
-    }
-    var componentDataTypes = Optional.ofNullable(leafComponentType)
-        .map(Collections::singleton)
-        .orElse(Collections.emptySet());
-    return new SimpleCompositeDataTypeSpi(module, DataTypeFlavor.Array, componentDataTypes, newDimension);
   }
 
   @Override
@@ -72,7 +54,7 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
 
   @Override
   public DataTypeFlavor flavor() {
-    return m_dataTypeFlavor;
+    return m_flavor;
   }
 
   @Override

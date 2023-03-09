@@ -34,6 +34,6 @@ open class IdeaJavaScriptFunction(protected val ideaModule: IdeaNodeModule, inte
             ?.firstNotNullOfOrNull { it as? JSParenthesizedExpression }
             ?.innerExpression as? JSObjectLiteralExpression
         return Optional.ofNullable(literal)
-            .map { ideaModule.spiFactory.createObjectLiteralExpression(it) }
+            .map { ideaModule.nodeElementFactory().createObjectLiteralExpression(it) }
     }
 }

@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IExportFrom;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElementFactory;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.ExportFromQuery;
@@ -54,6 +55,11 @@ public class NodeModuleImplementor extends AbstractNodeElement<NodeModuleSpi> im
   @Override
   public String name() {
     return packageJson().name();
+  }
+
+  @Override
+  public INodeElementFactory nodeElementFactory() {
+    return spi().nodeElementFactory().api();
   }
 
   @Override

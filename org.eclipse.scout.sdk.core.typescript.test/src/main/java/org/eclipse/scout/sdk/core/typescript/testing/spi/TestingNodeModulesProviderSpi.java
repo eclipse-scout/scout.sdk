@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.typescript.testing;
+package org.eclipse.scout.sdk.core.typescript.testing.spi;
 
 import static java.util.Collections.emptyList;
 import static java.util.function.Function.identity;
@@ -45,7 +45,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
 import org.w3c.dom.Element;
 
-public class TestingNodeModulesProvider implements NodeModulesProviderSpi {
+public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
   public static final String TAG_NAME_MODULE = "module";
   public static final String TAG_NAME_EXPORT = "export";
   public static final String TAG_NAME_CLASS = "class";

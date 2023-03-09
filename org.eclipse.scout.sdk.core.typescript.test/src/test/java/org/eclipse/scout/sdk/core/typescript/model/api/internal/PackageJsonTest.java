@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
+import org.eclipse.scout.sdk.core.typescript.testing.TestingPackageJsonHelper;
 import org.junit.jupiter.api.Test;
 
 public class PackageJsonTest {
@@ -25,7 +26,7 @@ public class PackageJsonTest {
   @Test
   public void testPackageJsonParser() {
     var packageJsonDirectory = FixtureHelper.SIMPLE_MODULE_DIR;
-    var packageJson = IPackageJson.parse(packageJsonDirectory);
+    var packageJson = TestingPackageJsonHelper.parse(packageJsonDirectory);
     assertEquals("./src/exports-index.ts", packageJson.main().orElseThrow());
     assertEquals("23.1.0-snapshot", packageJson.version());
     assertEquals("@eclipse-scout/sdk-test-module", packageJson.name());
@@ -38,27 +39,27 @@ public class PackageJsonTest {
     assertEquals("https://www.eclipse.org/scout", packageJson.jsonString("homepage").orElseThrow());
     assertEquals(17, packageJson.jsonObject("").orElseThrow().size());
 
-    assertThrows(IllegalArgumentException.class, () -> IPackageJson.parse(FixtureHelper.BASE).name()); // no package.json
-    assertThrows(IllegalArgumentException.class, () -> IPackageJson.parse(FixtureHelper.EMPTY_MODULE_DIR).name()); // mandatory attributes missing
+    assertThrows(IllegalArgumentException.class, () -> TestingPackageJsonHelper.parse(FixtureHelper.BASE).name()); // no package.json
+    assertThrows(IllegalArgumentException.class, () -> TestingPackageJsonHelper.parse(FixtureHelper.EMPTY_MODULE_DIR).name()); // mandatory attributes missing
   }
 
   @Test
   public void testMain() {
-    assertEquals("./src/main-index.ts", IPackageJson.parse(FixtureHelper.CLASSIC_MODULE_DIR).main().orElseThrow());
-    assertEquals("./src/module-index.ts", IPackageJson.parse(FixtureHelper.ES_MODULE_DIR).main().orElseThrow());
-    assertTrue(IPackageJson.parse(FixtureHelper.MINIMAL_MODULE_DIR).main().isEmpty());
-    assertEquals("./dist/eclipse-scout-core.esm.js", IPackageJson.parse(FixtureHelper.NESTED_EXPORTS_MODULE_DIR).main().orElseThrow());
-    assertEquals("./src/exports-index.ts", IPackageJson.parse(FixtureHelper.SIMPLE_MODULE_DIR).main().orElseThrow());
-    assertEquals("src/index.js", IPackageJson.parse(FixtureHelper.SRC_MODULE_DIR).main().orElseThrow());
-    assertEquals(315, IPackageJson.parse(FixtureHelper.SRC_MODULE_DIR).containingModule().source().orElseThrow().length());
+    assertEquals("./src/main-index.ts", TestingPackageJsonHelper.parse(FixtureHelper.CLASSIC_MODULE_DIR).main().orElseThrow());
+    assertEquals("./src/module-index.ts", TestingPackageJsonHelper.parse(FixtureHelper.ES_MODULE_DIR).main().orElseThrow());
+    assertTrue(TestingPackageJsonHelper.parse(FixtureHelper.MINIMAL_MODULE_DIR).main().isEmpty());
+    assertEquals("./dist/eclipse-scout-core.esm.js", TestingPackageJsonHelper.parse(FixtureHelper.NESTED_EXPORTS_MODULE_DIR).main().orElseThrow());
+    assertEquals("./src/exports-index.ts", TestingPackageJsonHelper.parse(FixtureHelper.SIMPLE_MODULE_DIR).main().orElseThrow());
+    assertEquals("src/index.js", TestingPackageJsonHelper.parse(FixtureHelper.SRC_MODULE_DIR).main().orElseThrow());
+    assertEquals(315, TestingPackageJsonHelper.parse(FixtureHelper.SRC_MODULE_DIR).containingModule().source().orElseThrow().length());
   }
 
   @Test
   @SuppressWarnings({"ConstantConditions", "EqualsBetweenInconvertibleTypes", "SimplifiableAssertion", "EqualsWithItself"})
   public void testPackageHashCodeEqualsToString() {
-    var packageJson1 = IPackageJson.parse(FixtureHelper.SIMPLE_MODULE_DIR);
-    var packageJson2 = IPackageJson.parse(FixtureHelper.MINIMAL_MODULE_DIR);
-    var packageJson3 = IPackageJson.parse(FixtureHelper.SIMPLE_MODULE_DIR);
+    var packageJson1 = TestingPackageJsonHelper.parse(FixtureHelper.SIMPLE_MODULE_DIR);
+    var packageJson2 = TestingPackageJsonHelper.parse(FixtureHelper.MINIMAL_MODULE_DIR);
+    var packageJson3 = TestingPackageJsonHelper.parse(FixtureHelper.SIMPLE_MODULE_DIR);
 
     assertEquals(packageJson1, packageJson3);
     assertNotEquals(packageJson1, packageJson2);

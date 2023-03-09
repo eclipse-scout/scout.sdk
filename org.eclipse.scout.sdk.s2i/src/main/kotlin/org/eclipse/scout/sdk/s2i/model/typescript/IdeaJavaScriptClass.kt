@@ -45,7 +45,7 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     override fun createDataType(name: String) = DataTypeSpiUtils.createDataType(name, javaScriptClass, ideaModule)
 
     override fun functions(): List<FunctionSpi> = m_functions.computeIfAbsentAndGet {
-        val functions = javaScriptClass.functions.map { ideaModule.spiFactory.createJavaScriptFunction(it) }
+        val functions = javaScriptClass.functions.map { ideaModule.nodeElementFactory().createJavaScriptFunction(it) }
         return@computeIfAbsentAndGet Collections.unmodifiableList(functions)
     }
 

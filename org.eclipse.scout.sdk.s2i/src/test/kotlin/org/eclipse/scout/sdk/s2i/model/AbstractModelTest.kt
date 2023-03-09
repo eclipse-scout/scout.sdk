@@ -13,6 +13,7 @@ import com.intellij.openapi.project.rootManager
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
+import org.eclipse.scout.sdk.core.typescript.testing.TestingPackageJsonHelper
 import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModules
 import java.nio.file.Files
@@ -49,7 +50,7 @@ abstract class AbstractModelTest(val fixturePath: String) : BasePlatformTestCase
 
         val availableModules = Files.walk(allFixturesRoot, 3)
             .filter { it.fileName.toString() == IPackageJson.FILE_NAME }
-            .map { IPackageJson.parse(it.parent) }
+            .map { TestingPackageJsonHelper.parse(it.parent) }
             .collect(toMap(IPackageJson::name, Function.identity()))
         val requiredModules = dependencies
             .map { availableModules[it] ?: throw SdkException("Dependency '{}' of '{}' could not be found.", it, myFixtureRoot.resolve(IPackageJson.FILE_NAME)) }

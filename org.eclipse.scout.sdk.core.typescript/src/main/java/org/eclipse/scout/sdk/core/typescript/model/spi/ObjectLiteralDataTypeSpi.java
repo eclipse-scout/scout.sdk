@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.typescript.model.spi;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
-import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.DataTypeImplementor;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SourceRange;
@@ -20,9 +19,9 @@ import org.eclipse.scout.sdk.core.util.SourceRange;
 public class ObjectLiteralDataTypeSpi extends AbstractNodeElementSpi<IDataType> implements DataTypeSpi {
 
   private final String m_name;
-  private final IObjectLiteral m_objectLiteral;
+  private final ObjectLiteralSpi m_objectLiteral;
 
-  public ObjectLiteralDataTypeSpi(NodeModuleSpi module, String name, IObjectLiteral objectLiteral) {
+  protected ObjectLiteralDataTypeSpi(NodeModuleSpi module, String name, ObjectLiteralSpi objectLiteral) {
     super(module);
     m_name = Ensure.notNull(name);
     m_objectLiteral = Ensure.notNull(objectLiteral);
@@ -43,7 +42,7 @@ public class ObjectLiteralDataTypeSpi extends AbstractNodeElementSpi<IDataType> 
     return false;
   }
 
-  public IObjectLiteral objectLiteral() {
+  public ObjectLiteralSpi objectLiteral() {
     return m_objectLiteral;
   }
 

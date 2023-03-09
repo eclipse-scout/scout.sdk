@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.NodeModulesProvider;
+import org.eclipse.scout.sdk.core.typescript.testing.spi.TestingNodeModulesProviderSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -74,7 +75,7 @@ public class NodeModulesExtension implements BeforeEachCallback, AfterEachCallba
 
   @Override
   public void beforeEach(ExtensionContext context) {
-    NodeModulesProvider.registerProvider(context, new TestingNodeModulesProvider());
+    NodeModulesProvider.registerProvider(context, new TestingNodeModulesProviderSpi());
   }
 
   @Override

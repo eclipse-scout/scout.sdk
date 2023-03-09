@@ -20,4 +20,6 @@ public interface NodeModuleSpi extends NodeElementSpi {
   PackageJsonSpi packageJson();
 
   Map<String, ExportFromSpi> exports();
+
+  NodeElementFactorySpi nodeElementFactory();
 }

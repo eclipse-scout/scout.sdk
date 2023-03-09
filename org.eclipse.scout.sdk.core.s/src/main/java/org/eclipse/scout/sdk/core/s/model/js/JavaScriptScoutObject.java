@@ -113,7 +113,7 @@ public class JavaScriptScoutObject implements IScoutJsObject {
     datatypeDetector.unused().forEach((name, type) -> {
       if (!excludedProperties.contains(name)) {
         result.compute(name, (key, lower) -> {
-          var syntheticField = IField.createSynthetic(key, type, owner.declaringClass());
+          var syntheticField = owner.scoutJsModel().nodeModule().nodeElementFactory().createSyntheticField(key, type);
           return ScoutJsProperty.choose(new ScoutJsProperty(owner, syntheticField, datatypeDetector), lower);
         });
       }

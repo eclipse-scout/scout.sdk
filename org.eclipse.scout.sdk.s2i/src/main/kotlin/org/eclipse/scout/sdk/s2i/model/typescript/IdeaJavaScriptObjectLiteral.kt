@@ -41,6 +41,6 @@ open class IdeaJavaScriptObjectLiteral(protected val ideaModule: IdeaNodeModule,
 
     private fun createMapping(name: String?, expression: JSExpression?): Pair<String, IdeaConstantValue>? {
         if (name == null || expression == null) return null
-        return name to ideaModule.spiFactory.createConstantValue(expression)
+        return name to ideaModule.nodeElementFactory().createConstantValue(expression)
     }
 }

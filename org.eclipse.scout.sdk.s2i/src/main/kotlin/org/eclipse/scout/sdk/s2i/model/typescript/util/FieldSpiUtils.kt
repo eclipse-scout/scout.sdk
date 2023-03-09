@@ -39,15 +39,15 @@ object FieldSpiUtils {
         return null
     }
 
-    private fun createField(field: JSField, module: IdeaNodeModule): FieldSpi = module.spiFactory.createJavaScriptField(field)
+    private fun createField(field: JSField, module: IdeaNodeModule): FieldSpi = module.nodeElementFactory().createJavaScriptField(field)
 
     private fun createField(assignment: JSAssignmentExpression, module: IdeaNodeModule): FieldSpi? {
         val reference: JSReferenceExpression = assignment.definitionExpression?.expression as? JSReferenceExpression ?: return null
         if (reference.qualifier !is JSThisExpression) return null
-        return module.spiFactory.createJavaScriptAssignmentExpressionAsField(assignment, reference)
+        return module.nodeElementFactory().createJavaScriptAssignmentExpressionAsField(assignment, reference)
     }
 
-    private fun createField(property: JSRecordType.PropertySignature, module: IdeaNodeModule): FieldSpi = module.spiFactory.createRecordField(property)
+    private fun createField(property: JSRecordType.PropertySignature, module: IdeaNodeModule): FieldSpi = module.nodeElementFactory().createRecordField(property)
 
     /* **************************************************************************
      * CHOOSE FIELDS

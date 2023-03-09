@@ -14,7 +14,6 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.query.DependencyQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
-import org.eclipse.scout.sdk.core.typescript.model.spi.SimpleNodeModuleSpi;
 
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
@@ -45,8 +44,4 @@ public interface IPackageJson extends INodeElement {
   DependencyQuery dependencies();
 
   Optional<INodeModule> dependency(String name);
-
-  static IPackageJson parse(Path nodeModuleDir) {
-    return new SimpleNodeModuleSpi(nodeModuleDir).packageJson().api();
-  }
 }

@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.typescript.model.spi;
+package org.eclipse.scout.sdk.core.typescript.testing.spi;
 
 import static java.util.Collections.emptySet;
 
@@ -19,13 +19,16 @@ import java.util.Collection;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.PackageJsonImplementor;
+import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
-public class LocalPackageJsonSpi extends AbstractNodeElementSpi<IPackageJson> implements PackageJsonSpi {
+public class TestingPackageJsonSpi extends AbstractNodeElementSpi<IPackageJson> implements PackageJsonSpi {
 
   private final Path m_directory;
 
-  public LocalPackageJsonSpi(NodeModuleSpi module, Path directory) {
+  public TestingPackageJsonSpi(NodeModuleSpi module, Path directory) {
     super(module);
     m_directory = directory;
   }

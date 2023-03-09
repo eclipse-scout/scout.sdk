@@ -23,4 +23,6 @@ public interface INodeModule extends INodeElement {
   Optional<IExportFrom> export(String name);
 
   IPackageJson packageJson();
+
+  INodeElementFactory nodeElementFactory();
 }

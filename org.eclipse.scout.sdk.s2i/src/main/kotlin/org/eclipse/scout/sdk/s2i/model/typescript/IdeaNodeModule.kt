@@ -33,14 +33,14 @@ import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeModuleImplem
 import org.eclipse.scout.sdk.core.typescript.model.spi.*
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.SourceRange
-import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaSpiFactory
+import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaNodeElementFactory
 import java.nio.CharBuffer
 import java.util.*
 import java.util.Collections.unmodifiableMap
 
 class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
 
-    val spiFactory = IdeaSpiFactory(this)
+    private val m_nodeElementFactory = IdeaNodeElementFactory(this)
     private val m_mainFile = FinalValue<VirtualFile>()
     private val m_mainPsi = FinalValue<JSFile>()
     private val m_packageJsonSpi = FinalValue<PackageJsonSpi>()
@@ -48,7 +48,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
 
     override fun containingModule() = this
 
-    override fun packageJson(): PackageJsonSpi = m_packageJsonSpi.computeIfAbsentAndGet { spiFactory.createPackageJson(nodeModuleDir) }
+    override fun packageJson(): PackageJsonSpi = m_packageJsonSpi.computeIfAbsentAndGet { nodeElementFactory().createPackageJson(nodeModuleDir) }
 
     override fun createApi() = NodeModuleImplementor(this, packageJson())
 
@@ -103,7 +103,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
 
     internal fun createIdeaExportFrom(exportDeclaration: JSElement, referencedElement: JSElement, exportAlias: String? = referencedElement.name): IdeaExportFrom? {
         val exportName = exportAlias ?: return null // cannot re-export an anonymous element
-        return createSpiForPsi(referencedElement)?.let { spiFactory.createExportFrom(exportDeclaration, exportName, it) }
+        return createSpiForPsi(referencedElement)?.let { nodeElementFactory().createExportFrom(exportDeclaration, exportName, it) }
     }
 
     internal fun findAllExportedElements(file: JSFile): Set<JSElement> {
@@ -160,30 +160,32 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
         }
     }
 
+    override fun nodeElementFactory(): IdeaNodeElementFactory = m_nodeElementFactory
+
     fun createSpiForPsi(psi: JSElement): NodeElementSpi? {
         if (psi is TypeScriptClass) {
-            return spiFactory.createTypeScriptClass(psi)
+            return nodeElementFactory().createTypeScriptClass(psi)
         }
         if (psi is TypeScriptInterface) {
-            return spiFactory.createTypeScriptInterface(psi)
+            return nodeElementFactory().createTypeScriptInterface(psi)
         }
         if (psi is TypeScriptFunction) {
-            return spiFactory.createTypeScriptFunction(psi)
+            return nodeElementFactory().createTypeScriptFunction(psi)
         }
         if (psi is TypeScriptTypeAlias) {
-            return spiFactory.createTypeScriptTypeAlias(psi)
+            return nodeElementFactory().createTypeScriptTypeAlias(psi)
         }
         if (psi is JSClass) {
-            return spiFactory.createJavaScriptClass(psi)
+            return nodeElementFactory().createJavaScriptClass(psi)
         }
         if (psi is JSFunction) {
-            return spiFactory.createJavaScriptFunction(psi)
+            return nodeElementFactory().createJavaScriptFunction(psi)
         }
         if (psi is JSObjectLiteralExpression) {
-            return spiFactory.createObjectLiteralExpression(psi)
+            return nodeElementFactory().createObjectLiteralExpression(psi)
         }
         if (psi is JSVariable) {
-            return spiFactory.createJavaScriptVariable(psi)
+            return nodeElementFactory().createJavaScriptVariable(psi)
         }
         SdkLog.warning("Unsupported type: '" + psi::class.java.name + "' called '" + psi.name + "'.")
         return null

@@ -64,15 +64,15 @@ object DataTypeSpiUtils {
                 arrayDimension++
                 currentType = (currentType as JSArrayType).type
             } while (currentType is JSArrayType)
-            return module.spiFactory.createArrayDataType(currentType?.let { createDataType(it, module) }, arrayDimension)
+            return module.nodeElementFactory().createArrayDataType(currentType?.let { createDataType(it, module) }, arrayDimension)
         }
-        if (type is JSUtilType) return module.spiFactory.createJavaScriptType(type)
+        if (type is JSUtilType) return module.nodeElementFactory().createJavaScriptType(type)
 
         (type.sourceElement as? JSElement)
             ?.let { (module.moduleInventory.resolveReferencedElement(it) as? DataTypeSpi) }
             ?.let { return it }
 
-        return module.spiFactory.createJavaScriptType(type)
+        return module.nodeElementFactory().createJavaScriptType(type)
     }
 
     private fun createDataType(objectLiteral: JSObjectLiteralExpression, module: IdeaNodeModule): DataTypeSpi? {
@@ -81,7 +81,7 @@ object DataTypeSpiUtils {
             is JSProperty -> parent.name
             else -> null
         } ?: return null
-        return module.spiFactory.createObjectLiteralDataType(name, objectLiteral)
+        return module.nodeElementFactory().createObjectLiteralDataType(name, objectLiteral)
     }
 
     fun createDataType(property: JSRecordType.PropertySignature, module: IdeaNodeModule): DataTypeSpi? {
@@ -96,12 +96,12 @@ object DataTypeSpiUtils {
                 arrayDimension++
                 currentType = currentType.substring(0, currentType.length - 2)
             } while (currentType.endsWith("[]"))
-            return module.spiFactory.createArrayDataType(if (currentType.isEmpty()) null else createDataType(currentType, scope, module), arrayDimension)
+            return module.nodeElementFactory().createArrayDataType(if (currentType.isEmpty()) null else createDataType(currentType, scope, module), arrayDimension)
         }
         if (dataType.isNotEmpty()) {
             val source = JSTypeSourceFactory.createTypeSource(scope, true)
             val type = JSNamedTypeFactory.createType(dataType, source, JSTypeContext.INSTANCE, false)
-            return module.spiFactory.createJavaScriptType(type)
+            return module.nodeElementFactory().createJavaScriptType(type)
         }
         return null
     }
@@ -147,7 +147,7 @@ object DataTypeSpiUtils {
                     arrayDimension++
                     currentConstantValue = currentConstantValue!!.convertTo(Array<IConstantValue>::class.java).orElse(null)?.firstOrNull()
                 } while (currentConstantValue?.type() == IConstantValue.ConstantValueType.Array)
-                constantValue.ideaModule.spiFactory.createArrayDataType(currentConstantValue?.let { getDataType(it) }, arrayDimension)
+                constantValue.ideaModule.nodeElementFactory().createArrayDataType(currentConstantValue?.let { getDataType(it) }, arrayDimension)
             }
 
             IConstantValue.ConstantValueType.ObjectLiteral,

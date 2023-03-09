@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.typescript.model.spi;
+package org.eclipse.scout.sdk.core.typescript.testing.spi;
 
 import static java.util.Collections.emptyMap;
 
@@ -20,15 +20,20 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeModuleImplementor;
+import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.ExportFromSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementFactorySpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SourceRange;
 
-public class SimpleNodeModuleSpi extends AbstractNodeElementSpi<INodeModule> implements NodeModuleSpi {
+public class TestingNodeModuleSpi extends AbstractNodeElementSpi<INodeModule> implements NodeModuleSpi {
   private final FinalValue<PackageJsonSpi> m_packageJson;
   private final Path m_directory;
 
-  public SimpleNodeModuleSpi(Path packageJsonDirectory) {
+  public TestingNodeModuleSpi(Path packageJsonDirectory) {
     super(null);
     m_directory = packageJsonDirectory;
     m_packageJson = new FinalValue<>();
@@ -36,7 +41,7 @@ public class SimpleNodeModuleSpi extends AbstractNodeElementSpi<INodeModule> imp
 
   @Override
   public PackageJsonSpi packageJson() {
-    return m_packageJson.computeIfAbsentAndGet(() -> new LocalPackageJsonSpi(this, m_directory));
+    return m_packageJson.computeIfAbsentAndGet(() -> new TestingPackageJsonSpi(this, m_directory));
   }
 
   @Override
@@ -49,7 +54,7 @@ public class SimpleNodeModuleSpi extends AbstractNodeElementSpi<INodeModule> imp
   public Optional<SourceRange> source() {
     return packageJson().api().main()
         .map(main -> packageJson().containingDir().resolve(main))
-        .map(SimpleNodeModuleSpi::readContent)
+        .map(TestingNodeModuleSpi::readContent)
         .map(content -> new SourceRange(content, 0));
   }
 
@@ -65,6 +70,12 @@ public class SimpleNodeModuleSpi extends AbstractNodeElementSpi<INodeModule> imp
   @Override
   public NodeModuleSpi containingModule() {
     return this;
+  }
+
+  @Override
+  public NodeElementFactorySpi nodeElementFactory() {
+    // simple local implementation cannot create node elements
+    return null;
   }
 
   @Override

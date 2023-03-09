@@ -12,13 +12,13 @@ package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-import org.eclipse.scout.sdk.core.typescript.model.spi.SimpleNodeModuleSpi;
+import org.eclipse.scout.sdk.core.typescript.testing.spi.TestingNodeModuleSpi;
 import org.junit.jupiter.api.Test;
 
 public class NodeModuleTest {
   @Test
   public void testNodeModule() {
-    var spi = new SimpleNodeModuleSpi(FixtureHelper.MINIMAL_MODULE_DIR);
+    var spi = new TestingNodeModuleSpi(FixtureHelper.MINIMAL_MODULE_DIR);
     var module = spi.api();
 
     assertSame(spi.api(), module);

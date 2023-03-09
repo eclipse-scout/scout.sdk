@@ -33,7 +33,7 @@ open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(val id
     override fun hasModifier(modifier: Modifier) = false
 
     override fun constantValue(): IConstantValue = m_constantValue.computeIfAbsentAndGet {
-        ideaModule.spiFactory.createConstantValue(javaScriptAssignmentExpression.rOperand)
+        ideaModule.nodeElementFactory().createConstantValue(javaScriptAssignmentExpression.rOperand)
     }
 
     override fun dataType(): DataTypeSpi? = m_dataType.computeIfAbsentAndGet {

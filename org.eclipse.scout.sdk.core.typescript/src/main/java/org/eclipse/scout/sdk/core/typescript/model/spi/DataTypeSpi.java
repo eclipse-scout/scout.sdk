@@ -24,7 +24,7 @@ public interface DataTypeSpi extends NodeElementSpi {
   boolean isPrimitive();
 
   default DataTypeSpi createArrayType(int dimension) {
-    return SimpleCompositeDataTypeSpi.createArray(this.containingModule(), this, dimension);
+    return containingModule().nodeElementFactory().createArrayDataType(this, dimension);
   }
 
   default DataTypeFlavor flavor() {
