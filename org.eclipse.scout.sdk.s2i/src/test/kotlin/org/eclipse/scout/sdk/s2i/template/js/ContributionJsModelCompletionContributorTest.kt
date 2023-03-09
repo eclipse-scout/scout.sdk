@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.template.js
 
-import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
 
 class ContributionJsModelCompletionContributorTest : AbstractJsModelCompletionContributorTest() {
 
@@ -24,9 +24,9 @@ class ContributionJsModelCompletionContributorTest : AbstractJsModelCompletionCo
     override fun getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents_StringFieldExQualified() = getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents(STRING_FIELD_EX_NAME)
 
     override fun getValueCompletionWidgetExpectedFileContents(): Array<String?> =
-        arrayOf("$ONLY_HERE_PROPERTY_NAME: { ${ScoutJsModel.ID_PROPERTY_NAME}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME}: $STRING_FIELD_NAME }")
+        arrayOf("$ONLY_HERE_PROPERTY_NAME: { ${ScoutJsCoreConstants.PROPERTY_NAME_ID}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}: $STRING_FIELD_NAME }")
 
-    override fun getValueCompletionObjectTypeExpectedFileContents_Widget() = getValueCompletionObjectTypeExpectedFileContents(ScoutJsModel.WIDGET_CLASS_NAME)
+    override fun getValueCompletionObjectTypeExpectedFileContents_Widget() = getValueCompletionObjectTypeExpectedFileContents(ScoutJsCoreConstants.CLASS_NAME_WIDGET)
 
     override fun getValueCompletionObjectTypeExpectedFileContents_StringFieldEx() = getValueCompletionObjectTypeExpectedFileContents(STRING_FIELD_EX_NAME)
 

@@ -58,15 +58,13 @@ class IdeaSpiFactory(val ideaModule: IdeaNodeModule) {
         IdeaJavaScriptAssignmentExpressionAsField(ideaModule, it, jsReferenceExpression)
     }
 
-    fun createSimpleDataType(type: String) = getOrCreate(type) { SimpleDataTypeSpi(ideaModule, type) }
-
     fun createJavaScriptType(jsType: JSType) = getOrCreate(jsType) { IdeaJavaScriptType(ideaModule, it) }
 
     fun createObjectLiteralDataType(name: String, jsObjectLiteral: JSObjectLiteralExpression) = createObjectLiteralDataType(name, createObjectLiteralExpression(jsObjectLiteral).api())
 
     fun createObjectLiteralDataType(name: String, objectLiteral: IObjectLiteral) = getOrCreate(name to objectLiteral) { ObjectLiteralDataTypeSpi(ideaModule, name, objectLiteral) }
 
-    fun createArrayDataType(componentDataType: DataTypeSpi?, arrayDimension: Int): SimpleCompositeDataTypeSpi =
+    fun createArrayDataType(componentDataType: DataTypeSpi?, arrayDimension: Int): DataTypeSpi =
         getOrCreate(componentDataType to arrayDimension) { SimpleCompositeDataTypeSpi.createArray(ideaModule, componentDataType, arrayDimension) }
 
     @Suppress("UNCHECKED_CAST")

@@ -12,17 +12,20 @@ package org.eclipse.scout.sdk.s2i.template.js
 import com.intellij.codeInsight.completion.CompletionType
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.impl.LookupImpl
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiFile
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase
 import junit.framework.AssertionFailedError
-import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
-import org.eclipse.scout.sdk.core.s.model.js.ScoutJsPropertySubType
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
+import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertySubType
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils.removeWhitespace
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes
-import org.eclipse.scout.sdk.core.util.Ensure.newFail
-import org.eclipse.scout.sdk.s2i.model.js.JsModel
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
+import org.eclipse.scout.sdk.core.util.Ensure
+import org.eclipse.scout.sdk.s2i.model.js.JsModelService
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
+import java.util.stream.Collectors.toSet
 
 abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixtureTestCase() {
 
@@ -43,12 +46,12 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         const val PROJECT_NAMESPACE = "project"
         const val CONTRIBUTION_NAMESPACE = "contribution"
 
-        const val SCOUT_MODULE_NAME = "@eclipse-scout/core"
+        const val SCOUT_MODULE_NAME = ScoutJsCoreConstants.SCOUT_JS_CORE_MODULE_NAME
         const val LAYER_MODULE_NAME = "@eclipse-scout/layer"
 
         const val SCOUT_WITHOUT_CLASS_REFERENCE_DIR = "scout_without_class_reference"
 
-        const val WIDGET_STATE = "${ScoutJsModel.WIDGET_CLASS_NAME}.WidgetState"
+        const val WIDGET_STATE = "${ScoutJsCoreConstants.CLASS_NAME_WIDGET}.WidgetState"
         const val WIDGET_STATE_A = "$WIDGET_STATE.A"
         const val WIDGET_STATE_B = "$WIDGET_STATE.B"
         const val WIDGET_STATE_C = "$WIDGET_STATE.C"
@@ -59,7 +62,6 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         const val STRING_FIELD_EX_NAME = "StringFieldEx"
         const val STRING_FIELD_EX_QUALIFIED_NAME = "$LAYER_NAMESPACE.$STRING_FIELD_EX_NAME"
 
-        const val TEMPLATE_COMPLETION_CONTENT = "a"
         const val LABEL_PROPERTY_NAME = "label"
         const val STATE_PROPERTY_NAME = "state"
         const val CHILD_PROPERTY_NAME = "child"
@@ -91,18 +93,12 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
     protected fun hasLayerModule() = getNamespace() == LAYER_NAMESPACE || getDependencies().map { it.second }.any { LAYER_MODULE_NAME == it }
 
     fun testJsModel() {
-        val scoutJsModel = scoutJsModel() ?: throw newFail("ScoutJsModel for module {} not found.", myFixture.module)
-        testJsModel(scoutJsModel)
-    }
-
-    protected open fun scoutJsModel() = JsModel.getOrCreateModule(myFixture.module)
-
-    protected open fun testJsModel(scoutJsModel: ScoutJsModel) {
+        val scoutJsModel = scoutJsModel()
         // FIXME model: add enum support
-        assertEquals(if (hasLayerModule()) 3 else 2, scoutJsModel.scoutObjects().count())
+        assertEquals(if (hasLayerModule()) 3 else 2, scoutJsModel.findScoutObjects().withIncludeDependencies(true).count())
 //        assertEquals(if (hasLayerModule()) 5 else 4, scoutJsModel.scoutObjects().count())
 
-        val scoutWidgetClass = scoutJsModel.scoutWidgetClass().orElse(null)
+        val scoutWidgetClass = scoutJsModel.widgetClass()
         assertNotNull(scoutWidgetClass)
 
         // validate model of WidgetState enum
@@ -110,61 +106,75 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
 //        assertEquals("$JS_MODEL_ENUM_SIMPLE_NAME $WIDGET_STATE [A=$UNKNOWN_DATA_TYPE, B=$UNKNOWN_DATA_TYPE, C=$UNKNOWN_DATA_TYPE]", scoutJsModel.scoutObject(WIDGET_STATE).toString())
 
         // validate model of Widget class
-        val widget = scoutJsModel.scoutObject(ScoutJsModel.WIDGET_CLASS_NAME)
+        val widget = scoutJsModel
+            .findScoutObjects()
+            .withObjectType(ScoutJsCoreConstants.CLASS_NAME_WIDGET)
+            .withIncludeDependencies(true)
+            .first()
+            .orElse(null)
         assertNotNull(widget)
-        // FIXME model: add enum support, remove excludedProperties
+
+        // FIXME model: add enum support
 //        assertEquals(10, widget.properties().count())
-        val idProperty = widget.property(ScoutJsModel.ID_PROPERTY_NAME)
+        val idProperty = widget.properties()[ScoutJsCoreConstants.PROPERTY_NAME_ID]
         assertNotNull(idProperty)
-        // FIXME model: parser does not detect a dataType here (maybe use "any")
-//        assertEquals(TypeScriptTypes._object, idProperty.type.toString())
-        val objectTypeProperty = widget.property(ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME)
+        assertEquals(TypeScriptTypes._string, idProperty?.type?.dataType()?.orElse(null)?.name())
+        val objectTypeProperty = widget.properties()[ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE]
         assertNotNull(objectTypeProperty)
         // FIXME model: parser does not detect a dataType here (maybe use "any")
 //        assertEquals(TypeScriptTypes._object, objectTypeProperty.type.toString())
-        val visibleProperty = widget.property(VISIBLE_PROPERTY_NAME)
+        val visibleProperty = widget.properties()[VISIBLE_PROPERTY_NAME]
         assertNotNull(visibleProperty)
-        assertEquals(TypeScriptTypes._boolean, visibleProperty.type.toString())
-        val nameProperty = widget.property(NAME_PROPERTY_NAME)
+        assertEquals(TypeScriptTypes._boolean, visibleProperty?.type.toString())
+        val nameProperty = widget.properties()[NAME_PROPERTY_NAME]
         assertNotNull(nameProperty)
-        assertEquals(TypeScriptTypes._string, nameProperty.type.toString())
-        val fieldsProperty = widget.property(FIELDS_PROPERTY_NAME)
+        assertEquals(TypeScriptTypes._string, nameProperty?.type.toString())
+        val fieldsProperty = widget.properties()[FIELDS_PROPERTY_NAME]
         assertNotNull(fieldsProperty)
-        assertTrue(fieldsProperty.isWidget(scoutJsModel))
-        // FIXME model: add array support
-//        assertTrue(fieldsProperty.isArray)
-        val childProperty = widget.property(CHILD_PROPERTY_NAME)
+        assertTrue(fieldsProperty?.type?.hasLeafClasses() == true)
+        assertSame(scoutWidgetClass, fieldsProperty?.type?.leafClasses()?.findFirst()?.orElse(null))
+        assertTrue(fieldsProperty?.type?.isArray == true)
+        val childProperty = widget.properties()[CHILD_PROPERTY_NAME]
         assertNotNull(childProperty)
-        assertTrue(childProperty.isWidget(scoutJsModel))
-        val stateProperty = widget.property(STATE_PROPERTY_NAME)
+        assertSame(scoutWidgetClass, childProperty?.type?.dataType()?.orElse(null))
+        val stateProperty = widget.properties()[STATE_PROPERTY_NAME]
         assertNotNull(stateProperty)
         // FIXME model: add enum support
 //        assertEquals("$SCOUT_NAMESPACE.$WIDGET_STATE", stateProperty.type.toString())
-        val labelProperty = widget.property(LABEL_PROPERTY_NAME)
+        val labelProperty = widget.properties()[LABEL_PROPERTY_NAME]
         assertNotNull(labelProperty)
-        assertEquals("${TypeScriptTypes._string} (sub-type=${ScoutJsPropertySubType.TEXT_KEY})", labelProperty.type.toString())
-        val selectedTabProperty = widget.property(SELECTED_TAB_PROPERTY_NAME)
+        assertEquals("${TypeScriptTypes._string} (sub-type=${ScoutJsPropertySubType.TEXT_KEY})", labelProperty?.type.toString())
+        val selectedTabProperty = widget.properties()[SELECTED_TAB_PROPERTY_NAME]
         assertNotNull(selectedTabProperty)
-        assertEquals(TypeScriptTypes._string, selectedTabProperty.type.toString())
-        val onlyHereProperty = widget.property(ONLY_HERE_PROPERTY_NAME)
+        assertEquals(TypeScriptTypes._string, selectedTabProperty?.type?.dataType()?.orElse(null)?.name())
+        val onlyHereProperty = widget.properties()[ONLY_HERE_PROPERTY_NAME]
         assertNotNull(onlyHereProperty)
-        assertEquals(ScoutJsModel.WIDGET_CLASS_NAME, onlyHereProperty.type.toString())
+        assertSame(scoutWidgetClass, onlyHereProperty?.type?.dataType()?.orElse(null))
+        assertTrue(onlyHereProperty?.type?.hasLeafClasses() == true)
+        assertEquals(ScoutJsCoreConstants.CLASS_NAME_WIDGET, onlyHereProperty?.type?.dataType()?.orElse(null)?.name())
 
         // test that Widget is recognized as Widget
         assertTrue(widget.declaringClass().isInstanceOf(scoutWidgetClass))
+        assertTrue(scoutWidgetClass.isInstanceOf(widget.declaringClass()))
+        assertSame(scoutWidgetClass, widget.declaringClass())
 
         // validate model of StringField.FieldState enum
         // FIXME model: add enum support
 //        assertEquals("$JS_MODEL_ENUM_SIMPLE_NAME $FIELD_STYLE_NAME [CLASSIC=$UNKNOWN_DATA_TYPE, ALTERNATIVE=$UNKNOWN_DATA_TYPE]", scoutJsModel.scoutObject(FIELD_STYLE_NAME).toString())
 
         // validate model of StringField class. this includes the test that the fieldStyle property is recognized as enum
-        val stringField = scoutJsModel.scoutObject(STRING_FIELD_NAME)
+        val stringField = scoutJsModel
+            .findScoutObjects()
+            .withObjectType(STRING_FIELD_NAME)
+            .withIncludeDependencies(true)
+            .first()
+            .orElse(null)
         assertNotNull(stringField)
-        val maxLengthProperty = stringField.property(MAX_LENGTH_PROPERTY_NAME)
+        val maxLengthProperty = stringField.properties()[MAX_LENGTH_PROPERTY_NAME]
         assertNotNull(maxLengthProperty)
         // tests that the datatype is recognized if a reference to a variable is used
-        assertEquals(TypeScriptTypes._number, maxLengthProperty.type.toString())
-        val fieldStyleProperty = stringField.property(FIELD_STYLE_PROPERTY_NAME)
+        assertEquals(TypeScriptTypes._number, maxLengthProperty?.type.toString())
+        val fieldStyleProperty = stringField.properties()[FIELD_STYLE_PROPERTY_NAME]
         assertNotNull(fieldStyleProperty)
         // FIXME model: add enum support
 //        assertEquals("$SCOUT_NAMESPACE.$FIELD_STYLE_NAME", fieldStyleProperty.type.toString())
@@ -174,27 +184,21 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
 
         // validate valuesForProperty results
         assertEquals(
-            setOfNotNull(ScoutJsModel.WIDGET_CLASS_NAME, STRING_FIELD_NAME, if (hasLayerModule()) STRING_FIELD_EX_QUALIFIED_NAME else null),
-            childProperty.values(scoutJsModel).map { it.name() }.toSet()
+            setOfNotNull(ScoutJsCoreConstants.CLASS_NAME_WIDGET, STRING_FIELD_NAME, if (hasLayerModule()) STRING_FIELD_EX_QUALIFIED_NAME else null),
+            childProperty?.computePossibleValues(scoutJsModel)?.map { it.name() }?.collect(toSet())
         )
-        assertEquals(setOf(true.toString(), false.toString()), visibleProperty.values(scoutJsModel).map { it.name() }.toSet())
-        // FIXME model: add enum support
-//        assertEquals(setOf(WIDGET_STATE_A, WIDGET_STATE_B, WIDGET_STATE_C), stateProperty.values(scoutJsModel).map { it.name() }.toSet())
         assertEquals(
-            setOfNotNull(ScoutJsModel.WIDGET_CLASS_NAME, STRING_FIELD_NAME, if (hasLayerModule()) STRING_FIELD_EX_QUALIFIED_NAME else null),
-            objectTypeProperty.values(scoutJsModel).map { it.name() }.toSet()
+            setOf(true.toString(), false.toString()),
+            visibleProperty?.computePossibleValues(scoutJsModel)?.map { it.name() }?.collect(toSet())
         )
+        assertEquals(emptySet<String>(), objectTypeProperty?.computePossibleValues(scoutJsModel)?.map { it.name() }?.collect(toSet()))
 
         // test that StringField inherits properties from Widget
         assertEquals(
             setOf(
-                ScoutJsModel.ID_PROPERTY_NAME, ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME, VISIBLE_PROPERTY_NAME, NAME_PROPERTY_NAME, FIELDS_PROPERTY_NAME, CHILD_PROPERTY_NAME,
+                ScoutJsCoreConstants.PROPERTY_NAME_ID, ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE, VISIBLE_PROPERTY_NAME, NAME_PROPERTY_NAME, FIELDS_PROPERTY_NAME, CHILD_PROPERTY_NAME,
                 STATE_PROPERTY_NAME, LABEL_PROPERTY_NAME, ONLY_HERE_PROPERTY_NAME, MAX_LENGTH_PROPERTY_NAME, FIELD_STYLE_PROPERTY_NAME, SELECTED_TAB_PROPERTY_NAME
-                // FIXME model: add enum support
-                , "WidgetState", "FieldStyle"
-                // FIXME model: remove excludedProperties
-                , "children", "enabledComputed"
-            ), stringField.properties().keys
+            ), stringField.findProperties().withSuperClasses(true).stream().map { it.name() }.collect(toSet())
         )
 
         if (!hasLayerModule()) {
@@ -202,12 +206,15 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         }
 
         // validate model of StringFieldEx class
-        val stringFieldEx = scoutJsModel.scoutObject(STRING_FIELD_EX_QUALIFIED_NAME)
+        val stringFieldEx = scoutJsModel.findScoutObjects()
+            .withIncludeDependencies(true)
+            .withObjectType(STRING_FIELD_EX_QUALIFIED_NAME)
+            .first().orElse(null)
         assertNotNull(stringFieldEx)
-        val minLengthProperty = stringFieldEx.property(MIN_LENGTH_PROPERTY_NAME)
+        val minLengthProperty = stringFieldEx.properties()[MIN_LENGTH_PROPERTY_NAME]
         assertNotNull(minLengthProperty)
         // tests that the datatype is recognized if a reference to a variable is used
-        assertEquals(TypeScriptTypes._number, minLengthProperty.type.toString())
+        assertEquals(TypeScriptTypes._number, minLengthProperty?.type?.dataType()?.orElse(null)?.name())
 
         // test that StringFieldEx is recognized as Widget
         assertTrue(stringFieldEx.declaringClass().isInstanceOf(scoutWidgetClass))
@@ -215,36 +222,40 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         // test that StringFieldEx inherits properties from StringField, Widget
         assertEquals(
             setOf(
-                ScoutJsModel.ID_PROPERTY_NAME, ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME, VISIBLE_PROPERTY_NAME, NAME_PROPERTY_NAME, FIELDS_PROPERTY_NAME, CHILD_PROPERTY_NAME,
+                ScoutJsCoreConstants.PROPERTY_NAME_ID, ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE, VISIBLE_PROPERTY_NAME, NAME_PROPERTY_NAME, FIELDS_PROPERTY_NAME, CHILD_PROPERTY_NAME,
                 STATE_PROPERTY_NAME, LABEL_PROPERTY_NAME, ONLY_HERE_PROPERTY_NAME, MAX_LENGTH_PROPERTY_NAME, MIN_LENGTH_PROPERTY_NAME, FIELD_STYLE_PROPERTY_NAME, SELECTED_TAB_PROPERTY_NAME
-                // FIXME model: add enum support
-                , "WidgetState", "FieldStyle"
-                // FIXME model: remove excludedProperties
-                , "children", "enabledComputed"
-            ), scoutJsModel.scoutObject(STRING_FIELD_EX_QUALIFIED_NAME).properties().keys
+            ), stringFieldEx
+                .findProperties()
+                .withSuperClasses(true)
+                .stream()
+                .map { it.name() }
+                .collect(toSet())
         )
     }
 
+    protected open fun scoutJsModel() = JsModelService.getOrCreate(myFixture.module) ?: throw Ensure.newFail("ScoutJsModel for module {} not found.", myFixture.module)
+
+
     fun testNameCompletionWidget() {
+        val widgetClass = scoutJsModel().widgetClass()
         val selectedElement = doCompleteAssertContent(NAME_COMPLETION_FILE, CHILD_PROPERTY_NAME, *getNameCompletionWidgetExpectedFileContents(CHILD_PROPERTY_NAME))
-        assertTrue((selectedElement as? JsModelCompletionHelper.ScoutJsPropertyLookupElement)?.isWidget(scoutJsModel()) ?: false)
+        val dataType = (selectedElement as? JsModelCompletionHelper.ScoutJsPropertyLookupElement)?.scoutJsProperty?.type?.dataType()?.orElse(null) as? IES6Class
+        assertTrue(dataType?.isInstanceOf(widgetClass) ?: false)
     }
 
     protected open fun getNameCompletionWidgetExpectedFileContents(finishLookupName: String) =
-        arrayOf(", $CHILD_PROPERTY_NAME: { ${ScoutJsModel.ID_PROPERTY_NAME}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME}: $TEMPLATE_COMPLETION_CONTENT}")
+        arrayOf(", $CHILD_PROPERTY_NAME: { ${ScoutJsCoreConstants.PROPERTY_NAME_ID}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}:}")
 
     fun testNameCompletionWidgetArray() {
         val selectedElement = doCompleteAssertContent(NAME_COMPLETION_FILE, FIELDS_PROPERTY_NAME, *getNameCompletionWidgetArrayExpectedFileContents(FIELDS_PROPERTY_NAME))
-        val prop = selectedElement as JsModelCompletionHelper.ScoutJsPropertyLookupElement
-        assertTrue(prop.isWidget(scoutJsModel()))
-        // FIXME model: add array support
-//        assertTrue(prop.isArray())
+        val element = selectedElement as? JsModelCompletionHelper.ScoutJsPropertyLookupElement
+        val dataTypeName = element?.scoutJsProperty?.type?.dataType()?.orElse(null)?.name()
+        assertEquals("${ScoutJsCoreConstants.CLASS_NAME_WIDGET}[]", dataTypeName)
+        assertTrue(element?.scoutJsProperty?.type?.isArray == true)
     }
 
     protected open fun getNameCompletionWidgetArrayExpectedFileContents(finishLookupName: String) =
-        // FIXME model: add array support
-        arrayOf(", $FIELDS_PROPERTY_NAME: { ${ScoutJsModel.ID_PROPERTY_NAME}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME}: $TEMPLATE_COMPLETION_CONTENT}")
-//        arrayOf(", $FIELDS_PROPERTY_NAME: [{ ${ScoutJsModel.ID_PROPERTY_NAME}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME}: $TEMPLATE_COMPLETION_CONTENT}]")
+        arrayOf(", $FIELDS_PROPERTY_NAME: [{ ${ScoutJsCoreConstants.PROPERTY_NAME_ID}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}:}]")
 
     fun testNameCompletionAdditionalWidgetInExistingArray_StringField() {
         doCompleteAssertContent(VALUE_COMPLETION_WIDGET_ARRAY_FILE, STRING_FIELD_NAME, *getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents_StringField())
@@ -272,8 +283,8 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
 
     protected open fun getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents(objectType: String, importName: String? = null, importModule: String? = null) =
         arrayOf(
-            "$FIELDS_PROPERTY_NAME: [{${ScoutJsModel.ID_PROPERTY_NAME}: 'FirstInnerField',${ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME}:'${ScoutJsModel.WIDGET_CLASS_NAME}'}," + // the existing widget in the array
-                    "{${ScoutJsModel.ID_PROPERTY_NAME}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}',${ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME}:$objectType}]",  // the inserted StringField at the end of the array
+            "$FIELDS_PROPERTY_NAME: [{${ScoutJsCoreConstants.PROPERTY_NAME_ID}: 'FirstInnerField',${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}:'${ScoutJsCoreConstants.CLASS_NAME_WIDGET}'}," + // the existing widget in the array
+                    "{${ScoutJsCoreConstants.PROPERTY_NAME_ID}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}',${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}:$objectType}]",  // the inserted StringField at the end of the array
             getImportFileContent(importName, importModule)
         )
 
@@ -303,7 +314,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
     }
 
     protected open fun getNameCompletionTextKeyExpectedFileContents() =
-        arrayOf(", $LABEL_PROPERTY_NAME: '${TranslationPatterns.JsModelTextKeyPattern.MODEL_TEXT_KEY_PREFIX}$TEMPLATE_COMPLETION_CONTENT${TranslationPatterns.JsModelTextKeyPattern.MODEL_TEXT_KEY_SUFFIX}'")
+        arrayOf(", $LABEL_PROPERTY_NAME: '${TranslationPatterns.JsModelTextKeyPattern.MODEL_TEXT_KEY_PREFIX}${TranslationPatterns.JsModelTextKeyPattern.MODEL_TEXT_KEY_SUFFIX}'")
 
     fun testNameCompletionUnknownObject() {
         myFixture.configureByFile(NAME_COMPLETION_UNKNOWN_OBJECT_FILE)
@@ -319,12 +330,12 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
 
     protected open fun getValueCompletionWidgetExpectedFileContents() =
         arrayOf(
-            "$ONLY_HERE_PROPERTY_NAME: { ${ScoutJsModel.ID_PROPERTY_NAME}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME}: $STRING_FIELD_NAME }",
+            "$ONLY_HERE_PROPERTY_NAME: { ${ScoutJsCoreConstants.PROPERTY_NAME_ID}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}: $STRING_FIELD_NAME }",
             getImportFileContent(STRING_FIELD_NAME, SCOUT_MODULE_NAME)
         )
 
     fun testValueCompletionObjectType_Widget() {
-        doCompleteAssertContent(VALUE_COMPLETION_OBJECT_TYPE_FILE, ScoutJsModel.WIDGET_CLASS_NAME, *getValueCompletionObjectTypeExpectedFileContents_Widget())
+        doCompleteAssertContent(VALUE_COMPLETION_OBJECT_TYPE_FILE, ScoutJsCoreConstants.CLASS_NAME_WIDGET, *getValueCompletionObjectTypeExpectedFileContents_Widget())
     }
 
     fun testValueCompletionObjectType_StringFieldEx() {
@@ -335,14 +346,14 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
     }
 
     protected open fun getValueCompletionObjectTypeExpectedFileContents(objectType: String, importName: String? = null, importModule: String? = null) =
-        arrayOf("${ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME}: $objectType ", getImportFileContent(importName, importModule))
+        arrayOf("${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}: $objectType ", getImportFileContent(importName, importModule))
 
-    protected open fun getValueCompletionObjectTypeExpectedFileContents_Widget() = getValueCompletionObjectTypeExpectedFileContents(ScoutJsModel.WIDGET_CLASS_NAME, ScoutJsModel.WIDGET_CLASS_NAME, SCOUT_MODULE_NAME)
+    protected open fun getValueCompletionObjectTypeExpectedFileContents_Widget() = getValueCompletionObjectTypeExpectedFileContents(ScoutJsCoreConstants.CLASS_NAME_WIDGET, ScoutJsCoreConstants.CLASS_NAME_WIDGET, SCOUT_MODULE_NAME)
 
-    protected open fun getValueCompletionObjectTypeExpectedFileContents_StringFieldEx() = getValueCompletionObjectTypeExpectedFileContents(STRING_FIELD_EX_NAME, STRING_FIELD_EX_NAME, LAYER_MODULE_NAME)
+    protected open fun getValueCompletionObjectTypeExpectedFileContents_StringFieldEx() = getValueCompletionObjectTypeExpectedFileContents(STRING_FIELD_EX_QUALIFIED_NAME, STRING_FIELD_EX_NAME, LAYER_MODULE_NAME)
 
     fun testValueCompletionObjectTypeStringLiteral_Widget() {
-        doCompleteAssertContent(VALUE_COMPLETION_OBJECT_TYPE_STRING_LITERAL_FILE, ScoutJsModel.WIDGET_CLASS_NAME, *getValueCompletionObjectTypeStringLiteralExpectedFileContents_Widget())
+        doCompleteAssertContent(VALUE_COMPLETION_OBJECT_TYPE_STRING_LITERAL_FILE, ScoutJsCoreConstants.CLASS_NAME_WIDGET, *getValueCompletionObjectTypeStringLiteralExpectedFileContents_Widget())
     }
 
     fun testValueCompletionObjectTypeStringLiteral_StringFieldEx() {
@@ -359,9 +370,9 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         doCompleteAssertContent(VALUE_COMPLETION_OBJECT_TYPE_STRING_LITERAL_FILE, STRING_FIELD_EX_QUALIFIED_NAME, *getValueCompletionObjectTypeStringLiteralExpectedFileContents_StringFieldExQualifiedName())
     }
 
-    protected open fun getValueCompletionObjectTypeStringLiteralExpectedFileContents(objectType: String) = arrayOf("${ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME}: '$objectType' ")
+    protected open fun getValueCompletionObjectTypeStringLiteralExpectedFileContents(objectType: String) = arrayOf("${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}: '$objectType' ")
 
-    protected open fun getValueCompletionObjectTypeStringLiteralExpectedFileContents_Widget() = getValueCompletionObjectTypeStringLiteralExpectedFileContents(ScoutJsModel.WIDGET_CLASS_NAME)
+    protected open fun getValueCompletionObjectTypeStringLiteralExpectedFileContents_Widget() = getValueCompletionObjectTypeStringLiteralExpectedFileContents(ScoutJsCoreConstants.CLASS_NAME_WIDGET)
 
     protected open fun getValueCompletionObjectTypeStringLiteralExpectedFileContents_StringFieldEx() = getValueCompletionObjectTypeStringLiteralExpectedFileContents(STRING_FIELD_EX_QUALIFIED_NAME)
 
@@ -372,10 +383,11 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
 //        doCompleteAssertContent(VALUE_COMPLETION_ENUM_FILE, WIDGET_STATE_B, *getValueCompletionEnumExpectedFileContents())
     }
 
-    protected open fun getValueCompletionEnumExpectedFileContents() = arrayOf("$STATE_PROPERTY_NAME: $WIDGET_STATE_B ", getImportFileContent(ScoutJsModel.WIDGET_CLASS_NAME, SCOUT_MODULE_NAME))
+    protected open fun getValueCompletionEnumExpectedFileContents() = arrayOf("$STATE_PROPERTY_NAME: $WIDGET_STATE_B ", getImportFileContent(ScoutJsCoreConstants.CLASS_NAME_WIDGET, SCOUT_MODULE_NAME))
 
     private fun doCompleteAssertContent(filePath: String, finishLookupName: String, vararg expectedFileContent: String?): JsModelCompletionHelper.ScoutJsModelLookupElement? {
         val (file, modelElement) = doCompletion(filePath, finishLookupName)
+        PsiDocumentManager.getInstance(file.project).commitAllDocuments()
         val fileContent = file.text
         val cleanFunc = { it: String -> removeWhitespace(it).replace('\"', '\'') }
         val fileContentClean = cleanFunc(fileContent)

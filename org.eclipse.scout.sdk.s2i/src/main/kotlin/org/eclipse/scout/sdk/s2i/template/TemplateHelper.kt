@@ -17,7 +17,7 @@ object TemplateHelper {
 
     val SCOUT_LOOKUP_ELEMENT_MARKER = Key.create<Boolean>("ScoutLookupElement.marker")
 
-    fun removePrefix(editor: Editor, prefix: CharSequence) {
+    fun removePrefix(editor: Editor, prefix: CharSequence): Int {
         val document = editor.document
         val offset = editor.caretModel.offset
         var start = offset - 1 // move to the position before the caret
@@ -30,7 +30,9 @@ object TemplateHelper {
         while (start >= limit && isAlphaChar(chars[start])) {
             start--
         }
-        document.replaceString(start + 1, offset, "")
+        start++
+        document.replaceString(start, offset, "")
+        return offset - start
     }
 
     private fun isAlphaChar(char: Char) = char in 'a'..'z' || char in 'A'..'Z'

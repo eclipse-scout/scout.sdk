@@ -38,7 +38,7 @@ export class SomeClass {
     this.myObjectDef = null;
     this.myObjectInfer = {};
 
-    /** @type {any} */
+    /** @type {*} */
     this.myAnyDef = null;
     this.myAnyInfer = null;
 

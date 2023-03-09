@@ -9,21 +9,25 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.query;
 
+import java.util.Collections;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
+import org.eclipse.scout.sdk.core.typescript.model.api.spliterator.PackageJsonDependencySpliterator;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
-import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 public class DependencyQuery extends AbstractQuery<INodeModule> {
 
-  private final PackageJsonSpi m_packageJsonSpi;
+  private final NodeModuleSpi m_rootModule;
   private String m_name;
+  private boolean m_recursive;
+  private boolean m_withSelf;
 
-  public DependencyQuery(PackageJsonSpi packageJson) {
-    m_packageJsonSpi = Ensure.notNull(packageJson);
+  public DependencyQuery(NodeModuleSpi start) {
+    m_rootModule = Ensure.notNull(start);
   }
 
   /**
@@ -38,21 +42,40 @@ public class DependencyQuery extends AbstractQuery<INodeModule> {
     return this;
   }
 
-  public String name() {
+  protected String name() {
     return m_name;
   }
 
-  protected PackageJsonSpi packageJson() {
-    return m_packageJsonSpi;
+  public DependencyQuery withSelf(boolean withSelf) {
+    m_withSelf = withSelf;
+    return this;
+  }
+
+  protected boolean isWithSelf() {
+    return m_withSelf;
+  }
+
+  public DependencyQuery withRecursive(boolean recursive) {
+    m_recursive = recursive;
+    return this;
+  }
+
+  protected boolean isRecursive() {
+    return m_recursive;
+  }
+
+  protected NodeModuleSpi module() {
+    return m_rootModule;
   }
 
   @Override
   protected Stream<INodeModule> createStream() {
+    var startModules = isWithSelf() ? Collections.singletonList(module()) : module().packageJson().dependencies();
+    var stream = StreamSupport.stream(new PackageJsonDependencySpliterator(startModules, isRecursive(), isWithSelf()), false);
     var name = name();
-    var stream = packageJson().dependencies().stream().map(NodeModuleSpi::api);
     if (name != null) {
-      return stream.filter(nodeModule -> name.equals(nodeModule.name()));
+      stream = stream.filter(nodeModule -> name.equals(nodeModule.packageJson().api().name()));
     }
-    return stream;
+    return stream.map(NodeModuleSpi::api);
   }
 }

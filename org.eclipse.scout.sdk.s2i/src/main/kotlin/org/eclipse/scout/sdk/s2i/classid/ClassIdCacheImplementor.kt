@@ -151,7 +151,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     internal fun fileCache() = m_fileCache // for testing
 
     internal fun processFileEvents(events: List<PsiFile>) {
-        if (events.isEmpty()) return
+        if (!project.isInitialized || events.isEmpty()) return
         val eventsByModule = computeInReadAction(project) {
             events.toHashSet().groupBy { it.containingModule() /* read action required */ }
         }

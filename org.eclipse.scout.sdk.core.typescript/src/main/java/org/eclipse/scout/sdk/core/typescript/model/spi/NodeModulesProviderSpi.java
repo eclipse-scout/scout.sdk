@@ -11,7 +11,12 @@ package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.Set;
 
 public interface NodeModulesProviderSpi {
   Optional<NodeModuleSpi> create(Path nodeModuleDir);
+
+  Set<NodeModuleSpi> remove(Path changedPath);
+
+  void clear();
 }

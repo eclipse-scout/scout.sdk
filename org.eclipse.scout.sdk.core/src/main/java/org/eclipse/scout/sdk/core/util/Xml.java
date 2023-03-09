@@ -177,6 +177,22 @@ public final class Xml {
     return Optional.empty();
   }
 
+  public static List<Element> childElementsWithTagName(Node parent, String tagName) {
+    if (parent == null) {
+      return emptyList();
+    }
+    if (tagName == null) {
+      return emptyList();
+    }
+    var children = parent.getChildNodes();
+    return IntStream.range(0, children.getLength())
+        .mapToObj(children::item)
+        .filter(n -> n.getNodeType() == Node.ELEMENT_NODE)
+        .map(Element.class::cast)
+        .filter(e -> Objects.equals(e.getLocalName(), tagName))
+        .toList();
+  }
+
   /**
    * Evaluates the specified xPath string on the specified {@link Document}.
    *

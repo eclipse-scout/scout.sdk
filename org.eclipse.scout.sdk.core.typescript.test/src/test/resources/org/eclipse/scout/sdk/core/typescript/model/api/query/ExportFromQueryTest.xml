@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~
+  ~ This program and the accompanying materials are made
+  ~ available under the terms of the Eclipse Public License 2.0
+  ~ which is available at https://www.eclipse.org/legal/epl-2.0/
+  ~
+  ~ SPDX-License-Identifier: EPL-2.0
+  -->
+<module name="root">
+  <module name="1">
+    <module name="1_1"></module>
+    <module name="1_2">
+      <export name="Ex1">
+        <class name="Ex1Class"></class>
+      </export>
+    </module>
+    <module name="1_3">
+      <module name="1_3_1"></module>
+      <module name="@eclipse-scout/core">
+        <export name="Widget">
+          <class name="Widget"></class>
+        </export>
+        <module name="1_3_2_1"></module>
+        <module name="1_3_2_2">
+          <export name="Ex2">
+            <class name="Ex2Class"></class>
+          </export>
+          <export name="Ex3">
+            <class name="Ex3Class"></class>
+          </export>
+          <export name="Ex4">
+            <class name="Ex4Class"></class>
+          </export>
+        </module>
+      </module>
+    </module>
+  </module>
+
+  <export name="OwnExport1">
+    <class name="OwnExport1Class"></class>
+  </export>
+  <export name="OwnExport2">
+    <class name="OwnExport2Class"></class>
+  </export>
+  <export name="OwnExport3">
+    <class name="OwnExport3Class"></class>
+  </export>
+</module>

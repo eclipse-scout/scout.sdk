@@ -35,11 +35,11 @@ public interface IES6Class extends IDataType {
 
   boolean isInterface();
 
-  boolean isInstanceOf(String className);
-
   boolean isInstanceOf(IES6Class es6Class);
 
   Optional<IField> field(String name);
 
   Optional<IFunction> function(String name);
+
+  IDataType createDataType(String name);
 }

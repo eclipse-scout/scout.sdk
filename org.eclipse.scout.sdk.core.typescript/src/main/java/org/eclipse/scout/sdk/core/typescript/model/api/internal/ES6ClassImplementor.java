@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
@@ -39,14 +40,6 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
   @Override
   public boolean isInterface() {
     return spi().isInterface();
-  }
-
-  @Override
-  public boolean isInstanceOf(String className) {
-    if (Strings.isBlank(className)) {
-      return false;
-    }
-    return supers().withName(className).withSelf(true).existsAny();
   }
 
   @Override
@@ -95,5 +88,15 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
   @Override
   public boolean isPrimitive() {
     return spi().isPrimitive();
+  }
+
+  @Override
+  public Stream<IDataType> leafTypes() {
+    return Stream.of(this);
+  }
+
+  @Override
+  public IDataType createDataType(String name) {
+    return spi().createDataType(name).api();
   }
 }

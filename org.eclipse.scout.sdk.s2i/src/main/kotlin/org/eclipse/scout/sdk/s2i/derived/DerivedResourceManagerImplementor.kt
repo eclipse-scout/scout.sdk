@@ -46,7 +46,10 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
 
     private val m_updateHandlerFactories = HashMap<Class<*>, DerivedResourceHandlerFactory>() // use a map so that there is always only one factory of the same type
     private val m_delayedProcessor = DelayedBuffer(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true) { events ->
-        scheduleUpdate(union(events))
+        if (!project.isInitialized || events.isEmpty()) return@DelayedBuffer
+        val unionScope = union(events)
+        if (SearchScope.isEmptyScope(unionScope)) return@DelayedBuffer
+        scheduleUpdate(unionScope)
     }
     private var m_busConnection: MessageBusConnection? = null
 

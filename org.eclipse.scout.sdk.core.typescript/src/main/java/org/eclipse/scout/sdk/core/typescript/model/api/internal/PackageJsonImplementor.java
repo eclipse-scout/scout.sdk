@@ -38,6 +38,7 @@ public class PackageJsonImplementor extends AbstractNodeElement<PackageJsonSpi> 
   private final String m_version;
   private final JsonObject m_jsonRoot;
   private final FinalValue<Optional<String>> m_main;
+  private final FinalValue<Optional<CharSequence>> m_mainContent;
 
   public PackageJsonImplementor(PackageJsonSpi spi) {
     super(spi);
@@ -45,6 +46,7 @@ public class PackageJsonImplementor extends AbstractNodeElement<PackageJsonSpi> 
     m_name = Ensure.notBlank(m_jsonRoot.getString("name", null), "Name missing in '{}'.", spi.containingDir());
     m_version = Ensure.notBlank(m_jsonRoot.getString("version", null), "Version missing in '{}'.", spi.containingDir());
     m_main = new FinalValue<>();
+    m_mainContent = new FinalValue<>();
   }
 
   protected static JsonObject loadContent(PackageJsonSpi spi) {
@@ -82,9 +84,7 @@ public class PackageJsonImplementor extends AbstractNodeElement<PackageJsonSpi> 
 
   @Override
   public Optional<CharSequence> mainContent() {
-    return main()
-        .map(main -> directory().resolve(main))
-        .map(PackageJsonImplementor::loadContent);
+    return m_mainContent.computeIfAbsentAndGet(() -> main().map(main -> directory().resolve(main)).map(PackageJsonImplementor::loadContent));
   }
 
   protected Optional<String> computeMain() {
@@ -149,7 +149,7 @@ public class PackageJsonImplementor extends AbstractNodeElement<PackageJsonSpi> 
 
   @Override
   public DependencyQuery dependencies() {
-    return new DependencyQuery(spi());
+    return new DependencyQuery(spi().containingModule());
   }
 
   @Override
@@ -161,7 +161,7 @@ public class PackageJsonImplementor extends AbstractNodeElement<PackageJsonSpi> 
 
   @Override
   public String toString() {
-    return name() + "@" + version();
+    return name() + '@' + version();
   }
 
   @Override

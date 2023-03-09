@@ -29,11 +29,6 @@ class IdeaNodeModules(val project: Project) {
 
     fun create(nodeModuleDir: VirtualFile) = getOrCreateModule(nodeModuleDir)
 
-    fun clear() {
-        m_modules.clear()
-        m_packageJsonLocationByFile.clear()
-    }
-
     fun resolveReferencedElement(element: JSElement): NodeElementSpi? {
         val reference = PsiTreeUtil.findChildOfType(element, PsiQualifiedReferenceElement::class.java, false) ?: return null
         return resolveReference(reference)
@@ -80,9 +75,9 @@ class IdeaNodeModules(val project: Project) {
 
     internal fun getModules(): Collection<IdeaNodeModule> = m_modules.values.toSet()
 
-    fun remove(vf: VirtualFile): Collection<IdeaNodeModule> {
+    fun remove(changedPath: VirtualFile): Set<IdeaNodeModule> {
         val modules = m_modules
-            .filter { vf.path.startsWith(it.key.path) }
+            .filter { changedPath.path.startsWith(it.key.path) }
             .map { it.value }
 
         if (modules.isEmpty()) return emptySet()
@@ -92,7 +87,7 @@ class IdeaNodeModules(val project: Project) {
 
     fun remove(module: IdeaNodeModule) = remove(setOf(module))
 
-    fun remove(modules: Collection<IdeaNodeModule>): Collection<IdeaNodeModule> {
+    fun remove(modules: Collection<IdeaNodeModule>): Set<IdeaNodeModule> {
         val dependentModules = collectDependentModules(modules)
 
         // remove everything that is mapped to a module contained in dependentModules
@@ -101,7 +96,14 @@ class IdeaNodeModules(val project: Project) {
         return dependentModules
     }
 
-    private fun collectDependentModules(modules: Collection<IdeaNodeModule>): Collection<IdeaNodeModule> {
+    fun clear() {
+        m_modules.clear()
+        m_packageJsonLocationByFile.clear()
+    }
+
+    fun isEmpty() = m_modules.isEmpty()
+
+    private fun collectDependentModules(modules: Collection<IdeaNodeModule>): Set<IdeaNodeModule> {
         val remainingModules = m_modules.values.toMutableSet()
 
         val result = mutableSetOf<IdeaNodeModule>()

@@ -59,7 +59,7 @@ object FieldSpiUtils {
 
         chooseField(field1 to dataType1, field2 to dataType2)?.let { return it }
 
-        if (dataType1.dataTypeFlavor() === IDataType.DataTypeFlavor.Array && dataType2.dataTypeFlavor() === IDataType.DataTypeFlavor.Array) {
+        if (dataType1.flavor() === IDataType.DataTypeFlavor.Array && dataType2.flavor() === IDataType.DataTypeFlavor.Array) {
             if (dataType1.arrayDimension() != dataType2.arrayDimension()) return field1
 
             val componentDataType1 = dataType1.componentDataTypes().findFirst().orElse(null) ?: return field2

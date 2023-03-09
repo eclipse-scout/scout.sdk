@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.typescript.model.api;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
-import org.eclipse.scout.sdk.core.typescript.model.spi.SimpleDataTypeSpi;
 
 public interface IDataType extends INodeElement {
 
@@ -21,14 +20,20 @@ public interface IDataType extends INodeElement {
 
   boolean isPrimitive();
 
-  default DataTypeFlavor dataTypeFlavor() {
-    return spi().dataTypeFlavor();
+  default IDataType createArrayType(int dimension) {
+    return spi().createArrayType(dimension).api();
+  }
+
+  default DataTypeFlavor flavor() {
+    return spi().flavor();
   }
 
   default Stream<IDataType> componentDataTypes() {
     return spi().componentDataTypes()
         .map(DataTypeSpi::api);
   }
+
+  Stream<IDataType> leafTypes();
 
   default int arrayDimension() {
     return spi().arrayDimension();
@@ -37,9 +42,5 @@ public interface IDataType extends INodeElement {
   enum DataTypeFlavor {
     Single,
     Array
-  }
-
-  static IDataType createSimple(String dataType) {
-    return new SimpleDataTypeSpi(null, dataType).api();
   }
 }

@@ -9,9 +9,13 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js;
 
+import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 public interface IScoutJsObject {
 
@@ -20,41 +24,35 @@ public interface IScoutJsObject {
   String name();
 
   default String shortName() {
-    if (scoutJsModel().namespace().map(ScoutJsModel.SCOUT_NAMESPACE::equals).orElse(false)) {
+    if (ScoutJsCoreConstants.NAMESPACE.equals(scoutJsModel().namespace().orElse(null))) {
       return name();
     }
     return qualifiedName();
   }
 
   default String qualifiedName() {
-    return scoutJsModel().namespace().map(ns -> ns + "." + name()).orElse(name());
+    return toQualifiedName(scoutJsModel().namespace().orElse(null), name());
+  }
+
+  static String toQualifiedName(String namespace, String objectName) {
+    if (Strings.isEmpty(objectName)) {
+      return null;
+    }
+    var result = new StringBuilder();
+    if (Strings.hasText(namespace)) {
+      result.append(namespace).append('.');
+    }
+    result.append(objectName);
+    return result.toString();
   }
 
   IES6Class declaringClass();
 
   Map<String, ScoutJsProperty> properties();
 
-  default ScoutJsProperty property(String name) {
-    if (name == null) {
-      return null;
-    }
-
-    return properties().get(name);
+  default ScoutJsPropertyQuery findProperties() {
+    return new ScoutJsPropertyQuery(this);
   }
 
-  /**
-   * Properties might be declared on several levels in the class hierarchy. E.g. a property 'x' may be declared on
-   * Widget and on FormField. In that case basically the FormField declaration (lower in the hierarchy) should win
-   * (might be narrowed) unless the specification of the Widget element (higher in the hierarchy) is more specific.
-   */
-  default ScoutJsProperty chooseProperty(ScoutJsProperty higher, ScoutJsProperty lower) {
-    if (lower == null) {
-      return higher; // first occurrence
-    }
-    if (lower.type().dataType().isEmpty() && higher.type().dataType().isPresent()) {
-      // higher level is more specific
-      return higher;
-    }
-    return lower;
-  }
+  List<IFunction> _inits();
 }

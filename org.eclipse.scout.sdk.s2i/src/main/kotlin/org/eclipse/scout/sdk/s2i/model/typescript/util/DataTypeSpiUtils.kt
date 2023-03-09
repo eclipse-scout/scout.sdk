@@ -13,10 +13,7 @@ import com.intellij.lang.ecmascript6.psi.ES6ImportDeclaration
 import com.intellij.lang.javascript.psi.*
 import com.intellij.lang.javascript.psi.jsdoc.JSDocComment
 import com.intellij.lang.javascript.psi.resolve.JSTypeEvaluator
-import com.intellij.lang.javascript.psi.types.JSArrayType
-import com.intellij.lang.javascript.psi.types.JSLiteralType
-import com.intellij.lang.javascript.psi.types.JSUtilType
-import com.intellij.lang.javascript.psi.types.JSWrapperType
+import com.intellij.lang.javascript.psi.types.*
 import com.intellij.lang.javascript.psi.types.evaluable.JSQualifiedReferenceType
 import com.intellij.lang.javascript.psi.types.primitives.JSNullType
 import com.intellij.lang.javascript.psi.types.primitives.JSUndefinedType
@@ -69,7 +66,7 @@ object DataTypeSpiUtils {
             } while (currentType is JSArrayType)
             return module.spiFactory.createArrayDataType(currentType?.let { createDataType(it, module) }, arrayDimension)
         }
-        (type as? JSUtilType)?.let { return module.spiFactory.createJavaScriptType(it) }
+        if (type is JSUtilType) return module.spiFactory.createJavaScriptType(type)
 
         (type.sourceElement as? JSElement)
             ?.let { (module.moduleInventory.resolveReferencedElement(it) as? DataTypeSpi) }
@@ -91,7 +88,7 @@ object DataTypeSpiUtils {
         return property.jsType?.let { createDataType(it, module) }
     }
 
-    fun createDataType(dataType: String, module: IdeaNodeModule): DataTypeSpi? =
+    fun createDataType(dataType: String, scope: JSElement, module: IdeaNodeModule): DataTypeSpi? {
         if (dataType.endsWith("[]")) {
             var arrayDimension = 0
             var currentType = dataType
@@ -99,14 +96,15 @@ object DataTypeSpiUtils {
                 arrayDimension++
                 currentType = currentType.substring(0, currentType.length - 2)
             } while (currentType.endsWith("[]"))
-            module.spiFactory.createArrayDataType(
-                if (currentType.isEmpty()) null else module.spiFactory.createSimpleDataType(currentType),
-                arrayDimension
-            )
-        } else if (dataType.isNotEmpty())
-            module.spiFactory.createSimpleDataType(dataType)
-        else
-            null
+            return module.spiFactory.createArrayDataType(if (currentType.isEmpty()) null else createDataType(currentType, scope, module), arrayDimension)
+        }
+        if (dataType.isNotEmpty()) {
+            val source = JSTypeSourceFactory.createTypeSource(scope, true)
+            val type = JSNamedTypeFactory.createType(dataType, source, JSTypeContext.INSTANCE, false)
+            return module.spiFactory.createJavaScriptType(type)
+        }
+        return null
+    }
 
     private fun createJSDocCommentDataType(comment: JSDocComment, module: IdeaNodeModule, getDataType: (JSDocComment) -> String?): DataTypeSpi? {
         val dataType = getDataType(comment) ?: return null
@@ -118,7 +116,7 @@ object DataTypeSpiUtils {
             ?.let { module.moduleInventory.resolveImport(it) as? DataTypeSpi }
             ?.let { return it }
 
-        return createDataType(dataType, module)
+        return createDataType(dataType, comment, module)
     }
 
     private fun createJSDocCommentTypeDataType(comment: JSDocComment, module: IdeaNodeModule) = createJSDocCommentDataType(comment, module) { it.type }

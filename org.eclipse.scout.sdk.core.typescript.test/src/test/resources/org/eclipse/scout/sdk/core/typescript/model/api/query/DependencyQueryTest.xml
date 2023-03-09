@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~
+  ~ This program and the accompanying materials are made
+  ~ available under the terms of the Eclipse Public License 2.0
+  ~ which is available at https://www.eclipse.org/legal/epl-2.0/
+  ~
+  ~ SPDX-License-Identifier: EPL-2.0
+  -->
+<module name="root">
+  <module name="a"></module>
+  <module name="b">
+    <module name="1">
+      <module name="1_1"></module>
+      <module name="1_2"></module>
+      <module name="1_3">
+        <module name="1_3_1"></module>
+        <module name="@eclipse-scout/core">
+          <export name="Widget">
+            <class name="Widget"></class>
+          </export>
+          <module name="1_3_2_1"></module>
+          <module name="1_3_2_2"></module>
+        </module>
+        <module name="1_3_3">
+          <module name="1_3_3_1"></module>
+          <module name="@eclipse-scout/core">
+            <export name="Widget">
+              <class name="Widget"></class>
+            </export>
+          </module>
+        </module>
+      </module>
+    </module>
+    <module name="2"></module>
+    <module name="3">
+      <module name="3_1"></module>
+      <module name="3_2">
+        <module name="@eclipse-scout/core">
+          <export name="Widget">
+            <class name="Widget"></class>
+          </export>
+        </module>
+      </module>
+    </module>
+  </module>
+  <module name="c"></module>
+  <module name="d">
+    <module name="1">
+      <module name="1_1"></module>
+      <module name="1_2"></module>
+      <module name="1_3">
+        <module name="1_3_1"></module>
+        <module name="@eclipse-scout/core">
+          <export name="Widget">
+            <class name="Widget"></class>
+          </export>
+          <module name="1_3_2_1"></module>
+          <module name="1_3_2_2"></module>
+        </module>
+        <module name="1_3_3">
+          <module name="1_3_3_1"></module>
+          <module name="@eclipse-scout/core">
+            <export name="Widget">
+              <class name="Widget"></class>
+            </export>
+          </module>
+        </module>
+      </module>
+    </module>
+    <module name="2"></module>
+    <module name="3">
+      <module name="3_1"></module>
+      <module name="3_2">
+        <module name="@eclipse-scout/core">
+          <export name="Widget">
+            <class name="Widget"></class>
+          </export>
+        </module>
+      </module>
+    </module>
+  </module>
+</module>

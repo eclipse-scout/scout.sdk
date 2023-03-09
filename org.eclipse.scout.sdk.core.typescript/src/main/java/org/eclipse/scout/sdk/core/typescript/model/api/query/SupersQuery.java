@@ -14,6 +14,7 @@ import java.util.stream.StreamSupport;
 
 import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+import org.eclipse.scout.sdk.core.typescript.model.api.spliterator.SupersSpliterator;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 
 public class SupersQuery extends AbstractQuery<IES6Class> {

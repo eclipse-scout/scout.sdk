@@ -381,7 +381,8 @@ public final class JdtUtils {
         if (monitor != null && monitor.isCanceled()) {
           throw new OperationCanceledException("annotated types search canceled.");
         }
-        if (match.getElement()instanceof IType t) {
+        var matchedElement = match.getElement();
+        if (matchedElement instanceof IType t) {
           result.add(t);
         }
       }

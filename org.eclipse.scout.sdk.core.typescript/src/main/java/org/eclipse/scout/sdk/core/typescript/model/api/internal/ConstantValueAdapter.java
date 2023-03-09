@@ -28,9 +28,9 @@ public class ConstantValueAdapter implements IConstantValue {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public <T> Optional<T> convertTo(Class<T> expectedType) {
     if (expectedType == IObjectLiteral.class) {
-      //noinspection unchecked
       return (Optional<T>) asObjectLiteral();
     }
     return Optional.empty();

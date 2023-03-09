@@ -10,135 +10,53 @@
 package org.eclipse.scout.sdk.core.s.model.js;
 
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-import static java.util.stream.Collectors.toSet;
-import static org.eclipse.scout.sdk.core.util.Strings.removePrefix;
+import static java.util.stream.Collectors.toUnmodifiableMap;
 
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.s.IWebConstants;
-import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
-import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
+import org.eclipse.scout.sdk.core.typescript.IWebConstants;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IExportFrom;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
-import org.eclipse.scout.sdk.core.typescript.model.api.NodeModulesProvider;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.Strings;
 
-// FIXME model:
-//  * add factory/inventory (like IdeaNodeModules)
-//  * caching (remove changed entries)
-//  * only consider INodeModule with dependency on @eclipse-scout/core
 public class ScoutJsModel {
-
-  public static final String SCOUT_NAMESPACE = "scout";
-  public static final String OBJECT_TYPE_PROPERTY_NAME = "objectType";
-  public static final String ID_PROPERTY_NAME = "id";
-  public static final String WIDGET_CLASS_NAME = "Widget";
-  public static final IDataType DATA_TYPE_STRING = IDataType.createSimple(TypeScriptTypes._string);
-  public static final IDataType DATA_TYPE_WIDGET = IDataType.createSimple(WIDGET_CLASS_NAME);
 
   private static final Pattern NAMESPACE_PATTERN_WITHOUT_CLASS_REFERENCE = Pattern.compile("window\\.([\\w._]+)\\s*=\\s*Object\\.assign\\(window\\.");
   private static final Pattern NAMESPACE_PATTERN_WITH_CLASS_REFERENCE = Pattern.compile("ObjectFactory\\.get\\(\\)\\.registerNamespace\\('([\\w._]+)',");
 
   private final INodeModule m_nodeModule;
+  private final IES6Class m_widgetClass;
   private final FinalValue<Optional<String>> m_namespace;
   private final FinalValue<Map<String, IScoutJsObject>> m_objects;
-  private final FinalValue<Collection<ScoutJsModel>> m_dependencies;
-  private final FinalValue<Optional<IES6Class>> m_scoutWidgetClass;
-  private boolean m_useClassReference;
-  private final boolean m_supportsTypeScript;
+  private final FinalValue<Boolean> m_supportsTypeScript;
+  private final FinalValue<Boolean> m_useClassReference;
 
-  protected ScoutJsModel(INodeModule module) {
+  protected ScoutJsModel(INodeModule module, IES6Class widgetClass) {
     m_nodeModule = module;
+    m_widgetClass = widgetClass;
     m_namespace = new FinalValue<>();
     m_objects = new FinalValue<>();
-    m_dependencies = new FinalValue<>();
-    m_scoutWidgetClass = new FinalValue<>();
-    m_useClassReference = true; // default to new layout
-
-    // TypeScript is supported if the main file is written in TypeScript
-    m_supportsTypeScript = module.packageJson()
-        .main()
-        .filter(main -> main.endsWith(IWebConstants.TS_FILE_SUFFIX))
-        .isPresent();
+    m_supportsTypeScript = new FinalValue<>();
+    m_useClassReference = new FinalValue<>();
   }
 
-  public static Optional<ScoutJsModel> create(Path nodeModuleDir, Object context) {
-    return NodeModulesProvider.create(nodeModuleDir, context)
-        .map(NodeModuleSpi::api)
-        .flatMap(ScoutJsModel::create);
+  public ScoutJsObjectQuery findScoutObjects() {
+    return new ScoutJsObjectQuery(this);
   }
 
-  public static Optional<ScoutJsModel> create(INodeModule module) {
-    return Optional.ofNullable(module)
-        .map(ScoutJsModel::new);
-  }
-
-  public IScoutJsObject scoutObject(String objectType) {
-    if (objectType == null) {
-      return null;
-    }
-    var namespace = namespace().orElse(null);
-
-    if (namespace == null && !objectType.contains(".")) {
-      var scoutObject = scoutObjectsInternal().get(objectType);
-      if (scoutObject != null) {
-        return scoutObject;
-      }
-    }
-
-    if (namespace == null || !SCOUT_NAMESPACE.equals(namespace) && !objectType.startsWith(namespace + ".")) {
-      return dependencies().stream()
-          .map(scoutJsModel -> scoutJsModel.scoutObject(objectType))
-          .filter(Objects::nonNull)
-          .findFirst()
-          .orElse(null);
-    }
-
-    return scoutObjectsInternal().get(removePrefix(objectType, namespace + "."));
-  }
-
-  public IScoutJsObject scoutObject(IES6Class es6Class) {
-    if (es6Class == null) {
-      return null;
-    }
-    if (es6Class.containingModule() != nodeModule()) {
-      return dependencies().stream()
-          .map(scoutJsModel -> scoutJsModel.scoutObject(es6Class))
-          .findFirst()
-          .orElse(null);
-    }
-    return scoutObjectsInternal().values().stream()
-        .filter(scoutJsObject -> es6Class == scoutJsObject.declaringClass())
-        .findFirst()
-        .orElse(null);
-  }
-
-  public Stream<IScoutJsObject> scoutObjects() {
-    return scoutObjects(true);
-  }
-
-  public Stream<IScoutJsObject> scoutObjects(boolean includeDependencies) {
-    var stream = scoutObjectsInternal().values().stream();
-    if (includeDependencies) {
-      stream = Stream.concat(stream, dependencies().stream().flatMap(d -> d.scoutObjects(true)));
-    }
-    return stream;
-  }
-
-  protected Map<String, IScoutJsObject> scoutObjectsInternal() {
-    return Collections.unmodifiableMap(m_objects.computeIfAbsentAndGet(this::parseScoutObjects));
+  public Map<String, IScoutJsObject> exportedScoutObjects() {
+    return m_objects.computeIfAbsentAndGet(this::parseScoutObjects);
   }
 
   protected Map<String, IScoutJsObject> parseScoutObjects() {
@@ -150,7 +68,7 @@ public class ScoutJsModel {
           .filter(IES6Class.class::isInstance)
           .map(IES6Class.class::cast)
           .flatMap(element -> TypeScriptScoutObject.create(this, element).stream())
-          .collect(toMap(IScoutJsObject::name, identity()));
+          .collect(toUnmodifiableMap(IScoutJsObject::name, identity()));
     }
 
     return nodeModule()
@@ -160,60 +78,79 @@ public class ScoutJsModel {
         .map(IExportFrom::referencedElement)
         .filter(IES6Class.class::isInstance)
         .map(IES6Class.class::cast)
-        .flatMap(element -> JavaScriptScoutObject.create(this, element).stream())
-        .collect(toMap(IScoutJsObject::name, identity()));
+        .flatMap(element -> JavaScriptScoutObject.create(this, element, widgetClass()).stream())
+        .collect(toUnmodifiableMap(IScoutJsObject::name, identity()));
   }
 
-  public Collection<ScoutJsModel> dependencies() {
-    return Collections.unmodifiableCollection(m_dependencies.computeIfAbsentAndGet(this::parseDependencies));
+  /**
+   * Without "this" model. only dependencies. Leaf dependencies (deepest, typically @eclipse-scout/core) come first in
+   * the list
+   * 
+   * @return
+   */
+  public Stream<INodeModule> scoutJsDependenciesRecursively() {
+    var collector = new LinkedHashSet<NodeModuleSpi>(); // deepest dependency first
+    var visited = new HashSet<NodeModuleSpi>();
+    nodeModule()
+        .packageJson().spi()
+        .dependencies()
+        .forEach(d -> collectScoutCoreModules(d, collector, visited));
+    return collector.stream().map(NodeModuleSpi::api);
   }
 
-  protected Collection<ScoutJsModel> parseDependencies() {
-    return nodeModule().packageJson().dependencies().stream()
-        .map(ScoutJsModel::create)
-        .flatMap(Optional::stream)
-        .collect(toSet());
-  }
-
-  public Optional<IES6Class> scoutWidgetClass() {
-    return m_scoutWidgetClass.computeIfAbsentAndGet(this::parseScoutWidgetClass);
-  }
-
-  protected Optional<IES6Class> parseScoutWidgetClass() {
-    if (SCOUT_NAMESPACE.equals(namespace().orElse(null))) {
-      var scoutJsObject = scoutObject(WIDGET_CLASS_NAME);
-      return Optional.ofNullable(scoutJsObject)
-          .map(IScoutJsObject::declaringClass);
+  protected static boolean collectScoutCoreModules(NodeModuleSpi module, Set<NodeModuleSpi> collector, Set<NodeModuleSpi> visited) {
+    if (visited.contains(module)) {
+      return collector.contains(module);
     }
-    return dependencies().stream()
-        .map(ScoutJsModel::scoutWidgetClass)
-        .flatMap(Optional::stream)
-        .findFirst();
-  }
+    visited.add(module);
 
-  public boolean supportsClassReference() {
-    namespace(); // ensure parsed
-    return m_useClassReference;
+    if (ScoutJsCoreConstants.SCOUT_JS_CORE_MODULE_NAME.equals(module.packageJson().api().name())) {
+      collector.add(module);
+      return true;
+    }
+
+    var added = false;
+    for (var child : module.packageJson().dependencies()) {
+      var containsScoutCore = collectScoutCoreModules(child, collector, visited);
+      if (containsScoutCore && !added) {
+        collector.add(module);
+        added = true;
+      }
+    }
+    return added;
   }
 
   public boolean supportsTypeScript() {
-    return m_supportsTypeScript;
+    // TypeScript is supported if the main file is written in TypeScript
+    return m_supportsTypeScript.computeIfAbsentAndGet(() -> nodeModule().packageJson()
+        .main()
+        .filter(main -> main.endsWith(IWebConstants.TS_FILE_SUFFIX))
+        .isPresent());
+  }
+
+  public IES6Class widgetClass() {
+    return m_widgetClass;
+  }
+
+  public boolean supportsClassReference() {
+    return m_useClassReference.computeIfAbsentAndGet(() -> widgetClass() // only scout-core decides if class-references are supported
+        .containingModule()
+        .packageJson()
+        .mainContent()
+        .map(NAMESPACE_PATTERN_WITH_CLASS_REFERENCE::matcher)
+        .filter(Matcher::find)
+        .isPresent());
   }
 
   public Optional<String> namespace() {
     return m_namespace.computeIfAbsentAndGet(() -> nodeModule().packageJson()
         .mainContent()
-        .flatMap(this::parseNamespace));
+        .flatMap(ScoutJsModel::parseNamespace));
   }
 
-  protected Optional<String> parseNamespace(CharSequence content) {
+  protected static Optional<String> parseNamespace(CharSequence content) {
     return firstGroup(NAMESPACE_PATTERN_WITH_CLASS_REFERENCE.matcher(content).results())
-        .or(() -> firstGroup(NAMESPACE_PATTERN_WITHOUT_CLASS_REFERENCE.matcher(content).results())
-            .map(ns -> {
-              // legacy mode found: class reference not supported
-              m_useClassReference = false;
-              return ns;
-            }));
+        .or(() -> firstGroup(NAMESPACE_PATTERN_WITHOUT_CLASS_REFERENCE.matcher(content).results()));
   }
 
   private static Optional<String> firstGroup(Stream<MatchResult> matches) {

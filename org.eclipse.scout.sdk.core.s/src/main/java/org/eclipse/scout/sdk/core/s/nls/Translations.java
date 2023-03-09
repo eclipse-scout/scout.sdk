@@ -34,13 +34,14 @@ import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.log.SdkLog;
-import org.eclipse.scout.sdk.core.s.IWebConstants;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutChartApi;
 import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi;
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
+import org.eclipse.scout.sdk.core.typescript.IWebConstants;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -72,8 +73,8 @@ public final class Translations {
 
   private static Map<String /* node module name */, ITypeNameSupplier /* text contributor */> getPredefinedTextContributorMappings(IScoutApi api) {
     Map<String, ITypeNameSupplier> mappings = new HashMap<>(2);
-    mappings.put(IWebConstants.SCOUT_JS_CORE_MODULE_NAME, api.UiTextContributor());
-    api.api(IScoutChartApi.class).ifPresent(chartApi -> mappings.put(IWebConstants.SCOUT_JS_CHART_MODULE_NAME, chartApi.ChartUiTextContributor()));
+    mappings.put(ScoutJsCoreConstants.SCOUT_JS_CORE_MODULE_NAME, api.UiTextContributor());
+    api.api(IScoutChartApi.class).ifPresent(chartApi -> mappings.put(ScoutJsCoreConstants.SCOUT_JS_CHART_MODULE_NAME, chartApi.ChartUiTextContributor()));
     return mappings;
   }
 

@@ -18,6 +18,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.DataTypeImplementor;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType> implements DataTypeSpi {
@@ -25,6 +26,7 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
   private final DataTypeFlavor m_dataTypeFlavor;
   private final Collection<DataTypeSpi> m_componentDataTypes;
   private final int m_arrayDimension;
+  private final FinalValue<String> m_name = new FinalValue<>();
 
   protected SimpleCompositeDataTypeSpi(NodeModuleSpi module, DataTypeFlavor dataTypeFlavor, Collection<DataTypeSpi> componentDataTypes, int arrayDimension) {
     super(module);
@@ -33,14 +35,21 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
     m_arrayDimension = arrayDimension;
   }
 
-  public static SimpleCompositeDataTypeSpi createArray(NodeModuleSpi module, DataTypeSpi componentDataType, int arrayDimension) {
-    return new SimpleCompositeDataTypeSpi(
-        module,
-        DataTypeFlavor.Array,
-        Optional.ofNullable(componentDataType)
-            .map(Collections::singleton)
-            .orElse(Collections.emptySet()),
-        arrayDimension);
+  public static DataTypeSpi createArray(NodeModuleSpi module, DataTypeSpi componentDataType, int arrayDimension) {
+    if (arrayDimension < 1) {
+      return componentDataType;
+    }
+
+    var newDimension = arrayDimension;
+    var leafComponentType = componentDataType;
+    if (componentDataType != null && componentDataType.flavor() == DataTypeFlavor.Array) {
+      newDimension += componentDataType.arrayDimension();
+      leafComponentType = componentDataType.componentDataTypes().findAny().orElseThrow();
+    }
+    var componentDataTypes = Optional.ofNullable(leafComponentType)
+        .map(Collections::singleton)
+        .orElse(Collections.emptySet());
+    return new SimpleCompositeDataTypeSpi(module, DataTypeFlavor.Array, componentDataTypes, newDimension);
   }
 
   @Override
@@ -50,10 +59,10 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
 
   @Override
   public String name() {
-    return switch (dataTypeFlavor()) {
+    return m_name.computeIfAbsentAndGet(() -> switch (flavor()) {
       case Array -> componentDataTypes().findFirst().map(DataTypeSpi::name).orElse("") + "[]".repeat(arrayDimension());
       case Single -> null;
-    };
+    });
   }
 
   @Override
@@ -62,7 +71,7 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
   }
 
   @Override
-  public DataTypeFlavor dataTypeFlavor() {
+  public DataTypeFlavor flavor() {
     return m_dataTypeFlavor;
   }
 

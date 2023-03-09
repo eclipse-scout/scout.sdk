@@ -24,6 +24,8 @@ public interface ES6ClassSpi extends DataTypeSpi, ISuperHierarchyElement<ES6Clas
 
   List<FunctionSpi> functions();
 
+  DataTypeSpi createDataType(String name);
+
   @Override
   default boolean isPrimitive() {
     return false;

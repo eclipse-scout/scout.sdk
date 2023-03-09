@@ -19,11 +19,10 @@ import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.util.ProcessingContext
-import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
-import org.eclipse.scout.sdk.core.s.model.js.ScoutJsProperty
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.PropertyCompletionInfo
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.SELECTED_ELEMENT
-import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.createLookupElement
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.getPropertyValueInfo
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.propertyElementPattern
 import org.eclipse.scout.sdk.s2i.toVirtualFile
@@ -43,7 +42,7 @@ class JsModelValueCompletionContributor : CompletionContributor() {
             val completionInfo = getPropertyValueInfo(parameters, result) ?: return
 
             // require an objectType to be set or the completion of the object type itself
-            if (completionInfo.objectType == null && ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME != completionInfo.propertyName) return
+            if (completionInfo.objectTypeDeclaringScoutObject() == null && ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE != completionInfo.propertyName) return
 
             val elements = getPropertyValueElements(completionInfo) ?: return
             if (elements.isNotEmpty()) {
@@ -53,40 +52,31 @@ class JsModelValueCompletionContributor : CompletionContributor() {
         }
 
         private fun getPropertyValueElements(completionInfo: PropertyCompletionInfo): List<LookupElement>? {
-            val scoutJsModel = completionInfo.scoutJsModel() ?: return null
-            val scoutJsProperty = if (ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME == completionInfo.propertyName) {
-                getPropertyValueInfo(completionInfo.property, "")
-                    ?.let { scoutJsModel.scoutObject(it.objectType)?.property(it.propertyName) }
-                    ?.takeIf { it.isWidget(scoutJsModel) } // only accept widgets filter. for all other types use the default: all known top-level objects
-                    ?: scoutJsModel.scoutObject(ScoutJsModel.WIDGET_CLASS_NAME).property(ScoutJsModel.OBJECT_TYPE_PROPERTY_NAME)
-            } else {
-                scoutJsModel.scoutObject(completionInfo.objectType).property(completionInfo.propertyName)
-            } ?: return emptyList()
+            var infoForPropertyLookup = completionInfo
+            if (ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE == completionInfo.propertyName) {
+                infoForPropertyLookup = getPropertyValueInfo(completionInfo.property, completionInfo.searchPrefix) ?: completionInfo
+            }
+            val scoutObject = infoForPropertyLookup.objectTypeDeclaringScoutObject() ?: return emptyList()
+            val scoutJsProperty = scoutObject
+                .findProperties()
+                .withSuperClasses(true)
+                .withName(infoForPropertyLookup.propertyName)
+                .stream()
+                .findAny()
+                .orElse(null) ?: return emptyList()
 
-            return scoutJsProperty.values(scoutJsModel).map {
-                val lookupElement = createLookupElement(it.name(), it, scoutJsProperty, completionInfo)
+            return scoutJsProperty.computePossibleValues(completionInfo.scoutJsModel).map {
+                val lookupElement = JsModelCompletionHelper.createPropertyValueLookupElement(it, completionInfo)
                 if (!completionInfo.isInLiteral) {
-                    withJsImportIfNecessary(lookupElement, completionInfo.property.containingFile.originalFile, scoutJsProperty, scoutJsModel)
+                    withJsImportIfNecessary(lookupElement, completionInfo.property.containingFile.originalFile)
                 } else {
                     lookupElement
                 }
-            }
+            }.toList()
         }
 
-        private fun withJsImportIfNecessary(lookupElement: LookupElementBuilder, place: PsiElement, scoutJsProperty: ScoutJsProperty, scoutJsModel: ScoutJsModel): LookupElementBuilder {
-            val targetScoutJsModel = scoutJsProperty.scoutJsModel()
-            if (!scoutJsProperty.isEnum && (!targetScoutJsModel.supportsClassReference() || (!scoutJsProperty.isWidget(scoutJsModel) && scoutJsProperty.isObjectType))) {
-                return lookupElement
-            }
-
-            val type = if (targetScoutJsModel.supportsClassReference() && (scoutJsProperty.isWidget(scoutJsModel) || scoutJsProperty.isObjectType)) {
-                (lookupElement.getUserData(SELECTED_ELEMENT) as? JsModelCompletionHelper.ScoutJsObjectLookupElement)?.scoutJsObject?.declaringClass()
-            } else {
-                // FIXME model: add enum support
-//                targetJsModel.element(scoutJsProperty.dataType.type)
-                null
-            } ?: return lookupElement
-
+        private fun withJsImportIfNecessary(lookupElement: LookupElementBuilder, place: PsiElement): LookupElementBuilder {
+            val type = findTypeToImport(lookupElement) ?: return lookupElement
             val originalHandler = lookupElement.insertHandler
             var importName = type.name()
             val firstDot = importName.indexOf('.')
@@ -100,6 +90,20 @@ class JsModelValueCompletionContributor : CompletionContributor() {
                 val targetModuleMainFile = targetModuleMainPath.toVirtualFile()?.let { PsiManager.getInstance(context.project).findFile(it) } ?: return@withInsertHandler
                 ES6ImportPsiUtil.insertJSImport(place, importName, ES6ImportPsiUtil.ImportExportType.SPECIFIER, targetModuleMainFile, context.editor)
             }
+        }
+
+        private fun findTypeToImport(lookupElement: LookupElementBuilder): IES6Class? {
+            val lookupElementViewModel = lookupElement.getUserData(SELECTED_ELEMENT) ?: return null
+            val property = lookupElementViewModel.property()
+            if (property.scoutJsObject.scoutJsModel().supportsClassReference() && (property.type.hasLeafClasses() || property.isObjectType)) {
+                val objectLookupElement = lookupElementViewModel as? JsModelCompletionHelper.ScoutJsObjectLookupElement ?: return null
+                return objectLookupElement.propertyValue.scoutJsObject.declaringClass()
+            }
+            if (property.type.isEnumLike) {
+                // FIXME model: add enum support
+                return null
+            }
+            return null
         }
     }
 }

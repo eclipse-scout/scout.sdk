@@ -45,8 +45,8 @@ dependencies {
     api("org.apache.poi", "poi-ooxml", "5.2.3")
     testImplementation("org.mockito", "mockito-core", "4.11.0")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
-    testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.test", scoutSdkVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.test", scoutSdkVersion)
+    testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.typescript.test", scoutSdkVersion)
 }
 
 allprojects {

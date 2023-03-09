@@ -14,4 +14,6 @@ class ProjectJsModelCompletionContributorTest : AbstractJsModelCompletionContrib
     override fun getDirectory(): String = PROJECT_NAMESPACE
 
     override fun getDependencies(): List<Pair<String, String>> = listOf(SCOUT_NAMESPACE to SCOUT_MODULE_NAME, LAYER_NAMESPACE to LAYER_MODULE_NAME)
+
+    override fun getValueCompletionObjectTypeExpectedFileContents_StringFieldEx() = getValueCompletionObjectTypeExpectedFileContents(STRING_FIELD_EX_NAME)
 }

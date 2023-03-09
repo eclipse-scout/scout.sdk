@@ -23,6 +23,7 @@ public class ExportFromQuery extends AbstractQuery<IExportFrom> {
   private final NodeModuleSpi m_moduleSpi;
   private String m_name;
   private INodeElement m_element;
+  private boolean m_recursive;
 
   public ExportFromQuery(NodeModuleSpi module) {
     m_moduleSpi = Ensure.notNull(module);
@@ -40,8 +41,17 @@ public class ExportFromQuery extends AbstractQuery<IExportFrom> {
     return this;
   }
 
-  public String name() {
+  protected String name() {
     return m_name;
+  }
+
+  public ExportFromQuery withRecursive(boolean recursive) {
+    m_recursive = recursive;
+    return this;
+  }
+
+  protected boolean isRecursive() {
+    return m_recursive;
   }
 
   public ExportFromQuery withElement(INodeElement element) {
@@ -49,7 +59,7 @@ public class ExportFromQuery extends AbstractQuery<IExportFrom> {
     return this;
   }
 
-  public INodeElement element() {
+  protected INodeElement element() {
     return m_element;
   }
 
@@ -64,16 +74,27 @@ public class ExportFromQuery extends AbstractQuery<IExportFrom> {
 
   @Override
   protected Stream<IExportFrom> createStream() {
-    return createStreamForName()
-        .filter(this::test)
-        .map(ExportFromSpi::api);
+    var name = name();
+    Stream<ExportFromSpi> result;
+    if (isRecursive()) {
+      result = module().api()
+          .packageJson()
+          .dependencies()
+          .withSelf(true)
+          .withRecursive(true)
+          .stream()
+          .flatMap(module -> createStreamForName(module.spi(), name));
+    }
+    else {
+      result = createStreamForName(module(), name);
+    }
+    return result.filter(this::test).map(ExportFromSpi::api);
   }
 
-  protected Stream<ExportFromSpi> createStreamForName() {
-    var name = name();
+  protected static Stream<ExportFromSpi> createStreamForName(NodeModuleSpi module, String name) {
     if (name == null) {
-      return module().exports().values().stream();
+      return module.exports().values().stream();
     }
-    return Stream.ofNullable(module().exports().get(name));
+    return Stream.ofNullable(module.exports().get(name));
   }
 }

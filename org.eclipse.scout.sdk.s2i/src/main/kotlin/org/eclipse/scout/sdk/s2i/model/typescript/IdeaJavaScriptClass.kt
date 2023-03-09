@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import org.eclipse.scout.sdk.s2i.model.typescript.util.FieldSpiUtils
 import java.util.*
 import java.util.stream.Stream
@@ -29,16 +30,19 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     private val m_superInterfaces = FinalValue<List<ES6ClassSpi>>()
     private val m_superClass = FinalValue<Optional<ES6ClassSpi>>()
     private val m_functions = FinalValue<List<FunctionSpi>>()
+    private val m_name = FinalValue<String>()
 
     override fun createApi() = ES6ClassImplementor(this)
 
     override fun source() = ideaModule.sourceFor(javaScriptClass)
 
-    override fun name() = javaScriptClass.name
+    override fun name(): String = m_name.computeIfAbsentAndGet { javaScriptClass.name }
 
     override fun isEnum() = javaScriptClass is TypeScriptEnum
 
     override fun isInterface() = javaScriptClass is TypeScriptInterface
+
+    override fun createDataType(name: String) = DataTypeSpiUtils.createDataType(name, javaScriptClass, ideaModule)
 
     override fun functions(): List<FunctionSpi> = m_functions.computeIfAbsentAndGet {
         val functions = javaScriptClass.functions.map { ideaModule.spiFactory.createJavaScriptFunction(it) }
