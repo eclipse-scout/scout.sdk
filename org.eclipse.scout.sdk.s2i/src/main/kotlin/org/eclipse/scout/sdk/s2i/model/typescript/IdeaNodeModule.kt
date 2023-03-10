@@ -57,7 +57,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
     internal fun computeExports(): Map<String, ExportFromSpi> {
         val mainPsi = mainPsi()
         if (mainPsi == null) {
-            SdkLog.warning("No entry point found for module '{}'. Module will not export anything.", packageJson().containingDir())
+            SdkLog.debug("No entry point found for module '{}'. Module will not export anything.", packageJson().containingDir())
             return emptyMap()
         }
 

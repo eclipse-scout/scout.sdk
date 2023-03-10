@@ -9,10 +9,12 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js;
 
+import static java.util.Collections.unmodifiableMap;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toUnmodifiableMap;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +29,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IExportFrom;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
+import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -60,26 +63,32 @@ public class ScoutJsModel {
   }
 
   protected Map<String, IScoutJsObject> parseScoutObjects() {
+    var widgetClass = widgetClass();
+    Stream<IScoutJsObject> objects;
     if (supportsTypeScript()) {
-      // parse all the classes with a model
-      return nodeModule()
+      var scoutJsCore = widgetClass.containingModule();
+      var modelAdapter = (IES6Class) scoutJsCore.export(ScoutJsCoreConstants.CLASS_NAME_MODEL_ADAPTER).orElseThrow().referencedElement();
+      objects = nodeModule()
           .exports().stream()
           .map(IExportFrom::referencedElement)
           .filter(IES6Class.class::isInstance)
           .map(IES6Class.class::cast)
-          .flatMap(element -> TypeScriptScoutObject.create(this, element).stream())
-          .collect(toUnmodifiableMap(IScoutJsObject::name, identity()));
+          .filter(c -> !c.isInterface())
+          .filter(c -> !c.isInstanceOf(modelAdapter))
+          .flatMap(element -> TypeScriptScoutObject.create(this, element).stream());
     }
-
-    return nodeModule()
-        .exports().stream()
-        .filter(export -> !export.name().endsWith("Adapter"))
-        .filter(export -> !export.name().endsWith("Model"))
-        .map(IExportFrom::referencedElement)
-        .filter(IES6Class.class::isInstance)
-        .map(IES6Class.class::cast)
-        .flatMap(element -> JavaScriptScoutObject.create(this, element, widgetClass()).stream())
-        .collect(toUnmodifiableMap(IScoutJsObject::name, identity()));
+    else {
+      objects = nodeModule()
+          .exports().stream()
+          .filter(export -> !export.name().endsWith("Adapter"))
+          .filter(export -> !export.name().endsWith("Model"))
+          .map(IExportFrom::referencedElement)
+          .filter(IES6Class.class::isInstance)
+          .map(IES6Class.class::cast)
+          .flatMap(element -> JavaScriptScoutObject.create(this, element, widgetClass).stream());
+    }
+    var myObjects = objects.collect(toMap(IScoutJsObject::name, identity(), Ensure::failOnDuplicates, LinkedHashMap::new));
+    return unmodifiableMap(myObjects);
   }
 
   /**

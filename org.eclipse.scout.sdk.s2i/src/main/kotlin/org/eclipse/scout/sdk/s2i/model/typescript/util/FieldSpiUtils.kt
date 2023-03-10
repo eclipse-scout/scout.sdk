@@ -134,7 +134,7 @@ object FieldSpiUtils {
 
     private class FieldCollector(val module: IdeaNodeModule) {
 
-        val map = HashMap<String, FieldSpi>()
+        val map = LinkedHashMap<String, FieldSpi>()
 
         fun fields(): List<FieldSpi> = map.values.toImmutableList()
 

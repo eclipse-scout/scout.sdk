@@ -48,7 +48,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.containingModule
-import org.eclipse.scout.sdk.s2i.model.js.JsModelService
+import org.eclipse.scout.sdk.s2i.model.js.JsModelManager
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
 import org.eclipse.scout.sdk.s2i.template.BoolVariableAdapter
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
@@ -89,7 +89,7 @@ object JsModelCompletionHelper {
         if (requireNameInfo != isNameCompletion) return null // early abort if not requested type
         val objectLiteral = PsiTreeUtil.getParentOfType(property, JSObjectLiteralExpression::class.java) ?: return null
         val module = property.containingModule() ?: return null
-        val scoutJsModel = JsModelService.getOrCreate(module) ?: return null
+        val scoutJsModel = JsModelManager.getOrCreate(module) ?: return null
 
         if (isNameCompletion) {
             if (propertyName.length == CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED.length) {

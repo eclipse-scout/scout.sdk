@@ -21,13 +21,14 @@ import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
 public class TypeScriptScoutObject implements IScoutJsObject {
 
   private final IES6Class m_class;
-  private final IES6Class m_model;
+  private final IES6Class m_model; // may be null
   private final ScoutJsModel m_scoutJsModel;
   private final FinalValue<Map<String, ScoutJsProperty>> m_properties;
   private final FinalValue<List<IFunction>> m_init;
@@ -41,12 +42,17 @@ public class TypeScriptScoutObject implements IScoutJsObject {
   }
 
   public static Optional<IScoutJsObject> create(ScoutJsModel scoutJsModel, IES6Class clazz) {
-    return Optional.ofNullable(clazz)
-        .flatMap(c -> c.field(ScoutJsCoreConstants.PROPERTY_NAME_MODEL)
-            .flatMap(IField::dataType)
-            .filter(IES6Class.class::isInstance)
-            .map(IES6Class.class::cast)
-            .map(m -> new TypeScriptScoutObject(scoutJsModel, c, m)));
+    if (scoutJsModel == null || clazz == null) {
+      return Optional.empty();
+    }
+
+    // use model if available and class itself otherwise
+    var modelDefiningClass = clazz.field(ScoutJsCoreConstants.PROPERTY_NAME_MODEL)
+        .flatMap(IField::dataType)
+        .filter(IES6Class.class::isInstance)
+        .map(IES6Class.class::cast)
+        .orElse(clazz);
+    return Optional.of(new TypeScriptScoutObject(scoutJsModel, clazz, modelDefiningClass));
   }
 
   @Override
@@ -61,7 +67,14 @@ public class TypeScriptScoutObject implements IScoutJsObject {
 
   @Override
   public Map<String, ScoutJsProperty> properties() {
-    return m_properties.computeIfAbsentAndGet(() -> JavaScriptScoutObject.createProperties(model().fields().stream(), createOverrides(), this));
+    return m_properties.computeIfAbsentAndGet(() -> {
+      var fields = model()
+          .fields()
+          .withoutModifier(Modifier.STATIC)
+          .stream()
+          .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_EVENT_MAP));
+      return JavaScriptScoutObject.createProperties(fields, createOverrides(), this);
+    });
   }
 
   protected List<IPropertyDataTypeOverride> createOverrides() {
@@ -71,7 +84,7 @@ public class TypeScriptScoutObject implements IScoutJsObject {
 
   @Override
   public List<IFunction> _inits() {
-    return m_init.computeIfAbsentAndGet(() -> declaringClass().functions().withName("_init").stream().toList());
+    return m_init.computeIfAbsentAndGet(() -> declaringClass().functions().withName(ScoutJsCoreConstants.FUNCTION_NAME_INIT).stream().toList());
   }
 
   public IES6Class model() {
@@ -85,6 +98,6 @@ public class TypeScriptScoutObject implements IScoutJsObject {
 
   @Override
   public String toString() {
-    return name() + " [" + scoutJsModel().nodeModule() + ']';
+    return declaringClass().toString();
   }
 }

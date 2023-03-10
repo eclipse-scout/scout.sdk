@@ -22,6 +22,7 @@ import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.guessModuleDir
 import com.intellij.openapi.project.rootManager
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.roots.ModuleRootManager
@@ -365,17 +366,7 @@ fun VirtualFile.containingSourceFolder(project: Project) = containingModule(proj
 /**
  * @return The directory [Path] of this [Module]. It is the main content root of the [Module] or the directory containing the .iml file if no content roots are available
  */
-fun Module.moduleDirPath(): Path {
-    val contentRoots = rootManager.contentRoots.filter { it.isDirectory }
-    var virtualDirectory: VirtualFile? = null
-    if (contentRoots.size > 1) {
-        virtualDirectory = contentRoots.find { it.name == name }
-    }
-    if (virtualDirectory == null) {
-        virtualDirectory = contentRoots.firstOrNull()
-    }
-    return virtualDirectory?.resolveLocalPath() ?: Paths.get(ModuleUtilCore.getModuleDirPath(this))
-}
+fun Module.moduleDirPath(): Path = guessModuleDir()?.resolveLocalPath() ?: Paths.get(ModuleUtilCore.getModuleDirPath(this))
 
 /**
  * Executes the given [IBreadthFirstVisitor] on all super classes. The starting [PsiClass] is visited as well.

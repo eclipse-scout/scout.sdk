@@ -26,10 +26,15 @@ public final class ScoutJsCoreConstants {
    */
   public static final String SCOUT_JS_CORE_MODULE_NAME = "@eclipse-scout/core";
 
+  public static final String JQUERY = "JQuery";
   public static final String NAMESPACE = "scout";
+
   public static final String PROPERTY_NAME_OBJECT_TYPE = "objectType";
   public static final String PROPERTY_NAME_ID = "id";
   public static final String PROPERTY_NAME_MODEL = "model";
+  public static final String PROPERTY_NAME_EVENT_MAP = "eventMap";
+
+  public static final String FUNCTION_NAME_INIT = "_init";
 
   public static final String CLASS_NAME_WIDGET = "Widget";
   public static final String CLASS_NAME_GROUP_BOX = "GroupBox";
@@ -42,6 +47,7 @@ public final class ScoutJsCoreConstants {
   public static final String CLASS_NAME_DATE_FIELD = "DateField";
   public static final String CLASS_NAME_MENU = "Menu";
   public static final String CLASS_NAME_VIEW_MENU_TAB = "ViewMenuTab";
+  public static final String CLASS_NAME_MODEL_ADAPTER = "ModelAdapter";
 
   @SuppressWarnings("StaticCollection")
   private static final Map<String /* class-name */, Set<String /* property-name */>> EXCLUDED_PROPERTIES = new HashMap<>();

@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.core.testing.CoreTestingUtils.removeWhitespace
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.util.Ensure
-import org.eclipse.scout.sdk.s2i.model.js.JsModelService
+import org.eclipse.scout.sdk.s2i.model.js.JsModelManager
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 import java.util.stream.Collectors.toSet
 
@@ -233,7 +233,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         )
     }
 
-    protected open fun scoutJsModel() = JsModelService.getOrCreate(myFixture.module) ?: throw Ensure.newFail("ScoutJsModel for module {} not found.", myFixture.module)
+    protected open fun scoutJsModel() = JsModelManager.getOrCreate(myFixture.module) ?: throw Ensure.newFail("ScoutJsModel for module {} not found.", myFixture.module)
 
 
     fun testNameCompletionWidget() {

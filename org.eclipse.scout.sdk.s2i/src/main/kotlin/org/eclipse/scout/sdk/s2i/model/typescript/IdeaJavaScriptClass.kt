@@ -50,15 +50,17 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     }
 
     override fun superInterfaces(): Stream<ES6ClassSpi> = m_superInterfaces.computeIfAbsentAndGet {
-        val superInterfaces = javaScriptClass.implementedInterfaces
-            .mapNotNull {
-                val module = ideaModule.moduleInventory.findContainingModule(it) ?: return@mapNotNull null
-                module.createSpiForPsi(it) as? ES6ClassSpi
-            }
-        return@computeIfAbsentAndGet Collections.unmodifiableList(superInterfaces)
+        val superInterfaces = if (isInterface) javaScriptClass.superClasses else javaScriptClass.implementedInterfaces
+        val spi = superInterfaces.mapNotNull {
+            val module = ideaModule.moduleInventory.findContainingModule(it) ?: return@mapNotNull null
+            module.createSpiForPsi(it) as? ES6ClassSpi
+        }
+        return@computeIfAbsentAndGet Collections.unmodifiableList(spi)
     }.stream()
 
     override fun superClass(): Optional<ES6ClassSpi> = m_superClass.computeIfAbsentAndGet {
+        if (isInterface) return@computeIfAbsentAndGet Optional.empty() // interfaces have no super classes
+
         val superClass = javaScriptClass.superClasses.firstOrNull() ?: return@computeIfAbsentAndGet Optional.empty()
         val module = ideaModule.moduleInventory.findContainingModule(superClass) ?: return@computeIfAbsentAndGet Optional.empty()
         val superClassSpi = module.createSpiForPsi(superClass) as? ES6ClassSpi

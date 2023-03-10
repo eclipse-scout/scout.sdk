@@ -16,6 +16,6 @@ import com.intellij.openapi.startup.StartupActivity
 class JsModelCacheStartup : StartupActivity, DumbAware {
     override fun runActivity(project: Project) {
         // enforce service creation to ensure the psi listener is active
-        project.getService(JsModelService::class.java)
+        project.getService(JsModelManager::class.java)
     }
 }

@@ -15,7 +15,6 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -63,12 +63,16 @@ public class JavaScriptScoutObject implements IScoutJsObject {
   public static Optional<IScoutJsObject> create(ScoutJsModel owner, IES6Class clazz, IDataType widgetDataType) {
     return Optional.ofNullable(widgetDataType)
         .flatMap(widgetType -> Optional.ofNullable(clazz)
-            .filter(c -> !isPrivateOrJQueryLikeName(c.name()))
             .map(c -> new JavaScriptScoutObject(owner, c)));
   }
 
-  public static boolean isPrivateOrJQueryLikeName(CharSequence name) {
-    return Strings.startsWith(name, '$') || Strings.startsWith(name, '_');
+  protected static boolean isPrivateOrJQueryLike(IField field) {
+    var name = field.name();
+    if (Strings.startsWith(name, '$') || Strings.startsWith(name, '_')) {
+      return true;
+    }
+    var dataTypeName = field.dataType().map(IDataType::name).orElse(null);
+    return Strings.startsWith(dataTypeName, ScoutJsCoreConstants.JQUERY);
   }
 
   @Override
@@ -77,17 +81,12 @@ public class JavaScriptScoutObject implements IScoutJsObject {
   }
 
   protected Map<String, ScoutJsProperty> parseProperties() {
-    var excludedProperties = getExcludedProperties();
     var fields = declaringClass()
         .fields()
         .withoutModifier(Modifier.STATIC)
         .stream()
-        .filter(f -> !isPrivateOrJQueryLikeName(f.name()))
         .filter(f -> !REGEX_CONSTANT.matcher(f.name()).matches());
-    if (!excludedProperties.isEmpty()) {
-      fields = fields.filter(f -> !excludedProperties.contains(f.name()));
-    }
-    return createProperties(fields, createOverrides(), this, excludedProperties);
+    return createProperties(fields, createOverrides(), this);
   }
 
   protected List<IPropertyDataTypeOverride> createOverrides() {
@@ -101,12 +100,14 @@ public class JavaScriptScoutObject implements IScoutJsObject {
   }
 
   protected static Map<String, ScoutJsProperty> createProperties(Stream<IField> properties, List<IPropertyDataTypeOverride> overrides, IScoutJsObject owner) {
-    return createProperties(properties, overrides, owner, null);
-  }
-
-  private static Map<String, ScoutJsProperty> createProperties(Stream<IField> properties, List<IPropertyDataTypeOverride> overrides, IScoutJsObject owner, Collection<String> excludedProperties) {
     var datatypeDetector = new PropertyDataTypeDetector(overrides);
-    var result = properties
+    var excludedProperties = getExcludedProperties(owner.declaringClass());
+    var fields = properties
+        .filter(f -> !isPrivateOrJQueryLike(f));
+    if (!excludedProperties.isEmpty()) {
+      fields = fields.filter(f -> !excludedProperties.contains(f.name()));
+    }
+    var result = fields
         .map(f -> new ScoutJsProperty(owner, f, datatypeDetector))
         .collect(toMap(ScoutJsProperty::name, identity(), Ensure::failOnDuplicates, LinkedHashMap::new));
 
@@ -123,17 +124,16 @@ public class JavaScriptScoutObject implements IScoutJsObject {
     return unmodifiableMap(result);
   }
 
-  private Set<String> getExcludedProperties() {
-    var declaringClass = declaringClass();
-    if (ScoutJsCoreConstants.SCOUT_JS_CORE_MODULE_NAME.equals(declaringClass.containingModule().name())) {
-      return ScoutJsCoreConstants.getExcludedProperties(declaringClass.name());
+  private static Set<String> getExcludedProperties(INodeElement fieldDeclaringClass) {
+    if (ScoutJsCoreConstants.SCOUT_JS_CORE_MODULE_NAME.equals(fieldDeclaringClass.containingModule().name())) {
+      return ScoutJsCoreConstants.getExcludedProperties(fieldDeclaringClass.name());
     }
     return emptySet();
   }
 
   @Override
   public List<IFunction> _inits() {
-    return m_init.computeIfAbsentAndGet(() -> declaringClass().functions().withName("_init").stream().toList());
+    return m_init.computeIfAbsentAndGet(() -> declaringClass().functions().withName(ScoutJsCoreConstants.FUNCTION_NAME_INIT).stream().toList());
   }
 
   public List<IFunction> constructors() {

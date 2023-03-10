@@ -34,7 +34,7 @@ import java.nio.file.Path
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class JsModelService(val project: Project) : NodeModulesProviderSpi, Disposable {
+class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable {
 
     private val m_delayedProcessor = DelayedBuffer(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true, this::processFileEvents)
     private val m_nodeModuleInventory = IdeaNodeModules(project)
