@@ -22,7 +22,7 @@ class JsModelNameCompletionContributor : CompletionContributor() {
     private class JsModelNameCompletionProvider : CompletionProvider<CompletionParameters>() {
         override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
             val completionInfo = JsModelCompletionHelper.getPropertyNameInfo(parameters, result) ?: return
-            val scoutJsObject = completionInfo.objectTypeDeclaringScoutObject() ?: return
+            val scoutJsObject = completionInfo.objectTypeScoutObject() ?: return
             val properties = scoutJsObject.findProperties()
                 .withSuperClasses(true)
                 .stream()

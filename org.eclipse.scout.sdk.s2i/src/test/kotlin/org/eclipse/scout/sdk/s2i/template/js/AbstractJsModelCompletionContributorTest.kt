@@ -118,40 +118,40 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
 //        assertEquals(10, widget.properties().count())
         val idProperty = widget.properties()[ScoutJsCoreConstants.PROPERTY_NAME_ID]
         assertNotNull(idProperty)
-        assertEquals(TypeScriptTypes._string, idProperty?.type?.dataType()?.orElse(null)?.name())
+        assertEquals(TypeScriptTypes._string, idProperty?.type()?.dataType()?.orElse(null)?.name())
         val objectTypeProperty = widget.properties()[ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE]
         assertNotNull(objectTypeProperty)
         // FIXME model: parser does not detect a dataType here (maybe use "any")
 //        assertEquals(TypeScriptTypes._object, objectTypeProperty.type.toString())
         val visibleProperty = widget.properties()[VISIBLE_PROPERTY_NAME]
         assertNotNull(visibleProperty)
-        assertEquals(TypeScriptTypes._boolean, visibleProperty?.type.toString())
+        assertEquals(TypeScriptTypes._boolean, visibleProperty?.type().toString())
         val nameProperty = widget.properties()[NAME_PROPERTY_NAME]
         assertNotNull(nameProperty)
-        assertEquals(TypeScriptTypes._string, nameProperty?.type.toString())
+        assertEquals(TypeScriptTypes._string, nameProperty?.type().toString())
         val fieldsProperty = widget.properties()[FIELDS_PROPERTY_NAME]
         assertNotNull(fieldsProperty)
-        assertTrue(fieldsProperty?.type?.hasLeafClasses() == true)
-        assertSame(scoutWidgetClass, fieldsProperty?.type?.leafClasses()?.findFirst()?.orElse(null))
-        assertTrue(fieldsProperty?.type?.isArray == true)
+        assertTrue(fieldsProperty?.type()?.hasClasses() == true)
+        assertSame(scoutWidgetClass, fieldsProperty?.type()?.classes()?.findFirst()?.orElse(null))
+        assertTrue(fieldsProperty?.type()?.isArray == true)
         val childProperty = widget.properties()[CHILD_PROPERTY_NAME]
         assertNotNull(childProperty)
-        assertSame(scoutWidgetClass, childProperty?.type?.dataType()?.orElse(null))
+        assertSame(scoutWidgetClass, childProperty?.type()?.dataType()?.orElse(null))
         val stateProperty = widget.properties()[STATE_PROPERTY_NAME]
         assertNotNull(stateProperty)
         // FIXME model: add enum support
 //        assertEquals("$SCOUT_NAMESPACE.$WIDGET_STATE", stateProperty.type.toString())
         val labelProperty = widget.properties()[LABEL_PROPERTY_NAME]
         assertNotNull(labelProperty)
-        assertEquals("${TypeScriptTypes._string} (sub-type=${ScoutJsPropertySubType.TEXT_KEY})", labelProperty?.type.toString())
+        assertEquals("${TypeScriptTypes._string} (sub-type=${ScoutJsPropertySubType.TEXT_KEY})", labelProperty?.type().toString())
         val selectedTabProperty = widget.properties()[SELECTED_TAB_PROPERTY_NAME]
         assertNotNull(selectedTabProperty)
-        assertEquals(TypeScriptTypes._string, selectedTabProperty?.type?.dataType()?.orElse(null)?.name())
+        assertEquals(TypeScriptTypes._string, selectedTabProperty?.type()?.dataType()?.orElse(null)?.name())
         val onlyHereProperty = widget.properties()[ONLY_HERE_PROPERTY_NAME]
         assertNotNull(onlyHereProperty)
-        assertSame(scoutWidgetClass, onlyHereProperty?.type?.dataType()?.orElse(null))
-        assertTrue(onlyHereProperty?.type?.hasLeafClasses() == true)
-        assertEquals(ScoutJsCoreConstants.CLASS_NAME_WIDGET, onlyHereProperty?.type?.dataType()?.orElse(null)?.name())
+        assertSame(scoutWidgetClass, onlyHereProperty?.type()?.dataType()?.orElse(null))
+        assertTrue(onlyHereProperty?.type()?.hasClasses() == true)
+        assertEquals(ScoutJsCoreConstants.CLASS_NAME_WIDGET, onlyHereProperty?.type()?.dataType()?.orElse(null)?.name())
 
         // test that Widget is recognized as Widget
         assertTrue(widget.declaringClass().isInstanceOf(scoutWidgetClass))
@@ -173,7 +173,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         val maxLengthProperty = stringField.properties()[MAX_LENGTH_PROPERTY_NAME]
         assertNotNull(maxLengthProperty)
         // tests that the datatype is recognized if a reference to a variable is used
-        assertEquals(TypeScriptTypes._number, maxLengthProperty?.type.toString())
+        assertEquals(TypeScriptTypes._number, maxLengthProperty?.type().toString())
         val fieldStyleProperty = stringField.properties()[FIELD_STYLE_PROPERTY_NAME]
         assertNotNull(fieldStyleProperty)
         // FIXME model: add enum support
@@ -214,7 +214,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         val minLengthProperty = stringFieldEx.properties()[MIN_LENGTH_PROPERTY_NAME]
         assertNotNull(minLengthProperty)
         // tests that the datatype is recognized if a reference to a variable is used
-        assertEquals(TypeScriptTypes._number, minLengthProperty?.type?.dataType()?.orElse(null)?.name())
+        assertEquals(TypeScriptTypes._number, minLengthProperty?.type()?.dataType()?.orElse(null)?.name())
 
         // test that StringFieldEx is recognized as Widget
         assertTrue(stringFieldEx.declaringClass().isInstanceOf(scoutWidgetClass))
@@ -239,7 +239,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
     fun testNameCompletionWidget() {
         val widgetClass = scoutJsModel().widgetClass()
         val selectedElement = doCompleteAssertContent(NAME_COMPLETION_FILE, CHILD_PROPERTY_NAME, *getNameCompletionWidgetExpectedFileContents(CHILD_PROPERTY_NAME))
-        val dataType = (selectedElement as? JsModelCompletionHelper.ScoutJsPropertyLookupElement)?.scoutJsProperty?.type?.dataType()?.orElse(null) as? IES6Class
+        val dataType = (selectedElement as? JsModelCompletionHelper.JsNameLookupElement)?.scoutJsProperty?.type()?.dataType()?.orElse(null) as? IES6Class
         assertTrue(dataType?.isInstanceOf(widgetClass) ?: false)
     }
 
@@ -248,10 +248,10 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
 
     fun testNameCompletionWidgetArray() {
         val selectedElement = doCompleteAssertContent(NAME_COMPLETION_FILE, FIELDS_PROPERTY_NAME, *getNameCompletionWidgetArrayExpectedFileContents(FIELDS_PROPERTY_NAME))
-        val element = selectedElement as? JsModelCompletionHelper.ScoutJsPropertyLookupElement
-        val dataTypeName = element?.scoutJsProperty?.type?.dataType()?.orElse(null)?.name()
+        val element = selectedElement as? JsModelCompletionHelper.JsNameLookupElement
+        val dataTypeName = element?.scoutJsProperty?.type()?.dataType()?.orElse(null)?.name()
         assertEquals("${ScoutJsCoreConstants.CLASS_NAME_WIDGET}[]", dataTypeName)
-        assertTrue(element?.scoutJsProperty?.type?.isArray == true)
+        assertTrue(element?.scoutJsProperty?.type()?.isArray == true)
     }
 
     protected open fun getNameCompletionWidgetArrayExpectedFileContents(finishLookupName: String) =
@@ -298,7 +298,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
 
     fun testNameCompletionNumeric() {
         val selectedElement = doCompleteAssertContent(NAME_COMPLETION_FILE, MAX_LENGTH_PROPERTY_NAME, *getNameCompletionNumericExpectedFileContents())
-        val type = (selectedElement as? JsModelCompletionHelper.ScoutJsPropertyLookupElement)?.scoutJsProperty?.type
+        val type = (selectedElement as? JsModelCompletionHelper.JsNameLookupElement)?.scoutJsProperty?.type()
         assertNotNull(type)
         assertEquals(TypeScriptTypes._number, type!!.dataType().map { it.name() }.orElse(null))
     }
@@ -307,7 +307,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
 
     fun testNameCompletionTextKey() {
         val selectedElement = doCompleteAssertContent(NAME_COMPLETION_FILE, LABEL_PROPERTY_NAME, *getNameCompletionTextKeyExpectedFileContents())
-        val type = (selectedElement as? JsModelCompletionHelper.ScoutJsPropertyLookupElement)?.scoutJsProperty?.type
+        val type = (selectedElement as? JsModelCompletionHelper.JsNameLookupElement)?.scoutJsProperty?.type()
         assertNotNull(type)
         assertEquals(TypeScriptTypes._string, type!!.dataType().map { it.name() }.orElse(null))
         assertEquals(ScoutJsPropertySubType.TEXT_KEY, type.subType())

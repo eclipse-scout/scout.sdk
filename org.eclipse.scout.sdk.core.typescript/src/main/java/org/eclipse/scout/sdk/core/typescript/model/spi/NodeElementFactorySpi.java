@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElementFactory;
@@ -23,6 +24,8 @@ public interface NodeElementFactorySpi extends NodeElementSpi {
   DataTypeSpi createObjectLiteralDataType(String name, ObjectLiteralSpi objectLiteral);
 
   DataTypeSpi createArrayDataType(DataTypeSpi componentDataType, int arrayDimension);
+
+  DataTypeSpi createClassWithTypeArgumentsDataType(ES6ClassSpi classSpi, List<DataTypeSpi> arguments);
 
   @Override
   default Optional<SourceRange> source() {

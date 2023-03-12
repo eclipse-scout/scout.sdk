@@ -33,6 +33,8 @@ public interface IES6Class extends IDataType {
 
   Stream<IES6Class> superInterfaces();
 
+  boolean isTypeAlias();
+
   boolean isInterface();
 
   boolean isInstanceOf(IES6Class es6Class);

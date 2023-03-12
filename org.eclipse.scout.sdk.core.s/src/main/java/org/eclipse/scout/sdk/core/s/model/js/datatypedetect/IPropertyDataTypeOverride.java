@@ -12,12 +12,14 @@ package org.eclipse.scout.sdk.core.s.model.js.datatypedetect;
 import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertyType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
-import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 
 public interface IPropertyDataTypeOverride {
-  Optional<ScoutJsPropertyType> overrideType(IField field);
+  Optional<ScoutJsPropertyType> getOverrideFor(ScoutJsProperty property);
+
+  void markUsed(String propertyName);
 
   Map<String, IDataType> unused();
 }

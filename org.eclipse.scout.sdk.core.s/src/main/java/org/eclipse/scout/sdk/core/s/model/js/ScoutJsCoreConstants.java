@@ -9,11 +9,14 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+@SuppressWarnings("StaticCollection")
 public final class ScoutJsCoreConstants {
 
   /**
@@ -33,6 +36,8 @@ public final class ScoutJsCoreConstants {
   public static final String PROPERTY_NAME_ID = "id";
   public static final String PROPERTY_NAME_MODEL = "model";
   public static final String PROPERTY_NAME_EVENT_MAP = "eventMap";
+  public static final String PROPERTY_NAME_SELF = "self";
+  public static final String PROPERTY_NAME_WIDGET_MAP = "widgetMap";
 
   public static final String FUNCTION_NAME_INIT = "_init";
 
@@ -48,12 +53,17 @@ public final class ScoutJsCoreConstants {
   public static final String CLASS_NAME_MENU = "Menu";
   public static final String CLASS_NAME_VIEW_MENU_TAB = "ViewMenuTab";
   public static final String CLASS_NAME_MODEL_ADAPTER = "ModelAdapter";
+  public static final String CLASS_NAME_STATUS_OR_MODEL = "StatusOrModel";
+  public static final String CLASS_NAME_STATUS = "Status";
+  public static final String CLASS_NAME_LOOKUP_CALL = "LookupCall";
+  public static final String CLASS_NAME_LOOKUP_CALL_OR_MODEL = "LookupCallOrModel";
 
-  @SuppressWarnings("StaticCollection")
+  public static final Set<String> CLASS_NAMES_MODEL_TYPES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("ObjectOrChildModel", "ChildModelOf", "ObjectOrModel", "FullModelOf", "ModelOf", "InitModelOf")));
+
   private static final Map<String /* class-name */, Set<String /* property-name */>> EXCLUDED_PROPERTIES = new HashMap<>();
   static {
     EXCLUDED_PROPERTIES.put(CLASS_NAME_WIDGET, Set.of("enabledComputed", "events", "attached", "children", "cloneOf", "destroyed", "destroying",
-        "eventDelegators", "htmlComp", "initialized", "removalPending", "removing", "rendered", "rendering", "parent", "owner", "session"));
+        "eventDelegators", "htmlComp", "initialized", "removalPending", "removing", "rendered", "rendering", "owner"));
     EXCLUDED_PROPERTIES.put(CLASS_NAME_GROUP_BOX, Set.of("controls", "processButtons", "processMenus", "systemButtons", "customButtons"));
     EXCLUDED_PROPERTIES.put(CLASS_NAME_TAG_FIELD, Set.of("fieldHtmlComp", "popup"));
     EXCLUDED_PROPERTIES.put(CLASS_NAME_SMART_FIELD, Set.of("lookupSeqNo", "popup"));

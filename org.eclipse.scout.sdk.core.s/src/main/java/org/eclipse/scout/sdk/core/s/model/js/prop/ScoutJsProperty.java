@@ -16,11 +16,48 @@ import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.PropertyDataTypeDetector;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 
-public record ScoutJsProperty(IScoutJsObject scoutJsObject, IField field, ScoutJsPropertyType type) {
+public class ScoutJsProperty {
+
+  private final FinalValue<ScoutJsPropertyType> m_type;
+  private final PropertyDataTypeDetector m_detector; // may be null
+  private final IScoutJsObject m_scoutJsObject;
+  private final IField m_field;
 
   public ScoutJsProperty(IScoutJsObject scoutJsObject, IField field, PropertyDataTypeDetector dataTypeDetector) {
-    this(scoutJsObject, field, dataTypeDetector.detect(field));
+    m_scoutJsObject = Ensure.notNull(scoutJsObject);
+    m_field = Ensure.notNull(field);
+    m_type = new FinalValue<>();
+    m_detector = dataTypeDetector;
+    if (dataTypeDetector != null) {
+      dataTypeDetector.markUsed(field().name());
+    }
+  }
+
+  public ScoutJsProperty(IScoutJsObject scoutJsObject, IField field, ScoutJsPropertyType type) {
+    m_scoutJsObject = Ensure.notNull(scoutJsObject);
+    m_field = Ensure.notNull(field);
+    m_type = new FinalValue<>();
+    m_type.set(Ensure.notNull(type));
+    m_detector = null;
+  }
+
+  public IField field() {
+    return m_field;
+  }
+
+  public IScoutJsObject scoutJsObject() {
+    return m_scoutJsObject;
+  }
+
+  public ScoutJsPropertyType type() {
+    return m_type.computeIfAbsentAndGet(this::detectType);
+  }
+
+  protected ScoutJsPropertyType detectType() {
+    return m_detector.detect(this);
   }
 
   public String name() {
@@ -48,6 +85,7 @@ public record ScoutJsProperty(IScoutJsObject scoutJsObject, IField field, ScoutJ
   }
 
   public Stream<? extends IScoutJsPropertyValue> computePossibleValues(ScoutJsModel scope) {
+    var type = type();
     if (type.isEnumLike()) {
       // FIXME model: add enum support
       return Stream.empty();
@@ -57,13 +95,17 @@ public record ScoutJsProperty(IScoutJsObject scoutJsObject, IField field, ScoutJ
           .map(v -> new ScoutJsBooleanPropertyValue(v, this));
     }
     return type
-        .leafClasses()
-        .flatMap(es6Class -> scope.findScoutObjects().withIncludeDependencies(true).withInstanceOf(es6Class).stream())
+        .classes()
+        .flatMap(es6Class -> scope
+            .findScoutObjects()
+            .withIncludeDependencies(true)
+            .withInstanceOf(es6Class)
+            .stream())
         .map(o -> new ScoutJsObjectPropertyValue(o, this));
   }
 
   @Override
   public String toString() {
-    return name() + " [type=" + type + ", object=" + scoutJsObject + ']';
+    return name() + " [type=" + type() + ", object=" + scoutJsObject() + ']';
   }
 }

@@ -74,8 +74,9 @@ public class ScoutJsModel {
           .filter(IES6Class.class::isInstance)
           .map(IES6Class.class::cast)
           .filter(c -> !c.isInterface())
+          .filter(c -> !c.isTypeAlias())
           .filter(c -> !c.isInstanceOf(modelAdapter))
-          .flatMap(element -> TypeScriptScoutObject.create(this, element).stream());
+          .map(element -> TypeScriptScoutObject.create(this, element).orElseThrow());
     }
     else {
       objects = nodeModule()

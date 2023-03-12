@@ -9,7 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
-import java.util.stream.Stream;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
@@ -31,8 +32,8 @@ public interface DataTypeSpi extends NodeElementSpi {
     return DataTypeFlavor.Single;
   }
 
-  default Stream<DataTypeSpi> componentDataTypes() {
-    return Stream.empty();
+  default Collection<DataTypeSpi> componentDataTypes() {
+    return Collections.emptyList();
   }
 
   default int arrayDimension() {

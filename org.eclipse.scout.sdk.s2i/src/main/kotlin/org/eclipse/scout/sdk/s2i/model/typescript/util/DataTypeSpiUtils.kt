@@ -20,6 +20,7 @@ import com.intellij.lang.javascript.psi.types.primitives.JSUndefinedType
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaConstantValue
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
 
@@ -68,11 +69,22 @@ object DataTypeSpiUtils {
         }
         if (type is JSUtilType) return module.nodeElementFactory().createJavaScriptType(type)
 
-        (type.sourceElement as? JSElement)
-            ?.let { (module.moduleInventory.resolveReferencedElement(it) as? DataTypeSpi) }
-            ?.let { return it }
+        resolveAsReferencedType(type, module)?.let { return it }
 
         return module.nodeElementFactory().createJavaScriptType(type)
+    }
+
+    private fun resolveAsReferencedType(type: JSType, module: IdeaNodeModule): DataTypeSpi? {
+        val sourceElement = type.sourceElement as? JSElement ?: return null
+        val reference = module.moduleInventory.resolveReferencedElement(sourceElement) as? DataTypeSpi ?: return null
+
+        if (reference !is ES6ClassSpi) return reference
+        if (sourceElement !is JSTypeArgumentsOwner) return reference
+        val typeArgumentClasses = sourceElement
+            .typeArguments
+            .mapNotNull { resolveAsReferencedType(it.jsType, module) }
+        if (typeArgumentClasses.isEmpty()) return reference
+        return module.nodeElementFactory().createClassWithTypeArgumentsDataType(reference, typeArgumentClasses)
     }
 
     private fun createDataType(objectLiteral: JSObjectLiteralExpression, module: IdeaNodeModule): DataTypeSpi? {

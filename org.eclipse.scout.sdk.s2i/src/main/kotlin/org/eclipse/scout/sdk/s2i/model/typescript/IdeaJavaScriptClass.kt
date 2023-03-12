@@ -11,13 +11,11 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptEnum
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptInterface
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeAlias
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.ES6ClassImplementor
-import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
-import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
-import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
-import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.*
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import org.eclipse.scout.sdk.s2i.model.typescript.util.FieldSpiUtils
@@ -42,6 +40,8 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
 
     override fun isInterface() = javaScriptClass is TypeScriptInterface
 
+    override fun isTypeAlias() = javaScriptClass is TypeScriptTypeAlias
+
     override fun createDataType(name: String) = DataTypeSpiUtils.createDataType(name, javaScriptClass, ideaModule)
 
     override fun functions(): List<FunctionSpi> = m_functions.computeIfAbsentAndGet {
@@ -49,11 +49,14 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
         return@computeIfAbsentAndGet Collections.unmodifiableList(functions)
     }
 
+    override fun typeArguments() = emptyList<DataTypeSpi>()
+
     override fun superInterfaces(): Stream<ES6ClassSpi> = m_superInterfaces.computeIfAbsentAndGet {
         val superInterfaces = if (isInterface) javaScriptClass.superClasses else javaScriptClass.implementedInterfaces
         val spi = superInterfaces.mapNotNull {
             val module = ideaModule.moduleInventory.findContainingModule(it) ?: return@mapNotNull null
-            module.createSpiForPsi(it) as? ES6ClassSpi
+            // do not directly use the superInterface as it might point to a .d.ts file
+            return@mapNotNull module.classes()[it.name]
         }
         return@computeIfAbsentAndGet Collections.unmodifiableList(spi)
     }.stream()
@@ -63,7 +66,9 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
 
         val superClass = javaScriptClass.superClasses.firstOrNull() ?: return@computeIfAbsentAndGet Optional.empty()
         val module = ideaModule.moduleInventory.findContainingModule(superClass) ?: return@computeIfAbsentAndGet Optional.empty()
-        val superClassSpi = module.createSpiForPsi(superClass) as? ES6ClassSpi
+
+        // do not directly use the superClass as it might point to a .d.ts file
+        val superClassSpi = module.classes()[superClass.name]
         return@computeIfAbsentAndGet Optional.ofNullable(superClassSpi)
     }
 

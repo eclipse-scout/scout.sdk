@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertyType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
-import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 
 public class PropertyDataTypeDetector {
 
@@ -27,11 +27,15 @@ public class PropertyDataTypeDetector {
     m_overrides = overrides;
   }
 
-  public ScoutJsPropertyType detect(IField field) {
+  public ScoutJsPropertyType detect(ScoutJsProperty property) {
     return m_overrides.stream()
-        .flatMap(override -> override.overrideType(field).stream())
+        .flatMap(override -> override.getOverrideFor(property).stream())
         .findFirst()
-        .orElseGet(() -> new ScoutJsPropertyType(field.dataType().orElse(null)));
+        .orElseGet(() -> new ScoutJsPropertyType(property.field().dataType().orElse(null), property));
+  }
+
+  public void markUsed(String propertyName) {
+    m_overrides.forEach(o -> o.markUsed(propertyName));
   }
 
   public Map<String, IDataType> unused() {

@@ -10,8 +10,8 @@
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
@@ -42,7 +42,7 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
   @Override
   public String name() {
     return m_name.computeIfAbsentAndGet(() -> switch (flavor()) {
-      case Array -> componentDataTypes().findFirst().map(DataTypeSpi::name).orElse("") + "[]".repeat(arrayDimension());
+      case Array -> componentDataTypes().stream().findFirst().map(DataTypeSpi::name).orElse("") + "[]".repeat(arrayDimension());
       case Single -> null;
     });
   }
@@ -58,8 +58,8 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
   }
 
   @Override
-  public Stream<DataTypeSpi> componentDataTypes() {
-    return Optional.ofNullable(m_componentDataTypes).stream().flatMap(Collection::stream);
+  public Collection<DataTypeSpi> componentDataTypes() {
+    return Collections.unmodifiableCollection(m_componentDataTypes);
   }
 
   @Override
@@ -69,6 +69,6 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
 
   @Override
   public Optional<SourceRange> source() {
-    return Optional.of(new SourceRange(name(), 0));
+    return Optional.empty();
   }
 }

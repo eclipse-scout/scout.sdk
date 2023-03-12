@@ -57,13 +57,15 @@ public class ScoutJsPropertyQuery extends AbstractQuery<ScoutJsProperty> {
 
     // for each property also check the super classes (it may contain the same property but with a more detailed data-type)
     // choose the one which is better, even no super-classes should be considered in this query
-    var superClasses = obj.declaringClass().supers().withSuperInterfaces(false).stream();
-    obj.scoutJsModel().findScoutObjects()
-        .withIncludeDependencies(true)
-        .withObjectClasses(superClasses)
-        .stream()
-        .flatMap(superObject -> superObject.properties().values().stream())
-        .forEach(inheritedProperty -> updateOrAddSuperPropertyIfNecessary(properties, inheritedProperty));
+    var superClasses = obj.declaringClass().supers().withSuperInterfaces(false).stream().toList();
+    if (!superClasses.isEmpty()) {
+      obj.scoutJsModel().findScoutObjects()
+          .withIncludeDependencies(true)
+          .withObjectClasses(superClasses)
+          .stream()
+          .flatMap(superObject -> superObject.properties().values().stream())
+          .forEach(inheritedProperty -> updateOrAddSuperPropertyIfNecessary(properties, inheritedProperty));
+    }
 
     var name = name();
     if (name == null) {

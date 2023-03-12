@@ -16,10 +16,7 @@ import com.intellij.lang.ecmascript6.psi.JSExportAssignment
 import com.intellij.lang.javascript.JSTokenTypes
 import com.intellij.lang.javascript.inspections.JSRecursiveWalkingElementSkippingNestedFunctionsVisitor
 import com.intellij.lang.javascript.psi.*
-import com.intellij.lang.javascript.psi.ecma6.TypeScriptClass
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptFunction
-import com.intellij.lang.javascript.psi.ecma6.TypeScriptInterface
-import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeAlias
 import com.intellij.lang.javascript.psi.ecmal4.JSAttributeList
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.openapi.vfs.VirtualFile
@@ -31,12 +28,15 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeModuleImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.*
+import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.SourceRange
 import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaNodeElementFactory
 import java.nio.CharBuffer
 import java.util.*
 import java.util.Collections.unmodifiableMap
+import java.util.function.Function
+import java.util.stream.Collectors.toMap
 
 class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
 
@@ -45,12 +45,23 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
     private val m_mainPsi = FinalValue<JSFile>()
     private val m_packageJsonSpi = FinalValue<PackageJsonSpi>()
     private val m_exports = FinalValue<Map<String, ExportFromSpi>>()
+    private val m_classesByName = FinalValue<Map<String, ES6ClassSpi>>()
 
     override fun containingModule() = this
 
     override fun packageJson(): PackageJsonSpi = m_packageJsonSpi.computeIfAbsentAndGet { nodeElementFactory().createPackageJson(nodeModuleDir) }
 
     override fun createApi() = NodeModuleImplementor(this, packageJson())
+
+    fun classes(): Map<String, ES6ClassSpi> = m_classesByName.computeIfAbsentAndGet(this::computeClassesByName)
+
+    internal fun computeClassesByName(): Map<String, ES6ClassSpi> {
+        return exports().values.stream()
+            .map { it.referencedElement() }
+            .filter { it is ES6ClassSpi }
+            .map { it as ES6ClassSpi }
+            .collect(toMap({ e -> e.name() }, Function.identity(), Ensure::failOnDuplicates, { LinkedHashMap() }))
+    }
 
     override fun exports(): Map<String, ExportFromSpi> = m_exports.computeIfAbsentAndGet(this::computeExports)
 
@@ -162,18 +173,9 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
 
     override fun nodeElementFactory(): IdeaNodeElementFactory = m_nodeElementFactory
 
-    fun createSpiForPsi(psi: JSElement): NodeElementSpi? {
-        if (psi is TypeScriptClass) {
-            return nodeElementFactory().createTypeScriptClass(psi)
-        }
-        if (psi is TypeScriptInterface) {
-            return nodeElementFactory().createTypeScriptInterface(psi)
-        }
+    private fun createSpiForPsi(psi: JSElement): NodeElementSpi? {
         if (psi is TypeScriptFunction) {
             return nodeElementFactory().createTypeScriptFunction(psi)
-        }
-        if (psi is TypeScriptTypeAlias) {
-            return nodeElementFactory().createTypeScriptTypeAlias(psi)
         }
         if (psi is JSClass) {
             return nodeElementFactory().createJavaScriptClass(psi)

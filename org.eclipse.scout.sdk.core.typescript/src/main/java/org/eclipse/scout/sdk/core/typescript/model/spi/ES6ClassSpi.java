@@ -20,9 +20,13 @@ public interface ES6ClassSpi extends DataTypeSpi, ISuperHierarchyElement<ES6Clas
 
   boolean isEnum();
 
+  boolean isTypeAlias();
+
   List<FieldSpi> fields();
 
   List<FunctionSpi> functions();
+
+  List<DataTypeSpi> typeArguments();
 
   DataTypeSpi createDataType(String name);
 

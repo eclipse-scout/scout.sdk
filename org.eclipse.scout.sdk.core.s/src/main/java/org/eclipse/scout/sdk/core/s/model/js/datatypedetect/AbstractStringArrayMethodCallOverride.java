@@ -13,17 +13,16 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toUnmodifiableMap;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertySubType;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertyType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
-import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -42,20 +41,30 @@ public abstract class AbstractStringArrayMethodCallOverride implements IProperty
   }
 
   protected AbstractStringArrayMethodCallOverride(Stream<String> names, ScoutJsPropertySubType subType) {
-    m_overrides = names.collect(toMap(identity(), s -> Boolean.FALSE, (a, b) -> Boolean.FALSE, HashMap::new));
+    m_overrides = names.collect(toMap(identity(), s -> Boolean.FALSE, (a, b) -> Boolean.FALSE));
     m_subType = subType;
   }
 
   @Override
-  public Optional<ScoutJsPropertyType> overrideType(IField field) {
-    return Optional.ofNullable(m_overrides.computeIfPresent(field.name(), (k, v) -> Boolean.TRUE))
-        .map(v -> createPropertyType(field.dataType().map(IDataType::arrayDimension).orElse(0)));
+  public Optional<ScoutJsPropertyType> getOverrideFor(ScoutJsProperty property) {
+    var field = property.field();
+    var fieldName = field.name();
+    if (m_overrides.containsKey(fieldName)) {
+      markUsed(fieldName);
+      return Optional.ofNullable(createPropertyType(field.dataType().map(IDataType::arrayDimension).orElse(0), property));
+    }
+    return Optional.empty();
   }
 
-  protected ScoutJsPropertyType createPropertyType(int arrayDimension) {
+  @Override
+  public void markUsed(String propertyName) {
+    m_overrides.computeIfPresent(propertyName, (k, v) -> Boolean.TRUE);
+  }
+
+  protected ScoutJsPropertyType createPropertyType(int arrayDimension, ScoutJsProperty property) {
     var detectedOverride = getOverrideType();
     var dataType = detectedOverride.createArrayType(arrayDimension);
-    return new ScoutJsPropertyType(dataType, m_subType);
+    return new ScoutJsPropertyType(dataType, m_subType, property);
   }
 
   protected abstract IDataType getOverrideType();

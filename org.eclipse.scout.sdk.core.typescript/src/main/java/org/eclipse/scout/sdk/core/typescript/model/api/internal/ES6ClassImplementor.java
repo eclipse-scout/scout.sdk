@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
+import static java.util.stream.Collectors.joining;
+
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -19,6 +21,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FunctionQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.SupersQuery;
+import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -35,6 +38,11 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
   @Override
   public boolean isEnum() {
     return spi().isEnum();
+  }
+
+  @Override
+  public boolean isTypeAlias() {
+    return spi().isTypeAlias();
   }
 
   @Override
@@ -91,12 +99,24 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
   }
 
   @Override
-  public Stream<IDataType> leafTypes() {
-    return Stream.of(this);
+  public IDataType createDataType(String name) {
+    return spi().createDataType(name).api();
   }
 
   @Override
-  public IDataType createDataType(String name) {
-    return spi().createDataType(name).api();
+  public Stream<IDataType> typeArguments() {
+    return spi().typeArguments().stream()
+        .map(DataTypeSpi::api);
+  }
+
+  @Override
+  public String toString() {
+    if (spi().typeArguments().isEmpty()) {
+      return super.toString();
+    }
+    var typeArgs = typeArguments()
+        .map(Object::toString)
+        .collect(joining(", ", "<", ">"));
+    return name() + typeArgs + " [" + containingModule() + ']';
   }
 }

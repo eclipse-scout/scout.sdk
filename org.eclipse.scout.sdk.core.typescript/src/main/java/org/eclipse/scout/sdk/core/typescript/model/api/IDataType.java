@@ -28,12 +28,14 @@ public interface IDataType extends INodeElement {
     return spi().flavor();
   }
 
-  default Stream<IDataType> componentDataTypes() {
-    return spi().componentDataTypes()
-        .map(DataTypeSpi::api);
+  default Stream<IDataType> typeArguments() {
+    return Stream.empty();
   }
 
-  Stream<IDataType> leafTypes();
+  default Stream<IDataType> componentDataTypes() {
+    return spi().componentDataTypes().stream()
+        .map(DataTypeSpi::api);
+  }
 
   default int arrayDimension() {
     return spi().arrayDimension();

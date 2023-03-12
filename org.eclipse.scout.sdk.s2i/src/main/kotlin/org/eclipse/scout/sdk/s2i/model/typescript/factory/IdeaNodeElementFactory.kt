@@ -10,10 +10,7 @@
 package org.eclipse.scout.sdk.s2i.model.typescript.factory
 
 import com.intellij.lang.javascript.psi.*
-import com.intellij.lang.javascript.psi.ecma6.TypeScriptClass
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptFunction
-import com.intellij.lang.javascript.psi.ecma6.TypeScriptInterface
-import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeAlias
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.openapi.vfs.VirtualFile
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
@@ -24,17 +21,8 @@ import org.eclipse.scout.sdk.s2i.model.typescript.*
 
 class IdeaNodeElementFactory(val ideaModule: IdeaNodeModule) : AbstractNodeElementFactorySpi(ideaModule) {
 
-    fun createTypeScriptClass(tsClass: TypeScriptClass): IdeaTypeScriptClass =
-        getOrCreate(tsClass) { IdeaTypeScriptClass(ideaModule, it) }
-
-    fun createTypeScriptInterface(tsInterface: TypeScriptInterface): IdeaTypeScriptInterface =
-        getOrCreate(tsInterface) { IdeaTypeScriptInterface(ideaModule, it) }
-
     fun createTypeScriptFunction(tsFunction: TypeScriptFunction): IdeaTypeScriptFunction =
         getOrCreate(tsFunction) { IdeaTypeScriptFunction(ideaModule, it) }
-
-    fun createTypeScriptTypeAlias(tsTypeAlias: TypeScriptTypeAlias): IdeaTypeScriptType =
-        getOrCreate(tsTypeAlias) { IdeaTypeScriptType(ideaModule, it) }
 
     fun createJavaScriptClass(jsClass: JSClass): IdeaJavaScriptClass =
         getOrCreate(jsClass) { IdeaJavaScriptClass(ideaModule, it) }

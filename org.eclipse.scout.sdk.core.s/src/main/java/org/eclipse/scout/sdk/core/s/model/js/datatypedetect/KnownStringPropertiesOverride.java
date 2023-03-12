@@ -16,26 +16,31 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.s.model.js.IScoutJsObject;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
+import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertyType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
-import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 
 public class KnownStringPropertiesOverride implements IPropertyDataTypeOverride {
 
   private final IScoutJsObject m_owner;
-  private final ScoutJsPropertyType m_stringPropertyType;
+  private final IDataType m_stringType;
 
   public KnownStringPropertiesOverride(IScoutJsObject owner, IDataType stringType) {
     m_owner = owner;
-    m_stringPropertyType = new ScoutJsPropertyType(stringType);
+    m_stringType = stringType;
   }
 
   @Override
-  public Optional<ScoutJsPropertyType> overrideType(IField field) {
-    if (m_owner.declaringClass() == m_owner.scoutJsModel().widgetClass() && ScoutJsCoreConstants.PROPERTY_NAME_ID.equals(field.name())) {
-      return Optional.of(m_stringPropertyType);
+  public Optional<ScoutJsPropertyType> getOverrideFor(ScoutJsProperty property) {
+    if (m_owner.declaringClass() == m_owner.scoutJsModel().widgetClass() && ScoutJsCoreConstants.PROPERTY_NAME_ID.equals(property.field().name())) {
+      return Optional.of(new ScoutJsPropertyType(m_stringType, property));
     }
     return Optional.empty();
+  }
+
+  @Override
+  public void markUsed(String propertyName) {
+    // nop
   }
 
   @Override

@@ -9,8 +9,10 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,6 +56,11 @@ public abstract class AbstractNodeElementFactorySpi extends AbstractNodeElementS
   }
 
   @Override
+  public DataTypeSpi createClassWithTypeArgumentsDataType(ES6ClassSpi classSpi, List<DataTypeSpi> arguments) {
+    return getOrCreate(new SimpleEntry<>(classSpi, arguments), id -> new ES6ClassWithTypeArgumentsSpi(containingModule(), id.getKey(), id.getValue()));
+  }
+
+  @Override
   public DataTypeSpi createArrayDataType(DataTypeSpi componentDataType, int arrayDimension) {
     if (arrayDimension < 1) {
       return componentDataType;
@@ -63,7 +70,7 @@ public abstract class AbstractNodeElementFactorySpi extends AbstractNodeElementS
     var leafComponentType = componentDataType;
     if (componentDataType != null && componentDataType.flavor() == DataTypeFlavor.Array) {
       newDimension += componentDataType.arrayDimension();
-      leafComponentType = componentDataType.componentDataTypes().findAny().orElse(null);
+      leafComponentType = componentDataType.componentDataTypes().stream().findAny().orElse(null);
     }
     var componentDataTypes = Optional.ofNullable(leafComponentType)
         .map(Collections::singleton)
