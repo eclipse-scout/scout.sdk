@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.util.Collection;
+
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementFactorySpi;
 
 public interface INodeElementFactory extends INodeElement {
@@ -20,4 +22,8 @@ public interface INodeElementFactory extends INodeElement {
   IDataType createObjectLiteralDataType(String name, IObjectLiteral objectLiteral);
 
   IDataType createArrayDataType(IDataType componentDataType, int arrayDimension);
+
+  IDataType createUnionDataType(Collection<IDataType> componentDataTypes);
+
+  IDataType createIntersectionDataType(Collection<IDataType> componentDataTypes);
 }

@@ -43,6 +43,8 @@ public interface IDataType extends INodeElement {
 
   enum DataTypeFlavor {
     Single,
-    Array
+    Array,
+    Union,
+    Intersection
   }
 }

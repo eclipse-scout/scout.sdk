@@ -9,12 +9,13 @@
  */
 package org.eclipse.scout.sdk.s2i.model
 
+import com.intellij.util.containers.isEmpty
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.api.IField
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
-import kotlin.streams.asSequence
 
 abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: String = "typescript/moduleWithExternalImports") : AbstractModelTest(fixturePath) {
 
@@ -24,18 +25,24 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
     }
 
     protected fun assertES6Class(es6Class: IES6Class) {
-        assertEquals(if (isAssignmentPossible()) 23 else 10, es6Class.fields().withoutModifier(Modifier.STATIC).stream().count())
+        assertEquals(if (isAssignmentPossible()) 30 else 16, es6Class.fields().withoutModifier(Modifier.STATIC).stream().count())
 
-//        assertFieldDefAndInfer(myString(), es6Class)
-//        assertFieldDefAndInfer(myNumber(), es6Class)
-//        assertFieldDefAndInfer(myBoolean(), es6Class)
-//        assertFieldDefAndInfer(myUndefined(), es6Class)
-//        assertFieldDefAndInfer(myNull(), es6Class)
-//        assertFieldDefAndInfer(myObject(), es6Class)
+        assertFieldDefAndInfer(myString(), es6Class)
+        assertFieldDefAndInfer(myNumber(), es6Class)
+        assertFieldDefAndInfer(myBoolean(), es6Class)
+        assertFieldDefAndInfer(myUndefined(), es6Class)
+        assertFieldDefAndInfer(myNull(), es6Class)
+        assertFieldDefAndInfer(myObject(), es6Class)
         assertFieldDefAndInfer(myAny(), es6Class)
         assertFieldDefAndInfer(myRef(), es6Class)
         assertFieldDefAndInfer(myStringArray(), es6Class)
         assertFieldDefAndInfer(myNumberArray(), es6Class)
+        assertFieldDef(myStringNumberUnion(), es6Class)
+        assertFieldDefAndInfer(myStringNumberUnionArray(), es6Class)
+        assertFieldDef(myStringArrayNumberUnion(), es6Class)
+        assertFieldDef(myAbBcIntersection(), es6Class)
+        assertFieldDef(myAbBcIntersectionArray(), es6Class)
+        assertFieldDef(myAbBcArrayIntersection(), es6Class)
 
         if (!isAssignmentPossible()) return
 
@@ -79,14 +86,33 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
             return
         }
 
-        val dataType = field.dataType().orElseThrow()
-        assertEquals(expectedField.dataTypeName, dataType.name())
-        assertEquals(TypeScriptTypes.isPrimitive(expectedField.dataTypeName), dataType.isPrimitive)
-        assertEquals(expectedField.dataTypeFlavor, dataType.flavor())
-        assertEquals(expectedField.componentDataTypes, dataType.componentDataTypes().asSequence().map { it.name() }.toSet())
-        assertEquals(expectedField.arrayDimension, dataType.arrayDimension())
+        assertDataType(expectedField.dataType, field.dataType().orElseThrow())
+    }
 
-        if (expectedField.isES6Class) {
+    protected fun assertDataType(expectedDataType: ExpectedDataType, dataType: IDataType) {
+        expectedDataType.name?.let {
+            assertEquals(it, dataType.name())
+        }
+        assertEquals(TypeScriptTypes.isPrimitive(expectedDataType.name), dataType.isPrimitive)
+        assertEquals(expectedDataType.flavor, dataType.flavor())
+        val remainingExpectedComponentDataTypes = expectedDataType.componentDataTypes.toMutableSet()
+        assertTrue(dataType.componentDataTypes()
+            .map {
+                remainingExpectedComponentDataTypes.removeIf { expectedComponentDataType ->
+                    try {
+                        assertDataType(expectedComponentDataType, it)
+                        true
+                    } catch (e: AssertionError) {
+                        false
+                    }
+                }
+            }
+            .filter { !it }
+            .isEmpty())
+
+        assertEquals(expectedDataType.arrayDimension, dataType.arrayDimension())
+
+        if (expectedDataType.isES6Class) {
             assertTrue(dataType is IES6Class)
         }
     }
@@ -96,8 +122,8 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
     protected open fun isOptionalPossible() = true
 
     protected open fun isInferPossible(field: ExpectedField) =
-        when (field.dataTypeFlavor) {
-            DataTypeFlavor.Single -> when (field.dataTypeName) {
+        when (field.dataType.flavor) {
+            DataTypeFlavor.Single -> when (field.dataType.name) {
                 TypeScriptTypes._string,
                 TypeScriptTypes._number,
                 TypeScriptTypes._boolean,
@@ -106,47 +132,215 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
                 else -> false
             }
 
-            DataTypeFlavor.Array -> true
+            DataTypeFlavor.Array,
+            DataTypeFlavor.Union,
+            DataTypeFlavor.Intersection -> true
         }
 
-    protected open fun myString() = ExpectedField("myString", TypeScriptTypes._string, optional = true)
+    protected open fun myString() = ExpectedField(
+        "myString",
+        ExpectedDataType(TypeScriptTypes._string),
+        optional = true
+    )
 
-    protected open fun myNumber() = ExpectedField("myNumber", TypeScriptTypes._number)
+    protected open fun myNumber() = ExpectedField(
+        "myNumber",
+        ExpectedDataType(TypeScriptTypes._number)
+    )
 
-    protected open fun myBoolean() = ExpectedField("myBoolean", TypeScriptTypes._boolean)
+    protected open fun myBoolean() = ExpectedField(
+        "myBoolean",
+        ExpectedDataType(TypeScriptTypes._boolean)
+    )
 
-    protected open fun myUndefined() = ExpectedField("myUndefined", TypeScriptTypes._undefined)
+    protected open fun myUndefined() = ExpectedField(
+        "myUndefined",
+        ExpectedDataType(TypeScriptTypes._undefined)
+    )
 
-    protected open fun myNull() = ExpectedField("myNull", TypeScriptTypes._null)
+    protected open fun myNull() = ExpectedField(
+        "myNull",
+        ExpectedDataType(TypeScriptTypes._null)
+    )
 
-    protected open fun myObject() = ExpectedField("myObject", TypeScriptTypes._object)
+    protected open fun myObject() = ExpectedField(
+        "myObject",
+        ExpectedDataType(TypeScriptTypes._object)
+    )
 
-    protected open fun myAny() = ExpectedField("myAny", TypeScriptTypes._any, optional = true)
+    protected open fun myAny() = ExpectedField(
+        "myAny",
+        ExpectedDataType(TypeScriptTypes._any),
+        optional = true
+    )
 
-    protected open fun myRef() = ExpectedField("myRef", "WildcardClass", isES6Class = true)
+    protected open fun myRef() = ExpectedField(
+        "myRef",
+        ExpectedDataType(
+            "WildcardClass",
+            isES6Class = true
+        )
+    )
 
-    protected open fun myStaticString() = ExpectedField("myStaticString", TypeScriptTypes._string)
+    protected open fun myStaticString() = ExpectedField(
+        "myStaticString",
+        ExpectedDataType(TypeScriptTypes._string)
+    )
 
-    protected open fun myEnum() = ExpectedField("myEnum", TypeScriptTypes._object)
+    protected open fun myEnum() = ExpectedField(
+        "myEnum",
+        ExpectedDataType(TypeScriptTypes._object)
+    )
 
-    protected open fun myStaticStringRef() = ExpectedField("myStaticStringRef", TypeScriptTypes._string)
+    protected open fun myStaticStringRef() = ExpectedField(
+        "myStaticStringRef",
+        ExpectedDataType(TypeScriptTypes._string)
+    )
 
-    protected open fun myEnumRef() = ExpectedField("myEnumRef", "myEnum")
+    protected open fun myEnumRef() = ExpectedField(
+        "myEnumRef",
+        ExpectedDataType("myEnum")
+    )
 
-    protected open fun myStringArray() = ExpectedField("myStringArray", "${TypeScriptTypes._string}[][]", optional = true, dataTypeFlavor = DataTypeFlavor.Array, componentDataTypes = setOf(TypeScriptTypes._string), arrayDimension = 2)
+    protected open fun myStringArray() = ExpectedField(
+        "myStringArray",
+        ExpectedDataType(
+            null,
+            flavor = DataTypeFlavor.Array,
+            componentDataTypes = setOf(
+                ExpectedDataType(TypeScriptTypes._string)
+            ),
+            arrayDimension = 2
+        ),
+        optional = true
+    )
 
-    protected open fun myNumberArray() = ExpectedField("myNumberArray", "${TypeScriptTypes._number}[]", dataTypeFlavor = DataTypeFlavor.Array, componentDataTypes = setOf(TypeScriptTypes._number), arrayDimension = 1)
+    protected open fun myNumberArray() = ExpectedField(
+        "myNumberArray",
+        ExpectedDataType(
+            null,
+            flavor = DataTypeFlavor.Array,
+            componentDataTypes = setOf(
+                ExpectedDataType(TypeScriptTypes._number)
+            ),
+            arrayDimension = 1
+        )
+    )
 
-    protected open fun myArray() = ExpectedField("myArray", "[]", dataTypeFlavor = DataTypeFlavor.Array, componentDataTypes = emptySet(), arrayDimension = 1)
+    protected open fun myArray() = ExpectedField(
+        "myArray",
+        ExpectedDataType(
+            null,
+            flavor = DataTypeFlavor.Array,
+            componentDataTypes = emptySet(),
+            arrayDimension = 1
+        )
+    )
+
+    protected open fun myStringNumberUnion() = ExpectedField(
+        "myStringNumberUnion",
+        ExpectedDataType(
+            null,
+            flavor = DataTypeFlavor.Union,
+            componentDataTypes = setOf(
+                ExpectedDataType(TypeScriptTypes._string),
+                ExpectedDataType(TypeScriptTypes._number)
+            )
+        )
+    )
+
+    protected open fun myStringNumberUnionArray() = ExpectedField(
+        "myStringNumberUnionArray",
+        ExpectedDataType(
+            null,
+            flavor = DataTypeFlavor.Array,
+            componentDataTypes = setOf(
+                ExpectedDataType(
+                    null,
+                    flavor = DataTypeFlavor.Union,
+                    componentDataTypes = setOf(
+                        ExpectedDataType(TypeScriptTypes._string),
+                        ExpectedDataType(TypeScriptTypes._number)
+                    )
+                )
+            ),
+            arrayDimension = 1
+        )
+    )
+
+    protected open fun myStringArrayNumberUnion() = ExpectedField(
+        "myStringArrayNumberUnion",
+        ExpectedDataType(
+            null,
+            flavor = DataTypeFlavor.Union,
+            componentDataTypes = setOf(
+                ExpectedDataType(
+                    null,
+                    flavor = DataTypeFlavor.Array,
+                    componentDataTypes = setOf(
+                        ExpectedDataType(TypeScriptTypes._string)
+                    ),
+                    arrayDimension = 1
+                ),
+                ExpectedDataType(TypeScriptTypes._number)
+            )
+        )
+    )
+
+    protected open fun myAbBcIntersection() = ExpectedField(
+        "myAbBcIntersection",
+        ExpectedDataType(
+            null,
+            flavor = DataTypeFlavor.Intersection,
+            componentDataTypes = setOf(
+                ExpectedDataType("AB"),
+                ExpectedDataType("BC")
+            )
+        )
+    )
+
+    protected open fun myAbBcIntersectionArray() = ExpectedField(
+        "myAbBcIntersectionArray",
+        ExpectedDataType(
+            null,
+            flavor = DataTypeFlavor.Array,
+            componentDataTypes = setOf(
+                ExpectedDataType(
+                    null,
+                    flavor = DataTypeFlavor.Intersection,
+                    componentDataTypes = setOf(
+                        ExpectedDataType("AB"),
+                        ExpectedDataType("BC")
+                    ),
+                ),
+            ),
+            arrayDimension = 1
+        )
+    )
+
+    protected open fun myAbBcArrayIntersection() = ExpectedField(
+        "myAbBcArrayIntersection",
+        ExpectedDataType(
+            null,
+            flavor = DataTypeFlavor.Intersection,
+            componentDataTypes = setOf(
+                ExpectedDataType("AB"),
+                ExpectedDataType(
+                    null,
+                    flavor = DataTypeFlavor.Array,
+                    componentDataTypes = setOf(
+                        ExpectedDataType("BC")
+                    ),
+                    arrayDimension = 1
+                )
+            )
+        )
+    )
 
     protected inner class ExpectedField(
         val name: String,
-        val dataTypeName: String,
-        val optional: Boolean = false,
-        val isES6Class: Boolean = false,
-        val dataTypeFlavor: DataTypeFlavor = DataTypeFlavor.Single,
-        val componentDataTypes: Set<String> = emptySet(),
-        val arrayDimension: Int = 0
+        val dataType: ExpectedDataType,
+        val optional: Boolean = false
     ) {
 
         var infer = false
@@ -157,4 +351,12 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
 
         fun isAssertDataType() = !(infer && !isInferPossible(this))
     }
+
+    protected inner class ExpectedDataType(
+        val name: String?,
+        val isES6Class: Boolean = false,
+        val flavor: DataTypeFlavor = DataTypeFlavor.Single,
+        val componentDataTypes: Set<ExpectedDataType> = emptySet(),
+        val arrayDimension: Int = 0
+    )
 }

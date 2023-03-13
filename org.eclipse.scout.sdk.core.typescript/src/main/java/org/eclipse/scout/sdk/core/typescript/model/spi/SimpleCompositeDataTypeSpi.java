@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.typescript.model.spi;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
@@ -19,6 +20,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.internal.DataTypeImplemen
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SourceRange;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType> implements DataTypeSpi {
 
@@ -42,9 +44,27 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
   @Override
   public String name() {
     return m_name.computeIfAbsentAndGet(() -> switch (flavor()) {
-      case Array -> componentDataTypes().stream().findFirst().map(DataTypeSpi::name).orElse("") + "[]".repeat(arrayDimension());
+      case Array -> componentDataTypes().stream().findFirst().map(this::boxComponentDataType).orElse("") + "[]".repeat(arrayDimension());
+      case Union -> componentDataTypes().stream().map(this::boxComponentDataType).collect(Collectors.joining(" | "));
+      case Intersection -> componentDataTypes().stream().map(this::boxComponentDataType).collect(Collectors.joining(" & "));
       case Single -> null;
     });
+  }
+
+  protected String boxComponentDataType(DataTypeSpi componentDataType) {
+    if (componentDataType == null || Strings.isBlank(componentDataType.name())) {
+      return null;
+    }
+
+    if (switch (flavor()) {
+      case Array -> componentDataType.flavor() == DataTypeFlavor.Union || componentDataType.flavor() == DataTypeFlavor.Intersection;
+      case Union -> componentDataType.flavor() == DataTypeFlavor.Intersection;
+      case Intersection -> componentDataType.flavor() == DataTypeFlavor.Union;
+      case Single -> false;
+    }) {
+      return "(" + componentDataType.name() + ")";
+    }
+    return componentDataType.name();
   }
 
   @Override

@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElementFactory;
@@ -51,6 +53,10 @@ public abstract class AbstractNodeElementFactorySpi extends AbstractNodeElementS
     return getOrCreate(new CompositeObject(name, objectLiteral), id -> new ObjectLiteralDataTypeSpi(containingModule(), name, objectLiteral));
   }
 
+  protected DataTypeSpi createCompositeDataType(DataTypeFlavor flavor, Collection<DataTypeSpi> componentDataTypes) {
+    return getOrCreate(new CompositeObject(flavor, componentDataTypes), id -> new SimpleCompositeDataTypeSpi(containingModule(), flavor, componentDataTypes, 0));
+  }
+
   protected DataTypeSpi createCompositeDataType(DataTypeFlavor flavor, Collection<DataTypeSpi> componentDataTypes, int arrayDimension) {
     return getOrCreate(new CompositeObject(flavor, componentDataTypes, arrayDimension), id -> new SimpleCompositeDataTypeSpi(containingModule(), flavor, componentDataTypes, arrayDimension));
   }
@@ -77,5 +83,31 @@ public abstract class AbstractNodeElementFactorySpi extends AbstractNodeElementS
         .orElse(Collections.emptySet());
 
     return createCompositeDataType(DataTypeFlavor.Array, componentDataTypes, newDimension);
+  }
+
+  protected DataTypeSpi createUnionOrIntersectionDataType(Collection<DataTypeSpi> componentDataTypes, DataTypeFlavor unionOrIntersection) {
+    if (componentDataTypes == null || componentDataTypes.isEmpty()) {
+      return null;
+    }
+    if (componentDataTypes.size() == 1) {
+      return componentDataTypes.stream().findFirst().orElse(null);
+    }
+    if (unionOrIntersection != DataTypeFlavor.Union && unionOrIntersection != DataTypeFlavor.Intersection) {
+      return null;
+    }
+
+    return createCompositeDataType(unionOrIntersection, componentDataTypes.stream()
+        .flatMap(componentDataType -> componentDataType.flavor() == unionOrIntersection ? componentDataType.componentDataTypes().stream() : Stream.of(componentDataType))
+        .collect(Collectors.toSet()));
+  }
+
+  @Override
+  public DataTypeSpi createUnionDataType(Collection<DataTypeSpi> componentDataTypes) {
+    return createUnionOrIntersectionDataType(componentDataTypes, DataTypeFlavor.Union);
+  }
+
+  @Override
+  public DataTypeSpi createIntersectionDataType(Collection<DataTypeSpi> componentDataTypes) {
+    return createUnionOrIntersectionDataType(componentDataTypes, DataTypeFlavor.Intersection);
   }
 }

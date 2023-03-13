@@ -63,6 +63,32 @@ export class SomeClass {
     this.myNumberArrayInfer = [42];
 
     this.myArrayInfer = [];
+
+    /**
+     *  @type {string | number}
+     */
+    this.myStringNumberUnionDef = null;
+    /**
+     *  @type {(string | number)[]}
+     */
+    this.myStringNumberUnionArrayDef = null;
+    this.myStringNumberUnionArrayInfer = [42, 'string', 13];
+    /**
+     *  @type {string[] | number}
+     */
+    this.myStringArrayNumberUnionDef = null;
+    /**
+     *  @type {AB & BC}
+     */
+    this.myAbBcIntersectionDef = null;
+    /**
+     *  @type {(AB & BC)[]}
+     */
+    this.myAbBcIntersectionArrayDef = null;
+    /**
+     *  @type {AB & BC[]}
+     */
+    this.myAbBcArrayIntersectionDef = null;
   }
 
   /**

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2i.model.typescript.util
 import com.intellij.lang.ecmascript6.psi.ES6ImportDeclaration
 import com.intellij.lang.javascript.psi.*
 import com.intellij.lang.javascript.psi.jsdoc.JSDocComment
+import com.intellij.lang.javascript.psi.resolve.JSResolveUtil
 import com.intellij.lang.javascript.psi.resolve.JSTypeEvaluator
 import com.intellij.lang.javascript.psi.types.*
 import com.intellij.lang.javascript.psi.types.evaluable.JSQualifiedReferenceType
@@ -39,7 +40,9 @@ object DataTypeSpiUtils {
         if (element is JSObjectLiteralExpression) {
             createDataType(element, module)?.let { return it }
         }
-        return getDataType(constantValue)
+        getDataType(constantValue)?.let { return it }
+        return JSResolveUtil.getElementJSType(element)
+            ?.let { createDataType(it, module) }
     }
 
     private fun createDataType(assignment: JSAssignmentExpression, module: IdeaNodeModule): DataTypeSpi? {
@@ -66,6 +69,15 @@ object DataTypeSpiUtils {
                 currentType = (currentType as JSArrayType).type
             } while (currentType is JSArrayType)
             return module.nodeElementFactory().createArrayDataType(currentType?.let { createDataType(it, module) }, arrayDimension)
+        }
+        if (type is JSUnionOrIntersectionType) {
+            return type.types.map { createDataType(it, module) }
+                .let {
+                    if (type.isUnionType)
+                        module.nodeElementFactory().createUnionDataType(it)
+                    else
+                        module.nodeElementFactory().createIntersectionDataType(it)
+                }
         }
         if (type is JSUtilType) return module.nodeElementFactory().createJavaScriptType(type)
 
@@ -100,22 +112,14 @@ object DataTypeSpiUtils {
         return property.jsType?.let { createDataType(it, module) }
     }
 
+    private val ILLEGAL_DATA_TYPE_CHARS = "[|&\\(\\)\\[\\]]".toRegex()
+
     fun createDataType(dataType: String, scope: JSElement, module: IdeaNodeModule): DataTypeSpi? {
-        if (dataType.endsWith("[]")) {
-            var arrayDimension = 0
-            var currentType = dataType
-            do {
-                arrayDimension++
-                currentType = currentType.substring(0, currentType.length - 2)
-            } while (currentType.endsWith("[]"))
-            return module.nodeElementFactory().createArrayDataType(if (currentType.isEmpty()) null else createDataType(currentType, scope, module), arrayDimension)
-        }
-        if (dataType.isNotEmpty()) {
-            val source = JSTypeSourceFactory.createTypeSource(scope, true)
-            val type = JSNamedTypeFactory.createType(dataType, source, JSTypeContext.INSTANCE, false)
-            return module.nodeElementFactory().createJavaScriptType(type)
-        }
-        return null
+        if (dataType.isEmpty() || dataType.contains(ILLEGAL_DATA_TYPE_CHARS)) return null
+
+        val source = JSTypeSourceFactory.createTypeSource(scope, true)
+        val type = JSNamedTypeFactory.createType(dataType, source, JSTypeContext.INSTANCE, false)
+        return module.nodeElementFactory().createJavaScriptType(type)
     }
 
     private fun createJSDocCommentDataType(comment: JSDocComment, module: IdeaNodeModule, getDataType: (JSDocComment) -> String?): DataTypeSpi? {
@@ -153,12 +157,22 @@ object DataTypeSpiUtils {
 
             IConstantValue.ConstantValueType.Array -> {
                 var arrayDimension = 0
-                var currentConstantValue: IConstantValue? = constantValue
+                var currentConstantValues: Collection<IConstantValue> = listOf(constantValue)
                 do {
                     arrayDimension++
-                    currentConstantValue = currentConstantValue!!.convertTo(Array<IConstantValue>::class.java).orElse(null)?.firstOrNull()
-                } while (currentConstantValue?.type() == IConstantValue.ConstantValueType.Array)
-                constantValue.ideaModule.nodeElementFactory().createArrayDataType(currentConstantValue?.let { getDataType(it) }, arrayDimension)
+                    currentConstantValues = currentConstantValues.asSequence()
+                        .flatMap { currentConstantValue ->
+                            currentConstantValue.convertTo(Array<IConstantValue>::class.java)
+                                .map { it.asSequence() }
+                                .orElse(emptySequence())
+                        }
+                        .toList()
+                } while (currentConstantValues
+                        .mapNotNull { it.type() }
+                        .let { types -> types.isNotEmpty() && types.all { it == IConstantValue.ConstantValueType.Array } }
+                )
+                val union = constantValue.ideaModule.nodeElementFactory().createUnionDataType(currentConstantValues.map { getDataType(it) })
+                constantValue.ideaModule.nodeElementFactory().createArrayDataType(union, arrayDimension)
             }
 
             IConstantValue.ConstantValueType.ObjectLiteral,

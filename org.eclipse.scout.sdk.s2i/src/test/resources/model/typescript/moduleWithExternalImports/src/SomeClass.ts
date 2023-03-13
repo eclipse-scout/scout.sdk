@@ -48,6 +48,15 @@ export class SomeClass {
 
   myArrayInfer = [];
 
+  myStringNumberUnionDef: string | number;
+  myStringNumberUnionArrayDef: (string | number)[];
+  myStringNumberUnionArrayInfer = [42, 'string', 13];
+  myStringArrayNumberUnionDef: string[] | number;
+
+  myAbBcIntersectionDef: AB & BC;
+  myAbBcIntersectionArrayDef: (AB & BC)[];
+  myAbBcArrayIntersectionDef: AB & BC[];
+
   static myStaticStringDef: string = 'staticString' as const;
   static myStaticStringInfer = 'staticString' as const;
 
@@ -61,3 +70,13 @@ export class SomeClass {
     return 3;
   }
 }
+
+type AB = {
+  a: number;
+  b: number;
+};
+
+type BC = {
+  b: number;
+  c: number;
+};

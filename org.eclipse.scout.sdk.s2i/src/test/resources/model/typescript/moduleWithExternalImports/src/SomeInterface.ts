@@ -9,7 +9,7 @@
  */
 
 // @ts-expect-error
-import {WildcardClass as WildcardClassAlias} from '@eclipse-scout/sdk-export-ts';
+import {WildcardClass as WildcardClassAlias, WildcardType} from '@eclipse-scout/sdk-export-ts';
 
 // noinspection JSUnusedGlobalSymbols
 export interface SomeInterface {
@@ -23,6 +23,22 @@ export interface SomeInterface {
   myRefDef: WildcardClassAlias;
   myStringArrayDef?: string[][];
   myNumberArrayDef: number[];
+  myStringNumberUnionDef: string | number;
+  myStringNumberUnionArrayDef: (string | number)[];
+  myStringArrayNumberUnionDef: string[] | number;
+  myAbBcIntersectionDef: AB & BC;
+  myAbBcIntersectionArrayDef: (AB & BC)[];
+  myAbBcArrayIntersectionDef: AB & BC[];
 
   someFunc(): number;
 }
+
+type AB = {
+  a: number;
+  b: number;
+};
+
+type BC = {
+  b: number;
+  c: number;
+};

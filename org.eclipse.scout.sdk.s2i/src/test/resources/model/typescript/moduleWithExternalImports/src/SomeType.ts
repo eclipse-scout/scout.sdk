@@ -23,4 +23,20 @@ export type SomeType = {
   myRefDef: WildcardClassAlias;
   myStringArrayDef?: string[][];
   myNumberArrayDef: number[];
+  myStringNumberUnionDef: string | number;
+  myStringNumberUnionArrayDef: (string | number)[];
+  myStringArrayNumberUnionDef: string[] | number;
+  myAbBcIntersectionDef: AB & BC;
+  myAbBcIntersectionArrayDef: (AB & BC)[];
+  myAbBcArrayIntersectionDef: AB & BC[];
+};
+
+type AB = {
+  a: number;
+  b: number;
+};
+
+type BC = {
+  b: number;
+  c: number;
 };
