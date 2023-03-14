@@ -121,10 +121,9 @@ object DataTypeSpiUtils {
     private fun createJSDocCommentDataType(comment: JSDocComment, module: IdeaNodeModule, getDataType: (JSDocComment) -> String?): DataTypeSpi? {
         val dataType = getDataType(comment) ?: return null
 
-        PsiTreeUtil.getChildrenOfType(comment.containingFile, ES6ImportDeclaration::class.java)
-            ?.asSequence()
-            ?.flatMap { it.importSpecifiers.asSequence() }
-            ?.firstOrNull { it.declaredName == dataType }
+        PsiTreeUtil.getChildrenOfTypeAsList(comment.containingFile, ES6ImportDeclaration::class.java).asSequence()
+            .flatMap { it.importSpecifiers.asSequence() }
+            .firstOrNull { it.declaredName == dataType }
             ?.let { module.moduleInventory.resolveImport(it) as? DataTypeSpi }
             ?.let { return it }
 

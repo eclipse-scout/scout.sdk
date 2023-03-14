@@ -79,7 +79,10 @@ public final class NodeModulesProvider {
     listeners.remove(listener);
   }
 
-  static void triggerRemoved(Set<NodeModuleSpi> removed) {
+  private static void triggerRemoved(Set<NodeModuleSpi> removed) {
+    if (removed != null && removed.isEmpty()) {
+      return;
+    }
     listeners.get(INodeModulesRemovedListener.class)
         .forEach(listener -> listener.nodeModulesRemoved(removed));
   }
