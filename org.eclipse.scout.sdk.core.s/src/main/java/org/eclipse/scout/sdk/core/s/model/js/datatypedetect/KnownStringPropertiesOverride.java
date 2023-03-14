@@ -32,7 +32,8 @@ public class KnownStringPropertiesOverride implements IPropertyDataTypeOverride 
 
   @Override
   public Optional<ScoutJsPropertyType> getOverrideFor(ScoutJsProperty property) {
-    if (m_owner.declaringClass() == m_owner.scoutJsModel().widgetClass() && ScoutJsCoreConstants.PROPERTY_NAME_ID.equals(property.field().name())) {
+    if (ScoutJsCoreConstants.SCOUT_JS_CORE_MODULE_NAME.equals(m_owner.declaringClass().containingModule().name())
+        && ScoutJsCoreConstants.PROPERTY_NAME_ID.equals(property.field().name())) {
       return Optional.of(new ScoutJsPropertyType(m_stringType, property));
     }
     return Optional.empty();

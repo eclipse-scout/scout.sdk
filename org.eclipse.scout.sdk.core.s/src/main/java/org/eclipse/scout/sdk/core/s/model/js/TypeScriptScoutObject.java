@@ -9,12 +9,13 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.IPropertyDataTypeOverride;
+import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.KnownStringPropertiesOverride;
 import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.NlsPropertyOverride;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty;
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
@@ -60,21 +61,25 @@ public class TypeScriptScoutObject implements IScoutJsObject {
 
   @Override
   public Map<String, ScoutJsProperty> properties() {
-    return m_properties.computeIfAbsentAndGet(() -> {
-      var fields = model().orElse(declaringClass())
-          .fields()
-          .withoutModifier(Modifier.STATIC)
-          .stream()
-          .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_EVENT_MAP))
-          .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_SELF))
-          .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_WIDGET_MAP));
-      return JavaScriptScoutObject.createProperties(fields, createOverrides(), this);
-    });
+    return m_properties.computeIfAbsentAndGet(this::parseProperties);
+  }
+
+  protected Map<String, ScoutJsProperty> parseProperties() {
+    var fields = model().orElse(declaringClass())
+        .fields()
+        .withoutModifier(Modifier.STATIC)
+        .stream()
+        .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_EVENT_MAP))
+        .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_SELF))
+        .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_WIDGET_MAP));
+    return JavaScriptScoutObject.createProperties(fields, createOverrides(), this);
   }
 
   protected List<IPropertyDataTypeOverride> createOverrides() {
     var stringType = Ensure.notNull(declaringClass().createDataType(TypeScriptTypes._string));
-    return Collections.singletonList(new NlsPropertyOverride(this, stringType));
+    return Arrays.asList(
+        new NlsPropertyOverride(this, stringType),
+        new KnownStringPropertiesOverride(this, stringType));
   }
 
   @Override

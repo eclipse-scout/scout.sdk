@@ -73,7 +73,6 @@ public class ScoutJsModel {
           .map(IExportFrom::referencedElement)
           .filter(IES6Class.class::isInstance)
           .map(IES6Class.class::cast)
-          .filter(c -> !c.isInterface())
           .filter(c -> !c.isTypeAlias())
           .filter(c -> !c.isInstanceOf(modelAdapter))
           .map(element -> TypeScriptScoutObject.create(this, element).orElseThrow());

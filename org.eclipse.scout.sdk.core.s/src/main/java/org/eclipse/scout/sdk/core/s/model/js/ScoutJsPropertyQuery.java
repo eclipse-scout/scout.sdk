@@ -57,7 +57,7 @@ public class ScoutJsPropertyQuery extends AbstractQuery<ScoutJsProperty> {
 
     // for each property also check the super classes (it may contain the same property but with a more detailed data-type)
     // choose the one which is better, even no super-classes should be considered in this query
-    var superClasses = obj.declaringClass().supers().withSuperInterfaces(false).stream().toList();
+    var superClasses = obj.declaringClass().supers().stream().toList();
     if (!superClasses.isEmpty()) {
       obj.scoutJsModel().findScoutObjects()
           .withIncludeDependencies(true)
@@ -71,7 +71,7 @@ public class ScoutJsPropertyQuery extends AbstractQuery<ScoutJsProperty> {
     if (name == null) {
       return properties.values().stream();
     }
-    return Stream.of(properties.get(name)); // if name filter is given: only one property can be part of the result
+    return Stream.ofNullable(properties.get(name)); // if name filter is given: only one property can be part of the result
   }
 
   protected void updateOrAddSuperPropertyIfNecessary(Map<String, ScoutJsProperty> properties, ScoutJsProperty inheritedProperty) {

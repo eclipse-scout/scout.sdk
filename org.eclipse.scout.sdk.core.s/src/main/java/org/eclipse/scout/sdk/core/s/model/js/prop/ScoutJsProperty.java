@@ -15,6 +15,7 @@ import org.eclipse.scout.sdk.core.s.model.js.IScoutJsObject;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.PropertyDataTypeDetector;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -36,12 +37,19 @@ public class ScoutJsProperty {
     }
   }
 
-  public ScoutJsProperty(IScoutJsObject scoutJsObject, IField field, ScoutJsPropertyType type) {
+  protected ScoutJsProperty(IScoutJsObject scoutJsObject, IField field) {
     m_scoutJsObject = Ensure.notNull(scoutJsObject);
     m_field = Ensure.notNull(field);
     m_type = new FinalValue<>();
-    m_type.set(Ensure.notNull(type));
+    //noinspection ThisEscapedInObjectConstruction
+    m_type.set(new ScoutJsPropertyType(field.dataType().orElse(null), this));
     m_detector = null;
+  }
+
+  public static ScoutJsProperty createSynthetic(IScoutJsObject owner, String propertyName, IDataType dataType) {
+    var syntheticField = owner.scoutJsModel().nodeModule().nodeElementFactory()
+        .createSyntheticField(propertyName, dataType);
+    return new ScoutJsProperty(owner, syntheticField);
   }
 
   public IField field() {

@@ -18,10 +18,10 @@ class LayerJsModelCompletionContributorTest : AbstractJsModelCompletionContribut
     override fun getDependencies(): List<Pair<String, String>> = listOf(SCOUT_WITHOUT_CLASS_REFERENCE_DIR to SCOUT_MODULE_NAME)
 
     override fun getNameCompletionWidgetExpectedFileContents(finishLookupName: String) =
-        arrayOf(", $CHILD_PROPERTY_NAME: { ${ScoutJsCoreConstants.PROPERTY_NAME_ID}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}: ''}")
+        arrayOf(", $CHILD_PROPERTY_NAME: { ${ScoutJsCoreConstants.PROPERTY_NAME_ID}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}: }")
 
     override fun getNameCompletionWidgetArrayExpectedFileContents(finishLookupName: String) =
-        arrayOf(", $FIELDS_PROPERTY_NAME: [{ ${ScoutJsCoreConstants.PROPERTY_NAME_ID}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}: ''}]")
+        arrayOf(", $FIELDS_PROPERTY_NAME: [{ ${ScoutJsCoreConstants.PROPERTY_NAME_ID}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}: }]")
 
     override fun getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents(objectType: String, importName: String?, importModule: String?): Array<String?> =
         arrayOf(

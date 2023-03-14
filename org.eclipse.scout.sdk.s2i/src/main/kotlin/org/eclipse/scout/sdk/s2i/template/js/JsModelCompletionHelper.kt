@@ -53,12 +53,14 @@ import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
 import org.eclipse.scout.sdk.s2i.template.BoolVariableAdapter
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 import org.eclipse.scout.sdk.s2i.template.VariableDescriptor
+import java.util.*
 import java.util.stream.Collectors
 import javax.swing.Icon
 
 object JsModelCompletionHelper {
 
     const val ID_DEFAULT_TEXT = "MyId"
+    const val STRING_DELIM = "'"
     val SELECTED_ELEMENT = Key.create<ScoutJsModelLookupElement?>("ScoutLookupJsModelElement")
 
     val BOOL_VARIABLE = BoolVariableAdapter<Unit?>("BOOL", false.toString()).invoke(null)
@@ -152,7 +154,7 @@ object JsModelCompletionHelper {
     private fun insertObjectTypeWithQuotes(presentableName: String, searchPrefix: String, context: InsertionContext) {
         writeCommandAction(context.project).run(ThrowableRunnable<RuntimeException> {
             val startOffset = context.editor.caretModel.currentCaret.offset
-            val insertText = "'$presentableName'"
+            val insertText = "$STRING_DELIM$presentableName$STRING_DELIM"
             context.document.insertString(startOffset, insertText)
             val prefixRemoveLen = TemplateHelper.removePrefix(context.editor, searchPrefix)
             context.editor.caretModel.currentCaret.moveToOffset(startOffset + insertText.length - prefixRemoveLen)
@@ -189,19 +191,17 @@ object JsModelCompletionHelper {
     }
 
     private fun buildPropertyValueSource(selectedElement: ScoutJsModelLookupElement, completionInfo: PropertyCompletionInfo): String {
-        val rootModel = completionInfo.scoutJsModel
         val property = selectedElement.property()
-        val valueSrc = WrappingStringBuilder()
-        val stringLiteralDelimiter = "'"
+        val propertyType = property.type()
 
         // wrappings
-        val propertyType = property.type()
+        val valueSrc = WrappingStringBuilder()
         if (propertyType.isArray && !completionInfo.isInArray) {
             valueSrc.appendWrapping("[", "]")
         }
         val propertyDataTypeName = propertyType.dataType().map { it.name() }.orElse(null)
-        if (TypeScriptTypes._string == propertyDataTypeName) {
-            valueSrc.appendWrapping(stringLiteralDelimiter, stringLiteralDelimiter)
+        if (TypeScriptTypes._string == propertyDataTypeName && selectedElement.property().name() != ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE) {
+            valueSrc.appendWrapping(STRING_DELIM, STRING_DELIM)
             if (propertyType.subType() == ScoutJsPropertySubType.TEXT_KEY) {
                 valueSrc.appendWrapping(
                     TranslationPatterns.JsModelTextKeyPattern.MODEL_TEXT_KEY_PREFIX,
@@ -219,18 +219,43 @@ object JsModelCompletionHelper {
             valueSrc.append(COMPLETE_VARIABLE_SRC)
         } else if (propertyType.isBoolean) {
             valueSrc.append(BOOL_VARIABLE_SRC)
+        } else if (selectedElement.property().name() == ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE) {
+            valueSrc.append(COMPLETE_VARIABLE_SRC)
         } else if (propertyType.hasClasses()) {
-            val objectType = if (selectedElement is JsObjectValueLookupElement) {
-                (if (rootModel.supportsClassReference()) selectedElement.propertyValue.scoutJsObject.name() else selectedElement.propertyValue.scoutJsObject.shortName())
-            } else {
-                null
-            } ?: COMPLETE_VARIABLE_SRC
-            val objectTypeSrc = if (rootModel.supportsClassReference()) objectType else "'$objectType'"
-            valueSrc.append("\n${ScoutJsCoreConstants.PROPERTY_NAME_ID}: '$TEXT_VARIABLE_SRC',\n${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}: $objectTypeSrc$END_VARIABLE_SRC\n")
+            valueSrc.append(buildClassPropertyValueSource(selectedElement, completionInfo))
         } else {
             valueSrc.append(TEXT_VARIABLE_SRC)
         }
         return valueSrc.toString()
+    }
+
+    fun buildClassPropertyValueSource(selectedElement: ScoutJsModelLookupElement, completionInfo: PropertyCompletionInfo): String {
+        val rootModel = completionInfo.scoutJsModel
+        val propertyObject = when (selectedElement) {
+            is JsObjectValueLookupElement -> selectedElement.propertyValue.scoutJsObject
+            is JsNameLookupElement -> rootModel
+                .findScoutObjects()
+                .withIncludeDependencies(true)
+                .withObjectClasses(selectedElement.property().type().classes())
+                .first().orElse(null)
+
+            else -> null
+        } ?: return "\n" + COMPLETE_VARIABLE_SRC
+
+        val predefinedProperties = ArrayList<String>()
+        if (propertyObject.hasProperty(ScoutJsCoreConstants.PROPERTY_NAME_ID)) {
+            predefinedProperties.add("${ScoutJsCoreConstants.PROPERTY_NAME_ID}: $STRING_DELIM$TEXT_VARIABLE_SRC$STRING_DELIM")
+        }
+        if (propertyObject.hasProperty(ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE)) {
+            val objectType = if (completionInfo.isPropertyNameCompletion) COMPLETE_VARIABLE_SRC
+            else if (rootModel.supportsClassReference()) propertyObject.name()
+            else "$STRING_DELIM${propertyObject.shortName()}$STRING_DELIM"
+            predefinedProperties.add("${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}: $objectType")
+        }
+        if (predefinedProperties.isEmpty()) {
+            return "\n" + COMPLETE_VARIABLE_SRC + "\n"
+        }
+        return "\n" + predefinedProperties.joinToString(",\n") + END_VARIABLE_SRC + "\n"
     }
 
     fun buildTemplate(id: String, source: String, defaultValueProvider: (String) -> String): TemplateImpl {
@@ -259,16 +284,44 @@ object JsModelCompletionHelper {
     }
 
     data class PropertyCompletionInfo(
-        val property: JSProperty, val propertyName: String, val objectLiteral: JSObjectLiteralExpression, val module: Module, val scoutJsModel: ScoutJsModel, val isLast: Boolean,
+        val propertyPsi: JSProperty, val propertyName: String, val objectLiteral: JSObjectLiteralExpression, val module: Module, val scoutJsModel: ScoutJsModel, val isLast: Boolean,
         val isPropertyNameCompletion: Boolean, val siblingPropertyNames: Set<String>, val searchPrefix: String, val isInArray: Boolean, val isInLiteral: Boolean
     ) {
         private val m_objectTypeProperty by lazy { objectLiteral.findProperty(ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE) }
         private val m_objectTypeScoutObject = FinalValue<IScoutJsObject?>()
         private val m_objectTypeClass = FinalValue<IES6Class?>()
         private val m_objectTypeModel = FinalValue<ScoutJsModel?>()
+        private val m_scoutObjects = FinalValue<List<IScoutJsObject>>()
+        private val m_parentScoutProperty = FinalValue<ScoutJsProperty?>()
 
-        fun objectTypeScoutObject() = m_objectTypeScoutObject.computeIfAbsentAndGet {
+        private fun objectTypeScoutObject() = m_objectTypeScoutObject.computeIfAbsentAndGet {
             objectTypeModel()?.findScoutObjects()?.withObjectClass(objectTypeClass())?.first()?.orElse(null)
+        }
+
+        /**
+         * The [IScoutJsObject]s of the current completion. Detected from an explicit objectType property or by the datatype of the parent property.
+         */
+        fun scoutObjects() = m_scoutObjects.computeIfAbsentAndGet {
+            val scoutObject = objectTypeScoutObject()
+            if (scoutObject != null) return@computeIfAbsentAndGet Collections.singletonList(scoutObject)
+
+            val parentProperty = parentScoutProperty() ?: return@computeIfAbsentAndGet emptyList()
+            if (!parentProperty.type().hasClasses()) return@computeIfAbsentAndGet emptyList()
+            return@computeIfAbsentAndGet parentProperty.scoutJsObject().scoutJsModel().findScoutObjects()
+                .withIncludeDependencies(true)
+                .withObjectClasses(parentProperty.type().classes())
+                .stream().toList()
+        }.stream()
+
+        fun parentScoutProperty() = m_parentScoutProperty.computeIfAbsentAndGet {
+            val infoForParentObject = getPropertyValueInfo(propertyPsi, searchPrefix) ?: return@computeIfAbsentAndGet null
+            infoForParentObject
+                .objectTypeScoutObject()
+                ?.findProperties()
+                ?.withName(infoForParentObject.propertyName)
+                ?.withSuperClasses(true)
+                ?.first()
+                ?.orElse(null)
         }
 
         private fun objectTypeClass() = m_objectTypeClass.computeIfAbsentAndGet { findReferencedClass() }

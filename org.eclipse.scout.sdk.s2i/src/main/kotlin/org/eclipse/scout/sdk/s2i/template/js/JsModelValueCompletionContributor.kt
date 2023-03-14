@@ -49,10 +49,6 @@ class JsModelValueCompletionContributor : CompletionContributor() {
     private class JsModelValueCompletionProvider : CompletionProvider<CompletionParameters>() {
         override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
             val completionInfo = getPropertyValueInfo(parameters, result) ?: return
-
-            // require an objectType to be set or the completion of the object type itself
-            if (completionInfo.objectTypeScoutObject() == null && ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE != completionInfo.propertyName) return
-
             val elements = getPropertyValueElements(completionInfo) ?: return
             if (elements.isNotEmpty()) {
                 result.addAllElements(elements)
@@ -61,23 +57,21 @@ class JsModelValueCompletionContributor : CompletionContributor() {
         }
 
         private fun getPropertyValueElements(completionInfo: PropertyCompletionInfo): List<LookupElement>? {
-            var infoForPropertyLookup = completionInfo
-            if (ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE == completionInfo.propertyName) {
-                infoForPropertyLookup = getPropertyValueInfo(completionInfo.property, completionInfo.searchPrefix) ?: completionInfo
-            }
-            val scoutObject = infoForPropertyLookup.objectTypeScoutObject() ?: return emptyList()
-            val scoutJsProperty = scoutObject
-                .findProperties()
-                .withSuperClasses(true)
-                .withName(infoForPropertyLookup.propertyName)
-                .stream()
-                .findAny()
-                .orElse(null) ?: return emptyList()
+            val scoutJsProperty = if (ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE == completionInfo.propertyName) {
+                completionInfo.parentScoutProperty()
+            } else {
+                completionInfo.scoutObjects().flatMap {
+                    it.findProperties()
+                        .withSuperClasses(true)
+                        .withName(completionInfo.propertyName)
+                        .stream()
+                }.findAny().orElse(null)
+            } ?: return emptyList()
 
             return scoutJsProperty.computePossibleValues(completionInfo.scoutJsModel).map {
                 val lookupElement = JsModelCompletionHelper.createPropertyValueLookupElement(it, completionInfo)
                 if (!completionInfo.isInLiteral) {
-                    withJsImportIfNecessary(lookupElement, completionInfo.scoutJsModel, completionInfo.property.containingFile.originalFile)
+                    withJsImportIfNecessary(lookupElement, completionInfo.scoutJsModel, completionInfo.propertyPsi.containingFile.originalFile)
                 } else {
                     lookupElement
                 }

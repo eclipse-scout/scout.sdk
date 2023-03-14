@@ -113,10 +113,7 @@ public class JavaScriptScoutObject implements IScoutJsObject {
 
     datatypeDetector.unused().forEach((name, type) -> {
       if (!excludedProperties.contains(name)) {
-        result.compute(name, (key, lower) -> {
-          var syntheticField = owner.scoutJsModel().nodeModule().nodeElementFactory().createSyntheticField(key, type);
-          return ScoutJsProperty.choose(new ScoutJsProperty(owner, syntheticField, datatypeDetector), lower);
-        });
+        result.compute(name, (key, lower) -> ScoutJsProperty.choose(ScoutJsProperty.createSynthetic(owner, key, type), lower));
       }
       SdkLog.warning("Property {}.{} is declared as {} property but is not declared as field.", owner.name(), name, type);
     });

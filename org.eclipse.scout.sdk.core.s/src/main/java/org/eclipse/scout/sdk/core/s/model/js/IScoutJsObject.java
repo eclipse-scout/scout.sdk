@@ -46,6 +46,13 @@ public interface IScoutJsObject {
     return result.toString();
   }
 
+  default boolean hasProperty(String name) {
+    return findProperties()
+        .withSuperClasses(true)
+        .withName(name)
+        .existsAny();
+  }
+
   IES6Class declaringClass();
 
   Map<String, ScoutJsProperty> properties();

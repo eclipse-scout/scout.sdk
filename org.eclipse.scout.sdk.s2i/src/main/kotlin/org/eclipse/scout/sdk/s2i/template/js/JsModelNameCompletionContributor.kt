@@ -22,10 +22,7 @@ class JsModelNameCompletionContributor : CompletionContributor() {
     private class JsModelNameCompletionProvider : CompletionProvider<CompletionParameters>() {
         override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
             val completionInfo = JsModelCompletionHelper.getPropertyNameInfo(parameters, result) ?: return
-            val scoutJsObject = completionInfo.objectTypeScoutObject() ?: return
-            val properties = scoutJsObject.findProperties()
-                .withSuperClasses(true)
-                .stream()
+            val properties = completionInfo.scoutObjects().flatMap { it.findProperties().withSuperClasses(true).stream() }
                 .filter { !completionInfo.siblingPropertyNames.contains(it.name()) } // these properties are already present
                 .map { JsModelCompletionHelper.createPropertyNameLookupElement(it, completionInfo) }
                 .toList()
