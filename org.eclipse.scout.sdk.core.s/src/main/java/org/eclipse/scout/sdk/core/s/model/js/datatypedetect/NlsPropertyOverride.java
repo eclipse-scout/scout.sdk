@@ -10,21 +10,29 @@
 package org.eclipse.scout.sdk.core.s.model.js.datatypedetect;
 
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.model.js.IScoutJsObject;
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertySubType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 
 public class NlsPropertyOverride extends AbstractStringArrayMethodCallOverride {
 
-  public static final String RESOLVE_TEXT_KEYS_METHOD_NAME = "resolveTextKeys";
-  public static final Pattern REGEX_NLS_PROPERTY_TYPE = Pattern.compile(PROPERTY_TYPE_METHOD_REGEX_PREFIX + RESOLVE_TEXT_KEYS_METHOD_NAME + PROPERTY_TYPE_METHOD_REGEX_SUFFIX);
+  public static final Pattern REGEX_NLS_KEYS = Pattern.compile(PROPERTY_TYPE_METHOD_REGEX_PREFIX + ScoutJsCoreConstants.FUNCTION_NAME_RESOLVE_TEXT_KEYS + PROPERTY_TYPE_METHOD_REGEX_SUFFIX);
+  public static final Pattern REGEX_NLS_PROPERTY = Pattern.compile("\\." + ScoutJsCoreConstants.FUNCTION_NAME_RESOLVE_TEXT_PROPERTY + "\\(this\\s*,\\s*'([^']+)'");
 
   private final IDataType m_stringType;
 
   public NlsPropertyOverride(IScoutJsObject owner, IDataType stringType) {
-    super(owner._inits().stream().flatMap(init -> parseMethodCallWithStringArguments(init, REGEX_NLS_PROPERTY_TYPE)), ScoutJsPropertySubType.TEXT_KEY);
+    super(parseNames(owner), ScoutJsPropertySubType.TEXT_KEY);
     m_stringType = stringType;
+  }
+
+  protected static Stream<String> parseNames(IScoutJsObject owner) {
+    return owner._inits().stream().flatMap(init -> Stream.concat(
+        parseMethodCallWithStringArguments(init, REGEX_NLS_KEYS),
+        parseMethodCallWithStringArguments(init, REGEX_NLS_PROPERTY)));
   }
 
   @Override

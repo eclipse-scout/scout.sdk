@@ -12,12 +12,12 @@ package org.eclipse.scout.sdk.core.s.model.js.datatypedetect;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.s.model.js.JavaScriptScoutObject;
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 
 public class PreserveOnPropertyChangeOverride extends AbstractStringArrayMethodCallOverride {
 
-  public static final String ADD_PRESERVE_ON_PROPERTY_CHANGE_PROPERTIES_METHOD_NAME = "_addPreserveOnPropertyChangeProperties";
-  public static final Pattern REGEX_PRESERVE_PROPERTY_TYPE = Pattern.compile(PROPERTY_TYPE_METHOD_REGEX_PREFIX + ADD_PRESERVE_ON_PROPERTY_CHANGE_PROPERTIES_METHOD_NAME + PROPERTY_TYPE_METHOD_REGEX_SUFFIX);
+  public static final Pattern REGEX_PRESERVE_PROPERTY_TYPE = Pattern.compile(PROPERTY_TYPE_METHOD_REGEX_PREFIX + ScoutJsCoreConstants.FUNCTION_NAME_ADD_PRESERVE_ON_PROPERTY_CHANGE_PROPERTIES + PROPERTY_TYPE_METHOD_REGEX_SUFFIX);
 
   private final IDataType m_stringType;
 

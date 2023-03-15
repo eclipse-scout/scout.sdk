@@ -40,6 +40,10 @@ public final class ScoutJsCoreConstants {
   public static final String PROPERTY_NAME_WIDGET_MAP = "widgetMap";
 
   public static final String FUNCTION_NAME_INIT = "_init";
+  public static final String FUNCTION_NAME_RESOLVE_TEXT_KEYS = "resolveTextKeys";
+  public static final String FUNCTION_NAME_RESOLVE_TEXT_PROPERTY = "resolveTextProperty";
+  public static final String FUNCTION_NAME_ADD_PRESERVE_ON_PROPERTY_CHANGE_PROPERTIES = "_addPreserveOnPropertyChangeProperties";
+  public static final String FUNCTION_NAME_ADD_WIDGET_PROPERTIES = "_addWidgetProperties";
 
   public static final String CLASS_NAME_WIDGET = "Widget";
   public static final String CLASS_NAME_GROUP_BOX = "GroupBox";
