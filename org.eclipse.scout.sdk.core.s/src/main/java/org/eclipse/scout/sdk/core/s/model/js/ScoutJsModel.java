@@ -24,12 +24,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.typescript.IWebConstants;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IExportFrom;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
-import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -66,15 +66,12 @@ public class ScoutJsModel {
     var widgetClass = widgetClass();
     Stream<IScoutJsObject> objects;
     if (supportsTypeScript()) {
-      var scoutJsCore = widgetClass.containingModule();
-      var modelAdapter = (IES6Class) scoutJsCore.export(ScoutJsCoreConstants.CLASS_NAME_MODEL_ADAPTER).orElseThrow().referencedElement();
       objects = nodeModule()
           .exports().stream()
           .map(IExportFrom::referencedElement)
           .filter(IES6Class.class::isInstance)
           .map(IES6Class.class::cast)
           .filter(c -> !c.isTypeAlias())
-          .filter(c -> !c.isInstanceOf(modelAdapter))
           .map(element -> TypeScriptScoutObject.create(this, element).orElseThrow());
     }
     else {
@@ -87,15 +84,16 @@ public class ScoutJsModel {
           .map(IES6Class.class::cast)
           .flatMap(element -> JavaScriptScoutObject.create(this, element, widgetClass).stream());
     }
-    var myObjects = objects.collect(toMap(IScoutJsObject::name, identity(), Ensure::failOnDuplicates, LinkedHashMap::new));
+    var myObjects = objects.collect(toMap(IScoutJsObject::name, identity(), (a, b) -> {
+      SdkLog.warning("Duplicate classes with name '{}' in module '{}'.", a.name(), nodeModule().name());
+      return b;
+    }, LinkedHashMap::new));
     return unmodifiableMap(myObjects);
   }
 
   /**
    * Without "this" model. only dependencies. Leaf dependencies (deepest, typically @eclipse-scout/core) come first in
    * the list
-   * 
-   * @return
    */
   public Stream<INodeModule> scoutJsDependenciesRecursively() {
     var collector = new LinkedHashSet<NodeModuleSpi>(); // deepest dependency first

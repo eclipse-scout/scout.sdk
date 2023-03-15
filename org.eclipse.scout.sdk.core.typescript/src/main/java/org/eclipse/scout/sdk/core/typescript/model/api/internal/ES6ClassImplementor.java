@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.core.typescript.model.api.query.FunctionQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.SupersQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implements IES6Class {
   public ES6ClassImplementor(ES6ClassSpi spi) {
@@ -52,10 +51,13 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
 
   @Override
   public boolean isInstanceOf(IES6Class es6Class) {
-    if (es6Class == null || Strings.isBlank(es6Class.name())) {
+    if (es6Class == null) {
       return false;
     }
-    return supers().withName(es6Class.name()).withSelf(true).stream().anyMatch(es6Class::equals);
+    if (es6Class == this) {
+      return true;
+    }
+    return supers().withName(es6Class.name()).existsAny();
   }
 
   @Override

@@ -28,7 +28,6 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeModuleImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.*
-import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.SourceRange
 import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaNodeElementFactory
@@ -60,7 +59,10 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
             .map { it.referencedElement() }
             .filter { it is ES6ClassSpi }
             .map { it as ES6ClassSpi }
-            .collect(toMap({ e -> e.name() }, Function.identity(), Ensure::failOnDuplicates, { LinkedHashMap() }))
+            .collect(toMap({ e -> e.name() }, Function.identity(), { _, b ->
+                SdkLog.warning("Duplicate class '{}' in '{}'.", b.name(), packageJson().api().name())
+                b
+            }, { LinkedHashMap() }))
     }
 
     override fun exports(): Map<String, ExportFromSpi> = m_exports.computeIfAbsentAndGet(this::computeExports)
@@ -189,7 +191,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
         if (psi is JSVariable) {
             return nodeElementFactory().createJavaScriptVariable(psi)
         }
-        SdkLog.warning("Unsupported type: '" + psi::class.java.name + "' called '" + psi.name + "'.")
+        SdkLog.debug("Unsupported type: '" + psi::class.java.name + "' called '" + psi.name + "'.")
         return null
     }
 

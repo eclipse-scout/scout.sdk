@@ -109,7 +109,10 @@ public class JavaScriptScoutObject implements IScoutJsObject {
     }
     var result = fields
         .map(f -> new ScoutJsProperty(owner, f, datatypeDetector))
-        .collect(toMap(ScoutJsProperty::name, identity(), Ensure::failOnDuplicates, LinkedHashMap::new));
+        .collect(toMap(ScoutJsProperty::name, identity(), (a, b) -> {
+          SdkLog.warning("Duplicate property '{}' in '{}'.", b.name(), owner);
+          return b;
+        }, LinkedHashMap::new));
 
     datatypeDetector.unused().forEach((name, type) -> {
       if (!excludedProperties.contains(name)) {
