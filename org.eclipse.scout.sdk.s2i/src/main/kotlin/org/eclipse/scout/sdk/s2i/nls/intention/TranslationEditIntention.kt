@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaE
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationSpec
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader
 import org.eclipse.scout.sdk.s2i.nls.editor.TranslationEditDialog
+import org.eclipse.scout.sdk.s2i.nls.editor.TranslationNewDialog
 
 class TranslationEditIntention : PsiElementBaseIntentionAction() {
 
@@ -31,12 +32,16 @@ class TranslationEditIntention : PsiElementBaseIntentionAction() {
         val key = spec.resolveTranslationKey() ?: return
         val manager = TranslationManagerLoader.createManager(module, spec.translationDependencyScope) ?: return
         val translationToEdit = manager.translation(key).orElse(null) ?: return
-        if (!translationToEdit.hasEditableStores()) {
+        if (!manager.isEditable) {
             SdkLog.warning("Translation '{}' cannot be edited because it is read-only.", translationToEdit.key())
             return
         }
 
-        val dialog = TranslationEditDialog(project, translationToEdit, manager)
+        val dialog = if (translationToEdit.hasEditableStores())
+            TranslationEditDialog(project, translationToEdit, manager)
+        else
+            TranslationNewDialog(project, manager.primaryEditableStore().orElseThrow(), manager, translationToEdit.key()) // override
+
         val ok = dialog.showAndGet()
         if (ok) {
             callInIdeaEnvironment(project, message("edit.translation.x", key)) { env, progress ->
