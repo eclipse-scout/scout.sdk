@@ -11,10 +11,10 @@ package org.eclipse.scout.sdk.core.s.model.js.prop;
 
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.s.model.js.IScoutJsObject;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.PropertyDataTypeDetector;
+import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -95,8 +95,9 @@ public class ScoutJsProperty {
   public Stream<? extends IScoutJsPropertyValue> computePossibleValues(ScoutJsModel scope) {
     var type = type();
     if (type.isEnumLike()) {
-      // FIXME model: add enum support
-      return Stream.empty();
+      return type.scoutJsEnum().stream()
+          .flatMap(scoutJsEnum -> scoutJsEnum.constants().stream()
+              .map(enumProperty -> new ScoutJsEnumPropertyValue(scoutJsEnum, enumProperty, this)));
     }
     if (type.isBoolean()) {
       return Stream.of(true, false)

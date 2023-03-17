@@ -7,41 +7,24 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.s.model.js;
-
-import static java.util.stream.Collectors.toUnmodifiableSet;
+package org.eclipse.scout.sdk.core.s.model.js.objects;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
+import org.eclipse.scout.sdk.core.s.model.js.AbstractScoutJsElementQuery;
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 
-public class ScoutJsObjectQuery extends AbstractQuery<IScoutJsObject> {
+public class ScoutJsObjectQuery extends AbstractScoutJsElementQuery<IScoutJsObject, ScoutJsObjectQuery> {
 
-  private final ScoutJsModel m_model;
-
-  private boolean m_includeDependencies;
   private String m_objectType;
-  private Set<IES6Class> m_objectClasses;
   private IES6Class m_instanceOf;
 
   public ScoutJsObjectQuery(ScoutJsModel model) {
-    m_model = model;
-  }
-
-  public ScoutJsObjectQuery withIncludeDependencies(boolean includeDependencies) {
-    m_includeDependencies = includeDependencies;
-    return this;
-  }
-
-  protected boolean isIncludeDependencies() {
-    return m_includeDependencies;
+    super(model);
   }
 
   public ScoutJsObjectQuery withObjectType(String objectType) {
@@ -54,40 +37,15 @@ public class ScoutJsObjectQuery extends AbstractQuery<IScoutJsObject> {
   }
 
   public ScoutJsObjectQuery withObjectClasses(Stream<IES6Class> declaringClasses) {
-    if (declaringClasses == null) {
-      m_objectClasses = null;
-    }
-    else {
-      m_objectClasses = declaringClasses.collect(toUnmodifiableSet());
-      if (m_objectClasses.isEmpty()) {
-        m_objectClasses = null;
-      }
-    }
-    return this;
+    return withDeclaringClasses(declaringClasses);
   }
 
   public ScoutJsObjectQuery withObjectClasses(Collection<? extends IES6Class> declaringClasses) {
-    if (declaringClasses == null || declaringClasses.isEmpty()) {
-      m_objectClasses = null;
-    }
-    else {
-      m_objectClasses = new HashSet<>(declaringClasses);
-    }
-    return this;
+    return withDeclaringClasses(declaringClasses);
   }
 
   public ScoutJsObjectQuery withObjectClass(IES6Class declaringClass) {
-    if (declaringClass == null) {
-      m_objectClasses = null;
-    }
-    else {
-      m_objectClasses = Collections.singleton(declaringClass);
-    }
-    return this;
-  }
-
-  protected Set<IES6Class> objectClasses() {
-    return m_objectClasses;
+    return withDeclaringClass(declaringClass);
   }
 
   public ScoutJsObjectQuery withInstanceOf(IES6Class superClass) {
@@ -99,27 +57,14 @@ public class ScoutJsObjectQuery extends AbstractQuery<IScoutJsObject> {
     return m_instanceOf;
   }
 
-  protected ScoutJsModel model() {
-    return m_model;
+  @Override
+  protected ScoutJsObjectSpliterator createSpliterator() {
+    return new ScoutJsObjectSpliterator(model(), isIncludeDependencies());
   }
 
   @Override
-  protected Stream<IScoutJsObject> createStream() {
-    var filter = createFilter();
-    var stream = StreamSupport.stream(new ScoutJsObjectSpliterator(model(), isIncludeDependencies()), false);
-    if (filter == null) {
-      return stream;
-    }
-    return stream.filter(filter);
-  }
-
   protected Predicate<IScoutJsObject> createFilter() {
-    Predicate<IScoutJsObject> result = null;
-
-    var declaringClassFilter = objectClasses();
-    if (declaringClassFilter != null) {
-      result = o -> declaringClassFilter.contains(o.declaringClass());
-    }
+    var result = super.createFilter();
 
     var objectType = objectType();
     if (objectType != null) {

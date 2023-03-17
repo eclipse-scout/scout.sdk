@@ -51,13 +51,15 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
 
         const val SCOUT_WITHOUT_CLASS_REFERENCE_DIR = "scout_without_class_reference"
 
-        const val WIDGET_STATE = "${ScoutJsCoreConstants.CLASS_NAME_WIDGET}.WidgetState"
-        const val WIDGET_STATE_A = "$WIDGET_STATE.A"
-        const val WIDGET_STATE_B = "$WIDGET_STATE.B"
-        const val WIDGET_STATE_C = "$WIDGET_STATE.C"
+        const val WIDGET_STATE_NAME = "WidgetState"
+        const val WIDGET_STATE_A = "A"
+        const val WIDGET_STATE_B = "B"
+        const val WIDGET_STATE_C = "C"
 
         const val STRING_FIELD_NAME = "StringField"
-        const val FIELD_STYLE_NAME = "$STRING_FIELD_NAME.FieldStyle"
+        const val FIELD_STYLE_NAME = "FieldStyle"
+        const val FIELD_STYLE_CLASSIC = "CLASSIC"
+        const val FIELD_STYLE_ALTERNATIVE = "ALTERNATIVE"
 
         const val STRING_FIELD_EX_NAME = "StringFieldEx"
         const val STRING_FIELD_EX_QUALIFIED_NAME = "$LAYER_NAMESPACE.$STRING_FIELD_EX_NAME"
@@ -94,16 +96,11 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
 
     fun testJsModel() {
         val scoutJsModel = scoutJsModel()
-        // FIXME model: add enum support
         assertEquals(if (hasLayerModule()) 3 else 2, scoutJsModel.findScoutObjects().withIncludeDependencies(true).count())
-//        assertEquals(if (hasLayerModule()) 5 else 4, scoutJsModel.scoutObjects().count())
+        assertEquals(2, scoutJsModel.findScoutEnums().withIncludeDependencies(true).count())
 
         val scoutWidgetClass = scoutJsModel.widgetClass()
         assertNotNull(scoutWidgetClass)
-
-        // validate model of WidgetState enum
-        // FIXME model: add enum support
-//        assertEquals("$JS_MODEL_ENUM_SIMPLE_NAME $WIDGET_STATE [A=$UNKNOWN_DATA_TYPE, B=$UNKNOWN_DATA_TYPE, C=$UNKNOWN_DATA_TYPE]", scoutJsModel.scoutObject(WIDGET_STATE).toString())
 
         // validate model of Widget class
         val widget = scoutJsModel
@@ -114,8 +111,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
             .orElse(null)
         assertNotNull(widget)
 
-        // FIXME model: add enum support
-//        assertEquals(10, widget.properties().count())
+        assertEquals(10, widget.properties().count())
         val idProperty = widget.properties()[ScoutJsCoreConstants.PROPERTY_NAME_ID]
         assertNotNull(idProperty)
         assertEquals(TypeScriptTypes._string, idProperty?.type()?.dataType()?.orElse(null)?.name())
@@ -139,8 +135,8 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         assertSame(scoutWidgetClass, childProperty?.type()?.dataType()?.orElse(null))
         val stateProperty = widget.properties()[STATE_PROPERTY_NAME]
         assertNotNull(stateProperty)
-        // FIXME model: add enum support
-//        assertEquals("$SCOUT_NAMESPACE.$WIDGET_STATE", stateProperty.type.toString())
+        assertEquals(true, stateProperty?.type()?.isEnumLike)
+        assertEquals(WIDGET_STATE_NAME, stateProperty?.type().toString())
         val labelProperty = widget.properties()[LABEL_PROPERTY_NAME]
         assertNotNull(labelProperty)
         assertEquals("${TypeScriptTypes._string} (sub-type=${ScoutJsPropertySubType.TEXT_KEY})", labelProperty?.type().toString())
@@ -158,9 +154,13 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         assertTrue(scoutWidgetClass.isInstanceOf(widget.declaringClass()))
         assertSame(scoutWidgetClass, widget.declaringClass())
 
-        // validate model of StringField.FieldState enum
-        // FIXME model: add enum support
-//        assertEquals("$JS_MODEL_ENUM_SIMPLE_NAME $FIELD_STYLE_NAME [CLASSIC=$UNKNOWN_DATA_TYPE, ALTERNATIVE=$UNKNOWN_DATA_TYPE]", scoutJsModel.scoutObject(FIELD_STYLE_NAME).toString())
+        // validate model of WidgetState enum
+        val widgetStateEnum = stateProperty?.type()?.scoutJsEnum()?.orElse(null)
+        assertNotNull(widgetStateEnum)
+        assertEquals(WIDGET_STATE_NAME, widgetStateEnum?.name())
+        assertEquals("${ScoutJsCoreConstants.CLASS_NAME_WIDGET}.$WIDGET_STATE_NAME", widgetStateEnum?.referenceName())
+        assertEquals(widget.declaringClass(), widgetStateEnum?.topLevelReference())
+        assertEquals(setOf(WIDGET_STATE_A, WIDGET_STATE_B, WIDGET_STATE_C), widgetStateEnum?.constants()?.toSet())
 
         // validate model of StringField class. this includes the test that the fieldStyle property is recognized as enum
         val stringField = scoutJsModel
@@ -176,8 +176,8 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         assertEquals(TypeScriptTypes._number, maxLengthProperty?.type().toString())
         val fieldStyleProperty = stringField.properties()[FIELD_STYLE_PROPERTY_NAME]
         assertNotNull(fieldStyleProperty)
-        // FIXME model: add enum support
-//        assertEquals("$SCOUT_NAMESPACE.$FIELD_STYLE_NAME", fieldStyleProperty.type.toString())
+        assertEquals(true, fieldStyleProperty?.type()?.isEnumLike)
+        assertEquals(FIELD_STYLE_NAME, fieldStyleProperty?.type().toString())
 
         // test that StringField is recognized as Widget
         assertTrue(stringField.declaringClass().isInstanceOf(scoutWidgetClass))
@@ -200,6 +200,14 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
                 STATE_PROPERTY_NAME, LABEL_PROPERTY_NAME, ONLY_HERE_PROPERTY_NAME, MAX_LENGTH_PROPERTY_NAME, FIELD_STYLE_PROPERTY_NAME, SELECTED_TAB_PROPERTY_NAME
             ), stringField.findProperties().withSuperClasses(true).stream().map { it.name() }.collect(toSet())
         )
+
+        // validate model of StringField.FieldStyle enum
+        val fieldStyleEnum = fieldStyleProperty?.type()?.scoutJsEnum()?.orElse(null)
+        assertNotNull(fieldStyleEnum)
+        assertEquals(FIELD_STYLE_NAME, fieldStyleEnum?.name())
+        assertEquals("$STRING_FIELD_NAME.$FIELD_STYLE_NAME", fieldStyleEnum?.referenceName())
+        assertEquals(stringField.declaringClass(), fieldStyleEnum?.topLevelReference())
+        assertEquals(setOf(FIELD_STYLE_CLASSIC, FIELD_STYLE_ALTERNATIVE), fieldStyleEnum?.constants()?.toSet())
 
         if (!hasLayerModule()) {
             return
@@ -379,11 +387,11 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
     protected open fun getValueCompletionObjectTypeStringLiteralExpectedFileContents_StringFieldExQualifiedName() = getValueCompletionObjectTypeStringLiteralExpectedFileContents(STRING_FIELD_EX_QUALIFIED_NAME)
 
     fun testValueCompletionEnum() {
-        // FIXME model: add enum support
-//        doCompleteAssertContent(VALUE_COMPLETION_ENUM_FILE, WIDGET_STATE_B, *getValueCompletionEnumExpectedFileContents())
+        doCompleteAssertContent(VALUE_COMPLETION_ENUM_FILE, WIDGET_STATE_B, *getValueCompletionEnumExpectedFileContents())
     }
 
-    protected open fun getValueCompletionEnumExpectedFileContents() = arrayOf("$STATE_PROPERTY_NAME: $WIDGET_STATE_B ", getImportFileContent(ScoutJsCoreConstants.CLASS_NAME_WIDGET, SCOUT_MODULE_NAME))
+    protected open fun getValueCompletionEnumExpectedFileContents() =
+        arrayOf("$STATE_PROPERTY_NAME: ${ScoutJsCoreConstants.CLASS_NAME_WIDGET}.$WIDGET_STATE_NAME.$WIDGET_STATE_B ", getImportFileContent(ScoutJsCoreConstants.CLASS_NAME_WIDGET, SCOUT_MODULE_NAME))
 
     private fun doCompleteAssertContent(filePath: String, finishLookupName: String, vararg expectedFileContent: String?): JsModelCompletionHelper.ScoutJsModelLookupElement? {
         val (file, modelElement) = doCompletion(filePath, finishLookupName)

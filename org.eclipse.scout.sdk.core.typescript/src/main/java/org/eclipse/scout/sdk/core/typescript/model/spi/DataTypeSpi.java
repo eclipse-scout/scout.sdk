@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
@@ -38,5 +39,9 @@ public interface DataTypeSpi extends NodeElementSpi {
 
   default int arrayDimension() {
     return 0;
+  }
+
+  default Optional<ObjectLiteralSpi> objectLiteral() {
+    return Optional.empty();
   }
 }

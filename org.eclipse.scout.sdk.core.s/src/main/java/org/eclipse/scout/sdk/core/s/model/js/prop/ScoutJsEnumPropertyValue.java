@@ -9,11 +9,11 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js.prop;
 
-import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
+import org.eclipse.scout.sdk.core.s.model.js.enums.IScoutJsEnum;
 
-public record ScoutJsObjectPropertyValue(IScoutJsObject scoutJsObject, ScoutJsProperty property) implements IScoutJsPropertyValue {
+public record ScoutJsEnumPropertyValue(IScoutJsEnum scoutJsEnum, String enumConstant, ScoutJsProperty property) implements IScoutJsPropertyValue {
   @Override
   public String name() {
-    return scoutJsObject.shortName();
+    return scoutJsEnum.referenceName() + "." + enumConstant;
   }
 }

@@ -42,8 +42,9 @@ public class ObjectLiteralDataTypeSpi extends AbstractNodeElementSpi<IDataType> 
     return false;
   }
 
-  public ObjectLiteralSpi objectLiteral() {
-    return m_objectLiteral;
+  @Override
+  public Optional<ObjectLiteralSpi> objectLiteral() {
+    return Optional.of(m_objectLiteral);
   }
 
   @Override

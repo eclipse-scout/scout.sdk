@@ -28,7 +28,7 @@ import com.intellij.util.ThrowableRunnable
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
 import org.eclipse.scout.sdk.core.typescript.IWebConstants
-import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.PropertyCompletionInfo
@@ -83,12 +83,12 @@ class JsModelValueCompletionContributor : CompletionContributor() {
             return lookupElement.withInsertHandler { context, item ->
                 originalInsertHandler?.handleInsert(context, item)
 
-                val typeToImport = findTypeToImport(lookupElement) ?: return@withInsertHandler
-                var importName = typeToImport.exportAlias().orElse(typeToImport.name())
+                val elementToImport = findElementToImport(lookupElement) ?: return@withInsertHandler
+                var importName = elementToImport.exportAlias().orElse(elementToImport.name())
                 val firstDot = importName.indexOf('.')
                 if (firstDot > 0) importName = importName.take(firstDot)
 
-                val importFrom = if (typeToImport.containingModule() == editModel.nodeModule()) {
+                val importFrom = if (elementToImport.containingModule() == editModel.nodeModule()) {
                     // relative path inside same module
                     val editDir = place.containingFile.virtualFile.parent.resolveLocalPath() ?: return@withInsertHandler
                     val editModelPackageJson = editModel.nodeModule().packageJson()
@@ -97,7 +97,7 @@ class JsModelValueCompletionContributor : CompletionContributor() {
                     Strings.removeSuffix(Strings.removeSuffix(rel, IWebConstants.TS_FILE_SUFFIX), IWebConstants.JS_FILE_SUFFIX)
                 } else {
                     // import directly to other module
-                    typeToImport.containingModule().name()
+                    elementToImport.containingModule().name()
                 }
 
                 if (!ApplicationManager.getApplication().isWriteAccessAllowed) {
@@ -141,12 +141,11 @@ class JsModelValueCompletionContributor : CompletionContributor() {
             }
         }
 
-        private fun findTypeToImport(lookupElement: LookupElementBuilder): IES6Class? {
+        private fun findElementToImport(lookupElement: LookupElementBuilder): INodeElement? {
             val lookupElementViewModel = lookupElement.getUserData(SELECTED_ELEMENT) ?: return null
             val property = lookupElementViewModel.property()
             if (property.type().isEnumLike) {
-                // FIXME model: add enum support
-                return null
+                return property.type().scoutJsEnum().map { it.topLevelReference() }.orElse(null)
             }
             if (property.scoutJsObject().scoutJsModel().supportsClassReference() && (property.type().hasClasses() || property.isObjectType)) {
                 val objectLookupElement = lookupElementViewModel as? JsModelCompletionHelper.JsObjectValueLookupElement ?: return null

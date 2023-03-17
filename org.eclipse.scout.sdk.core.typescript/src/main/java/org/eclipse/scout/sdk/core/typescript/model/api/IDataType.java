@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi;
 
 public interface IDataType extends INodeElement {
 
@@ -39,6 +41,10 @@ public interface IDataType extends INodeElement {
 
   default int arrayDimension() {
     return spi().arrayDimension();
+  }
+
+  default Optional<IObjectLiteral> objectLiteral() {
+    return spi().objectLiteral().map(ObjectLiteralSpi::api);
   }
 
   enum DataTypeFlavor {

@@ -17,8 +17,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.s.model.js.IScoutJsObject;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
+import org.eclipse.scout.sdk.core.s.model.js.enums.IScoutJsEnum;
+import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
@@ -33,12 +34,14 @@ public class ScoutJsPropertyType {
   private final ScoutJsProperty m_declaringProperty;
   private final ScoutJsPropertySubType m_subType;
   private final FinalValue<Set<IES6Class>> m_classes;
+  private final FinalValue<Optional<IScoutJsEnum>> m_enum;
 
   public ScoutJsPropertyType(IDataType dataType, ScoutJsPropertySubType subType, ScoutJsProperty declaringProperty) {
     m_dataType = dataType; // dataType may be null in case the property is based on a Field and the field has no datatype (cannot be detected. e.g. in JavaScript: this.myField = null)
     m_subType = Ensure.notNull(subType);
     m_declaringProperty = Ensure.notNull(declaringProperty);
     m_classes = new FinalValue<>();
+    m_enum = new FinalValue<>();
   }
 
   public ScoutJsPropertyType(IDataType dataType, ScoutJsProperty declaringProperty) {
@@ -67,18 +70,15 @@ public class ScoutJsPropertyType {
   }
 
   public boolean isEnumLike() {
-    var datatype = dataType().orElse(null);
-    if (datatype == null) {
-      return false;
-    }
-    if (datatype.flavor() != DataTypeFlavor.Single) {
-      return false;
-    }
-    if (datatype instanceof IES6Class es6Class) {
-      return es6Class.isEnum();
-    }
-    // FIXME model: add enum support
-    return false;
+    return scoutJsEnum().isPresent();
+  }
+
+  public Optional<IScoutJsEnum> scoutJsEnum() {
+    return m_enum.computeIfAbsentAndGet(() -> dataType().flatMap(dataType -> declaringProperty().scoutJsObject().scoutJsModel()
+        .findScoutEnums()
+        .withIncludeDependencies(true)
+        .withFulfillsDataType(dataType)
+        .first()));
   }
 
   public boolean isArray() {
@@ -86,7 +86,7 @@ public class ScoutJsPropertyType {
   }
 
   public boolean hasClasses() {
-    return !getClasses().isEmpty();
+    return !isEnumLike() && !getClasses().isEmpty();
   }
 
   public Stream<IES6Class> classes() {

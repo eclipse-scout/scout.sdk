@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.s.model.js;
+package org.eclipse.scout.sdk.core.s.model.js.objects;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableMap;
@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.IPropertyDataTypeOverride;
 import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.KnownStringPropertiesOverride;
 import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.NlsPropertyOverride;

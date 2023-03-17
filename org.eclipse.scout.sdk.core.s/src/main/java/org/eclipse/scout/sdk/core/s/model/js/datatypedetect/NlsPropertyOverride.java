@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.core.s.model.js.datatypedetect;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.s.model.js.IScoutJsObject;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
+import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertySubType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 

@@ -7,21 +7,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.s.model.js;
+package org.eclipse.scout.sdk.core.s.model.js.objects;
 
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.sdk.core.s.model.js.IScoutJsElement;
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty;
-import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertyQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
-import org.eclipse.scout.sdk.core.util.Strings;
 
-public interface IScoutJsObject {
-
-  ScoutJsModel scoutJsModel();
-
-  String name();
+public interface IScoutJsObject extends IScoutJsElement {
 
   default String shortName() {
     if (ScoutJsCoreConstants.NAMESPACE.equals(scoutJsModel().namespace().orElse(null))) {
@@ -31,19 +28,7 @@ public interface IScoutJsObject {
   }
 
   default String qualifiedName() {
-    return toQualifiedName(scoutJsModel().namespace().orElse(null), name());
-  }
-
-  static String toQualifiedName(String namespace, String objectName) {
-    if (Strings.isEmpty(objectName)) {
-      return null;
-    }
-    var result = new StringBuilder();
-    if (Strings.hasText(namespace)) {
-      result.append(namespace).append('.');
-    }
-    result.append(objectName);
-    return result.toString();
+    return IScoutJsElement.toQualifiedName(scoutJsModel().namespace().orElse(null), name());
   }
 
   default boolean hasProperty(String name) {
@@ -52,8 +37,6 @@ public interface IScoutJsObject {
         .withName(name)
         .existsAny();
   }
-
-  IES6Class declaringClass();
 
   Map<String, ScoutJsProperty> properties();
 

@@ -12,22 +12,27 @@ package org.eclipse.scout.sdk.core.s.model.js;
 import static java.util.stream.Collectors.toCollection;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
+import org.eclipse.scout.sdk.core.util.Ensure;
 
-public class ScoutJsObjectSpliterator implements Spliterator<IScoutJsObject> {
+public abstract class AbstractScoutJsElementSpliterator<E extends IScoutJsElement> implements Spliterator<E> {
 
+  private final Function<ScoutJsModel, Collection<E>> m_scoutElements;
   private final Deque<INodeModule> m_dependencyDek;
   private final int m_characteristics;
 
   private ScoutJsModel m_currentModel;
-  private Iterator<IScoutJsObject> m_currentModelObjectsIterator; // points to the objects of the currently active ScoutJsModel
+  private Iterator<E> m_currentModelElementsIterator; // points to the elements of the currently active ScoutJsModel
 
-  public ScoutJsObjectSpliterator(ScoutJsModel model, boolean includeDependencies) {
+  protected AbstractScoutJsElementSpliterator(ScoutJsModel model, boolean includeDependencies, Function<ScoutJsModel, Collection<E>> scoutElements) {
+    m_scoutElements = Ensure.notNull(scoutElements);
     m_currentModel = model;
     if (includeDependencies) {
       m_dependencyDek = model
@@ -37,7 +42,7 @@ public class ScoutJsObjectSpliterator implements Spliterator<IScoutJsObject> {
     else {
       m_dependencyDek = null;
     }
-    m_currentModelObjectsIterator = model.exportedScoutObjects().values().iterator();
+    m_currentModelElementsIterator = m_scoutElements.apply(model).iterator();
 
     var characteristics = Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED;
     if (!includeDependencies) {
@@ -47,14 +52,14 @@ public class ScoutJsObjectSpliterator implements Spliterator<IScoutJsObject> {
   }
 
   @Override
-  public boolean tryAdvance(Consumer<? super IScoutJsObject> consumer) {
-    if (!m_currentModelObjectsIterator.hasNext()) {
+  public boolean tryAdvance(Consumer<? super E> consumer) {
+    if (!m_currentModelElementsIterator.hasNext()) {
       if (m_dependencyDek != null) {
         boolean movedToNextModel;
         do {
           movedToNextModel = moveToNextModel();
         }
-        while (movedToNextModel && !m_currentModelObjectsIterator.hasNext());
+        while (movedToNextModel && !m_currentModelElementsIterator.hasNext());
 
         if (!movedToNextModel) {
           return false;
@@ -65,25 +70,25 @@ public class ScoutJsObjectSpliterator implements Spliterator<IScoutJsObject> {
       }
     }
 
-    consumer.accept(m_currentModelObjectsIterator.next());
+    consumer.accept(m_currentModelElementsIterator.next());
     return true;
   }
 
   protected boolean moveToNextModel() {
     if (m_dependencyDek.isEmpty()) {
       m_currentModel = null;
-      m_currentModelObjectsIterator = null;
+      m_currentModelElementsIterator = null;
       return false;
     }
     var widgetClass = m_currentModel.widgetClass();
     m_currentModel = ScoutJsModels.create(m_dependencyDek.removeLast(), widgetClass).orElseThrow();
-    m_currentModelObjectsIterator = m_currentModel.exportedScoutObjects().values().iterator();
+    m_currentModelElementsIterator = m_scoutElements.apply(m_currentModel).iterator();
 
     return true;
   }
 
   @Override
-  public Spliterator<IScoutJsObject> trySplit() {
+  public Spliterator<E> trySplit() {
     return null; // no split support needed
   }
 
@@ -91,7 +96,7 @@ public class ScoutJsObjectSpliterator implements Spliterator<IScoutJsObject> {
   public long estimateSize() {
     if (hasCharacteristics(SIZED)) {
       // no recursion -> exact number of elements known.
-      return m_currentModel.exportedScoutObjects().size();
+      return m_scoutElements.apply(m_currentModel).size();
     }
     return Long.MAX_VALUE; // having recursion the size is unknown as we don't know the number of grand-children yet
   }

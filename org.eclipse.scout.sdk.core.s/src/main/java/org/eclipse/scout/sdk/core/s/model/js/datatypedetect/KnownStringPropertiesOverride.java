@@ -14,8 +14,8 @@ import static java.util.Collections.emptyMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.s.model.js.IScoutJsObject;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
+import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertyType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;

@@ -30,5 +30,5 @@ class ContributionJsModelCompletionContributorTest : AbstractJsModelCompletionCo
 
     override fun getValueCompletionObjectTypeExpectedFileContents_StringFieldEx() = getValueCompletionObjectTypeExpectedFileContents(STRING_FIELD_EX_NAME)
 
-    override fun getValueCompletionEnumExpectedFileContents(): Array<String?> = arrayOf("$STATE_PROPERTY_NAME: $WIDGET_STATE_B ")
+    override fun getValueCompletionEnumExpectedFileContents(): Array<String?> = arrayOf("$STATE_PROPERTY_NAME: ${ScoutJsCoreConstants.CLASS_NAME_WIDGET}.$WIDGET_STATE_NAME.$WIDGET_STATE_B ")
 }

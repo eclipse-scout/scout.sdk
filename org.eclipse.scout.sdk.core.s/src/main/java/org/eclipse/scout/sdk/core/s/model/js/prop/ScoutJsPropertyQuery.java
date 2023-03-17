@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.s.model.js;
+package org.eclipse.scout.sdk.core.s.model.js.prop;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +15,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
-import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty;
+import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 
 public class ScoutJsPropertyQuery extends AbstractQuery<ScoutJsProperty> {
 

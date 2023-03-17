@@ -34,14 +34,11 @@ import com.intellij.psi.util.elementType
 import com.intellij.util.ThrowableRunnable
 import icons.JavaScriptPsiIcons
 import org.eclipse.scout.sdk.core.java.JavaUtils
-import org.eclipse.scout.sdk.core.s.model.js.IScoutJsObject
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModels
-import org.eclipse.scout.sdk.core.s.model.js.prop.IScoutJsPropertyValue
-import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsObjectPropertyValue
-import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty
-import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertySubType
+import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject
+import org.eclipse.scout.sdk.core.s.model.js.prop.*
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
@@ -125,7 +122,12 @@ object JsModelCompletionHelper {
     private fun createLookupElement(modelElement: ScoutJsModelLookupElement, completionInfo: PropertyCompletionInfo): LookupElementBuilder {
         val name = modelElement.name()
         val presentableName = modelElement.presentableName()
-        var result = LookupElementBuilder.create(name, if (completionInfo.isInLiteral) name else presentableName)
+        var result = LookupElementBuilder.create(
+            name, when (modelElement) {
+                is JsObjectValueLookupElement -> if (completionInfo.isInLiteral) name else presentableName
+                else -> name
+            }
+        )
             .withLookupString(name)
             .withLookupString(presentableName)
             .withCaseSensitivity(true)
@@ -426,5 +428,9 @@ object JsModelCompletionHelper {
         override fun icon() = AllIcons.Nodes.Enum
         override fun typeText(): String = property().type().dataType().map { it.name() }.orElse(null)
         override fun name(): String = propertyValue.name()
+        override fun presentableName(): String = when (propertyValue) {
+            is ScoutJsEnumPropertyValue -> propertyValue.enumConstant
+            else -> name()
+        }
     }
 }

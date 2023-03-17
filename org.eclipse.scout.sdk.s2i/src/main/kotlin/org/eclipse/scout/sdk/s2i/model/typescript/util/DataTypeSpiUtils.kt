@@ -15,7 +15,7 @@ import com.intellij.lang.javascript.psi.jsdoc.JSDocComment
 import com.intellij.lang.javascript.psi.resolve.JSResolveUtil
 import com.intellij.lang.javascript.psi.resolve.JSTypeEvaluator
 import com.intellij.lang.javascript.psi.types.*
-import com.intellij.lang.javascript.psi.types.evaluable.JSQualifiedReferenceType
+import com.intellij.lang.javascript.psi.types.evaluable.JSEvaluableOnlyType
 import com.intellij.lang.javascript.psi.types.primitives.JSNullType
 import com.intellij.lang.javascript.psi.types.primitives.JSUndefinedType
 import com.intellij.psi.util.PsiTreeUtil
@@ -52,7 +52,7 @@ object DataTypeSpiUtils {
     }
 
     private fun createDataType(typeOwner: JSTypeOwner, module: IdeaNodeModule, constantValue: () -> IConstantValue?): DataTypeSpi? {
-        if (typeOwner.jsType is JSWrapperType || typeOwner.jsType is JSQualifiedReferenceType) {
+        if (typeOwner.jsType is JSWrapperType || typeOwner.jsType is JSEvaluableOnlyType) {
             getDataType(constantValue)?.let { return it }
         }
         return typeOwner.jsType?.let { createDataType(it, module) }
@@ -175,7 +175,7 @@ object DataTypeSpiUtils {
                 constantValue.ideaModule.nodeElementFactory().createArrayDataType(union, arrayDimension)
             }
 
-            IConstantValue.ConstantValueType.ObjectLiteral,
+            IConstantValue.ConstantValueType.ObjectLiteral -> (constantValue.unwrappedElement() as? JSObjectLiteralExpression)?.let { createDataType(it, constantValue.ideaModule) }
             IConstantValue.ConstantValueType.Unknown -> null
         }
     }

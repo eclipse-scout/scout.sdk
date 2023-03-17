@@ -25,5 +25,6 @@ class ScoutJsModelCompletionContributorTest : AbstractJsModelCompletionContribut
 
     override fun getValueCompletionObjectTypeExpectedFileContents_Widget() = getValueCompletionObjectTypeExpectedFileContents(ScoutJsCoreConstants.CLASS_NAME_WIDGET, ScoutJsCoreConstants.CLASS_NAME_WIDGET, "../index")
 
-    override fun getValueCompletionEnumExpectedFileContents() = arrayOf("$STATE_PROPERTY_NAME: $WIDGET_STATE_B ", getImportFileContent(ScoutJsCoreConstants.CLASS_NAME_WIDGET, "../index"))
+    override fun getValueCompletionEnumExpectedFileContents() =
+        arrayOf("$STATE_PROPERTY_NAME: ${ScoutJsCoreConstants.CLASS_NAME_WIDGET}.$WIDGET_STATE_NAME.$WIDGET_STATE_B ", getImportFileContent(ScoutJsCoreConstants.CLASS_NAME_WIDGET, "../index"))
 }
