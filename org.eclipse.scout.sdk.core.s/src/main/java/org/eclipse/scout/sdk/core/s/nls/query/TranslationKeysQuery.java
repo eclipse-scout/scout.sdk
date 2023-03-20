@@ -45,8 +45,9 @@ public class TranslationKeysQuery implements IFileQuery {
 
   private static final String LITERAL_DELIMITER = "['`\"]";
   private static final Pattern TRANSLATION_LITERAL_PATTERN = Pattern.compile(LITERAL_DELIMITER + '(' + ITranslation.KEY_REGEX.pattern() + ')' + LITERAL_DELIMITER);
+  @SuppressWarnings("StaticCollection")
+  private static final Set<String> ACCEPTED_EXTENSIONS = DependencyScope.supportedFileExtensions().keySet();
 
-  private final Set<String> m_acceptedFileExtensions = DependencyScope.supportedFileExtensions().keySet();
   private final Map<Path, Set<FileQueryMatch>> m_result = new HashMap<>();
   private final String m_name;
 
@@ -58,9 +59,13 @@ public class TranslationKeysQuery implements IFileQuery {
     m_name = Strings.notBlank(name).orElse("Search all translation keys");
   }
 
+  public static boolean acceptFileExtension(String extension) {
+    return ACCEPTED_EXTENSIONS.contains(extension);
+  }
+
   @Override
   public void searchIn(FileQueryInput input) {
-    if (!m_acceptedFileExtensions.contains(input.fileExtension())) {
+    if (!acceptFileExtension(input.fileExtension())) {
       return;
     }
 
