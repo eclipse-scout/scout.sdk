@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.s2i.model.typescript
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
+import org.eclipse.scout.sdk.core.typescript.model.api.ITypeOf
 import org.eclipse.scout.sdk.s2i.model.AbstractModelTest
 
 
@@ -23,17 +24,39 @@ class IdeaTypeScriptEnumTest : AbstractModelTest("typescript/moduleWithEnums") {
 
     fun testEnumLikeTypeAlias() {
         val constEnumType = myIdeaNodeModule.export("ConstEnumType").orElseThrow().referencedElement() as IES6Class
-        assertEquals("FIRST", constEnumType.field("FIRST").orElseThrow().name())
-        assertEquals("FIRST: 'a'", constEnumType.field("FIRST").orElseThrow().source().orElseThrow().asCharSequence().toString())
-        assertFalse(constEnumType.field("SECOND").orElseThrow().isOptional)
-        assertEquals("c", constEnumType.field("THIRD").orElseThrow().constantValue().asString().orElseThrow())
-        assertEquals("\"c\"", constEnumType.field("THIRD").orElseThrow().dataType().orElseThrow().name())
+        assertTrue(constEnumType.isTypeAlias)
+        val constEnumAliased = constEnumType.aliasedDataType().orElseThrow()
+        assertEquals("EnumObject", constEnumAliased.name())
+        assertTrue(constEnumAliased is IES6Class)
+        assertEquals(1, constEnumAliased.typeArguments().count())
+
+        val constEnumTypeArgument = constEnumAliased.typeArguments().findFirst().orElseThrow()
+        assertTrue(constEnumTypeArgument is ITypeOf)
+
+        val constEnumComponentType = (constEnumTypeArgument as ITypeOf).dataType().orElseThrow()
+        assertEquals("Const", constEnumComponentType.name())
+        val constEnumObjectLiteral = constEnumComponentType.objectLiteral().orElseThrow()
+        assertNotNull("FIRST", constEnumObjectLiteral.property("FIRST").orElseThrow())
+        assertEquals("a", constEnumObjectLiteral.property("FIRST").orElseThrow().asString().orElseThrow())
+        assertEquals("c", constEnumObjectLiteral.property("THIRD").orElseThrow().asString().orElseThrow())
+        assertEquals("string", constEnumObjectLiteral.property("THIRD").orElseThrow().dataType().orElseThrow().name())
 
         val noConstEnumType = myIdeaNodeModule.export("NoConstEnumType").orElseThrow().referencedElement() as IES6Class
-        assertEquals("first", noConstEnumType.field("first").orElseThrow().name())
-        assertEquals("first: 1", noConstEnumType.field("first").orElseThrow().source().orElseThrow().asCharSequence().toString())
-        assertFalse(noConstEnumType.field("second").orElseThrow().isOptional)
-        assertEquals(3, noConstEnumType.field("third").orElseThrow().constantValue().convertTo(Int::class.java).orElseThrow())
-        assertEquals("3", noConstEnumType.field("third").orElseThrow().dataType().orElseThrow().name())
+        assertTrue(noConstEnumType.isTypeAlias)
+        val noConstEnumAliased = noConstEnumType.aliasedDataType().orElseThrow()
+        assertEquals("EnumObject", noConstEnumAliased.name())
+        assertTrue(noConstEnumAliased is IES6Class)
+        assertEquals(1, noConstEnumAliased.typeArguments().count())
+
+        val noConstEnumTypeArgument = noConstEnumAliased.typeArguments().findFirst().orElseThrow()
+        assertTrue(noConstEnumTypeArgument is ITypeOf)
+
+        val noConstEnumComponentType = (noConstEnumTypeArgument as ITypeOf).dataType().orElseThrow()
+        assertEquals("NoConst", noConstEnumComponentType.name())
+        val noConstEnumObjectLiteral = noConstEnumComponentType.objectLiteral().orElseThrow()
+        assertNotNull("first", noConstEnumObjectLiteral.property("first").orElseThrow())
+        assertEquals(1, noConstEnumObjectLiteral.property("first").orElseThrow().convertTo(Int::class.java).orElseThrow())
+        assertEquals(3, noConstEnumObjectLiteral.property("third").orElseThrow().convertTo(Int::class.java).orElseThrow())
+        assertEquals("number", noConstEnumObjectLiteral.property("third").orElseThrow().dataType().orElseThrow().name())
     }
 }

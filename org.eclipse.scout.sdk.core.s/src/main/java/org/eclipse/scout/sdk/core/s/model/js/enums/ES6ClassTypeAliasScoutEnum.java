@@ -50,12 +50,12 @@ public class ES6ClassTypeAliasScoutEnum implements IScoutJsEnum {
             .map(IExportFrom::referencedElement)
             .flatMap(reference -> {
               if (reference instanceof IVariable variable) {
-                return FieldVariableScoutEnum.create(owner, variable)
+                return VariableScoutEnum.create(owner, variable)
                     .map(scoutJsEnum -> new ES6ClassTypeAliasScoutEnum(owner, clazz, scoutJsEnum));
               }
               if (reference instanceof IES6Class element && matcher.groupCount() > 1) {
                 return element.field(matcher.group(2))
-                    .flatMap(field -> FieldVariableScoutEnum.create(owner, field, element))
+                    .flatMap(field -> VariableScoutEnum.create(owner, field))
                     .map(scoutJsEnum -> new ES6ClassTypeAliasScoutEnum(owner, clazz, scoutJsEnum));
               }
               return Optional.empty();

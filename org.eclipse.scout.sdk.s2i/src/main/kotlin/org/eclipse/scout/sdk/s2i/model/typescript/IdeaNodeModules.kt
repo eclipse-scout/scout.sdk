@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 import com.intellij.lang.ecmascript6.psi.ES6ImportSpecifier
 import com.intellij.lang.ecmascript6.psi.ES6ImportSpecifierAlias
 import com.intellij.lang.javascript.psi.JSElement
+import com.intellij.lang.javascript.psi.JSField
+import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
@@ -20,6 +22,7 @@ import com.intellij.psi.PsiQualifiedReferenceElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
+import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
 
 class IdeaNodeModules(val project: Project) {
@@ -46,7 +49,13 @@ class IdeaNodeModules(val project: Project) {
         }
         val containingModule = findContainingModule(referencedElement) ?: return null
         val name = (referencedElement as? PsiNamedElement)?.name ?: return null
-        return containingModule.exports()[name]?.referencedElement()
+        containingModule.exports()[name]?.referencedElement()?.let { return it }
+        if (referencedElement is JSField) {
+            val clazz = PsiTreeUtil.getParentOfType(referencedElement, JSClass::class.java) ?: return null
+            val es6Class = containingModule.exports()[clazz.name]?.referencedElement() as? ES6ClassSpi ?: return null
+            return es6Class.api().field(name).map { it.spi() }.orElse(null)
+        }
+        return null
     }
 
     fun findContainingModule(element: PsiElement?): IdeaNodeModule? {

@@ -20,6 +20,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElementFactory;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeElementFactoryImplementor;
@@ -44,8 +45,8 @@ public abstract class AbstractNodeElementFactorySpi extends AbstractNodeElementS
   }
 
   @Override
-  public SyntheticFieldSpi createSyntheticField(String name, DataTypeSpi dataType) {
-    return getOrCreate(new CompositeObject(name, SyntheticFieldSpi.class), id -> new SyntheticFieldSpi(containingModule(), name, dataType));
+  public SyntheticFieldSpi createSyntheticField(String name, DataTypeSpi dataType, ES6ClassSpi declaringClass) {
+    return getOrCreate(new CompositeObject(name, SyntheticFieldSpi.class), id -> new SyntheticFieldSpi(containingModule(), name, dataType, declaringClass));
   }
 
   @Override
@@ -109,5 +110,14 @@ public abstract class AbstractNodeElementFactorySpi extends AbstractNodeElementS
   @Override
   public DataTypeSpi createIntersectionDataType(Collection<DataTypeSpi> componentDataTypes) {
     return createUnionOrIntersectionDataType(componentDataTypes, DataTypeFlavor.Intersection);
+  }
+
+  @Override
+  public DataTypeSpi createConstantValueDataType(IConstantValue constantValue) {
+    if (constantValue == null) {
+      return null;
+    }
+
+    return getOrCreate(new CompositeObject(constantValue, ConstantValueDataTypeSpi.class), id -> new ConstantValueDataTypeSpi(containingModule(), constantValue));
   }
 }

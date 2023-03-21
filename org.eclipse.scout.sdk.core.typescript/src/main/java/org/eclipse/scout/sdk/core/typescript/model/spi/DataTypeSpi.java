@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 
@@ -42,6 +43,10 @@ public interface DataTypeSpi extends NodeElementSpi {
   }
 
   default Optional<ObjectLiteralSpi> objectLiteral() {
+    return Optional.empty();
+  }
+
+  default Optional<IConstantValue> constantValue() {
     return Optional.empty();
   }
 }

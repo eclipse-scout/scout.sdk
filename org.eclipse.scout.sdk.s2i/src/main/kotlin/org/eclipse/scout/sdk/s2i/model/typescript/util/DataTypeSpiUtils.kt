@@ -11,6 +11,9 @@ package org.eclipse.scout.sdk.s2i.model.typescript.util
 
 import com.intellij.lang.ecmascript6.psi.ES6ImportDeclaration
 import com.intellij.lang.javascript.psi.*
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptAsExpression
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptLiteralType
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeofType
 import com.intellij.lang.javascript.psi.jsdoc.JSDocComment
 import com.intellij.lang.javascript.psi.resolve.JSResolveUtil
 import com.intellij.lang.javascript.psi.resolve.JSTypeEvaluator
@@ -58,7 +61,7 @@ object DataTypeSpiUtils {
         return typeOwner.jsType?.let { createDataType(it, module) }
     }
 
-    private fun createDataType(type: JSType, module: IdeaNodeModule): DataTypeSpi? {
+    fun createDataType(type: JSType, module: IdeaNodeModule): DataTypeSpi? {
         if (type is JSWrapperType) return createDataType(type.originalType, module)
         if (type.isJavaScript && (type is JSNullType || type is JSUndefinedType)) return null
         if (type is JSArrayType) {
@@ -79,6 +82,15 @@ object DataTypeSpiUtils {
                         module.nodeElementFactory().createIntersectionDataType(it)
                 }
         }
+        if (type is TypeScriptTypeOfJSTypeImpl) {
+            return (type.sourceElement as? TypeScriptTypeofType)?.let { module.nodeElementFactory().createTypeScriptTypeofType(it) }
+        }
+        if (type.isTypeScript && type is JSLiteralType) {
+            (type.sourceElement as? TypeScriptLiteralType)?.expression
+                ?.let { module.nodeElementFactory().createConstantValue(it) }
+                ?.let { module.nodeElementFactory().createConstantValueDataType(it) }
+                ?.let { return it }
+        }
         if (type is JSUtilType) return module.nodeElementFactory().createJavaScriptType(type)
 
         resolveAsReferencedType(type, module)?.let { return it }
@@ -94,22 +106,20 @@ object DataTypeSpiUtils {
         if (sourceElement !is JSTypeArgumentsOwner) return reference
         val typeArgumentClasses = sourceElement
             .typeArguments
-            .mapNotNull { resolveAsReferencedType(it.jsType, module) }
+            .mapNotNull { createDataType(it.jsType, module) }
         if (typeArgumentClasses.isEmpty()) return reference
         return module.nodeElementFactory().createClassWithTypeArgumentsDataType(reference, typeArgumentClasses)
     }
 
     private fun createDataType(objectLiteral: JSObjectLiteralExpression, module: IdeaNodeModule): DataTypeSpi? {
-        val name = when (val parent = objectLiteral.parent) {
+        var parent = objectLiteral.parent
+        if (parent is TypeScriptAsExpression) parent = parent.parent
+        val name = when (parent) {
             is JSFieldVariable -> parent.name
             is JSProperty -> parent.name
             else -> null
         } ?: return null
         return module.nodeElementFactory().createObjectLiteralDataType(name, objectLiteral)
-    }
-
-    fun createDataType(property: JSRecordType.PropertySignature, module: IdeaNodeModule): DataTypeSpi? {
-        return property.jsType?.let { createDataType(it, module) }
     }
 
     private val ILLEGAL_DATA_TYPE_CHARS = "[|&\\(\\)\\[\\]]".toRegex()
@@ -162,7 +172,7 @@ object DataTypeSpiUtils {
                     arrayDimension++
                     currentConstantValues = currentConstantValues.asSequence()
                         .flatMap { currentConstantValue ->
-                            currentConstantValue.convertTo(Array<IConstantValue>::class.java)
+                            currentConstantValue.asArray()
                                 .map { it.asSequence() }
                                 .orElse(emptySequence())
                         }

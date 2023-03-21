@@ -48,7 +48,7 @@ public class ScoutJsProperty {
 
   public static ScoutJsProperty createSynthetic(IScoutJsObject owner, String propertyName, IDataType dataType) {
     var syntheticField = owner.scoutJsModel().nodeModule().nodeElementFactory()
-        .createSyntheticField(propertyName, dataType);
+        .createSyntheticField(propertyName, dataType, owner.declaringClass());
     return new ScoutJsProperty(owner, syntheticField);
   }
 

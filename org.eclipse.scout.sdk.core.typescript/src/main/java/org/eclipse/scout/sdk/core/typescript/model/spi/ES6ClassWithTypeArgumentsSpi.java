@@ -57,6 +57,11 @@ public class ES6ClassWithTypeArgumentsSpi extends AbstractNodeElementSpi<IES6Cla
   }
 
   @Override
+  public Optional<DataTypeSpi> aliasedDataType() {
+    return m_class.aliasedDataType();
+  }
+
+  @Override
   public List<FieldSpi> fields() {
     return m_class.fields();
   }

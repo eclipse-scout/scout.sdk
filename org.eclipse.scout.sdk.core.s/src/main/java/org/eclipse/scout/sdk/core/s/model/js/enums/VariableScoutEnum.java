@@ -15,7 +15,6 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.s.model.js.IScoutJsElement;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
-import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue.ConstantValueType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
@@ -25,33 +24,19 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IVariable;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
-public class FieldVariableScoutEnum implements IScoutJsEnum {
+public class VariableScoutEnum implements IScoutJsEnum {
 
   private final ScoutJsModel m_scoutJsModel;
-  private final String m_name;
+  private final IVariable m_variable;
   private final IObjectLiteral m_objectLiteral;
-  private final IES6Class m_class;
-  private final INodeElement m_reference;
-  private final FinalValue<List<String>> m_constants;
+  private final FinalValue<IES6Class> m_declaringClass = new FinalValue<>();
+  private final FinalValue<INodeElement> m_reference = new FinalValue<>();
+  private final FinalValue<List<String>> m_constants = new FinalValue<>();
 
-  protected FieldVariableScoutEnum(ScoutJsModel scoutJsModel, String name, IObjectLiteral objectLiteral, IES6Class clazz, INodeElement reference) {
+  protected VariableScoutEnum(ScoutJsModel scoutJsModel, IVariable variable, IObjectLiteral objectLiteral) {
     m_scoutJsModel = scoutJsModel;
-    m_name = name;
-    m_objectLiteral = objectLiteral;
-    m_class = clazz;
-    m_reference = Ensure.notNull(reference);
-    m_constants = new FinalValue<>();
-  }
-
-  public static Optional<IScoutJsEnum> create(ScoutJsModel owner, IField field, IES6Class clazz) {
-    if (owner == null || clazz == null) {
-      return Optional.empty();
-    }
-    return Optional.ofNullable(field)
-        .map(IField::constantValue)
-        .filter(constantValue -> constantValue.type() == ConstantValueType.ObjectLiteral)
-        .flatMap(IConstantValue::asObjectLiteral)
-        .map(objectLiteral -> new FieldVariableScoutEnum(owner, field.name(), objectLiteral, clazz, clazz));
+    m_variable = Ensure.notNull(variable);
+    m_objectLiteral = Ensure.notNull(objectLiteral);
   }
 
   public static Optional<IScoutJsEnum> create(ScoutJsModel owner, IVariable variable) {
@@ -59,8 +44,9 @@ public class FieldVariableScoutEnum implements IScoutJsEnum {
       return Optional.empty();
     }
     return Optional.ofNullable(variable)
-        .flatMap(IVariable::objectLiteralValue)
-        .map(objectLiteral -> new FieldVariableScoutEnum(owner, variable.name(), objectLiteral, null, variable));
+        .map(IVariable::constantValue)
+        .flatMap(IConstantValue::asObjectLiteral)
+        .map(objectLiteral -> new VariableScoutEnum(owner, variable, objectLiteral));
   }
 
   protected IObjectLiteral objectLiteral() {
@@ -74,12 +60,17 @@ public class FieldVariableScoutEnum implements IScoutJsEnum {
 
   @Override
   public String name() {
-    return m_name;
+    return m_variable.name();
   }
 
   @Override
   public IES6Class declaringClass() {
-    return m_class;
+    return m_declaringClass.computeIfAbsentAndGet(() -> {
+      if (m_variable instanceof IField field) {
+        return field.declaringClass();
+      }
+      return null;
+    });
   }
 
   @Override
@@ -91,7 +82,12 @@ public class FieldVariableScoutEnum implements IScoutJsEnum {
 
   @Override
   public INodeElement topLevelReference() {
-    return m_reference;
+    return m_reference.computeIfAbsentAndGet(() -> {
+      if (m_variable instanceof IField field) {
+        return field.declaringClass();
+      }
+      return m_variable;
+    });
   }
 
   @Override

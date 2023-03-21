@@ -9,17 +9,11 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
-import java.util.Optional;
-
 import org.eclipse.scout.sdk.core.typescript.model.spi.VariableSpi;
 
-public interface IVariable extends INodeElement {
+public interface IVariable extends INodeElement, IDataTypeOwner {
   @Override
   VariableSpi spi();
 
   IConstantValue constantValue();
-
-  Optional<IObjectLiteral> objectLiteralValue();
-
-  Optional<String> stringValue();
 }

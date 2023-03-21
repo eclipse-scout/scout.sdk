@@ -11,10 +11,12 @@ package org.eclipse.scout.sdk.s2i.model.typescript.factory
 
 import com.intellij.lang.javascript.psi.*
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptFunction
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeofType
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.openapi.vfs.VirtualFile
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementFactorySpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralDataTypeSpi
 import org.eclipse.scout.sdk.s2i.model.typescript.*
@@ -33,11 +35,8 @@ class IdeaNodeElementFactory(val ideaModule: IdeaNodeModule) : AbstractNodeEleme
     fun createObjectLiteralExpression(jsObjectLiteral: JSObjectLiteralExpression): IdeaJavaScriptObjectLiteral =
         getOrCreate(jsObjectLiteral) { IdeaJavaScriptObjectLiteral(ideaModule, it) }
 
-    fun createJavaScriptField(jsField: JSField): IdeaJavaScriptField =
-        getOrCreate(jsField) { IdeaJavaScriptField(ideaModule, it) }
-
-    fun createRecordField(property: JSRecordType.PropertySignature): IdeaRecordField =
-        getOrCreate(property) { IdeaRecordField(ideaModule, it) }
+    fun createJavaScriptField(jsField: JSField, declaringClass: ES6ClassSpi): IdeaJavaScriptField =
+        getOrCreate(jsField) { IdeaJavaScriptField(ideaModule, it, declaringClass) }
 
     fun createJavaScriptVariable(jsVariable: JSVariable): IdeaJavaScriptVariable =
         getOrCreate(jsVariable) { IdeaJavaScriptVariable(ideaModule, it) }
@@ -51,12 +50,15 @@ class IdeaNodeElementFactory(val ideaModule: IdeaNodeModule) : AbstractNodeEleme
     fun createPackageJson(moduleDir: VirtualFile): IdeaPackageJson =
         getOrCreate(moduleDir) { IdeaPackageJson(ideaModule, it) }
 
-    fun createJavaScriptAssignmentExpressionAsField(jsAssignmentExpression: JSAssignmentExpression, jsReferenceExpression: JSReferenceExpression): IdeaJavaScriptAssignmentExpressionAsField =
-        getOrCreate(jsAssignmentExpression) { IdeaJavaScriptAssignmentExpressionAsField(ideaModule, it, jsReferenceExpression) }
+    fun createJavaScriptAssignmentExpressionAsField(jsAssignmentExpression: JSAssignmentExpression, jsReferenceExpression: JSReferenceExpression, declaringClass: ES6ClassSpi): IdeaJavaScriptAssignmentExpressionAsField =
+        getOrCreate(jsAssignmentExpression) { IdeaJavaScriptAssignmentExpressionAsField(ideaModule, it, jsReferenceExpression, declaringClass) }
 
     fun createJavaScriptType(jsType: JSType): IdeaJavaScriptType =
         getOrCreate(jsType) { IdeaJavaScriptType(ideaModule, it) }
 
     fun createObjectLiteralDataType(name: String, jsObjectLiteral: JSObjectLiteralExpression): ObjectLiteralDataTypeSpi =
         createObjectLiteralDataType(name, createObjectLiteralExpression(jsObjectLiteral))
+
+    fun createTypeScriptTypeofType(typeOfType: TypeScriptTypeofType): IdeaTypeScriptTypeofType =
+        getOrCreate(typeOfType) { IdeaTypeScriptTypeofType(ideaModule, typeOfType) }
 }

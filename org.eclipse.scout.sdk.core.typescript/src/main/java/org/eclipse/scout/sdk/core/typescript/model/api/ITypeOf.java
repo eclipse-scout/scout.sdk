@@ -9,15 +9,13 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
-import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi;
+import java.util.Optional;
 
-public interface IField extends IVariable {
+import org.eclipse.scout.sdk.core.typescript.model.spi.TypeOfSpi;
+
+public interface ITypeOf extends IDataType, IDataTypeOwner {
   @Override
-  FieldSpi spi();
+  TypeOfSpi spi();
 
-  boolean isOptional();
-
-  boolean hasModifier(Modifier modifier);
-
-  IES6Class declaringClass();
+  Optional<IDataTypeOwner> dataTypeOwner();
 }

@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2i.model.typescript.util
 import com.intellij.lang.javascript.psi.*
 import com.intellij.lang.javascript.psi.ecma6.*
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
-import com.intellij.lang.javascript.psi.types.TypeScriptTypeOfJSTypeImpl
 import com.intellij.psi.PsiElement
 import kotlinx.collections.immutable.toImmutableList
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes
@@ -28,26 +27,24 @@ object FieldSpiUtils {
      * CREATE FIELDS
      * *************************************************************************/
 
-    fun createField(element: JSElement, module: IdeaNodeModule): FieldSpi? {
+    fun createField(element: JSElement, declaringClass: ES6ClassSpi, module: IdeaNodeModule): FieldSpi? {
         if (element is JSField) {
-            return createField(element, module)
+            return createField(element, declaringClass, module)
         }
         if (element is JSAssignmentExpression) {
-            createField(element, module)?.let { return it }
+            createField(element, declaringClass, module)?.let { return it }
         }
 
         return null
     }
 
-    private fun createField(field: JSField, module: IdeaNodeModule): FieldSpi = module.nodeElementFactory().createJavaScriptField(field)
+    private fun createField(field: JSField, declaringClass: ES6ClassSpi, module: IdeaNodeModule): FieldSpi = module.nodeElementFactory().createJavaScriptField(field, declaringClass)
 
-    private fun createField(assignment: JSAssignmentExpression, module: IdeaNodeModule): FieldSpi? {
+    private fun createField(assignment: JSAssignmentExpression, declaringClass: ES6ClassSpi, module: IdeaNodeModule): FieldSpi? {
         val reference: JSReferenceExpression = assignment.definitionExpression?.expression as? JSReferenceExpression ?: return null
         if (reference.qualifier !is JSThisExpression) return null
-        return module.nodeElementFactory().createJavaScriptAssignmentExpressionAsField(assignment, reference)
+        return module.nodeElementFactory().createJavaScriptAssignmentExpressionAsField(assignment, reference, declaringClass)
     }
-
-    private fun createField(property: JSRecordType.PropertySignature, module: IdeaNodeModule): FieldSpi = module.nodeElementFactory().createRecordField(property)
 
     /* **************************************************************************
      * CHOOSE FIELDS
@@ -90,8 +87,8 @@ object FieldSpiUtils {
      * COLLECT FIELDS
      * *************************************************************************/
 
-    fun collectFields(element: JSElement, module: IdeaNodeModule): List<FieldSpi> {
-        val collector = FieldCollector(module)
+    fun collectFields(element: JSElement, declaringClass: ES6ClassSpi, module: IdeaNodeModule): List<FieldSpi> {
+        val collector = FieldCollector(declaringClass, module)
         if (element is TypeScriptTypeAlias) {
             collectFields(collector, element)
             return collector.fields()
@@ -104,16 +101,9 @@ object FieldSpiUtils {
 
     private fun collectFields(collector: FieldCollector, typeAlias: TypeScriptTypeAlias) {
         val typeDeclaration = typeAlias.typeDeclaration
-        if (typeDeclaration is TypeScriptObjectType) {
-            // type with own fields
-            collector.collectTypeScriptPropertySignatures(typeDeclaration.children)
-        } else {
-            // type alias with referenced fields (enum like)
-            val parsedType = typeAlias.parsedTypeDeclaration ?: return
-            val recordType = JSTypeUtils.firstChildOfType(parsedType, TypeScriptTypeOfJSTypeImpl::class.java)?.substitute() as? JSRecordType ?: return
-            recordType.properties
-                .forEach { collector.collect(createField(it, collector.module)) }
-        }
+        if (typeDeclaration !is TypeScriptObjectType) return
+        // type with own fields
+        collector.collectTypeScriptPropertySignatures(typeDeclaration.children)
     }
 
     private fun collectFields(collector: FieldCollector, clazz: JSClass) {
@@ -132,14 +122,14 @@ object FieldSpiUtils {
             .forEach { collector.collect(it) }
     }
 
-    private class FieldCollector(val module: IdeaNodeModule) {
+    private class FieldCollector(val declaringClass: ES6ClassSpi, val module: IdeaNodeModule) {
 
         val map = LinkedHashMap<String, FieldSpi>()
 
         fun fields(): List<FieldSpi> = map.values.toImmutableList()
 
         fun collect(element: JSElement) {
-            createField(element, module)?.let { collect(it) }
+            createField(element, declaringClass, module)?.let { collect(it) }
         }
 
         fun collect(field: FieldSpi) {

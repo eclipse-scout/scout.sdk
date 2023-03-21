@@ -9,24 +9,14 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
-import java.util.Optional;
-
-import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
-import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
-import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
-import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi;
 
-public class FieldImplementor extends AbstractNodeElement<FieldSpi> implements IField {
+public class FieldImplementor extends VariableImplementor<FieldSpi> implements IField {
   public FieldImplementor(FieldSpi spi) {
     super(spi);
-  }
-
-  @Override
-  public String name() {
-    return spi().name();
   }
 
   @Override
@@ -40,12 +30,7 @@ public class FieldImplementor extends AbstractNodeElement<FieldSpi> implements I
   }
 
   @Override
-  public Optional<IDataType> dataType() {
-    return Optional.ofNullable(spi().dataType()).map(DataTypeSpi::api);
-  }
-
-  @Override
-  public IConstantValue constantValue() {
-    return spi().constantValue();
+  public IES6Class declaringClass() {
+    return spi().declaringClass().api();
   }
 }

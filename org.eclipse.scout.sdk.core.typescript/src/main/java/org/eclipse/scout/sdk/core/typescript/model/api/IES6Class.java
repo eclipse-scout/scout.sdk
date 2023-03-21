@@ -35,6 +35,8 @@ public interface IES6Class extends IDataType {
 
   boolean isTypeAlias();
 
+  Optional<IDataType> aliasedDataType();
+
   boolean isInterface();
 
   boolean isInstanceOf(IES6Class es6Class);

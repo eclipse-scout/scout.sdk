@@ -9,13 +9,22 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
-public interface IConstantValue {
+public interface IConstantValue extends IDataTypeOwner {
   <T> Optional<T> convertTo(Class<T> expectedType);
 
   default Optional<String> asString() {
     return convertTo(String.class);
+  }
+
+  default Optional<Boolean> asBoolean() {
+    return convertTo(Boolean.class);
+  }
+
+  default Optional<BigDecimal> asBigDecimal() {
+    return convertTo(BigDecimal.class);
   }
 
   default Optional<IES6Class> asES6Class() {
@@ -26,9 +35,23 @@ public interface IConstantValue {
     return convertTo(IObjectLiteral.class);
   }
 
-  ConstantValueType type();
+  default Optional<IConstantValue[]> asArray() {
+    return convertTo(IConstantValue[].class);
+  }
 
-  Optional<IDataType> dataType();
+  default Optional<?> value() {
+    return switch (type()) {
+      case String -> asString();
+      case Boolean -> asBoolean();
+      case Numeric -> asBigDecimal();
+      case ES6Class -> asES6Class();
+      case ObjectLiteral -> asObjectLiteral();
+      case Array -> asArray();
+      default -> Optional.empty();
+    };
+  }
+
+  ConstantValueType type();
 
   enum ConstantValueType {
     ObjectLiteral,

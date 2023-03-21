@@ -29,6 +29,7 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     private val m_superClass = FinalValue<Optional<ES6ClassSpi>>()
     private val m_functions = FinalValue<List<FunctionSpi>>()
     private val m_name = FinalValue<String>()
+    private val m_aliasedDataType = FinalValue<Optional<DataTypeSpi>>()
 
     override fun createApi() = ES6ClassImplementor(this)
 
@@ -41,6 +42,12 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     override fun isInterface() = javaScriptClass is TypeScriptInterface
 
     override fun isTypeAlias() = javaScriptClass is TypeScriptTypeAlias
+
+    override fun aliasedDataType(): Optional<DataTypeSpi> = m_aliasedDataType.computeIfAbsentAndGet {
+        val typeAlias = javaScriptClass as? TypeScriptTypeAlias ?: return@computeIfAbsentAndGet Optional.empty()
+        val jsType = typeAlias.parsedTypeDeclaration ?: return@computeIfAbsentAndGet Optional.empty()
+        Optional.ofNullable(DataTypeSpiUtils.createDataType(jsType, ideaModule))
+    }
 
     override fun createDataType(name: String) = DataTypeSpiUtils.createDataType(name, javaScriptClass, ideaModule)
 
@@ -73,6 +80,6 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     }
 
     override fun fields(): List<FieldSpi> = m_fields.computeIfAbsentAndGet {
-        FieldSpiUtils.collectFields(javaScriptClass, ideaModule)
+        FieldSpiUtils.collectFields(javaScriptClass, this, ideaModule)
     }
 }

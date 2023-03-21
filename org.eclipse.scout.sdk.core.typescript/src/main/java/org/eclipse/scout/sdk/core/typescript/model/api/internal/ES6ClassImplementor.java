@@ -45,6 +45,11 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
   }
 
   @Override
+  public Optional<IDataType> aliasedDataType() {
+    return spi().aliasedDataType().map(DataTypeSpi::api);
+  }
+
+  @Override
   public boolean isInterface() {
     return spi().isInterface();
   }

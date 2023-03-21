@@ -72,8 +72,8 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
         assertEquals("keyWithSlash", literal.find("/fields/1/a~1b").orElseThrow().asString().orElseThrow()) // ~1 = ~
 
         // root element
-        assertSame(literal, literal.find("").orElseThrow().convertTo(IObjectLiteral::class.java).orElseThrow())
-        assertSame(literal, literal.find(null as CharSequence?).orElseThrow().convertTo(IObjectLiteral::class.java).orElseThrow())
+        assertSame(literal, literal.find("").orElseThrow().asObjectLiteral().orElseThrow())
+        assertSame(literal, literal.find(null as CharSequence?).orElseThrow().asObjectLiteral().orElseThrow())
 
         // not found elements
         assertTrue(literal.find("/fields/1/subElements33/0/arrItem/2").isEmpty)
@@ -83,7 +83,7 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
 
     fun testObjectLiteralReferences() {
         val withTypeRef = myIdeaNodeModule.export("WithTypeRef").orElseThrow().referencedElement() as IVariable
-        val literal = withTypeRef.objectLiteralValue().orElseThrow()
+        val literal = withTypeRef.constantValue().asObjectLiteral().orElseThrow()
 
         val named = literal.property("named").orElseThrow()
         assertEquals(IConstantValue.ConstantValueType.ES6Class, named.type())
@@ -116,20 +116,20 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
 
     fun testReferencedConstantValues() {
         val referencedValue = myIdeaNodeModule.export("ReferencedValue").orElseThrow().referencedElement() as IVariable
-        assertEquals("staticString", referencedValue.stringValue().orElseThrow())
+        assertEquals("staticString", referencedValue.constantValue().asString().orElseThrow())
 
         val referencedValueProp = myIdeaNodeModule.export("ReferencedValueProp").orElseThrow().referencedElement() as IVariable
-        assertEquals("HALF_UP", referencedValueProp.stringValue().orElseThrow())
+        assertEquals("HALF_UP", referencedValueProp.constantValue().asString().orElseThrow())
 
         val referencedEnum = myIdeaNodeModule.export("ReferencedEnum").orElseThrow().referencedElement() as IVariable
-        val referencedEnumObjectLiteral = referencedEnum.objectLiteralValue().orElseThrow()
+        val referencedEnumObjectLiteral = referencedEnum.constantValue().asObjectLiteral().orElseThrow()
         assertEquals(6, referencedEnumObjectLiteral.properties().size)
         assertEquals(2, referencedEnumObjectLiteral.property("c").orElseThrow().convertTo(Int::class.java).orElseThrow())
 
         val referencedEnumProp = myIdeaNodeModule.export("ReferencedEnumProp").orElseThrow().referencedElement() as IVariable
-        val referencedEnumPropObjectLiteral = referencedEnumProp.objectLiteralValue().orElseThrow()
+        val referencedEnumPropObjectLiteral = referencedEnumProp.constantValue().asObjectLiteral().orElseThrow()
         assertEquals(2, referencedEnumPropObjectLiteral.properties().size)
-        assertFalse(referencedEnumPropObjectLiteral.property("b").orElseThrow().convertTo(Boolean::class.java).orElseThrow())
+        assertFalse(referencedEnumPropObjectLiteral.property("b").orElseThrow().asBoolean().orElseThrow())
 
         val referencedType = myIdeaNodeModule.export("ReferencedType").orElseThrow().referencedElement() as IVariable
         assertEquals("WildcardClass", referencedType.constantValue().asES6Class().orElseThrow().name())

@@ -17,7 +17,7 @@ public interface INodeElementFactory extends INodeElement {
   @Override
   NodeElementFactorySpi spi();
 
-  IField createSyntheticField(String name, IDataType dataType);
+  IField createSyntheticField(String name, IDataType dataType, IES6Class declaringClass);
 
   IDataType createObjectLiteralDataType(String name, IObjectLiteral objectLiteral);
 
@@ -26,4 +26,6 @@ public interface INodeElementFactory extends INodeElement {
   IDataType createUnionDataType(Collection<IDataType> componentDataTypes);
 
   IDataType createIntersectionDataType(Collection<IDataType> componentDataTypes);
+
+  IDataType createConstantValueDataType(IConstantValue constantValue);
 }

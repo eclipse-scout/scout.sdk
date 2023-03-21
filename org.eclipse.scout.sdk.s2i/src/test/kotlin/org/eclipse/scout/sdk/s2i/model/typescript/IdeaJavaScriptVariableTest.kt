@@ -20,17 +20,17 @@ class IdeaJavaScriptVariableTest : AbstractModelTest("javascript/moduleWithEnums
 
     fun testSingleEnumJs() {
         val hAlign = myIdeaNodeModule.export("HAlign").orElseThrow().referencedElement() as IVariable
-        val enumValue = hAlign.objectLiteralValue().orElseThrow()
+        val enumValue = hAlign.constantValue().asObjectLiteral().orElseThrow()
 
         val leftProperty = enumValue.property("LEFT").orElseThrow()
         assertEquals("left", leftProperty.asString().orElseThrow())
         assertEquals(IConstantValue.ConstantValueType.String, leftProperty.type())
 
         val rightProperty = enumValue.property("RIGHT").orElseThrow()
-        assertTrue(rightProperty.convertTo(String::class.java).isEmpty)
+        assertTrue(rightProperty.asString().isEmpty)
         assertTrue(rightProperty.convertTo(Iterable::class.java).isEmpty) // unknown conversion
         assertTrue(rightProperty.convertTo(Double::class.java).isEmpty)
-        assertTrue(rightProperty.convertTo(IObjectLiteral::class.java).isEmpty)
+        assertTrue(rightProperty.asObjectLiteral().isEmpty)
         assertEquals(IConstantValue.ConstantValueType.Unknown, rightProperty.type())
 
         val centerProperty = enumValue.property("CENTER").orElseThrow()
@@ -42,7 +42,7 @@ class IdeaJavaScriptVariableTest : AbstractModelTest("javascript/moduleWithEnums
         assertEquals(3L, centerProperty.convertTo(java.lang.Long::class.java).orElseThrow())
         assertEquals(3.21, centerProperty.convertTo(Double::class.java).orElseThrow())
         assertEquals(3.21, centerProperty.convertTo(java.lang.Double::class.java).orElseThrow())
-        assertEquals(BigDecimal("3.21"), centerProperty.convertTo(BigDecimal::class.java).orElseThrow())
+        assertEquals(BigDecimal("3.21"), centerProperty.asBigDecimal().orElseThrow())
         assertEquals(BigInteger("3"), centerProperty.convertTo(BigInteger::class.java).orElseThrow())
 
         assertEquals(IConstantValue.ConstantValueType.Numeric, centerProperty.type())
@@ -59,12 +59,12 @@ class IdeaJavaScriptVariableTest : AbstractModelTest("javascript/moduleWithEnums
         assertEquals(11L, aProperty.convertTo(java.lang.Long::class.java).orElseThrow())
         assertEquals(11.0, aProperty.convertTo(Double::class.java).orElseThrow())
         assertEquals(11.0, aProperty.convertTo(java.lang.Double::class.java).orElseThrow())
-        assertEquals(BigDecimal("11"), aProperty.convertTo(BigDecimal::class.java).orElseThrow())
+        assertEquals(BigDecimal("11"), aProperty.asBigDecimal().orElseThrow())
         assertEquals(BigInteger("11"), aProperty.convertTo(BigInteger::class.java).orElseThrow())
 
         val bProperty = next.property("b").orElseThrow()
-        assertFalse(bProperty.convertTo(Boolean::class.java).orElseThrow())
-        assertEquals(java.lang.Boolean.FALSE, bProperty.convertTo(java.lang.Boolean::class.java).orElseThrow())
+        assertFalse(bProperty.asBoolean().orElseThrow())
+        assertEquals(java.lang.Boolean.FALSE, bProperty.asBoolean().orElseThrow())
         assertEquals(IConstantValue.ConstantValueType.Boolean, bProperty.type())
 
         val undef = enumValue.property("UNDEF").orElseThrow()
@@ -78,9 +78,9 @@ class IdeaJavaScriptVariableTest : AbstractModelTest("javascript/moduleWithEnums
         Assert.assertArrayEquals(arrayOf("a", "b", "c"), arrValue[1])
         assertEquals(Array<String>::class.java, arrValue[0]::class.java)
 
-        val constArrValue = arr.convertTo(Array<IConstantValue>::class.java).orElseThrow()[1]
+        val constArrValue = arr.asArray().orElseThrow()[1]
         assertEquals(IConstantValue.ConstantValueType.Array, constArrValue.type())
-        assertEquals("b", constArrValue.convertTo(Array<IConstantValue>::class.java).orElseThrow()[1].convertTo(String::class.java).orElseThrow())
+        assertEquals("b", constArrValue.asArray().orElseThrow()[1].convertTo(String::class.java).orElseThrow())
     }
 
     fun testNestedEnumJs() {
@@ -102,11 +102,11 @@ class IdeaJavaScriptVariableTest : AbstractModelTest("javascript/moduleWithEnums
 
     fun testMultiEnumJs() {
         val severityField = myIdeaNodeModule.export("Severity").orElseThrow().referencedElement() as IVariable
-        val severity = severityField.objectLiteralValue().orElseThrow()
+        val severity = severityField.constantValue().asObjectLiteral().orElseThrow()
         assertEquals("warning", severity.propertyAsString("WARNING").orElseThrow())
 
         val roundingModeField = myIdeaNodeModule.export("RoundingMode").orElseThrow().referencedElement() as IVariable
-        val roundingMode = roundingModeField.objectLiteralValue().orElseThrow()
+        val roundingMode = roundingModeField.constantValue().asObjectLiteral().orElseThrow()
         assertEquals("HALF_UP", roundingMode.propertyAsString("HALF_UP").orElseThrow())
     }
 }

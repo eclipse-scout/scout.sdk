@@ -11,21 +11,17 @@ package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
-import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
-import org.eclipse.scout.sdk.core.typescript.model.api.IVariable;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataTypeOwner;
+import org.eclipse.scout.sdk.core.typescript.model.api.ITypeOf;
+import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeOwnerSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
-import org.eclipse.scout.sdk.core.typescript.model.spi.VariableSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.TypeOfSpi;
 
-public class VariableImplementor<SPI extends VariableSpi> extends AbstractNodeElement<SPI> implements IVariable {
-  public VariableImplementor(SPI spi) {
+public class TypeOfImplementor extends DataTypeImplementor<TypeOfSpi> implements ITypeOf {
+
+  public TypeOfImplementor(TypeOfSpi spi) {
     super(spi);
-  }
-
-  @Override
-  public String name() {
-    return spi().name();
   }
 
   @Override
@@ -34,7 +30,7 @@ public class VariableImplementor<SPI extends VariableSpi> extends AbstractNodeEl
   }
 
   @Override
-  public IConstantValue constantValue() {
-    return spi().constantValue();
+  public Optional<IDataTypeOwner> dataTypeOwner() {
+    return Optional.ofNullable(spi().dataTypeOwner()).map(DataTypeOwnerSpi::api);
   }
 }

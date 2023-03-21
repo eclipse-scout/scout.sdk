@@ -47,6 +47,10 @@ public interface IDataType extends INodeElement {
     return spi().objectLiteral().map(ObjectLiteralSpi::api);
   }
 
+  default Optional<IConstantValue> constantValue() {
+    return spi().constantValue();
+  }
+
   enum DataTypeFlavor {
     Single,
     Array,

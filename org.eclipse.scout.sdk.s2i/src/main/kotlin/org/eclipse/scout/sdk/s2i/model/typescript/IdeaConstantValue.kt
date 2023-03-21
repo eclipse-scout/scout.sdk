@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.*
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptAsExpression
+import com.intellij.lang.javascript.psi.util.ExpressionUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
@@ -18,6 +19,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
+import java.math.BigDecimal
 import java.math.BigInteger
 import java.util.*
 
@@ -139,45 +141,65 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
     }
 
     protected fun tryConvertToNumber(requestedNumberType: Class<*>): Any? {
-        val literal = unwrappedElement() as? JSLiteralExpression ?: return null
-        val value = literal.takeIf { it.isNumericLiteral }?.value ?: return null
+        val expression = unwrappedElement() as? JSExpression ?: return null
+        val value = ExpressionUtil.computeConstantExpression(expression) as? Number ?: return null
+        if (requestedNumberType.isInstance(value)) return value
 
-        // currently number can only return BigInteger, Long or Double.
-        // com.intellij.lang.javascript.psi.impl.JSLiteralExpressionImpl.getValue
-        if (value is BigInteger) {
-            return when (requestedNumberType) {
-                Int::class.java, java.lang.Integer::class.java -> value.intValueExact()
-                Float::class.java, java.lang.Float::class.java -> value.toFloat()
-                Long::class.java, java.lang.Long::class.java -> value.toLong()
-                Double::class.java, java.lang.Double::class.java -> value.toDouble()
-                java.math.BigDecimal::class.java -> value.toBigDecimal()
-                java.math.BigInteger::class.java -> value
-                else -> null
+        when (requestedNumberType) {
+            Float::class.java, java.lang.Float::class.java -> value.toFloat()
+            Double::class.java, java.lang.Double::class.java -> value.toDouble()
+            else -> null
+        }?.let { return it }
+
+        when (value) {
+            is BigInteger -> {
+                when (requestedNumberType) {
+                    Int::class.java, java.lang.Integer::class.java -> value.intValueExact()
+                    Long::class.java, java.lang.Long::class.java -> value.longValueExact()
+                    else -> null
+                }?.let { return it }
+            }
+
+            is BigDecimal -> {
+                when (requestedNumberType) {
+                    Int::class.java, java.lang.Integer::class.java -> value.intValueExact()
+                    Long::class.java, java.lang.Long::class.java -> value.longValueExact()
+                    else -> null
+                }?.let { return it }
+            }
+
+            else -> {
+                when (requestedNumberType) {
+                    Int::class.java, java.lang.Integer::class.java -> value.toInt()
+                    Long::class.java, java.lang.Long::class.java -> value.toLong()
+                    else -> null
+                }?.let { return it }
             }
         }
-        if (value is Long) {
-            return when (requestedNumberType) {
-                Int::class.java, java.lang.Integer::class.java -> value.toInt()
-                Float::class.java, java.lang.Float::class.java -> value.toFloat()
-                Long::class.java, java.lang.Long::class.java -> value
-                Double::class.java, java.lang.Double::class.java -> value.toDouble()
-                java.math.BigDecimal::class.java -> value.toBigDecimal()
-                java.math.BigInteger::class.java -> value.toBigInteger()
+
+        return when (requestedNumberType) {
+            java.math.BigInteger::class.java -> when (value) {
+                is Int -> value.toBigInteger()
+                is Float -> value.toBigDecimal().toBigInteger()
+                is Long -> value.toBigInteger()
+                is Double -> value.toBigDecimal().toBigInteger()
+                is BigInteger -> value
+                is BigDecimal -> value.toBigInteger()
                 else -> null
             }
-        }
-        if (value is Double) {
-            return when (requestedNumberType) {
-                Int::class.java, java.lang.Integer::class.java -> value.toInt()
-                Float::class.java, java.lang.Float::class.java -> value.toFloat()
-                Long::class.java, java.lang.Long::class.java -> value.toLong()
-                Double::class.java, java.lang.Double::class.java -> value
-                java.math.BigDecimal::class.java -> value.toBigDecimal()
-                java.math.BigInteger::class.java -> value.toBigDecimal().toBigInteger()
+
+            java.math.BigDecimal::class.java -> when (value) {
+                is Int -> value.toBigDecimal()
+                is Float -> value.toBigDecimal()
+                is Long -> value.toBigDecimal()
+                is Double -> value.toBigDecimal()
+                is BigInteger -> value.toBigDecimal()
+                is BigDecimal -> value
                 else -> null
             }
+
+            else -> null
         }
-        return null
     }
 
     protected fun tryConvertToBoolean(): Boolean? {

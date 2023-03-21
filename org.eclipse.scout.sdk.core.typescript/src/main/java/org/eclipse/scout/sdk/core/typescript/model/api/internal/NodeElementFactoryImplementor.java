@@ -14,7 +14,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElementFactory;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
@@ -34,8 +36,8 @@ public class NodeElementFactoryImplementor extends AbstractNodeElement<NodeEleme
   }
 
   @Override
-  public IField createSyntheticField(String name, IDataType dataType) {
-    return spi().createSyntheticField(name, Ensure.notNull(dataType).spi()).api();
+  public IField createSyntheticField(String name, IDataType dataType, IES6Class declaringClass) {
+    return spi().createSyntheticField(name, Ensure.notNull(dataType).spi(), Ensure.notNull(declaringClass).spi()).api();
   }
 
   @Override
@@ -68,5 +70,10 @@ public class NodeElementFactoryImplementor extends AbstractNodeElement<NodeEleme
         .map(spi()::createIntersectionDataType)
         .map(DataTypeSpi::api)
         .orElse(null);
+  }
+
+  @Override
+  public IDataType createConstantValueDataType(IConstantValue constantValue) {
+    return spi().createConstantValueDataType(Ensure.notNull(constantValue)).api();
   }
 }

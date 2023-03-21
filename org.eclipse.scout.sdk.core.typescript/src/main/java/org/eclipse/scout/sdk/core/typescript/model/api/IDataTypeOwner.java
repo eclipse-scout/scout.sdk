@@ -7,9 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+package org.eclipse.scout.sdk.core.typescript.model.api;
 
-export * from './LocalClass';
-export * from './TestClass';
-export * from './WithTypeRef';
-// noinspection JSUnusedGlobalSymbols
-export {default as SampleModel} from './SampleModel';
+import java.util.Optional;
+
+public interface IDataTypeOwner {
+
+  Optional<IDataType> dataType();
+}

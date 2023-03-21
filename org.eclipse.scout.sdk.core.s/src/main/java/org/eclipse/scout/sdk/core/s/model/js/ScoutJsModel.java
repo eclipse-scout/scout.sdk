@@ -29,9 +29,9 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.model.js.enums.ES6ClassEnumScoutEnum;
 import org.eclipse.scout.sdk.core.s.model.js.enums.ES6ClassTypeAliasScoutEnum;
-import org.eclipse.scout.sdk.core.s.model.js.enums.FieldVariableScoutEnum;
 import org.eclipse.scout.sdk.core.s.model.js.enums.IScoutJsEnum;
 import org.eclipse.scout.sdk.core.s.model.js.enums.ScoutJsEnumQuery;
+import org.eclipse.scout.sdk.core.s.model.js.enums.VariableScoutEnum;
 import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 import org.eclipse.scout.sdk.core.s.model.js.objects.JavaScriptScoutObject;
 import org.eclipse.scout.sdk.core.s.model.js.objects.ScoutJsObjectQuery;
@@ -142,12 +142,12 @@ public class ScoutJsModel {
                   .withModifier(Modifier.STATIC)
                   .stream()
                   .filter(field -> field.dataType().flatMap(IDataType::objectLiteral).isPresent())
-                  .flatMap(field -> FieldVariableScoutEnum.create(this, field, element).stream())),
+                  .flatMap(field -> VariableScoutEnum.create(this, field).stream())),
           nodeModule().exports().stream()
               .map(IExportFrom::referencedElement)
               .filter(IVariable.class::isInstance)
               .map(IVariable.class::cast)
-              .flatMap(variable -> FieldVariableScoutEnum.create(this, variable).stream()));
+              .flatMap(variable -> VariableScoutEnum.create(this, variable).stream()));
     }
     return enums.collect(Collectors.toUnmodifiableSet());
   }

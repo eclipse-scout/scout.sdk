@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElementFactory;
 import org.eclipse.scout.sdk.core.util.SourceRange;
 
@@ -20,7 +21,7 @@ public interface NodeElementFactorySpi extends NodeElementSpi {
   @Override
   INodeElementFactory api();
 
-  FieldSpi createSyntheticField(String name, DataTypeSpi dataType);
+  FieldSpi createSyntheticField(String name, DataTypeSpi dataType, ES6ClassSpi declaringClass);
 
   DataTypeSpi createObjectLiteralDataType(String name, ObjectLiteralSpi objectLiteral);
 
@@ -29,6 +30,8 @@ public interface NodeElementFactorySpi extends NodeElementSpi {
   DataTypeSpi createUnionDataType(Collection<DataTypeSpi> componentDataTypes);
 
   DataTypeSpi createIntersectionDataType(Collection<DataTypeSpi> componentDataTypes);
+
+  DataTypeSpi createConstantValueDataType(IConstantValue constantValue);
 
   DataTypeSpi createClassWithTypeArgumentsDataType(ES6ClassSpi classSpi, List<DataTypeSpi> arguments);
 
