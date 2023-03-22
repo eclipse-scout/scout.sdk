@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SuperHierarchySpliterator;
 
 /**
  * <h3>{@link InnerTypeSpliterator}</h3>
@@ -36,7 +37,7 @@ public class InnerTypeSpliterator implements Spliterator<IType> {
 
   public InnerTypeSpliterator(Spliterator<IType> innerTypesFirstLevel, boolean includeInnerTypesRecursive) {
     m_includeInnerTypesRecursive = includeInnerTypesRecursive;
-    m_characteristics = SuperTypeHierarchySpliterator.getCharacteristics(!includeInnerTypesRecursive);
+    m_characteristics = SuperHierarchySpliterator.getCharacteristics(!includeInnerTypesRecursive);
     if (includeInnerTypesRecursive) {
       m_dek = new ArrayDeque<>();
     }

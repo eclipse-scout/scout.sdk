@@ -38,8 +38,8 @@ public abstract class AbstractNodeElementFactorySpi extends AbstractNodeElementS
     return new NodeElementFactoryImplementor(this);
   }
 
+  @SuppressWarnings("unchecked")
   protected <ID, R> R getOrCreate(ID identifier, Function<ID, R> factory) {
-    //noinspection unchecked
     return (R) m_elements.computeIfAbsent(identifier, id -> factory.apply((ID) id));
   }
 

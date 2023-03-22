@@ -19,6 +19,7 @@ import java.util.stream.StreamSupport;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.java.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SuperHierarchySpliterator;
 
 public class WrappingSpliterator<T extends IJavaElement> implements Spliterator<T> {
 
@@ -95,6 +96,6 @@ public class WrappingSpliterator<T extends IJavaElement> implements Spliterator<
 
   @Override
   public int characteristics() {
-    return SuperTypeHierarchySpliterator.DEFAULT_CHARACTERISTICS | SIZED | SUBSIZED;
+    return SuperHierarchySpliterator.DEFAULT_CHARACTERISTICS | SIZED | SUBSIZED;
   }
 }

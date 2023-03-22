@@ -20,6 +20,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.util.SuperHierarchySpliterator;
 import org.junit.jupiter.api.Test;
 
 @SuppressWarnings("unchecked")
@@ -43,21 +44,21 @@ public class HierarchicalSpliteratorTest {
     assertEquals(numElements, startTypeOnly.estimateSize());
 
     Spliterator<Object> superClassesOnly = new HierarchicalSpliterator<>(t, true, false, false, f);
-    assertEquals(SuperTypeHierarchySpliterator.DEFAULT_CHARACTERISTICS, superClassesOnly.characteristics());
+    assertEquals(SuperHierarchySpliterator.DEFAULT_CHARACTERISTICS, superClassesOnly.characteristics());
     assertEquals(Long.MAX_VALUE, superClassesOnly.estimateSize());
 
     Spliterator<Object> superInterfacesOnly = new HierarchicalSpliterator<>(t, false, true, false, f);
-    assertEquals(SuperTypeHierarchySpliterator.DEFAULT_CHARACTERISTICS, superInterfacesOnly.characteristics());
+    assertEquals(SuperHierarchySpliterator.DEFAULT_CHARACTERISTICS, superInterfacesOnly.characteristics());
     assertEquals(Long.MAX_VALUE, superInterfacesOnly.estimateSize());
 
     Spliterator<Object> empty = new HierarchicalSpliterator<>(t, false, false, false, f);
-    assertEquals(SuperTypeHierarchySpliterator.DEFAULT_CHARACTERISTICS | Spliterator.SIZED | Spliterator.SUBSIZED, empty.characteristics());
+    assertEquals(SuperHierarchySpliterator.DEFAULT_CHARACTERISTICS | Spliterator.SIZED | Spliterator.SUBSIZED, empty.characteristics());
     assertEquals(0, empty.estimateSize());
     assertFalse(empty.tryAdvance(o -> {
     }));
 
     Spliterator<IType> selfOnly = new SuperTypeHierarchySpliterator(t, false, false, true);
-    assertEquals(SuperTypeHierarchySpliterator.DEFAULT_CHARACTERISTICS | Spliterator.SIZED | Spliterator.SUBSIZED, selfOnly.characteristics());
+    assertEquals(SuperHierarchySpliterator.DEFAULT_CHARACTERISTICS | Spliterator.SIZED | Spliterator.SUBSIZED, selfOnly.characteristics());
     assertEquals(1, selfOnly.estimateSize());
   }
 }
