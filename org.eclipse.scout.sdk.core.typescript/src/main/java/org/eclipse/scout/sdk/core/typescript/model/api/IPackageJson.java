@@ -9,14 +9,14 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.math.BigDecimal;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.query.DependencyQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
-
-import jakarta.json.JsonObject;
-import jakarta.json.JsonValue;
 
 public interface IPackageJson extends INodeElement {
 
@@ -33,11 +33,17 @@ public interface IPackageJson extends INodeElement {
 
   Optional<CharSequence> mainContent();
 
-  Optional<String> jsonString(String... pathSegments);
+  Optional<String> propertyAsString(String name);
 
-  Optional<? extends JsonObject> jsonObject(String... pathSegments);
+  Optional<Map<String, Object>> findPropertyAsObject(JsonPointer pointer);
 
-  <T extends JsonValue> Optional<T> jsonValue(Class<T> type, String... pathSegments);
+  Optional<String> findPropertyAsString(JsonPointer pointer);
+
+  Optional<Boolean> findPropertyAsBoolean(JsonPointer pointer);
+
+  Optional<BigDecimal> findPropertyAsNumber(JsonPointer pointer);
+
+  Optional<List<Object>> findPropertyAsArray(JsonPointer pointer);
 
   String version();
 

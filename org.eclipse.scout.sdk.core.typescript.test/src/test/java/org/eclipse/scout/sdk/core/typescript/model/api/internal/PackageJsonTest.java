@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
+import org.eclipse.scout.sdk.core.typescript.model.api.JsonPointer;
 import org.eclipse.scout.sdk.core.typescript.testing.TestingPackageJsonHelper;
 import org.junit.jupiter.api.Test;
 
@@ -34,10 +35,10 @@ public class PackageJsonTest {
     assertEquals(packageJsonDirectory.resolve(IPackageJson.FILE_NAME), packageJson.location());
     assertEquals(1880, packageJson.source().orElseThrow().length());
 
-    assertEquals("./dist/d.ts/src/index.d.ts", packageJson.jsonString("publishConfig", "types").orElseThrow());
-    assertTrue(packageJson.jsonObject("nonExisting").isEmpty());
-    assertEquals("https://www.eclipse.org/scout", packageJson.jsonString("homepage").orElseThrow());
-    assertEquals(17, packageJson.jsonObject("").orElseThrow().size());
+    assertEquals("./dist/d.ts/src/index.d.ts", packageJson.findPropertyAsString(JsonPointer.compile("/publishConfig/types")).orElseThrow());
+    assertTrue(packageJson.findPropertyAsObject(JsonPointer.compile("/nonExisting")).isEmpty());
+    assertEquals("https://www.eclipse.org/scout", packageJson.propertyAsString("homepage").orElseThrow());
+    assertEquals(17, packageJson.findPropertyAsObject(JsonPointer.compile("")).orElseThrow().size());
 
     assertThrows(IllegalArgumentException.class, () -> TestingPackageJsonHelper.parse(FixtureHelper.BASE).name()); // no package.json
     assertThrows(IllegalArgumentException.class, () -> TestingPackageJsonHelper.parse(FixtureHelper.EMPTY_MODULE_DIR).name()); // mandatory attributes missing

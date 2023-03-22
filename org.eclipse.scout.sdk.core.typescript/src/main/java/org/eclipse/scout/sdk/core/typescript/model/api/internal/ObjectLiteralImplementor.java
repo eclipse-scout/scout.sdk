@@ -14,9 +14,12 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
+import org.eclipse.scout.sdk.core.typescript.model.api.JsonPointer;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi;
+import org.eclipse.scout.sdk.core.util.Ensure;
 
 public class ObjectLiteralImplementor extends AbstractNodeElement<ObjectLiteralSpi> implements IObjectLiteral {
   public ObjectLiteralImplementor(ObjectLiteralSpi spi) {
@@ -35,7 +38,10 @@ public class ObjectLiteralImplementor extends AbstractNodeElement<ObjectLiteralS
 
   @Override
   public Optional<IConstantValue> find(JsonPointer pointer) {
-    return Optional.ofNullable(pointer.find(new ConstantValueAdapter(this)));
+    var adapter = new ConstantValuePointerElement(new P_ConstantValueAdapter(this));
+    return Optional.ofNullable(pointer.find(adapter))
+        .map(r -> (ConstantValuePointerElement) r)
+        .map(ConstantValuePointerElement::getValue);
   }
 
   @Override
@@ -67,5 +73,38 @@ public class ObjectLiteralImplementor extends AbstractNodeElement<ObjectLiteralS
   public <T> Optional<T> propertyAs(String name, Class<T> type) {
     return property(name)
         .flatMap(v -> v.convertTo(type));
+  }
+
+  private static final class P_ConstantValueAdapter implements IConstantValue {
+
+    private final IObjectLiteral m_literal;
+
+    public P_ConstantValueAdapter(IObjectLiteral literal) {
+      m_literal = Ensure.notNull(literal);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> Optional<T> convertTo(Class<T> expectedType) {
+      if (expectedType == IObjectLiteral.class) {
+        return (Optional<T>) asObjectLiteral();
+      }
+      return Optional.empty();
+    }
+
+    @Override
+    public Optional<IObjectLiteral> asObjectLiteral() {
+      return Optional.of(m_literal);
+    }
+
+    @Override
+    public ConstantValueType type() {
+      return ConstantValueType.ObjectLiteral;
+    }
+
+    @Override
+    public Optional<IDataType> dataType() {
+      return Optional.empty();
+    }
   }
 }

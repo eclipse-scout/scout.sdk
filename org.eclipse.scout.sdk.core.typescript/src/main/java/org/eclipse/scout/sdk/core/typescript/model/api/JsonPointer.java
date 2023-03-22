@@ -7,24 +7,27 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.core.typescript.model.api.internal;
+package org.eclipse.scout.sdk.core.typescript.model.api;
 
-import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
+import java.util.Arrays;
+
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 public final class JsonPointer {
 
-  private final String[] m_tokens;
+  private final String[] m_tokens; // may be null
+  private final CharSequence m_raw;
 
-  private JsonPointer(String[] tokens) {
+  private JsonPointer(String[] tokens, CharSequence pointer) {
     m_tokens = tokens;
+    m_raw = pointer;
   }
 
   public static JsonPointer compile(CharSequence pointer) {
     if (Strings.isEmpty(pointer)) {
-      return new JsonPointer(null);
+      return new JsonPointer(null, pointer);
     }
 
     var tokens = CoreUtils.PATH_SEGMENT_SPLIT_PATTERN.splitAsStream(pointer)
@@ -33,10 +36,20 @@ public final class JsonPointer {
     if (!Strings.isEmpty(tokens[0])) {
       throw new SdkException("A non-empty JSON Pointer must begin with a slash ('/').");
     }
-    return new JsonPointer(tokens);
+    return new JsonPointer(tokens, pointer);
   }
 
-  public IConstantValue find(IConstantValue start) {
+  public interface IJsonPointerElement {
+    int arrayLength();
+
+    boolean isObject();
+
+    IJsonPointerElement element(String name);
+
+    IJsonPointerElement element(int index);
+  }
+
+  public IJsonPointerElement find(IJsonPointerElement start) {
     var result = start;
     if (m_tokens == null || m_tokens.length < 2) {
       return result;
@@ -44,24 +57,24 @@ public final class JsonPointer {
 
     var numSegments = m_tokens.length;
     for (var i = 1; i < numSegments; i++) { // Start with index 1, skipping the root token
-      switch (result.type()) {
-        case ObjectLiteral:
-          var object = result.asObjectLiteral().orElseThrow();
-          result = object.property(m_tokens[i]).orElse(null);
-          if (result == null) {
-            return null; // path not found
-          }
-          break;
-        case Array:
-          var index = getIndex(m_tokens[i]);
-          var array = result.convertTo(IConstantValue[].class).orElseThrow();
-          if (index > array.length) {
-            return null; // path not found
-          }
-          result = array[index];
-          break;
-        default:
+      if (result.isObject()) {
+        result = result.element(m_tokens[i]);
+        if (result == null) {
           return null; // path not found
+        }
+      }
+      else {
+        var arrayLen = result.arrayLength();
+        if (arrayLen > 0) {
+          var index = getIndex(m_tokens[i]);
+          if (index > arrayLen) {
+            return null; // path not found
+          }
+          result = result.element(index);
+        }
+        else {
+          return null; // path not found
+        }
       }
     }
     return result;
@@ -103,5 +116,29 @@ public final class JsonPointer {
       unescapedToken.append(ch);
     }
     return unescapedToken.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    return Arrays.equals(m_tokens, ((JsonPointer) o).m_tokens);
+  }
+
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(m_tokens);
+  }
+
+  @Override
+  public String toString() {
+    if (m_raw == null) {
+      return "null";
+    }
+    return m_raw.toString();
   }
 }

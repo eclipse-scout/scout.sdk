@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
+import org.eclipse.scout.sdk.core.typescript.model.api.JsonPointer;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -32,6 +33,10 @@ public interface PackageJsonSpi extends NodeElementSpi {
   boolean existsFile(String relPath);
 
   Collection<NodeModuleSpi> dependencies();
+
+  Object find(JsonPointer pointer);
+
+  String getString(String name);
 
   @Override
   default Optional<SourceRange> source() {

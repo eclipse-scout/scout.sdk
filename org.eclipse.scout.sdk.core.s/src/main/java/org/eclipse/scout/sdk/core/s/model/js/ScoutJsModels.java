@@ -19,7 +19,6 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IExportFrom;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.NodeModulesProvider;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
-import org.eclipse.scout.sdk.core.util.Ensure;
 
 public final class ScoutJsModels {
 
@@ -68,7 +67,8 @@ public final class ScoutJsModels {
         .flatMap(ScoutJsModels::findScoutJsCoreModule)
         .flatMap(scoutJsCore -> scoutJsCore.export(ScoutJsCoreConstants.CLASS_NAME_WIDGET))
         .map(IExportFrom::referencedElement)
-        .map(w -> Ensure.instanceOf(w, IES6Class.class));
+        .filter(IES6Class.class::isInstance)
+        .map(IES6Class.class::cast);
   }
 
   private static Optional<INodeModule> findScoutJsCoreModule(INodeModule start) {

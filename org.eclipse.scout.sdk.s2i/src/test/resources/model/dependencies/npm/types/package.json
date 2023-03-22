@@ -1,0 +1,26 @@
+{
+  "name": "@sdk/testing",
+  "version": "23.1.0-snapshot",
+  "numeric1": 1,
+  "numeric2": 1.34,
+  "arr": [
+    "s",
+    1,
+    1234.6789,
+    false,
+    {
+      "inArr": true,
+      "strInArr": "strInArr"
+    }
+  ],
+  "bool": true,
+  "null": null,
+  "obj": {
+    "nestedObj": {
+      "a": 100.234,
+      "b": "b"
+    },
+    "nestedBool": true,
+    "nestedString": "str"
+  }
+}

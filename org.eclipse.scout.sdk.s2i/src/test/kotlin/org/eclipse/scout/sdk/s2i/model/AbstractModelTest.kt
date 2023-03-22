@@ -13,6 +13,7 @@ import com.intellij.openapi.project.rootManager
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
+import org.eclipse.scout.sdk.core.typescript.model.api.JsonPointer
 import org.eclipse.scout.sdk.core.typescript.testing.TestingPackageJsonHelper
 import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModules
@@ -40,7 +41,7 @@ abstract class AbstractModelTest(val fixturePath: String) : BasePlatformTestCase
         val moduleRoot = module.rootManager.contentRoots.first()
         myNodeModules = IdeaNodeModules(module.project)
         myIdeaNodeModule = myNodeModules.create(moduleRoot)?.api() ?: throw IllegalArgumentException("'$moduleRoot' is no valid node module root.")
-        myIdeaNodeModule.packageJson().jsonObject("dependencies").ifPresent {
+        myIdeaNodeModule.packageJson().findPropertyAsObject(JsonPointer.compile("/dependencies")).ifPresent {
             npmInstall(it.keys)
         }
     }

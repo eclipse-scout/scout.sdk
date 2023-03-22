@@ -14,6 +14,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -113,6 +114,8 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
           "version": "%s"
         }
         """.formatted(name, version);
+    when(packageJsonSpi.getString(eq("name"))).thenReturn(name);
+    when(packageJsonSpi.getString(eq("version"))).thenReturn(version);
     when(packageJsonSpi.content()).thenReturn(new ByteArrayInputStream(packageJsonContent.getBytes(StandardCharsets.UTF_8)));
     var dependencies = subModules.stream()
         .map(this::getOrCreateModule)

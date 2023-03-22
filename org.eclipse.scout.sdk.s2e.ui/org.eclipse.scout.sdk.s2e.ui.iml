@@ -15,7 +15,6 @@
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java" scope="PROVIDED" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" scope="PROVIDED" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.typescript" scope="PROVIDED" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.glassfish:jakarta.json:2.0.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: wsdl4j:wsdl4j:1.6.2" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.ecj" scope="PROVIDED" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.s2e.doc" scope="PROVIDED" />
@@ -152,6 +151,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: net.bytebuddy:byte-buddy-agent:1.12.19" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.objenesis:objenesis:3.3" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.typescript.test" scope="TEST" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.glassfish:jakarta.json:2.0.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.maven:maven-embedder:3.8.6" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.maven:maven-settings:3.8.6" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.maven:maven-settings-builder:3.8.6" level="project" />
@@ -191,7 +191,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.commons:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.json:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: commons-fileupload:commons-fileupload:1.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: commons-fileupload:commons-fileupload:1.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client.test:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.commons:commons-math3:3.6.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.test:23.1-SNAPSHOT" level="project" />

@@ -11,7 +11,7 @@ package org.eclipse.scout.sdk.s2i.model
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtil
-import junit.framework.TestCase
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModules
@@ -19,7 +19,7 @@ import org.mockito.Mockito
 import java.nio.file.Path
 import java.nio.file.Paths
 
-abstract class AbstractPackageJsonTest(fixturePath: String) : TestCase() {
+abstract class AbstractPackageJsonTest(fixturePath: String) : BasePlatformTestCase() {
 
     protected val myAllFixturesPath = "src/test/resources/model/dependencies"
     protected val myFixtureRoot: Path = Paths.get("").toAbsolutePath().resolve(myAllFixturesPath).resolve(fixturePath)
