@@ -11,21 +11,21 @@ package org.eclipse.scout.sdk.core.s.model.js.enums;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
+import org.eclipse.scout.sdk.core.s.model.js.prop.IScoutJsPropertyValue;
+import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
-import org.eclipse.scout.sdk.core.typescript.model.api.IExportFrom;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.ITypeOf;
 import org.eclipse.scout.sdk.core.typescript.model.api.IVariable;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public class ES6ClassTypeAliasScoutEnum implements IScoutJsEnum {
-
-  protected static final Pattern TYPE_ALIAS_ENUM_PATTERN = Pattern.compile("export\\s+type\\s+\\w+\\s*=\\s*EnumObject\\s*<\\s*typeof\\s+(\\w+)(?:\\s*\\.\\s*(\\w+))?\\s*>\\s*;");
 
   private final ScoutJsModel m_scoutJsModel;
   private final IES6Class m_class;
@@ -41,25 +41,27 @@ public class ES6ClassTypeAliasScoutEnum implements IScoutJsEnum {
     if (owner == null || clazz == null || !clazz.isTypeAlias()) {
       return Optional.empty();
     }
-    return clazz.source()
-        .map(SourceRange::asCharSequence)
-        .map(TYPE_ALIAS_ENUM_PATTERN::matcher)
-        .filter(Matcher::matches)
-        .flatMap(matcher -> owner.nodeModule()
-            .export(matcher.group(1))
-            .map(IExportFrom::referencedElement)
-            .flatMap(reference -> {
-              if (reference instanceof IVariable variable) {
-                return VariableScoutEnum.create(owner, variable)
-                    .map(scoutJsEnum -> new ES6ClassTypeAliasScoutEnum(owner, clazz, scoutJsEnum));
-              }
-              if (reference instanceof IES6Class element && matcher.groupCount() > 1) {
-                return element.field(matcher.group(2))
-                    .flatMap(field -> VariableScoutEnum.create(owner, field))
-                    .map(scoutJsEnum -> new ES6ClassTypeAliasScoutEnum(owner, clazz, scoutJsEnum));
-              }
-              return Optional.empty();
-            }));
+    var aliasedType = Optional.of(clazz)
+        .flatMap(IES6Class::aliasedDataType);
+
+    if (aliasedType.map(dataType -> ScoutJsCoreConstants.CLASS_NAME_ENUM_OBJECT.equals(dataType.name()))
+        .orElse(false)) {
+      return aliasedType.stream()
+          .flatMap(IDataType::typeArguments)
+          .findFirst()
+          .filter(ITypeOf.class::isInstance)
+          .map(ITypeOf.class::cast)
+          .flatMap(ITypeOf::dataTypeOwner)
+          .filter(IVariable.class::isInstance)
+          .map(IVariable.class::cast)
+          .flatMap(variable -> VariableScoutEnum.create(owner, variable))
+          .map(scoutJsEnum -> new ES6ClassTypeAliasScoutEnum(owner, clazz, scoutJsEnum));
+    }
+
+    return aliasedType
+        .filter(dataType -> DataTypeFlavor.Union == dataType.flavor())
+        .flatMap(unionDataType -> ConstantValueUnionScoutEnum.create(owner, unionDataType))
+        .map(scoutJsEnum -> new ES6ClassTypeAliasScoutEnum(owner, clazz, scoutJsEnum));
   }
 
   @Override
@@ -94,6 +96,11 @@ public class ES6ClassTypeAliasScoutEnum implements IScoutJsEnum {
   @Override
   public List<String> constants() {
     return wrappedEnum().constants();
+  }
+
+  @Override
+  public Stream<? extends IScoutJsPropertyValue> createPropertyValues(ScoutJsProperty property) {
+    return wrappedEnum().createPropertyValues(property);
   }
 
   @Override

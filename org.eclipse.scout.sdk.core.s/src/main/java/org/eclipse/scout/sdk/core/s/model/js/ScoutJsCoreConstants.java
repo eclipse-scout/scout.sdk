@@ -61,6 +61,7 @@ public final class ScoutJsCoreConstants {
   public static final String CLASS_NAME_STATUS = "Status";
   public static final String CLASS_NAME_LOOKUP_CALL = "LookupCall";
   public static final String CLASS_NAME_LOOKUP_CALL_OR_MODEL = "LookupCallOrModel";
+  public static final String CLASS_NAME_ENUM_OBJECT = "EnumObject";
 
   public static final Set<String> CLASS_NAMES_MODEL_TYPES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("ObjectOrChildModel", "ChildModelOf", "ObjectOrModel", "FullModelOf", "ModelOf", "InitModelOf")));
 

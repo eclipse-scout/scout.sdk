@@ -94,14 +94,12 @@ public class ScoutJsProperty {
 
   public Stream<? extends IScoutJsPropertyValue> computePossibleValues(ScoutJsModel scope) {
     var type = type();
-    if (type.isEnumLike()) {
-      return type.scoutJsEnum().stream()
-          .flatMap(scoutJsEnum -> scoutJsEnum.constants().stream()
-              .map(enumProperty -> new ScoutJsEnumPropertyValue(scoutJsEnum, enumProperty, this)));
-    }
     if (type.isBoolean()) {
       return Stream.of(true, false)
           .map(v -> new ScoutJsBooleanPropertyValue(v, this));
+    }
+    if (type.isEnumLike()) {
+      return type.scoutJsEnum().stream().flatMap(scoutJsEnum -> scoutJsEnum.createPropertyValues(this));
     }
     return type
         .classes()

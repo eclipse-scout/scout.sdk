@@ -41,6 +41,7 @@ import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject
 import org.eclipse.scout.sdk.core.s.model.js.prop.*
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
@@ -136,9 +137,14 @@ object JsModelCompletionHelper {
         modelElement.tailText()?.let { result = result.withTailText(it, true) }
         modelElement.typeText()?.let { result = result.withTypeText(it, true) }
 
-        if (!completionInfo.isPropertyNameCompletion && !completionInfo.isInLiteral && completionInfo.propertyName == ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE && !completionInfo.scoutJsModel.supportsClassReference()) {
-            // append missing quotes if not supporting class references for objectType (no template required)
-            result = result.withInsertHandler { context, _ -> insertObjectTypeWithQuotes(name, completionInfo.searchPrefix, context) }
+        if (!completionInfo.isPropertyNameCompletion && !completionInfo.isInLiteral
+            && ((completionInfo.propertyName == ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE && !completionInfo.scoutJsModel.supportsClassReference())
+                    || (modelElement.property().type().isEnumLike && (modelElement as? JsValueLookupElement)?.let { it.propertyValue as? ScoutJsConstantValuePropertyValue }?.value?.type() == IConstantValue.ConstantValueType.String))
+        ) {
+            // append missing quotes (no template required)
+            //  - if not supporting class references for objectType
+            //  - if enum like property with constant string values
+            result = result.withInsertHandler { context, _ -> insertWithQuotes(name, completionInfo.searchPrefix, context) }
             result.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true)
         } else {
             val isTemplateRequired = completionInfo.isPropertyNameCompletion || (modelElement.property().type().hasClasses() && completionInfo.propertyName != ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE)
@@ -153,7 +159,7 @@ object JsModelCompletionHelper {
         return result
     }
 
-    private fun insertObjectTypeWithQuotes(presentableName: String, searchPrefix: String, context: InsertionContext) {
+    private fun insertWithQuotes(presentableName: String, searchPrefix: String, context: InsertionContext) {
         writeCommandAction(context.project).run(ThrowableRunnable<RuntimeException> {
             val startOffset = context.editor.caretModel.currentCaret.offset
             val insertText = "$STRING_DELIM$presentableName$STRING_DELIM"

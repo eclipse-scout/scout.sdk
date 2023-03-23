@@ -103,8 +103,8 @@ public class VariableScoutEnum implements IScoutJsEnum {
   public boolean fulfills(IDataType dataType) {
     return Optional.ofNullable(dataType)
         .flatMap(IDataType::objectLiteral)
-        .map(objectLiteral -> objectLiteral == objectLiteral())
-        .orElse(false);
+        .filter(objectLiteral -> objectLiteral == objectLiteral())
+        .isPresent();
   }
 
   @Override

@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
+import org.eclipse.scout.sdk.core.s.model.js.enums.ConstantValueUnionScoutEnum;
 import org.eclipse.scout.sdk.core.s.model.js.enums.IScoutJsEnum;
 import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
@@ -78,7 +79,8 @@ public class ScoutJsPropertyType {
         .findScoutEnums()
         .withIncludeDependencies(true)
         .withFulfillsDataType(dataType)
-        .first()));
+        .first()
+        .or(() -> ConstantValueUnionScoutEnum.create(declaringProperty().scoutJsObject().scoutJsModel(), dataType))));
   }
 
   public boolean isArray() {
@@ -86,7 +88,7 @@ public class ScoutJsPropertyType {
   }
 
   public boolean hasClasses() {
-    return !isEnumLike() && !getClasses().isEmpty();
+    return !getClasses().isEmpty() && !isEnumLike();
   }
 
   public Stream<IES6Class> classes() {

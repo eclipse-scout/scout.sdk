@@ -104,6 +104,7 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
         referencedES6Class()?.let { return@computeIfAbsentAndGet IConstantValue.ConstantValueType.ES6Class }
         referencedConstantValue()?.let { return@computeIfAbsentAndGet it.type() }
 
+        if (unwrappedElement is JSPrefixExpression && (unwrappedElement.expression as? JSLiteralExpression)?.isNumericLiteral == true) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Numeric
         // literal values
         if (unwrappedElement !is JSLiteralExpression) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.Unknown
         if (unwrappedElement.isStringLiteral) return@computeIfAbsentAndGet IConstantValue.ConstantValueType.String

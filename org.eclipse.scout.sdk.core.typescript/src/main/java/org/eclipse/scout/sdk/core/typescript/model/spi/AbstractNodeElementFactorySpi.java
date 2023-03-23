@@ -9,15 +9,17 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import static java.util.stream.Collectors.toCollection;
+
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
@@ -99,7 +101,7 @@ public abstract class AbstractNodeElementFactorySpi extends AbstractNodeElementS
 
     return createCompositeDataType(unionOrIntersection, componentDataTypes.stream()
         .flatMap(componentDataType -> componentDataType.flavor() == unionOrIntersection ? componentDataType.componentDataTypes().stream() : Stream.of(componentDataType))
-        .collect(Collectors.toSet()));
+        .collect(toCollection(LinkedHashSet::new)));
   }
 
   @Override

@@ -49,13 +49,12 @@ class IdeaNodeModules(val project: Project) {
         }
         val containingModule = findContainingModule(referencedElement) ?: return null
         val name = (referencedElement as? PsiNamedElement)?.name ?: return null
-        containingModule.exports()[name]?.referencedElement()?.let { return it }
         if (referencedElement is JSField) {
             val clazz = PsiTreeUtil.getParentOfType(referencedElement, JSClass::class.java) ?: return null
             val es6Class = containingModule.exports()[clazz.name]?.referencedElement() as? ES6ClassSpi ?: return null
             return es6Class.api().field(name).map { it.spi() }.orElse(null)
         }
-        return null
+        return containingModule.exports()[name]?.referencedElement()
     }
 
     fun findContainingModule(element: PsiElement?): IdeaNodeModule? {

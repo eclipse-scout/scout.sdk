@@ -123,13 +123,11 @@ public class ScoutJsModel {
               .map(IExportFrom::referencedElement)
               .filter(IES6Class.class::isInstance)
               .map(IES6Class.class::cast)
-              .filter(IES6Class::isTypeAlias)
               .flatMap(element -> ES6ClassTypeAliasScoutEnum.create(this, element).stream()),
           nodeModule().exports().stream()
               .map(IExportFrom::referencedElement)
               .filter(IES6Class.class::isInstance)
               .map(IES6Class.class::cast)
-              .filter(IES6Class::isEnum)
               .flatMap(element -> ES6ClassEnumScoutEnum.create(this, element).stream()));
     }
     else {

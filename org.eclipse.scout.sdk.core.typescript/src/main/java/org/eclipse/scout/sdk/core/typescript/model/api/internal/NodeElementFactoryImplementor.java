@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
+import static java.util.stream.Collectors.toCollection;
+
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
@@ -55,7 +57,7 @@ public class NodeElementFactoryImplementor extends AbstractNodeElement<NodeEleme
     return Optional.ofNullable(componentDataTypes)
         .map(types -> types.stream()
             .map(IDataType::spi)
-            .collect(Collectors.toSet()))
+            .collect(toCollection(LinkedHashSet::new)))
         .map(spi()::createUnionDataType)
         .map(DataTypeSpi::api)
         .orElse(null);
@@ -66,7 +68,7 @@ public class NodeElementFactoryImplementor extends AbstractNodeElement<NodeEleme
     return Optional.ofNullable(componentDataTypes)
         .map(types -> types.stream()
             .map(IDataType::spi)
-            .collect(Collectors.toSet()))
+            .collect(toCollection(LinkedHashSet::new)))
         .map(spi()::createIntersectionDataType)
         .map(DataTypeSpi::api)
         .orElse(null);
