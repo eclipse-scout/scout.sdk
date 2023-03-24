@@ -32,6 +32,11 @@ public class ES6ClassWithTypeArgumentsSpi extends AbstractNodeElementSpi<IES6Cla
   }
 
   @Override
+  public ES6ClassSpi withoutTypeArguments() {
+    return m_class;
+  }
+
+  @Override
   public String name() {
     return m_class.name();
   }

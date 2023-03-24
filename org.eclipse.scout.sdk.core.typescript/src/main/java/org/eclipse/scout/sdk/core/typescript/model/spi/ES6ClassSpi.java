@@ -33,6 +33,10 @@ public interface ES6ClassSpi extends DataTypeSpi, ISuperHierarchyElement<ES6Clas
 
   DataTypeSpi createDataType(String name);
 
+  default ES6ClassSpi withoutTypeArguments() {
+    return this;
+  }
+
   @Override
   default boolean isPrimitive() {
     return false;

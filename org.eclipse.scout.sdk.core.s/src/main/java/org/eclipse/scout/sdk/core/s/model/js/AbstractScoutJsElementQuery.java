@@ -12,8 +12,6 @@ package org.eclipse.scout.sdk.core.s.model.js;
 import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -51,12 +49,14 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
     return m_includeDependencies;
   }
 
-  public TYPE withDeclaringClasses(Stream<IES6Class> declaringClasses) {
+  public TYPE withDeclaringClasses(Stream<? extends IES6Class> declaringClasses) {
     if (declaringClasses == null) {
       m_declaringClasses = null;
     }
     else {
-      m_declaringClasses = declaringClasses.collect(toUnmodifiableSet());
+      m_declaringClasses = declaringClasses
+          .map(IES6Class::withoutTypeArguments)
+          .collect(toUnmodifiableSet());
       if (m_declaringClasses.isEmpty()) {
         m_declaringClasses = null;
       }
@@ -67,21 +67,17 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
   public TYPE withDeclaringClasses(Collection<? extends IES6Class> declaringClasses) {
     if (declaringClasses == null || declaringClasses.isEmpty()) {
       m_declaringClasses = null;
+      return thisInstance();
     }
-    else {
-      m_declaringClasses = new HashSet<>(declaringClasses);
-    }
-    return thisInstance();
+    return withDeclaringClasses(declaringClasses.stream());
   }
 
   public TYPE withDeclaringClass(IES6Class declaringClass) {
     if (declaringClass == null) {
       m_declaringClasses = null;
+      return thisInstance();
     }
-    else {
-      m_declaringClasses = Collections.singleton(declaringClass);
-    }
-    return thisInstance();
+    return withDeclaringClasses(Stream.of(declaringClass));
   }
 
   protected Set<IES6Class> declaringClasses() {

@@ -55,6 +55,11 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
   }
 
   @Override
+  public IES6Class withoutTypeArguments() {
+    return spi().withoutTypeArguments().api();
+  }
+
+  @Override
   public boolean isInstanceOf(IES6Class es6Class) {
     if (es6Class == null) {
       return false;

@@ -34,7 +34,6 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import java.util.logging.Level
 import javax.swing.ScrollPaneConstants
 
-
 open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
 
     private val m_textLog = Logger.getInstance(IdeaLogger::class.java)
