@@ -114,30 +114,32 @@ public class ScoutJsPropertyType {
     if (!(dataType instanceof IES6Class clazz)) {
       return null;
     }
-    if (!ScoutJsCoreConstants.SCOUT_JS_CORE_MODULE_NAME.equals(clazz.containingModule().name())) {
-      return clazz;
+    if (ScoutJsCoreConstants.SCOUT_JS_CORE_MODULE_NAME.equals(clazz.containingModule().name())) {
+      var className = clazz.name();
+      if (ScoutJsCoreConstants.CLASS_NAMES_MODEL_TYPES.contains(className)) {
+        return clazz
+            .typeArguments()
+            .findFirst()
+            .filter(IES6Class.class::isInstance)
+            .map(IES6Class.class::cast)
+            .orElse(clazz);
+      }
+      var scoutJsCoreModel = declaringProperty().scoutJsObject().scoutJsModel();
+      if (ScoutJsCoreConstants.CLASS_NAME_STATUS_OR_MODEL.equals(className)) {
+        var status = scoutJsCoreModel.exportedScoutObjects().get(ScoutJsCoreConstants.CLASS_NAME_STATUS);
+        return Optional.ofNullable(status)
+            .map(IScoutJsObject::declaringClass)
+            .orElse(clazz);
+      }
+      if (ScoutJsCoreConstants.CLASS_NAME_LOOKUP_CALL_OR_MODEL.equals(className)) {
+        var lookupCall = scoutJsCoreModel.exportedScoutObjects().get(ScoutJsCoreConstants.CLASS_NAME_LOOKUP_CALL);
+        return Optional.ofNullable(lookupCall)
+            .map(IScoutJsObject::declaringClass)
+            .orElse(clazz);
+      }
     }
-    var className = clazz.name();
-    if (ScoutJsCoreConstants.CLASS_NAMES_MODEL_TYPES.contains(className)) {
-      return clazz
-          .typeArguments()
-          .findFirst()
-          .filter(IES6Class.class::isInstance)
-          .map(IES6Class.class::cast)
-          .orElse(clazz);
-    }
-    var scoutJsCoreModel = declaringProperty().scoutJsObject().scoutJsModel();
-    if (ScoutJsCoreConstants.CLASS_NAME_STATUS_OR_MODEL.equals(className)) {
-      var status = scoutJsCoreModel.exportedScoutObjects().get(ScoutJsCoreConstants.CLASS_NAME_STATUS);
-      return Optional.ofNullable(status)
-          .map(IScoutJsObject::declaringClass)
-          .orElse(clazz);
-    }
-    if (ScoutJsCoreConstants.CLASS_NAME_LOOKUP_CALL_OR_MODEL.equals(className)) {
-      var lookupCall = scoutJsCoreModel.exportedScoutObjects().get(ScoutJsCoreConstants.CLASS_NAME_LOOKUP_CALL);
-      return Optional.ofNullable(lookupCall)
-          .map(IScoutJsObject::declaringClass)
-          .orElse(clazz);
+    if (clazz.isTypeAlias()) {
+      return convertToClass(clazz.aliasedDataType().orElse(null));
     }
     return clazz;
   }

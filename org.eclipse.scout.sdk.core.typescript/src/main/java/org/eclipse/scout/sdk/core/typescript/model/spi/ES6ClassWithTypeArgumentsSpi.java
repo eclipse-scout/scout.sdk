@@ -64,7 +64,7 @@ public class ES6ClassWithTypeArgumentsSpi extends AbstractNodeElementSpi<IES6Cla
 
   @Override
   public boolean isTypeAlias() {
-    return false;
+    return m_class.isTypeAlias();
   }
 
   @Override
