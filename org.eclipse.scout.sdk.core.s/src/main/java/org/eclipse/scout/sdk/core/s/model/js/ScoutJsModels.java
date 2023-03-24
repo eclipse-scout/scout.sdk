@@ -66,9 +66,7 @@ public final class ScoutJsModels {
     return Optional.ofNullable(start)
         .flatMap(ScoutJsModels::findScoutJsCoreModule)
         .flatMap(scoutJsCore -> scoutJsCore.export(ScoutJsCoreConstants.CLASS_NAME_WIDGET))
-        .map(IExportFrom::referencedElement)
-        .filter(IES6Class.class::isInstance)
-        .map(IES6Class.class::cast);
+        .flatMap(IExportFrom::referencedClass);
   }
 
   private static Optional<INodeModule> findScoutJsCoreModule(INodeModule start) {

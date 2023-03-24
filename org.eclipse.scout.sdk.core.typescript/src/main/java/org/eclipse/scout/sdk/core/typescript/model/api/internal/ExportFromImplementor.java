@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IExportFrom;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ExportFromSpi;
@@ -34,5 +35,12 @@ public class ExportFromImplementor extends AbstractNodeElement<ExportFromSpi> im
   @Override
   public INodeElement referencedElement() {
     return spi().referencedElement().api();
+  }
+
+  @Override
+  public Optional<IES6Class> referencedClass() {
+    return Optional.of(referencedElement())
+        .filter(IES6Class.class::isInstance)
+        .map(IES6Class.class::cast);
   }
 }

@@ -84,9 +84,8 @@ public class ScoutJsModel {
     if (supportsTypeScript()) {
       objects = nodeModule()
           .exports().stream()
-          .map(IExportFrom::referencedElement)
-          .filter(IES6Class.class::isInstance)
-          .map(IES6Class.class::cast)
+          .map(IExportFrom::referencedClass)
+          .flatMap(Optional::stream)
           .filter(c -> !c.isTypeAlias() && !c.isEnum())
           .map(element -> TypeScriptScoutObject.create(this, element).orElseThrow());
     }
@@ -95,9 +94,8 @@ public class ScoutJsModel {
           .exports().stream()
           .filter(export -> !export.name().endsWith("Adapter"))
           .filter(export -> !export.name().endsWith("Model"))
-          .map(IExportFrom::referencedElement)
-          .filter(IES6Class.class::isInstance)
-          .map(IES6Class.class::cast)
+          .map(IExportFrom::referencedClass)
+          .flatMap(Optional::stream)
           .flatMap(element -> JavaScriptScoutObject.create(this, element, widgetClass).stream());
     }
     var myObjects = objects.collect(toMap(IScoutJsObject::name, identity(), (a, b) -> {
@@ -120,22 +118,19 @@ public class ScoutJsModel {
     if (supportsTypeScript()) {
       enums = Stream.concat(
           nodeModule().exports().stream()
-              .map(IExportFrom::referencedElement)
-              .filter(IES6Class.class::isInstance)
-              .map(IES6Class.class::cast)
+              .map(IExportFrom::referencedClass)
+              .flatMap(Optional::stream)
               .flatMap(element -> ES6ClassTypeAliasScoutEnum.create(this, element).stream()),
           nodeModule().exports().stream()
-              .map(IExportFrom::referencedElement)
-              .filter(IES6Class.class::isInstance)
-              .map(IES6Class.class::cast)
+              .map(IExportFrom::referencedClass)
+              .flatMap(Optional::stream)
               .flatMap(element -> ES6ClassEnumScoutEnum.create(this, element).stream()));
     }
     else {
       enums = Stream.concat(
           nodeModule().exports().stream()
-              .map(IExportFrom::referencedElement)
-              .filter(IES6Class.class::isInstance)
-              .map(IES6Class.class::cast)
+              .map(IExportFrom::referencedClass)
+              .flatMap(Optional::stream)
               .flatMap(element -> element.fields()
                   .withModifier(Modifier.STATIC)
                   .stream()

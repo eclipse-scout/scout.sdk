@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.typescript.model.spi.ExportFromSpi;
 
 public interface IExportFrom extends INodeElement {
@@ -16,4 +18,6 @@ public interface IExportFrom extends INodeElement {
   ExportFromSpi spi();
 
   INodeElement referencedElement();
+
+  Optional<IES6Class> referencedClass();
 }

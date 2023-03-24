@@ -123,12 +123,11 @@ object JsModelCompletionHelper {
     private fun createLookupElement(modelElement: ScoutJsModelLookupElement, completionInfo: PropertyCompletionInfo): LookupElementBuilder {
         val name = modelElement.name()
         val presentableName = modelElement.presentableName()
-        var result = LookupElementBuilder.create(
-            name, when (modelElement) {
-                is JsObjectValueLookupElement -> if (completionInfo.isInLiteral) name else presentableName
-                else -> name
-            }
-        )
+        val lookupString = when (modelElement) {
+            is JsObjectValueLookupElement -> if (completionInfo.isInLiteral) name else presentableName
+            else -> name
+        }
+        var result = LookupElementBuilder.create(name, lookupString)
             .withLookupString(name)
             .withLookupString(presentableName)
             .withCaseSensitivity(true)
@@ -137,13 +136,12 @@ object JsModelCompletionHelper {
         modelElement.tailText()?.let { result = result.withTailText(it, true) }
         modelElement.typeText()?.let { result = result.withTypeText(it, true) }
 
-        if (!completionInfo.isPropertyNameCompletion && !completionInfo.isInLiteral
-            && ((completionInfo.propertyName == ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE && !completionInfo.scoutJsModel.supportsClassReference())
-                    || (modelElement.property().type().isEnumLike && (modelElement as? JsValueLookupElement)?.let { it.propertyValue as? ScoutJsConstantValuePropertyValue }?.value?.type() == IConstantValue.ConstantValueType.String))
-        ) {
+        val isValueCompletionOutsideLiteral = !completionInfo.isPropertyNameCompletion && !completionInfo.isInLiteral
+        val isStringObjectTypeCompletion = completionInfo.propertyName == ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE && !completionInfo.scoutJsModel.supportsClassReference()
+        val isEnumWithConstantStringValue = modelElement.property().type().isEnumLike && modelElement is JsValueLookupElement
+                && (modelElement.propertyValue as? ScoutJsConstantValuePropertyValue)?.value?.type() == IConstantValue.ConstantValueType.String
+        if (isValueCompletionOutsideLiteral && (isStringObjectTypeCompletion || isEnumWithConstantStringValue)) {
             // append missing quotes (no template required)
-            //  - if not supporting class references for objectType
-            //  - if enum like property with constant string values
             result = result.withInsertHandler { context, _ -> insertWithQuotes(name, completionInfo.searchPrefix, context) }
             result.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true)
         } else {
