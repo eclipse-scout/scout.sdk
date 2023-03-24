@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.util.SuperHierarchySpliterator.ISuperHierarchyElement;
 
 public interface ES6ClassSpi extends DataTypeSpi, ISuperHierarchyElement<ES6ClassSpi> {
@@ -24,6 +25,8 @@ public interface ES6ClassSpi extends DataTypeSpi, ISuperHierarchyElement<ES6Clas
   boolean isTypeAlias();
 
   Optional<DataTypeSpi> aliasedDataType();
+
+  boolean hasModifier(Modifier modifier);
 
   List<FieldSpi> fields();
 

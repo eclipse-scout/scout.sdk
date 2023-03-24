@@ -14,11 +14,13 @@ import com.intellij.lang.javascript.psi.ecma6.TypeScriptInterface
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeAlias
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.ES6ClassImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.*
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import org.eclipse.scout.sdk.s2i.model.typescript.util.FieldSpiUtils
+import org.eclipse.scout.sdk.s2i.model.typescript.util.toModifierType
 import java.util.*
 import java.util.stream.Stream
 
@@ -36,6 +38,8 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     override fun source() = ideaModule.sourceFor(javaScriptClass)
 
     override fun name(): String = m_name.computeIfAbsentAndGet { javaScriptClass.name }
+
+    override fun hasModifier(modifier: Modifier) = javaScriptClass.hasModifier(modifier.toModifierType())
 
     override fun isEnum() = javaScriptClass is TypeScriptEnum
 

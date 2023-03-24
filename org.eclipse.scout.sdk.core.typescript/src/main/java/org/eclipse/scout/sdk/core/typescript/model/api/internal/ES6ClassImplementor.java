@@ -18,6 +18,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FunctionQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.SupersQuery;
@@ -52,6 +53,11 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
   @Override
   public boolean isInterface() {
     return spi().isInterface();
+  }
+
+  @Override
+  public boolean hasModifier(Modifier modifier) {
+    return spi().hasModifier(modifier);
   }
 
   @Override

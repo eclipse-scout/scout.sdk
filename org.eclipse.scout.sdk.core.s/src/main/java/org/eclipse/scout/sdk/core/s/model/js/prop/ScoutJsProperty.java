@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.PropertyDataTypeDete
 import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
@@ -106,6 +107,7 @@ public class ScoutJsProperty {
         .flatMap(es6Class -> scope
             .findScoutObjects()
             .withIncludeDependencies(true)
+            .withoutModifier(Modifier.ABSTRACT)
             .withInstanceOf(es6Class)
             .stream())
         .map(o -> new ScoutJsObjectPropertyValue(o, this));

@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.ES6ClassImplementor;
 import org.eclipse.scout.sdk.core.util.SourceRange;
 
@@ -34,6 +35,11 @@ public class ES6ClassWithTypeArgumentsSpi extends AbstractNodeElementSpi<IES6Cla
   @Override
   public ES6ClassSpi withoutTypeArguments() {
     return m_class;
+  }
+
+  @Override
+  public boolean hasModifier(Modifier modifier) {
+    return m_class.hasModifier(modifier);
   }
 
   @Override
