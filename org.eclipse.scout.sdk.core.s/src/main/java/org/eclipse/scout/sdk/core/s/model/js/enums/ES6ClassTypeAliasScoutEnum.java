@@ -105,7 +105,7 @@ public class ES6ClassTypeAliasScoutEnum implements IScoutJsEnum {
 
   @Override
   public boolean fulfills(IDataType dataType) {
-    return dataType == declaringClass() || wrappedEnum().fulfills(dataType);
+    return fulfills(dataType, dt -> dt == declaringClass() || wrappedEnum().fulfills(dt));
   }
 
   @Override

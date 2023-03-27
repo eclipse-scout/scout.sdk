@@ -101,10 +101,10 @@ public class VariableScoutEnum implements IScoutJsEnum {
 
   @Override
   public boolean fulfills(IDataType dataType) {
-    return Optional.ofNullable(dataType)
+    return fulfills(dataType, dt -> Optional.ofNullable(dt)
         .flatMap(IDataType::objectLiteral)
         .filter(objectLiteral -> objectLiteral == objectLiteral())
-        .isPresent();
+        .isPresent());
   }
 
   @Override

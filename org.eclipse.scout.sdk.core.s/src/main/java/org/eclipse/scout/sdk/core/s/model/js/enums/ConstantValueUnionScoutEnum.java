@@ -110,7 +110,7 @@ public class ConstantValueUnionScoutEnum implements IScoutJsEnum {
 
   @Override
   public boolean fulfills(IDataType dataType) {
-    return dataType == m_unionDataType;
+    return fulfills(dataType, dt -> dt == m_unionDataType);
   }
 
   @Override

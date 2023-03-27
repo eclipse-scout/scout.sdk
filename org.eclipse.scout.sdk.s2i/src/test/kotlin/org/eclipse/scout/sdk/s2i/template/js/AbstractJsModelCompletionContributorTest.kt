@@ -155,7 +155,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         assertSame(scoutWidgetClass, widget.declaringClass())
 
         // validate model of WidgetState enum
-        val widgetStateEnum = stateProperty?.type()?.scoutJsEnum()?.orElse(null)
+        val widgetStateEnum = stateProperty?.type()?.scoutJsEnums()?.findFirst()?.orElse(null)
         assertNotNull(widgetStateEnum)
         assertEquals(WIDGET_STATE_NAME, widgetStateEnum?.name())
         assertEquals("${ScoutJsCoreConstants.CLASS_NAME_WIDGET}.$WIDGET_STATE_NAME", widgetStateEnum?.referenceName())
@@ -202,7 +202,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         )
 
         // validate model of StringField.FieldStyle enum
-        val fieldStyleEnum = fieldStyleProperty?.type()?.scoutJsEnum()?.orElse(null)
+        val fieldStyleEnum = fieldStyleProperty?.type()?.scoutJsEnums()?.findFirst()?.orElse(null)
         assertNotNull(fieldStyleEnum)
         assertEquals(FIELD_STYLE_NAME, fieldStyleEnum?.name())
         assertEquals("$STRING_FIELD_NAME.$FIELD_STYLE_NAME", fieldStyleEnum?.referenceName())

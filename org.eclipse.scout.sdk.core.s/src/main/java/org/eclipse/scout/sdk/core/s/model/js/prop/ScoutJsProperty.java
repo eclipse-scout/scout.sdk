@@ -100,7 +100,7 @@ public class ScoutJsProperty {
           .map(v -> new ScoutJsBooleanPropertyValue(v, this));
     }
     if (type.isEnumLike()) {
-      return type.scoutJsEnum().stream().flatMap(scoutJsEnum -> scoutJsEnum.createPropertyValues(this));
+      return type.scoutJsEnums().flatMap(scoutJsEnum -> scoutJsEnum.createPropertyValues(this));
     }
     return type
         .classes()

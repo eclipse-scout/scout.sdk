@@ -35,14 +35,14 @@ public class ScoutJsPropertyType {
   private final ScoutJsProperty m_declaringProperty;
   private final ScoutJsPropertySubType m_subType;
   private final FinalValue<Set<IES6Class>> m_classes;
-  private final FinalValue<Optional<IScoutJsEnum>> m_enum;
+  private final FinalValue<Set<IScoutJsEnum>> m_enums;
 
   public ScoutJsPropertyType(IDataType dataType, ScoutJsPropertySubType subType, ScoutJsProperty declaringProperty) {
     m_dataType = dataType; // dataType may be null in case the property is based on a Field and the field has no datatype (cannot be detected. e.g. in JavaScript: this.myField = null)
     m_subType = Ensure.notNull(subType);
     m_declaringProperty = Ensure.notNull(declaringProperty);
     m_classes = new FinalValue<>();
-    m_enum = new FinalValue<>();
+    m_enums = new FinalValue<>();
   }
 
   public ScoutJsPropertyType(IDataType dataType, ScoutJsProperty declaringProperty) {
@@ -71,16 +71,24 @@ public class ScoutJsPropertyType {
   }
 
   public boolean isEnumLike() {
-    return scoutJsEnum().isPresent();
+    return !getScoutJsEnums().isEmpty();
   }
 
-  public Optional<IScoutJsEnum> scoutJsEnum() {
-    return m_enum.computeIfAbsentAndGet(() -> dataType().flatMap(dataType -> declaringProperty().scoutJsObject().scoutJsModel()
-        .findScoutEnums()
-        .withIncludeDependencies(true)
-        .withFulfillsDataType(dataType)
-        .first()
-        .or(() -> ConstantValueUnionScoutEnum.create(declaringProperty().scoutJsObject().scoutJsModel(), dataType))));
+  public Stream<IScoutJsEnum> scoutJsEnums() {
+    return getScoutJsEnums().stream();
+  }
+
+  protected Set<IScoutJsEnum> getScoutJsEnums() {
+    return m_enums.computeIfAbsentAndGet(() -> dataType().stream()
+        .flatMap(dataType -> Stream
+            .concat(
+                declaringProperty().scoutJsObject().scoutJsModel()
+                    .findScoutEnums()
+                    .withIncludeDependencies(true)
+                    .withFulfillsDataType(dataType)
+                    .stream(),
+                ConstantValueUnionScoutEnum.create(declaringProperty().scoutJsObject().scoutJsModel(), dataType).stream()))
+        .collect(toCollection(LinkedHashSet::new)));
   }
 
   public boolean isArray() {

@@ -27,6 +27,7 @@ import com.intellij.util.ProcessingContext
 import com.intellij.util.ThrowableRunnable
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
+import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsEnumPropertyValue
 import org.eclipse.scout.sdk.core.typescript.IWebConstants
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement
 import org.eclipse.scout.sdk.core.util.Strings
@@ -144,8 +145,8 @@ class JsModelValueCompletionContributor : CompletionContributor() {
         private fun findElementToImport(lookupElement: LookupElementBuilder): INodeElement? {
             val lookupElementViewModel = lookupElement.getUserData(SELECTED_ELEMENT) ?: return null
             val property = lookupElementViewModel.property()
-            if (property.type().isEnumLike) {
-                return property.type().scoutJsEnum().map { it.topLevelReference() }.orElse(null)
+            if (property.type().isEnumLike && lookupElementViewModel is JsModelCompletionHelper.JsValueLookupElement && lookupElementViewModel.propertyValue is ScoutJsEnumPropertyValue) {
+                return lookupElementViewModel.propertyValue.scoutJsEnum.topLevelReference()
             }
             if (property.scoutJsObject().scoutJsModel().supportsClassReference() && (property.type().hasClasses() || property.isObjectType)) {
                 val objectLookupElement = lookupElementViewModel as? JsModelCompletionHelper.JsObjectValueLookupElement ?: return null

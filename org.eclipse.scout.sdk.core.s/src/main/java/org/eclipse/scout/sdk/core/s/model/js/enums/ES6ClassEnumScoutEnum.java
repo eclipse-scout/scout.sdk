@@ -70,7 +70,7 @@ public class ES6ClassEnumScoutEnum implements IScoutJsEnum {
 
   @Override
   public boolean fulfills(IDataType dataType) {
-    return dataType == declaringClass();
+    return fulfills(dataType, dt -> dt == declaringClass());
   }
 
   @Override
