@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IDataType
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import java.math.BigDecimal
@@ -26,6 +27,7 @@ import java.util.*
 open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val element: JSElement?) : IConstantValue {
 
     private val m_unwrappedElement = FinalValue<JSElement?>()
+    private val m_referencedElement = FinalValue<NodeElementSpi?>()
     private val m_referencedES6Class = FinalValue<ES6ClassSpi?>()
     private val m_referencedConstantValue = FinalValue<IdeaConstantValue?>()
 
@@ -41,9 +43,11 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
 
     protected fun unwrapJSNewExpression(element: JSElement?) = if (element is JSNewExpression) element.methodExpression else element
 
-    fun referencedES6Class() = m_referencedES6Class.computeIfAbsentAndGet {
-        (unwrappedElement() as? JSReferenceExpression)?.let { ideaModule.moduleInventory.resolveReferencedElement(it) as? ES6ClassSpi }
+    fun referencedElement() = m_referencedElement.computeIfAbsentAndGet {
+        (unwrappedElement() as? JSReferenceExpression)?.let { ideaModule.moduleInventory.resolveReferencedElement(it) }
     }
+
+    fun referencedES6Class() = m_referencedES6Class.computeIfAbsentAndGet { referencedElement() as? ES6ClassSpi }
 
     fun referencedConstantValue() = m_referencedConstantValue.computeIfAbsentAndGet {
         referencedES6Class()?.let { return@computeIfAbsentAndGet null }

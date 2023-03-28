@@ -25,6 +25,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaConstantValue
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
 
@@ -147,10 +148,18 @@ object DataTypeSpiUtils {
     private fun createJSDocCommentTypeDataType(comment: JSDocComment, module: IdeaNodeModule) = createJSDocCommentDataType(comment, module) { it.type }
 
     fun createDataType(constantValue: IdeaConstantValue): DataTypeSpi? {
+        constantValue.referencedElement()
+            ?.let { it as? FieldSpi }
+            ?.declaringClass()
+            ?.takeIf { it.isEnum }
+            ?.let { return it }
+
         constantValue.referencedConstantValue()
-            ?.let { it.element?.parent as? JSProperty }
-            ?.let { it.parent as? JSObjectLiteralExpression }
-            ?.let { createDataType(it, constantValue.ideaModule) }
+            ?.let { referencedConstantValue ->
+                (referencedConstantValue.element?.parent as? JSProperty)
+                    ?.let { it.parent as? JSObjectLiteralExpression }
+                    ?.let { createDataType(it, referencedConstantValue.ideaModule) }
+            }
             ?.let { return it }
 
         constantValue.referencedConstantValue()?.let { return it.dataType().orElse(null)?.spi() }
