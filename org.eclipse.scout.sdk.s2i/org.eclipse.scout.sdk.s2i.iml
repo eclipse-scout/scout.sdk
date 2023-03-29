@@ -148,6 +148,7 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.security:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:23.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.glassfish:jakarta.json:2.0.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.http-client:google-http-client-apache-v2:1.42.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.http-client:google-http-client:1.42.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.apache.httpcomponents:httpclient:4.5.13" level="project" />
