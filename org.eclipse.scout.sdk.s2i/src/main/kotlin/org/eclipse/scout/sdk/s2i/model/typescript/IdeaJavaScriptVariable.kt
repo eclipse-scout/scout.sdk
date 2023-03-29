@@ -11,12 +11,14 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.JSVariable
 import org.eclipse.scout.sdk.core.typescript.model.api.IVariable
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.VariableImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.VariableSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
+import org.eclipse.scout.sdk.s2i.model.typescript.util.toModifierType
 
 open class IdeaJavaScriptVariable(protected val ideaModule: IdeaNodeModule, internal val javaScriptVariable: JSVariable) : AbstractNodeElementSpi<IVariable>(ideaModule), VariableSpi {
 
@@ -25,6 +27,8 @@ open class IdeaJavaScriptVariable(protected val ideaModule: IdeaNodeModule, inte
     override fun createApi() = VariableImplementor(this)
 
     override fun source() = ideaModule.sourceFor(javaScriptVariable)
+
+    override fun hasModifier(modifier: Modifier) = javaScriptVariable.hasModifier(modifier.toModifierType())
 
     override fun name() = javaScriptVariable.name
 

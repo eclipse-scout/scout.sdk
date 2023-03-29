@@ -57,15 +57,12 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
       m_declaringClasses = declaringClasses
           .map(IES6Class::withoutTypeArguments)
           .collect(toUnmodifiableSet());
-      if (m_declaringClasses.isEmpty()) {
-        m_declaringClasses = null;
-      }
     }
     return thisInstance();
   }
 
   public TYPE withDeclaringClasses(Collection<? extends IES6Class> declaringClasses) {
-    if (declaringClasses == null || declaringClasses.isEmpty()) {
+    if (declaringClasses == null) {
       m_declaringClasses = null;
       return thisInstance();
     }
@@ -100,7 +97,7 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
     Predicate<E> result = null;
 
     var declaringClassFilter = declaringClasses();
-    if (declaringClassFilter != null) {
+    if (declaringClassFilter != null) { // empty set means result is empty
       result = e -> declaringClassFilter.contains(e.declaringClass());
     }
     return result;

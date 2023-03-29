@@ -200,12 +200,12 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
         val packageJson = packageJson().api()
         val main = packageJson.main().orElse(null)
         if (main == null) {
-            SdkLog.warning("'{}' does not contain an entry point.", packageJson.location())
+            SdkLog.info("'{}' does not contain an entry point.", packageJson.location())
             return@computeIfAbsentAndGet null
         }
         val mainFile = nodeModuleDir.findFileByRelativePath(main)?.takeIf { it.isValid && it.exists() }
         if (mainFile == null) {
-            SdkLog.warning("Entry point '{}' declared in '{}' could not be found.", main, packageJson.location())
+            SdkLog.info("Entry point '{}' declared in '{}' could not be found.", main, packageJson.location())
             return@computeIfAbsentAndGet null
         }
         return@computeIfAbsentAndGet mainFile

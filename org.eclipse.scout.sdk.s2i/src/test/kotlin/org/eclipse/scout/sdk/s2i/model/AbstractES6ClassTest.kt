@@ -96,19 +96,20 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
         assertEquals(TypeScriptTypes.isPrimitive(expectedDataType.name), dataType.isPrimitive)
         assertEquals(expectedDataType.flavor, dataType.flavor())
         val remainingExpectedComponentDataTypes = expectedDataType.componentDataTypes.toMutableSet()
-        assertTrue(dataType.componentDataTypes()
-            .map {
-                remainingExpectedComponentDataTypes.removeIf { expectedComponentDataType ->
-                    try {
-                        assertDataType(expectedComponentDataType, it)
-                        true
-                    } catch (e: AssertionError) {
-                        false
+        assertTrue(
+            dataType.childTypes()
+                .map {
+                    remainingExpectedComponentDataTypes.removeIf { expectedComponentDataType ->
+                        try {
+                            assertDataType(expectedComponentDataType, it)
+                            true
+                        } catch (e: AssertionError) {
+                            false
+                        }
                     }
                 }
-            }
-            .filter { !it }
-            .isEmpty())
+                .filter { !it }
+                .isEmpty())
 
         assertEquals(expectedDataType.arrayDimension, dataType.arrayDimension())
 

@@ -34,4 +34,6 @@ open class IdeaJavaScriptType(protected val ideaModule: IdeaNodeModule, protecte
     override fun name(): String = m_name.computeIfAbsentAndGet { if (javaScriptType is JSAnyType) TypeScriptTypes._any else javaScriptType.typeText }
 
     override fun isPrimitive() = (javaScriptType as? JSPrimitiveType)?.isPrimitive ?: (javaScriptType is JSUndefinedType || javaScriptType is JSNullType)
+
+    override fun childTypes(): Collection<DataTypeSpi> = emptyList()
 }

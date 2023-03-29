@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
@@ -25,6 +26,8 @@ public interface ES6ClassSpi extends DataTypeSpi, ISuperHierarchyElement<ES6Clas
   boolean isTypeAlias();
 
   Optional<DataTypeSpi> aliasedDataType();
+
+  Stream<ES6ClassSpi> inheritors(boolean deep);
 
   boolean hasModifier(Modifier modifier);
 

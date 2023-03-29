@@ -117,8 +117,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         assertEquals(TypeScriptTypes._string, idProperty?.type()?.dataType()?.orElse(null)?.name())
         val objectTypeProperty = widget.properties()[ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE]
         assertNotNull(objectTypeProperty)
-        // FIXME model: parser does not detect a dataType here (maybe use "any")
-//        assertEquals(TypeScriptTypes._object, objectTypeProperty.type.toString())
+        assertTrue(objectTypeProperty?.type()?.dataType()?.isEmpty == true)
         val visibleProperty = widget.properties()[VISIBLE_PROPERTY_NAME]
         assertNotNull(visibleProperty)
         assertEquals(TypeScriptTypes._boolean, visibleProperty?.type().toString())
@@ -128,7 +127,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         val fieldsProperty = widget.properties()[FIELDS_PROPERTY_NAME]
         assertNotNull(fieldsProperty)
         assertTrue(fieldsProperty?.type()?.hasClasses() == true)
-        assertSame(scoutWidgetClass, fieldsProperty?.type()?.classes()?.findFirst()?.orElse(null))
+        assertSame(scoutWidgetClass, fieldsProperty?.type()?.classes()?.firstOrNull())
         assertTrue(fieldsProperty?.type()?.isArray == true)
         val childProperty = widget.properties()[CHILD_PROPERTY_NAME]
         assertNotNull(childProperty)

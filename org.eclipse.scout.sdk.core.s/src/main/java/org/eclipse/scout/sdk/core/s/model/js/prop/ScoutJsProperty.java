@@ -95,6 +95,9 @@ public class ScoutJsProperty {
 
   public Stream<? extends IScoutJsPropertyValue> computePossibleValues(ScoutJsModel scope) {
     var type = type();
+    if (type.dataType().isEmpty()) {
+      return Stream.empty();
+    }
     if (type.isBoolean()) {
       return Stream.of(true, false)
           .map(v -> new ScoutJsBooleanPropertyValue(v, this));
@@ -102,14 +105,17 @@ public class ScoutJsProperty {
     if (type.isEnumLike()) {
       return type.scoutJsEnums().flatMap(scoutJsEnum -> scoutJsEnum.createPropertyValues(this));
     }
-    return type
-        .classes()
-        .flatMap(es6Class -> scope
-            .findScoutObjects()
-            .withIncludeDependencies(true)
-            .withoutModifier(Modifier.ABSTRACT)
-            .withInstanceOf(es6Class)
-            .stream())
+
+    var inheritorCandidates = type
+        .classes().stream()
+        .flatMap(c -> c.subTypes().withSelf(true).stream());
+    return scope
+        .findScoutObjects()
+        .withIncludeDependencies(true)
+        .withoutModifier(Modifier.ABSTRACT)
+        .withObjectClasses(inheritorCandidates)
+        .stream()
+        .filter(o -> !o.declaringClass().isInterface())
         .map(o -> new ScoutJsObjectPropertyValue(o, this));
   }
 

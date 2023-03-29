@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
@@ -26,6 +28,11 @@ public class ConstantValueDataTypeSpi extends AbstractNodeElementSpi<IDataType> 
   protected ConstantValueDataTypeSpi(NodeModuleSpi module, IConstantValue constantValue) {
     super(module);
     m_constantValue = constantValue;
+  }
+
+  @Override
+  public Collection<DataTypeSpi> childTypes() {
+    return Collections.emptyList();
   }
 
   @Override

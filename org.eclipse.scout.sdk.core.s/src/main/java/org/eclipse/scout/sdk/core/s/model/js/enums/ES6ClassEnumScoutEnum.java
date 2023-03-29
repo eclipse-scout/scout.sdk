@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
+import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeFulfillsEvaluator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
@@ -70,7 +71,7 @@ public class ES6ClassEnumScoutEnum implements IScoutJsEnum {
 
   @Override
   public boolean fulfills(IDataType dataType) {
-    return fulfills(dataType, dt -> dt == declaringClass());
+    return new DataTypeFulfillsEvaluator(dt -> dt == declaringClass()).fulfills(dataType);
   }
 
   @Override

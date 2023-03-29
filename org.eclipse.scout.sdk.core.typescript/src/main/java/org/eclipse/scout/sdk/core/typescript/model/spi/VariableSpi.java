@@ -11,10 +11,13 @@ package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IVariable;
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 
 public interface VariableSpi extends NodeElementSpi, DataTypeOwnerSpi {
   @Override
   IVariable api();
+
+  boolean hasModifier(Modifier modifier);
 
   String name();
 

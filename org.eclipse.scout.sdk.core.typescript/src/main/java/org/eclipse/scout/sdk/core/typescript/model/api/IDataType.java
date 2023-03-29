@@ -14,6 +14,8 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi;
+import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor;
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 public interface IDataType extends INodeElement {
 
@@ -34,10 +36,12 @@ public interface IDataType extends INodeElement {
     return Stream.empty();
   }
 
-  default Stream<IDataType> componentDataTypes() {
-    return spi().componentDataTypes().stream()
+  default Stream<IDataType> childTypes() {
+    return spi().childTypes().stream()
         .map(DataTypeSpi::api);
   }
+
+  TreeVisitResult visit(IBreadthFirstVisitor<IDataType> visitor);
 
   default int arrayDimension() {
     return spi().arrayDimension();

@@ -12,6 +12,9 @@ package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
+import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor;
+import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals;
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 public class DataTypeImplementor<SPI extends DataTypeSpi> extends AbstractNodeElement<SPI> implements IDataType {
 
@@ -22,6 +25,12 @@ public class DataTypeImplementor<SPI extends DataTypeSpi> extends AbstractNodeEl
   @Override
   public String name() {
     return spi().name();
+  }
+
+  @Override
+  public TreeVisitResult visit(IBreadthFirstVisitor<IDataType> visitor) {
+    IBreadthFirstVisitor<DataTypeSpi> spiVisitor = (element, level, index) -> visitor.visit(element.api(), level, index);
+    return TreeTraversals.create(spiVisitor, d -> d.childTypes().stream()).traverse(spi());
   }
 
   @Override

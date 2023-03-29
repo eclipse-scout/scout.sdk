@@ -44,9 +44,9 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
   @Override
   public String name() {
     return m_name.computeIfAbsentAndGet(() -> switch (flavor()) {
-      case Array -> componentDataTypes().stream().findFirst().map(this::boxComponentDataType).orElse("") + "[]".repeat(arrayDimension());
-      case Union -> componentDataTypes().stream().map(this::boxComponentDataType).collect(Collectors.joining(" | "));
-      case Intersection -> componentDataTypes().stream().map(this::boxComponentDataType).collect(Collectors.joining(" & "));
+      case Array -> childTypes().stream().findFirst().map(this::boxComponentDataType).orElse("") + "[]".repeat(arrayDimension());
+      case Union -> childTypes().stream().map(this::boxComponentDataType).collect(Collectors.joining(" | "));
+      case Intersection -> childTypes().stream().map(this::boxComponentDataType).collect(Collectors.joining(" & "));
       case Single -> null;
     });
   }
@@ -56,12 +56,13 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
       return null;
     }
 
-    if (switch (flavor()) {
+    var requiresParentheses = switch (flavor()) {
       case Array -> componentDataType.flavor() == DataTypeFlavor.Union || componentDataType.flavor() == DataTypeFlavor.Intersection;
       case Union -> componentDataType.flavor() == DataTypeFlavor.Intersection;
       case Intersection -> componentDataType.flavor() == DataTypeFlavor.Union;
       case Single -> false;
-    }) {
+    };
+    if (requiresParentheses) {
       return "(" + componentDataType.name() + ")";
     }
     return componentDataType.name();
@@ -78,7 +79,7 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
   }
 
   @Override
-  public Collection<DataTypeSpi> componentDataTypes() {
+  public Collection<DataTypeSpi> childTypes() {
     return Collections.unmodifiableCollection(m_componentDataTypes);
   }
 

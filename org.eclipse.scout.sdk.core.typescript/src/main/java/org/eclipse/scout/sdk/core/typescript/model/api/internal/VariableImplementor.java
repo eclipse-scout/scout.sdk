@@ -15,6 +15,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IVariable;
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.VariableSpi;
 
@@ -31,6 +32,11 @@ public class VariableImplementor<SPI extends VariableSpi> extends AbstractNodeEl
   @Override
   public Optional<IDataType> dataType() {
     return Optional.ofNullable(spi().dataType()).map(DataTypeSpi::api);
+  }
+
+  @Override
+  public boolean hasModifier(Modifier modifier) {
+    return modifier != null && spi().hasModifier(modifier);
   }
 
   @Override

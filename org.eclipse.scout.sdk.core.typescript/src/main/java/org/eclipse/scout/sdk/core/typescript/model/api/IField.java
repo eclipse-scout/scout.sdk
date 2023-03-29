@@ -17,7 +17,5 @@ public interface IField extends IVariable {
 
   boolean isOptional();
 
-  boolean hasModifier(Modifier modifier);
-
   IES6Class declaringClass();
 }

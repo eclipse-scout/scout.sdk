@@ -29,7 +29,7 @@ class IdeaDataTypeTest : AbstractModelTest("typescript/moduleWithExternalImports
 
         val aliasedDataType = alignmentDataType.aliasedDataType().orElseThrow()
         assertEquals(DataTypeFlavor.Union, aliasedDataType.flavor())
-        assertEquals(setOf(-1, 0, 1), aliasedDataType.componentDataTypes()
+        assertEquals(setOf(-1, 0, 1), aliasedDataType.childTypes()
             .flatMap { it.constantValue().stream() }
             .flatMap { cv -> cv.convertTo(Int::class.java).stream() }
             .collect(Collectors.toSet()))
@@ -40,7 +40,7 @@ class IdeaDataTypeTest : AbstractModelTest("typescript/moduleWithExternalImports
 
         val orientationDataType = orientation.dataType().orElseThrow()
         assertEquals(DataTypeFlavor.Union, orientationDataType.flavor())
-        assertEquals(setOf("top", "right", "bottom", "left"), orientationDataType.componentDataTypes()
+        assertEquals(setOf("top", "right", "bottom", "left"), orientationDataType.childTypes()
             .flatMap { it.constantValue().stream() }
             .flatMap { cv -> cv.asString().stream() }
             .collect(Collectors.toSet()))

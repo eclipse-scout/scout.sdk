@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.typescript.model.spi;
 import static java.util.Collections.unmodifiableList;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -48,6 +49,11 @@ public class ES6ClassWithTypeArgumentsSpi extends AbstractNodeElementSpi<IES6Cla
   }
 
   @Override
+  public Collection<DataTypeSpi> childTypes() {
+    return m_class.childTypes();
+  }
+
+  @Override
   protected IES6Class createApi() {
     return new ES6ClassImplementor(this);
   }
@@ -70,6 +76,11 @@ public class ES6ClassWithTypeArgumentsSpi extends AbstractNodeElementSpi<IES6Cla
   @Override
   public Optional<DataTypeSpi> aliasedDataType() {
     return m_class.aliasedDataType();
+  }
+
+  @Override
+  public Stream<ES6ClassSpi> inheritors(boolean deep) {
+    return m_class.inheritors(deep);
   }
 
   @Override

@@ -9,15 +9,14 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js.prop;
 
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toCollection;
 
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.model.js.enums.ConstantValueUnionScoutEnum;
 import org.eclipse.scout.sdk.core.s.model.js.enums.IScoutJsEnum;
 import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
@@ -25,24 +24,26 @@ import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
-import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 public class ScoutJsPropertyType {
 
-  private final IDataType m_dataType;
+  private final IDataType m_dataType; // dataType may be null in case the property is based on a Field and the field has no datatype (cannot be detected. e.g. in JavaScript: this.myField = null)
   private final ScoutJsProperty m_declaringProperty;
   private final ScoutJsPropertySubType m_subType;
-  private final FinalValue<Set<IES6Class>> m_classes;
   private final FinalValue<Set<IScoutJsEnum>> m_enums;
+  private final FinalValue<Set<IScoutJsObject>> m_objects;
+  private final FinalValue<Set<IES6Class>> m_classes;
 
   public ScoutJsPropertyType(IDataType dataType, ScoutJsPropertySubType subType, ScoutJsProperty declaringProperty) {
-    m_dataType = dataType; // dataType may be null in case the property is based on a Field and the field has no datatype (cannot be detected. e.g. in JavaScript: this.myField = null)
+    m_dataType = dataType;
     m_subType = Ensure.notNull(subType);
     m_declaringProperty = Ensure.notNull(declaringProperty);
-    m_classes = new FinalValue<>();
     m_enums = new FinalValue<>();
+    m_objects = new FinalValue<>();
+    m_classes = new FinalValue<>();
   }
 
   public ScoutJsPropertyType(IDataType dataType, ScoutJsProperty declaringProperty) {
@@ -70,6 +71,43 @@ public class ScoutJsPropertyType {
     return m_declaringProperty;
   }
 
+  public boolean hasClasses() {
+    return !classes().isEmpty() && !isEnumLike();
+  }
+
+  public Stream<IScoutJsObject> scoutJsObjects() {
+    return getScoutJsObjects().stream();
+  }
+
+  protected Set<IScoutJsObject> getScoutJsObjects() {
+    return m_objects.computeIfAbsentAndGet(() -> declaringProperty().scoutJsObject().scoutJsModel()
+        .findScoutObjects()
+        .withIncludeDependencies(true)
+        .withObjectClasses(classes())
+        .stream()
+        .collect(toCollection(LinkedHashSet::new)));
+  }
+
+  public Set<IES6Class> classes() {
+    return m_classes.computeIfAbsentAndGet(() -> {
+      var dt = dataType().orElse(null);
+      if (dt == null) {
+        return emptySet();
+      }
+
+      Set<IES6Class> classes = new LinkedHashSet<>();
+
+      var classCollector = new ScoutJsCoreDataTypesUnwrapVisitor((d, l, i) -> {
+        if (d instanceof IES6Class c && !c.isTypeAlias() && !c.isEnum()) {
+          classes.add(c);
+        }
+        return TreeVisitResult.CONTINUE;
+      });
+      dt.visit(classCollector);
+      return classes;
+    });
+  }
+
   public boolean isEnumLike() {
     return !getScoutJsEnums().isEmpty();
   }
@@ -79,7 +117,9 @@ public class ScoutJsPropertyType {
   }
 
   protected Set<IScoutJsEnum> getScoutJsEnums() {
-    return m_enums.computeIfAbsentAndGet(() -> dataType().stream()
+    return m_enums.computeIfAbsentAndGet(() -> dataType()
+        .filter(d -> d.flavor() != DataTypeFlavor.Array)
+        .stream()
         .flatMap(dataType -> Stream
             .concat(
                 declaringProperty().scoutJsObject().scoutJsModel()
@@ -93,63 +133,6 @@ public class ScoutJsPropertyType {
 
   public boolean isArray() {
     return m_dataType != null && m_dataType.flavor() == DataTypeFlavor.Array;
-  }
-
-  public boolean hasClasses() {
-    return !getClasses().isEmpty() && !isEnumLike();
-  }
-
-  public Stream<IES6Class> classes() {
-    return getClasses().stream();
-  }
-
-  protected Set<IES6Class> getClasses() {
-    return m_classes.computeIfAbsentAndGet(() -> unwrappedDataType() // handles arrays, union and intersection types (non-recursive)
-        .map(this::convertToClass)
-        .filter(Objects::nonNull)
-        .collect(toCollection(LinkedHashSet::new)));
-  }
-
-  protected Stream<IDataType> unwrappedDataType() {
-    return dataType()
-        .map(IDataType::spi)
-        .map(a -> a.componentDataTypes().isEmpty() ? Stream.of(a) : a.componentDataTypes().stream())
-        .orElseGet(Stream::empty)
-        .map(DataTypeSpi::api);
-  }
-
-  protected IES6Class convertToClass(IDataType dataType) {
-    if (!(dataType instanceof IES6Class clazz)) {
-      return null;
-    }
-    if (ScoutJsCoreConstants.SCOUT_JS_CORE_MODULE_NAME.equals(clazz.containingModule().name())) {
-      var className = clazz.name();
-      if (ScoutJsCoreConstants.CLASS_NAMES_MODEL_TYPES.contains(className)) {
-        return clazz
-            .typeArguments()
-            .findFirst()
-            .filter(IES6Class.class::isInstance)
-            .map(IES6Class.class::cast)
-            .orElse(clazz);
-      }
-      var scoutJsCoreModel = declaringProperty().scoutJsObject().scoutJsModel();
-      if (ScoutJsCoreConstants.CLASS_NAME_STATUS_OR_MODEL.equals(className)) {
-        var status = scoutJsCoreModel.exportedScoutObjects().get(ScoutJsCoreConstants.CLASS_NAME_STATUS);
-        return Optional.ofNullable(status)
-            .map(IScoutJsObject::declaringClass)
-            .orElse(clazz);
-      }
-      if (ScoutJsCoreConstants.CLASS_NAME_LOOKUP_CALL_OR_MODEL.equals(className)) {
-        var lookupCall = scoutJsCoreModel.exportedScoutObjects().get(ScoutJsCoreConstants.CLASS_NAME_LOOKUP_CALL);
-        return Optional.ofNullable(lookupCall)
-            .map(IScoutJsObject::declaringClass)
-            .orElse(clazz);
-      }
-    }
-    if (clazz.isTypeAlias()) {
-      return convertToClass(clazz.aliasedDataType().orElse(null));
-    }
-    return clazz;
   }
 
   public boolean isBoolean() {

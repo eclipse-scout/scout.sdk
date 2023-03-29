@@ -79,7 +79,7 @@ public abstract class AbstractNodeElementFactorySpi extends AbstractNodeElementS
     var leafComponentType = componentDataType;
     if (componentDataType != null && componentDataType.flavor() == DataTypeFlavor.Array) {
       newDimension += componentDataType.arrayDimension();
-      leafComponentType = componentDataType.componentDataTypes().stream().findAny().orElse(null);
+      leafComponentType = componentDataType.childTypes().stream().findAny().orElse(null);
     }
     var componentDataTypes = Optional.ofNullable(leafComponentType)
         .map(Collections::singleton)
@@ -100,7 +100,7 @@ public abstract class AbstractNodeElementFactorySpi extends AbstractNodeElementS
     }
 
     return createCompositeDataType(unionOrIntersection, componentDataTypes.stream()
-        .flatMap(componentDataType -> componentDataType.flavor() == unionOrIntersection ? componentDataType.componentDataTypes().stream() : Stream.of(componentDataType))
+        .flatMap(componentDataType -> componentDataType.flavor() == unionOrIntersection ? componentDataType.childTypes().stream() : Stream.of(componentDataType))
         .collect(toCollection(LinkedHashSet::new)));
   }
 

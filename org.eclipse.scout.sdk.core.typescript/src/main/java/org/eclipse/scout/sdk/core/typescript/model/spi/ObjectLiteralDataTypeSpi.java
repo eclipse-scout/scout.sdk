@@ -9,6 +9,9 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import static java.util.Collections.emptyList;
+
+import java.util.Collection;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
@@ -40,6 +43,11 @@ public class ObjectLiteralDataTypeSpi extends AbstractNodeElementSpi<IDataType> 
   @Override
   public boolean isPrimitive() {
     return false;
+  }
+
+  @Override
+  public Collection<DataTypeSpi> childTypes() {
+    return emptyList();
   }
 
   @Override

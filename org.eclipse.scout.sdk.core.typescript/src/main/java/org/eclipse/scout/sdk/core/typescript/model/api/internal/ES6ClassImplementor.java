@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FunctionQuery;
+import org.eclipse.scout.sdk.core.typescript.model.api.query.SubTypeQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.SupersQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
@@ -74,6 +75,11 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
       return true;
     }
     return supers().withName(es6Class.name()).existsAny();
+  }
+
+  @Override
+  public SubTypeQuery subTypes() {
+    return new SubTypeQuery(this.spi());
   }
 
   @Override

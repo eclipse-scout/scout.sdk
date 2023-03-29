@@ -20,7 +20,6 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleUtilCore
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
-import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessModuleDir
 import com.intellij.openapi.project.rootManager
@@ -50,7 +49,6 @@ import org.eclipse.scout.sdk.core.java.JavaTypes
 import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier
 import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.java.model.api.IType
-import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
 import org.eclipse.scout.sdk.core.s.environment.IProgress
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
@@ -216,26 +214,17 @@ fun PsiType.resolveTypeArgument(index: Int): PsiType? {
  *
  */
 fun PsiElement.containingModule(returnReferencingModuleIfNotInFilesystem: Boolean = true): Module? {
-    try {
-        val psiFile = containingFile
-        val isInProject = psiFile?.virtualFile?.isInLocalFileSystem ?: true /* a psi element which has not a file (e.g. PsiDirectory) */
-        if (!returnReferencingModuleIfNotInFilesystem && !isInProject) {
-            return null
-        }
-
-        val searchElement = if (isInProject) this else psiFile ?: this
-        return computeInReadAction(project) {
-            this
-                .takeIf { it.isValid }
-                ?.let { ModuleUtilCore.findModuleForPsiElement(searchElement) }
-        }
-    } catch (e: IndexNotReadyException) {
-        // in case the current call is already in a read-action.
-        // then the creator of the read-action must know that the index is not ready and may retry it afterwards
-        throw e
-    } catch (e: RuntimeException) {
-        SdkLog.warning("Unable to compute module of '{}'.", this, e)
+    val psiFile = containingFile
+    val isInProject = psiFile?.virtualFile?.isInLocalFileSystem ?: true /* a psi element which has not a file (e.g. PsiDirectory) */
+    if (!returnReferencingModuleIfNotInFilesystem && !isInProject) {
         return null
+    }
+
+    val searchElement = if (isInProject) this else psiFile ?: this
+    return computeInReadAction(project) {
+        this
+            .takeIf { it.isValid }
+            ?.let { ModuleUtilCore.findModuleForPsiElement(searchElement) }
     }
 }
 

@@ -25,6 +25,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.extractMethod.newImpl.ExtractMethodHelper.addSiblingAfter
 import com.intellij.util.ProcessingContext
 import com.intellij.util.ThrowableRunnable
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsEnumPropertyValue
@@ -49,8 +50,10 @@ class JsModelValueCompletionContributor : CompletionContributor() {
 
     private class JsModelValueCompletionProvider : CompletionProvider<CompletionParameters>() {
         override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
+            val start = System.currentTimeMillis()
             val completionInfo = getPropertyValueInfo(parameters, result) ?: return
             val elements = getPropertyValueElements(completionInfo) ?: return
+            SdkLog.info("Scout JS model value completion took {}ms", System.currentTimeMillis() - start)
             if (elements.isNotEmpty()) {
                 result.addAllElements(elements)
                 result.stopHere()

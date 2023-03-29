@@ -15,5 +15,7 @@ public interface IVariable extends INodeElement, IDataTypeOwner {
   @Override
   VariableSpi spi();
 
+  boolean hasModifier(Modifier modifier);
+
   IConstantValue constantValue();
 }

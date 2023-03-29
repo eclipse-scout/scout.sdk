@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.s.model.js.IScoutJsElement;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
+import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeFulfillsEvaluator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
@@ -101,10 +102,11 @@ public class VariableScoutEnum implements IScoutJsEnum {
 
   @Override
   public boolean fulfills(IDataType dataType) {
-    return fulfills(dataType, dt -> Optional.ofNullable(dt)
-        .flatMap(IDataType::objectLiteral)
+    return new DataTypeFulfillsEvaluator(dt -> dt
+        .objectLiteral()
         .filter(objectLiteral -> objectLiteral == objectLiteral())
-        .isPresent());
+        .isPresent())
+            .fulfills(dataType);
   }
 
   @Override

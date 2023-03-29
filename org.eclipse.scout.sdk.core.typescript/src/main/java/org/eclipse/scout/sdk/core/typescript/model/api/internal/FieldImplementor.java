@@ -11,7 +11,6 @@ package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
-import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi;
 
 public class FieldImplementor extends VariableImplementor<FieldSpi> implements IField {
@@ -22,11 +21,6 @@ public class FieldImplementor extends VariableImplementor<FieldSpi> implements I
   @Override
   public boolean isOptional() {
     return spi().isOptional();
-  }
-
-  @Override
-  public boolean hasModifier(Modifier modifier) {
-    return modifier != null && spi().hasModifier(modifier);
   }
 
   @Override

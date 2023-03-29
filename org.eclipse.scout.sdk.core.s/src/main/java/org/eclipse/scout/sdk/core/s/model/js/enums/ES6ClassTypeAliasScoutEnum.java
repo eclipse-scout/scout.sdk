@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.s.model.js.prop.IScoutJsPropertyValue;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty;
+import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeFulfillsEvaluator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
@@ -105,7 +106,8 @@ public class ES6ClassTypeAliasScoutEnum implements IScoutJsEnum {
 
   @Override
   public boolean fulfills(IDataType dataType) {
-    return fulfills(dataType, dt -> dt == declaringClass() || wrappedEnum().fulfills(dt));
+    return new DataTypeFulfillsEvaluator(dt -> dt == declaringClass() || wrappedEnum().fulfills(dt))
+        .fulfills(dataType);
   }
 
   @Override

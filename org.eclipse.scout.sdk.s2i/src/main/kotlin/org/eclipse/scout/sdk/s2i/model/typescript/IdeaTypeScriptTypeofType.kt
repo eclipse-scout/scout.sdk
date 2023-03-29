@@ -14,6 +14,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.ITypeOf
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.TypeOfImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeOwnerSpi
+import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.TypeOfSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 
@@ -24,6 +25,8 @@ open class IdeaTypeScriptTypeofType(protected val ideaModule: IdeaNodeModule, in
     override fun createApi() = TypeOfImplementor(this)
 
     override fun name() = typeOfType.name
+
+    override fun childTypes(): Collection<DataTypeSpi> = listOfNotNull(dataType())
 
     override fun source() = ideaModule.sourceFor(typeOfType)
 

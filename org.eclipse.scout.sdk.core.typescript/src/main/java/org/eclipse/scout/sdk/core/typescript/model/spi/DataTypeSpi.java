@@ -10,7 +10,6 @@
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
@@ -34,9 +33,7 @@ public interface DataTypeSpi extends NodeElementSpi {
     return DataTypeFlavor.Single;
   }
 
-  default Collection<DataTypeSpi> componentDataTypes() {
-    return Collections.emptyList();
-  }
+  Collection<DataTypeSpi> childTypes();
 
   default int arrayDimension() {
     return 0;
