@@ -88,6 +88,21 @@
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
     </dependency>
+    <dependency>
+      <!-- replace for excluded javax.annotation -->
+      <!-- replace for excluded javax.inject -->
+      <!-- in fact we would only need: -->
+      <!-- jakarta.annotation:jakarta.annotation-api and (org.glassfish.hk2.external:jakarta.inject or jakarta.inject:jakarta.inject-api) -->
+      <!-- but we use same as everywhere in scout -->
+      <groupId>org.glassfish.jersey.inject</groupId>
+      <artifactId>jersey-hk2</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.glassfish.hk2.external</groupId>
+          <artifactId>aopalliance-repackaged</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
     <!-- Scout RT Dependencies to test against -->
     <dependency>
