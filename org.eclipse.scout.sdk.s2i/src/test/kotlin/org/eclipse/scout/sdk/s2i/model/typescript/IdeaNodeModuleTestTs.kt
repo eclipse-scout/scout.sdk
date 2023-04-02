@@ -15,11 +15,11 @@ import org.eclipse.scout.sdk.s2i.model.AbstractModelTest
 class IdeaNodeModuleTestTs : AbstractModelTest("typescript/moduleWithExports") {
 
     fun testExportsWithTypeScript() {
-        val exports = myIdeaNodeModule.exports().stream()
-            .map { it.referencedElement().name() + " as " + it.name() }
-            .toList()
+        val exports = myIdeaNodeModule.elements().stream()
+            .flatMap { it.exportNames().stream().map { export -> it.name() + " as " + export } }
+            .toList().toSet()
         assertEquals(
-            listOf(
+            setOf(
                 "namedDefaultFunc as namedFunc",
                 "NamedClass as NamedClazz",
                 "NamedInterface as NamedInterface",
@@ -38,43 +38,43 @@ class IdeaNodeModuleTestTs : AbstractModelTest("typescript/moduleWithExports") {
     }
 
     fun testExportAliasForExportFrom() {
-        assertEquals("NamedClazz", myIdeaNodeModule.export("NamedClazz").orElseThrow().exportAlias().orElseThrow())
+        assertEquals(listOf("NamedClazz"), myIdeaNodeModule.export("NamedClazz").orElseThrow().exportNames())
     }
 
     fun testExportAliasForInterface() {
-        assertEquals("NamedInterface", myIdeaNodeModule.export("NamedInterface").orElseThrow().referencedElement().exportAlias().orElseThrow())
+        assertEquals(listOf("NamedInterface"), myIdeaNodeModule.export("NamedInterface").orElseThrow().exportNames())
     }
 
     fun testExportAliasForVariable() {
-        assertEquals("NamedObj", myIdeaNodeModule.export("NamedObj").orElseThrow().referencedElement().exportAlias().orElseThrow())
-        assertEquals("wildcardVar", myIdeaNodeModule.export("wildcardVar").orElseThrow().referencedElement().exportAlias().orElseThrow())
+        assertEquals(listOf("NamedObj"), myIdeaNodeModule.export("NamedObj").orElseThrow().exportNames())
+        assertEquals(listOf("wildcardVar"), myIdeaNodeModule.export("wildcardVar").orElseThrow().exportNames())
     }
 
     fun testExportAliasForModule() {
-        assertEquals("@eclipse-scout/sdk-export-ts", myIdeaNodeModule.exportAlias().orElseThrow())
+        assertEquals(listOf("@eclipse-scout/sdk-export-ts"), myIdeaNodeModule.exportNames())
     }
 
     fun testSourceOfInterface() {
-        val namedInterfaceSourceRange = myIdeaNodeModule.export("NamedInterface").orElseThrow().referencedElement().source().orElseThrow()
+        val namedInterfaceSourceRange = myIdeaNodeModule.export("NamedInterface").orElseThrow().source().orElseThrow()
         assertEquals("export interface NamedInterface {\n  myVar: boolean\n}", namedInterfaceSourceRange.asCharSequence().toString())
     }
 
     fun testSourceOfFunction() {
-        val namedFuncSource = myIdeaNodeModule.export("namedFunc").orElseThrow().referencedElement().source().orElseThrow().asCharSequence().toString()
+        val namedFuncSource = myIdeaNodeModule.export("namedFunc").orElseThrow().source().orElseThrow().asCharSequence().toString()
         assertEquals("function namedDefaultFunc() {\n}", namedFuncSource)
-        val wildcardFuncSource = myIdeaNodeModule.export("wildcardFunc").orElseThrow().referencedElement().source().orElseThrow().asCharSequence().toString()
+        val wildcardFuncSource = myIdeaNodeModule.export("wildcardFunc").orElseThrow().source().orElseThrow().asCharSequence().toString()
         assertEquals("export function wildcardFunc() {\n}", wildcardFuncSource)
     }
 
     fun testSourceOfType() {
-        val namedTypeSourceRange = myIdeaNodeModule.export("NamedType").orElseThrow().referencedElement().source().orElseThrow().asCharSequence().toString()
+        val namedTypeSourceRange = myIdeaNodeModule.export("NamedType").orElseThrow().source().orElseThrow().asCharSequence().toString()
         assertEquals("export type NamedType = {\n  myProperty: boolean\n};", namedTypeSourceRange)
-        val wildcardType = myIdeaNodeModule.export("WildcardType").orElseThrow().referencedElement().source().orElseThrow().asCharSequence().toString()
+        val wildcardType = myIdeaNodeModule.export("WildcardType").orElseThrow().source().orElseThrow().asCharSequence().toString()
         assertEquals("export type WildcardType = {\n  myProperty: boolean\n};", wildcardType)
     }
 
     fun testFunctions() {
-        val classWithFunctions = myIdeaNodeModule.export("ClassWithFunctions").orElseThrow().referencedElement() as IES6Class
+        val classWithFunctions = myIdeaNodeModule.export("ClassWithFunctions").orElseThrow() as IES6Class
         assertEquals("constructor", classWithFunctions.function("constructor").orElseThrow().name())
         assertEquals("_init", classWithFunctions.function("_init").orElseThrow().name())
         assertEquals("myOtherFunction", classWithFunctions.function("myOtherFunction").orElseThrow().name())

@@ -9,24 +9,16 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js;
 
-import static java.util.Collections.unmodifiableMap;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
-
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.model.js.enums.ES6ClassEnumScoutEnum;
 import org.eclipse.scout.sdk.core.s.model.js.enums.ES6ClassTypeAliasScoutEnum;
 import org.eclipse.scout.sdk.core.s.model.js.enums.IScoutJsEnum;
@@ -39,7 +31,6 @@ import org.eclipse.scout.sdk.core.s.model.js.objects.TypeScriptScoutObject;
 import org.eclipse.scout.sdk.core.typescript.IWebConstants;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
-import org.eclipse.scout.sdk.core.typescript.model.api.IExportFrom;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.IVariable;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
@@ -55,8 +46,8 @@ public class ScoutJsModel {
   private final INodeModule m_nodeModule;
   private final IES6Class m_widgetClass;
   private final FinalValue<Optional<String>> m_namespace;
-  private final FinalValue<Map<String, IScoutJsObject>> m_objects;
-  private final FinalValue<Collection<IScoutJsEnum>> m_enums;
+  private final FinalValue<List<IScoutJsObject>> m_objects;
+  private final FinalValue<List<IScoutJsEnum>> m_enums;
   private final FinalValue<Boolean> m_supportsTypeScript;
   private final FinalValue<Boolean> m_useClassReference;
 
@@ -74,75 +65,59 @@ public class ScoutJsModel {
     return new ScoutJsObjectQuery(this);
   }
 
-  public Map<String, IScoutJsObject> exportedScoutObjects() {
+  public List<IScoutJsObject> scoutObjects() {
     return m_objects.computeIfAbsentAndGet(this::parseScoutObjects);
   }
 
-  protected Map<String, IScoutJsObject> parseScoutObjects() {
+  protected List<IScoutJsObject> parseScoutObjects() {
     var widgetClass = widgetClass();
     Stream<IScoutJsObject> objects;
     if (supportsTypeScript()) {
       objects = nodeModule()
-          .exports().stream()
-          .map(IExportFrom::referencedClass)
-          .flatMap(Optional::stream)
+          .classes()
           .filter(c -> !c.isTypeAlias() && !c.isEnum())
           .map(element -> TypeScriptScoutObject.create(this, element).orElseThrow());
     }
     else {
       objects = nodeModule()
-          .exports().stream()
-          .filter(export -> !export.name().endsWith("Adapter"))
-          .filter(export -> !export.name().endsWith("Model"))
-          .map(IExportFrom::referencedClass)
-          .flatMap(Optional::stream)
+          .classes()
+          .filter(c -> !c.name().endsWith("Adapter") && !c.name().endsWith("Model"))
           .flatMap(element -> JavaScriptScoutObject.create(this, element, widgetClass).stream());
     }
-    var myObjects = objects.collect(toMap(IScoutJsObject::name, identity(), (a, b) -> {
-      SdkLog.warning("Duplicate classes with name '{}' in module '{}'.", a.name(), nodeModule().name());
-      return b;
-    }, LinkedHashMap::new));
-    return unmodifiableMap(myObjects);
+    return objects.toList();
   }
 
   public ScoutJsEnumQuery findScoutEnums() {
     return new ScoutJsEnumQuery(this);
   }
 
-  public Collection<IScoutJsEnum> exportedScoutEnums() {
+  public List<IScoutJsEnum> scoutEnums() {
     return m_enums.computeIfAbsentAndGet(this::parseScoutEnums);
   }
 
-  protected Collection<IScoutJsEnum> parseScoutEnums() {
+  protected List<IScoutJsEnum> parseScoutEnums() {
     Stream<IScoutJsEnum> enums;
     if (supportsTypeScript()) {
       enums = Stream.concat(
-          nodeModule().exports().stream()
-              .map(IExportFrom::referencedClass)
-              .flatMap(Optional::stream)
+          nodeModule().classes()
               .flatMap(element -> ES6ClassTypeAliasScoutEnum.create(this, element).stream()),
-          nodeModule().exports().stream()
-              .map(IExportFrom::referencedClass)
-              .flatMap(Optional::stream)
+          nodeModule().classes()
               .flatMap(element -> ES6ClassEnumScoutEnum.create(this, element).stream()));
     }
     else {
       enums = Stream.concat(
-          nodeModule().exports().stream()
-              .map(IExportFrom::referencedClass)
-              .flatMap(Optional::stream)
+          nodeModule().classes()
               .flatMap(element -> element.fields()
                   .withModifier(Modifier.STATIC)
                   .stream()
                   .filter(field -> field.dataType().flatMap(IDataType::objectLiteral).isPresent())
                   .flatMap(field -> VariableScoutEnum.create(this, field).stream())),
-          nodeModule().exports().stream()
-              .map(IExportFrom::referencedElement)
+          nodeModule().elements().stream()
               .filter(IVariable.class::isInstance)
               .map(IVariable.class::cast)
               .flatMap(variable -> VariableScoutEnum.create(this, variable).stream()));
     }
-    return enums.collect(Collectors.toUnmodifiableSet());
+    return enums.toList();
   }
 
   /**

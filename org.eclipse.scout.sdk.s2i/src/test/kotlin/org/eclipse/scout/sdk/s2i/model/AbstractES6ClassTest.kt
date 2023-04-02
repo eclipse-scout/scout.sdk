@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: String = "typescript/moduleWithExternalImports") : AbstractModelTest(fixturePath) {
 
     fun testES6Class() {
-        val es6Class = myIdeaNodeModule.export(es6ClassName).orElseThrow().referencedElement() as IES6Class
+        val es6Class = myIdeaNodeModule.export(es6ClassName).orElseThrow() as IES6Class
         assertES6Class(es6Class)
     }
 

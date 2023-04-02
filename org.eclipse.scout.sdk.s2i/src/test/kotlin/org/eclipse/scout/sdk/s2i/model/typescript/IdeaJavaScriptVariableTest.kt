@@ -19,7 +19,7 @@ import java.math.BigInteger
 class IdeaJavaScriptVariableTest : AbstractModelTest("javascript/moduleWithEnums") {
 
     fun testSingleEnumJs() {
-        val hAlign = myIdeaNodeModule.export("HAlign").orElseThrow().referencedElement() as IVariable
+        val hAlign = myIdeaNodeModule.export("HAlign").orElseThrow() as IVariable
         val enumValue = hAlign.constantValue().asObjectLiteral().orElseThrow()
 
         val leftProperty = enumValue.property("LEFT").orElseThrow()
@@ -84,7 +84,7 @@ class IdeaJavaScriptVariableTest : AbstractModelTest("javascript/moduleWithEnums
     }
 
     fun testNestedEnumJs() {
-        val enumInClass = myIdeaNodeModule.export("EnumInClass").orElseThrow().referencedElement() as IES6Class
+        val enumInClass = myIdeaNodeModule.export("EnumInClass").orElseThrow() as IES6Class
         val enums = enumInClass.fields()
             .withModifier(Modifier.STATIC)
             .stream()
@@ -101,11 +101,11 @@ class IdeaJavaScriptVariableTest : AbstractModelTest("javascript/moduleWithEnums
     }
 
     fun testMultiEnumJs() {
-        val severityField = myIdeaNodeModule.export("Severity").orElseThrow().referencedElement() as IVariable
+        val severityField = myIdeaNodeModule.export("Severity").orElseThrow() as IVariable
         val severity = severityField.constantValue().asObjectLiteral().orElseThrow()
         assertEquals("warning", severity.propertyAsString("WARNING").orElseThrow())
 
-        val roundingModeField = myIdeaNodeModule.export("RoundingMode").orElseThrow().referencedElement() as IVariable
+        val roundingModeField = myIdeaNodeModule.export("RoundingMode").orElseThrow() as IVariable
         val roundingMode = roundingModeField.constantValue().asObjectLiteral().orElseThrow()
         assertEquals("HALF_UP", roundingMode.propertyAsString("HALF_UP").orElseThrow())
     }

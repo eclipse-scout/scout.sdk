@@ -44,6 +44,8 @@
   ]]></description>
 
   <change-notes><![CDATA[
+       <b>March 31, 2023</b><br>
+        Adds code completion support for TypeScript models<br>
         <b>October 24, 2022</b><br>
         Adds support for Scout 23<br>
         <b>May 09, 2022</b><br>

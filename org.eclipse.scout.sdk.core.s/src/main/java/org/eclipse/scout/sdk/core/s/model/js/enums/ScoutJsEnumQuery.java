@@ -34,7 +34,7 @@ public class ScoutJsEnumQuery extends AbstractScoutJsElementQuery<IScoutJsEnum, 
 
   @Override
   protected ScoutJsEnumSpliterator createSpliterator() {
-    return new ScoutJsEnumSpliterator(model(), isIncludeDependencies());
+    return new ScoutJsEnumSpliterator(model(), isIncludeSelf(), isIncludeDependencies());
   }
 
   @Override

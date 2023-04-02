@@ -12,15 +12,14 @@ package org.eclipse.scout.sdk.core.typescript.model.spi;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeNameEvaluator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.DataTypeImplementor;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SourceRange;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType> implements DataTypeSpi {
 
@@ -43,29 +42,7 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
 
   @Override
   public String name() {
-    return m_name.computeIfAbsentAndGet(() -> switch (flavor()) {
-      case Array -> childTypes().stream().findFirst().map(this::boxComponentDataType).orElse("") + "[]".repeat(arrayDimension());
-      case Union -> childTypes().stream().map(this::boxComponentDataType).collect(Collectors.joining(" | "));
-      case Intersection -> childTypes().stream().map(this::boxComponentDataType).collect(Collectors.joining(" & "));
-      case Single -> null;
-    });
-  }
-
-  protected String boxComponentDataType(DataTypeSpi componentDataType) {
-    if (componentDataType == null || Strings.isBlank(componentDataType.name())) {
-      return null;
-    }
-
-    var requiresParentheses = switch (flavor()) {
-      case Array -> componentDataType.flavor() == DataTypeFlavor.Union || componentDataType.flavor() == DataTypeFlavor.Intersection;
-      case Union -> componentDataType.flavor() == DataTypeFlavor.Intersection;
-      case Intersection -> componentDataType.flavor() == DataTypeFlavor.Union;
-      case Single -> false;
-    };
-    if (requiresParentheses) {
-      return "(" + componentDataType.name() + ")";
-    }
-    return componentDataType.name();
+    return m_name.computeIfAbsentAndGet(() -> new DataTypeNameEvaluator().eval(this.api()));
   }
 
   @Override

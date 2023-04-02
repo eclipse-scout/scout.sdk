@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FunctionQuery;
-import org.eclipse.scout.sdk.core.typescript.model.api.query.SubTypeQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.SupersQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 
@@ -27,8 +26,6 @@ public interface IES6Class extends IDataType {
   FunctionQuery functions();
 
   boolean isEnum();
-
-  SubTypeQuery subTypes();
 
   Optional<IES6Class> superClass();
 

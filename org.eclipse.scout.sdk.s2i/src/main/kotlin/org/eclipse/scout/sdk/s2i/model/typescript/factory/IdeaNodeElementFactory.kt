@@ -10,21 +10,16 @@
 package org.eclipse.scout.sdk.s2i.model.typescript.factory
 
 import com.intellij.lang.javascript.psi.*
-import com.intellij.lang.javascript.psi.ecma6.TypeScriptFunction
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeofType
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.openapi.vfs.VirtualFile
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementFactorySpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
-import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralDataTypeSpi
 import org.eclipse.scout.sdk.s2i.model.typescript.*
 
 class IdeaNodeElementFactory(val ideaModule: IdeaNodeModule) : AbstractNodeElementFactorySpi(ideaModule) {
-
-    fun createTypeScriptFunction(tsFunction: TypeScriptFunction): IdeaTypeScriptFunction =
-        getOrCreate(tsFunction) { IdeaTypeScriptFunction(ideaModule, it) }
 
     fun createJavaScriptClass(jsClass: JSClass): IdeaJavaScriptClass =
         getOrCreate(jsClass) { IdeaJavaScriptClass(ideaModule, it) }
@@ -44,9 +39,6 @@ class IdeaNodeElementFactory(val ideaModule: IdeaNodeModule) : AbstractNodeEleme
     fun createConstantValue(jsElement: JSElement?): IdeaConstantValue =
         getOrCreate(jsElement to IConstantValue::class.java) { IdeaConstantValue(ideaModule, jsElement) }
 
-    fun createExportFrom(exportDeclaration: JSElement, exportName: String, referencedElement: NodeElementSpi): IdeaExportFrom =
-        getOrCreate(exportDeclaration to exportName) { IdeaExportFrom(ideaModule, exportDeclaration, exportName, referencedElement) }
-
     fun createPackageJson(moduleDir: VirtualFile): IdeaPackageJson =
         getOrCreate(moduleDir) { IdeaPackageJson(ideaModule, it) }
 
@@ -60,5 +52,5 @@ class IdeaNodeElementFactory(val ideaModule: IdeaNodeModule) : AbstractNodeEleme
         createObjectLiteralDataType(name, createObjectLiteralExpression(jsObjectLiteral))
 
     fun createTypeScriptTypeofType(typeOfType: TypeScriptTypeofType): IdeaTypeScriptTypeofType =
-        getOrCreate(typeOfType) { IdeaTypeScriptTypeofType(ideaModule, typeOfType) }
+        getOrCreate(typeOfType) { IdeaTypeScriptTypeofType(ideaModule, it) }
 }

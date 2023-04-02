@@ -12,9 +12,9 @@ package org.eclipse.scout.sdk.core.typescript.model.api;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.internal.IDataTypeVisitor;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi;
-import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 public interface IDataType extends INodeElement {
@@ -36,12 +36,14 @@ public interface IDataType extends INodeElement {
     return Stream.empty();
   }
 
+  boolean isAssignableFrom(IDataType childType);
+
   default Stream<IDataType> childTypes() {
     return spi().childTypes().stream()
         .map(DataTypeSpi::api);
   }
 
-  TreeVisitResult visit(IBreadthFirstVisitor<IDataType> visitor);
+  TreeVisitResult visit(IDataTypeVisitor visitor);
 
   default int arrayDimension() {
     return spi().arrayDimension();

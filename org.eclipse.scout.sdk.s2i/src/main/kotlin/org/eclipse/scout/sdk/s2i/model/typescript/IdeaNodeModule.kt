@@ -9,22 +9,20 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
-import com.intellij.lang.ecmascript6.psi.ES6ExportDeclaration
-import com.intellij.lang.ecmascript6.psi.ES6ExportDefaultAssignment
-import com.intellij.lang.ecmascript6.psi.ES6ImportExportSpecifierAlias
-import com.intellij.lang.ecmascript6.psi.JSExportAssignment
+import com.intellij.lang.ecmascript6.psi.*
 import com.intellij.lang.javascript.JSTokenTypes
 import com.intellij.lang.javascript.inspections.JSRecursiveWalkingElementSkippingNestedFunctionsVisitor
 import com.intellij.lang.javascript.psi.*
-import com.intellij.lang.javascript.psi.ecma6.TypeScriptFunction
 import com.intellij.lang.javascript.psi.ecmal4.JSAttributeList
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
+import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiReference
 import org.eclipse.scout.sdk.core.log.SdkLog
+import org.eclipse.scout.sdk.core.typescript.IWebConstants
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeModuleImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.*
@@ -33,8 +31,8 @@ import org.eclipse.scout.sdk.core.util.SourceRange
 import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaNodeElementFactory
 import java.nio.CharBuffer
 import java.util.*
+import java.util.Collections.emptyList
 import java.util.Collections.unmodifiableMap
-import java.util.function.Function
 import java.util.stream.Collectors.toMap
 
 class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
@@ -43,54 +41,114 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
     private val m_mainFile = FinalValue<VirtualFile>()
     private val m_mainPsi = FinalValue<JSFile>()
     private val m_packageJsonSpi = FinalValue<PackageJsonSpi>()
-    private val m_exports = FinalValue<Map<String, ExportFromSpi>>()
-    private val m_classesByName = FinalValue<Map<String, ES6ClassSpi>>()
+    private val m_elements = FinalValue<Map<NodeElementSpi, List<String>>>()
+    private val m_exports = FinalValue<Map<String, NodeElementSpi>>()
+    private val m_elementsByPsi = FinalValue<Map<PsiElement, NodeElementSpi>>()
+    private val m_classes = FinalValue<List<ES6ClassSpi>>()
 
     override fun containingModule() = this
+
+    override fun nodeElementFactory(): IdeaNodeElementFactory = m_nodeElementFactory
 
     override fun packageJson(): PackageJsonSpi = m_packageJsonSpi.computeIfAbsentAndGet { nodeElementFactory().createPackageJson(nodeModuleDir) }
 
     override fun createApi() = NodeModuleImplementor(this, packageJson())
 
-    fun classes(): Map<String, ES6ClassSpi> = m_classesByName.computeIfAbsentAndGet(this::computeClassesByName)
-
-    internal fun computeClassesByName(): Map<String, ES6ClassSpi> {
-        return exports().values.stream()
-            .map { it.referencedElement() }
-            .filter { it is ES6ClassSpi }
-            .map { it as ES6ClassSpi }
-            .collect(toMap({ e -> e.name() }, Function.identity(), { _, b ->
-                SdkLog.warning("Duplicate class '{}' in '{}'.", b.name(), packageJson().api().name())
-                b
-            }, { LinkedHashMap() }))
+    override fun classes(): List<ES6ClassSpi> = m_classes.computeIfAbsentAndGet {
+        elementsByPsi().values.asSequence()
+            .mapNotNull { it as? ES6ClassSpi }
+            .toList()
     }
 
-    override fun exports(): Map<String, ExportFromSpi> = m_exports.computeIfAbsentAndGet(this::computeExports)
+    fun elementsByPsi(): Map<PsiElement, NodeElementSpi> = m_elementsByPsi.computeIfAbsentAndGet {
+        val classesByPsi = elements().keys.asSequence()
+            .mapNotNull { getPsiForSpi(it)?.let { psi -> psi to it } }
+            .toMap(LinkedHashMap())
+        return@computeIfAbsentAndGet unmodifiableMap(classesByPsi)
+    }
 
-    internal fun computeExports(): Map<String, ExportFromSpi> {
+    override fun elements(): Map<NodeElementSpi, List<String> /* export name */> = m_elements.computeIfAbsentAndGet(this::computeNodeElements)
+
+    override fun exports(): Map<String, NodeElementSpi> = m_exports.computeIfAbsentAndGet {
+        val exports = elements().entries.stream()
+            .flatMap { it.value.map { alias -> alias to it.key }.stream() }
+            .collect(toMap({ it.first }, { it.second }, { _, b ->
+                SdkLog.warning("Duplicate export in '{}'.", packageJson().api().name())
+                b
+            }, { LinkedHashMap() }))
+        return@computeIfAbsentAndGet unmodifiableMap(exports)
+    }
+
+    fun resolveReferencedElement(element: JSElement) = moduleInventory.resolveReferencedElement(element, this)
+
+    fun resolveImport(importSpecifier: ES6ImportSpecifier) = moduleInventory.resolveImport(importSpecifier, this)
+
+    private fun computeNodeElements(): Map<NodeElementSpi, List<String>> {
+        val exportedElements = resolveModuleExports()
+        val notExportedElements = resolveNotExportedElements(exportedElements.keys)
+
+        val allElements = LinkedHashMap<NodeElementSpi, List<String>>(exportedElements.size + notExportedElements.size)
+        notExportedElements.asSequence()
+            .mapNotNull { createSpiForPsi(it) }
+            .map { it to emptyList<String>() }
+            .toMap(allElements)
+        exportedElements.entries.asSequence()
+            .mapNotNull { createSpiForPsi(it.key)?.let { spi -> spi to it.value } }
+            .toMap(allElements)
+        return unmodifiableMap(allElements)
+    }
+
+    private fun resolveNotExportedElements(exportedElements: Set<JSElement>): List<JSElement> {
+        val srcRoot = nodeModuleDir.findFileByRelativePath(IWebConstants.MAIN_JS_SOURCE_FOLDER)?.takeIf { it.isValid }
+            ?: nodeModuleDir.findFileByRelativePath(IWebConstants.JS_SOURCE_FOLDER)?.takeIf { it.isValid }
+            ?: return emptyList()
+        // search for elements not exported in the main file
+        // such elements have no export alias but may still be available inside the own module
+        val psiManager = PsiManager.getInstance(moduleInventory.project)
+        val result = ArrayList<JSElement>()
+        val mainFile = mainFile()
+        VfsUtilCore.iterateChildrenRecursively(srcRoot, this::acceptFile) { child ->
+            child.takeUnless { it.isDirectory }.takeUnless { it == mainFile }
+                ?.let { psiManager.findFile(it) as? JSFile }
+                ?.let { findAllExportedElements(it).filter { candidate -> !exportedElements.contains(candidate) } }
+                ?.forEach { result.add(it) }
+            true // keep on iterating
+        }
+        return result
+    }
+
+    private fun acceptFile(fileOrDirectory: VirtualFile): Boolean {
+        if (!fileOrDirectory.isValid || !fileOrDirectory.isInLocalFileSystem) {
+            return false
+        }
+        if (fileOrDirectory.isDirectory) {
+            return true
+        }
+        val fileName = fileOrDirectory.name
+        return fileName.endsWith(IWebConstants.JS_FILE_SUFFIX) || fileName.endsWith(IWebConstants.TS_FILE_SUFFIX)
+    }
+
+    private fun resolveModuleExports(): Map<JSElement, List<String>> {
         val mainPsi = mainPsi()
         if (mainPsi == null) {
-            SdkLog.debug("No entry point found for module '{}'. Module will not export anything.", packageJson().containingDir())
+            SdkLog.info("No entry point found for module '{}'. Module will not export anything.", packageJson().containingDir())
             return emptyMap()
         }
 
-        val result = LinkedHashMap<String, ExportFromSpi>()
+        val result = LinkedHashMap<JSElement, MutableList<String>>()
         mainPsi.accept(object : JSRecursiveWalkingElementSkippingNestedFunctionsVisitor() {
             override fun skipLambdas() = true
             override fun visitES6ExportDeclaration(exportDeclaration: ES6ExportDeclaration) {
                 super.visitES6ExportDeclaration(exportDeclaration)
-                parseES6ExportDeclaration(exportDeclaration).forEach {
-                    val old = result.put(it.name(), it)
-                    if (old != null) {
-                        SdkLog.warning("Duplicate export '{}' in '{}'.", it.name(), packageJson().api().location())
-                    }
+                resolveExportedElements(exportDeclaration).forEach {
+                    result.computeIfAbsent(it.first) { ArrayList() }.add(it.second)
                 }
             }
         })
-        return unmodifiableMap(result)
+        return result
     }
 
-    internal fun parseES6ExportDeclaration(exportDeclaration: ES6ExportDeclaration): List<IdeaExportFrom> {
+    private fun resolveExportedElements(exportDeclaration: ES6ExportDeclaration): List<Pair<JSElement, String>> {
         if (exportDeclaration.isExportAll) {
             // export * from './OtherFile';
             // Returns all elements exported in the target file
@@ -98,7 +156,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
                 ?.resolveReferencedElements()
                 ?.mapNotNull { it as? JSFile }
                 ?.flatMap { findAllExportedElements(it) }
-                ?.mapNotNull { createIdeaExportFrom(exportDeclaration, it) }
+                ?.mapNotNull { psi -> psi.name?.let { psi to it } }
                 ?: emptyList()
         }
 
@@ -110,17 +168,12 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
                     .filter { it.isValidResult }
                     .mapNotNull { it.element }
                     .flatMap { resolveExportTarget(it) }
-                    .mapNotNull { createIdeaExportFrom(specifier, it, specifier.declaredName) }
+                    .mapNotNull { psi -> specifier.declaredName?.let { psi to it } }
             }
     }
 
-    internal fun createIdeaExportFrom(exportDeclaration: JSElement, referencedElement: JSElement, exportAlias: String? = referencedElement.name): IdeaExportFrom? {
-        val exportName = exportAlias ?: return null // cannot re-export an anonymous element
-        return createSpiForPsi(referencedElement)?.let { nodeElementFactory().createExportFrom(exportDeclaration, exportName, it) }
-    }
-
-    internal fun findAllExportedElements(file: JSFile): Set<JSElement> {
-        val result = LinkedHashSet<JSElement>()
+    private fun findAllExportedElements(file: JSFile): List<JSElement> {
+        val result = ArrayList<JSElement>()
         file.accept(object : JSRecursiveWalkingElementSkippingNestedFunctionsVisitor() {
             override fun skipLambdas() = true
             override fun visitElement(element: PsiElement) {
@@ -153,6 +206,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
             }
             candidate = attributeOwner
         }
+        if (candidate is ES6ImportExportSpecifierAlias) candidate = candidate.findAliasedElement() as? JSElement
         if (candidate is ES6ExportDefaultAssignment) {
             candidate = if (candidate.namedElement == null) candidate.expression else candidate.namedElement
         }
@@ -173,23 +227,34 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
         }
     }
 
-    override fun nodeElementFactory(): IdeaNodeElementFactory = m_nodeElementFactory
+    private fun getPsiForSpi(spi: NodeElementSpi): JSElement? {
+        if (spi is IdeaJavaScriptClass) {
+            return spi.javaScriptClass
+        }
+        if (spi is IdeaJavaScriptFunction) {
+            return spi.javaScriptFunction
+        }
+        if (spi is IdeaJavaScriptObjectLiteral) {
+            return spi.jsObjectLiteral
+        }
+        if (spi is IdeaJavaScriptVariable) {
+            return spi.javaScriptVariable
+        }
+        return null
+    }
 
     private fun createSpiForPsi(psi: JSElement): NodeElementSpi? {
-        if (psi is TypeScriptFunction) {
-            return nodeElementFactory().createTypeScriptFunction(psi)
-        }
         if (psi is JSClass) {
-            return nodeElementFactory().createJavaScriptClass(psi)
+            return m_nodeElementFactory.createJavaScriptClass(psi)
         }
         if (psi is JSFunction) {
-            return nodeElementFactory().createJavaScriptFunction(psi)
+            return m_nodeElementFactory.createJavaScriptFunction(psi)
         }
         if (psi is JSObjectLiteralExpression) {
-            return nodeElementFactory().createObjectLiteralExpression(psi)
+            return m_nodeElementFactory.createObjectLiteralExpression(psi)
         }
         if (psi is JSVariable) {
-            return nodeElementFactory().createJavaScriptVariable(psi)
+            return m_nodeElementFactory.createJavaScriptVariable(psi)
         }
         SdkLog.debug("Unsupported type: '" + psi::class.java.name + "' called '" + psi.name + "'.")
         return null

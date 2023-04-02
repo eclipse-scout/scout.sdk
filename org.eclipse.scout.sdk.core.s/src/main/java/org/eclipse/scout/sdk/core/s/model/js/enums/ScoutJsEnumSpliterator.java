@@ -14,7 +14,7 @@ import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 
 public class ScoutJsEnumSpliterator extends AbstractScoutJsElementSpliterator<IScoutJsEnum> {
 
-  public ScoutJsEnumSpliterator(ScoutJsModel model, boolean includeDependencies) {
-    super(model, includeDependencies, ScoutJsModel::exportedScoutEnums);
+  public ScoutJsEnumSpliterator(ScoutJsModel model, boolean includeStart, boolean includeDependencies) {
+    super(model, includeStart, includeDependencies, ScoutJsModel::scoutEnums);
   }
 }

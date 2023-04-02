@@ -9,20 +9,16 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js.objects;
 
-import java.util.Collection;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.model.js.AbstractScoutJsElementQuery;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
-import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 
 public class ScoutJsObjectQuery extends AbstractScoutJsElementQuery<IScoutJsObject, ScoutJsObjectQuery> {
 
   private String m_objectType;
-  private IES6Class m_instanceOf;
   private Modifier m_requiredModifier;
   private Modifier m_notAllowedModifier;
 
@@ -37,27 +33,6 @@ public class ScoutJsObjectQuery extends AbstractScoutJsElementQuery<IScoutJsObje
 
   protected String objectType() {
     return m_objectType;
-  }
-
-  public ScoutJsObjectQuery withObjectClasses(Stream<IES6Class> declaringClasses) {
-    return withDeclaringClasses(declaringClasses);
-  }
-
-  public ScoutJsObjectQuery withObjectClasses(Collection<? extends IES6Class> declaringClasses) {
-    return withDeclaringClasses(declaringClasses);
-  }
-
-  public ScoutJsObjectQuery withObjectClass(IES6Class declaringClass) {
-    return withDeclaringClass(declaringClass);
-  }
-
-  public ScoutJsObjectQuery withInstanceOf(IES6Class superClass) {
-    m_instanceOf = superClass;
-    return this;
-  }
-
-  protected IES6Class instanceOf() {
-    return m_instanceOf;
   }
 
   public ScoutJsObjectQuery withoutModifier(Modifier modifier) {
@@ -80,7 +55,7 @@ public class ScoutJsObjectQuery extends AbstractScoutJsElementQuery<IScoutJsObje
 
   @Override
   protected ScoutJsObjectSpliterator createSpliterator() {
-    return new ScoutJsObjectSpliterator(model(), isIncludeDependencies());
+    return new ScoutJsObjectSpliterator(model(), isIncludeSelf(), isIncludeDependencies());
   }
 
   @Override
@@ -104,12 +79,6 @@ public class ScoutJsObjectQuery extends AbstractScoutJsElementQuery<IScoutJsObje
     var notAllowedModifier = getNotAllowedModifier();
     if (notAllowedModifier != null) {
       result = appendOrCreateFilter(result, o -> !o.declaringClass().hasModifier(notAllowedModifier));
-    }
-
-    // instanceOf checks are the slowest: therefore append last
-    var instanceOf = instanceOf();
-    if (instanceOf != null) {
-      result = appendOrCreateFilter(result, o -> o.declaringClass().isInstanceOf(instanceOf));
     }
 
     return result;

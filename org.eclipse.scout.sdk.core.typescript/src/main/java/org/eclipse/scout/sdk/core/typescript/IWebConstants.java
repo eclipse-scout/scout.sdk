@@ -12,6 +12,16 @@ package org.eclipse.scout.sdk.core.typescript;
 public interface IWebConstants {
 
   /**
+   * JavaScript/TypeScript source folder for modules with Maven layout.
+   */
+  String MAIN_JS_SOURCE_FOLDER = "src/main/js";
+
+  /**
+   * JavaScript/TypeScript source folder for modules with Node layout.
+   */
+  String JS_SOURCE_FOLDER = "src";
+
+  /**
    * The file extension for JavaScript files. Value is '{@code js}'.
    */
   String JS_FILE_EXTENSION = "js";

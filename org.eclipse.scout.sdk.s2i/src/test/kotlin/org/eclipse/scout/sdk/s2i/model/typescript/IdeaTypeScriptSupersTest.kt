@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.s2i.model.AbstractModelTest
 class IdeaTypeScriptSupersTest : AbstractModelTest("typescript/moduleWithExternalImports") {
 
     fun testSupers() {
-        val classWithSupers = myIdeaNodeModule.export("ClassWithSupers").orElseThrow().referencedElement() as IES6Class
+        val classWithSupers = myIdeaNodeModule.export("ClassWithSupers").orElseThrow() as IES6Class
 
         val superClass = classWithSupers.superClass().orElseThrow()
         assertEquals("NamedClass", superClass.name())

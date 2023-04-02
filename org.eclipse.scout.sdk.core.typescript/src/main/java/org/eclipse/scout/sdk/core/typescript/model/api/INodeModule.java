@@ -10,17 +10,20 @@
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.typescript.model.api.query.ExportFromQuery;
+import org.eclipse.scout.sdk.core.typescript.model.api.query.NodeElementQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
 
 public interface INodeModule extends INodeElement {
   @Override
   NodeModuleSpi spi();
 
-  ExportFromQuery exports();
+  NodeElementQuery elements();
 
-  Optional<IExportFrom> export(String name);
+  Stream<IES6Class> classes();
+
+  Optional<INodeElement> export(String name);
 
   IPackageJson packageJson();
 

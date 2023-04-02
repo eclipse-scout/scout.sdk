@@ -126,8 +126,8 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         assertEquals(TypeScriptTypes._string, nameProperty?.type().toString())
         val fieldsProperty = widget.properties()[FIELDS_PROPERTY_NAME]
         assertNotNull(fieldsProperty)
-        assertTrue(fieldsProperty?.type()?.hasClasses() == true)
-        assertSame(scoutWidgetClass, fieldsProperty?.type()?.classes()?.firstOrNull())
+        assertEquals(ScoutJsCoreConstants.CLASS_NAME_WIDGET + "[]", fieldsProperty?.type()?.displayName()?.orElse(null))
+        assertTrue(fieldsProperty?.type()?.isChildModelSupported == true)
         assertTrue(fieldsProperty?.type()?.isArray == true)
         val childProperty = widget.properties()[CHILD_PROPERTY_NAME]
         assertNotNull(childProperty)
@@ -145,7 +145,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         val onlyHereProperty = widget.properties()[ONLY_HERE_PROPERTY_NAME]
         assertNotNull(onlyHereProperty)
         assertSame(scoutWidgetClass, onlyHereProperty?.type()?.dataType()?.orElse(null))
-        assertTrue(onlyHereProperty?.type()?.hasClasses() == true)
+        assertTrue(onlyHereProperty?.type()?.isChildModelSupported == true)
         assertEquals(ScoutJsCoreConstants.CLASS_NAME_WIDGET, onlyHereProperty?.type()?.dataType()?.orElse(null)?.name())
 
         // test that Widget is recognized as Widget

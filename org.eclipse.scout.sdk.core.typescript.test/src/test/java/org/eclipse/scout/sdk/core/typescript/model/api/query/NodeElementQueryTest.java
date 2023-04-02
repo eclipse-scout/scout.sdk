@@ -19,27 +19,27 @@ import org.eclipse.scout.sdk.core.typescript.testing.ExtendWithNodeModules;
 import org.junit.jupiter.api.Test;
 
 @ExtendWithNodeModules("ExportFromQueryTest")
-public class ExportFromQueryTest {
+public class NodeElementQueryTest {
   @Test
   public void testSelf(INodeModule root) {
     var directExports = root
-        .exports()
-        .withName("OwnExport2")
+        .elements()
+        .withExportName("OwnExport2")
         .stream()
         .map(INodeElement::name)
         .toList();
-    assertEquals(List.of("OwnExport2"), directExports);
+    assertEquals(List.of("OwnExport2Class"), directExports);
 
     var allDirectExports = root
-        .exports()
+        .elements()
         .stream()
         .map(INodeElement::name)
         .toList();
-    assertEquals(List.of("OwnExport1", "OwnExport2", "OwnExport3"), allDirectExports);
+    assertEquals(List.of("OwnExport1Class", "OwnExport2Class", "OwnExport3Class"), allDirectExports);
 
     var directExportsNotFound = root
-        .exports()
-        .withName("Widget")
+        .elements()
+        .withExportName("Widget")
         .stream()
         .map(INodeElement::name)
         .toList();
@@ -49,8 +49,8 @@ public class ExportFromQueryTest {
   @Test
   public void testRecursive(INodeModule root) {
     var recursiveExports = root
-        .exports()
-        .withName("Widget")
+        .elements()
+        .withExportName("Widget")
         .withRecursive(true)
         .stream()
         .map(INodeElement::name)
@@ -58,20 +58,20 @@ public class ExportFromQueryTest {
     assertEquals(List.of("Widget"), recursiveExports);
 
     var recursiveExportsNotFound = root
-        .exports()
+        .elements()
         .withRecursive(true)
-        .withName("NotExisting")
+        .withExportName("NotExisting")
         .stream()
         .map(INodeElement::name)
         .toList();
     assertEquals(List.of(), recursiveExportsNotFound);
 
     var allRecursiveExports = root
-        .exports()
+        .elements()
         .withRecursive(true)
         .stream()
         .map(INodeElement::name)
         .toList();
-    assertEquals(List.of("OwnExport1", "OwnExport2", "OwnExport3", "Ex1", "Widget", "Ex2", "Ex3", "Ex4"), allRecursiveExports);
+    assertEquals(List.of("OwnExport1Class", "OwnExport2Class", "OwnExport3Class", "Ex1Class", "Widget", "Ex2Class", "Ex3Class", "Ex4Class"), allRecursiveExports);
   }
 }

@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
-import static java.util.stream.Collectors.joining;
-
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -21,7 +19,6 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FunctionQuery;
-import org.eclipse.scout.sdk.core.typescript.model.api.query.SubTypeQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.SupersQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
@@ -71,15 +68,12 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
     if (es6Class == null) {
       return false;
     }
-    if (es6Class == this) {
+    var me = withoutTypeArguments();
+    var raw = es6Class.withoutTypeArguments();
+    if (raw == me) {
       return true;
     }
-    return supers().withName(es6Class.name()).existsAny();
-  }
-
-  @Override
-  public SubTypeQuery subTypes() {
-    return new SubTypeQuery(this.spi());
+    return supers().stream().anyMatch(s -> s == raw);
   }
 
   @Override
@@ -131,16 +125,5 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
   public Stream<IDataType> typeArguments() {
     return spi().typeArguments().stream()
         .map(DataTypeSpi::api);
-  }
-
-  @Override
-  public String toString() {
-    if (spi().typeArguments().isEmpty()) {
-      return super.toString();
-    }
-    var typeArgs = typeArguments()
-        .map(Object::toString)
-        .collect(joining(", ", "<", ">"));
-    return name() + typeArgs + " [" + containingModule() + ']';
   }
 }

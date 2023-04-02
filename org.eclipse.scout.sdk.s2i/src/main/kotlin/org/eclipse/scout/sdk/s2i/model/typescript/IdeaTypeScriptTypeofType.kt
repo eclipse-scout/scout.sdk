@@ -24,7 +24,7 @@ open class IdeaTypeScriptTypeofType(protected val ideaModule: IdeaNodeModule, in
 
     override fun createApi() = TypeOfImplementor(this)
 
-    override fun name() = typeOfType.name
+    override fun name() = "typeof " + typeOfType.referenceText
 
     override fun childTypes(): Collection<DataTypeSpi> = listOfNotNull(dataType())
 
@@ -32,6 +32,6 @@ open class IdeaTypeScriptTypeofType(protected val ideaModule: IdeaNodeModule, in
 
     override fun dataTypeOwner() = m_dataTypeOwner.computeIfAbsentAndGet {
         val expression = typeOfType.expression ?: return@computeIfAbsentAndGet null
-        ideaModule.moduleInventory.resolveReferencedElement(expression) as? DataTypeOwnerSpi
+        ideaModule.resolveReferencedElement(expression) as? DataTypeOwnerSpi
     }
 }

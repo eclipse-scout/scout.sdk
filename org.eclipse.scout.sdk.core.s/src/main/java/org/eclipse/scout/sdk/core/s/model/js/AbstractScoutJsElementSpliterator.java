@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js;
 
+import static java.util.Collections.emptyIterator;
 import static java.util.stream.Collectors.toCollection;
 
 import java.util.ArrayDeque;
@@ -19,54 +20,51 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
 public abstract class AbstractScoutJsElementSpliterator<E extends IScoutJsElement> implements Spliterator<E> {
 
-  private final Function<ScoutJsModel, Collection<E>> m_scoutElements;
+  private final Function<ScoutJsModel, Collection<E>> m_scoutElementsProvider;
   private final Deque<INodeModule> m_dependencyDek;
   private final int m_characteristics;
-
-  private ScoutJsModel m_currentModel;
+  private final IES6Class m_widgetClass;
   private Iterator<E> m_currentModelElementsIterator; // points to the elements of the currently active ScoutJsModel
 
-  protected AbstractScoutJsElementSpliterator(ScoutJsModel model, boolean includeDependencies, Function<ScoutJsModel, Collection<E>> scoutElements) {
-    m_scoutElements = Ensure.notNull(scoutElements);
-    m_currentModel = model;
+  protected AbstractScoutJsElementSpliterator(ScoutJsModel start, boolean includeStart, boolean includeDependencies, Function<ScoutJsModel, Collection<E>> scoutElementsProvider) {
+    m_scoutElementsProvider = Ensure.notNull(scoutElementsProvider);
+    m_widgetClass = start.widgetClass();
     if (includeDependencies) {
-      m_dependencyDek = model
+      m_dependencyDek = start
           .scoutJsDependenciesRecursively()
           .collect(toCollection(ArrayDeque::new));
     }
     else {
-      m_dependencyDek = null;
+      m_dependencyDek = new ArrayDeque<>();
     }
-    m_currentModelElementsIterator = m_scoutElements.apply(model).iterator();
-
-    var characteristics = Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED;
-    if (!includeDependencies) {
-      characteristics |= (Spliterator.SIZED | Spliterator.SUBSIZED);
+    if (includeStart) {
+      m_dependencyDek.addLast(start.nodeModule());
     }
-    m_characteristics = characteristics;
+    moveToNextModel();
+    if (m_currentModelElementsIterator == null) {
+      // when no elements are available: assign empty one so that no null check is necessary in tryAdvance
+      m_currentModelElementsIterator = emptyIterator();
+    }
+    m_characteristics = Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED;
   }
 
   @Override
   public boolean tryAdvance(Consumer<? super E> consumer) {
     if (!m_currentModelElementsIterator.hasNext()) {
-      if (m_dependencyDek != null) {
-        boolean movedToNextModel;
-        do {
-          movedToNextModel = moveToNextModel();
-        }
-        while (movedToNextModel && !m_currentModelElementsIterator.hasNext());
-
-        if (!movedToNextModel) {
-          return false;
-        }
+      boolean movedToNextModel;
+      do {
+        movedToNextModel = moveToNextModel();
       }
-      else {
-        return false; // do not dive deep into dependencies: therefore abort here
+      while (movedToNextModel && !m_currentModelElementsIterator.hasNext());
+
+      if (!movedToNextModel) {
+        return false;
       }
     }
 
@@ -76,13 +74,11 @@ public abstract class AbstractScoutJsElementSpliterator<E extends IScoutJsElemen
 
   protected boolean moveToNextModel() {
     if (m_dependencyDek.isEmpty()) {
-      m_currentModel = null;
       m_currentModelElementsIterator = null;
       return false;
     }
-    var widgetClass = m_currentModel.widgetClass();
-    m_currentModel = ScoutJsModels.create(m_dependencyDek.removeLast(), widgetClass).orElseThrow();
-    m_currentModelElementsIterator = m_scoutElements.apply(m_currentModel).iterator();
+    var currentModel = ScoutJsModels.create(m_dependencyDek.removeLast(), m_widgetClass).orElseThrow();
+    m_currentModelElementsIterator = m_scoutElementsProvider.apply(currentModel).iterator();
 
     return true;
   }
@@ -94,11 +90,7 @@ public abstract class AbstractScoutJsElementSpliterator<E extends IScoutJsElemen
 
   @Override
   public long estimateSize() {
-    if (hasCharacteristics(SIZED)) {
-      // no recursion -> exact number of elements known.
-      return m_scoutElements.apply(m_currentModel).size();
-    }
-    return Long.MAX_VALUE; // having recursion the size is unknown as we don't know the number of grand-children yet
+    return Long.MAX_VALUE;
   }
 
   @Override

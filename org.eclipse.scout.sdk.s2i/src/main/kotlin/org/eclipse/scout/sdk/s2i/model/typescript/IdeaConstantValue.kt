@@ -44,7 +44,7 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
     protected fun unwrapJSNewExpression(element: JSElement?) = if (element is JSNewExpression) element.methodExpression else element
 
     fun referencedElement() = m_referencedElement.computeIfAbsentAndGet {
-        (unwrappedElement() as? JSReferenceExpression)?.let { ideaModule.moduleInventory.resolveReferencedElement(it) }
+        (unwrappedElement() as? JSReferenceExpression)?.let { ideaModule.resolveReferencedElement(it) }
     }
 
     fun referencedES6Class() = m_referencedES6Class.computeIfAbsentAndGet { referencedElement() as? ES6ClassSpi }

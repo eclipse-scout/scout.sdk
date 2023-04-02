@@ -9,11 +9,11 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript
 
+import com.intellij.lang.javascript.psi.JSExpression
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptEnum
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptInterface
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeAlias
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
-import com.intellij.lang.javascript.search.JSClassSearch
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.ES6ClassImplementor
@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.s2i.model.typescript.util.FieldSpiUtils
 import org.eclipse.scout.sdk.s2i.model.typescript.util.toModifierType
 import java.util.*
 import java.util.stream.Stream
-import kotlin.streams.asStream
 
 open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, internal val javaScriptClass: JSClass) : AbstractNodeElementSpi<IES6Class>(ideaModule), ES6ClassSpi {
 
@@ -57,13 +56,6 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
         Optional.ofNullable(DataTypeSpiUtils.createDataType(jsType, ideaModule))
     }
 
-    override fun inheritors(deep: Boolean): Stream<ES6ClassSpi> {
-        val query = JSClassSearch.searchClassInheritors(javaScriptClass, deep)
-        return query.asSequence()
-            .mapNotNull { resolveReferencedClass(it) }
-            .asStream()
-    }
-
     override fun createDataType(name: String) = DataTypeSpiUtils.createDataType(name, javaScriptClass, ideaModule)
 
     override fun functions(): List<FunctionSpi> = m_functions.computeIfAbsentAndGet {
@@ -74,22 +66,18 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     override fun typeArguments() = emptyList<DataTypeSpi>()
 
     override fun superInterfaces(): Stream<ES6ClassSpi> = m_superInterfaces.computeIfAbsentAndGet {
-        val superInterfaces = if (isInterface) javaScriptClass.superClasses else javaScriptClass.implementedInterfaces
-        val spi = superInterfaces.mapNotNull { resolveReferencedClass(it) }
-        return@computeIfAbsentAndGet Collections.unmodifiableList(spi)
+        val superInterfaces = if (isInterface) javaScriptClass.extendsList else javaScriptClass.implementsList
+        val interfaces = superInterfaces?.expressions?.mapNotNull { resolveReferencedClass(it) } ?: emptyList()
+        return@computeIfAbsentAndGet Collections.unmodifiableList(interfaces)
     }.stream()
 
     override fun superClass(): Optional<ES6ClassSpi> = m_superClass.computeIfAbsentAndGet {
         if (isInterface) return@computeIfAbsentAndGet Optional.empty() // interfaces have no super classes
-        val superClass = javaScriptClass.superClasses.firstOrNull() ?: return@computeIfAbsentAndGet Optional.empty()
-        return@computeIfAbsentAndGet Optional.ofNullable(resolveReferencedClass(superClass))
+        val superClassRef = javaScriptClass.extendsList?.expressions?.firstOrNull() ?: return@computeIfAbsentAndGet Optional.empty()
+        return@computeIfAbsentAndGet Optional.ofNullable(resolveReferencedClass(superClassRef))
     }
 
-    protected fun resolveReferencedClass(referencedClass: JSClass): ES6ClassSpi? {
-        val module = ideaModule.moduleInventory.findContainingModule(referencedClass) ?: return null
-        // do not directly use the superClass as it might point to a .d.ts file
-        return module.classes()[referencedClass.name]
-    }
+    protected fun resolveReferencedClass(referencedClass: JSExpression) = ideaModule.resolveReferencedElement(referencedClass) as? ES6ClassSpi
 
     override fun fields(): List<FieldSpi> = m_fields.computeIfAbsentAndGet {
         FieldSpiUtils.collectFields(javaScriptClass, this, ideaModule)

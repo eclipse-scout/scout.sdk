@@ -9,20 +9,21 @@
  */
 package org.eclipse.scout.sdk.core.typescript.testing.spi;
 
-import static java.util.Collections.emptyMap;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeModuleImplementor;
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi;
-import org.eclipse.scout.sdk.core.typescript.model.spi.ExportFromSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementFactorySpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -45,9 +46,20 @@ public class TestingNodeModuleSpi extends AbstractNodeElementSpi<INodeModule> im
   }
 
   @Override
-  public Map<String, ExportFromSpi> exports() {
+  public Map<NodeElementSpi, List<String>> elements() {
+    // simple local implementation cannot parse elements
+    return Collections.emptyMap();
+  }
+
+  @Override
+  public List<ES6ClassSpi> classes() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public Map<String, NodeElementSpi> exports() {
     // simple local implementation cannot parse exports
-    return emptyMap();
+    return Collections.emptyMap();
   }
 
   @Override

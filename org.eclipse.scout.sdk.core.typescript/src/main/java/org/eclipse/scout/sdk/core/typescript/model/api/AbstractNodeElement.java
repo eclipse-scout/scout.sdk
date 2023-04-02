@@ -9,6 +9,10 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableList;
+
+import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi;
@@ -18,12 +22,10 @@ import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public abstract class AbstractNodeElement<SPI extends NodeElementSpi> implements INodeElement {
   private final SPI m_spi;
-  private final FinalValue<Optional<String>> m_exportedName;
   private final FinalValue<Optional<SourceRange>> m_source;
 
   protected AbstractNodeElement(SPI spi) {
     m_spi = Ensure.notNull(spi);
-    m_exportedName = new FinalValue<>();
     m_source = new FinalValue<>();
   }
 
@@ -38,20 +40,21 @@ public abstract class AbstractNodeElement<SPI extends NodeElementSpi> implements
   }
 
   @Override
-  public Optional<String> exportAlias() {
-    return m_exportedName.computeIfAbsentAndGet(this::computeExportAlias);
+  public List<String> exportNames() {
+    var exportNames = containingModule().spi().elements().get(spi());
+    if (exportNames == null) {
+      return emptyList();
+    }
+    return unmodifiableList(exportNames);
+  }
+
+  @Override
+  public boolean isExported() {
+    return !exportNames().isEmpty();
   }
 
   @Override
   public Optional<SourceRange> source() {
     return m_source.computeIfAbsentAndGet(() -> spi().source());
-  }
-
-  public Optional<String> computeExportAlias() {
-    return containingModule()
-        .exports()
-        .withElement(this)
-        .first()
-        .map(INodeElement::name);
   }
 }

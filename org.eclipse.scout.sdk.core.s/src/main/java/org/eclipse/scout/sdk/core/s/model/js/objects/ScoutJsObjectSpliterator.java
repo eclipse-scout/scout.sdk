@@ -14,7 +14,7 @@ import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 
 public class ScoutJsObjectSpliterator extends AbstractScoutJsElementSpliterator<IScoutJsObject> {
 
-  public ScoutJsObjectSpliterator(ScoutJsModel model, boolean includeDependencies) {
-    super(model, includeDependencies, currentModel -> currentModel.exportedScoutObjects().values());
+  public ScoutJsObjectSpliterator(ScoutJsModel model, boolean includeStart, boolean includeDependencies) {
+    super(model, includeStart, includeDependencies, ScoutJsModel::scoutObjects);
   }
 }

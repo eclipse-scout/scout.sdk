@@ -19,13 +19,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.typescript.IWebConstants;
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
 import org.eclipse.scout.sdk.core.typescript.model.api.JsonPointer;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.DependencyQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
-import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -42,8 +42,8 @@ public class PackageJsonImplementor extends AbstractNodeElement<PackageJsonSpi> 
 
   public PackageJsonImplementor(PackageJsonSpi spi) {
     super(spi);
-    m_name = Ensure.notBlank(spi.getString("name"), "Node module name missing in package.json '{}'.", spi.containingDir());
-    m_version = Ensure.notBlank(spi.getString("version"), "Node module version missing in package.json '{}'.", spi.containingDir());
+    m_name = Strings.notBlank(spi.getString("name")).orElse("unknown");
+    m_version = Strings.notBlank(spi.getString("version")).orElse("0.0.0");
     m_main = new FinalValue<>();
     m_mainContent = new FinalValue<>();
   }
@@ -82,7 +82,12 @@ public class PackageJsonImplementor extends AbstractNodeElement<PackageJsonSpi> 
 
   protected Optional<String> computeMain() {
     // use source index as main if available next to package.json (naming convention)
-    var mainOverride = new String[]{"src/index.ts", "src/index.js", "src/main/js/index.ts", "src/main/js/index.js"};
+    var indexFileName = "index";
+    var mainOverride = new String[]{
+        IWebConstants.JS_SOURCE_FOLDER + "/" + indexFileName + IWebConstants.TS_FILE_SUFFIX,
+        IWebConstants.JS_SOURCE_FOLDER + "/" + indexFileName + IWebConstants.JS_FILE_SUFFIX,
+        IWebConstants.MAIN_JS_SOURCE_FOLDER + "/" + indexFileName + IWebConstants.TS_FILE_SUFFIX,
+        IWebConstants.MAIN_JS_SOURCE_FOLDER + "/" + indexFileName + IWebConstants.JS_FILE_SUFFIX};
     for (var override : mainOverride) {
       if (spi().existsFile(override)) {
         return Optional.of(override);

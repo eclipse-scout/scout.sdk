@@ -9,14 +9,22 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class DataTypeFulfillsEvaluator {
 
   private final Predicate<IDataType> m_evalStrategy;
+  private final Function<IDataType, Stream<IDataType>> m_childrenSupplier;
 
   public DataTypeFulfillsEvaluator(Predicate<IDataType> evalStrategy) {
+    this(evalStrategy, IDataType::childTypes);
+  }
+
+  public DataTypeFulfillsEvaluator(Predicate<IDataType> evalStrategy, Function<IDataType, Stream<IDataType>> childrenSupplier) {
     m_evalStrategy = evalStrategy;
+    m_childrenSupplier = childrenSupplier;
   }
 
   public boolean fulfills(IDataType dataType) {
@@ -33,11 +41,11 @@ public class DataTypeFulfillsEvaluator {
   }
 
   protected boolean checkUnion(IDataType dataType) {
-    return dataType.childTypes().anyMatch(this::fulfills);
+    return m_childrenSupplier.apply(dataType).anyMatch(this::fulfills);
   }
 
   protected boolean checkIntersection(IDataType dataType) {
-    return dataType.childTypes().allMatch(this::fulfills);
+    return m_childrenSupplier.apply(dataType).allMatch(this::fulfills);
   }
 
   protected boolean checkArray(IDataType dataType) {
@@ -48,9 +56,6 @@ public class DataTypeFulfillsEvaluator {
     // direct check first
     if (m_evalStrategy.test(dataType)) {
       return true;
-    }
-    if (dataType.spi().childTypes().isEmpty()) {
-      return false;
     }
     // continue with children if not matched (e.g. for a TypeAlias or TypeOfType)
     return checkUnion(dataType);

@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
@@ -19,7 +20,11 @@ public interface NodeModuleSpi extends NodeElementSpi {
 
   PackageJsonSpi packageJson();
 
-  Map<String, ExportFromSpi> exports();
+  Map<NodeElementSpi, List<String /* export names */>> elements();
+
+  Map<String /* export alias */, NodeElementSpi> exports();
+
+  List<ES6ClassSpi> classes();
 
   NodeElementFactorySpi nodeElementFactory();
 }

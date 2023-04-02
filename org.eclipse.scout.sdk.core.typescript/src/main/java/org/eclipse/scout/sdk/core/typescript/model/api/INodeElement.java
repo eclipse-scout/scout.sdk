@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi;
@@ -22,7 +23,9 @@ public interface INodeElement {
 
   String name();
 
-  Optional<String> exportAlias();
+  List<String> exportNames();
+
+  boolean isExported();
 
   Optional<SourceRange> source();
 }

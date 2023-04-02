@@ -41,7 +41,8 @@ public class PackageJsonTest {
     assertEquals(17, packageJson.findPropertyAsObject(JsonPointer.compile("")).orElseThrow().size());
 
     assertThrows(IllegalArgumentException.class, () -> TestingPackageJsonHelper.parse(FixtureHelper.BASE).name()); // no package.json
-    assertThrows(IllegalArgumentException.class, () -> TestingPackageJsonHelper.parse(FixtureHelper.EMPTY_MODULE_DIR).name()); // mandatory attributes missing
+    assertEquals("unknown", TestingPackageJsonHelper.parse(FixtureHelper.EMPTY_MODULE_DIR).name());
+    assertEquals("0.0.0", TestingPackageJsonHelper.parse(FixtureHelper.EMPTY_MODULE_DIR).version());
   }
 
   @Test

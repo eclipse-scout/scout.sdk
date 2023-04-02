@@ -147,7 +147,7 @@ object FieldSpiUtils {
         }
 
         fun collectJSElements(elements: Array<out PsiElement>, transform: (PsiElement) -> JSElement? = { it as? JSElement }) {
-            collectJSElements(elements.asSequence(), transform)
+            collectJSElements(elements.sortedBy { it.textOffset }.asSequence(), transform)
         }
 
         fun collectJSElements(elements: Sequence<PsiElement>, transform: (PsiElement) -> JSElement? = { it as? JSElement }) {

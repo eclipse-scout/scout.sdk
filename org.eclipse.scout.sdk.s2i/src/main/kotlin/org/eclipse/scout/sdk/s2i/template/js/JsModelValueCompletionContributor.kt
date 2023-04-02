@@ -33,7 +33,6 @@ import org.eclipse.scout.sdk.core.typescript.IWebConstants
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
-import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.PropertyCompletionInfo
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.SELECTED_ELEMENT
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.getPropertyValueInfo
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.propertyElementPattern
@@ -60,22 +59,20 @@ class JsModelValueCompletionContributor : CompletionContributor() {
             }
         }
 
-        private fun getPropertyValueElements(completionInfo: PropertyCompletionInfo): List<LookupElement>? {
+        private fun getPropertyValueElements(completionInfo: JsModelCompletionInfo): List<LookupElement>? {
             val scoutJsProperty = if (ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE == completionInfo.propertyName) {
                 completionInfo.parentScoutProperty()
             } else {
-                completionInfo.scoutObjects().flatMap {
-                    it.findProperties()
-                        .withSuperClasses(true)
-                        .withName(completionInfo.propertyName)
-                        .stream()
-                }.findAny().orElse(null)
+                completionInfo.availableProperties()
+                    .filter { it.name() == completionInfo.propertyName }
+                    .findAny().orElse(null)
             } ?: return emptyList()
 
+            val place = completionInfo.propertyPsi.containingFile.originalFile
             return scoutJsProperty.computePossibleValues(completionInfo.scoutJsModel).map {
                 val lookupElement = JsModelCompletionHelper.createPropertyValueLookupElement(it, completionInfo)
                 if (!completionInfo.isInLiteral) {
-                    withJsImportIfNecessary(lookupElement, completionInfo.scoutJsModel, completionInfo.propertyPsi.containingFile.originalFile)
+                    withJsImportIfNecessary(lookupElement, completionInfo.scoutJsModel, place)
                 } else {
                     lookupElement
                 }
@@ -88,7 +85,7 @@ class JsModelValueCompletionContributor : CompletionContributor() {
                 originalInsertHandler?.handleInsert(context, item)
 
                 val elementToImport = findElementToImport(lookupElement) ?: return@withInsertHandler
-                var importName = elementToImport.exportAlias().orElse(elementToImport.name())
+                var importName = elementToImport.exportNames().stream().findAny().orElse(elementToImport.name()) // use any of the exported names for the element
                 val firstDot = importName.indexOf('.')
                 if (firstDot > 0) importName = importName.take(firstDot)
 
@@ -151,7 +148,7 @@ class JsModelValueCompletionContributor : CompletionContributor() {
             if (property.type().isEnumLike && lookupElementViewModel is JsModelCompletionHelper.JsValueLookupElement && lookupElementViewModel.propertyValue is ScoutJsEnumPropertyValue) {
                 return lookupElementViewModel.propertyValue.scoutJsEnum.topLevelReference()
             }
-            if (property.scoutJsObject().scoutJsModel().supportsClassReference() && (property.type().hasClasses() || property.isObjectType)) {
+            if (property.scoutJsObject().scoutJsModel().supportsClassReference() && (lookupElementViewModel is JsModelCompletionHelper.JsObjectValueLookupElement || property.isObjectType)) {
                 val objectLookupElement = lookupElementViewModel as? JsModelCompletionHelper.JsObjectValueLookupElement ?: return null
                 return objectLookupElement.propertyValue.scoutJsObject.declaringClass()
             }

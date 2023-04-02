@@ -10,6 +10,8 @@
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeAssignableEvaluator;
+import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeNameEvaluator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor;
@@ -28,9 +30,14 @@ public class DataTypeImplementor<SPI extends DataTypeSpi> extends AbstractNodeEl
   }
 
   @Override
-  public TreeVisitResult visit(IBreadthFirstVisitor<IDataType> visitor) {
+  public boolean isAssignableFrom(IDataType childType) {
+    return new DataTypeAssignableEvaluator(childType).fulfills(this);
+  }
+
+  @Override
+  public TreeVisitResult visit(IDataTypeVisitor visitor) {
     IBreadthFirstVisitor<DataTypeSpi> spiVisitor = (element, level, index) -> visitor.visit(element.api(), level, index);
-    return TreeTraversals.create(spiVisitor, d -> d.childTypes().stream()).traverse(spi());
+    return TreeTraversals.create(spiVisitor, d -> visitor.childTypes(d.api()).map(IDataType::spi)).traverse(spi());
   }
 
   @Override
@@ -40,6 +47,6 @@ public class DataTypeImplementor<SPI extends DataTypeSpi> extends AbstractNodeEl
 
   @Override
   public String toString() {
-    return name() + " [" + containingModule() + ']';
+    return new DataTypeNameEvaluator().eval(this) + " [" + containingModule() + ']';
   }
 }

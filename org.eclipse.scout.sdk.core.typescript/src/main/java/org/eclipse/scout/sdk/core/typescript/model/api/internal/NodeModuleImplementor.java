@@ -9,15 +9,20 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
-import org.eclipse.scout.sdk.core.typescript.model.api.IExportFrom;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElementFactory;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
-import org.eclipse.scout.sdk.core.typescript.model.api.query.ExportFromQuery;
-import org.eclipse.scout.sdk.core.typescript.model.spi.ExportFromSpi;
+import org.eclipse.scout.sdk.core.typescript.model.api.query.NodeElementQuery;
+import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -37,19 +42,24 @@ public class NodeModuleImplementor extends AbstractNodeElement<NodeModuleSpi> im
   }
 
   @Override
-  public ExportFromQuery exports() {
-    return new ExportFromQuery(spi());
+  public NodeElementQuery elements() {
+    return new NodeElementQuery(spi());
   }
 
   @Override
-  public Optional<String> exportAlias() {
-    return Optional.ofNullable(name());
+  public Stream<IES6Class> classes() {
+    return spi().classes().stream().map(ES6ClassSpi::api);
   }
 
   @Override
-  public Optional<IExportFrom> export(String name) {
+  public Optional<INodeElement> export(String name) {
     return Optional.ofNullable(spi().exports().get(name))
-        .map(ExportFromSpi::api);
+        .map(NodeElementSpi::api);
+  }
+
+  @Override
+  public List<String> exportNames() {
+    return Collections.singletonList(name());
   }
 
   @Override

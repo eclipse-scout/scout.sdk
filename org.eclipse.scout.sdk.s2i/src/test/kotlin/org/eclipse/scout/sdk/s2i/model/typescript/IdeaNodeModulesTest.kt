@@ -17,7 +17,8 @@ import org.eclipse.scout.sdk.s2i.model.AbstractModelTest
 class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImports") {
 
     fun testResolveReferencedElement() {
-        val testClass = myIdeaNodeModule.export("TestClass").orElseThrow().referencedElement() as IES6Class
+        val moduleSpi = myIdeaNodeModule.spi() as IdeaNodeModule
+        val testClass = myIdeaNodeModule.export("TestClass").orElseThrow() as IES6Class
         assertEquals("@eclipse-scout/sdk-external-imports-js", testClass.containingModule().name())
 
         val external = testClass.field("external").orElseThrow().spi() as IdeaJavaScriptField
@@ -25,39 +26,39 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
         val wild = testClass.field("wild").orElseThrow().spi() as IdeaJavaScriptField
         val alias = testClass.field("alias").orElseThrow().spi() as IdeaJavaScriptField
 
-        val externalElement = myNodeModules.resolveReferencedElement(external.javaScriptField)?.api() as IES6Class
+        val externalElement = moduleSpi.resolveReferencedElement(external.javaScriptField)?.api() as IES6Class
         assertEquals("NamedDefaultClass", externalElement.name())
-        assertEquals("NamedClazz", externalElement.exportAlias().orElseThrow())
+        assertEquals(listOf("NamedClazz"), externalElement.exportNames())
         assertEquals("@eclipse-scout/sdk-export-js", externalElement.containingModule().name())
 
-        val localElement = myNodeModules.resolveReferencedElement(local.javaScriptField)?.api() as IES6Class
+        val localElement = moduleSpi.resolveReferencedElement(local.javaScriptField)?.api() as IES6Class
         assertEquals("LocalClass", localElement.name())
-        assertEquals("LocalClass", localElement.exportAlias().orElseThrow())
+        assertEquals(listOf("LocalClass"), localElement.exportNames())
         assertEquals("@eclipse-scout/sdk-external-imports-js", localElement.containingModule().name())
         assertSame(testClass.containingModule(), localElement.containingModule())
 
-        val wildElement = myNodeModules.resolveReferencedElement(wild.javaScriptField)?.api() as IES6Class
+        val wildElement = moduleSpi.resolveReferencedElement(wild.javaScriptField)?.api() as IES6Class
         assertEquals("WildcardClass", wildElement.name())
-        assertEquals("WildcardClass", wildElement.exportAlias().orElseThrow())
+        assertEquals(listOf("WildcardClass"), wildElement.exportNames())
         assertEquals("@eclipse-scout/sdk-export-js", wildElement.containingModule().name())
         assertSame(externalElement.containingModule(), wildElement.containingModule())
 
-        val aliasElement = myNodeModules.resolveReferencedElement(alias.javaScriptField)?.api() as IES6Class
+        val aliasElement = moduleSpi.resolveReferencedElement(alias.javaScriptField)?.api() as IES6Class
         assertEquals("AnotherClass", aliasElement.name())
-        assertEquals("AnotherClass", aliasElement.exportAlias().orElseThrow())
+        assertEquals(listOf("AnotherClass"), aliasElement.exportNames())
         assertEquals("@eclipse-scout/sdk-export-js", aliasElement.containingModule().name())
         assertSame(externalElement.containingModule(), aliasElement.containingModule())
     }
 
     fun testSuperClass() {
-        val testClass = myIdeaNodeModule.export("LocalClass").orElseThrow().referencedElement() as IES6Class
+        val testClass = myIdeaNodeModule.export("LocalClass").orElseThrow() as IES6Class
         val superClass = testClass.superClass().orElseThrow()
         assertEquals("AnotherClass", superClass.name())
         assertEquals("@eclipse-scout/sdk-export-js", superClass.containingModule().name())
     }
 
     fun testJsonPointer() {
-        val arrow = myIdeaNodeModule.export("SampleModel").orElseThrow().referencedElement() as IFunction
+        val arrow = myIdeaNodeModule.export("SampleModel").orElseThrow() as IFunction
         val literal = arrow.resultingObjectLiteral().orElseThrow()
 
         // sub elements
@@ -82,7 +83,7 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
     }
 
     fun testObjectLiteralReferences() {
-        val withTypeRef = myIdeaNodeModule.export("WithTypeRef").orElseThrow().referencedElement() as IVariable
+        val withTypeRef = myIdeaNodeModule.export("WithTypeRef").orElseThrow() as IVariable
         val literal = withTypeRef.constantValue().asObjectLiteral().orElseThrow()
 
         val named = literal.property("named").orElseThrow()
@@ -103,7 +104,7 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
     }
 
     fun testObjectLiteralInArrow() {
-        val arrow = myIdeaNodeModule.export("SampleModel").orElseThrow().referencedElement() as IFunction
+        val arrow = myIdeaNodeModule.export("SampleModel").orElseThrow() as IFunction
         val literal = arrow.resultingObjectLiteral().orElseThrow()
         assertEquals("WildcardClass", literal.propertyAsES6Class("objectType").orElseThrow().name())
         val fields = literal.propertyAs("fields", Array<IObjectLiteral>::class.java).orElseThrow()
@@ -115,26 +116,26 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
     }
 
     fun testReferencedConstantValues() {
-        val referencedValue = myIdeaNodeModule.export("ReferencedValue").orElseThrow().referencedElement() as IVariable
+        val referencedValue = myIdeaNodeModule.export("ReferencedValue").orElseThrow() as IVariable
         assertEquals("staticString", referencedValue.constantValue().asString().orElseThrow())
 
-        val referencedValueProp = myIdeaNodeModule.export("ReferencedValueProp").orElseThrow().referencedElement() as IVariable
+        val referencedValueProp = myIdeaNodeModule.export("ReferencedValueProp").orElseThrow() as IVariable
         assertEquals("HALF_UP", referencedValueProp.constantValue().asString().orElseThrow())
 
-        val referencedEnum = myIdeaNodeModule.export("ReferencedEnum").orElseThrow().referencedElement() as IVariable
+        val referencedEnum = myIdeaNodeModule.export("ReferencedEnum").orElseThrow() as IVariable
         val referencedEnumObjectLiteral = referencedEnum.constantValue().asObjectLiteral().orElseThrow()
         assertEquals(6, referencedEnumObjectLiteral.properties().size)
         assertEquals(2, referencedEnumObjectLiteral.property("c").orElseThrow().convertTo(Int::class.java).orElseThrow())
 
-        val referencedEnumProp = myIdeaNodeModule.export("ReferencedEnumProp").orElseThrow().referencedElement() as IVariable
+        val referencedEnumProp = myIdeaNodeModule.export("ReferencedEnumProp").orElseThrow() as IVariable
         val referencedEnumPropObjectLiteral = referencedEnumProp.constantValue().asObjectLiteral().orElseThrow()
         assertEquals(2, referencedEnumPropObjectLiteral.properties().size)
         assertFalse(referencedEnumPropObjectLiteral.property("b").orElseThrow().asBoolean().orElseThrow())
 
-        val referencedType = myIdeaNodeModule.export("ReferencedType").orElseThrow().referencedElement() as IVariable
+        val referencedType = myIdeaNodeModule.export("ReferencedType").orElseThrow() as IVariable
         assertEquals("WildcardClass", referencedType.constantValue().asES6Class().orElseThrow().name())
 
-        val referencedTypeProp = myIdeaNodeModule.export("ReferencedTypeProp").orElseThrow().referencedElement() as IVariable
+        val referencedTypeProp = myIdeaNodeModule.export("ReferencedTypeProp").orElseThrow() as IVariable
         assertEquals("WildcardClass", referencedTypeProp.constantValue().asES6Class().orElseThrow().name())
     }
 

@@ -10,7 +10,6 @@
 package org.eclipse.scout.sdk.core.typescript.testing.spi;
 
 import static java.util.Collections.emptyList;
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
@@ -22,21 +21,23 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.ES6ClassImplementor;
-import org.eclipse.scout.sdk.core.typescript.model.api.internal.ExportFromImplementor;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeModuleImplementor;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.PackageJsonImplementor;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
-import org.eclipse.scout.sdk.core.typescript.model.spi.ExportFromSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModulesProviderSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
@@ -133,10 +134,21 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
     when(moduleSpi.packageJson()).thenReturn(packageJsonSpi);
     when(packageJsonSpi.containingModule()).thenReturn(moduleSpi);
 
-    var allExports = exports.stream()
-        .map(e -> createExportFrom(e, moduleSpi))
-        .collect(toMap(ExportFromSpi::name, identity(), Ensure::failOnDuplicates, LinkedHashMap::new));
-    when(moduleSpi.exports()).thenReturn(allExports);
+    var elements = exports.stream()
+        .map(e -> createExport(e, moduleSpi))
+        .collect(toMap(SimpleEntry::getKey, SimpleEntry::getValue, Ensure::failOnDuplicates, LinkedHashMap::new));
+    when(moduleSpi.elements()).thenReturn(elements);
+
+    var exportedElements = elements.entrySet().stream()
+        .flatMap(e -> e.getValue().stream().map(exportName -> new SimpleEntry<>(exportName, e.getKey())))
+        .collect(toMap(SimpleEntry::getKey, SimpleEntry::getValue, Ensure::failOnDuplicates, LinkedHashMap::new));
+    when(moduleSpi.exports()).thenReturn(exportedElements);
+
+    var classes = elements.keySet().stream()
+        .filter(ES6ClassSpi.class::isInstance)
+        .map(ES6ClassSpi.class::cast)
+        .toList();
+    when(moduleSpi.classes()).thenReturn(classes);
 
     return moduleSpi;
   }
@@ -151,19 +163,11 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
     return spi;
   }
 
-  private static ExportFromSpi createExportFrom(Element exportElement, NodeModuleSpi moduleSpi) {
-    var name = exportElement.getAttribute("name");
-    var exportSpi = mock(ExportFromSpi.class);
-    when(exportSpi.name()).thenReturn(name);
-    var result = new ExportFromImplementor(exportSpi);
-    when(exportSpi.api()).thenReturn(result);
-    when(exportSpi.containingModule()).thenReturn(moduleSpi);
-
+  private static SimpleEntry<NodeElementSpi, List<String>> createExport(Element exportElement, NodeModuleSpi moduleSpi) {
+    var exportName = exportElement.getAttribute("name");
     var referencedElement = Xml.firstChildElement(exportElement, TAG_NAME_CLASS)
         .map(c -> createClass(c, moduleSpi))
         .orElseThrow(); // currently only classes can be exported and must be present
-
-    when(exportSpi.referencedElement()).thenReturn(referencedElement);
-    return exportSpi;
+    return new SimpleEntry<>(referencedElement, Collections.singletonList(exportName));
   }
 }

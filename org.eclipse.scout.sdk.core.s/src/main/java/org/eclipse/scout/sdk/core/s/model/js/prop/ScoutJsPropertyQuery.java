@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js.prop;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
@@ -53,7 +53,7 @@ public class ScoutJsPropertyQuery extends AbstractQuery<ScoutJsProperty> {
   @Override
   protected Stream<ScoutJsProperty> createStream() {
     var obj = object();
-    var properties = new HashMap<>(obj.properties());
+    var properties = new LinkedHashMap<>(obj.properties());
 
     // for each property also check the super classes (it may contain the same property but with a more detailed data-type)
     // choose the one which is better, even no super-classes should be considered in this query
@@ -61,7 +61,7 @@ public class ScoutJsPropertyQuery extends AbstractQuery<ScoutJsProperty> {
     if (!superClasses.isEmpty()) {
       obj.scoutJsModel().findScoutObjects()
           .withIncludeDependencies(true)
-          .withObjectClasses(superClasses)
+          .withDeclaringClasses(superClasses)
           .stream()
           .flatMap(superObject -> superObject.properties().values().stream())
           .forEach(inheritedProperty -> updateOrAddSuperPropertyIfNecessary(properties, inheritedProperty));

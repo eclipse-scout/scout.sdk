@@ -24,7 +24,7 @@ class JsModelNameCompletionContributor : CompletionContributor() {
         override fun addCompletions(parameters: CompletionParameters, context: ProcessingContext, result: CompletionResultSet) {
             val start = System.currentTimeMillis()
             val completionInfo = JsModelCompletionHelper.getPropertyNameInfo(parameters, result) ?: return
-            val properties = completionInfo.scoutObjects().flatMap { it.findProperties().withSuperClasses(true).stream() }
+            val properties = completionInfo.availableProperties()
                 .filter { !completionInfo.siblingPropertyNames.contains(it.name()) } // these properties are already present
                 .map { JsModelCompletionHelper.createPropertyNameLookupElement(it, completionInfo) }
                 .toList()

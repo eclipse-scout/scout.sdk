@@ -67,7 +67,7 @@ class IdeaDataTypeTest : AbstractModelTest("typescript/moduleWithExternalImports
         val objectLiteral = componentType.objectLiteral().orElseThrow()
         assertEquals(setOf("A", "B", "C"), objectLiteral.properties().keys)
         assertEquals(componentType, myIdeaNodeModule.export("Foo")
-            .map { it.referencedElement() as IES6Class }
+            .map { it as IES6Class }
             .flatMap { it.field("NestedEnumLike") }
             .flatMap { it.dataType() }
             .orElseThrow())
@@ -94,7 +94,7 @@ class IdeaDataTypeTest : AbstractModelTest("typescript/moduleWithExternalImports
         val objectLiteral = componentType.objectLiteral().orElseThrow()
         assertEquals(setOf("FOO", "BAR"), objectLiteral.properties().keys)
         assertEquals(componentType, myIdeaNodeModule.export("TopLevelEnumLike")
-            .map { it.referencedElement() as IVariable }
+            .map { it as IVariable }
             .flatMap { it.dataType() }
             .orElseThrow())
     }
@@ -117,7 +117,7 @@ class IdeaDataTypeTest : AbstractModelTest("typescript/moduleWithExternalImports
         assertTrue(typeArgument is IES6Class)
         assertTrue((typeArgument as IES6Class).isTypeAlias)
         assertEquals(setOf("DEFAULT", "ALTERNATIVE"), typeArgument.fields().stream().map { it.name() }.collect(Collectors.toSet()))
-        assertSame(typeArgument, myIdeaNodeModule.export("ObjectLiteralType").orElseThrow().referencedElement())
+        assertSame(typeArgument, myIdeaNodeModule.export("ObjectLiteralType").orElseThrow())
     }
 
     fun testRealEnum() {
@@ -127,11 +127,11 @@ class IdeaDataTypeTest : AbstractModelTest("typescript/moduleWithExternalImports
         assertEquals("RealEnum", realEnumDataType.name())
         assertTrue(realEnumDataType is IES6Class)
         assertEquals(setOf("X", "Y", "Z"), (realEnumDataType as IES6Class).fields().stream().map { it.name() }.collect(Collectors.toSet()))
-        assertSame(realEnumDataType, myIdeaNodeModule.export("RealEnum").orElseThrow().referencedElement())
+        assertSame(realEnumDataType, myIdeaNodeModule.export("RealEnum").orElseThrow())
     }
 
     private fun field(name: String): IField {
-        val foo = myIdeaNodeModule.export("Foo").orElseThrow().referencedElement() as IES6Class
+        val foo = myIdeaNodeModule.export("Foo").orElseThrow() as IES6Class
         return foo.field(name).orElseThrow()
     }
 }

@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
-import org.eclipse.scout.sdk.core.typescript.model.api.IExportFrom;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.NodeModulesProvider;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
@@ -65,8 +64,8 @@ public final class ScoutJsModels {
   private static Optional<IES6Class> findWidgetClassInDependencies(INodeModule start) {
     return Optional.ofNullable(start)
         .flatMap(ScoutJsModels::findScoutJsCoreModule)
-        .flatMap(scoutJsCore -> scoutJsCore.export(ScoutJsCoreConstants.CLASS_NAME_WIDGET))
-        .flatMap(IExportFrom::referencedClass);
+        .flatMap(m -> m.export(ScoutJsCoreConstants.CLASS_NAME_WIDGET))
+        .map(IES6Class.class::cast);
   }
 
   private static Optional<INodeModule> findScoutJsCoreModule(INodeModule start) {

@@ -25,6 +25,7 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
   private final ScoutJsModel m_model;
 
   private boolean m_includeDependencies;
+  private boolean m_includeSelf = true;
   private Set<IES6Class> m_declaringClasses;
 
   protected AbstractScoutJsElementQuery(ScoutJsModel model) {
@@ -47,6 +48,15 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
 
   protected boolean isIncludeDependencies() {
     return m_includeDependencies;
+  }
+
+  protected boolean isIncludeSelf() {
+    return m_includeSelf;
+  }
+
+  public TYPE withIncludeSelf(boolean includeSelf) {
+    m_includeSelf = includeSelf;
+    return thisInstance();
   }
 
   public TYPE withDeclaringClasses(Stream<? extends IES6Class> declaringClasses) {

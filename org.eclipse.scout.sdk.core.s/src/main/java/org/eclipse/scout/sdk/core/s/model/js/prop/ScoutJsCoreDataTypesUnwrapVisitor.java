@@ -10,16 +10,17 @@
 package org.eclipse.scout.sdk.core.s.model.js.prop;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
-import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModels;
-import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+import org.eclipse.scout.sdk.core.typescript.model.api.internal.IDataTypeVisitor;
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
-public class ScoutJsCoreDataTypesUnwrapVisitor implements IBreadthFirstVisitor<IDataType> {
+public class ScoutJsCoreDataTypesUnwrapVisitor implements IDataTypeVisitor {
 
   private final IBreadthFirstVisitor<IDataType> m_wrappedVisitor;
 
@@ -29,32 +30,56 @@ public class ScoutJsCoreDataTypesUnwrapVisitor implements IBreadthFirstVisitor<I
 
   @Override
   public TreeVisitResult visit(IDataType element, int level, int index) {
-    var containingModule = element.containingModule();
-    if (element instanceof IES6Class clazz && ScoutJsCoreConstants.SCOUT_JS_CORE_MODULE_NAME.equals(containingModule.name())) {
-      var className = clazz.name();
-      var scoutJsCoreModel = ScoutJsModels.create(containingModule).orElseThrow();
-      if (ScoutJsCoreConstants.CLASS_NAMES_MODEL_TYPES.contains(className)) {
-        return clazz
-            .typeArguments()
-            .findFirst()
-            .map(arg -> m_wrappedVisitor.visit(arg, level, index))
-            .orElse(TreeVisitResult.SKIP_SUBTREE);
-      }
-      if (ScoutJsCoreConstants.CLASS_NAME_STATUS_OR_MODEL.equals(className)) {
-        var status = scoutJsCoreModel.exportedScoutObjects().get(ScoutJsCoreConstants.CLASS_NAME_STATUS);
-        return Optional.ofNullable(status)
-            .map(IScoutJsObject::declaringClass)
-            .map(s -> m_wrappedVisitor.visit(s, level, index))
-            .orElse(TreeVisitResult.SKIP_SUBTREE);
-      }
-      if (ScoutJsCoreConstants.CLASS_NAME_LOOKUP_CALL_OR_MODEL.equals(className)) {
-        var lookupCall = scoutJsCoreModel.exportedScoutObjects().get(ScoutJsCoreConstants.CLASS_NAME_LOOKUP_CALL);
-        return Optional.ofNullable(lookupCall)
-            .map(IScoutJsObject::declaringClass)
-            .map(l -> m_wrappedVisitor.visit(l, level, index))
-            .orElse(TreeVisitResult.SKIP_SUBTREE);
-      }
+    return unwrap(element)
+        .map(l -> m_wrappedVisitor.visit(l, level, index))
+        .orElse(TreeVisitResult.SKIP_SUBTREE);
+  }
+
+  @Override
+  public Stream<IDataType> childTypes(IDataType parent) {
+    return unwrappedChildren(parent);
+  }
+
+  public static Optional<IDataType> unwrap(IDataType element) {
+    if (element == null) {
+      return Optional.empty();
     }
-    return m_wrappedVisitor.visit(element, level, index);
+    if (element.flavor() == DataTypeFlavor.Array) {
+      return element.childTypes().findAny()
+          .flatMap(ScoutJsCoreDataTypesUnwrapVisitor::unwrap)
+          .map(unwrapped -> unwrapped.createArrayType(element.arrayDimension()));
+    }
+
+    if (!(element instanceof IES6Class clazz)) {
+      return Optional.of(element);
+    }
+
+    var rawClass = clazz.withoutTypeArguments();
+    var containingModule = rawClass.containingModule();
+    if (!ScoutJsCoreConstants.SCOUT_JS_CORE_MODULE_NAME.equals(containingModule.name())) {
+      return Optional.of(element);
+    }
+
+    var className = rawClass.name();
+    if (ScoutJsCoreConstants.CLASS_NAMES_MODEL_TYPES.contains(className)) {
+      return clazz
+          .typeArguments()
+          .findFirst();
+    }
+    if (ScoutJsCoreConstants.CLASS_NAME_STATUS_OR_MODEL.equals(className)) {
+      return containingModule
+          .export(ScoutJsCoreConstants.CLASS_NAME_STATUS)
+          .map(s -> (IDataType) s);
+    }
+    if (ScoutJsCoreConstants.CLASS_NAME_LOOKUP_CALL_OR_MODEL.equals(className)) {
+      return containingModule
+          .export(ScoutJsCoreConstants.CLASS_NAME_LOOKUP_CALL)
+          .map(s -> (IDataType) s);
+    }
+    return Optional.of(element);
+  }
+
+  public static Stream<IDataType> unwrappedChildren(IDataType parent) {
+    return parent.childTypes().flatMap(c -> unwrap(c).stream());
   }
 }

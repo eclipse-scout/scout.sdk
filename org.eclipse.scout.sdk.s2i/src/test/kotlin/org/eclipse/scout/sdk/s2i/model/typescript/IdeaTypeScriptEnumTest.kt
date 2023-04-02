@@ -17,13 +17,13 @@ import org.eclipse.scout.sdk.s2i.model.AbstractModelTest
 class IdeaTypeScriptEnumTest : AbstractModelTest("typescript/moduleWithEnums") {
 
     fun testSingleEnumTs() {
-        val logLevel = myIdeaNodeModule.export("LogLevel").orElseThrow().referencedElement() as IES6Class
+        val logLevel = myIdeaNodeModule.export("LogLevel").orElseThrow() as IES6Class
         assertTrue(logLevel.isEnum)
         assertEquals("TRACE", logLevel.field("TRACE").orElseThrow().name())
     }
 
     fun testEnumLikeTypeAlias() {
-        val constEnumType = myIdeaNodeModule.export("ConstEnumType").orElseThrow().referencedElement() as IES6Class
+        val constEnumType = myIdeaNodeModule.export("ConstEnumType").orElseThrow() as IES6Class
         assertTrue(constEnumType.isTypeAlias)
         val constEnumAliased = constEnumType.aliasedDataType().orElseThrow()
         assertEquals("EnumObject", constEnumAliased.name())
@@ -41,7 +41,7 @@ class IdeaTypeScriptEnumTest : AbstractModelTest("typescript/moduleWithEnums") {
         assertEquals("c", constEnumObjectLiteral.property("THIRD").orElseThrow().asString().orElseThrow())
         assertEquals("string", constEnumObjectLiteral.property("THIRD").orElseThrow().dataType().orElseThrow().name())
 
-        val noConstEnumType = myIdeaNodeModule.export("NoConstEnumType").orElseThrow().referencedElement() as IES6Class
+        val noConstEnumType = myIdeaNodeModule.export("NoConstEnumType").orElseThrow() as IES6Class
         assertTrue(noConstEnumType.isTypeAlias)
         val noConstEnumAliased = noConstEnumType.aliasedDataType().orElseThrow()
         assertEquals("EnumObject", noConstEnumAliased.name())

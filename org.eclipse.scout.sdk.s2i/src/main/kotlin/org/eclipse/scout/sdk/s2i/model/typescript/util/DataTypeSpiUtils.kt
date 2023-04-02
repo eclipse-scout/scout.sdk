@@ -101,7 +101,7 @@ object DataTypeSpiUtils {
 
     private fun resolveAsReferencedType(type: JSType, module: IdeaNodeModule): DataTypeSpi? {
         val sourceElement = type.sourceElement as? JSElement ?: return null
-        val reference = module.moduleInventory.resolveReferencedElement(sourceElement) as? DataTypeSpi ?: return null
+        val reference = module.resolveReferencedElement(sourceElement) as? DataTypeSpi ?: return null
 
         if (reference !is ES6ClassSpi) return reference
         if (sourceElement !is JSTypeArgumentsOwner) return reference
@@ -139,7 +139,7 @@ object DataTypeSpiUtils {
         PsiTreeUtil.getChildrenOfTypeAsList(comment.containingFile, ES6ImportDeclaration::class.java).asSequence()
             .flatMap { it.importSpecifiers.asSequence() }
             .firstOrNull { it.declaredName == dataType }
-            ?.let { module.moduleInventory.resolveImport(it) as? DataTypeSpi }
+            ?.let { module.resolveImport(it) as? DataTypeSpi }
             ?.let { return it }
 
         return createDataType(dataType, comment, module)

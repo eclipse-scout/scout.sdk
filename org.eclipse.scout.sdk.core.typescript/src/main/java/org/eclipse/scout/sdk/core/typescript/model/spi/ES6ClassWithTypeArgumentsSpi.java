@@ -79,11 +79,6 @@ public class ES6ClassWithTypeArgumentsSpi extends AbstractNodeElementSpi<IES6Cla
   }
 
   @Override
-  public Stream<ES6ClassSpi> inheritors(boolean deep) {
-    return m_class.inheritors(deep);
-  }
-
-  @Override
   public List<FieldSpi> fields() {
     return m_class.fields();
   }

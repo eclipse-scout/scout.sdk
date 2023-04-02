@@ -37,7 +37,12 @@ public class ScoutJsModelTest {
   @Test
   @ExtendWithNodeModules("ScoutJsModelTestOnlyScout")
   public void testScoutJsDependenciesRecursivelyOnlyScout(INodeModule scoutCore) {
-    assertNotNull(ScoutJsModels.create(scoutCore).orElseThrow().exportedScoutObjects().get(ScoutJsCoreConstants.CLASS_NAME_WIDGET));
+    var model = ScoutJsModels.create(scoutCore).orElseThrow();
+    var widgetObject = model.scoutObjects().stream()
+        .filter(o -> ScoutJsCoreConstants.CLASS_NAME_WIDGET.equals(o.name()))
+        .findAny()
+        .orElse(null);
+    assertNotNull(widgetObject);
   }
 
   @Test

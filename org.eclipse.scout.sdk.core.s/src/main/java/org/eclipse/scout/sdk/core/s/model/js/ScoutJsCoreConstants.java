@@ -52,6 +52,7 @@ public final class ScoutJsCoreConstants {
   public static final String CLASS_NAME_TABLE = "Table";
   public static final String CLASS_NAME_TREE = "Tree";
   public static final String CLASS_NAME_TILE_GRID = "TileGrid";
+  public static final String CLASS_NAME_GRID_DATA = "GridData";
   public static final String CLASS_NAME_BUTTON = "Button";
   public static final String CLASS_NAME_DATE_FIELD = "DateField";
   public static final String CLASS_NAME_MENU = "Menu";

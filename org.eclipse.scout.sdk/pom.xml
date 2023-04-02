@@ -138,6 +138,7 @@
     <org.eclipse.equinox.p2.core>2.9.200</org.eclipse.equinox.p2.core>
     <org.eclipse.equinox.p2.engine>2.7.500</org.eclipse.equinox.p2.engine>
     <org.eclipse.equinox.p2.metadata>2.6.300</org.eclipse.equinox.p2.metadata>
+    <org.eclipse.equinox.p2.metadata.repository>1.4.100</org.eclipse.equinox.p2.metadata.repository>
     <org.eclipse.equinox.preferences>3.10.100</org.eclipse.equinox.preferences>
     <org.eclipse.equinox.registry>3.11.200</org.eclipse.equinox.registry>
     <org.eclipse.equinox.security>1.3.1000</org.eclipse.equinox.security>
@@ -471,6 +472,11 @@
         <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.equinox.p2.metadata</artifactId>
         <version>${org.eclipse.equinox.p2.metadata}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.equinox.p2.metadata.repository</artifactId>
+        <version>${org.eclipse.equinox.p2.metadata.repository}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.platform</groupId>
