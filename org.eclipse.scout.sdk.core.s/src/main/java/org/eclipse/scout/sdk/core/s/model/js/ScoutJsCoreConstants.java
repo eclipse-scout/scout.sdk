@@ -38,6 +38,10 @@ public final class ScoutJsCoreConstants {
   public static final String PROPERTY_NAME_EVENT_MAP = "eventMap";
   public static final String PROPERTY_NAME_SELF = "self";
   public static final String PROPERTY_NAME_WIDGET_MAP = "widgetMap";
+  public static final String PROPERTY_NAME_COLUMN_MAP = "columnMap";
+  public static final String PROPERTY_NAME_COLUMNS = "columns";
+  public static final String PROPERTY_NAME_DETAIL_FORM = "detailForm";
+  public static final String PROPERTY_NAME_DETAIL_TABLE = "detailTable";
 
   public static final String FUNCTION_NAME_INIT = "_init";
   public static final String FUNCTION_NAME_RESOLVE_TEXT_KEYS = "resolveTextKeys";
@@ -49,7 +53,9 @@ public final class ScoutJsCoreConstants {
   public static final String CLASS_NAME_GROUP_BOX = "GroupBox";
   public static final String CLASS_NAME_TAG_FIELD = "TagField";
   public static final String CLASS_NAME_SMART_FIELD = "SmartField";
+  public static final String CLASS_NAME_FORM = "Form";
   public static final String CLASS_NAME_TABLE = "Table";
+  public static final String CLASS_NAME_TABLE_FIELD = "TableField";
   public static final String CLASS_NAME_TREE = "Tree";
   public static final String CLASS_NAME_TILE_GRID = "TileGrid";
   public static final String CLASS_NAME_GRID_DATA = "GridData";
@@ -63,6 +69,11 @@ public final class ScoutJsCoreConstants {
   public static final String CLASS_NAME_LOOKUP_CALL = "LookupCall";
   public static final String CLASS_NAME_LOOKUP_CALL_OR_MODEL = "LookupCallOrModel";
   public static final String CLASS_NAME_ENUM_OBJECT = "EnumObject";
+  public static final String CLASS_NAME_COLUMN = "Column";
+
+  public static final String CLASS_NAME_SUFFIX_MODEL = "Model";
+  public static final String CLASS_NAME_SUFFIX_WIDGET_MAP = "WidgetMap";
+  public static final String CLASS_NAME_SUFFIX_COLUMN_MAP = "ColumnMap";
 
   public static final Set<String> CLASS_NAMES_MODEL_TYPES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList("ObjectOrChildModel", "ChildModelOf", "ObjectOrModel", "FullModelOf", "ModelOf", "InitModelOf")));
 

@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.core.typescript.model.api;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi;
 
@@ -33,4 +34,6 @@ public interface IObjectLiteral extends INodeElement {
   Optional<IES6Class> propertyAsES6Class(String name);
 
   <T> Optional<T> propertyAs(String name, Class<T> type);
+
+  Stream<IObjectLiteral> childObjectLiterals();
 }

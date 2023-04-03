@@ -12,9 +12,11 @@ package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
+import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue.ConstantValueType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
@@ -74,6 +76,24 @@ public class ObjectLiteralImplementor extends AbstractNodeElement<ObjectLiteralS
   public <T> Optional<T> propertyAs(String name, Class<T> type) {
     return property(name)
         .flatMap(v -> v.convertTo(type));
+  }
+
+  @Override
+  public Stream<IObjectLiteral> childObjectLiterals() {
+    return properties().values().stream()
+        .flatMap(constantValue -> {
+          if (constantValue.type() == ConstantValueType.ObjectLiteral) {
+            return constantValue.asObjectLiteral().stream();
+          }
+          if (constantValue.type() == ConstantValueType.Array) {
+            return constantValue.asArray()
+                .stream()
+                .flatMap(Stream::of)
+                .filter(cv -> cv.type() == ConstantValueType.ObjectLiteral)
+                .flatMap(cv -> cv.asObjectLiteral().stream());
+          }
+          return Stream.empty();
+        });
   }
 
   private static final class P_ConstantValueAdapter implements IConstantValue {
