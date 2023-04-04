@@ -9,7 +9,10 @@
  */
 package org.eclipse.scout.sdk.s2i.template.js
 
-import com.intellij.codeInsight.completion.*
+import com.intellij.codeInsight.completion.CodeCompletionHandlerBase
+import com.intellij.codeInsight.completion.CompletionInitializationContext
+import com.intellij.codeInsight.completion.CompletionParameters
+import com.intellij.codeInsight.completion.CompletionResultSet
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.codeInsight.template.Template
 import com.intellij.codeInsight.template.TemplateManager
@@ -95,7 +98,14 @@ object JsModelCompletionHelper {
         val isInArray = contextParent.elementType == JSStubElementTypes.ARRAY_LITERAL_EXPRESSION
         val siblings = contextParent.children
         val isLast = siblings.indexOf(contextElement) == siblings.size - 1
-        return JsModelCompletionInfo(property, propertyName, objectLiteral, module, scoutJsModel, isLast, isNameCompletion, usedPropertyNames, prefix, isInArray, contextElement is JSLiteralExpression)
+        val isInLiteral = contextElement is JSLiteralExpression
+
+        val extendedPrefix = contextElement
+            .takeIf { !isNameCompletion && !isInLiteral }
+            ?.text?.split(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED)?.firstOrNull()
+            ?.takeIf { it != prefix }
+
+        return JsModelCompletionInfo(property, propertyName, objectLiteral, module, scoutJsModel, isLast, isNameCompletion, usedPropertyNames, prefix, extendedPrefix, isInArray, isInLiteral)
     }
 
     fun createPropertyNameLookupElement(property: ScoutJsProperty, completionInfo: JsModelCompletionInfo) =
@@ -112,10 +122,8 @@ object JsModelCompletionHelper {
     private fun createLookupElement(modelElement: ScoutJsModelLookupElement, completionInfo: JsModelCompletionInfo): LookupElementBuilder {
         val name = modelElement.name()
         val presentableName = modelElement.presentableName()
-        val lookupString = when (modelElement) {
-            is JsObjectValueLookupElement -> if (completionInfo.isInLiteral) name else presentableName
-            else -> name
-        }
+        val lookupString = createLookupString(modelElement, completionInfo)
+
         var result = LookupElementBuilder.create(name, lookupString)
             .withLookupString(name)
             .withLookupString(presentableName)
@@ -125,20 +133,10 @@ object JsModelCompletionHelper {
         modelElement.tailText()?.let { result = result.withTailText(it, true) }
         modelElement.typeText()?.let { result = result.withTypeText(it, true) }
 
-        val isValueCompletionOutsideLiteral = !completionInfo.isPropertyNameCompletion && !completionInfo.isInLiteral
-        val isStringObjectTypeCompletion = completionInfo.propertyName == ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE && !completionInfo.scoutJsModel.supportsClassReference()
-        val isEnumWithConstantStringValue = modelElement.property().type().isEnumLike && modelElement is JsValueLookupElement
-                && (modelElement.propertyValue as? ScoutJsConstantValuePropertyValue)?.value?.type() == IConstantValue.ConstantValueType.String
-        if (isValueCompletionOutsideLiteral && (isStringObjectTypeCompletion || isEnumWithConstantStringValue)) {
-            // append missing quotes (no template required)
-            result = result.withInsertHandler { context, _ -> insertWithQuotes(name, completionInfo.searchPrefix, context) }
+        val isTemplateRequired = completionInfo.isPropertyNameCompletion || (completionInfo.propertyName != ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE && modelElement.property().type().isChildModelSupported)
+        if (isTemplateRequired) {
+            result = result.withInsertHandler { context, _ -> startTemplate(context.editor, completionInfo.searchPrefix, buildPropertyTemplate(modelElement, completionInfo)) }
             result.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true)
-        } else {
-            val isTemplateRequired = completionInfo.isPropertyNameCompletion || (completionInfo.propertyName != ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE && modelElement.property().type().isChildModelSupported)
-            if (isTemplateRequired) {
-                result = result.withInsertHandler { context, _ -> startTemplate(context.editor, completionInfo.searchPrefix, buildPropertyTemplate(modelElement, completionInfo)) }
-                result.putUserData(CodeCompletionHandlerBase.DIRECT_INSERTION, true)
-            }
         }
 
         result.putUserData(SELECTED_ELEMENT, modelElement)
@@ -146,14 +144,27 @@ object JsModelCompletionHelper {
         return result
     }
 
-    private fun insertWithQuotes(presentableName: String, searchPrefix: String, context: InsertionContext) {
-        writeCommandAction(context.project).run(ThrowableRunnable<RuntimeException> {
-            val startOffset = context.editor.caretModel.currentCaret.offset
-            val insertText = "$STRING_DELIM$presentableName$STRING_DELIM"
-            context.document.insertString(startOffset, insertText)
-            val prefixRemoveLen = TemplateHelper.removePrefix(context.editor, searchPrefix)
-            context.editor.caretModel.currentCaret.moveToOffset(startOffset + insertText.length - prefixRemoveLen)
-        })
+    private fun createLookupString(modelElement: ScoutJsModelLookupElement, completionInfo: JsModelCompletionInfo): String {
+        val name = modelElement.name()
+        val presentableName = modelElement.presentableName()
+        var lookupString = when (modelElement) {
+            is JsObjectValueLookupElement -> if (completionInfo.isInLiteral) name else presentableName
+            else -> name
+        }
+
+        val isValueCompletionOutsideLiteral = !completionInfo.isPropertyNameCompletion && !completionInfo.isInLiteral
+        val isStringObjectTypeCompletion = completionInfo.propertyName == ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE && !completionInfo.scoutJsModel.supportsClassReference()
+        val isEnumWithConstantStringValue = modelElement.property().type().isEnumLike && modelElement is JsValueLookupElement
+                && (modelElement.propertyValue as? ScoutJsConstantValuePropertyValue)?.value?.type() == IConstantValue.ConstantValueType.String
+
+
+        if (isValueCompletionOutsideLiteral && (isStringObjectTypeCompletion || isEnumWithConstantStringValue)) {
+            lookupString = "$STRING_DELIM$name$STRING_DELIM"
+        } else if (completionInfo.extendedSearchPrefix != null) {
+            lookupString = lookupString.removePrefix(completionInfo.extendedSearchPrefix.replaceAfterLast('.', ""))
+        }
+
+        return lookupString
     }
 
     private fun startTemplate(editor: Editor, prefix: CharSequence, template: Template) {

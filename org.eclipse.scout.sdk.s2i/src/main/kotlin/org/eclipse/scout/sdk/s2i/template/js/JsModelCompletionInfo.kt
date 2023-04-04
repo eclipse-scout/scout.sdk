@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
 
 data class JsModelCompletionInfo(
     val propertyPsi: JSProperty, val propertyName: String, val objectLiteral: JSObjectLiteralExpression, val module: Module, val scoutJsModel: ScoutJsModel, val isLast: Boolean,
-    val isPropertyNameCompletion: Boolean, val siblingPropertyNames: Set<String>, val searchPrefix: String, val isInArray: Boolean, val isInLiteral: Boolean
+    val isPropertyNameCompletion: Boolean, val siblingPropertyNames: Set<String>, val searchPrefix: String, val extendedSearchPrefix: String?, val isInArray: Boolean, val isInLiteral: Boolean
 ) {
     private val m_referencedClass = FinalValue<IES6Class?>()
     private val m_objectTypeScoutObject = FinalValue<IScoutJsObject?>()
