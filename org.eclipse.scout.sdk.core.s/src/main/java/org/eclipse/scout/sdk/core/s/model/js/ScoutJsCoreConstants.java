@@ -29,6 +29,7 @@ public final class ScoutJsCoreConstants {
    */
   public static final String SCOUT_JS_CORE_MODULE_NAME = "@eclipse-scout/core";
 
+  public static final String MODEL_SUFFIX = "Model";
   public static final String JQUERY = "JQuery";
   public static final String NAMESPACE = "scout";
 
@@ -57,6 +58,7 @@ public final class ScoutJsCoreConstants {
   public static final String CLASS_NAME_TABLE = "Table";
   public static final String CLASS_NAME_TABLE_FIELD = "TableField";
   public static final String CLASS_NAME_TREE = "Tree";
+  public static final String CLASS_NAME_PAGE = "Page";
   public static final String CLASS_NAME_TILE_GRID = "TileGrid";
   public static final String CLASS_NAME_GRID_DATA = "GridData";
   public static final String CLASS_NAME_BUTTON = "Button";

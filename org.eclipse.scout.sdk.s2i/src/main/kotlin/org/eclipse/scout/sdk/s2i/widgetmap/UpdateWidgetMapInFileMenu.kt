@@ -7,20 +7,18 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-package org.eclipse.scout.sdk.s2i.dataobject
+package org.eclipse.scout.sdk.s2i.widgetmap
 
+import com.intellij.lang.javascript.psi.JSFile
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiJavaFile
-import com.intellij.psi.search.GlobalSearchScope.fileScope
 import org.eclipse.scout.sdk.s2i.DataContextHelper
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 
-class UpdateDoConvenienceMethodsInFileMenu : AnAction(message("update.dataobject.in.file"), message("update.dataobject.in.file.desc"), null) {
+class UpdateWidgetMapInFileMenu : AnAction(message("update.widgetMap.in.file"), message("update.widgetMap.in.file.desc"), null) {
 
     override fun update(event: AnActionEvent) {
         event.presentation.isEnabled = getActiveFile(event) != null
@@ -30,15 +28,14 @@ class UpdateDoConvenienceMethodsInFileMenu : AnAction(message("update.dataobject
 
     override fun actionPerformed(event: AnActionEvent) {
         val file = getActiveFile(event) ?: return
-        val manager = EclipseScoutBundle.dataObjectManager(file.project)
         FileDocumentManager.getInstance().saveAllDocuments() // save all documents so that the update can see the latest changes
-        manager.scheduleConvenienceMethodsUpdate(fileScope(file))
+        WidgetMapUpdater.update(file.virtualFile, file.project)
     }
 
-    private fun getActiveFile(event: AnActionEvent): PsiJavaFile? {
+    private fun getActiveFile(event: AnActionEvent): JSFile? {
         val data = DataContextHelper(event.dataContext)
         val editor = data.editor() ?: return null
         val project = editor.project ?: return null
-        return PsiDocumentManager.getInstance(project).getPsiFile(editor.document) as? PsiJavaFile
+        return PsiDocumentManager.getInstance(project).getPsiFile(editor.document) as? JSFile
     }
 }

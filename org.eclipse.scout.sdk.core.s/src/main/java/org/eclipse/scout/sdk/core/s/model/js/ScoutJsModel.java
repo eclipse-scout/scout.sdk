@@ -81,7 +81,7 @@ public class ScoutJsModel {
     else {
       objects = nodeModule()
           .classes()
-          .filter(c -> !c.name().endsWith("Adapter") && !c.name().endsWith("Model"))
+          .filter(c -> !c.name().endsWith("Adapter") && !c.name().endsWith(ScoutJsCoreConstants.MODEL_SUFFIX))
           .flatMap(element -> JavaScriptScoutObject.create(this, element, widgetClass).stream());
     }
     return objects.toList();

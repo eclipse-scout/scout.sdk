@@ -20,4 +20,16 @@
     <completion.contributor language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.template.js.JsModelNameCompletionContributor" id="scoutModelNameCompletionJs" order="first"/>
     <completion.contributor language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.template.js.JsModelValueCompletionContributor" id="scoutModelValueCompletionJs" order="first"/>
   </extensions>
+  <actions>
+    <group id="org.eclipse.scout.sdk.s2i.ScoutJsMenu">
+      <add-to-group group-id="org.eclipse.scout.sdk.s2i.ScoutMenu" relative-to-action="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInFileMenu" anchor="after"/>
+      <separator></separator>
+      <action id="org.eclipse.scout.sdk.s2i.UpdateWidgetMapInScopeMenu"
+              class="org.eclipse.scout.sdk.s2i.widgetmap.UpdateWidgetMapInScopeMenu"/>
+      <action id="org.eclipse.scout.sdk.s2i.UpdateWidgetMapInFileMenu"
+              class="org.eclipse.scout.sdk.s2i.widgetmap.UpdateWidgetMapInFileMenu">
+        <keyboard-shortcut keymap="$default" first-keystroke="control alt shift W"/>
+      </action>
+    </group>
+  </actions>
 </idea-plugin>

@@ -40,10 +40,15 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
     private val m_nodeModuleInventory = IdeaNodeModules(project)
 
     companion object {
-        fun getOrCreate(module: Module): ScoutJsModel? {
-            val moduleRoot = module.guessModuleDir()?.canonicalFile?.resolveLocalPath() ?: return null
-            return ScoutJsModels.create(moduleRoot, module.project).orElse(null)
+        fun getOrCreateScoutJsModel(module: Module) = moduleDir(module)?.let {
+            ScoutJsModels.create(it, module.project).orElse(null)
         }
+
+        fun getOrCreateNodeModule(module: Module) = moduleDir(module)?.let {
+            NodeModulesProvider.createNodeModule(it, module.project).orElse(null)?.api()
+        }
+
+        private fun moduleDir(module: Module) = module.guessModuleDir()?.canonicalFile?.resolveLocalPath()
     }
 
     init {

@@ -35,7 +35,7 @@ class JsModelCacheStartup : StartupActivity, DumbAware {
             .filter { it.name.contains(".ui") }
             .filter { containsPackageJson(it) }
             .sortedBy { it.name }
-            .firstNotNullOfOrNull { JsModelManager.getOrCreate(it) }
+            .firstNotNullOfOrNull { JsModelManager.getOrCreateScoutJsModel(it) }
             ?.let {
                 preloadModel(it)
                 SdkLog.info("Scout JS model cache preloaded for module '{}' took {}ms.", it.nodeModule().name(), System.currentTimeMillis() - start)

@@ -25,8 +25,9 @@
         <ul>
           <li>Derived resource update for FormData and PageData</li>
           <li>DataObject convenience methods update</li>
+          <li>TypeScript WidgetMaps update</li>
           <li>Java code completion for Scout elements like FormFields, Menus, KeyStrokes, Codes and more.</li>
-          <li>JavaScript code completion for Scout JS models.</li>
+          <li>Code completion for Scout JS models.</li>
           <li>Scout national language support
             <ul>
               <li>Editor for Scout nls files</li>
@@ -44,7 +45,9 @@
   ]]></description>
 
   <change-notes><![CDATA[
-       <b>March 31, 2023</b><br>
+        <b>April 4, 2023</b><br>
+        Adds WidgetMaps update menus<br>
+        <b>March 31, 2023</b><br>
         Adds code completion support for TypeScript models<br>
         <b>October 24, 2022</b><br>
         Adds support for Scout 23<br>
@@ -146,12 +149,14 @@
       <add-to-group group-id="MainMenu" relative-to-action="ToolsMenu" anchor="after"/>
       <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu"
               class="org.eclipse.scout.sdk.s2i.derived.UpdateAllDerivedResourcesMenu"/>
+      <separator></separator>
       <action id="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInScopeMenu"
               class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInScopeMenu"/>
       <action id="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInFileMenu"
               class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInFileMenu">
         <keyboard-shortcut keymap="$default" first-keystroke="control alt shift O"/>
       </action>
+
     </group>
 
     <group id="org.eclipse.scout.sdk.s2i.ScoutElementActionGroup"

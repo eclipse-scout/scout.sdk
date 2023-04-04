@@ -82,7 +82,7 @@ object JsModelCompletionHelper {
         if (requireNameInfo != isNameCompletion) return null // early abort if not requested type
         val objectLiteral = PsiTreeUtil.getParentOfType(property, JSObjectLiteralExpression::class.java) ?: return null
         val module = property.containingModule() ?: return null
-        val scoutJsModel = JsModelManager.getOrCreate(module) ?: return null
+        val scoutJsModel = JsModelManager.getOrCreateScoutJsModel(module) ?: return null
 
         if (isNameCompletion) {
             if (propertyName.length == CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED.length) {

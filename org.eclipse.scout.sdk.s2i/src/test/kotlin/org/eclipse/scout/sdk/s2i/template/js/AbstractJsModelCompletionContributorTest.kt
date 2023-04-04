@@ -240,7 +240,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         )
     }
 
-    protected open fun scoutJsModel() = JsModelManager.getOrCreate(myFixture.module) ?: throw Ensure.newFail("ScoutJsModel for module {} not found.", myFixture.module)
+    protected open fun scoutJsModel() = JsModelManager.getOrCreateScoutJsModel(myFixture.module) ?: throw Ensure.newFail("ScoutJsModel for module {} not found.", myFixture.module)
 
 
     fun testNameCompletionWidget() {
