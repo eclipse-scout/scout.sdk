@@ -9,9 +9,11 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import java.nio.file.Path;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement.ExportType;
 import org.eclipse.scout.sdk.core.util.SourceRange;
 
 public interface NodeElementSpi {
@@ -19,6 +21,10 @@ public interface NodeElementSpi {
 
   @SuppressWarnings("ClassReferencesSubclass")
   NodeModuleSpi containingModule();
+
+  Optional<Path> containingFile();
+
+  ExportType exportType();
 
   Optional<SourceRange> source();
 }

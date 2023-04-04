@@ -20,6 +20,8 @@ import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement.ExportType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
 import org.eclipse.scout.sdk.core.typescript.model.api.JsonPointer;
 import org.eclipse.scout.sdk.core.typescript.model.api.JsonPointer.IJsonPointerElement;
@@ -46,6 +48,11 @@ public class TestingPackageJsonSpi extends AbstractNodeElementSpi<IPackageJson> 
     super(module);
     m_directory = directory;
     m_json = new FinalValue<>();
+  }
+
+  @Override
+  protected Path resolveContainingFile() {
+    return api().location();
   }
 
   @Override
@@ -121,6 +128,11 @@ public class TestingPackageJsonSpi extends AbstractNodeElementSpi<IPackageJson> 
         return parser.readObject();
       }
     });
+  }
+
+  @Override
+  public ExportType exportType() {
+    return INodeElement.ExportType.NONE;
   }
 
   private static final class P_JakartaJsonPointerElement implements IJsonPointerElement {

@@ -108,7 +108,7 @@ public class ScoutJsProperty {
         .withIncludeDependencies(true)
         .stream()
         .filter(o -> !o.declaringClass().isInterface())
-        .filter(o -> o.scoutJsModel() == scope || o.declaringClass().isExported())
+        .filter(o -> o.scoutJsModel() == scope || o.declaringClass().isExportedFromModule())
         .filter(o -> type.isAssignableFrom(o.declaringClass()))
         .map(o -> new ScoutJsObjectPropertyValue(o, this));
   }

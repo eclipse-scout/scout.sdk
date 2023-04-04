@@ -16,7 +16,7 @@ class IdeaNodeModuleTestTs : AbstractModelTest("typescript/moduleWithExports") {
 
     fun testExportsWithTypeScript() {
         val exports = myIdeaNodeModule.elements().stream()
-            .flatMap { it.exportNames().stream().map { export -> it.name() + " as " + export } }
+            .flatMap { it.moduleExportNames().stream().map { export -> it.name() + " as " + export } }
             .toList().toSet()
         assertEquals(
             setOf(
@@ -38,20 +38,20 @@ class IdeaNodeModuleTestTs : AbstractModelTest("typescript/moduleWithExports") {
     }
 
     fun testExportAliasForExportFrom() {
-        assertEquals(listOf("NamedClazz"), myIdeaNodeModule.export("NamedClazz").orElseThrow().exportNames())
+        assertEquals(listOf("NamedClazz"), myIdeaNodeModule.export("NamedClazz").orElseThrow().moduleExportNames())
     }
 
     fun testExportAliasForInterface() {
-        assertEquals(listOf("NamedInterface"), myIdeaNodeModule.export("NamedInterface").orElseThrow().exportNames())
+        assertEquals(listOf("NamedInterface"), myIdeaNodeModule.export("NamedInterface").orElseThrow().moduleExportNames())
     }
 
     fun testExportAliasForVariable() {
-        assertEquals(listOf("NamedObj"), myIdeaNodeModule.export("NamedObj").orElseThrow().exportNames())
-        assertEquals(listOf("wildcardVar"), myIdeaNodeModule.export("wildcardVar").orElseThrow().exportNames())
+        assertEquals(listOf("NamedObj"), myIdeaNodeModule.export("NamedObj").orElseThrow().moduleExportNames())
+        assertEquals(listOf("wildcardVar"), myIdeaNodeModule.export("wildcardVar").orElseThrow().moduleExportNames())
     }
 
     fun testExportAliasForModule() {
-        assertEquals(listOf("@eclipse-scout/sdk-export-ts"), myIdeaNodeModule.exportNames())
+        assertEquals(listOf("@eclipse-scout/sdk-export-ts"), myIdeaNodeModule.moduleExportNames())
     }
 
     fun testSourceOfInterface() {

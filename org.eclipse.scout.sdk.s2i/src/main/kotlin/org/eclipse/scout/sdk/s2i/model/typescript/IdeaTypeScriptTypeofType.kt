@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeofType
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement
 import org.eclipse.scout.sdk.core.typescript.model.api.ITypeOf
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.TypeOfImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
@@ -25,6 +26,10 @@ open class IdeaTypeScriptTypeofType(protected val ideaModule: IdeaNodeModule, in
     override fun createApi() = TypeOfImplementor(this)
 
     override fun name() = "typeof " + typeOfType.referenceText
+
+    override fun exportType() = INodeElement.ExportType.NONE
+
+    override fun resolveContainingFile() = null
 
     override fun childTypes(): Collection<DataTypeSpi> = listOfNotNull(dataType())
 

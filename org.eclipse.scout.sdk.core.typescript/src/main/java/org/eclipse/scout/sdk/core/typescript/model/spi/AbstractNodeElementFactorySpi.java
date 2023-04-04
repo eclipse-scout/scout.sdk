@@ -27,18 +27,28 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElementFactory;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeElementFactoryImplementor;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
+import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 
-public abstract class AbstractNodeElementFactorySpi extends AbstractNodeElementSpi<INodeElementFactory> implements NodeElementFactorySpi {
+public abstract class AbstractNodeElementFactorySpi implements NodeElementFactorySpi {
 
-  private final Map<Object, Object> m_elements = new ConcurrentHashMap<>();
+  private final Map<Object, Object> m_elements;
+  private final FinalValue<INodeElementFactory> m_api;
+  private final NodeModuleSpi m_module;
 
   protected AbstractNodeElementFactorySpi(NodeModuleSpi module) {
-    super(module);
+    m_module = Ensure.notNull(module);
+    m_elements = new ConcurrentHashMap<>();
+    m_api = new FinalValue<>();
+  }
+
+  public NodeModuleSpi containingModule() {
+    return m_module;
   }
 
   @Override
-  protected INodeElementFactory createApi() {
-    return new NodeElementFactoryImplementor(this);
+  public INodeElementFactory api() {
+    return m_api.computeIfAbsentAndGet(() -> new NodeElementFactoryImplementor(this));
   }
 
   @SuppressWarnings("unchecked")

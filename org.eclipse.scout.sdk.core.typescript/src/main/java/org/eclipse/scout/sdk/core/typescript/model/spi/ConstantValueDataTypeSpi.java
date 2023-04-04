@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement.ExportType;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.DataTypeImplementor;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SourceRange;
@@ -28,6 +30,16 @@ public class ConstantValueDataTypeSpi extends AbstractNodeElementSpi<IDataType> 
   protected ConstantValueDataTypeSpi(NodeModuleSpi module, IConstantValue constantValue) {
     super(module);
     m_constantValue = constantValue;
+  }
+
+  @Override
+  public ExportType exportType() {
+    return ExportType.NONE;
+  }
+
+  @Override
+  protected Path resolveContainingFile() {
+    return constantValue().flatMap(IConstantValue::containingFile).orElse(null);
   }
 
   @Override

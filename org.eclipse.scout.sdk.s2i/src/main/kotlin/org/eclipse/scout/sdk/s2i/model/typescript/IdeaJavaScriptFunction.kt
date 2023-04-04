@@ -17,6 +17,8 @@ import org.eclipse.scout.sdk.core.typescript.model.api.internal.FunctionImplemen
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi
+import org.eclipse.scout.sdk.s2i.model.typescript.util.exportType
+import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import java.util.*
 
 open class IdeaJavaScriptFunction(protected val ideaModule: IdeaNodeModule, internal val javaScriptFunction: JSFunction) : AbstractNodeElementSpi<IFunction>(ideaModule), FunctionSpi {
@@ -26,6 +28,10 @@ open class IdeaJavaScriptFunction(protected val ideaModule: IdeaNodeModule, inte
     override fun source() = ideaModule.sourceFor(javaScriptFunction)
 
     override fun name() = javaScriptFunction.name
+
+    override fun exportType() = javaScriptFunction.exportType()
+
+    override fun resolveContainingFile() = javaScriptFunction.containingFile.virtualFile.resolveLocalPath()
 
     override fun resultingObjectLiteral(): Optional<ObjectLiteralSpi> {
         val literal = javaScriptFunction

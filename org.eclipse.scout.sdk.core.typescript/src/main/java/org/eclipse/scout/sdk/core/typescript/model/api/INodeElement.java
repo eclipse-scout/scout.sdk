@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,13 +20,28 @@ public interface INodeElement {
   @SuppressWarnings("ClassReferencesSubclass")
   INodeModule containingModule();
 
+  Optional<Path> containingFile();
+
   NodeElementSpi spi();
 
   String name();
 
-  List<String> exportNames();
+  @SuppressWarnings("ClassReferencesSubclass")
+  Optional<String> computeImportPathFrom(INodeModule fromModule, Path fromFile);
 
-  boolean isExported();
+  Optional<String> computeImportPathFrom(INodeElement queryLocation);
+
+  List<String> moduleExportNames();
+
+  boolean isExportedFromModule();
+
+  ExportType exportType();
+
+  enum ExportType {
+    NONE,
+    NAMED,
+    DEFAULT
+  }
 
   Optional<SourceRange> source();
 }

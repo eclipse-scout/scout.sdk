@@ -11,14 +11,12 @@ package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElementFactory;
-import org.eclipse.scout.sdk.core.util.SourceRange;
 
-public interface NodeElementFactorySpi extends NodeElementSpi {
-  @Override
+public interface NodeElementFactorySpi {
+
   INodeElementFactory api();
 
   FieldSpi createSyntheticField(String name, DataTypeSpi dataType, ES6ClassSpi declaringClass);
@@ -34,9 +32,4 @@ public interface NodeElementFactorySpi extends NodeElementSpi {
   DataTypeSpi createConstantValueDataType(IConstantValue constantValue);
 
   DataTypeSpi createClassWithTypeArgumentsDataType(ES6ClassSpi classSpi, List<DataTypeSpi> arguments);
-
-  @Override
-  default Optional<SourceRange> source() {
-    return Optional.empty();
-  }
 }

@@ -20,13 +20,11 @@ public class SyntheticFieldSpi extends AbstractFieldSpi {
 
   private final String m_name;
   private final DataTypeSpi m_dataType;
-  private final ES6ClassSpi m_declaringClass;
 
   protected SyntheticFieldSpi(NodeModuleSpi module, String name, DataTypeSpi dataType, ES6ClassSpi declaringClass) {
-    super(module);
+    super(module, declaringClass);
     m_name = Ensure.notBlank(name);
     m_dataType = Ensure.notNull(dataType);
-    m_declaringClass = Ensure.notNull(declaringClass);
   }
 
   @Override
@@ -47,11 +45,6 @@ public class SyntheticFieldSpi extends AbstractFieldSpi {
   @Override
   public IConstantValue constantValue() {
     return null;
-  }
-
-  @Override
-  public ES6ClassSpi declaringClass() {
-    return m_declaringClass;
   }
 
   @Override

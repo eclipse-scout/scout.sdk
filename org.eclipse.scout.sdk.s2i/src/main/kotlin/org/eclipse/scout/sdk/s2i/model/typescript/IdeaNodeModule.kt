@@ -23,6 +23,7 @@ import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiReference
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.typescript.IWebConstants
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeModuleImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.*
@@ -30,6 +31,7 @@ import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.SourceRange
 import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaNodeElementFactory
 import java.nio.CharBuffer
+import java.nio.file.Path
 import java.util.*
 import java.util.Collections.emptyList
 import java.util.Collections.unmodifiableMap
@@ -48,7 +50,11 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
 
     override fun containingModule() = this
 
+    override fun exportType() = INodeElement.ExportType.NAMED
+
     override fun nodeElementFactory(): IdeaNodeElementFactory = m_nodeElementFactory
+
+    override fun resolveContainingFile(): Path? = packageJson().containingFile().orElse(null)
 
     override fun packageJson(): PackageJsonSpi = m_packageJsonSpi.computeIfAbsentAndGet { nodeElementFactory().createPackageJson(nodeModuleDir) }
 

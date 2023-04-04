@@ -58,7 +58,7 @@ public class NodeModuleImplementor extends AbstractNodeElement<NodeModuleSpi> im
   }
 
   @Override
-  public List<String> exportNames() {
+  public List<String> moduleExportNames() {
     return Collections.singletonList(name());
   }
 

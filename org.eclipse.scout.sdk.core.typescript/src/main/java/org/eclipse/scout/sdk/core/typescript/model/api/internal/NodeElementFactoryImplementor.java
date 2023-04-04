@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
@@ -26,30 +25,27 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementFactorySpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
-public class NodeElementFactoryImplementor extends AbstractNodeElement<NodeElementFactorySpi> implements INodeElementFactory {
+public class NodeElementFactoryImplementor implements INodeElementFactory {
+
+  private final NodeElementFactorySpi m_spi;
 
   public NodeElementFactoryImplementor(NodeElementFactorySpi spi) {
-    super(spi);
-  }
-
-  @Override
-  public String name() {
-    return "INodeElementFactory for " + containingModule().name();
+    m_spi = Ensure.notNull(spi);
   }
 
   @Override
   public IField createSyntheticField(String name, IDataType dataType, IES6Class declaringClass) {
-    return spi().createSyntheticField(name, Ensure.notNull(dataType).spi(), Ensure.notNull(declaringClass).spi()).api();
+    return m_spi.createSyntheticField(name, Ensure.notNull(dataType).spi(), Ensure.notNull(declaringClass).spi()).api();
   }
 
   @Override
   public IDataType createObjectLiteralDataType(String name, IObjectLiteral objectLiteral) {
-    return spi().createObjectLiteralDataType(name, Ensure.notNull(objectLiteral).spi()).api();
+    return m_spi.createObjectLiteralDataType(name, Ensure.notNull(objectLiteral).spi()).api();
   }
 
   @Override
   public IDataType createArrayDataType(IDataType componentDataType, int arrayDimension) {
-    return spi().createArrayDataType(Optional.ofNullable(componentDataType).map(IDataType::spi).orElse(null), arrayDimension).api();
+    return m_spi.createArrayDataType(Optional.ofNullable(componentDataType).map(IDataType::spi).orElse(null), arrayDimension).api();
   }
 
   @Override
@@ -58,7 +54,7 @@ public class NodeElementFactoryImplementor extends AbstractNodeElement<NodeEleme
         .map(types -> types.stream()
             .map(IDataType::spi)
             .collect(toCollection(LinkedHashSet::new)))
-        .map(spi()::createUnionDataType)
+        .map(m_spi::createUnionDataType)
         .map(DataTypeSpi::api)
         .orElse(null);
   }
@@ -69,13 +65,13 @@ public class NodeElementFactoryImplementor extends AbstractNodeElement<NodeEleme
         .map(types -> types.stream()
             .map(IDataType::spi)
             .collect(toCollection(LinkedHashSet::new)))
-        .map(spi()::createIntersectionDataType)
+        .map(m_spi::createIntersectionDataType)
         .map(DataTypeSpi::api)
         .orElse(null);
   }
 
   @Override
   public IDataType createConstantValueDataType(IConstantValue constantValue) {
-    return spi().createConstantValueDataType(Ensure.notNull(constantValue)).api();
+    return m_spi.createConstantValueDataType(Ensure.notNull(constantValue)).api();
   }
 }

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import com.intellij.openapi.vfs.VirtualFile
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.core.typescript.model.api.JsonPointer
 import org.eclipse.scout.sdk.core.typescript.model.api.JsonPointer.IJsonPointerElement
@@ -25,6 +26,7 @@ import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.s2i.model.typescript.util.NodeModuleUtils
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import java.io.InputStreamReader
+import java.nio.file.Path
 import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.StreamSupport
@@ -40,7 +42,11 @@ class IdeaPackageJson(private val ideaModule: IdeaNodeModule, private val module
 
     override fun content() = m_packageJson.inputStream
 
+    override fun exportType() = INodeElement.ExportType.NONE
+
     override fun containingDir() = moduleDir.resolveLocalPath()
+
+    override fun resolveContainingFile(): Path = api().location()
 
     override fun existsFile(relPath: String) = moduleDir.findFileByRelativePath(relPath) != null
 

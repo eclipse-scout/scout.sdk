@@ -23,9 +23,8 @@ open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(
     protected val ideaModule: IdeaNodeModule,
     internal val javaScriptAssignmentExpression: JSAssignmentExpression,
     internal val javaScriptReferenceExpression: JSReferenceExpression,
-    internal val declaringClass: ES6ClassSpi
-) :
-    AbstractFieldSpi(ideaModule) {
+    declaringClass: ES6ClassSpi
+) : AbstractFieldSpi(ideaModule, declaringClass) {
 
     private val m_dataType = FinalValue<DataTypeSpi?>()
     private val m_constantValue = FinalValue<IConstantValue>()
@@ -41,8 +40,6 @@ open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(
     override fun constantValue(): IConstantValue = m_constantValue.computeIfAbsentAndGet {
         ideaModule.nodeElementFactory().createConstantValue(javaScriptAssignmentExpression.rOperand)
     }
-
-    override fun declaringClass() = declaringClass
 
     override fun dataType(): DataTypeSpi? = m_dataType.computeIfAbsentAndGet {
         DataTypeSpiUtils.createDataType(javaScriptAssignmentExpression, ideaModule, this::constantValue)

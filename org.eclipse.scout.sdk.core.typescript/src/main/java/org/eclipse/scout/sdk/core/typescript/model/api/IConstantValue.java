@@ -10,10 +10,14 @@
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.Optional;
 
 public interface IConstantValue extends IDataTypeOwner {
+
   <T> Optional<T> convertTo(Class<T> expectedType);
+
+  Optional<Path> containingFile();
 
   default Optional<String> asString() {
     return convertTo(String.class);

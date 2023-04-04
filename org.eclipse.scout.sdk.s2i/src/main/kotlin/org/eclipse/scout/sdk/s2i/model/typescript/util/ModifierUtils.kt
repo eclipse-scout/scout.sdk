@@ -9,7 +9,11 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript.util
 
+import com.intellij.lang.ecmascript6.psi.ES6ExportDefaultAssignment
+import com.intellij.lang.javascript.psi.JSElement
 import com.intellij.lang.javascript.psi.ecmal4.JSAttributeList.ModifierType
+import com.intellij.lang.javascript.psi.ecmal4.JSAttributeListOwner
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement.ExportType
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 import org.eclipse.scout.sdk.core.util.SdkException
 
@@ -19,3 +23,8 @@ val MODIFIER_MAPPING = Modifier.values()
 fun Modifier.toModifierType(): ModifierType {
     return MODIFIER_MAPPING[this] ?: throw SdkException("No PSI mapping for Modifier '{}' (keyword={}).", name, keyword)
 }
+
+fun JSElement.exportType() =
+    if (parent is ES6ExportDefaultAssignment) ExportType.DEFAULT
+    else if (this is JSAttributeListOwner && this.hasModifier(ModifierType.EXPORT)) ExportType.NAMED
+    else ExportType.NONE

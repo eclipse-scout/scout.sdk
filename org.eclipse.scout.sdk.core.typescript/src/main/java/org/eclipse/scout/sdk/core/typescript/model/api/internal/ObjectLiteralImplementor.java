@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 
@@ -90,6 +91,11 @@ public class ObjectLiteralImplementor extends AbstractNodeElement<ObjectLiteralS
         return (Optional<T>) asObjectLiteral();
       }
       return Optional.empty();
+    }
+
+    @Override
+    public Optional<Path> containingFile() {
+      return m_literal.containingFile();
     }
 
     @Override

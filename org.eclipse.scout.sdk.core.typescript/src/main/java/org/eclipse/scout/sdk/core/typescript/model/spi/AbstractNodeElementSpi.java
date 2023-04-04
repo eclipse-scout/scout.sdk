@@ -9,21 +9,34 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import java.nio.file.Path;
+import java.util.Optional;
+
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
 public abstract class AbstractNodeElementSpi<API extends INodeElement> implements NodeElementSpi {
-  private final FinalValue<API> m_api = new FinalValue<>();
+  private final FinalValue<API> m_api;
+  private final FinalValue<Optional<Path>> m_containingFile;
   private final NodeModuleSpi m_module;
 
   protected AbstractNodeElementSpi(NodeModuleSpi module) {
     m_module = module;
+    m_api = new FinalValue<>();
+    m_containingFile = new FinalValue<>();
   }
+
+  @Override
+  public final Optional<Path> containingFile() {
+    return m_containingFile.computeIfAbsentAndGet(() -> Optional.ofNullable(resolveContainingFile()));
+  }
+
+  protected abstract Path resolveContainingFile();
 
   protected abstract API createApi();
 
   @Override
-  public API api() {
+  public final API api() {
     return m_api.computeIfAbsentAndGet(this::createApi);
   }
 

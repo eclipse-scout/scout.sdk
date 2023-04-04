@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import org.eclipse.scout.sdk.s2i.model.typescript.util.toModifierType
 
-open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, internal val javaScriptField: JSField, internal val declaringClass: ES6ClassSpi) : AbstractFieldSpi(ideaModule) {
+open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, internal val javaScriptField: JSField, declaringClass: ES6ClassSpi) : AbstractFieldSpi(ideaModule, declaringClass) {
 
     private val m_dataType = FinalValue<DataTypeSpi?>()
     private val m_constantValue = FinalValue<IConstantValue>()
@@ -36,8 +36,6 @@ open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, interna
     override fun constantValue(): IConstantValue = m_constantValue.computeIfAbsentAndGet {
         ideaModule.nodeElementFactory().createConstantValue(javaScriptField.initializer)
     }
-
-    override fun declaringClass() = declaringClass
 
     override fun dataType() = m_dataType.computeIfAbsentAndGet {
         DataTypeSpiUtils.createDataType(javaScriptField, ideaModule, this::constantValue)

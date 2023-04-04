@@ -16,6 +16,7 @@ import com.intellij.lang.javascript.psi.types.primitives.JSPrimitiveType
 import com.intellij.lang.javascript.psi.types.primitives.JSUndefinedType
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement.ExportType
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.DataTypeImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
@@ -26,6 +27,10 @@ import java.util.*
 open class IdeaJavaScriptType(protected val ideaModule: IdeaNodeModule, protected val javaScriptType: JSType) : AbstractNodeElementSpi<IDataType>(ideaModule), DataTypeSpi {
 
     private val m_name = FinalValue<String>()
+
+    override fun exportType() = ExportType.NONE
+
+    override fun resolveContainingFile() = null
 
     override fun createApi() = DataTypeImplementor(this)
 

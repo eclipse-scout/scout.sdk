@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import static java.util.Collections.unmodifiableList;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement.ExportType;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.ES6ClassImplementor;
 import org.eclipse.scout.sdk.core.util.SourceRange;
@@ -31,6 +33,16 @@ public class ES6ClassWithTypeArgumentsSpi extends AbstractNodeElementSpi<IES6Cla
     super(module);
     m_class = classSpi;
     m_arguments = unmodifiableList(new ArrayList<>(typeArguments));
+  }
+
+  @Override
+  public ExportType exportType() {
+    return ExportType.NONE;
+  }
+
+  @Override
+  protected Path resolveContainingFile() {
+    return null;
   }
 
   @Override

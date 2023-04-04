@@ -12,30 +12,20 @@ package org.eclipse.scout.sdk.s2i.template.js
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.codeInsight.lookup.LookupElementBuilder
-import com.intellij.lang.ecmascript6.psi.ES6ImportDeclaration
 import com.intellij.lang.javascript.patterns.JSPatterns.jsProperty
 import com.intellij.lang.javascript.psi.JSArrayLiteralExpression
-import com.intellij.lang.javascript.psi.impl.JSPsiElementFactory
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.patterns.PlatformPatterns.psiElement
-import com.intellij.psi.PsiComment
 import com.intellij.psi.PsiElement
-import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.refactoring.extractMethod.newImpl.ExtractMethodHelper.addSiblingAfter
 import com.intellij.util.ProcessingContext
-import com.intellij.util.ThrowableRunnable
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsEnumPropertyValue
-import org.eclipse.scout.sdk.core.typescript.IWebConstants
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement
-import org.eclipse.scout.sdk.core.util.Strings
-import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.SELECTED_ELEMENT
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.getPropertyValueInfo
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.propertyElementPattern
+import org.eclipse.scout.sdk.s2i.util.PsiImportUtils
 
 class JsModelValueCompletionContributor : CompletionContributor() {
 
@@ -83,64 +73,11 @@ class JsModelValueCompletionContributor : CompletionContributor() {
             val originalInsertHandler = lookupElement.insertHandler
             return lookupElement.withInsertHandler { context, item ->
                 originalInsertHandler?.handleInsert(context, item)
-
                 val elementToImport = findElementToImport(lookupElement) ?: return@withInsertHandler
-                var importName = elementToImport.exportNames().stream().findAny().orElse(elementToImport.name()) // use any of the exported names for the element
-                val firstDot = importName.indexOf('.')
-                if (firstDot > 0) importName = importName.take(firstDot)
-
-                val importFrom = if (elementToImport.containingModule() == editModel.nodeModule()) {
-                    // relative path inside same module
-                    val editDir = place.containingFile.virtualFile.parent.resolveLocalPath() ?: return@withInsertHandler
-                    val editModelPackageJson = editModel.nodeModule().packageJson()
-                    val main = editModelPackageJson.directory().resolve(editModelPackageJson.main().orElse(""))
-                    val rel = editDir.relativize(main).toString().replace('\\', '/')
-                    Strings.removeSuffix(Strings.removeSuffix(rel, IWebConstants.TS_FILE_SUFFIX), IWebConstants.JS_FILE_SUFFIX)
-                } else {
-                    // import directly to other module
-                    elementToImport.containingModule().name()
-                }
-
-                if (!ApplicationManager.getApplication().isWriteAccessAllowed) {
-                    WriteCommandAction.writeCommandAction(context.project).run(ThrowableRunnable<RuntimeException> {
-                        createOrUpdateImport(importName, importFrom, place)
-                    })
-                } else {
-                    createOrUpdateImport(importName, importFrom, place)
-                }
+                PsiImportUtils.createOrUpdateImport(elementToImport, editModel.nodeModule(), place)
             }
         }
 
-        /**
-         * Own implementation as JSImportAction is internal API and ES6ImportPsiUtil does not work correctly in TypeScript
-         */
-        private fun createOrUpdateImport(importName: String, importFrom: String, place: PsiElement) {
-            val psiFile = place.containingFile
-            val imports = PsiTreeUtil.getChildrenOfTypeAsList(psiFile, ES6ImportDeclaration::class.java)
-            val existingImport = imports.firstOrNull { Strings.withoutQuotes(it.fromClause?.referenceText) == importFrom }
-            if (existingImport != null) {
-                // check if already imported
-                val existingSpecifiers = existingImport.importSpecifiers.toList()
-                if (existingSpecifiers.any { it.declaredName == importName }) return // already exists
-
-                // add new specifier to existing import declaration
-                val specifiers = existingSpecifiers.map { it.text }.toMutableList()
-                specifiers.add(importName)
-                val newSpecifiers = specifiers.sorted().joinToString(", ")
-                val newImport = JSPsiElementFactory.createJSSourceElement("import {$newSpecifiers} from '$importFrom';", place, existingImport.javaClass)
-                existingImport.replace(newImport)
-                return
-            } else {
-                // add new import declaration
-                val importToAdd = JSPsiElementFactory.createJSSourceElement("import {$importName} from '$importFrom';", place, ES6ImportDeclaration::class.java)
-                if (imports.isEmpty()) {
-                    val firstNotComment = psiFile.children.firstOrNull { it !is PsiComment } ?: psiFile.children.firstOrNull()
-                    psiFile.addBefore(importToAdd, firstNotComment)
-                } else {
-                    imports.last().addSiblingAfter(importToAdd)
-                }
-            }
-        }
 
         private fun findElementToImport(lookupElement: LookupElementBuilder): INodeElement? {
             val lookupElementViewModel = lookupElement.getUserData(SELECTED_ELEMENT) ?: return null

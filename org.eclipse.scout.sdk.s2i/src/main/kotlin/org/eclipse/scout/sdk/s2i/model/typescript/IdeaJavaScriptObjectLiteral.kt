@@ -17,6 +17,8 @@ import org.eclipse.scout.sdk.core.typescript.model.api.internal.ObjectLiteralImp
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.s2i.model.typescript.util.exportType
+import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import java.util.*
 
 open class IdeaJavaScriptObjectLiteral(protected val ideaModule: IdeaNodeModule, internal val jsObjectLiteral: JSObjectLiteralExpression) : AbstractNodeElementSpi<IObjectLiteral>(ideaModule), ObjectLiteralSpi {
@@ -27,7 +29,11 @@ open class IdeaJavaScriptObjectLiteral(protected val ideaModule: IdeaNodeModule,
 
     override fun source() = ideaModule.sourceFor(jsObjectLiteral)
 
+    override fun exportType() = jsObjectLiteral.exportType()
+
     override fun name() = "" // anonymous
+
+    override fun resolveContainingFile() = jsObjectLiteral.containingFile.virtualFile.resolveLocalPath()
 
     override fun properties(): Map<String, IConstantValue> = m_properties.computeIfAbsentAndGet {
         return@computeIfAbsentAndGet Collections.unmodifiableMap(collectProperties())

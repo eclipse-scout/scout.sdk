@@ -11,10 +11,12 @@ package org.eclipse.scout.sdk.core.typescript.model.spi;
 
 import static java.util.Collections.emptyList;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement.ExportType;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.DataTypeImplementor;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SourceRange;
@@ -28,6 +30,16 @@ public class ObjectLiteralDataTypeSpi extends AbstractNodeElementSpi<IDataType> 
     super(module);
     m_name = Ensure.notNull(name);
     m_objectLiteral = Ensure.notNull(objectLiteral);
+  }
+
+  @Override
+  public ExportType exportType() {
+    return ExportType.NONE;
+  }
+
+  @Override
+  protected Path resolveContainingFile() {
+    return m_objectLiteral.containingFile().orElse(null);
   }
 
   @Override

@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement.ExportType;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeModuleImplementor;
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi;
@@ -38,6 +40,11 @@ public class TestingNodeModuleSpi extends AbstractNodeElementSpi<INodeModule> im
     super(null);
     m_directory = packageJsonDirectory;
     m_packageJson = new FinalValue<>();
+  }
+
+  @Override
+  protected Path resolveContainingFile() {
+    return packageJson().containingFile().orElse(null);
   }
 
   @Override
@@ -82,6 +89,11 @@ public class TestingNodeModuleSpi extends AbstractNodeElementSpi<INodeModule> im
   @Override
   public NodeModuleSpi containingModule() {
     return this;
+  }
+
+  @Override
+  public ExportType exportType() {
+    return INodeElement.ExportType.NAMED;
   }
 
   @Override

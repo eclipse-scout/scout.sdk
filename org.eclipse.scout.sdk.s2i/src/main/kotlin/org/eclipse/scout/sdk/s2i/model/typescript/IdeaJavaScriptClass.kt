@@ -21,7 +21,9 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.*
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import org.eclipse.scout.sdk.s2i.model.typescript.util.FieldSpiUtils
+import org.eclipse.scout.sdk.s2i.model.typescript.util.exportType
 import org.eclipse.scout.sdk.s2i.model.typescript.util.toModifierType
+import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import java.util.*
 import java.util.stream.Stream
 
@@ -37,6 +39,10 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     override fun createApi() = ES6ClassImplementor(this)
 
     override fun source() = ideaModule.sourceFor(javaScriptClass)
+
+    override fun exportType() = javaScriptClass.exportType()
+
+    override fun resolveContainingFile() = javaScriptClass.containingFile.virtualFile.resolveLocalPath()
 
     override fun name(): String = m_name.computeIfAbsentAndGet { javaScriptClass.name }
 

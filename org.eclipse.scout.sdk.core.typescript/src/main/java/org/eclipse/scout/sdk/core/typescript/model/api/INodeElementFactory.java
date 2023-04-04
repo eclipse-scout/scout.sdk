@@ -11,12 +11,7 @@ package org.eclipse.scout.sdk.core.typescript.model.api;
 
 import java.util.Collection;
 
-import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementFactorySpi;
-
-public interface INodeElementFactory extends INodeElement {
-  @Override
-  NodeElementFactorySpi spi();
-
+public interface INodeElementFactory {
   IField createSyntheticField(String name, IDataType dataType, IES6Class declaringClass);
 
   IDataType createObjectLiteralDataType(String name, IObjectLiteral objectLiteral);

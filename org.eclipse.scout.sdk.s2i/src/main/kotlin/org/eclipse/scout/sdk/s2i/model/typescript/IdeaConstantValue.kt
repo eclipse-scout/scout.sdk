@@ -20,8 +20,10 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
+import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.nio.file.Path
 import java.util.*
 
 open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val element: JSElement?) : IConstantValue {
@@ -30,6 +32,7 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
     private val m_referencedElement = FinalValue<NodeElementSpi?>()
     private val m_referencedES6Class = FinalValue<ES6ClassSpi?>()
     private val m_referencedConstantValue = FinalValue<IdeaConstantValue?>()
+    private val m_containingFile = FinalValue<Optional<Path>>()
 
     private val m_type = FinalValue<IConstantValue.ConstantValueType>()
     private val m_dataType = FinalValue<IDataType?>()
@@ -38,6 +41,8 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
         val unwrappedElement = unwrapTypeScriptAsExpression(element)
         unwrapJSNewExpression(unwrappedElement)
     }
+
+    override fun containingFile(): Optional<Path> = m_containingFile.computeIfAbsentAndGet { Optional.ofNullable(element?.containingFile?.virtualFile?.resolveLocalPath()) }
 
     protected fun unwrapTypeScriptAsExpression(element: JSElement?) = if (element is TypeScriptAsExpression) element.expression else element
 

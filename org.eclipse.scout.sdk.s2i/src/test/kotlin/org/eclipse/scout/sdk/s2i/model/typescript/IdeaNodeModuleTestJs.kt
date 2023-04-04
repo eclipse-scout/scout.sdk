@@ -16,7 +16,7 @@ class IdeaNodeModuleTestJs : AbstractModelTest("javascript/moduleWithExports") {
 
     fun testExports() {
         val exports = myIdeaNodeModule.elements().stream()
-            .flatMap { it.exportNames().stream().map { export -> it.name() + " as " + export } }
+            .flatMap { it.moduleExportNames().stream().map { export -> it.name() + " as " + export } }
             .toList().toSet()
         assertEquals(
             setOf(
@@ -42,20 +42,20 @@ class IdeaNodeModuleTestJs : AbstractModelTest("javascript/moduleWithExports") {
     }
 
     fun testExportAliasForExportFrom() {
-        assertEquals(listOf("NamedClazz"), myIdeaNodeModule.export("NamedClazz").orElseThrow().exportNames())
+        assertEquals(listOf("NamedClazz"), myIdeaNodeModule.export("NamedClazz").orElseThrow().moduleExportNames())
     }
 
     fun testExportAliasForClass() {
-        assertEquals(listOf("WildcardDefaultClass"), myIdeaNodeModule.export("WildcardDefaultClass").orElseThrow().exportNames())
+        assertEquals(listOf("WildcardDefaultClass"), myIdeaNodeModule.export("WildcardDefaultClass").orElseThrow().moduleExportNames())
     }
 
     fun testExportAliasForVariable() {
-        assertEquals(listOf("namedVar"), myIdeaNodeModule.export("namedVar").orElseThrow().exportNames())
-        assertEquals(listOf("utils"), myIdeaNodeModule.export("utils").orElseThrow().exportNames())
+        assertEquals(listOf("namedVar"), myIdeaNodeModule.export("namedVar").orElseThrow().moduleExportNames())
+        assertEquals(listOf("utils"), myIdeaNodeModule.export("utils").orElseThrow().moduleExportNames())
     }
 
     fun testExportAliasForModule() {
-        assertEquals(listOf("@eclipse-scout/sdk-export-js"), myIdeaNodeModule.exportNames())
+        assertEquals(listOf("@eclipse-scout/sdk-export-js"), myIdeaNodeModule.moduleExportNames())
     }
 
     fun testSourceOfClass() {

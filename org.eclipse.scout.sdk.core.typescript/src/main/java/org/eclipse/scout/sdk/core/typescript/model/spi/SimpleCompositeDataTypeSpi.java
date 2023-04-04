@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeNameEvaluator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement.ExportType;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.DataTypeImplementor;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
@@ -33,6 +35,16 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
     m_flavor = Ensure.notNull(flavor);
     m_componentDataTypes = componentDataTypes;
     m_arrayDimension = arrayDimension;
+  }
+
+  @Override
+  public ExportType exportType() {
+    return ExportType.NONE;
+  }
+
+  @Override
+  protected Path resolveContainingFile() {
+    return null;
   }
 
   @Override

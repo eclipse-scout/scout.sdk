@@ -12,13 +12,16 @@ package org.eclipse.scout.sdk.core.typescript.model.api;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.typescript.IWebConstants;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SourceRange;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 public abstract class AbstractNodeElement<SPI extends NodeElementSpi> implements INodeElement {
   private final SPI m_spi;
@@ -40,7 +43,51 @@ public abstract class AbstractNodeElement<SPI extends NodeElementSpi> implements
   }
 
   @Override
-  public List<String> exportNames() {
+  public Optional<Path> containingFile() {
+    return spi().containingFile();
+  }
+
+  @Override
+  public ExportType exportType() {
+    return spi().exportType();
+  }
+
+  @Override
+  public Optional<String> computeImportPathFrom(INodeElement fromElement) {
+    return Optional.ofNullable(fromElement)
+        .flatMap(f -> computeImportPathFrom(f.containingModule(), f.containingFile().orElse(null)));
+  }
+
+  @Override
+  public Optional<String> computeImportPathFrom(INodeModule fromModule, Path fromFile) {
+    if (containingModule() != fromModule) {
+      // this element is in another module -> path is the module name. 
+      // ignore here the case that this element is not exported from the module. This import will then just be invalid.
+      return Optional.ofNullable(containingModule().name());
+    }
+    if (fromFile == null) {
+      return Optional.empty();
+    }
+
+    Path importTarget;
+    if (this.isExportedFromModule()) {
+      // create import to the module main file
+      var packageJson = containingModule().packageJson();
+      importTarget = packageJson.directory().resolve(packageJson.main().orElse(""));
+    }
+    else {
+      // create relative path import to this file
+      importTarget = containingFile().orElse(null);
+    }
+
+    return Optional.ofNullable(importTarget)
+        .map(i -> fromFile.getParent().relativize(i))
+        .map(p -> p.toString().replace('\\', '/'))
+        .map(s -> Strings.removeSuffix(Strings.removeSuffix(s, IWebConstants.TS_FILE_SUFFIX), IWebConstants.JS_FILE_SUFFIX));
+  }
+
+  @Override
+  public List<String> moduleExportNames() {
     var exportNames = containingModule().spi().elements().get(spi());
     if (exportNames == null) {
       return emptyList();
@@ -49,8 +96,8 @@ public abstract class AbstractNodeElement<SPI extends NodeElementSpi> implements
   }
 
   @Override
-  public boolean isExported() {
-    return !exportNames().isEmpty();
+  public boolean isExportedFromModule() {
+    return !moduleExportNames().isEmpty();
   }
 
   @Override
