@@ -9,9 +9,6 @@
  */
 package org.eclipse.scout.sdk.core.s.widgetmap;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
-
 import java.util.List;
 import java.util.Map;
 
@@ -26,22 +23,28 @@ public class WidgetMapCreateOperation {
   private boolean m_isPage;
 
   // out
-  private List<CharSequence> m_classSources = emptyList();
-  private Map<String /* widgetMap declaration field name */, CharSequence /* field declaration source */> m_declarationSources = emptyMap();
-  private List<IES6Class> m_importsForModel = emptyList();
-  private List<String> m_importNamesForDeclarations = emptyList();
+  private List<CharSequence> m_classSources;
+  private Map<String /* widgetMap declaration field name */, CharSequence /* field declaration source */> m_declarationSources;
+  private List<IES6Class> m_importsForModel;
+  private List<String> m_importNamesForDeclarations;
 
   public void execute() {
     validateOperation();
-    // TODO FSH
+    // TODO FSH: add real implementation and remove dummy impl below
 
+    // Dummy implementation
+    setImportsForModel(literal().containingModule().classes().limit(2).toList());
+    setImportNamesForDeclarations(List.of("GeneratedWidgetMap", "GeneratedWidgetMap2"));
+    setDeclarationSources(Map.of("widgetMap", "declare widgetMap: GeneratedWidgetMap2;"));
     setClassSources(List.of(
-        "export type GeneratedWidgetMap = {\n" +
-            "  // TODO\n" +
-            "};",
-        "export type GeneratedWidgetMap2 = {\n" +
-            "  // TODO 2\n" +
-            "};"));
+        """
+            export type GeneratedWidgetMap = {
+              // TODO
+            };""".stripIndent(),
+        """
+            export type GeneratedWidgetMap2 = {
+              // TODO 2
+            };""".stripIndent()));
   }
 
   protected void validateOperation() {

@@ -79,11 +79,15 @@ public abstract class AbstractNodeElement<SPI extends NodeElementSpi> implements
       // create relative path import to this file
       importTarget = containingFile().orElse(null);
     }
+    if (importTarget == null) {
+      return Optional.empty();
+    }
 
-    return Optional.ofNullable(importTarget)
-        .map(i -> fromFile.getParent().relativize(i))
-        .map(p -> p.toString().replace('\\', '/'))
-        .map(s -> Strings.removeSuffix(Strings.removeSuffix(s, IWebConstants.TS_FILE_SUFFIX), IWebConstants.JS_FILE_SUFFIX));
+    var from = fromFile.getParent().relativize(importTarget).toString().replace('\\', '/');
+    if (!Strings.startsWith(from, '.')) {
+      from = "./" + from;
+    }
+    return Optional.of(Strings.removeSuffix(Strings.removeSuffix(from, IWebConstants.TS_FILE_SUFFIX), IWebConstants.JS_FILE_SUFFIX));
   }
 
   @Override

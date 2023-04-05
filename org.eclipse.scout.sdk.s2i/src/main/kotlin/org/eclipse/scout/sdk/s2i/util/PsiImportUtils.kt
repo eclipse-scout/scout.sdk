@@ -18,6 +18,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.refactoring.extractMethod.newImpl.ExtractMethodHelper.addSiblingAfter
 import com.intellij.util.ThrowableRunnable
+import org.eclipse.scout.sdk.core.typescript.IWebConstants
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule
 import org.eclipse.scout.sdk.core.util.Strings
@@ -53,7 +54,8 @@ object PsiImportUtils {
     fun createOrUpdateImport(importName: String, isDefaultImport: Boolean, importFrom: String, context: PsiElement) {
         val psiFile = context.containingFile
         val imports = PsiTreeUtil.getChildrenOfTypeAsList(psiFile, ES6ImportDeclaration::class.java)
-        val existingImport = imports.firstOrNull { Strings.withoutQuotes(it.fromClause?.referenceText) == importFrom }
+        val importFromClean = importFrom.removeSuffix(IWebConstants.TS_FILE_SUFFIX).removeSuffix(IWebConstants.JS_FILE_SUFFIX)
+        val existingImport = imports.firstOrNull { Strings.withoutQuotes(it.fromClause?.referenceText) == importFromClean }
         if (existingImport != null) {
             // check if already imported
             val existingSpecifiers = existingImport.importSpecifiers
@@ -75,7 +77,7 @@ object PsiImportUtils {
                 .filter { !Strings.isBlank(it) }
                 .joinToString(", ")
 
-            val newImport = JSPsiElementFactory.createJSSourceElement("import $newImports from '$importFrom';", context, existingImport.javaClass)
+            val newImport = JSPsiElementFactory.createJSSourceElement("import $newImports from '$importFromClean';", context, existingImport.javaClass)
             existingImport.replace(newImport)
             return
         }

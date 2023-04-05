@@ -10,9 +10,13 @@
 package org.eclipse.scout.sdk.s2i.widgetmap
 
 import com.intellij.lang.ASTFactory
+import com.intellij.lang.javascript.DialectDetector
 import com.intellij.lang.javascript.TypeScriptFileType
+import com.intellij.lang.javascript.psi.JSElement
 import com.intellij.lang.javascript.psi.JSFile
 import com.intellij.lang.javascript.psi.JSFunction
+import com.intellij.lang.javascript.psi.JSVarStatement
+import com.intellij.lang.javascript.psi.ecmal4.JSAttributeList
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.lang.javascript.psi.impl.JSPsiElementFactory
 import com.intellij.openapi.application.ApplicationManager
@@ -36,6 +40,7 @@ import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
 import org.eclipse.scout.sdk.core.s.widgetmap.WidgetMapCreateOperation
 import org.eclipse.scout.sdk.core.typescript.IWebConstants
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
@@ -44,6 +49,8 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.model.js.JsModelManager
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
+import org.eclipse.scout.sdk.s2i.resolveLocalPath
+import org.eclipse.scout.sdk.s2i.util.PsiImportUtils
 
 object WidgetMapUpdater {
 
@@ -58,7 +65,6 @@ object WidgetMapUpdater {
     }
 
     fun updateAsync(scope: SearchScope, project: Project) {
-        // TODO performance tests with lots of large models
         object : Task.Backgroundable(project, message("update.widgetMap.in.scope"), true, PerformInBackgroundOption.ALWAYS_BACKGROUND) {
             override fun run(indicator: ProgressIndicator) {
                 updateScope(scope, project, IdeaProgress(indicator))
@@ -66,28 +72,33 @@ object WidgetMapUpdater {
         }.queue()
     }
 
-    private fun findFilePair(file: VirtualFile, project: Project): Pair<JSFile /* model */, JSFile /* consumer */>? {
+    private fun findFilePair(file: VirtualFile, project: Project): Pair<JSFile /* model */, JSFile? /* consumer */>? {
         val fileName = file.name
         val psiManager = PsiManager.getInstance(project)
         val modelFileSuffix = ScoutJsCoreConstants.MODEL_SUFFIX + IWebConstants.TS_FILE_SUFFIX
-        val model: VirtualFile?
+        var model: VirtualFile?
         val consumer: VirtualFile?
+        val directory = file.parent
         if (fileName.endsWith(modelFileSuffix)) {
             // try to find model-consumer by name convention
             model = file
-            consumer = file.parent.findChild(fileName.removeSuffix(modelFileSuffix) + IWebConstants.TS_FILE_SUFFIX)?.takeIf { it.isValid }
+            val baseName = fileName.removeSuffix(modelFileSuffix)
+            consumer = directory.findChild(baseName + IWebConstants.TS_FILE_SUFFIX)?.takeIf { it.isValid }
+                ?: directory.findChild(baseName + IWebConstants.JS_FILE_SUFFIX)?.takeIf { it.isValid }
         } else {
             // try to find model by name convention
-            model = file.parent.findChild(fileName.removeSuffix(IWebConstants.TS_FILE_SUFFIX) + modelFileSuffix)?.takeIf { it.isValid }
-            consumer = file
+            model = directory.findChild(fileName.removeSuffix(IWebConstants.TS_FILE_SUFFIX).removeSuffix(IWebConstants.JS_FILE_SUFFIX) + modelFileSuffix)?.takeIf { it.isValid }
+            if (model == null) {
+                model = file
+                consumer = null
+            } else {
+                consumer = file
+            }
         }
 
-        val modelPsi = model?.let { psiManager.findFile(it) } as? JSFile
+        val modelPsi = psiManager.findFile(model) as? JSFile ?: return null
         val consumerPsi = consumer?.let { psiManager.findFile(it) } as? JSFile
-        if (modelPsi != null && consumerPsi != null) {
-            return modelPsi to consumerPsi
-        }
-        return null
+        return modelPsi to consumerPsi
     }
 
     private fun updateScope(scope: SearchScope, project: Project, progress: IdeaProgress) {
@@ -95,36 +106,60 @@ object WidgetMapUpdater {
         progress.indicator.text2 = message("search.for.models")
         val updates = IdeaEnvironment.computeInReadAction(project) {
             FileTypeIndex.getFiles(TypeScriptFileType.INSTANCE, GlobalSearchScope.EMPTY_SCOPE.union(scope))
-                .filter { it.name.endsWith(ScoutJsCoreConstants.MODEL_SUFFIX + IWebConstants.TS_FILE_SUFFIX) }
                 .filter { it.isValid && it.isInLocalFileSystem }
                 .mapNotNull { findFilePair(it, project) }
                 .groupBy { it.first.containingModule(false) }.entries
-                .flatMap { e -> e.key?.let { getWidgetMapUpdatesForModule(it, e.value) } ?: emptyList() }
+                .flatMap { e -> e.key?.let { getWidgetMapUpdatesForModule(it, e.value.distinct()) } ?: emptyList() }
         }
         progress.worked(70)
         updateFileContentsInBlocks(updates, project, progress.newChild(30))
     }
 
-    private fun getWidgetMapUpdatesForModule(module: Module, files: List<Pair<JSFile, JSFile>>): List<WidgetMapUpdateInfo> {
+    private fun getWidgetMapUpdatesForModule(module: Module, files: List<Pair<JSFile, JSFile?>>): List<WidgetMapUpdateInfo> {
         val nodeModule = JsModelManager.getOrCreateNodeModule(module)?.spi() as? IdeaNodeModule ?: return emptyList()
         return files
             .mapNotNull { file -> widgetMapInfoFor(file.first, file.second, nodeModule) }
             .toList()
     }
 
-    private fun widgetMapInfoFor(modelFile: JSFile, consumerFile: JSFile, nodeModule: IdeaNodeModule): WidgetMapUpdateInfo? {
+    private fun widgetMapInfoFor(modelFile: JSFile, consumerFile: JSFile?, nodeModule: IdeaNodeModule): WidgetMapUpdateInfo? {
         val modelFunctionPsi = findInChildrenOrGrandChildren(modelFile, JSFunction::class.java) ?: return null
-        val consumerClassPsi = findInChildrenOrGrandChildren(consumerFile, JSClass::class.java) ?: return null
-
         val modelFunction = nodeModule.elementsByPsi()[modelFunctionPsi] as? FunctionSpi ?: return null
         val objectLiteral = modelFunction.resultingObjectLiteral().orElse(null) ?: return null
-        val consumerClass = nodeModule.elementsByPsi()[consumerClassPsi] as? ES6ClassSpi ?: return null
+        if (SdkLog.isInfoEnabled()) {
+            SdkLog.info("Updating WidgetMaps for model '{}'.", modelFile.virtualFile.resolveLocalPath())
+        }
+
+        val consumerClassPsi = consumerFile?.let { findInChildrenOrGrandChildren(it, JSClass::class.java) }
+        if (consumerClassPsi == null) {
+            SdkLog.warning("Could not find a model owner for model '{}'. No declarations will be updated.", modelFile.virtualFile.resolveLocalPath())
+        }
+        val consumerClass = consumerClassPsi?.let { nodeModule.elementsByPsi()[it] as? ES6ClassSpi }
 
         val operation = WidgetMapCreateOperation()
         operation.setLiteral(objectLiteral.api())
-        operation.isPage = consumerClass.api().supers().withSuperInterfaces(false).stream().anyMatch { ScoutJsCoreConstants.CLASS_NAME_PAGE == it.name() }
+        operation.isPage = isPageModel(consumerClass, modelFile)
         operation.execute()
         return WidgetMapUpdateInfo(operation, modelFunctionPsi, consumerClassPsi)
+    }
+
+    private fun isPageModel(modelConsumer: ES6ClassSpi?, modelFile: JSFile): Boolean {
+        if (modelConsumer != null) {
+            return modelConsumer.api()
+                .supers()
+                .withSuperInterfaces(false)
+                .stream()
+                .anyMatch { ScoutJsCoreConstants.CLASS_NAME_PAGE == it.name() }
+        }
+
+        // try to detect based on model file name
+        val fileName = modelFile.virtualFile.name.removeSuffix(IWebConstants.TS_FILE_SUFFIX)
+        return fileName.endsWith(ScoutJsCoreConstants.CLASS_NAME_PAGE)
+                || fileName.endsWith(ScoutJsCoreConstants.CLASS_NAME_PAGE + ScoutJsCoreConstants.MODEL_SUFFIX)
+                || fileName.contains("PageWithTable")
+                || fileName.contains("PageWithNodes")
+                || fileName.endsWith("TablePage" + ScoutJsCoreConstants.MODEL_SUFFIX)
+                || fileName.endsWith("NodePage" + ScoutJsCoreConstants.MODEL_SUFFIX)
     }
 
     private fun <T : PsiElement> findInChildrenOrGrandChildren(jsFile: JSFile, type: Class<T>): T? {
@@ -151,21 +186,63 @@ object WidgetMapUpdater {
         WriteCommandAction.writeCommandAction(project).run(ThrowableRunnable<RuntimeException> {
             try {
                 val operation = updateInfo.operation
-                updateModel(updateInfo.modelFunction, operation.classSources(), operation.importsForModel())
-                updateConsumer(updateInfo.modelConsumer, operation.declarationSources(), operation.importNamesForDeclarations())
+                // update model
+                updateModel(updateInfo.modelFunction, operation.classSources(), operation.importsForModel(), operation.literal().containingModule())
+
+                // update consumer
+                updateInfo.modelConsumer?.let {
+                    if (DialectDetector.isTypeScript(it)) { // only update widgetMap declaration in TS files for now
+                        updateConsumer(it, operation.declarationSources(), operation.importNamesForDeclarations(), updateInfo.modelFunction)
+                    }
+                }
             } catch (e: RuntimeException) {
                 SdkLog.warning("Error updating WidgetMaps for file '{}'.", updateInfo.modelFunction.containingFile.virtualFile, e)
             }
         })
     }
 
-    private fun updateConsumer(consumer: JSClass, declarationSources: MutableMap<String, CharSequence>, importsForConsumer: MutableList<String>) {
-        // TODO: update declaration in consumer & add imports
+    private fun updateConsumer(consumer: JSClass, declarationSources: Map<String, CharSequence>, importsForConsumer: MutableList<String>, modelFunction: JSFunction) {
+        // replace fields
+        declarationSources.entries.forEach { replaceField(consumer, it.key, it.value) }
+
+        // add imports
+        val modelFile = modelFunction.containingFile.virtualFile.resolveLocalPath() ?: return
+        val consumerFile = consumer.containingFile.virtualFile.resolveLocalPath() ?: return
+        val from = "./" + consumerFile.parent.relativize(modelFile).toString()
+        importsForConsumer.forEach { PsiImportUtils.createOrUpdateImport(it, false, from, consumer) }
     }
 
-    private fun updateModel(modelFunction: JSFunction, newSources: List<CharSequence>, importsForModel: MutableList<IES6Class>) {
-        // TODO: add imports to model
+    private fun replaceField(ownerClass: JSClass, fieldName: String, fieldSource: CharSequence) {
+        val existingField = ownerClass.findFieldByName(fieldName)?.let { parentStatementOf(it) }
+        val newField = parentStatementOf(JSPsiElementFactory.createJSSourceElement("class Dummy {$fieldSource}", ownerClass, JSClass::class.java).fields.first())
+        if (existingField != null) {
+            existingField.replace(newField)
+            return
+        }
+
+        val fields = ownerClass.fields.sortedBy { it.textOffset }
+        val insertAnchor: JSElement? = (fields.firstOrNull { it.hasModifier(JSAttributeList.ModifierType.DECLARE) }
+            ?: fields.firstOrNull()
+            ?: ownerClass.functions.minByOrNull { it.textOffset })
+            ?.let { parentStatementOf(it) }
+        if (insertAnchor == null) {
+            ownerClass.addBefore(newField, ownerClass.node.lastChildNode.psi)
+        } else {
+            insertAnchor.parent.addBefore(newField, insertAnchor)
+        }
+    }
+
+    private fun parentStatementOf(jsElement: JSElement): JSElement {
+        val parent = jsElement.parent ?: return jsElement
+        if (parent is JSVarStatement) return parent
+        return jsElement
+    }
+
+    private fun updateModel(modelFunction: JSFunction, newSources: List<CharSequence>, importsForModel: List<IES6Class>, modelModule: INodeModule) {
         val psiFile = modelFunction.containingFile
+
+        importsForModel.forEach { PsiImportUtils.createOrUpdateImport(it, modelModule, modelFunction) }
+
         val topLevelElements = psiFile.children.toSet()
         val topLevelParent = PsiTreeUtil.findFirstParent(modelFunction, true) { topLevelElements.contains(it) } ?: return
         val container = topLevelParent.parent
@@ -202,7 +279,7 @@ object WidgetMapUpdater {
                 "* **************************************************************************/" + nl
     }
 
-    private data class WidgetMapUpdateInfo(val operation: WidgetMapCreateOperation, val modelFunction: JSFunction, val modelConsumer: JSClass) {
+    private data class WidgetMapUpdateInfo(val operation: WidgetMapCreateOperation, val modelFunction: JSFunction, val modelConsumer: JSClass?) {
         override fun toString() = modelFunction.containingFile.virtualFile.name
     }
 }
