@@ -36,4 +36,8 @@ public enum Modifier {
   Modifier(String keyword) {
     this.keyword = Ensure.notNull(keyword);
   }
+
+  public String keyword() {
+    return keyword;
+  }
 }

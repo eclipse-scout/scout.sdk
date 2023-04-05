@@ -9,12 +9,27 @@
  */
 package org.eclipse.scout.sdk.core.s.widgetmap;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
+import org.eclipse.scout.sdk.core.typescript.IWebConstants;
+import org.eclipse.scout.sdk.core.typescript.generator.ITypeScriptElementGenerator;
+import org.eclipse.scout.sdk.core.typescript.generator.field.FieldGenerator;
+import org.eclipse.scout.sdk.core.typescript.generator.field.IFieldGenerator;
+import org.eclipse.scout.sdk.core.typescript.generator.type.ITypeGenerator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 public class WidgetMapCreateOperation {
 
@@ -30,25 +45,69 @@ public class WidgetMapCreateOperation {
 
   public void execute() {
     validateOperation();
-    // TODO FSH: add real implementation and remove dummy impl below
 
-    // Dummy implementation
-    setImportsForModel(literal().containingModule().classes().limit(2).toList());
-    setImportNamesForDeclarations(List.of("GeneratedWidgetMap", "GeneratedWidgetMap2"));
-    setDeclarationSources(Map.of("widgetMap", "declare widgetMap: GeneratedWidgetMap2;"));
-    setClassSources(List.of(
-        """
-            export type GeneratedWidgetMap = {
-              // TODO
-            };""".stripIndent(),
-        """
-            export type GeneratedWidgetMap2 = {
-              // TODO 2
-            };""".stripIndent()));
+    var modelName = literal().containingFile()
+        .map(Path::getFileName)
+        .map(Path::toString)
+        .map(filename -> Strings.removeSuffix(filename, IWebConstants.TS_FILE_SUFFIX))
+        .orElseThrow(() -> Ensure.newFail("Model name can not be detected."));
+
+    Stream<ITypeGenerator<?>> generators;
+
+    if (isPage()) {
+      Map<String, CharSequence> declarations = new HashMap<>();
+      List<String> declarationImports = new ArrayList<>();
+
+      generators = Stream.concat(
+          IdObjectTypeMapUtils.createDetailFormGeneratorForPage(modelName, literal()).stream()
+              .peek(gen -> {
+                var detailForm = gen.objectType().flatMap(ObjectType::newClassName).orElseThrow();
+                declarations.put(ScoutJsCoreConstants.PROPERTY_NAME_DETAIL_FORM, createFieldDeclaration(ScoutJsCoreConstants.PROPERTY_NAME_DETAIL_FORM, detailForm)
+                    .toTypeScriptSource());
+                declarationImports.add(detailForm);
+              })
+              .flatMap(gen -> Stream.concat(Stream.of(gen), IdObjectTypeMapUtils.collectAdditionalGenerators(gen))),
+          IdObjectTypeMapUtils.createDetailTableGeneratorForPage(modelName, literal()).stream()
+              .peek(gen -> {
+                var detailPage = gen.objectType().flatMap(ObjectType::newClassName).orElseThrow();
+                declarations.put(ScoutJsCoreConstants.PROPERTY_NAME_DETAIL_TABLE, createFieldDeclaration(ScoutJsCoreConstants.PROPERTY_NAME_DETAIL_TABLE, detailPage)
+                    .toTypeScriptSource());
+                declarationImports.add(detailPage);
+              })
+              .flatMap(gen -> Stream.concat(Stream.of(gen), IdObjectTypeMapUtils.collectAdditionalGenerators(gen))));
+
+      setDeclarationSources(declarations);
+      setImportNamesForDeclarations(declarationImports);
+    }
+    else {
+      generators = IdObjectTypeMapUtils.createWidgetMapGenerator(modelName, literal()).stream()
+          .peek(gen -> {
+            var widgetMap = gen.map().orElseThrow().name();
+            setDeclarationSources(Stream.of(ScoutJsCoreConstants.PROPERTY_NAME_WIDGET_MAP)
+                .collect(Collectors.toMap(Function.identity(), prop -> createFieldDeclaration(prop, widgetMap)
+                    .toTypeScriptSource())));
+            setImportNamesForDeclarations(List.of(widgetMap));
+          })
+          .flatMap(gen -> Stream.concat(Stream.of(gen), IdObjectTypeMapUtils.collectAdditionalGenerators(gen)));
+    }
+
+    setClassSources(generators
+        .map(ITypeScriptElementGenerator::toTypeScriptSource)
+        .collect(Collectors.toList()));
+
+    // TODO fsh imports
+    setImportsForModel(Collections.emptyList());
   }
 
   protected void validateOperation() {
     Ensure.notNull(literal(), "No object-literal provided.");
+  }
+
+  protected static IFieldGenerator<?> createFieldDeclaration(String name, String dataType) {
+    return FieldGenerator.create()
+        .withElementName(name)
+        .withModifier(Modifier.DECLARE)
+        .withDataType(dataType);
   }
 
   public IObjectLiteral literal() {

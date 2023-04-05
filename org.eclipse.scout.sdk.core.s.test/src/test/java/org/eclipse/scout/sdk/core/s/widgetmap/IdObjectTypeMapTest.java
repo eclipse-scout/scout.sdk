@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
@@ -367,8 +366,6 @@ public class IdObjectTypeMapTest {
         .flatMap(IFunction::resultingObjectLiteral)
         .orElseThrow();
 
-    var objectTypes = IdObjectTypeMapUtils.createObjectTypesForPage("SomePageModel", somePageModel);
-
     //    {
     //      id: 'SomePage',
     //      detailForm: {
@@ -419,10 +416,7 @@ public class IdObjectTypeMapTest {
     //      }
     //    }
 
-    assertEquals(2, objectTypes.size());
-    assertEquals(List.of("SomePageForm", "SomeTable"), objectTypes.stream().map(ObjectType::newClassName).flatMap(Optional::stream).toList());
-
-    var somePageForm = objectTypes.stream().filter(ot -> "SomePageForm".equals(ot.newClassName().orElseThrow())).findFirst().orElseThrow();
+    var somePageForm = IdObjectTypeMapUtils.createDetailFormForPage("SomePageModel", somePageModel).orElseThrow();
     assertObjectType(ObjectType.create(formClass).orElseThrow()
         .withNewClassName("SomePageForm"), somePageForm);
 
@@ -452,7 +446,7 @@ public class IdObjectTypeMapTest {
     assertNotNull(ageField);
     assertObjectType(numberFieldObjectType, ageField.objectType());
 
-    var someTable = objectTypes.stream().filter(ot -> "SomeTable".equals(ot.newClassName().orElseThrow())).findFirst().orElseThrow();
+    var someTable = IdObjectTypeMapUtils.createDetailTableForPage("SomePageModel", somePageModel).orElseThrow();
     assertObjectType(ObjectType.create(tableClass).orElseThrow()
         .withNewClassName("SomeTable"), someTable);
 
