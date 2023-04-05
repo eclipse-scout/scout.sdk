@@ -13,6 +13,7 @@ import com.intellij.lang.javascript.psi.JSExpression
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptEnum
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptInterface
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeAlias
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeParameterListOwner
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
@@ -33,6 +34,7 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     private val m_superInterfaces = FinalValue<List<ES6ClassSpi>>()
     private val m_superClass = FinalValue<Optional<ES6ClassSpi>>()
     private val m_functions = FinalValue<List<FunctionSpi>>()
+    private val m_typeParameters = FinalValue<List<TypeParameterSpi>>()
     private val m_name = FinalValue<String>()
     private val m_aliasedDataType = FinalValue<Optional<DataTypeSpi>>()
 
@@ -43,6 +45,14 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     override fun exportType() = javaScriptClass.exportType()
 
     override fun resolveContainingFile() = javaScriptClass.containingFile.virtualFile.resolveLocalPath()
+
+    override fun typeParameters(): List<TypeParameterSpi> = m_typeParameters.computeIfAbsentAndGet {
+        if (javaScriptClass !is TypeScriptTypeParameterListOwner) return@computeIfAbsentAndGet emptyList()
+        val typeParameters = javaScriptClass.typeParameters
+        if (typeParameters.isEmpty()) return@computeIfAbsentAndGet emptyList()
+        return@computeIfAbsentAndGet typeParameters
+            .map { ideaModule.nodeElementFactory().createTypeParameter(it, this) }
+    }
 
     override fun name(): String = m_name.computeIfAbsentAndGet { javaScriptClass.name }
 

@@ -50,4 +50,6 @@ public interface IES6Class extends IDataType {
   Optional<IFunction> function(String name);
 
   IDataType createDataType(String name);
+
+  Stream<ITypeParameter> typeParameters();
 }

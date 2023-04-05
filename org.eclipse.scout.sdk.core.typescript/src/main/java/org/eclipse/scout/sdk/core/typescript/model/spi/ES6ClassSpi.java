@@ -34,6 +34,8 @@ public interface ES6ClassSpi extends DataTypeSpi, ISuperHierarchyElement<ES6Clas
 
   List<DataTypeSpi> typeArguments();
 
+  List<TypeParameterSpi> typeParameters();
+
   DataTypeSpi createDataType(String name);
 
   default ES6ClassSpi withoutTypeArguments() {

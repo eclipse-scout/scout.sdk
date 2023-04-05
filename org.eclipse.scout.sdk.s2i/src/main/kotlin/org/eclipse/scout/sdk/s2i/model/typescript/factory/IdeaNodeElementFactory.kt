@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.s2i.model.typescript.factory
 
 import com.intellij.lang.javascript.psi.*
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeParameter
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeofType
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.openapi.vfs.VirtualFile
@@ -53,4 +54,7 @@ class IdeaNodeElementFactory(val ideaModule: IdeaNodeModule) : AbstractNodeEleme
 
     fun createTypeScriptTypeofType(typeOfType: TypeScriptTypeofType): IdeaTypeScriptTypeofType =
         getOrCreate(typeOfType) { IdeaTypeScriptTypeofType(ideaModule, it) }
+
+    fun createTypeParameter(typeParameter: TypeScriptTypeParameter, ownerClass: ES6ClassSpi): IdeaTypeParameter =
+        getOrCreate(typeParameter) { IdeaTypeParameter(ideaModule, it, ownerClass) }
 }

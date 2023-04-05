@@ -12,7 +12,7 @@
 import {WildcardClass as WildcardClassAlias} from '@eclipse-scout/sdk-export-ts';
 
 // noinspection JSUnusedGlobalSymbols
-export class SomeClass {
+export class SomeClass<TArg0, TArg1 extends Promise<string> | string, TArg2 extends object = WildcardClassAlias> {
   myStringDef?: string;
   myStringInfer? = 'string';
 

@@ -16,12 +16,14 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
+import org.eclipse.scout.sdk.core.typescript.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FieldQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.FunctionQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.query.SupersQuery;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.TypeParameterSpi;
 
 public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implements IES6Class {
   public ES6ClassImplementor(ES6ClassSpi spi) {
@@ -125,5 +127,11 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
   public Stream<IDataType> typeArguments() {
     return spi().typeArguments().stream()
         .map(DataTypeSpi::api);
+  }
+
+  @Override
+  public Stream<ITypeParameter> typeParameters() {
+    return spi().typeParameters().stream()
+        .map(TypeParameterSpi::api);
   }
 }

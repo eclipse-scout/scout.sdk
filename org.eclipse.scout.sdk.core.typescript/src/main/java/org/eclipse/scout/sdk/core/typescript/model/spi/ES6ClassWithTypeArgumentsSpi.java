@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 
 import java.nio.file.Path;
@@ -103,6 +104,11 @@ public class ES6ClassWithTypeArgumentsSpi extends AbstractNodeElementSpi<IES6Cla
   @Override
   public List<DataTypeSpi> typeArguments() {
     return m_arguments;
+  }
+
+  @Override
+  public List<TypeParameterSpi> typeParameters() {
+    return emptyList();
   }
 
   @Override
