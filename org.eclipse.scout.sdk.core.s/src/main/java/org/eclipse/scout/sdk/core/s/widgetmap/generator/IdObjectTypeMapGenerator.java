@@ -13,13 +13,17 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.s.widgetmap.IdObjectType;
 import org.eclipse.scout.sdk.core.s.widgetmap.IdObjectTypeMap;
+import org.eclipse.scout.sdk.core.typescript.builder.TypeScriptSourceBuilder;
 import org.eclipse.scout.sdk.core.typescript.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.field.IFieldGenerator;
+import org.eclipse.scout.sdk.core.typescript.generator.type.CompositeTypeGenerator;
+import org.eclipse.scout.sdk.core.typescript.generator.type.TypeAliasGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.type.TypeGenerator;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
-public class IdObjectTypeMapGenerator extends TypeGenerator<IdObjectTypeMapGenerator> {
+public class IdObjectTypeMapGenerator extends TypeAliasGenerator<IdObjectTypeMapGenerator> {
 
   private IdObjectTypeMap m_map;
 
@@ -30,8 +34,17 @@ public class IdObjectTypeMapGenerator extends TypeGenerator<IdObjectTypeMapGener
     withModifier(Modifier.EXPORT)
         .withElementName(map.name());
 
+    var objectType = TypeGenerator.create();
     map.elements().values().stream().map(IdObjectTypeMapGenerator::createIdObjectTypeField)
-        .forEach(this::withField);
+        .forEach(objectType::withField);
+
+    var intersection = CompositeTypeGenerator.create()
+        .withFlavor(DataTypeFlavor.Intersection)
+        .withType(objectType);
+    map.idObjectTypeMapReferences()
+        .forEach(ref -> intersection.withType(b -> TypeScriptSourceBuilder.create(b)
+            .append(ref.name())));
+    withAliasedType(intersection);
   }
 
   protected static IFieldGenerator<?> createIdObjectTypeField(IdObjectType idObjectType) {

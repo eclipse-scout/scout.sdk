@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.core.s.widgetmap;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toCollection;
 
 import java.util.ArrayDeque;
@@ -142,6 +143,9 @@ public class WidgetMap extends IdObjectTypeMap {
                 .flatMap(IField::dataType)
                 .filter(IES6Class.class::isInstance)
                 .map(IES6Class.class::cast)
+                .filter(es6Class -> widgetClass()
+                    .filter(not(es6Class::equals))
+                    .isPresent())
                 .flatMap(IdObjectTypeMapReference::create))
             .stream())
         .collect(toCollection(LinkedHashSet::new));

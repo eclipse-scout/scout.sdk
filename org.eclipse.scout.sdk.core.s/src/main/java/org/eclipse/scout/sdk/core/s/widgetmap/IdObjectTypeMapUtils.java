@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.widgetmap.generator.IdObjectTypeMapGenerator;
 import org.eclipse.scout.sdk.core.s.widgetmap.generator.ObjectTypeGenerator;
-import org.eclipse.scout.sdk.core.typescript.generator.type.TypeGenerator;
+import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.INodeElementGenerator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue.ConstantValueType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
@@ -117,14 +117,14 @@ public final class IdObjectTypeMapUtils {
    * ADDITIONAL GENERATORS
    * *************************************************************************/
 
-  public static Stream<TypeGenerator<?>> collectAdditionalGenerators(IdObjectTypeMapGenerator generator) {
+  public static Stream<INodeElementGenerator<?>> collectAdditionalGenerators(IdObjectTypeMapGenerator generator) {
     return Optional.ofNullable(generator)
         .flatMap(IdObjectTypeMapGenerator::map)
         .stream()
         .flatMap(IdObjectTypeMapUtils::collectAdditionalGenerators);
   }
 
-  private static Stream<TypeGenerator<?>> collectAdditionalGenerators(IdObjectTypeMap map) {
+  private static Stream<INodeElementGenerator<?>> collectAdditionalGenerators(IdObjectTypeMap map) {
     return map.elements().values().stream()
         .map(IdObjectType::objectType)
         .filter(objectType -> objectType.newClassName().isPresent())
@@ -133,14 +133,14 @@ public final class IdObjectTypeMapUtils {
             collectAdditionalGenerators(objectType)));
   }
 
-  public static Stream<TypeGenerator<?>> collectAdditionalGenerators(ObjectTypeGenerator generator) {
+  public static Stream<INodeElementGenerator<?>> collectAdditionalGenerators(ObjectTypeGenerator generator) {
     return Optional.ofNullable(generator)
         .flatMap(ObjectTypeGenerator::objectType)
         .stream()
         .flatMap(IdObjectTypeMapUtils::collectAdditionalGenerators);
   }
 
-  private static Stream<TypeGenerator<?>> collectAdditionalGenerators(ObjectType objectType) {
+  private static Stream<INodeElementGenerator<?>> collectAdditionalGenerators(ObjectType objectType) {
     return Stream.concat(
         objectType.widgetMap().stream()
             .flatMap(m -> Stream.concat(

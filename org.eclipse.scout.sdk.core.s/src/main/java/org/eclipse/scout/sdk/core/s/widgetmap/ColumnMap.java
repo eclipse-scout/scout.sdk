@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.widgetmap;
 import static java.util.Collections.emptyMap;
 import static java.util.Optional.empty;
 import static java.util.function.Function.identity;
+import static java.util.function.Predicate.not;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -70,6 +71,9 @@ public class ColumnMap extends IdObjectTypeMap {
   protected Set<IdObjectTypeMapReference> parseIdObjectTypeMapReferences() {
     return model().property(ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE)
         .flatMap(IConstantValue::asES6Class)
+        .filter(es6Class -> classByObjectType(ScoutJsCoreConstants.CLASS_NAME_TABLE)
+            .filter(not(es6Class::equals))
+            .isPresent())
         .flatMap(es6Class -> es6Class.field(ScoutJsCoreConstants.PROPERTY_NAME_COLUMN_MAP))
         .flatMap(IField::dataType)
         .filter(IES6Class.class::isInstance)

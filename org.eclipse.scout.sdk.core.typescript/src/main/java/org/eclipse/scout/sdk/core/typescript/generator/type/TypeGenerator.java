@@ -32,7 +32,6 @@ import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.INodeElementG
  * @since 13.0
  */
 public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractNodeElementGenerator<TYPE> implements ITypeGenerator<TYPE> {
-  // TODO fsh union type
 
   private boolean m_asClass;
   private boolean m_asInterface;
@@ -59,31 +58,25 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractNo
   protected void buildType(ITypeScriptSourceBuilder<?> builder) {
     buildTypeDeclaration(NodeElementBuilder.create(builder));
     builder
-        .space()
         .blockStart().nl();
     buildTypeBody(builder);
     builder
-        .nl()
-        .blockEnd();
-    if (!m_asClass && !m_asInterface) {
-      builder.semicolon();
-    }
+        .nl().blockEnd();
   }
 
   protected void buildTypeDeclaration(INodeElementBuilder<?> builder) {
+    if (!m_asClass && !m_asInterface) {
+      return;
+    }
+
     builder.appendModifiers(modifiers());
 
-    var asType = false;
     // type definition
     if (m_asClass) {
       builder.append("class ");
     }
-    else if (m_asInterface) {
-      builder.append("interface ");
-    }
     else {
-      asType = true;
-      builder.append("type ");
+      builder.append("interface ");
     }
     builder.append(elementName().orElseThrow(() -> newFail("Type must have a name.")));
 
@@ -91,9 +84,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractNo
       superClass().ifPresent(superClass -> builder.append(" extends ").append(superClass));
     }
 
-    if (asType) {
-      builder.space().equalSign();
-    }
+    builder.space();
   }
 
   protected void buildTypeBody(ITypeScriptSourceBuilder<?> builder) {
@@ -143,12 +134,12 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractNo
 
   @Override
   public TYPE withoutField(Predicate<IFieldGenerator<?>> removalFilter) {
-    removeMemberIf(IFieldGenerator.class, removalFilter);
+    removeNodeElementIf(IFieldGenerator.class, removalFilter);
     return thisInstance();
   }
 
   @SuppressWarnings("unchecked")
-  protected <T extends INodeElementGenerator<?>, P extends INodeElementGenerator<?>> void removeMemberIf(Class<T> type, Predicate<P> removalFilter) {
+  protected <T extends INodeElementGenerator<?>, P extends INodeElementGenerator<?>> void removeNodeElementIf(Class<T> type, Predicate<P> removalFilter) {
     for (var it = m_nodeElements.iterator(); it.hasNext();) {
       var entry = it.next();
       if (entry.hasType(type)) {

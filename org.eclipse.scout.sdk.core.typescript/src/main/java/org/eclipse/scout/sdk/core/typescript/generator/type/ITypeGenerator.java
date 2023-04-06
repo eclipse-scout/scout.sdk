@@ -16,16 +16,15 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.typescript.generator.ITypeScriptElementGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.field.IFieldGenerator;
-import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.INodeElementGenerator;
 
 /**
  * <h3>{@link ITypeGenerator}</h3>
  * <p>
- * An {@link ITypeScriptElementGenerator} that creates types, classes or interfaces.
+ * An {@link ITypeScriptElementGenerator} that creates object types, classes or interfaces.
  *
  * @since 13.0
  */
-public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends INodeElementGenerator<TYPE> {
+public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IAliasedTypeGenerator<TYPE> {
 
   /**
    * Marks this {@link ITypeGenerator} to be created as {@code class}.

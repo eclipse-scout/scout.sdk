@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.core.typescript.IWebConstants;
 import org.eclipse.scout.sdk.core.typescript.generator.ITypeScriptElementGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.field.IFieldGenerator;
-import org.eclipse.scout.sdk.core.typescript.generator.type.ITypeGenerator;
+import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.INodeElementGenerator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
@@ -52,7 +52,7 @@ public class WidgetMapCreateOperation {
         .map(filename -> Strings.removeSuffix(filename, IWebConstants.TS_FILE_SUFFIX))
         .orElseThrow(() -> Ensure.newFail("Model name can not be detected."));
 
-    Stream<ITypeGenerator<?>> generators;
+    Stream<INodeElementGenerator<?>> generators;
 
     if (isPage()) {
       Map<String, CharSequence> declarations = new HashMap<>();
