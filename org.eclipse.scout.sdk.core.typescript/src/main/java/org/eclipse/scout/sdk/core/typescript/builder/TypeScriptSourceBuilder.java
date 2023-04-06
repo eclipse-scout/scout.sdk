@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.core.typescript.builder;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.SourceBuilderWrapper;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 
 /**
  * <h3>{@link TypeScriptSourceBuilder}</h3>
@@ -19,8 +20,22 @@ import org.eclipse.scout.sdk.core.builder.SourceBuilderWrapper;
  */
 public class TypeScriptSourceBuilder extends SourceBuilderWrapper<TypeScriptSourceBuilder> implements ITypeScriptSourceBuilder<TypeScriptSourceBuilder> {
 
+  private final ITypeScriptBuilderContext m_context;
+
   protected TypeScriptSourceBuilder(ISourceBuilder<?> inner) {
     super(inner);
+    var context = inner.context();
+    if (context instanceof ITypeScriptBuilderContext c) {
+      m_context = c;
+    }
+    else {
+      m_context = new TypeScriptBuilderContext(context);
+    }
+  }
+
+  @Override
+  public ITypeScriptBuilderContext context() {
+    return m_context;
   }
 
   /**
@@ -45,37 +60,10 @@ public class TypeScriptSourceBuilder extends SourceBuilderWrapper<TypeScriptSour
   }
 
   @Override
-  public TypeScriptSourceBuilder parenthesisOpen() {
-    return append('(');
-  }
-
-  @Override
-  public TypeScriptSourceBuilder parenthesisClose() {
-    return append(')');
-  }
-
-  @Override
-  public TypeScriptSourceBuilder equalSign() {
-    return append(" = ");
-  }
-
-  @Override
-  public TypeScriptSourceBuilder dot() {
-    return append('.');
-  }
-
-  @Override
-  public TypeScriptSourceBuilder colon() {
-    return append(':');
-  }
-
-  @Override
-  public TypeScriptSourceBuilder comma() {
-    return append(',');
-  }
-
-  @Override
-  public TypeScriptSourceBuilder semicolon() {
-    return append(';');
+  public TypeScriptSourceBuilder ref(IDataType ref) {
+    if (ref == null) {
+      return thisInstance();
+    }
+    return append(context().importValidator().use(ref));
   }
 }

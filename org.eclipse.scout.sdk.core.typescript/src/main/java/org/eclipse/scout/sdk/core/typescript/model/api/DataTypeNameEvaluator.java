@@ -57,7 +57,11 @@ public class DataTypeNameEvaluator {
     if (!Strings.isEmpty(args)) {
       args = "<" + args + ">";
     }
-    return type.name() + args;
+    return nameForLeafType(type) + args;
+  }
+
+  protected String nameForLeafType(IDataType type) {
+    return type.name();
   }
 
   protected String boxComponentDataType(DataTypeFlavor parentFlavor, IDataType componentDataType) {

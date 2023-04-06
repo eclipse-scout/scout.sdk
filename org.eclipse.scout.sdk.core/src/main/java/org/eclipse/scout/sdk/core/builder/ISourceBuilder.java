@@ -155,6 +155,55 @@ public interface ISourceBuilder<TYPE extends ISourceBuilder<TYPE>> {
   TYPE space();
 
   /**
+   * Appends an opening parenthesis: (
+   *
+   * @return This builder
+   */
+  TYPE parenthesisOpen();
+
+  /**
+   * Appends a closing parenthesis: )
+   *
+   * @return This builder
+   */
+  TYPE parenthesisClose();
+
+  /**
+   * Appends the equal sign (=) including a leading and trailing space.
+   *
+   * @return This builder
+   */
+  TYPE equalSign();
+
+  /**
+   * Appends a dot: .
+   *
+   * @return This builder
+   */
+  TYPE dot();
+
+  /**
+   * Appends a colon: :
+   *
+   * @return This builder
+   */
+  TYPE colon();
+
+  /**
+   * Appends a comma: ,
+   *
+   * @return This builder
+   */
+  TYPE comma();
+
+  /**
+   * Appends a semicolon: ;
+   *
+   * @return This builder
+   */
+  TYPE semicolon();
+
+  /**
    * Appends the specified {@link ISourceGenerator} to this {@link ISourceBuilder} by calling
    * {@link ISourceGenerator#generate(ISourceBuilder)} using this instance as argument.
    *

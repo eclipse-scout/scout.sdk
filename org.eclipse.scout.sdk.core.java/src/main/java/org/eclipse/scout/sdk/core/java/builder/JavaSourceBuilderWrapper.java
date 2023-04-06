@@ -71,42 +71,6 @@ public class JavaSourceBuilderWrapper<TYPE extends IJavaSourceBuilder<TYPE>> ext
   }
 
   @Override
-  public TYPE parenthesisOpen() {
-    inner().parenthesisOpen();
-    return thisInstance();
-  }
-
-  @Override
-  public TYPE parenthesisClose() {
-    inner().parenthesisClose();
-    return thisInstance();
-  }
-
-  @Override
-  public TYPE equalSign() {
-    inner().equalSign();
-    return thisInstance();
-  }
-
-  @Override
-  public TYPE dot() {
-    inner().dot();
-    return thisInstance();
-  }
-
-  @Override
-  public TYPE comma() {
-    inner().comma();
-    return thisInstance();
-  }
-
-  @Override
-  public TYPE semicolon() {
-    inner().semicolon();
-    return thisInstance();
-  }
-
-  @Override
   public TYPE references(Stream<? extends CharSequence> refs, CharSequence prefix, CharSequence delimiter, CharSequence suffix) {
     inner().references(refs, prefix, delimiter, suffix);
     return thisInstance();

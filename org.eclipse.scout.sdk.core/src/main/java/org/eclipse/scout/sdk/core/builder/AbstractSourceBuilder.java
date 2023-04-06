@@ -91,6 +91,41 @@ public abstract class AbstractSourceBuilder<TYPE extends ISourceBuilder<TYPE>> i
   }
 
   @Override
+  public TYPE parenthesisOpen() {
+    return append('(');
+  }
+
+  @Override
+  public TYPE parenthesisClose() {
+    return append(')');
+  }
+
+  @Override
+  public TYPE equalSign() {
+    return append(" = ");
+  }
+
+  @Override
+  public TYPE dot() {
+    return append('.');
+  }
+
+  @Override
+  public TYPE colon() {
+    return append(':');
+  }
+
+  @Override
+  public TYPE comma() {
+    return append(',');
+  }
+
+  @Override
+  public TYPE semicolon() {
+    return append(';');
+  }
+
+  @Override
   public TYPE append(ISourceGenerator<ISourceBuilder<?>> generator) {
     Ensure.notNull(generator).generate(this);
     return thisInstance();

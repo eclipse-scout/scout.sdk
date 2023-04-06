@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.typescript.builder;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.SourceBuilderWrapper;
 import org.eclipse.scout.sdk.core.typescript.generator.AbstractTypeScriptElementGenerator;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 
 /**
  * <h3>{@link TypeScriptSourceBuilderWrapper}</h3>
@@ -30,6 +31,11 @@ public class TypeScriptSourceBuilderWrapper<TYPE extends ITypeScriptSourceBuilde
   }
 
   @Override
+  public ITypeScriptBuilderContext context() {
+    return (ITypeScriptBuilderContext) super.context();
+  }
+
+  @Override
   public TYPE blockStart() {
     inner().blockStart();
     return thisInstance();
@@ -42,44 +48,8 @@ public class TypeScriptSourceBuilderWrapper<TYPE extends ITypeScriptSourceBuilde
   }
 
   @Override
-  public TYPE parenthesisOpen() {
-    inner().parenthesisOpen();
-    return thisInstance();
-  }
-
-  @Override
-  public TYPE parenthesisClose() {
-    inner().parenthesisClose();
-    return thisInstance();
-  }
-
-  @Override
-  public TYPE equalSign() {
-    inner().equalSign();
-    return thisInstance();
-  }
-
-  @Override
-  public TYPE dot() {
-    inner().dot();
-    return thisInstance();
-  }
-
-  @Override
-  public TYPE colon() {
-    inner().colon();
-    return thisInstance();
-  }
-
-  @Override
-  public TYPE comma() {
-    inner().comma();
-    return thisInstance();
-  }
-
-  @Override
-  public TYPE semicolon() {
-    inner().semicolon();
+  public TYPE ref(IDataType ref) {
+    inner().ref(ref);
     return thisInstance();
   }
 }

@@ -98,4 +98,46 @@ public class SourceBuilderWrapper<TYPE extends ISourceBuilder<TYPE>> extends Abs
     inner().append(l);
     return thisInstance();
   }
+
+  @Override
+  public TYPE parenthesisOpen() {
+    inner().parenthesisOpen();
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE parenthesisClose() {
+    inner().parenthesisClose();
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE equalSign() {
+    inner().equalSign();
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE dot() {
+    inner().dot();
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE colon() {
+    inner().colon();
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE comma() {
+    inner().comma();
+    return thisInstance();
+  }
+
+  @Override
+  public TYPE semicolon() {
+    inner().semicolon();
+    return thisInstance();
+  }
 }

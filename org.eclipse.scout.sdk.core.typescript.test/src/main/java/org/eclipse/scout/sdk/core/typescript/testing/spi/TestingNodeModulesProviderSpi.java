@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,9 +35,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
+import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeNameEvaluator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue.ConstantValueType;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
@@ -120,6 +126,26 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
     var subModules = Xml.childElementsWithTagName(moduleElement, TAG_NAME_MODULE);
     var exports = Xml.childElementsWithTagName(moduleElement, TAG_NAME_EXPORT);
     return getOrCreateModule(name, version, index, subModules, exports);
+  }
+
+  public static IDataType createCompositeDataType(DataTypeFlavor flavor, IDataType... children) {
+    var dataType = mock(IDataType.class);
+    when(dataType.name()).thenAnswer(invocation -> new DataTypeNameEvaluator().eval(dataType));
+    when(dataType.typeArguments()).thenAnswer(invocation -> Stream.empty());
+    when(dataType.flavor()).thenReturn(flavor);
+    when(dataType.childTypes()).thenAnswer(invocation -> Arrays.stream(children));
+    when(dataType.arrayDimension()).thenReturn(flavor == DataTypeFlavor.Array ? 1 : 0);
+    return dataType;
+  }
+
+  public static IDataType createDataType(String name, IDataType... typeArguments) {
+    var dataType = mock(IDataType.class);
+    when(dataType.name()).thenReturn(name);
+    when(dataType.typeArguments()).thenAnswer(invocation -> Arrays.stream(typeArguments));
+    when(dataType.isPrimitive()).thenReturn(TypeScriptTypes.isPrimitive(name));
+    when(dataType.flavor()).thenReturn(DataTypeFlavor.Single);
+    when(dataType.childTypes()).thenAnswer(invocation -> Stream.empty());
+    return dataType;
   }
 
   public Optional<NodeModuleSpi> getOrCreateModule(String name, String version) {

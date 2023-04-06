@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.core.typescript.builder;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 
 /**
  * <h3>{@link ITypeScriptSourceBuilder}</h3>
@@ -19,6 +20,9 @@ import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
  * @since 13.0
  */
 public interface ITypeScriptSourceBuilder<TYPE extends ITypeScriptSourceBuilder<TYPE>> extends ISourceBuilder<TYPE> {
+
+  @Override
+  ITypeScriptBuilderContext context();
 
   /**
    * Appends a new TypeScript block start: {
@@ -34,52 +38,5 @@ public interface ITypeScriptSourceBuilder<TYPE extends ITypeScriptSourceBuilder<
    */
   TYPE blockEnd();
 
-  /**
-   * Appends an opening parenthesis: (
-   *
-   * @return This builder
-   */
-  TYPE parenthesisOpen();
-
-  /**
-   * Appends a closing parenthesis: )
-   *
-   * @return This builder
-   */
-  TYPE parenthesisClose();
-
-  /**
-   * Appends the equal sign (=) including a leading and trailing space.
-   *
-   * @return This builder
-   */
-  TYPE equalSign();
-
-  /**
-   * Appends a dot: .
-   *
-   * @return This builder
-   */
-  TYPE dot();
-
-  /**
-   * Appends a colon: :
-   *
-   * @return This builder
-   */
-  TYPE colon();
-
-  /**
-   * Appends a comma: ,
-   * 
-   * @return This builder
-   */
-  TYPE comma();
-
-  /**
-   * Appends a semicolon: ;
-   *
-   * @return This builder
-   */
-  TYPE semicolon();
+  TYPE ref(IDataType ref);
 }

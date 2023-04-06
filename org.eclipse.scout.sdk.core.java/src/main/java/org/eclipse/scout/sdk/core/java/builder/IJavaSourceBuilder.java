@@ -44,53 +44,11 @@ public interface IJavaSourceBuilder<TYPE extends IJavaSourceBuilder<TYPE>> exten
   TYPE blockEnd();
 
   /**
-   * Appends an opening parenthesis: (
-   *
-   * @return This builder
-   */
-  TYPE parenthesisOpen();
-
-  /**
-   * Appends a closing parenthesis: )
-   *
-   * @return This builder
-   */
-  TYPE parenthesisClose();
-
-  /**
    * Appends the annotation @ sign.
    *
    * @return This builder
    */
   TYPE at();
-
-  /**
-   * Appends the equal sign (=) including a leading and trailing space.
-   *
-   * @return This builder
-   */
-  TYPE equalSign();
-
-  /**
-   * Appends a dot: .
-   *
-   * @return This builder
-   */
-  TYPE dot();
-
-  /**
-   * Appends a comma: ,
-   * 
-   * @return This builder
-   */
-  TYPE comma();
-
-  /**
-   * Appends a semicolon: ;
-   *
-   * @return This builder
-   */
-  TYPE semicolon();
 
   /**
    * Appends a Java type reference for the specified {@link IType}.

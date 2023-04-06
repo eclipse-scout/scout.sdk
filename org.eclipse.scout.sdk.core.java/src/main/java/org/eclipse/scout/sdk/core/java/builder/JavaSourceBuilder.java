@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.builder.SourceBuilderWrapper;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
@@ -104,36 +103,6 @@ public class JavaSourceBuilder extends SourceBuilderWrapper<JavaSourceBuilder> i
   @Override
   public JavaSourceBuilder at() {
     return append('@');
-  }
-
-  @Override
-  public JavaSourceBuilder parenthesisOpen() {
-    return append('(');
-  }
-
-  @Override
-  public JavaSourceBuilder parenthesisClose() {
-    return append(')');
-  }
-
-  @Override
-  public JavaSourceBuilder equalSign() {
-    return append(" = ");
-  }
-
-  @Override
-  public JavaSourceBuilder dot() {
-    return append(JavaTypes.C_DOT);
-  }
-
-  @Override
-  public JavaSourceBuilder comma() {
-    return append(JavaTypes.C_COMMA);
-  }
-
-  @Override
-  public JavaSourceBuilder semicolon() {
-    return append(';');
   }
 
   @Override
