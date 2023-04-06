@@ -10,9 +10,12 @@
 package org.eclipse.scout.sdk.core.s.widgetmap.generator;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.widgetmap.IdObjectType;
 import org.eclipse.scout.sdk.core.s.widgetmap.IdObjectTypeMap;
+import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
 import org.eclipse.scout.sdk.core.typescript.builder.TypeScriptSourceBuilder;
 import org.eclipse.scout.sdk.core.typescript.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.field.IFieldGenerator;
@@ -20,6 +23,7 @@ import org.eclipse.scout.sdk.core.typescript.generator.type.CompositeTypeGenerat
 import org.eclipse.scout.sdk.core.typescript.generator.type.TypeAliasGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.type.TypeGenerator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
+import org.eclipse.scout.sdk.core.typescript.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
@@ -51,7 +55,20 @@ public class IdObjectTypeMapGenerator extends TypeAliasGenerator<IdObjectTypeMap
     var id = "'" + idObjectType.id() + "'";
 
     var objectType = idObjectType.objectType();
-    var dataType = objectType.newClassName().orElse(objectType.es6Class().name());
+    var dataType = objectType.newClassName().orElseGet(() -> {
+      var es6Class = objectType.es6Class();
+      var name = es6Class.name();
+      var typeParameterCount = es6Class.typeParameters()
+          .map(ITypeParameter::defaultConstraint)
+          .filter(Optional::isEmpty)
+          .count();
+      if (typeParameterCount > 0) {
+        name += Stream.generate(() -> TypeScriptTypes._any)
+            .limit(typeParameterCount)
+            .collect(Collectors.joining(", ", "<", ">"));
+      }
+      return name;
+    });
 
     return FieldGenerator.create()
         .withElementName(id)

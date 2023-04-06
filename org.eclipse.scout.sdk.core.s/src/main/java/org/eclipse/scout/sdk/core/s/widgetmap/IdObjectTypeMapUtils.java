@@ -68,7 +68,7 @@ public final class IdObjectTypeMapUtils {
               }
               var objectType = idObjectType.objectType().withNewClassName(name);
 
-              WidgetMap.create(name, ol, true).ifPresent(objectType::withWidgetMap);
+              WidgetMap.create(name, ol).ifPresent(objectType::withWidgetMap);
               ColumnMap.create(name, ol).ifPresent(objectType::withColumnMap);
 
               return objectType;

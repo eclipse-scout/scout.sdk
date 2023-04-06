@@ -21,16 +21,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue.ConstantValueType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 public class ColumnMap extends IdObjectTypeMap {
+
+  private final FinalValue<Optional<IES6Class>> m_tableClass = new FinalValue<>();
+  private final FinalValue<Optional<IES6Class>> m_columnClass = new FinalValue<>();
 
   protected ColumnMap(String name, IObjectLiteral model) {
     super(name, model);
@@ -46,9 +49,17 @@ public class ColumnMap extends IdObjectTypeMap {
         .map(n -> new ColumnMap(n, tableModel));
   }
 
+  protected Optional<IES6Class> tableClass() {
+    return m_tableClass.computeIfAbsentAndGet(() -> classByObjectType(ScoutJsCoreConstants.CLASS_NAME_TABLE));
+  }
+
+  protected Optional<IES6Class> columnClass() {
+    return m_columnClass.computeIfAbsentAndGet(() -> classByObjectType(ScoutJsCoreConstants.CLASS_NAME_COLUMN));
+  }
+
   @Override
   protected Map<String, IdObjectType> parseElements() {
-    var columnClass = classByObjectType(ScoutJsCoreConstants.CLASS_NAME_COLUMN).orElse(null);
+    var columnClass = columnClass().orElse(null);
     if (columnClass == null) {
       return emptyMap();
     }
@@ -62,7 +73,7 @@ public class ColumnMap extends IdObjectTypeMap {
         .flatMap(Optional::stream)
         .filter(idObjectType -> idObjectType.objectType().isInstanceOf(columnClass))
         .collect(Collectors.toMap(IdObjectType::id, identity(), (a, b) -> {
-          SdkLog.warning("Duplicate column ids with name '{}' in column map '{}'.", a.id(), name());
+          createDuplicateIdWarning(a.id());
           return b;
         }, LinkedHashMap::new));
   }
@@ -71,7 +82,7 @@ public class ColumnMap extends IdObjectTypeMap {
   protected Set<IdObjectTypeMapReference> parseIdObjectTypeMapReferences() {
     return model().property(ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE)
         .flatMap(IConstantValue::asES6Class)
-        .filter(es6Class -> classByObjectType(ScoutJsCoreConstants.CLASS_NAME_TABLE)
+        .filter(es6Class -> tableClass()
             .filter(not(es6Class::equals))
             .isPresent())
         .flatMap(es6Class -> es6Class.field(ScoutJsCoreConstants.PROPERTY_NAME_COLUMN_MAP))

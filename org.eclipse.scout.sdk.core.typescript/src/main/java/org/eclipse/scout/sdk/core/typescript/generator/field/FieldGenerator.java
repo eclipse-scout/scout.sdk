@@ -50,7 +50,6 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
     if (elementName.isPresent()) {
       builder
           .appendModifiers(modifiers())
-          .space()
           .append(elementName.orElseThrow())
           .colon()
           .space()

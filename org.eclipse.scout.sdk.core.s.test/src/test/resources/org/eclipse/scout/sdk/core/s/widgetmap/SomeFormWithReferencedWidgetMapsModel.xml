@@ -11,7 +11,7 @@
 <module name="@sdk/project">
   <export name="SomeFormWithReferencedWidgetMapsModel">
     <function>
-      <objectLiteral>
+      <objectLiteral file="src/js/form/SomeFormWithReferencedWidgetMapsModel.ts">
         <property name="id">
           <constantValue>
             <type>String</type>

@@ -11,7 +11,7 @@
 <module name="@sdk/project">
   <export name="SomeFormWithTableFieldModel">
     <function>
-      <objectLiteral>
+      <objectLiteral file="src/js/form/SomeFormWithTableFieldModel.ts">
         <property name="id">
           <constantValue>
             <type>String</type>

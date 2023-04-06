@@ -63,6 +63,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
+  private static final String TAG_NAME_FILE = "file";
   private static final String TAG_NAME_MODULE = "module";
   private static final String TAG_NAME_EXPORT = "export";
   private static final String TAG_NAME_INDEX = "index";
@@ -205,6 +206,8 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
         .flatMap(sc -> Xml.firstChildElement(sc, TAG_NAME_REF));
     when(spi.superClass()).thenAnswer(invocation -> superClassRef.map(ref -> resolveRefSpi(ref, moduleSpi, ES6ClassSpi.class)));
 
+    createContainingFile(classElement, spi);
+
     return spi;
   }
 
@@ -217,6 +220,7 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
     when(spi.containingModule()).thenReturn(moduleSpi);
 
     createDataType(fieldElement, spi, moduleSpi);
+    createContainingFile(fieldElement, spi);
 
     return spi;
   }
@@ -252,10 +256,11 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
         .map(ol -> createObjectLiteral(ol, moduleSpi));
     when(spi.resultingObjectLiteral()).thenReturn(resultingObjectLiteral);
 
+    createContainingFile(functionElement, spi);
+
     return spi;
   }
 
-  @SuppressWarnings("TypeMayBeWeakened")
   private static ObjectLiteralSpi createObjectLiteral(Element objectLiteralElement, NodeModuleSpi moduleSpi) {
     var spi = mock(ObjectLiteralSpi.class);
     when(spi.name()).thenReturn("");
@@ -270,7 +275,16 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
         .collect(toMap(SimpleEntry::getKey, SimpleEntry::getValue, (a, b) -> b, LinkedHashMap::new));
     when(spi.properties()).thenReturn(properties);
 
+    createContainingFile(objectLiteralElement, spi);
+
     return spi;
+  }
+
+  private static void createContainingFile(Element nodeElement, NodeElementSpi spi) {
+    var containingFile = Strings.notBlank(nodeElement.getAttribute(TAG_NAME_FILE))
+        .map(Path::of);
+
+    when(spi.containingFile()).thenReturn(containingFile);
   }
 
   @SuppressWarnings("TypeMayBeWeakened")

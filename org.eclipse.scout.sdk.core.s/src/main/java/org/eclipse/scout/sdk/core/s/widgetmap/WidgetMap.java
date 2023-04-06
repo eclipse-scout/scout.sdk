@@ -21,11 +21,13 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.visitor.DefaultDepthFirstVisitor;
 import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals;
@@ -33,39 +35,27 @@ import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 public class WidgetMap extends IdObjectTypeMap {
 
-  private final boolean m_skipTopLevel;
+  private final FinalValue<Optional<IES6Class>> m_tableClass = new FinalValue<>();
 
-  protected WidgetMap(String name, IObjectLiteral model, boolean skipTopLevel) {
+  protected WidgetMap(String name, IObjectLiteral model) {
     super(name, model);
-    m_skipTopLevel = skipTopLevel;
   }
 
   public static Optional<WidgetMap> create(String widgetOrModelName, IObjectLiteral widgetModel) {
-    return create(widgetOrModelName, widgetModel, false);
-  }
-
-  public static Optional<WidgetMap> create(String widgetOrModelName, IObjectLiteral widgetModel, boolean skipTopLevel) {
     if (widgetOrModelName == null || widgetModel == null) {
       return empty();
     }
     return Optional.of(widgetOrModelName)
         .map(n -> Strings.removeSuffix(n, ScoutJsCoreConstants.CLASS_NAME_SUFFIX_MODEL))
         .map(n -> n + ScoutJsCoreConstants.CLASS_NAME_SUFFIX_WIDGET_MAP)
-        .map(n -> new WidgetMap(n, widgetModel, skipTopLevel));
-  }
-
-  protected boolean isSkipTopLevel() {
-    return m_skipTopLevel;
+        .map(n -> new WidgetMap(n, widgetModel));
   }
 
   @Override
   protected Map<String, IdObjectType> parseElements() {
-    var widgetClass = widgetClass().orElse(null);
-    if (widgetClass == null) {
+    if (widgetClass().isEmpty()) {
       return emptyMap();
     }
-    var tableClass = classByObjectType(ScoutJsCoreConstants.CLASS_NAME_TABLE);
-    var tableFieldClass = classByObjectType(ScoutJsCoreConstants.CLASS_NAME_TABLE_FIELD);
 
     Map<String, IdObjectType> widgets = new LinkedHashMap<>();
 
@@ -76,51 +66,21 @@ public class WidgetMap extends IdObjectTypeMap {
 
           @Override
           public TreeVisitResult preVisit(IObjectLiteral element, int level, int index) {
-            m_ancestors.addLast(element);
+            var result = TreeVisitResult.CONTINUE;
 
             if (element == null) {
-              return TreeVisitResult.SKIP_SUBTREE;
+              result = TreeVisitResult.SKIP_SUBTREE;
             }
-            if (level == 0 && isSkipTopLevel()) {
-              return TreeVisitResult.CONTINUE;
+            else if (level > 0) {
+              result = collectIdObjectType(
+                  element,
+                  m_ancestors,
+                  idObjectType -> Optional.ofNullable(widgets.put(idObjectType.id(), idObjectType))
+                      .ifPresent((iot) -> createDuplicateIdWarning(iot.id())));
             }
 
-            return IdObjectType.create(element)
-                .map(idObjectType -> {
-                  if (tableClass
-                      .filter(clazz -> idObjectType.objectType().isInstanceOf(clazz))
-                      .isPresent()) {
-                    var tableName = idObjectType.id().replace(".", "");
-                    if (ScoutJsCoreConstants.CLASS_NAME_TABLE.equals(tableName) ||
-                        tableName.equals(idObjectType.objectType().es6Class().name())) {
-                      m_ancestors.removeLast(); // remove current element
-                      tableName = Optional.ofNullable(m_ancestors.peekLast()) // get parent
-                          .flatMap(IdObjectType::create)
-                          .filter(iot -> tableFieldClass
-                              .filter(clazz -> iot.objectType().isInstanceOf(clazz))
-                              .isPresent()) // check if parent is a TableField
-                          .map(iot -> iot.id().replace(".", "") + ScoutJsCoreConstants.CLASS_NAME_TABLE)
-                          .orElse(tableName);
-                      m_ancestors.addLast(element); // add current element again
-                    }
-
-                    var objectType = idObjectType.objectType().withNewClassName(tableName);
-
-                    create(tableName, element, true).ifPresent(objectType::withWidgetMap);
-                    ColumnMap.create(tableName, element).ifPresent(objectType::withColumnMap);
-
-                    widgets.put(idObjectType.id(), idObjectType);
-
-                    return TreeVisitResult.SKIP_SUBTREE;
-                  }
-
-                  if (idObjectType.objectType().isInstanceOf(widgetClass)) {
-                    widgets.put(idObjectType.id(), idObjectType);
-                  }
-
-                  return TreeVisitResult.CONTINUE;
-                })
-                .orElse(TreeVisitResult.CONTINUE);
+            m_ancestors.addLast(element);
+            return result;
           }
 
           @Override
@@ -132,6 +92,58 @@ public class WidgetMap extends IdObjectTypeMap {
         .traverse(model());
 
     return widgets;
+  }
+
+  protected Optional<IES6Class> tableClass() {
+    return m_tableClass.computeIfAbsentAndGet(() -> classByObjectType(ScoutJsCoreConstants.CLASS_NAME_TABLE));
+  }
+
+  protected boolean isWidget(IdObjectType idObjectType) {
+    return widgetClass()
+        .filter(clazz -> idObjectType.objectType().isInstanceOf(clazz))
+        .isPresent();
+  }
+
+  protected boolean isTable(IdObjectType idObjectType) {
+    return tableClass()
+        .filter(clazz -> idObjectType.objectType().isInstanceOf(clazz))
+        .isPresent();
+  }
+
+  protected TreeVisitResult collectIdObjectType(IObjectLiteral element, Deque<IObjectLiteral> ancestors, Consumer<IdObjectType> collector) {
+    var idObjectType = IdObjectType.create(element).orElse(null);
+    if (idObjectType == null) {
+      return TreeVisitResult.CONTINUE;
+    }
+
+    if (isTable(idObjectType)) {
+      handleTable(element, idObjectType, ancestors);
+      collector.accept(idObjectType);
+      return TreeVisitResult.SKIP_SUBTREE;
+    }
+
+    if (isWidget(idObjectType)) {
+      collector.accept(idObjectType);
+    }
+
+    return TreeVisitResult.CONTINUE;
+  }
+
+  @SuppressWarnings("MethodMayBeStatic")
+  protected void handleTable(IObjectLiteral element, IdObjectType idObjectType, Deque<IObjectLiteral> ancestors) {
+    var name = idObjectType.id().replace(".", "");
+    if (ScoutJsCoreConstants.CLASS_NAME_TABLE.equals(name) || name.equals(idObjectType.objectType().es6Class().name())) {
+      name = Optional.ofNullable(ancestors.peekLast()) // get parent
+          .flatMap(IdObjectType::create)
+          .map(iot -> iot.id().replace(".", "") + ScoutJsCoreConstants.CLASS_NAME_TABLE)
+          .orElse(name);
+    }
+
+    var objectType = idObjectType.objectType()
+        .withNewClassName(name);
+
+    WidgetMap.create(name, element).ifPresent(objectType::withWidgetMap);
+    ColumnMap.create(name, element).ifPresent(objectType::withColumnMap);
   }
 
   @Override

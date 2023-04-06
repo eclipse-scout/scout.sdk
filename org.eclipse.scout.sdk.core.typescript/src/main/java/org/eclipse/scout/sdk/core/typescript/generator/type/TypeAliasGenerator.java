@@ -43,7 +43,7 @@ public class TypeAliasGenerator<TYPE extends ITypeAliasGenerator<TYPE>> extends 
         .appendModifiers(modifiers())
         .append("type ")
         .append(elementName().orElseThrow(() -> newFail("Type must have a name.")))
-        .space().equalSign().space()
+        .equalSign()
         .append(aliasedType().orElseThrow(() -> newFail("Type must have an aliased type.")))
         .semicolon();
   }

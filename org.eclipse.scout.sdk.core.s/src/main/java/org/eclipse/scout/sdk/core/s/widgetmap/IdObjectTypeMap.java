@@ -9,11 +9,13 @@
  */
 package org.eclipse.scout.sdk.core.s.widgetmap;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.model.js.IScoutJsElement;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModels;
@@ -71,4 +73,8 @@ public abstract class IdObjectTypeMap {
   }
 
   protected abstract Set<IdObjectTypeMapReference> parseIdObjectTypeMapReferences();
+
+  protected void createDuplicateIdWarning(String id) {
+    SdkLog.warning("Duplicate id '{}' in model '{}'.", id, model().containingFile().map(Path::toString).orElse(name()));
+  }
 }
