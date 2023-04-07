@@ -16,6 +16,8 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.typescript.builder.ITypeScriptBuilderContext;
+import org.eclipse.scout.sdk.core.typescript.builder.TypeScriptBuilderContext;
 
 /**
  * <h3>{@link ITypeScriptElementGenerator}</h3>
@@ -46,6 +48,18 @@ public interface ITypeScriptElementGenerator<TYPE extends ITypeScriptElementGene
    * @return A {@link StringBuilder} holding the content of the created source.
    */
   default StringBuilder toTypeScriptSource() {
-    return toSource(identity(), new BuilderContext());
+    return toTypeScriptSource(new TypeScriptBuilderContext(new BuilderContext()));
+  }
+
+  /**
+   * Executes this {@link ITypeScriptElementGenerator} using the context given.
+   *
+   * @param context
+   *          The {@link ITypeScriptBuilderContext} in which the source is created. Must not be {@code null}.
+   * @return A {@link StringBuilder} holding the content of the created source.
+   * @see #toTypeScriptSource()
+   */
+  default StringBuilder toTypeScriptSource(ITypeScriptBuilderContext context) {
+    return toSource(identity(), context);
   }
 }

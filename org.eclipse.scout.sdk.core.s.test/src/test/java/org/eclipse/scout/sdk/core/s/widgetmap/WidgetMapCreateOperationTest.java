@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
+import org.eclipse.scout.sdk.core.typescript.builder.imports.IES6ImportCollector.ES6ImportDescriptor;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.testing.ExtendWithNodeModules;
@@ -79,7 +80,8 @@ public class WidgetMapCreateOperationTest {
     assertEquals(1, declarationSources.size());
     assertEqualsIgnoreWhitespaces("declare widgetMap: SomeFormWidgetMap;", declarationSources.get("widgetMap"));
 
-    assertEquals(List.of("SomeFormWidgetMap"), operation.importNamesForDeclarations());
+    var imports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("SomeFormWidgetMap"), imports);
   }
 
   @Test
@@ -185,7 +187,8 @@ public class WidgetMapCreateOperationTest {
     assertEquals(1, declarationSources.size());
     assertEqualsIgnoreWhitespaces("declare widgetMap: SomeFormWithTableFieldWidgetMap;", declarationSources.get("widgetMap"));
 
-    assertEquals(List.of("SomeFormWithTableFieldWidgetMap"), operation.importNamesForDeclarations());
+    var imports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("SomeFormWithTableFieldWidgetMap"), imports);
   }
 
   @Test
@@ -241,7 +244,8 @@ public class WidgetMapCreateOperationTest {
     assertEquals(1, declarationSources.size());
     assertEqualsIgnoreWhitespaces("declare widgetMap: SomeFormWithReferencedWidgetMapsWidgetMap;", declarationSources.get("widgetMap"));
 
-    assertEquals(List.of("SomeFormWithReferencedWidgetMapsWidgetMap"), operation.importNamesForDeclarations());
+    var imports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("SomeFormWithReferencedWidgetMapsWidgetMap"), imports);
   }
 
   @Test
@@ -336,7 +340,8 @@ public class WidgetMapCreateOperationTest {
     assertEqualsIgnoreWhitespaces("declare detailForm: SomePageForm;", declarationSources.get("detailForm"));
     assertEqualsIgnoreWhitespaces("declare detailTable: SomeTable;", declarationSources.get("detailTable"));
 
-    assertEquals(List.of("SomePageForm", "SomeTable"), operation.importNamesForDeclarations());
+    var imports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("SomePageForm", "SomeTable"), imports);
   }
 
   private static void assertEqualsIgnoreWhitespaces(CharSequence expected, CharSequence actual) {

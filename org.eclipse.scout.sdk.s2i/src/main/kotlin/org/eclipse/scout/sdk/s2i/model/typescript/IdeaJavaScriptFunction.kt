@@ -17,21 +17,25 @@ import org.eclipse.scout.sdk.core.typescript.model.api.internal.FunctionImplemen
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi
+import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.core.util.SourceRange
 import org.eclipse.scout.sdk.s2i.model.typescript.util.exportType
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import java.util.*
 
 open class IdeaJavaScriptFunction(protected val ideaModule: IdeaNodeModule, internal val javaScriptFunction: JSFunction) : AbstractNodeElementSpi<IFunction>(ideaModule), FunctionSpi {
 
+    private val m_source = FinalValue<Optional<SourceRange>>()
+
     override fun createApi() = FunctionImplementor(this)
 
-    override fun source() = ideaModule.sourceFor(javaScriptFunction)
+    override fun source(): Optional<SourceRange> = m_source.computeIfAbsentAndGet { ideaModule.sourceFor(javaScriptFunction) }
 
     override fun name() = javaScriptFunction.name
 
     override fun exportType() = javaScriptFunction.exportType()
 
-    override fun resolveContainingFile() = javaScriptFunction.containingFile.virtualFile.resolveLocalPath()
+    override fun resolveContainingFile() = javaScriptFunction.containingFile?.virtualFile?.resolveLocalPath()
 
     override fun resultingObjectLiteral(): Optional<ObjectLiteralSpi> {
         val literal = javaScriptFunction

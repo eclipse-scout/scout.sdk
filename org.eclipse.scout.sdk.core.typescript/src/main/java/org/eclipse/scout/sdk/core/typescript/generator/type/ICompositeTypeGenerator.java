@@ -14,6 +14,7 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.typescript.builder.ITypeScriptSourceBuilder;
 import org.eclipse.scout.sdk.core.typescript.generator.ITypeScriptElementGenerator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 
@@ -24,7 +25,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
  *
  * @since 13.0
  */
-public interface ICompositeTypeGenerator<TYPE extends ICompositeTypeGenerator<TYPE>> extends IAliasedTypeGenerator<TYPE> {
+public interface ICompositeTypeGenerator<TYPE extends ICompositeTypeGenerator<TYPE>> extends IDataTypeGenerator<TYPE> {
 
   /**
    * @return The data type flavor.
@@ -56,7 +57,7 @@ public interface ICompositeTypeGenerator<TYPE extends ICompositeTypeGenerator<TY
   /**
    * @return A {@link Stream} returning all types of this {@link ICompositeTypeGenerator}.
    */
-  Stream<ISourceGenerator<ISourceBuilder<?>>> types();
+  Stream<ISourceGenerator<? super ITypeScriptSourceBuilder<?>>> types();
 
   /**
    * Adds the specified type to this {@link ICompositeTypeGenerator}.
@@ -65,5 +66,5 @@ public interface ICompositeTypeGenerator<TYPE extends ICompositeTypeGenerator<TY
    *          The {@link ISourceGenerator<ISourceBuilder<?>>} to add. Must not be {@code null}.
    * @return This generator.
    */
-  TYPE withType(ISourceGenerator<ISourceBuilder<?>> type);
+  TYPE withType(ISourceGenerator<? super ITypeScriptSourceBuilder<?>> type);
 }

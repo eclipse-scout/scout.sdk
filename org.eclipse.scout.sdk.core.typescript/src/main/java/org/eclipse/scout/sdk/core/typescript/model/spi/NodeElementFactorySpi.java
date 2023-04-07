@@ -31,5 +31,5 @@ public interface NodeElementFactorySpi {
 
   DataTypeSpi createConstantValueDataType(IConstantValue constantValue);
 
-  DataTypeSpi createClassWithTypeArgumentsDataType(ES6ClassSpi classSpi, List<DataTypeSpi> arguments);
+  ES6ClassSpi createClassWithTypeArgumentsDataType(ES6ClassSpi classSpi, List<DataTypeSpi> arguments);
 }

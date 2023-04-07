@@ -15,7 +15,7 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.lang.javascript.patterns.JSPatterns.jsProperty
 import com.intellij.lang.javascript.psi.JSArrayLiteralExpression
 import com.intellij.patterns.PlatformPatterns.psiElement
-import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.util.ProcessingContext
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.SELECTED_ELEMENT
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.getPropertyValueInfo
 import org.eclipse.scout.sdk.s2i.template.js.JsModelCompletionHelper.propertyElementPattern
-import org.eclipse.scout.sdk.s2i.util.PsiImportUtils
+import org.eclipse.scout.sdk.s2i.util.ES6ImportUtils
 
 class JsModelValueCompletionContributor : CompletionContributor() {
 
@@ -69,15 +69,14 @@ class JsModelValueCompletionContributor : CompletionContributor() {
             }.toList()
         }
 
-        private fun withJsImportIfNecessary(lookupElement: LookupElementBuilder, editModel: ScoutJsModel, place: PsiElement): LookupElementBuilder {
+        private fun withJsImportIfNecessary(lookupElement: LookupElementBuilder, editModel: ScoutJsModel, place: PsiFile): LookupElementBuilder {
             val originalInsertHandler = lookupElement.insertHandler
             return lookupElement.withInsertHandler { context, item ->
                 originalInsertHandler?.handleInsert(context, item)
                 val elementToImport = findElementToImport(lookupElement) ?: return@withInsertHandler
-                PsiImportUtils.createOrUpdateImport(elementToImport, editModel.nodeModule(), place)
+                ES6ImportUtils.createOrUpdateImport(elementToImport, null, editModel.nodeModule(), place)
             }
         }
-
 
         private fun findElementToImport(lookupElement: LookupElementBuilder): INodeElement? {
             val lookupElementViewModel = lookupElement.getUserData(SELECTED_ELEMENT) ?: return null

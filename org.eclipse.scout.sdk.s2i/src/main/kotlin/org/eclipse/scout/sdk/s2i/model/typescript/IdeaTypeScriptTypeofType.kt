@@ -18,10 +18,13 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeOwnerSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.TypeOfSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.core.util.SourceRange
+import java.util.*
 
 open class IdeaTypeScriptTypeofType(protected val ideaModule: IdeaNodeModule, internal val typeOfType: TypeScriptTypeofType) : AbstractNodeElementSpi<ITypeOf>(ideaModule), TypeOfSpi {
 
     private val m_dataTypeOwner = FinalValue<DataTypeOwnerSpi?>()
+    private val m_source = FinalValue<Optional<SourceRange>>()
 
     override fun createApi() = TypeOfImplementor(this)
 
@@ -33,7 +36,7 @@ open class IdeaTypeScriptTypeofType(protected val ideaModule: IdeaNodeModule, in
 
     override fun childTypes(): Collection<DataTypeSpi> = listOfNotNull(dataType())
 
-    override fun source() = ideaModule.sourceFor(typeOfType)
+    override fun source(): Optional<SourceRange> = m_source.computeIfAbsentAndGet { ideaModule.sourceFor(typeOfType) }
 
     override fun dataTypeOwner() = m_dataTypeOwner.computeIfAbsentAndGet {
         val expression = typeOfType.expression ?: return@computeIfAbsentAndGet null

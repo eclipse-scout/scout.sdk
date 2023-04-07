@@ -37,7 +37,7 @@ public class ObjectTypeGenerator extends TypeGenerator<ObjectTypeGenerator> {
     withModifier(Modifier.EXPORT)
         .asClass()
         .withElementName(elementName)
-        .withSuperClass(objectType.es6Class().name());
+        .withSuperClass(objectType.es6Class());
 
     objectType.widgetMap()
         .map(ObjectTypeGenerator::createWidgetMapField)
@@ -49,10 +49,12 @@ public class ObjectTypeGenerator extends TypeGenerator<ObjectTypeGenerator> {
   }
 
   protected static IFieldGenerator<?> createIdObjectTypeMapField(IdObjectTypeMap map, String fieldName) {
+    var objectLiteral = map.model();
+    var name = ObjectType.ensureValidName(map.name());
     return FieldGenerator.create()
         .withElementName(fieldName)
         .withModifier(Modifier.DECLARE)
-        .withDataType(map.name());
+        .withDataType(objectLiteral.createDataType(name));
   }
 
   protected static IFieldGenerator<?> createWidgetMapField(IdObjectTypeMap map) {

@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.sdk.s2i.model.typescript.util
 
-import com.intellij.lang.ecmascript6.psi.ES6ImportDeclaration
 import com.intellij.lang.javascript.psi.*
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptAsExpression
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptLiteralType
@@ -21,13 +20,13 @@ import com.intellij.lang.javascript.psi.types.*
 import com.intellij.lang.javascript.psi.types.evaluable.JSEvaluableOnlyType
 import com.intellij.lang.javascript.psi.types.primitives.JSNullType
 import com.intellij.lang.javascript.psi.types.primitives.JSUndefinedType
-import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaConstantValue
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
+import org.eclipse.scout.sdk.s2i.util.ES6ImportUtils
 
 object DataTypeSpiUtils {
 
@@ -136,7 +135,7 @@ object DataTypeSpiUtils {
     private fun createJSDocCommentDataType(comment: JSDocComment, module: IdeaNodeModule, getDataType: (JSDocComment) -> String?): DataTypeSpi? {
         val dataType = getDataType(comment) ?: return null
 
-        PsiTreeUtil.getChildrenOfTypeAsList(comment.containingFile, ES6ImportDeclaration::class.java).asSequence()
+        ES6ImportUtils.importsInFileOf(comment).asSequence()
             .flatMap { it.importSpecifiers.asSequence() }
             .firstOrNull { it.declaredName == dataType }
             ?.let { module.resolveImport(it) as? DataTypeSpi }

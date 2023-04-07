@@ -10,7 +10,6 @@
 package org.eclipse.scout.sdk.core.typescript.generator.type;
 
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
-import static org.eclipse.scout.sdk.core.util.Strings.notBlank;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +24,7 @@ import org.eclipse.scout.sdk.core.typescript.generator.ITypeScriptElementGenerat
 import org.eclipse.scout.sdk.core.typescript.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.AbstractNodeElementGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.INodeElementGenerator;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 
 /**
  * <h3>{@link TypeGenerator}</h3>
@@ -35,7 +35,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractNo
 
   private boolean m_asClass;
   private boolean m_asInterface;
-  private String m_superClass;
+  private IES6Class m_superClass;
   private final List<SortedNodeElementEntry> m_nodeElements;
 
   protected TypeGenerator() {
@@ -81,7 +81,7 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractNo
     builder.append(elementName().orElseThrow(() -> newFail("Type must have a name.")));
 
     if (m_asClass) {
-      superClass().ifPresent(superClass -> builder.append(" extends ").append(superClass));
+      superClass().ifPresent(superClass -> builder.append(" extends ").ref(superClass));
     }
 
     builder.space();
@@ -108,12 +108,12 @@ public class TypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends AbstractNo
   }
 
   @Override
-  public Optional<String> superClass() {
-    return notBlank(m_superClass);
+  public Optional<IES6Class> superClass() {
+    return Optional.ofNullable(m_superClass);
   }
 
   @Override
-  public TYPE withSuperClass(String superClass) {
+  public TYPE withSuperClass(IES6Class superClass) {
     m_superClass = superClass;
     return thisInstance();
   }

@@ -31,6 +31,8 @@ public interface IPackageJson extends INodeElement {
 
   Optional<String> main();
 
+  Optional<Path> mainLocation();
+
   Optional<CharSequence> mainContent();
 
   Optional<String> propertyAsString(String name);

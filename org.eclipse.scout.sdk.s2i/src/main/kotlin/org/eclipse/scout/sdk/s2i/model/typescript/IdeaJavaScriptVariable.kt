@@ -17,22 +17,25 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.VariableSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.core.util.SourceRange
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import org.eclipse.scout.sdk.s2i.model.typescript.util.exportType
 import org.eclipse.scout.sdk.s2i.model.typescript.util.toModifierType
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
+import java.util.*
 
 open class IdeaJavaScriptVariable(protected val ideaModule: IdeaNodeModule, internal val javaScriptVariable: JSVariable) : AbstractNodeElementSpi<IVariable>(ideaModule), VariableSpi {
 
     private val m_dataType = FinalValue<DataTypeSpi?>()
+    private val m_source = FinalValue<Optional<SourceRange>>()
 
     override fun createApi() = VariableImplementor(this)
 
-    override fun source() = ideaModule.sourceFor(javaScriptVariable)
+    override fun source(): Optional<SourceRange> = m_source.computeIfAbsentAndGet { ideaModule.sourceFor(javaScriptVariable) }
 
     override fun exportType() = javaScriptVariable.exportType()
 
-    override fun resolveContainingFile() = javaScriptVariable.containingFile.virtualFile.resolveLocalPath()
+    override fun resolveContainingFile() = javaScriptVariable.containingFile?.virtualFile?.resolveLocalPath()
 
     override fun hasModifier(modifier: Modifier) = javaScriptVariable.hasModifier(modifier.toModifierType())
 

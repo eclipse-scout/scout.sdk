@@ -16,12 +16,11 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.typescript.IWebConstants;
+import org.eclipse.scout.sdk.core.typescript.builder.imports.ES6ImportCollector;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SourceRange;
-import org.eclipse.scout.sdk.core.util.Strings;
 
 public abstract class AbstractNodeElement<SPI extends NodeElementSpi> implements INodeElement {
   private final SPI m_spi;
@@ -73,7 +72,7 @@ public abstract class AbstractNodeElement<SPI extends NodeElementSpi> implements
     if (this.isExportedFromModule()) {
       // create import to the module main file
       var packageJson = containingModule().packageJson();
-      importTarget = packageJson.directory().resolve(packageJson.main().orElse(""));
+      importTarget = packageJson.mainLocation().orElse(packageJson.location());
     }
     else {
       // create relative path import to this file
@@ -82,12 +81,7 @@ public abstract class AbstractNodeElement<SPI extends NodeElementSpi> implements
     if (importTarget == null) {
       return Optional.empty();
     }
-
-    var from = fromFile.getParent().relativize(importTarget).toString().replace('\\', '/');
-    if (!Strings.startsWith(from, '.')) {
-      from = "./" + from;
-    }
-    return Optional.of(Strings.removeSuffix(Strings.removeSuffix(from, IWebConstants.TS_FILE_SUFFIX), IWebConstants.JS_FILE_SUFFIX));
+    return Optional.of(ES6ImportCollector.buildRelativeImportPath(fromFile, importTarget));
   }
 
   @Override

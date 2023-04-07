@@ -17,7 +17,9 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractFieldSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.core.util.SourceRange
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
+import java.util.*
 
 open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(
     protected val ideaModule: IdeaNodeModule,
@@ -28,8 +30,9 @@ open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(
 
     private val m_dataType = FinalValue<DataTypeSpi?>()
     private val m_constantValue = FinalValue<IConstantValue>()
+    private val m_source = FinalValue<Optional<SourceRange>>()
 
-    override fun source() = ideaModule.sourceFor(javaScriptAssignmentExpression)
+    override fun source(): Optional<SourceRange> = m_source.computeIfAbsentAndGet { ideaModule.sourceFor(javaScriptAssignmentExpression) }
 
     override fun name() = javaScriptReferenceExpression.referenceName
 

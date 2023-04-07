@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface INodeElementFactory {
   IField createSyntheticField(String name, IDataType dataType, IES6Class declaringClass);
@@ -23,4 +24,6 @@ public interface INodeElementFactory {
   IDataType createIntersectionDataType(Collection<IDataType> componentDataTypes);
 
   IDataType createConstantValueDataType(IConstantValue constantValue);
+
+  IES6Class createClassWithTypeArguments(IES6Class clazz, List<IDataType> arguments);
 }

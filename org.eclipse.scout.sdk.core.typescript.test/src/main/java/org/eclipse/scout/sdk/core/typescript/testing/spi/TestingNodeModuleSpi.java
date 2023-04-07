@@ -71,8 +71,7 @@ public class TestingNodeModuleSpi extends AbstractNodeElementSpi<INodeModule> im
 
   @Override
   public Optional<SourceRange> source() {
-    return packageJson().api().main()
-        .map(main -> packageJson().containingDir().resolve(main))
+    return packageJson().api().mainLocation()
         .map(TestingNodeModuleSpi::readContent)
         .map(content -> new SourceRange(content, 0));
   }

@@ -32,6 +32,7 @@ public class PackageJsonTest {
     assertEquals("23.1.0-snapshot", packageJson.version());
     assertEquals("@eclipse-scout/sdk-test-module", packageJson.name());
     assertSame(packageJsonDirectory, packageJson.directory());
+    assertEquals(packageJsonDirectory.resolve("src/exports-index.ts"), packageJson.mainLocation().orElseThrow());
     assertEquals(packageJsonDirectory.resolve(IPackageJson.FILE_NAME), packageJson.location());
     assertEquals(1880, packageJson.source().orElseThrow().length());
 

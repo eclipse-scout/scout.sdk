@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.typescript.generator.ITypeScriptElementGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.field.IFieldGenerator;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 
 /**
  * <h3>{@link ITypeGenerator}</h3>
@@ -24,7 +25,7 @@ import org.eclipse.scout.sdk.core.typescript.generator.field.IFieldGenerator;
  *
  * @since 13.0
  */
-public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IAliasedTypeGenerator<TYPE> {
+public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IDataTypeGenerator<TYPE> {
 
   /**
    * Marks this {@link ITypeGenerator} to be created as {@code class}.
@@ -43,7 +44,7 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IAlia
   /**
    * @return The super class name.
    */
-  Optional<String> superClass();
+  Optional<IES6Class> superClass();
 
   /**
    * Sets the super class reference of this {@link ITypeGenerator}.
@@ -52,7 +53,7 @@ public interface ITypeGenerator<TYPE extends ITypeGenerator<TYPE>> extends IAlia
    *          The super class reference or {@code null} if this {@link ITypeGenerator} should not have a super class.
    * @return This generator.
    */
-  TYPE withSuperClass(String superClass);
+  TYPE withSuperClass(IES6Class superClass);
 
   /**
    * @return A {@link Stream} returning all {@link IFieldGenerator}s of this {@link ITypeGenerator}.

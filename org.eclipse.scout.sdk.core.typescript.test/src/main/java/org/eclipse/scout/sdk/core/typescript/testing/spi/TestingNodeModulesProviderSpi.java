@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -24,7 +25,6 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,13 +35,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
-import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeNameEvaluator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue.ConstantValueType;
-import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
@@ -69,21 +65,21 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
-  private static final String TAG_NAME_FILE = "file";
-  private static final String TAG_NAME_MODULE = "module";
-  private static final String TAG_NAME_EXPORT = "export";
-  private static final String TAG_NAME_INDEX = "index";
-  private static final String TAG_NAME_REF = "ref";
-  private static final String TAG_NAME_FIELD = "field";
-  private static final String TAG_NAME_DATA_TYPE = "dataType";
-  private static final String TAG_NAME_CLASS = "class";
-  private static final String TAG_NAME_SUPER_CLASS = "superClass";
-  private static final String TAG_NAME_FUNCTION = "function";
-  private static final String TAG_NAME_OBJECT_LITERAL = "objectLiteral";
-  private static final String TAG_NAME_PROPERTY = "property";
-  private static final String TAG_NAME_CONSTANT_VALUE = "constantValue";
-  private static final String TAG_NAME_TYPE = "type";
-  private static final String TAG_NAME_VALUE = "value";
+  public static final String TAG_NAME_FILE = "file";
+  public static final String TAG_NAME_MODULE = "module";
+  public static final String TAG_NAME_EXPORT = "export";
+  public static final String TAG_NAME_INDEX = "index";
+  public static final String TAG_NAME_REF = "ref";
+  public static final String TAG_NAME_FIELD = "field";
+  public static final String TAG_NAME_DATA_TYPE = "dataType";
+  public static final String TAG_NAME_CLASS = "class";
+  public static final String TAG_NAME_SUPER_CLASS = "superClass";
+  public static final String TAG_NAME_FUNCTION = "function";
+  public static final String TAG_NAME_OBJECT_LITERAL = "objectLiteral";
+  public static final String TAG_NAME_PROPERTY = "property";
+  public static final String TAG_NAME_CONSTANT_VALUE = "constantValue";
+  public static final String TAG_NAME_TYPE = "type";
+  public static final String TAG_NAME_VALUE = "value";
 
   private final Map<String, Optional<NodeModuleSpi>> m_modules = new HashMap<>();
 
@@ -128,26 +124,6 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
     return getOrCreateModule(name, version, index, subModules, exports);
   }
 
-  public static IDataType createCompositeDataType(DataTypeFlavor flavor, IDataType... children) {
-    var dataType = mock(IDataType.class);
-    when(dataType.name()).thenAnswer(invocation -> new DataTypeNameEvaluator().eval(dataType));
-    when(dataType.typeArguments()).thenAnswer(invocation -> Stream.empty());
-    when(dataType.flavor()).thenReturn(flavor);
-    when(dataType.childTypes()).thenAnswer(invocation -> Arrays.stream(children));
-    when(dataType.arrayDimension()).thenReturn(flavor == DataTypeFlavor.Array ? 1 : 0);
-    return dataType;
-  }
-
-  public static IDataType createDataType(String name, IDataType... typeArguments) {
-    var dataType = mock(IDataType.class);
-    when(dataType.name()).thenReturn(name);
-    when(dataType.typeArguments()).thenAnswer(invocation -> Arrays.stream(typeArguments));
-    when(dataType.isPrimitive()).thenReturn(TypeScriptTypes.isPrimitive(name));
-    when(dataType.flavor()).thenReturn(DataTypeFlavor.Single);
-    when(dataType.childTypes()).thenAnswer(invocation -> Stream.empty());
-    return dataType;
-  }
-
   public Optional<NodeModuleSpi> getOrCreateModule(String name, String version) {
     return getOrCreateModule(name, version, null, emptyList(), emptyList());
   }
@@ -164,42 +140,17 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
   }
 
   private NodeModuleSpi createModule(String name, String version, CharSequence index, Collection<Element> subModules, Collection<Element> exports) {
-    var packageJsonSpi = mock(PackageJsonSpi.class);
-    var packageJsonContent = """
-        {
-          "name": "%s",
-          "version": "%s"
-        }
-        """.formatted(name, version);
-    when(packageJsonSpi.getString(eq("name"))).thenReturn(name);
-    when(packageJsonSpi.getString(eq("version"))).thenReturn(version);
-    when(packageJsonSpi.content()).thenReturn(new ByteArrayInputStream(packageJsonContent.getBytes(StandardCharsets.UTF_8)));
+    var moduleSpi = createNodeModule(name, version, index);
     var dependencies = subModules.stream()
         .map(this::getOrCreateModule)
         .flatMap(Optional::stream)
         .collect(toCollection(LinkedHashSet::new));
+    var packageJsonSpi = moduleSpi.packageJson();
     when(packageJsonSpi.dependencies()).thenReturn(dependencies);
-
-    var packageJsonApi = new PackageJsonImplementor(packageJsonSpi) {
-      @Override
-      public Optional<CharSequence> mainContent() {
-        return Optional.ofNullable(index);
-      }
-    };
-    when(packageJsonSpi.api()).thenReturn(packageJsonApi);
-
-    var moduleSpi = mock(NodeModuleSpi.class);
-    var moduleApi = new NodeModuleImplementor(moduleSpi, packageJsonSpi);
-    when(moduleSpi.api()).thenReturn(moduleApi);
-    when(moduleSpi.containingModule()).thenReturn(moduleSpi);
-    when(moduleSpi.packageJson()).thenReturn(packageJsonSpi);
-    when(packageJsonSpi.containingModule()).thenReturn(moduleSpi);
-
     var elements = exports.stream()
         .map(e -> createExport(e, moduleSpi))
         .collect(toMap(SimpleEntry::getKey, SimpleEntry::getValue, Ensure::failOnDuplicates, LinkedHashMap::new));
     when(moduleSpi.elements()).thenReturn(elements);
-
     var exportedElements = elements.entrySet().stream()
         .flatMap(e -> e.getValue().stream().map(exportName -> new SimpleEntry<>(exportName, e.getKey())))
         .collect(toMap(SimpleEntry::getKey, SimpleEntry::getValue, Ensure::failOnDuplicates, LinkedHashMap::new));
@@ -214,14 +165,51 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
     return moduleSpi;
   }
 
+  public static NodeModuleSpi createNodeModule(String name, String version, CharSequence index) {
+    var packageJsonSpi = mock(PackageJsonSpi.class);
+    var packageJsonContent = """
+        {
+          "name": "%s",
+          "version": "%s"
+        }
+        """.formatted(name, version);
+    when(packageJsonSpi.getString(eq("name"))).thenReturn(name);
+    when(packageJsonSpi.getString(eq("version"))).thenReturn(version);
+    when(packageJsonSpi.content()).thenReturn(new ByteArrayInputStream(packageJsonContent.getBytes(StandardCharsets.UTF_8)));
+
+    var packageJsonApi = new PackageJsonImplementor(packageJsonSpi) {
+      @Override
+      public Optional<CharSequence> mainContent() {
+        return Optional.ofNullable(index);
+      }
+    };
+    when(packageJsonSpi.api()).thenReturn(packageJsonApi);
+
+    var moduleSpi = mock(NodeModuleSpi.class);
+    var moduleApi = new NodeModuleImplementor(moduleSpi, packageJsonSpi);
+    when(moduleSpi.api()).thenReturn(moduleApi);
+    when(moduleSpi.containingModule()).thenReturn(moduleSpi);
+    when(moduleSpi.packageJson()).thenReturn(packageJsonSpi);
+    when(moduleSpi.nodeElementFactory()).thenReturn(new TestingNodeElementFactorySpi(moduleSpi));
+    when(packageJsonSpi.containingModule()).thenReturn(moduleSpi);
+
+    return moduleSpi;
+  }
+
   private static ES6ClassSpi createClass(Element classElement, NodeModuleSpi moduleSpi) {
     var name = classElement.getAttribute("name");
     var spi = mock(ES6ClassSpi.class);
     when(spi.name()).thenReturn(name);
     var result = new ES6ClassImplementor(spi);
     when(spi.api()).thenReturn(result);
+    when(spi.flavor()).thenReturn(DataTypeFlavor.Single);
     when(spi.withoutTypeArguments()).thenReturn(spi);
     when(spi.containingModule()).thenReturn(moduleSpi);
+    when(spi.createDataType(anyString())).thenAnswer(invocation -> {
+      String dataTypeName = invocation.getArgument(0);
+      var factory = (TestingNodeElementFactorySpi) moduleSpi.nodeElementFactory();
+      return factory.getOrCreateDataTypeSpi(dataTypeName);
+    });
 
     var fields = Xml.childElementsWithTagName(classElement, TAG_NAME_FIELD).stream()
         .map(f -> createField(f, moduleSpi))
@@ -293,10 +281,15 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
     var result = new ObjectLiteralImplementor(spi);
     when(spi.api()).thenReturn(result);
     when(spi.containingModule()).thenReturn(moduleSpi);
+    when(spi.createDataType(anyString())).thenAnswer(invocation -> {
+      String name = invocation.getArgument(0);
+      var factory = (TestingNodeElementFactorySpi) moduleSpi.nodeElementFactory();
+      return factory.getOrCreateDataTypeSpi(name);
+    });
 
     var properties = Xml.childElementsWithTagName(objectLiteralElement, TAG_NAME_PROPERTY).stream()
         .flatMap(prop -> Xml.firstChildElement(prop, TAG_NAME_CONSTANT_VALUE)
-            .map(cv -> TestingNodeModulesProviderSpi.createConstantValue(cv, moduleSpi))
+            .map(cv -> createConstantValue(cv, moduleSpi))
             .map(cv -> new SimpleEntry<>(prop.getAttribute("name"), cv)).stream())
         .collect(toMap(SimpleEntry::getKey, SimpleEntry::getValue, (a, b) -> b, LinkedHashMap::new));
     when(spi.properties()).thenReturn(properties);

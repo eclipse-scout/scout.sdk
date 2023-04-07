@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.typescript.builder.imports;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,8 +17,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.eclipse.scout.sdk.core.typescript.IWebConstants;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 public class ES6ImportCollector implements IES6ImportCollector {
   private final Map<String, ES6ImportDescriptor> m_imports;
@@ -57,5 +60,13 @@ public class ES6ImportCollector implements IES6ImportCollector {
   @Override
   public void registerReservedName(String name) {
     m_imports.put(name, null);
+  }
+
+  public static String buildRelativeImportPath(Path importer, Path imported) {
+    var from = importer.getParent().relativize(imported).toString().replace('\\', '/');
+    if (!Strings.startsWith(from, '.')) {
+      from = "./" + from;
+    }
+    return Strings.removeSuffix(Strings.removeSuffix(from, IWebConstants.TS_FILE_SUFFIX), IWebConstants.JS_FILE_SUFFIX);
   }
 }

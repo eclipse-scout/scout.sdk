@@ -39,8 +39,10 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
 import org.eclipse.scout.sdk.core.s.widgetmap.WidgetMapCreateOperation
 import org.eclipse.scout.sdk.core.typescript.IWebConstants
-import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
+import org.eclipse.scout.sdk.core.typescript.builder.imports.ES6ImportCollector
+import org.eclipse.scout.sdk.core.typescript.builder.imports.IES6ImportCollector
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule
+import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
@@ -50,7 +52,9 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.model.js.JsModelManager
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
-import org.eclipse.scout.sdk.s2i.util.PsiImportUtils
+import org.eclipse.scout.sdk.s2i.util.ES6ImportUtils
+import java.nio.file.Path
+import java.util.regex.Pattern
 
 object WidgetMapUpdater {
 
@@ -104,7 +108,7 @@ object WidgetMapUpdater {
     private fun updateScope(scope: SearchScope, project: Project, progress: IdeaProgress) {
         progress.init(100, message("update.widgetMap.in.scope"))
         progress.indicator.text2 = message("search.for.models")
-        val updates = IdeaEnvironment.computeInReadAction(project) {
+        val updateInfos = IdeaEnvironment.computeInReadAction(project) {
             FileTypeIndex.getFiles(TypeScriptFileType.INSTANCE, GlobalSearchScope.EMPTY_SCOPE.union(scope))
                 .filter { it.isValid && it.isInLocalFileSystem }
                 .mapNotNull { findFilePair(it, project) }
@@ -112,7 +116,7 @@ object WidgetMapUpdater {
                 .flatMap { e -> e.key?.let { getWidgetMapUpdatesForModule(it, e.value.distinct()) } ?: emptyList() }
         }
         progress.worked(70)
-        updateFileContentsInBlocks(updates, project, progress.newChild(30))
+        writeUpdates(updateInfos, project, progress.newChild(30))
     }
 
     private fun getWidgetMapUpdatesForModule(module: Module, files: List<Pair<JSFile, JSFile?>>): List<WidgetMapUpdateInfo> {
@@ -169,47 +173,59 @@ object WidgetMapUpdater {
                 .firstOrNull()
     }
 
-    private fun updateFileContentsInBlocks(updates: List<WidgetMapUpdateInfo>, project: Project, progress: IdeaProgress) {
+    private fun writeUpdates(updates: List<WidgetMapUpdateInfo>, project: Project, progress: IdeaProgress) {
         progress.init(updates.size, message("writing.new.widgetMaps"))
         updates.forEach {
-            ApplicationManager.getApplication().invokeAndWait {
-                WriteAction.run<RuntimeException> {
-                    progress.indicator.text2 = it.modelFunction.containingFile.virtualFile.name
-                    writeUpdate(it, project)
-                    progress.worked(1)
+            if (progress.indicator.isCanceled) return
+            try {
+                ApplicationManager.getApplication().invokeAndWait {
+                    WriteAction.run<RuntimeException> {
+                        progress.indicator.text2 = it.modelFunction.containingFile?.virtualFile?.name
+                        writeUpdate(it, project)
+                        progress.worked(1)
+                    }
                 }
+            } catch (e: RuntimeException) {
+                val realEx = if (e.cause == null || e.cause == e) e else e.cause
+                SdkLog.warning("Error updating WidgetMaps for file '{}'.", it.modelFunction.containingFile?.virtualFile?.resolveLocalPath(), realEx)
             }
         }
     }
 
     private fun writeUpdate(updateInfo: WidgetMapUpdateInfo, project: Project) {
         WriteCommandAction.writeCommandAction(project).run(ThrowableRunnable<RuntimeException> {
-            try {
-                val operation = updateInfo.operation
-                // update model
-                updateModel(updateInfo.modelFunction, operation.classSources(), operation.importsForModel(), operation.literal().containingModule())
+            val operation = updateInfo.operation
+            // update model
+            updateWidgetMaps(updateInfo.modelFunction, operation.classSources(), operation.importsForModel(), operation.literal().containingModule())
 
-                // update consumer
-                updateInfo.modelConsumer?.let {
-                    if (DialectDetector.isTypeScript(it)) { // only update widgetMap declaration in TS files for now
-                        updateConsumer(it, operation.declarationSources(), operation.importNamesForDeclarations(), updateInfo.modelFunction)
-                    }
-                }
-            } catch (e: RuntimeException) {
-                SdkLog.warning("Error updating WidgetMaps for file '{}'.", updateInfo.modelFunction.containingFile.virtualFile, e)
-            }
+            // update consumer
+            updateInfo.modelConsumer
+                ?.takeIf { DialectDetector.isTypeScript(it) } // only update widgetMap declaration in TS files for now
+                ?.let { updateDeclarations(it, operation.declarationSources(), operation.importNamesForDeclarations(), operation.literal()) }
         })
     }
 
-    private fun updateConsumer(consumer: JSClass, declarationSources: Map<String, CharSequence>, importsForConsumer: MutableList<String>, modelFunction: JSFunction) {
+    private fun updateDeclarations(consumer: JSClass, declarationSources: Map<String, CharSequence>, importsForConsumer: List<IES6ImportCollector.ES6ImportDescriptor>, model: IObjectLiteral) {
         // replace fields
         declarationSources.entries.forEach { replaceField(consumer, it.key, it.value) }
 
         // add imports
-        val modelFile = modelFunction.containingFile.virtualFile.resolveLocalPath() ?: return
-        val consumerFile = consumer.containingFile.virtualFile.resolveLocalPath() ?: return
-        val from = "./" + consumerFile.parent.relativize(modelFile).toString()
-        importsForConsumer.forEach { PsiImportUtils.createOrUpdateImport(it, false, from, consumer) }
+        val modelFile = model.containingFile().orElse(null) ?: return
+        val consumerFile = consumer.containingFile?.virtualFile?.resolveLocalPath() ?: return
+        val module = model.containingModule()
+        val from = if (isFileExportedFromModule(module, modelFile)) module.packageJson().mainLocation().orElseThrow() else modelFile
+        val importFrom = ES6ImportCollector.buildRelativeImportPath(consumerFile, from)
+
+        importsForConsumer.forEach { ES6ImportUtils.createOrUpdateImport(it.element.name(), it.alias, false, importFrom, consumer) }
+    }
+
+    private fun isFileExportedFromModule(module: INodeModule, modelFile: Path): Boolean {
+        val moduleMain = module.packageJson().mainLocation().orElse(null) ?: return false
+        val mainSource = module.source().orElse(null)?.asCharSequence() ?: return false
+        val rel = ES6ImportCollector.buildRelativeImportPath(moduleMain, modelFile)
+        val relPat = Pattern.quote(rel)
+        val regex = Pattern.compile("export\\s+\\*\\s+from\\s+['\"]$relPat(?:\\.ts)?['\"]\\s*;")
+        return regex.matcher(mainSource).find()
     }
 
     private fun replaceField(ownerClass: JSClass, fieldName: String, fieldSource: CharSequence) {
@@ -238,10 +254,10 @@ object WidgetMapUpdater {
         return jsElement
     }
 
-    private fun updateModel(modelFunction: JSFunction, newSources: List<CharSequence>, importsForModel: List<IES6Class>, modelModule: INodeModule) {
+    private fun updateWidgetMaps(modelFunction: JSFunction, newSources: List<CharSequence>, importsForModel: List<IES6ImportCollector.ES6ImportDescriptor>, modelModule: INodeModule) {
         val psiFile = modelFunction.containingFile
 
-        importsForModel.forEach { PsiImportUtils.createOrUpdateImport(it, modelModule, modelFunction) }
+        importsForModel.forEach { ES6ImportUtils.createOrUpdateImport(it.element, it.alias, modelModule, modelFunction) }
 
         val topLevelElements = psiFile.children.toSet()
         val topLevelParent = PsiTreeUtil.findFirstParent(modelFunction, true) { topLevelElements.contains(it) } ?: return
@@ -280,6 +296,6 @@ object WidgetMapUpdater {
     }
 
     private data class WidgetMapUpdateInfo(val operation: WidgetMapCreateOperation, val modelFunction: JSFunction, val modelConsumer: JSClass?) {
-        override fun toString() = modelFunction.containingFile.virtualFile.name
+        override fun toString() = modelFunction.containingFile?.virtualFile?.name ?: ""
     }
 }

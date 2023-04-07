@@ -13,6 +13,8 @@ import static java.util.stream.Collectors.toCollection;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
@@ -73,5 +75,11 @@ public class NodeElementFactoryImplementor implements INodeElementFactory {
   @Override
   public IDataType createConstantValueDataType(IConstantValue constantValue) {
     return m_spi.createConstantValueDataType(Ensure.notNull(constantValue)).api();
+  }
+
+  @Override
+  public IES6Class createClassWithTypeArguments(IES6Class clazz, List<IDataType> arguments) {
+    var args = (List<DataTypeSpi>) arguments.stream().filter(Objects::nonNull).map(IDataType::spi).toList();
+    return m_spi.createClassWithTypeArgumentsDataType(clazz.spi(), args).api();
   }
 }

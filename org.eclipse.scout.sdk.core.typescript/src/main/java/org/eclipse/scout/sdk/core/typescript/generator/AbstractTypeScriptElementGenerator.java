@@ -72,7 +72,9 @@ public abstract class AbstractTypeScriptElementGenerator<TYPE extends ITypeScrip
       setup();
       setSetupDone();
     }
-    build(ensureTypeScriptSourceBuilder(builder));
+    var typeScriptBuilder = ensureTypeScriptSourceBuilder(builder);
+    elementName().ifPresent(n -> typeScriptBuilder.context().importValidator().importCollector().registerReservedName(n));
+    build(typeScriptBuilder);
   }
 
   private boolean isSetupDone() {

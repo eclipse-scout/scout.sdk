@@ -17,6 +17,8 @@ import org.eclipse.scout.sdk.core.typescript.model.api.internal.ObjectLiteralImp
 import org.eclipse.scout.sdk.core.typescript.model.spi.AbstractNodeElementSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.core.util.SourceRange
+import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import org.eclipse.scout.sdk.s2i.model.typescript.util.exportType
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import java.util.*
@@ -24,16 +26,19 @@ import java.util.*
 open class IdeaJavaScriptObjectLiteral(protected val ideaModule: IdeaNodeModule, internal val jsObjectLiteral: JSObjectLiteralExpression) : AbstractNodeElementSpi<IObjectLiteral>(ideaModule), ObjectLiteralSpi {
 
     private val m_properties = FinalValue<Map<String, IConstantValue>>()
+    private val m_source = FinalValue<Optional<SourceRange>>()
 
     override fun createApi() = ObjectLiteralImplementor(this)
 
-    override fun source() = ideaModule.sourceFor(jsObjectLiteral)
+    override fun source(): Optional<SourceRange> = m_source.computeIfAbsentAndGet { ideaModule.sourceFor(jsObjectLiteral) }
 
     override fun exportType() = jsObjectLiteral.exportType()
 
     override fun name() = "" // anonymous
 
-    override fun resolveContainingFile() = jsObjectLiteral.containingFile.virtualFile.resolveLocalPath()
+    override fun resolveContainingFile() = jsObjectLiteral.containingFile?.virtualFile?.resolveLocalPath()
+
+    override fun createDataType(name: String) = DataTypeSpiUtils.createDataType(name, jsObjectLiteral, ideaModule)
 
     override fun properties(): Map<String, IConstantValue> = m_properties.computeIfAbsentAndGet {
         return@computeIfAbsentAndGet Collections.unmodifiableMap(collectProperties())

@@ -10,7 +10,9 @@
 package org.eclipse.scout.sdk.core.s.widgetmap;
 
 import java.util.Optional;
+import java.util.function.Function;
 
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 
 public class IdObjectTypeMapReference {
@@ -47,7 +49,9 @@ public class IdObjectTypeMapReference {
         .orElseThrow();
   }
 
-  public Optional<IES6Class> reference() {
-    return es6Class();
+  public IDataType reference() {
+    return es6Class()
+        .<IDataType> map(Function.identity())
+        .orElseGet(() -> m_idObjectTypeMap.model().createDataType(name()));
   }
 }

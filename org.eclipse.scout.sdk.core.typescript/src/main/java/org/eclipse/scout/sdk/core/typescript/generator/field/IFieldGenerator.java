@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.INodeElementGenerator;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 
 /**
  * <h3>{@link IFieldGenerator}</h3>
@@ -26,14 +27,14 @@ public interface IFieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends INo
   /**
    * @return The data type reference of this {@link IFieldGenerator}.
    */
-  Optional<String> dataType();
+  Optional<IDataType> dataType();
 
   /**
    * Sets the data type of this {@link IFieldGenerator}.
    *
-   * @param reference
-   *          The data type reference or {@code null}. E.g. {@code string[]}
+   * @param type
+   *          The data type of the field or {@code null}.
    * @return This generator.
    */
-  TYPE withDataType(String reference);
+  TYPE withDataType(IDataType type);
 }

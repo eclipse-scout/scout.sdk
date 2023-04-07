@@ -53,6 +53,11 @@ public class ObjectLiteralImplementor extends AbstractNodeElement<ObjectLiteralS
   }
 
   @Override
+  public IDataType createDataType(String name) {
+    return spi().createDataType(name).api();
+  }
+
+  @Override
   public Optional<IConstantValue> property(String name) {
     return Optional.ofNullable(properties().get(name));
   }

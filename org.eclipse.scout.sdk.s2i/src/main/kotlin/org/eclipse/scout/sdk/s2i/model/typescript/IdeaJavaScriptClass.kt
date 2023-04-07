@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.ES6ClassImplementor
 import org.eclipse.scout.sdk.core.typescript.model.spi.*
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.core.util.SourceRange
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import org.eclipse.scout.sdk.s2i.model.typescript.util.FieldSpiUtils
 import org.eclipse.scout.sdk.s2i.model.typescript.util.exportType
@@ -37,14 +38,15 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
     private val m_typeParameters = FinalValue<List<TypeParameterSpi>>()
     private val m_name = FinalValue<String>()
     private val m_aliasedDataType = FinalValue<Optional<DataTypeSpi>>()
+    private val m_source = FinalValue<Optional<SourceRange>>()
 
     override fun createApi() = ES6ClassImplementor(this)
 
-    override fun source() = ideaModule.sourceFor(javaScriptClass)
+    override fun source(): Optional<SourceRange> = m_source.computeIfAbsentAndGet { ideaModule.sourceFor(javaScriptClass) }
 
     override fun exportType() = javaScriptClass.exportType()
 
-    override fun resolveContainingFile() = javaScriptClass.containingFile.virtualFile.resolveLocalPath()
+    override fun resolveContainingFile() = javaScriptClass.containingFile?.virtualFile?.resolveLocalPath()
 
     override fun typeParameters(): List<TypeParameterSpi> = m_typeParameters.computeIfAbsentAndGet {
         if (javaScriptClass !is TypeScriptTypeParameterListOwner) return@computeIfAbsentAndGet emptyList()

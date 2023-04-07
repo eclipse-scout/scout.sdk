@@ -36,4 +36,6 @@ public interface IObjectLiteral extends INodeElement {
   <T> Optional<T> propertyAs(String name, Class<T> type);
 
   Stream<IObjectLiteral> childObjectLiterals();
+
+  IDataType createDataType(String name);
 }

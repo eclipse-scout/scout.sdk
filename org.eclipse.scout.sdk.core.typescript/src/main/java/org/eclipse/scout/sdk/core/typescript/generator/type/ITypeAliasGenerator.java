@@ -26,7 +26,7 @@ public interface ITypeAliasGenerator<TYPE extends ITypeAliasGenerator<TYPE>> ext
   /**
    * @return The aliased type of this {@link ITypeAliasGenerator}.
    */
-  Optional<IAliasedTypeGenerator<?>> aliasedType();
+  Optional<IDataTypeGenerator<?>> aliasedType();
 
   /**
    * Adds the specified aliased type to this {@link ITypeAliasGenerator}.
@@ -36,5 +36,5 @@ public interface ITypeAliasGenerator<TYPE extends ITypeAliasGenerator<TYPE>> ext
    * @return This generator.
    * @see TypeGenerator#create()
    */
-  TYPE withAliasedType(IAliasedTypeGenerator<?> generator);
+  TYPE withAliasedType(IDataTypeGenerator<?> generator);
 }

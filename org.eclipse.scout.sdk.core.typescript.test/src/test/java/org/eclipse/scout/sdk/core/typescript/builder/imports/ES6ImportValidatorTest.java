@@ -10,12 +10,13 @@
 package org.eclipse.scout.sdk.core.typescript.builder.imports;
 
 import static java.util.Arrays.asList;
-import static org.eclipse.scout.sdk.core.typescript.testing.spi.TestingNodeModulesProviderSpi.createCompositeDataType;
-import static org.eclipse.scout.sdk.core.typescript.testing.spi.TestingNodeModulesProviderSpi.createDataType;
+import static org.eclipse.scout.sdk.core.typescript.testing.spi.TestingNodeElementFactorySpi.newDataType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
+
 import org.eclipse.scout.sdk.core.typescript.builder.imports.IES6ImportCollector.ES6ImportDescriptor;
-import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
+import org.eclipse.scout.sdk.core.typescript.testing.spi.TestingNodeElementFactorySpi;
 import org.junit.jupiter.api.Test;
 
 public class ES6ImportValidatorTest {
@@ -23,11 +24,11 @@ public class ES6ImportValidatorTest {
   @Test
   public void testDuplicate() {
     var validator = new ES6ImportValidator();
-    var first = createDataType("First");
+    var first = newDataType("First");
     assertEquals("First", validator.use(first));
-    assertEquals("Second", validator.use(createDataType("Second")));
-    assertEquals("First0", validator.use(createDataType("First")));
-    assertEquals("First1", validator.use(createDataType("First")));
+    assertEquals("Second", validator.use(newDataType("Second")));
+    assertEquals("First0", validator.use(newDataType("First")));
+    assertEquals("First1", validator.use(newDataType("First")));
     assertEquals("First", validator.use(first));
 
     assertCollectorContent(validator, "First", "Second", "First as First0", "First as First1");
@@ -38,11 +39,11 @@ public class ES6ImportValidatorTest {
     var validator = new ES6ImportValidator();
     validator.importCollector().registerReservedName("First");
 
-    var first = createDataType("First");
+    var first = newDataType("First");
     assertEquals("First0", validator.use(first));
-    assertEquals("Second", validator.use(createDataType("Second")));
-    assertEquals("First1", validator.use(createDataType("First")));
-    assertEquals("First2", validator.use(createDataType("First")));
+    assertEquals("Second", validator.use(newDataType("Second")));
+    assertEquals("First1", validator.use(newDataType("First")));
+    assertEquals("First2", validator.use(newDataType("First")));
     assertEquals("First0", validator.use(first));
 
     assertCollectorContent(validator, "First as First0", "Second", "First as First1", "First as First2");
@@ -51,18 +52,19 @@ public class ES6ImportValidatorTest {
   @Test
   public void testComposite() {
     var validator = new ES6ImportValidator();
-    var string = createDataType("string");
-    var object = createDataType("object");
-    var clazz = createDataType("MyClass");
-    var clazz0 = createDataType("MyClass");
-    var clazz1 = createDataType("MyClass");
-    var any = createDataType("any");
-    var record = createDataType("Record", string, clazz0);
-    var arr = createCompositeDataType(DataTypeFlavor.Array, clazz);
-    var intersection = createCompositeDataType(DataTypeFlavor.Intersection, object, record);
-    var composite = createCompositeDataType(DataTypeFlavor.Union, arr, intersection, clazz1, any);
+    var factory = new TestingNodeElementFactorySpi();
+    var string = newDataType("string");
+    var object = newDataType("object").spi();
+    var clazz = newDataType("MyClass").spi();
+    var clazz0 = newDataType("MyClass");
+    var clazz1 = newDataType("MyClass").spi();
+    var any = newDataType("any").spi();
+    var record = newDataType("Record", string, clazz0).spi();
+    var arr = factory.createArrayDataType(clazz, 2);
+    var intersection = factory.createIntersectionDataType(List.of(object, record));
+    var composite = factory.createUnionDataType(List.of(arr, intersection, clazz1, any));
 
-    assertEquals("MyClass[] | (object & Record<string, MyClass0>) | MyClass1 | any", validator.use(composite));
+    assertEquals("MyClass[][] | (object & Record<string, MyClass0>) | MyClass1 | any", validator.use(composite.api()));
     assertCollectorContent(validator, "MyClass", "MyClass as MyClass0", "MyClass as MyClass1");
   }
 

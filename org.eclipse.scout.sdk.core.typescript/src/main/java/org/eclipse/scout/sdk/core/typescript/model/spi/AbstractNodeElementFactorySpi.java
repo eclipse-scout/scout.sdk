@@ -66,16 +66,12 @@ public abstract class AbstractNodeElementFactorySpi implements NodeElementFactor
     return getOrCreate(new CompositeObject(name, objectLiteral), id -> new ObjectLiteralDataTypeSpi(containingModule(), name, objectLiteral));
   }
 
-  protected DataTypeSpi createCompositeDataType(DataTypeFlavor flavor, Collection<DataTypeSpi> componentDataTypes) {
+  private DataTypeSpi createCompositeDataType(DataTypeFlavor flavor, Collection<DataTypeSpi> componentDataTypes) {
     return getOrCreate(new CompositeObject(flavor, componentDataTypes), id -> new SimpleCompositeDataTypeSpi(containingModule(), flavor, componentDataTypes, 0));
   }
 
-  protected DataTypeSpi createCompositeDataType(DataTypeFlavor flavor, Collection<DataTypeSpi> componentDataTypes, int arrayDimension) {
-    return getOrCreate(new CompositeObject(flavor, componentDataTypes, arrayDimension), id -> new SimpleCompositeDataTypeSpi(containingModule(), flavor, componentDataTypes, arrayDimension));
-  }
-
   @Override
-  public DataTypeSpi createClassWithTypeArgumentsDataType(ES6ClassSpi classSpi, List<DataTypeSpi> arguments) {
+  public ES6ClassSpi createClassWithTypeArgumentsDataType(ES6ClassSpi classSpi, List<DataTypeSpi> arguments) {
     return getOrCreate(new SimpleEntry<>(classSpi, arguments), id -> new ES6ClassWithTypeArgumentsSpi(containingModule(), id.getKey(), id.getValue()));
   }
 
@@ -94,16 +90,16 @@ public abstract class AbstractNodeElementFactorySpi implements NodeElementFactor
     var componentDataTypes = Optional.ofNullable(leafComponentType)
         .map(Collections::singleton)
         .orElse(Collections.emptySet());
-
-    return createCompositeDataType(DataTypeFlavor.Array, componentDataTypes, newDimension);
+    var dimension = newDimension;
+    return getOrCreate(new CompositeObject(DataTypeFlavor.Array, componentDataTypes, dimension), id -> new SimpleCompositeDataTypeSpi(containingModule(), DataTypeFlavor.Array, componentDataTypes, dimension));
   }
 
-  protected DataTypeSpi createUnionOrIntersectionDataType(Collection<DataTypeSpi> componentDataTypes, DataTypeFlavor unionOrIntersection) {
+  private DataTypeSpi createUnionOrIntersectionDataType(Collection<DataTypeSpi> componentDataTypes, DataTypeFlavor unionOrIntersection) {
     if (componentDataTypes == null || componentDataTypes.isEmpty()) {
       return null;
     }
     if (componentDataTypes.size() == 1) {
-      return componentDataTypes.stream().findFirst().orElse(null);
+      return componentDataTypes.iterator().next();
     }
     if (unionOrIntersection != DataTypeFlavor.Union && unionOrIntersection != DataTypeFlavor.Intersection) {
       return null;

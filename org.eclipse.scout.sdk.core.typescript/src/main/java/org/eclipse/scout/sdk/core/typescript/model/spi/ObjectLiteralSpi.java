@@ -21,4 +21,6 @@ public interface ObjectLiteralSpi extends NodeElementSpi {
   String name();
 
   Map<String, IConstantValue> properties();
+
+  DataTypeSpi createDataType(String name);
 }

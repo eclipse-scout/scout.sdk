@@ -16,7 +16,6 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.typescript.builder.ITypeScriptSourceBuilder;
 import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.AbstractNodeElementGenerator;
@@ -32,7 +31,7 @@ public class CompositeTypeGenerator<TYPE extends ICompositeTypeGenerator<TYPE>> 
 
   private DataTypeFlavor m_flavor = DataTypeFlavor.Single;
   private int m_arrayDimension = 1;
-  private final Collection<ISourceGenerator<ISourceBuilder<?>>> m_types;
+  private final Collection<ISourceGenerator<? super ITypeScriptSourceBuilder<?>>> m_types;
 
   protected CompositeTypeGenerator() {
     m_types = new LinkedHashSet<>();
@@ -82,12 +81,12 @@ public class CompositeTypeGenerator<TYPE extends ICompositeTypeGenerator<TYPE>> 
   }
 
   @Override
-  public Stream<ISourceGenerator<ISourceBuilder<?>>> types() {
+  public Stream<ISourceGenerator<? super ITypeScriptSourceBuilder<?>>> types() {
     return m_types.stream();
   }
 
   @Override
-  public TYPE withType(ISourceGenerator<ISourceBuilder<?>> type) {
+  public TYPE withType(ISourceGenerator<? super ITypeScriptSourceBuilder<?>> type) {
     m_types.add(Ensure.notNull(type));
     return thisInstance();
   }

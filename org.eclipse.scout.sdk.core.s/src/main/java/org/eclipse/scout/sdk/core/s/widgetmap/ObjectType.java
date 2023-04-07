@@ -12,11 +12,15 @@ package org.eclipse.scout.sdk.core.s.widgetmap;
 import static java.util.Optional.empty;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 public class ObjectType {
+
+  private static final Pattern NOT_ALLOWED_CLASS_NAME_CHARS = Pattern.compile("\\W");
 
   private final IES6Class m_es6Class;
   private String m_newClassName = null;
@@ -46,9 +50,16 @@ public class ObjectType {
     return Optional.ofNullable(m_newClassName);
   }
 
-  public ObjectType withNewClassName(String newClassName) {
-    m_newClassName = newClassName;
+  public ObjectType withNewClassName(CharSequence newClassName) {
+    m_newClassName = ensureValidName(newClassName);
     return this;
+  }
+
+  public static String ensureValidName(CharSequence name) {
+    if (name == null) {
+      return null;
+    }
+    return Strings.capitalize(NOT_ALLOWED_CLASS_NAME_CHARS.matcher(name).replaceAll("")).toString();
   }
 
   public Optional<WidgetMap> widgetMap() {

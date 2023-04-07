@@ -32,15 +32,20 @@ public interface IES6ImportCollector {
    */
   record ES6ImportDescriptor(IDataType element, String alias) {
 
-    String nameForSource() {
+    public String nameForSource() {
       return alias == null ? element.name() : alias;
     }
 
-    String importSpecifier() {
+    public String importSpecifier() {
       if (alias == null) {
         return element.name();
       }
       return element().name() + " as " + alias;
+    }
+
+    @Override
+    public String toString() {
+      return nameForSource();
     }
   }
 }

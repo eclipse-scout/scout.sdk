@@ -42,6 +42,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
     private val m_nodeElementFactory = IdeaNodeElementFactory(this)
     private val m_mainFile = FinalValue<VirtualFile>()
     private val m_mainPsi = FinalValue<JSFile>()
+    private val m_source = FinalValue<Optional<SourceRange>>()
     private val m_packageJsonSpi = FinalValue<PackageJsonSpi>()
     private val m_elements = FinalValue<Map<NodeElementSpi, List<String>>>()
     private val m_exports = FinalValue<Map<String, NodeElementSpi>>()
@@ -288,7 +289,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
         }
     }
 
-    override fun source() = sourceFor(mainPsi())
+    override fun source(): Optional<SourceRange> = m_source.computeIfAbsentAndGet { sourceFor(mainPsi()) }
 
     internal fun sourceFor(element: PsiElement?): Optional<SourceRange> {
         val sourceRange = element

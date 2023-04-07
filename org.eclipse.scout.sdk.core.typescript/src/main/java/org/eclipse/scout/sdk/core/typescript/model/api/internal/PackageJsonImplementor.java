@@ -71,13 +71,18 @@ public class PackageJsonImplementor extends AbstractNodeElement<PackageJsonSpi> 
   }
 
   @Override
+  public Optional<Path> mainLocation() {
+    return main().map(m -> directory().resolve(m).normalize());
+  }
+
+  @Override
   public Optional<String> main() {
     return m_main.computeIfAbsentAndGet(this::computeMain);
   }
 
   @Override
   public Optional<CharSequence> mainContent() {
-    return m_mainContent.computeIfAbsentAndGet(() -> main().map(main -> directory().resolve(main)).map(PackageJsonImplementor::loadContent));
+    return m_mainContent.computeIfAbsentAndGet(() -> mainLocation().map(PackageJsonImplementor::loadContent));
   }
 
   protected Optional<String> computeMain() {

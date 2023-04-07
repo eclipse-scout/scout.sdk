@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.AbstractNodeE
  */
 public class TypeAliasGenerator<TYPE extends ITypeAliasGenerator<TYPE>> extends AbstractNodeElementGenerator<TYPE> implements ITypeAliasGenerator<TYPE> {
 
-  private IAliasedTypeGenerator<?> m_aliasedTypeGenerator;
+  private IDataTypeGenerator<?> m_aliasedTypeGenerator;
 
   protected TypeAliasGenerator() {
   }
@@ -49,12 +49,12 @@ public class TypeAliasGenerator<TYPE extends ITypeAliasGenerator<TYPE>> extends 
   }
 
   @Override
-  public Optional<IAliasedTypeGenerator<?>> aliasedType() {
+  public Optional<IDataTypeGenerator<?>> aliasedType() {
     return Optional.ofNullable(m_aliasedTypeGenerator);
   }
 
   @Override
-  public TYPE withAliasedType(IAliasedTypeGenerator<?> generator) {
+  public TYPE withAliasedType(IDataTypeGenerator<?> generator) {
     m_aliasedTypeGenerator = generator;
     return thisInstance();
   }

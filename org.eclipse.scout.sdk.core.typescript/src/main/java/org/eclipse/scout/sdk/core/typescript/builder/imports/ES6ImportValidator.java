@@ -24,7 +24,7 @@ public class ES6ImportValidator implements IES6ImportValidator {
       "PromiseLike", "Promise", "ArrayLike", "Partial", "Required", "Readonly", "Pick", "Record",
       "Exclude", "Extract", "Omit", "NonNullable", "this", "ThisType"));
 
-  private final IES6ImportCollector m_collector;
+  private IES6ImportCollector m_collector;
 
   public ES6ImportValidator() {
     m_collector = new ES6ImportCollector();
@@ -41,7 +41,6 @@ public class ES6ImportValidator implements IES6ImportValidator {
       if (type.isPrimitive()) {
         return type.name();
       }
-      // maybe also handle built-in TS types like Record, Partial or Pick etc.
       return computeUniqueNameAndRegisterUsage(type);
     }
   }
@@ -73,7 +72,7 @@ public class ES6ImportValidator implements IES6ImportValidator {
     return collector.add(newAlias, type, newAlias).nameForSource();
   }
 
-  protected static String getUniqueAlias(String origName, Collection<String> usedNames) {
+  public static String getUniqueAlias(String origName, Collection<String> usedNames) {
     var uniqueName = origName;
     var counter = 0;
     do {
@@ -87,5 +86,9 @@ public class ES6ImportValidator implements IES6ImportValidator {
   @Override
   public IES6ImportCollector importCollector() {
     return m_collector;
+  }
+
+  public void setImportCollector(IES6ImportCollector collector) {
+    m_collector = collector;
   }
 }

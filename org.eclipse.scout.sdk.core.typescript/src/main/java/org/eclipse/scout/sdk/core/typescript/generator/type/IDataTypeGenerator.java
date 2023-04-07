@@ -12,11 +12,11 @@ package org.eclipse.scout.sdk.core.typescript.generator.type;
 import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.INodeElementGenerator;
 
 /**
- * <h3>{@link IAliasedTypeGenerator}</h3>
+ * <h3>{@link IDataTypeGenerator}</h3>
  * <p>
  * Marker interface for {@link INodeElementGenerator}s that can be used as aliased types.
  *
  * @since 13.0
  */
-public interface IAliasedTypeGenerator<TYPE extends IAliasedTypeGenerator<TYPE>> extends INodeElementGenerator<TYPE> {
+public interface IDataTypeGenerator<TYPE extends IDataTypeGenerator<TYPE>> extends INodeElementGenerator<TYPE> {
 }
