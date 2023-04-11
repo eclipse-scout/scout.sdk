@@ -11,10 +11,9 @@ package org.eclipse.scout.sdk.core.s.widgetmap;
 
 import static java.util.Optional.empty;
 
+import java.util.Collection;
 import java.util.Optional;
 
-import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
-import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -29,25 +28,19 @@ public class IdObjectType {
     m_objectType = Ensure.notNull(objectType);
   }
 
-  public static Optional<IdObjectType> create(String id, IES6Class es6Class) {
+  public static Optional<IdObjectType> create(String id, IES6Class es6Class, Collection<String> usedNames) {
     if (id == null) {
       return empty();
     }
-    return ObjectType.create(es6Class).map(e -> new IdObjectType(id, e));
+    return ObjectType.create(es6Class, usedNames).map(e -> new IdObjectType(id, e));
   }
 
-  public static Optional<IdObjectType> create(IObjectLiteral objectLiteral) {
+  public static Optional<IdObjectType> create(IObjectLiteral objectLiteral, Collection<String> usedNames) {
     return Optional.ofNullable(objectLiteral)
-        .flatMap(ol -> {
-          var id = ol.property(ScoutJsCoreConstants.PROPERTY_NAME_ID)
-              .flatMap(IConstantValue::asString)
-              .orElse(null);
-          var objectType = ol.property(ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE)
-              .flatMap(IConstantValue::asES6Class)
-              .orElse(null);
-
-          return create(id, objectType);
-        });
+        .flatMap(ol -> create(
+            IdObjectTypeMapUtils.getId(ol).orElse(null),
+            IdObjectTypeMapUtils.getObjectType(ol).orElse(null),
+            usedNames));
   }
 
   public String id() {

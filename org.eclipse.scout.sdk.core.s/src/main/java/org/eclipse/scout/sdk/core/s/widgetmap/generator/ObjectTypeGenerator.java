@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.widgetmap.IdObjectTypeMap;
 import org.eclipse.scout.sdk.core.s.widgetmap.ObjectType;
+import org.eclipse.scout.sdk.core.s.widgetmap.Type;
 import org.eclipse.scout.sdk.core.typescript.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.type.TypeGenerator;
@@ -50,7 +51,7 @@ public class ObjectTypeGenerator extends TypeGenerator<ObjectTypeGenerator> {
 
   protected static IFieldGenerator<?> createIdObjectTypeMapField(IdObjectTypeMap map, String fieldName) {
     var objectLiteral = map.model();
-    var name = ObjectType.ensureValidName(map.name());
+    var name = Type.ensureValidName(map.name());
     return FieldGenerator.create()
         .withElementName(fieldName)
         .withModifier(Modifier.DECLARE)

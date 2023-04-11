@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~
+  ~ This program and the accompanying materials are made
+  ~ available under the terms of the Eclipse Public License 2.0
+  ~ which is available at https://www.eclipse.org/legal/epl-2.0/
+  ~
+  ~ SPDX-License-Identifier: EPL-2.0
+  -->
+<module name="@sdk/project">
+  <export name="SomePageModel">
+    <function>
+      <objectLiteral file="src/js/form/SomePageModel.ts">
+        <property name="id">
+          <constantValue>
+            <type>String</type>
+            <value>SomePage</value>
+          </constantValue>
+        </property>
+        <property name="detailForm">
+          <constantValue>
+            <type>ObjectLiteral</type>
+            <value>
+              <objectLiteral>
+                <property name="objectType">
+                  <constantValue>
+                    <type>ES6Class</type>
+                    <value>
+                      <ref name="Form" module="@eclipse-scout/core"></ref>
+                    </value>
+                  </constantValue>
+                </property>
+                <property name="rootGroupBox">
+                  <constantValue>
+                    <type>ObjectLiteral</type>
+                    <value>
+                      <objectLiteral>
+                        <property name="id">
+                          <constantValue>
+                            <type>String</type>
+                            <value>MainBox</value>
+                          </constantValue>
+                        </property>
+                        <property name="objectType">
+                          <constantValue>
+                            <type>ES6Class</type>
+                            <value>
+                              <ref name="GroupBox" module="@eclipse-scout/core"></ref>
+                            </value>
+                          </constantValue>
+                        </property>
+                        <property name="fields">
+                          <constantValue>
+                            <type>Array</type>
+                            <value>
+                              <constantValue>
+                                <type>ObjectLiteral</type>
+                                <value>
+                                  <objectLiteral>
+                                    <property name="id">
+                                      <constantValue>
+                                        <type>String</type>
+                                        <value>LastNameField</value>
+                                      </constantValue>
+                                    </property>
+                                    <property name="objectType">
+                                      <constantValue>
+                                        <type>ES6Class</type>
+                                        <value>
+                                          <ref name="StringField" module="@eclipse-scout/core"></ref>
+                                        </value>
+                                      </constantValue>
+                                    </property>
+                                  </objectLiteral>
+                                </value>
+                              </constantValue>
+                              <constantValue>
+                                <type>ObjectLiteral</type>
+                                <value>
+                                  <objectLiteral>
+                                    <property name="id">
+                                      <constantValue>
+                                        <type>String</type>
+                                        <value>FirstNameField</value>
+                                      </constantValue>
+                                    </property>
+                                    <property name="objectType">
+                                      <constantValue>
+                                        <type>ES6Class</type>
+                                        <value>
+                                          <ref name="StringField" module="@eclipse-scout/core"></ref>
+                                        </value>
+                                      </constantValue>
+                                    </property>
+                                  </objectLiteral>
+                                </value>
+                              </constantValue>
+                              <constantValue>
+                                <type>ObjectLiteral</type>
+                                <value>
+                                  <objectLiteral>
+                                    <property name="id">
+                                      <constantValue>
+                                        <type>String</type>
+                                        <value>AgeField</value>
+                                      </constantValue>
+                                    </property>
+                                    <property name="objectType">
+                                      <constantValue>
+                                        <type>ES6Class</type>
+                                        <value>
+                                          <ref name="NumberField" module="@eclipse-scout/core"></ref>
+                                        </value>
+                                      </constantValue>
+                                    </property>
+                                  </objectLiteral>
+                                </value>
+                              </constantValue>
+                            </value>
+                          </constantValue>
+                        </property>
+                      </objectLiteral>
+                    </value>
+                  </constantValue>
+                </property>
+              </objectLiteral>
+            </value>
+          </constantValue>
+        </property>
+        <property name="detailTable">
+          <constantValue>
+            <type>ObjectLiteral</type>
+            <value>
+              <objectLiteral>
+                <property name="objectType">
+                  <constantValue>
+                    <type>ES6Class</type>
+                    <value>
+                      <ref name="Table" module="@eclipse-scout/core"></ref>
+                    </value>
+                  </constantValue>
+                </property>
+                <property name="columns">
+                  <constantValue>
+                    <type>Array</type>
+                    <value>
+                      <constantValue>
+                        <type>ObjectLiteral</type>
+                        <value>
+                          <objectLiteral>
+                            <property name="id">
+                              <constantValue>
+                                <type>String</type>
+                                <value>IdColumn</value>
+                              </constantValue>
+                            </property>
+                            <property name="objectType">
+                              <constantValue>
+                                <type>ES6Class</type>
+                                <value>
+                                  <ref name="NumberColumn" module="@eclipse-scout/core"></ref>
+                                </value>
+                              </constantValue>
+                            </property>
+                          </objectLiteral>
+                        </value>
+                      </constantValue>
+                      <constantValue>
+                        <type>ObjectLiteral</type>
+                        <value>
+                          <objectLiteral>
+                            <property name="id">
+                              <constantValue>
+                                <type>String</type>
+                                <value>NameColumn</value>
+                              </constantValue>
+                            </property>
+                            <property name="objectType">
+                              <constantValue>
+                                <type>ES6Class</type>
+                                <value>
+                                  <ref name="Column" module="@eclipse-scout/core"></ref>
+                                </value>
+                              </constantValue>
+                            </property>
+                          </objectLiteral>
+                        </value>
+                      </constantValue>
+                    </value>
+                  </constantValue>
+                </property>
+                <property name="menus">
+                  <constantValue>
+                    <type>Array</type>
+                    <value>
+                      <constantValue>
+                        <type>ObjectLiteral</type>
+                        <value>
+                          <objectLiteral>
+                            <property name="id">
+                              <constantValue>
+                                <type>String</type>
+                                <value>NewMenu</value>
+                              </constantValue>
+                            </property>
+                            <property name="objectType">
+                              <constantValue>
+                                <type>ES6Class</type>
+                                <value>
+                                  <ref name="Menu" module="@eclipse-scout/core"></ref>
+                                </value>
+                              </constantValue>
+                            </property>
+                          </objectLiteral>
+                        </value>
+                      </constantValue>
+                      <constantValue>
+                        <type>ObjectLiteral</type>
+                        <value>
+                          <objectLiteral>
+                            <property name="id">
+                              <constantValue>
+                                <type>String</type>
+                                <value>EditMenu</value>
+                              </constantValue>
+                            </property>
+                            <property name="objectType">
+                              <constantValue>
+                                <type>ES6Class</type>
+                                <value>
+                                  <ref name="Menu" module="@eclipse-scout/core"></ref>
+                                </value>
+                              </constantValue>
+                            </property>
+                          </objectLiteral>
+                        </value>
+                      </constantValue>
+                    </value>
+                  </constantValue>
+                </property>
+              </objectLiteral>
+            </value>
+          </constantValue>
+        </property>
+      </objectLiteral>
+    </function>
+  </export>
+  <index>
+    ObjectFactory.get().registerNamespace('project', self);
+  </index>
+  <module name="@eclipse-scout/core">
+    <export name="Widget">
+      <class name="Widget"></class>
+    </export>
+    <export name="Form">
+      <class name="Form">
+        <superClass>
+          <ref name="Widget" module="@eclipse-scout/core"></ref>
+        </superClass>
+      </class>
+    </export>
+    <export name="FormField">
+      <class name="FormField">
+        <superClass>
+          <ref name="Widget" module="@eclipse-scout/core"></ref>
+        </superClass>
+      </class>
+    </export>
+    <export name="GroupBox">
+      <class name="GroupBox">
+        <superClass>
+          <ref name="FormField" module="@eclipse-scout/core"></ref>
+        </superClass>
+      </class>
+    </export>
+    <export name="StringField">
+      <class name="StringField">
+        <superClass>
+          <ref name="FormField" module="@eclipse-scout/core"></ref>
+        </superClass>
+      </class>
+    </export>
+    <export name="NumberField">
+      <class name="NumberField">
+        <superClass>
+          <ref name="FormField" module="@eclipse-scout/core"></ref>
+        </superClass>
+      </class>
+    </export>
+    <export name="Menu">
+      <class name="Menu">
+        <superClass>
+          <ref name="Widget" module="@eclipse-scout/core"></ref>
+        </superClass>
+      </class>
+    </export>
+    <export name="Table">
+      <class name="Table">
+        <superClass>
+          <ref name="Widget" module="@eclipse-scout/core"></ref>
+        </superClass>
+      </class>
+    </export>
+    <export name="Column">
+      <class name="Column"></class>
+    </export>
+    <export name="NumberColumn">
+      <class name="NumberColumn">
+        <superClass>
+          <ref name="Column" module="@eclipse-scout/core"></ref>
+        </superClass>
+      </class>
+    </export>
+    <index>
+      ObjectFactory.get().registerNamespace('scout', self);
+    </index>
+  </module>
+</module>

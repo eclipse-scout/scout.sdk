@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
@@ -27,13 +28,9 @@ public class IdObjectTypeMapTest {
   @Test
   @ExtendWithNodeModules("SomeFormModel")
   public void testWidgetMap(INodeModule module) {
-    var groupBoxClass = classByObjectType("GroupBox", module);
-    var stringFieldClass = classByObjectType("StringField", module);
-    var menuClass = classByObjectType("Menu", module);
-
-    var groupBoxObjectType = ObjectType.create(groupBoxClass).orElseThrow();
-    var stringFieldObjectType = ObjectType.create(stringFieldClass).orElseThrow();
-    var menuObjectType = ObjectType.create(menuClass).orElseThrow();
+    var groupBoxObjectType = createObjectType("GroupBox", module);
+    var stringFieldObjectType = createObjectType("StringField", module);
+    var menuObjectType = createObjectType("Menu", module);
 
     var someFormModel = module.export("SomeFormModel")
         .filter(IFunction.class::isInstance)
@@ -100,21 +97,15 @@ public class IdObjectTypeMapTest {
   @Test
   @ExtendWithNodeModules("SomeFormWithTableFieldModel")
   public void testWidgetMapWithTable(INodeModule module) {
-    var groupBoxClass = classByObjectType("GroupBox", module);
-    var stringFieldClass = classByObjectType("StringField", module);
-    var tableFieldClass = classByObjectType("TableField", module);
-    var tableClass = classByObjectType("Table", module);
-    var fancyTableClass = classByObjectType("FancyTable", module);
-    var menuClass = classByObjectType("Menu", module);
-    var columnClass = classByObjectType("Column", module);
-    var numberColumnClass = classByObjectType("NumberColumn", module);
+    var tableClass = findClassByObjectType("Table", module);
+    var fancyTableClass = findClassByObjectType("FancyTable", module);
 
-    var groupBoxObjectType = ObjectType.create(groupBoxClass).orElseThrow();
-    var stringFieldObjectType = ObjectType.create(stringFieldClass).orElseThrow();
-    var tableFieldObjectType = ObjectType.create(tableFieldClass).orElseThrow();
-    var menuObjectType = ObjectType.create(menuClass).orElseThrow();
-    var columnObjectType = ObjectType.create(columnClass).orElseThrow();
-    var numberColumnObjectType = ObjectType.create(numberColumnClass).orElseThrow();
+    var groupBoxObjectType = createObjectType("GroupBox", module);
+    var stringFieldObjectType = createObjectType("StringField", module);
+    var tableFieldObjectType = createObjectType("TableField", module);
+    var menuObjectType = createObjectType("Menu", module);
+    var columnObjectType = createObjectType("Column", module);
+    var numberColumnObjectType = createObjectType("NumberColumn", module);
 
     var someFormModel = module.export("SomeFormWithTableFieldModel")
         .filter(IFunction.class::isInstance)
@@ -200,8 +191,7 @@ public class IdObjectTypeMapTest {
 
     var someTable = widgetMap.elements().get("SomeTable");
     assertNotNull(someTable);
-    assertObjectType(ObjectType.create(tableClass).orElseThrow()
-        .withNewClassName("SomeTable"), someTable.objectType());
+    assertObjectType(createObjectType(tableClass).withNewClassName("SomeTable"), someTable.objectType());
 
     var someTableWidgetMap = someTable.objectType().widgetMap().orElse(null);
     assertNotNull(someTableWidgetMap);
@@ -242,8 +232,7 @@ public class IdObjectTypeMapTest {
 
     var table = widgetMap.elements().get("Table");
     assertNotNull(table);
-    assertObjectType(ObjectType.create(fancyTableClass).orElseThrow()
-        .withNewClassName("FancyTableFieldTable"), table.objectType());
+    assertObjectType(createObjectType(fancyTableClass).withNewClassName("FancyTableFieldTable"), table.objectType());
 
     var fancyTableFieldTableColumnMap = table.objectType().columnMap().orElse(null);
     assertNotNull(fancyTableFieldTableColumnMap);
@@ -254,7 +243,7 @@ public class IdObjectTypeMapTest {
     assertEquals(List.of("TextColumn"), fancyTableFieldTableColumnMap.elements().keySet().stream().toList());
 
     assertEquals(1, fancyTableFieldTableColumnMap.idObjectTypeMapReferences().size());
-    assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(classByObjectType("FancyTableColumnMap", module)).orElseThrow(), fancyTableFieldTableColumnMap.idObjectTypeMapReferences().stream().findFirst().orElseThrow());
+    assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(findClassByObjectType("FancyTableColumnMap", module)).orElseThrow(), fancyTableFieldTableColumnMap.idObjectTypeMapReferences().stream().findFirst().orElseThrow());
 
     var textColumn = fancyTableFieldTableColumnMap.elements().get("TextColumn");
     assertNotNull(textColumn);
@@ -264,17 +253,11 @@ public class IdObjectTypeMapTest {
   @Test
   @ExtendWithNodeModules("SomeFormWithReferencedWidgetMapsModel")
   public void testWidgetMapWithReferencedWidgetMaps(INodeModule module) {
-    var groupBoxClass = classByObjectType("GroupBox", module);
-    var stringFieldClass = classByObjectType("StringField", module);
-    var tabBoxClass = classByObjectType("TabBox", module);
-    var documentsBoxClass = classByObjectType("DocumentsBox", module);
-    var notesBoxClass = classByObjectType("NotesBox", module);
-
-    var groupBoxObjectType = ObjectType.create(groupBoxClass).orElseThrow();
-    var stringFieldObjectType = ObjectType.create(stringFieldClass).orElseThrow();
-    var tabBoxObjectType = ObjectType.create(tabBoxClass).orElseThrow();
-    var documentsBoxObjectType = ObjectType.create(documentsBoxClass).orElseThrow();
-    var notesBoxObjectType = ObjectType.create(notesBoxClass).orElseThrow();
+    var groupBoxObjectType = createObjectType("GroupBox", module);
+    var stringFieldObjectType = createObjectType("StringField", module);
+    var tabBoxObjectType = createObjectType("TabBox", module);
+    var documentsBoxObjectType = createObjectType("DocumentsBox", module);
+    var notesBoxObjectType = createObjectType("NotesBox", module);
 
     var someFormModel = module.export("SomeFormWithReferencedWidgetMapsModel")
         .filter(IFunction.class::isInstance)
@@ -318,8 +301,8 @@ public class IdObjectTypeMapTest {
 
     assertEquals(2, widgetMap.idObjectTypeMapReferences().size());
     var idObjectTypeMapReferences = widgetMap.idObjectTypeMapReferences().stream().toList();
-    assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(classByObjectType("DocumentsBoxWidgetMap", module)).orElseThrow(), idObjectTypeMapReferences.get(0));
-    assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(classByObjectType("NotesBoxWidgetMap", module)).orElseThrow(), idObjectTypeMapReferences.get(1));
+    assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(findClassByObjectType("DocumentsBoxWidgetMap", module)).orElseThrow(), idObjectTypeMapReferences.get(0));
+    assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(findClassByObjectType("NotesBoxWidgetMap", module)).orElseThrow(), idObjectTypeMapReferences.get(1));
 
     var mainBox = widgetMap.elements().get("MainBox");
     assertNotNull(mainBox);
@@ -345,21 +328,25 @@ public class IdObjectTypeMapTest {
   @Test
   @ExtendWithNodeModules("SomePageModel")
   public void testPageObjectTypes(INodeModule module) {
-    var formClass = classByObjectType("Form", module);
-    var groupBoxClass = classByObjectType("GroupBox", module);
-    var stringFieldClass = classByObjectType("StringField", module);
-    var numberFieldClass = classByObjectType("NumberField", module);
-    var menuClass = classByObjectType("Menu", module);
-    var tableClass = classByObjectType("Table", module);
-    var columnClass = classByObjectType("Column", module);
-    var numberColumnClass = classByObjectType("NumberColumn", module);
+    assertSomePageModel(module, "SomePageForm", "SomeTable");
+  }
 
-    var groupBoxObjectType = ObjectType.create(groupBoxClass).orElseThrow();
-    var stringFieldObjectType = ObjectType.create(stringFieldClass).orElseThrow();
-    var numberFieldObjectType = ObjectType.create(numberFieldClass).orElseThrow();
-    var menuObjectType = ObjectType.create(menuClass).orElseThrow();
-    var columnObjectType = ObjectType.create(columnClass).orElseThrow();
-    var numberColumnObjectType = ObjectType.create(numberColumnClass).orElseThrow();
+  @Test
+  @ExtendWithNodeModules("SomePageModelWithoutTopLevelId")
+  public void testPageObjectTypesWithoutTopLevelId(INodeModule module) {
+    assertSomePageModel(module, "SomePageForm", "SomePageTable");
+  }
+
+  private static void assertSomePageModel(INodeModule module, String expectedDetailFormName, String expectedDetailTableName) {
+    var formClass = findClassByObjectType("Form", module);
+    var tableClass = findClassByObjectType("Table", module);
+
+    var groupBoxObjectType = createObjectType("GroupBox", module);
+    var stringFieldObjectType = createObjectType("StringField", module);
+    var numberFieldObjectType = createObjectType("NumberField", module);
+    var menuObjectType = createObjectType("Menu", module);
+    var columnObjectType = createObjectType("Column", module);
+    var numberColumnObjectType = createObjectType("NumberColumn", module);
 
     var somePageModel = module.export("SomePageModel")
         .map(IFunction.class::cast)
@@ -369,7 +356,7 @@ public class IdObjectTypeMapTest {
     //    {
     //      id: 'SomePage',
     //      detailForm: {
-    //        id: 'Form',
+    //        id: 'Form', // OPTIONAL
     //        objectType: Form,
     //        rootGroupBox: {
     //          id: 'MainBox',
@@ -391,7 +378,7 @@ public class IdObjectTypeMapTest {
     //        }
     //      },
     //      detailTable: {
-    //        id: 'SomeTable',
+    //        id: 'SomeTable', // OPTIONAL
     //        objectType: Table,
     //        columns: [
     //          {
@@ -417,13 +404,12 @@ public class IdObjectTypeMapTest {
     //    }
 
     var somePageForm = IdObjectTypeMapUtils.createDetailFormForPage("SomePageModel", somePageModel).orElseThrow();
-    assertObjectType(ObjectType.create(formClass).orElseThrow()
-        .withNewClassName("SomePageForm"), somePageForm);
+    assertObjectType(createObjectType(formClass).withNewClassName(expectedDetailFormName), somePageForm);
 
     var somePageFormWidgetMap = somePageForm.widgetMap().orElseThrow();
     assertTrue(somePageForm.columnMap().isEmpty());
 
-    assertEquals("SomePageFormWidgetMap", somePageFormWidgetMap.name());
+    assertEquals(expectedDetailFormName + "WidgetMap", somePageFormWidgetMap.name());
 
     assertEquals(4, somePageFormWidgetMap.elements().size());
     assertEquals(List.of("MainBox", "LastNameField", "FirstNameField", "AgeField"), somePageFormWidgetMap.elements().keySet().stream().toList());
@@ -447,13 +433,12 @@ public class IdObjectTypeMapTest {
     assertObjectType(numberFieldObjectType, ageField.objectType());
 
     var someTable = IdObjectTypeMapUtils.createDetailTableForPage("SomePageModel", somePageModel).orElseThrow();
-    assertObjectType(ObjectType.create(tableClass).orElseThrow()
-        .withNewClassName("SomeTable"), someTable);
+    assertObjectType(createObjectType(tableClass).withNewClassName(expectedDetailTableName), someTable);
 
     var someTableWidgetMap = someTable.widgetMap().orElseThrow();
     var someTableColumnMap = someTable.columnMap().orElseThrow();
 
-    assertEquals("SomeTableWidgetMap", someTableWidgetMap.name());
+    assertEquals(expectedDetailTableName + "WidgetMap", someTableWidgetMap.name());
 
     assertEquals(2, someTableWidgetMap.elements().size());
     assertEquals(List.of("NewMenu", "EditMenu"), someTableWidgetMap.elements().keySet().stream().toList());
@@ -468,7 +453,7 @@ public class IdObjectTypeMapTest {
     assertNotNull(editMenu);
     assertObjectType(menuObjectType, editMenu.objectType());
 
-    assertEquals("SomeTableColumnMap", someTableColumnMap.name());
+    assertEquals(expectedDetailTableName + "ColumnMap", someTableColumnMap.name());
 
     assertEquals(2, someTableColumnMap.elements().size());
     assertEquals(List.of("IdColumn", "NameColumn"), someTableColumnMap.elements().keySet().stream().toList());
@@ -496,7 +481,7 @@ public class IdObjectTypeMapTest {
     expected.idObjectTypeMap().ifPresent(widgetMap -> assertSame(widgetMap, actual.idObjectTypeMap().orElseThrow()));
   }
 
-  private static IES6Class classByObjectType(String objectType, INodeModule module) {
+  private static IES6Class findClassByObjectType(String objectType, INodeModule module) {
     return module.elements()
         .withRecursive(true)
         .stream()
@@ -505,5 +490,13 @@ public class IdObjectTypeMapTest {
         .findAny()
         .map(IES6Class.class::cast)
         .orElseThrow();
+  }
+
+  private static ObjectType createObjectType(String objectType, INodeModule module) {
+    return createObjectType(findClassByObjectType(objectType, module));
+  }
+
+  private static ObjectType createObjectType(IES6Class es6Class) {
+    return ObjectType.create(es6Class, new HashSet<>()).orElseThrow();
   }
 }

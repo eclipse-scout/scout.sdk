@@ -76,12 +76,15 @@ public class WidgetMapCreateOperationTest {
         "'SomeMenu': Menu;" +
         "};"), operation.classSources());
 
+    var imports = operation.importsForModel().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("GroupBox", "StringField", "Menu"), imports);
+
     var declarationSources = operation.declarationSources();
     assertEquals(1, declarationSources.size());
     assertEqualsIgnoreWhitespaces("declare widgetMap: SomeFormWidgetMap;", declarationSources.get("widgetMap"));
 
-    var imports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
-    assertEquals(List.of("SomeFormWidgetMap"), imports);
+    var declarationImports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("SomeFormWidgetMap"), declarationImports);
   }
 
   @Test
@@ -183,12 +186,16 @@ public class WidgetMapCreateOperationTest {
 
     ), operation.classSources());
 
+    var imports = operation.importsForModel().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("GroupBox", "StringField", "TableField", "SomeTable", "FancyTableFieldTable", "SomeTableWidgetMap", "Table", "SomeTableColumnMap", "Menu", "NumberColumn", "Column", "FancyTable", "FancyTableFieldTableColumnMap",
+        "FancyTableColumnMap"), imports);
+
     var declarationSources = operation.declarationSources();
     assertEquals(1, declarationSources.size());
     assertEqualsIgnoreWhitespaces("declare widgetMap: SomeFormWithTableFieldWidgetMap;", declarationSources.get("widgetMap"));
 
-    var imports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
-    assertEquals(List.of("SomeFormWithTableFieldWidgetMap"), imports);
+    var declarationImports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("SomeFormWithTableFieldWidgetMap"), declarationImports);
   }
 
   @Test
@@ -240,17 +247,30 @@ public class WidgetMapCreateOperationTest {
         "'NotesBox': NotesBox;" +
         "} & DocumentsBoxWidgetMap & NotesBoxWidgetMap;"), operation.classSources());
 
+    var imports = operation.importsForModel().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("GroupBox", "StringField", "TabBox", "DocumentsBox", "NotesBox", "DocumentsBoxWidgetMap", "NotesBoxWidgetMap"), imports);
+
     var declarationSources = operation.declarationSources();
     assertEquals(1, declarationSources.size());
     assertEqualsIgnoreWhitespaces("declare widgetMap: SomeFormWithReferencedWidgetMapsWidgetMap;", declarationSources.get("widgetMap"));
 
-    var imports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
-    assertEquals(List.of("SomeFormWithReferencedWidgetMapsWidgetMap"), imports);
+    var declarationImports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("SomeFormWithReferencedWidgetMapsWidgetMap"), declarationImports);
   }
 
   @Test
   @ExtendWithNodeModules("SomePageModel")
   public void testPageObjectTypes(INodeModule module) {
+    assertSomePageModel(module, "SomePageForm", "SomeTable");
+  }
+
+  @Test
+  @ExtendWithNodeModules("SomePageModelWithoutTopLevelId")
+  public void testPageObjectTypesWithoutTopLevelId(INodeModule module) {
+    assertSomePageModel(module, "SomePageForm", "SomePageTable");
+  }
+
+  private static void assertSomePageModel(INodeModule module, String expectedDetailFormName, String expectedDetailTableName) {
     var somePageModel = module.export("SomePageModel")
         .map(IFunction.class::cast)
         .flatMap(IFunction::resultingObjectLiteral)
@@ -259,7 +279,7 @@ public class WidgetMapCreateOperationTest {
     //    {
     //      id: 'SomePage',
     //      detailForm: {
-    //        id: 'Form',
+    //        id: 'Form', // OPTIONAL
     //        objectType: Form,
     //        rootGroupBox: {
     //          id: 'MainBox',
@@ -281,7 +301,7 @@ public class WidgetMapCreateOperationTest {
     //        }
     //      },
     //      detailTable: {
-    //        id: 'SomeTable',
+    //        id: 'SomeTable', // OPTIONAL
     //        objectType: Table,
     //        columns: [
     //          {
@@ -312,36 +332,40 @@ public class WidgetMapCreateOperationTest {
     operation.execute();
 
     assertEqualsIgnoreWhitespaces(List.of(
-        "export class SomePageForm extends Form {" +
-            "declare widgetMap: SomePageFormWidgetMap;" +
+        "export class " + expectedDetailFormName + " extends Form {" +
+            "declare widgetMap: " + expectedDetailFormName + "WidgetMap;" +
             "}",
-        "export type SomePageFormWidgetMap = {" +
+        "export type " + expectedDetailFormName + "WidgetMap = {" +
             "'MainBox': GroupBox;" +
             "'LastNameField': StringField;" +
             "'FirstNameField': StringField;" +
             "'AgeField': NumberField;" +
             "};",
-        "export class SomeTable extends Table {" +
-            "declare widgetMap: SomeTableWidgetMap;" +
-            "declare columnMap: SomeTableColumnMap;" +
+        "export class " + expectedDetailTableName + " extends Table {" +
+            "declare widgetMap: " + expectedDetailTableName + "WidgetMap;" +
+            "declare columnMap: " + expectedDetailTableName + "ColumnMap;" +
             "}",
-        "export type SomeTableWidgetMap = {" +
+        "export type " + expectedDetailTableName + "WidgetMap = {" +
             "'NewMenu': Menu;" +
             "'EditMenu': Menu;" +
             "};",
-        "export type SomeTableColumnMap = {" +
+        "export type " + expectedDetailTableName + "ColumnMap = {" +
             "'IdColumn': NumberColumn;" +
             "'NameColumn': Column;" +
             "};"),
         operation.classSources());
 
+    var imports = operation.importsForModel().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("Form", expectedDetailFormName + "WidgetMap", "GroupBox", "StringField", "NumberField", "Table", expectedDetailTableName + "WidgetMap", expectedDetailTableName + "ColumnMap", "Menu", "NumberColumn", "Column"),
+        imports);
+
     var declarationSources = operation.declarationSources();
     assertEquals(2, declarationSources.size());
-    assertEqualsIgnoreWhitespaces("declare detailForm: SomePageForm;", declarationSources.get("detailForm"));
-    assertEqualsIgnoreWhitespaces("declare detailTable: SomeTable;", declarationSources.get("detailTable"));
+    assertEqualsIgnoreWhitespaces("declare detailForm: " + expectedDetailFormName + ";", declarationSources.get("detailForm"));
+    assertEqualsIgnoreWhitespaces("declare detailTable: " + expectedDetailTableName + ";", declarationSources.get("detailTable"));
 
-    var imports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
-    assertEquals(List.of("SomePageForm", "SomeTable"), imports);
+    var declarationImports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of(expectedDetailFormName, expectedDetailTableName), declarationImports);
   }
 
   private static void assertEqualsIgnoreWhitespaces(CharSequence expected, CharSequence actual) {

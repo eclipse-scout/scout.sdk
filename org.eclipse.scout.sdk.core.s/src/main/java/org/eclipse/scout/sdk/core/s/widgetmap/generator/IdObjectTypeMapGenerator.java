@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.core.java.JavaUtils;
 import org.eclipse.scout.sdk.core.s.widgetmap.IdObjectType;
 import org.eclipse.scout.sdk.core.s.widgetmap.IdObjectTypeMap;
 import org.eclipse.scout.sdk.core.s.widgetmap.IdObjectTypeMapReference;
-import org.eclipse.scout.sdk.core.s.widgetmap.ObjectType;
+import org.eclipse.scout.sdk.core.s.widgetmap.Type;
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
 import org.eclipse.scout.sdk.core.typescript.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.field.IFieldGenerator;
@@ -37,7 +37,7 @@ public class IdObjectTypeMapGenerator extends TypeAliasGenerator<IdObjectTypeMap
     var map = map().orElseThrow(() -> Ensure.newFail("IdObjectTypeMap missing."));
 
     withModifier(Modifier.EXPORT)
-        .withElementName(ObjectType.ensureValidName(map.name()));
+        .withElementName(Type.ensureValidName(map.name()));
 
     var objectType = TypeGenerator.create();
     map.elements().values().stream().map(this::createIdObjectTypeField)

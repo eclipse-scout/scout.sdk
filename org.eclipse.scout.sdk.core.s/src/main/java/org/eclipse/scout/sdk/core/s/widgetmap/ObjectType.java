@@ -11,31 +11,29 @@ package org.eclipse.scout.sdk.core.s.widgetmap;
 
 import static java.util.Optional.empty;
 
+import java.util.Collection;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.util.Ensure;
-import org.eclipse.scout.sdk.core.util.Strings;
 
-public class ObjectType {
-
-  private static final Pattern NOT_ALLOWED_CLASS_NAME_CHARS = Pattern.compile("\\W");
+public class ObjectType extends Type {
 
   private final IES6Class m_es6Class;
-  private String m_newClassName = null;
   private WidgetMap m_widgetMap = null;
   private ColumnMap m_columnMap = null;
 
-  protected ObjectType(IES6Class es6Class) {
+  protected ObjectType(IES6Class es6Class, Collection<String> usedNames) {
+    super(Ensure.notNull(usedNames));
     m_es6Class = Ensure.notNull(es6Class);
   }
 
-  public static Optional<ObjectType> create(IES6Class es6Class) {
-    if (es6Class == null) {
+  public static Optional<ObjectType> create(IES6Class es6Class, Collection<String> usedNames) {
+    if (es6Class == null || usedNames == null) {
       return empty();
     }
-    return Optional.of(new ObjectType(es6Class));
+    return Optional.of(new ObjectType(es6Class, usedNames));
   }
 
   public IES6Class es6Class() {
@@ -46,20 +44,10 @@ public class ObjectType {
     return es6Class().isInstanceOf(es6Class);
   }
 
-  public Optional<String> newClassName() {
-    return Optional.ofNullable(m_newClassName);
-  }
-
+  @Override
   public ObjectType withNewClassName(CharSequence newClassName) {
-    m_newClassName = ensureValidName(newClassName);
+    super.withNewClassName(newClassName);
     return this;
-  }
-
-  public static String ensureValidName(CharSequence name) {
-    if (name == null) {
-      return null;
-    }
-    return Strings.capitalize(NOT_ALLOWED_CLASS_NAME_CHARS.matcher(name).replaceAll("")).toString();
   }
 
   public Optional<WidgetMap> widgetMap() {
@@ -79,6 +67,15 @@ public class ObjectType {
 
   public ObjectType withColumnMap(ColumnMap columnMap) {
     m_columnMap = columnMap;
+    return this;
+  }
+
+  public ObjectType withNewClassNameAndMaps(CharSequence newClassName, IObjectLiteral model) {
+    withNewClassName(newClassName);
+
+    WidgetMap.create(newClassName().orElse(null), model, usedNames()).ifPresent(this::withWidgetMap);
+    ColumnMap.create(newClassName().orElse(null), model, usedNames()).ifPresent(this::withColumnMap);
+
     return this;
   }
 }

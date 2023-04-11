@@ -12,8 +12,11 @@ package org.eclipse.scout.sdk.core.s.widgetmap;
 import static java.util.Optional.empty;
 import static java.util.function.Predicate.not;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
@@ -22,6 +25,8 @@ import org.eclipse.scout.sdk.core.s.widgetmap.generator.ObjectTypeGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.INodeElementGenerator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue.ConstantValueType;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -60,19 +65,53 @@ public final class IdObjectTypeMapUtils {
     return pageModel.property(propertyName)
         .filter(cv -> cv.type() == ConstantValueType.ObjectLiteral)
         .flatMap(IConstantValue::asObjectLiteral)
-        .flatMap(ol -> IdObjectType.create(ol)
-            .map(idObjectType -> {
-              var name = idObjectType.id();
-              if (!acceptName.test(name) || name.equals(idObjectType.objectType().es6Class().name())) {
-                name = pageName + name;
+        .flatMap(ol -> ol.property(ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE)
+            .flatMap(IConstantValue::asES6Class)
+            .flatMap(es6Class -> ObjectType.create(es6Class, calculateUsedNames(pageModel)))
+            .map(objectType -> {
+              var es6ClassName = objectType.es6Class().name();
+              var newClassName = getId(ol).orElse(es6ClassName);
+              if (!acceptName.test(newClassName) || es6ClassName.equals(newClassName)) {
+                newClassName = pageName + newClassName;
               }
-              var objectType = idObjectType.objectType().withNewClassName(name);
-
-              WidgetMap.create(name, ol).ifPresent(objectType::withWidgetMap);
-              ColumnMap.create(name, ol).ifPresent(objectType::withColumnMap);
-
-              return objectType;
+              return objectType.withNewClassNameAndMaps(newClassName, ol);
             }));
+  }
+
+  /* **************************************************************************
+   * USED NAMES
+   * *************************************************************************/
+
+  public static Collection<String> calculateUsedNames(INodeElement nodeElement) {
+    if (nodeElement == null) {
+      return new HashSet<>();
+    }
+    var containingFile = nodeElement.containingFile().orElse(null);
+    return nodeElement.containingModule().elements().stream()
+        .filter(element -> element.containingFile()
+            .filter(otherPath -> !otherPath.equals(containingFile))
+            .isPresent())
+        .filter(INodeElement::isExportedFromModule)
+        .map(INodeElement::moduleExportNames)
+        .flatMap(Collection::stream)
+        .collect(Collectors.toCollection(HashSet::new));
+  }
+
+  /* **************************************************************************
+   * PROPERTIES
+   * *************************************************************************/
+
+  public static Optional<String> getId(IObjectLiteral model) {
+    return Optional.ofNullable(model)
+        .flatMap(ol -> ol.property(ScoutJsCoreConstants.PROPERTY_NAME_ID))
+        .flatMap(IConstantValue::asString)
+        .flatMap(Strings::notBlank);
+  }
+
+  public static Optional<IES6Class> getObjectType(IObjectLiteral model) {
+    return Optional.ofNullable(model)
+        .flatMap(ol -> ol.property(ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE))
+        .flatMap(IConstantValue::asES6Class);
   }
 
   /* **************************************************************************

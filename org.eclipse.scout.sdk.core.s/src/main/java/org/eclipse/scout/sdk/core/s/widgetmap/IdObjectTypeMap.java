@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.core.s.widgetmap;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -24,17 +25,16 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
-public abstract class IdObjectTypeMap {
+public abstract class IdObjectTypeMap extends Type {
 
-  private final String m_name;
   private final IObjectLiteral m_model;
   private final FinalValue<Optional<ScoutJsModel>> m_scoutJsModel = new FinalValue<>();
   private final Map<String, Optional<IES6Class>> m_classes = new HashMap<>();
   private final FinalValue<Map<String, IdObjectType>> m_elements = new FinalValue<>();
   private final FinalValue<Set<IdObjectTypeMapReference>> m_idObjectTypeMapReferences = new FinalValue<>();
 
-  protected IdObjectTypeMap(String name, IObjectLiteral model) {
-    m_name = Ensure.notNull(name);
+  protected IdObjectTypeMap(String name, IObjectLiteral model, Collection<String> usedNames) {
+    super(Ensure.notNull(name), usedNames);
     m_model = Ensure.notNull(model);
   }
 
@@ -42,8 +42,13 @@ public abstract class IdObjectTypeMap {
     return m_model;
   }
 
+  @Override
+  public Type withNewClassName(CharSequence name) {
+    throw new UnsupportedOperationException();
+  }
+
   public String name() {
-    return m_name;
+    return newClassName().orElseThrow();
   }
 
   protected Optional<ScoutJsModel> scoutJsModel() {

@@ -14,6 +14,7 @@ import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toCollection;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -36,18 +37,25 @@ public class WidgetMap extends IdObjectTypeMap {
 
   private final FinalValue<Optional<IES6Class>> m_tableClass = new FinalValue<>();
 
-  protected WidgetMap(String name, IObjectLiteral model) {
-    super(name, model);
+  protected WidgetMap(String name, IObjectLiteral model, Collection<String> usedNames) {
+    super(name, model, usedNames);
   }
 
   public static Optional<WidgetMap> create(String widgetOrModelName, IObjectLiteral widgetModel) {
     if (widgetOrModelName == null || widgetModel == null) {
       return empty();
     }
+    return create(widgetOrModelName, widgetModel, IdObjectTypeMapUtils.calculateUsedNames(widgetModel));
+  }
+
+  public static Optional<WidgetMap> create(String widgetOrModelName, IObjectLiteral widgetModel, Collection<String> usedNames) {
+    if (widgetOrModelName == null || widgetModel == null || usedNames == null) {
+      return empty();
+    }
     return Optional.of(widgetOrModelName)
         .map(n -> Strings.removeSuffix(n, ScoutJsCoreConstants.CLASS_NAME_SUFFIX_MODEL))
         .map(n -> n + ScoutJsCoreConstants.CLASS_NAME_SUFFIX_WIDGET_MAP)
-        .map(n -> new WidgetMap(n, widgetModel));
+        .map(n -> new WidgetMap(n, widgetModel, usedNames));
   }
 
   @Override
@@ -110,7 +118,7 @@ public class WidgetMap extends IdObjectTypeMap {
   }
 
   protected TreeVisitResult collectIdObjectType(IObjectLiteral element, Deque<IObjectLiteral> ancestors, Consumer<IdObjectType> collector) {
-    var idObjectType = IdObjectType.create(element).orElse(null);
+    var idObjectType = IdObjectType.create(element, usedNames()).orElse(null);
     if (idObjectType == null) {
       return TreeVisitResult.CONTINUE;
     }
@@ -128,21 +136,16 @@ public class WidgetMap extends IdObjectTypeMap {
     return TreeVisitResult.CONTINUE;
   }
 
-  @SuppressWarnings("MethodMayBeStatic")
   protected void handleTable(IObjectLiteral element, IdObjectType idObjectType, Deque<IObjectLiteral> ancestors) {
-    var name = idObjectType.id().replace(".", "");
+    var name = idObjectType.id();
     if (ScoutJsCoreConstants.CLASS_NAME_TABLE.equals(name) || name.equals(idObjectType.objectType().es6Class().name())) {
       name = Optional.ofNullable(ancestors.peekLast()) // get parent
-          .flatMap(IdObjectType::create)
-          .map(iot -> iot.id().replace(".", "") + ScoutJsCoreConstants.CLASS_NAME_TABLE)
+          .flatMap(ol -> IdObjectType.create(ol, usedNames()))
+          .map(iot -> iot.id() + ScoutJsCoreConstants.CLASS_NAME_TABLE)
           .orElse(name);
     }
 
-    var objectType = idObjectType.objectType()
-        .withNewClassName(name);
-
-    WidgetMap.create(name, element).ifPresent(objectType::withWidgetMap);
-    ColumnMap.create(name, element).ifPresent(objectType::withColumnMap);
+    idObjectType.objectType().withNewClassNameAndMaps(name, element);
   }
 
   @Override
