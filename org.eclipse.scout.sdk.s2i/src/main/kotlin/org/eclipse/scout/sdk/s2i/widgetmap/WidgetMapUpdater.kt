@@ -101,6 +101,7 @@ object WidgetMapUpdater {
         }
 
         val modelPsi = psiManager.findFile(model) as? JSFile ?: return null
+        if (!DialectDetector.isTypeScript(modelPsi)) return null // while the consumer may be a JS file, the model must be a TS file!
         val consumerPsi = consumer?.let { psiManager.findFile(it) } as? JSFile
         return modelPsi to consumerPsi
     }
