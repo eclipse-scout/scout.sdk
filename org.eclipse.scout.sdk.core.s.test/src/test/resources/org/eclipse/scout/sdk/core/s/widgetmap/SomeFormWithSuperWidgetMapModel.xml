@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~
+  ~ This program and the accompanying materials are made
+  ~ available under the terms of the Eclipse Public License 2.0
+  ~ which is available at https://www.eclipse.org/legal/epl-2.0/
+  ~
+  ~ SPDX-License-Identifier: EPL-2.0
+  -->
+<module name="@sdk/project">
+  <export name="SomeFormWithSuperWidgetMapModel">
+    <function>
+      <objectLiteral file="src/js/form/SomeFormWithSuperWidgetMapModel.ts">
+        <property name="id">
+          <constantValue>
+            <type>String</type>
+            <value>SomeForm</value>
+          </constantValue>
+        </property>
+        <property name="rootGroupBox">
+          <constantValue>
+            <type>ObjectLiteral</type>
+            <value>
+              <objectLiteral>
+                <property name="id">
+                  <constantValue>
+                    <type>String</type>
+                    <value>MainBox</value>
+                  </constantValue>
+                </property>
+                <property name="objectType">
+                  <constantValue>
+                    <type>ES6Class</type>
+                    <value>
+                      <ref name="GroupBox" module="@eclipse-scout/core"></ref>
+                    </value>
+                  </constantValue>
+                </property>
+                <property name="fields">
+                  <constantValue>
+                    <type>Array</type>
+                    <value>
+                      <constantValue>
+                        <type>ObjectLiteral</type>
+                        <value>
+                          <objectLiteral>
+                            <property name="id">
+                              <constantValue>
+                                <type>String</type>
+                                <value>TitleField</value>
+                              </constantValue>
+                            </property>
+                            <property name="objectType">
+                              <constantValue>
+                                <type>ES6Class</type>
+                                <value>
+                                  <ref name="StringField" module="@eclipse-scout/core"></ref>
+                                </value>
+                              </constantValue>
+                            </property>
+                          </objectLiteral>
+                        </value>
+                      </constantValue>
+                    </value>
+                  </constantValue>
+                </property>
+              </objectLiteral>
+            </value>
+          </constantValue>
+        </property>
+      </objectLiteral>
+    </function>
+  </export>
+  <export name="SomeFormWithSuperWidgetMap">
+    <class name="SomeFormWithSuperWidgetMap">
+      <superClass>
+        <ref name="SomeSuperClass1" module="@sdk/project"></ref>
+      </superClass>
+    </class>
+  </export>
+  <export name="SomeSuperClass1">
+    <class name="SomeSuperClass1">
+      <superClass>
+        <ref name="SomeSuperClass2" module="@sdk/project"></ref>
+      </superClass>
+    </class>
+  </export>
+  <export name="SomeSuperClass2">
+    <class name="SomeSuperClass2">
+      <superClass>
+        <ref name="SomeSuperClass3" module="@sdk/project"></ref>
+      </superClass>
+      <field name="widgetMap">
+        <dataType>
+          <ref name="SomeSuperClass2WidgetMap" module="@sdk/project"></ref>
+        </dataType>
+      </field>
+    </class>
+  </export>
+  <export name="SomeSuperClass3">
+    <class name="SomeSuperClass3">
+      <superClass>
+        <ref name="Widget" module="@eclipse-scout/core"></ref>
+      </superClass>
+      <field name="widgetMap">
+        <dataType>
+          <ref name="SomeSuperClass3WidgetMap" module="@sdk/project"></ref>
+        </dataType>
+      </field>
+    </class>
+  </export>
+  <export name="SomeSuperClass2WidgetMap">
+    <class name="SomeSuperClass2WidgetMap"></class>
+  </export>
+  <export name="SomeSuperClass3WidgetMap">
+    <class name="SomeSuperClass3WidgetMap"></class>
+  </export>
+  <index>
+    ObjectFactory.get().registerNamespace('project', self);
+  </index>
+  <module name="@eclipse-scout/core">
+    <export name="Widget">
+      <class name="Widget"></class>
+    </export>
+    <export name="FormField">
+      <class name="FormField">
+        <superClass>
+          <ref name="Widget" module="@eclipse-scout/core"></ref>
+        </superClass>
+      </class>
+    </export>
+    <export name="GroupBox">
+      <class name="GroupBox">
+        <superClass>
+          <ref name="FormField" module="@eclipse-scout/core"></ref>
+        </superClass>
+      </class>
+    </export>
+    <export name="StringField">
+      <class name="StringField">
+        <superClass>
+          <ref name="FormField" module="@eclipse-scout/core"></ref>
+        </superClass>
+      </class>
+    </export>
+    <index>
+      ObjectFactory.get().registerNamespace('scout', self);
+    </index>
+  </module>
+</module>

@@ -143,28 +143,9 @@ object WidgetMapUpdater {
 
         val operation = WidgetMapCreateOperation()
         operation.setLiteral(objectLiteral.api())
-        operation.isPage = isPageModel(consumerClass, modelFile)
+        operation.setMainWidget(consumerClass?.api())
         operation.execute()
         return WidgetMapUpdateInfo(operation, modelFunctionPsi, consumerClassPsi)
-    }
-
-    private fun isPageModel(modelConsumer: ES6ClassSpi?, modelFile: JSFile): Boolean {
-        if (modelConsumer != null) {
-            return modelConsumer.api()
-                .supers()
-                .withSuperInterfaces(false)
-                .stream()
-                .anyMatch { ScoutJsCoreConstants.CLASS_NAME_PAGE == it.name() }
-        }
-
-        // try to detect based on model file name
-        val fileName = modelFile.virtualFile.name.removeSuffix(IWebConstants.TS_FILE_SUFFIX)
-        return fileName.endsWith(ScoutJsCoreConstants.CLASS_NAME_PAGE)
-                || fileName.endsWith(ScoutJsCoreConstants.CLASS_NAME_PAGE + ScoutJsCoreConstants.MODEL_SUFFIX)
-                || fileName.contains("PageWithTable")
-                || fileName.contains("PageWithNodes")
-                || fileName.endsWith("TablePage" + ScoutJsCoreConstants.MODEL_SUFFIX)
-                || fileName.endsWith("NodePage" + ScoutJsCoreConstants.MODEL_SUFFIX)
     }
 
     private fun <T : PsiElement> findInChildrenOrGrandChildren(jsFile: JSFile, type: Class<T>): T? {

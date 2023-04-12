@@ -73,7 +73,7 @@ public class ObjectType extends Type {
   public ObjectType withNewClassNameAndMaps(CharSequence newClassName, IObjectLiteral model) {
     withNewClassName(newClassName);
 
-    WidgetMap.create(newClassName().orElse(null), model, usedNames()).ifPresent(this::withWidgetMap);
+    WidgetMap.create(newClassName().orElse(null), model, null, usedNames()).ifPresent(this::withWidgetMap);
     ColumnMap.create(newClassName().orElse(null), model, usedNames()).ifPresent(this::withColumnMap);
 
     return this;

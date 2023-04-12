@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~
+  ~ This program and the accompanying materials are made
+  ~ available under the terms of the Eclipse Public License 2.0
+  ~ which is available at https://www.eclipse.org/legal/epl-2.0/
+  ~
+  ~ SPDX-License-Identifier: EPL-2.0
+  -->
+<module name="@sdk/project">
+  <export name="SomeEmptyFormWithSuperWidgetMapModel">
+    <function>
+      <objectLiteral file="src/js/form/SomeEmptyFormWithSuperWidgetMapModel.ts">
+        <property name="id">
+          <constantValue>
+            <type>String</type>
+            <value>SomeForm</value>
+          </constantValue>
+        </property>
+      </objectLiteral>
+    </function>
+  </export>
+  <export name="SomeEmptyFormWithSuperWidgetMap">
+    <class name="SomeEmptyFormWithSuperWidgetMap">
+      <superClass>
+        <ref name="SomeSuperClass1" module="@sdk/project"></ref>
+      </superClass>
+    </class>
+  </export>
+  <export name="SomeSuperClass1">
+    <class name="SomeSuperClass1">
+      <superClass>
+        <ref name="SomeSuperClass2" module="@sdk/project"></ref>
+      </superClass>
+    </class>
+  </export>
+  <export name="SomeSuperClass2">
+    <class name="SomeSuperClass2">
+      <superClass>
+        <ref name="SomeSuperClass3" module="@sdk/project"></ref>
+      </superClass>
+      <field name="widgetMap">
+        <dataType>
+          <ref name="SomeSuperClass2WidgetMap" module="@sdk/project"></ref>
+        </dataType>
+      </field>
+    </class>
+  </export>
+  <export name="SomeSuperClass3">
+    <class name="SomeSuperClass3">
+      <superClass>
+        <ref name="Widget" module="@eclipse-scout/core"></ref>
+      </superClass>
+      <field name="widgetMap">
+        <dataType>
+          <ref name="SomeSuperClass3WidgetMap" module="@sdk/project"></ref>
+        </dataType>
+      </field>
+    </class>
+  </export>
+  <export name="SomeSuperClass2WidgetMap">
+    <class name="SomeSuperClass2WidgetMap"></class>
+  </export>
+  <export name="SomeSuperClass3WidgetMap">
+    <class name="SomeSuperClass3WidgetMap"></class>
+  </export>
+  <index>
+    ObjectFactory.get().registerNamespace('project', self);
+  </index>
+  <module name="@eclipse-scout/core">
+    <export name="Widget">
+      <class name="Widget"></class>
+    </export>
+    <index>
+      ObjectFactory.get().registerNamespace('scout', self);
+    </index>
+  </module>
+</module>

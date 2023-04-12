@@ -112,6 +112,27 @@
                                         <property name="id">
                                           <constantValue>
                                             <type>String</type>
+                                            <value>DocumentsBox2</value>
+                                          </constantValue>
+                                        </property>
+                                        <property name="objectType">
+                                          <constantValue>
+                                            <type>ES6Class</type>
+                                            <value>
+                                              <ref name="DocumentsBox" module="@sdk/project"></ref>
+                                            </value>
+                                          </constantValue>
+                                        </property>
+                                      </objectLiteral>
+                                    </value>
+                                  </constantValue>
+                                  <constantValue>
+                                    <type>ObjectLiteral</type>
+                                    <value>
+                                      <objectLiteral>
+                                        <property name="id">
+                                          <constantValue>
+                                            <type>String</type>
                                             <value>NotesBox</value>
                                           </constantValue>
                                         </property>

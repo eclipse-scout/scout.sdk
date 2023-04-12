@@ -79,6 +79,18 @@ public abstract class IdObjectTypeMap extends Type {
 
   protected abstract Set<IdObjectTypeMapReference> parseIdObjectTypeMapReferences();
 
+  public boolean isEmpty() {
+    return isElementsEmpty() && isIdObjectTypeMapReferencesEmpty();
+  }
+
+  protected boolean isElementsEmpty() {
+    return elements().isEmpty();
+  }
+
+  protected boolean isIdObjectTypeMapReferencesEmpty() {
+    return idObjectTypeMapReferences().isEmpty();
+  }
+
   protected void createDuplicateIdWarning(String id) {
     SdkLog.warning("Duplicate id '{}' in model '{}'.", id, model().containingFile().map(Path::toString).orElse(name()));
   }

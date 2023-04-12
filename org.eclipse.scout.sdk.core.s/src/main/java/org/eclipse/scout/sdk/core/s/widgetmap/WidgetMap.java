@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
@@ -35,27 +36,34 @@ import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
 public class WidgetMap extends IdObjectTypeMap {
 
+  private final IES6Class m_mainWidget;
+  private final FinalValue<Optional<IdObjectTypeMapReference>> m_superWidgetMapReference = new FinalValue<>();
   private final FinalValue<Optional<IES6Class>> m_tableClass = new FinalValue<>();
 
-  protected WidgetMap(String name, IObjectLiteral model, Collection<String> usedNames) {
+  protected WidgetMap(String name, IObjectLiteral model, IES6Class mainWidget, Collection<String> usedNames) {
     super(name, model, usedNames);
+    m_mainWidget = mainWidget;
   }
 
-  public static Optional<WidgetMap> create(String widgetOrModelName, IObjectLiteral widgetModel) {
+  public static Optional<WidgetMap> create(String widgetOrModelName, IObjectLiteral widgetModel, IES6Class mainWidget) {
     if (widgetOrModelName == null || widgetModel == null) {
       return empty();
     }
-    return create(widgetOrModelName, widgetModel, IdObjectTypeMapUtils.calculateUsedNames(widgetModel));
+    return create(widgetOrModelName, widgetModel, mainWidget, IdObjectTypeMapUtils.calculateUsedNames(widgetModel));
   }
 
-  public static Optional<WidgetMap> create(String widgetOrModelName, IObjectLiteral widgetModel, Collection<String> usedNames) {
+  public static Optional<WidgetMap> create(String widgetOrModelName, IObjectLiteral widgetModel, IES6Class mainWidget, Collection<String> usedNames) {
     if (widgetOrModelName == null || widgetModel == null || usedNames == null) {
       return empty();
     }
     return Optional.of(widgetOrModelName)
         .map(n -> Strings.removeSuffix(n, ScoutJsCoreConstants.CLASS_NAME_SUFFIX_MODEL))
         .map(n -> n + ScoutJsCoreConstants.CLASS_NAME_SUFFIX_WIDGET_MAP)
-        .map(n -> new WidgetMap(n, widgetModel, usedNames));
+        .map(n -> new WidgetMap(n, widgetModel, mainWidget, usedNames));
+  }
+
+  public Optional<IES6Class> mainWidget() {
+    return Optional.ofNullable(m_mainWidget);
   }
 
   @Override
@@ -151,16 +159,45 @@ public class WidgetMap extends IdObjectTypeMap {
   @Override
   protected Set<IdObjectTypeMapReference> parseIdObjectTypeMapReferences() {
     var widgetClass = widgetClass().orElse(null);
-    return elements().values().stream()
-        .flatMap(element -> element.objectType().widgetMap().flatMap(IdObjectTypeMapReference::create)
-            .or(() -> element.objectType().es6Class()
-                .field(ScoutJsCoreConstants.PROPERTY_NAME_WIDGET_MAP)
-                .flatMap(IField::dataType)
-                .filter(IES6Class.class::isInstance)
-                .map(IES6Class.class::cast)
-                .filter(es6Class -> es6Class != widgetClass)
-                .flatMap(IdObjectTypeMapReference::create))
-            .stream())
+    return Stream.concat(
+        superWidgetMapReference().stream(),
+        elements().values().stream()
+            .flatMap(element -> element.objectType().widgetMap().flatMap(IdObjectTypeMapReference::create)
+                .or(() -> element.objectType().es6Class()
+                    .field(ScoutJsCoreConstants.PROPERTY_NAME_WIDGET_MAP)
+                    .flatMap(IField::dataType)
+                    .filter(IES6Class.class::isInstance)
+                    .map(IES6Class.class::cast)
+                    .filter(es6Class -> es6Class != widgetClass)
+                    .flatMap(IdObjectTypeMapReference::create))
+                .stream()))
         .collect(toCollection(LinkedHashSet::new));
+  }
+
+  public Optional<IdObjectTypeMapReference> superWidgetMapReference() {
+    return m_superWidgetMapReference.computeIfAbsentAndGet(this::parseSuperWidgetMapReference);
+  }
+
+  protected Optional<IdObjectTypeMapReference> parseSuperWidgetMapReference() {
+    var widgetClass = widgetClass().orElse(null);
+    return mainWidget().stream()
+        .flatMap(mainWidget -> mainWidget.supers()
+            .withSuperInterfaces(false)
+            .stream())
+        .takeWhile(es6Class -> es6Class != widgetClass)
+        .flatMap(es6Class -> es6Class.field(ScoutJsCoreConstants.PROPERTY_NAME_WIDGET_MAP).stream())
+        .findFirst()
+        .flatMap(IField::dataType)
+        .filter(IES6Class.class::isInstance)
+        .map(IES6Class.class::cast)
+        .flatMap(IdObjectTypeMapReference::create);
+  }
+
+  @Override
+  public boolean isIdObjectTypeMapReferencesEmpty() {
+    return super.isIdObjectTypeMapReferencesEmpty() ||
+        superWidgetMapReference()
+            .map(reference -> idObjectTypeMapReferences().size() == 1 && idObjectTypeMapReferences().contains(reference))
+            .orElse(false);
   }
 }
