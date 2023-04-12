@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.s2i.widgetmap
 
 import com.intellij.lang.ASTFactory
+import com.intellij.lang.ecmascript6.psi.impl.ES6CreateImportUtil
 import com.intellij.lang.javascript.DialectDetector
 import com.intellij.lang.javascript.TypeScriptFileType
 import com.intellij.lang.javascript.psi.JSElement
@@ -30,6 +31,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
+import com.intellij.psi.PsiWhiteSpace
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.SearchScope
@@ -177,21 +179,24 @@ object WidgetMapUpdater {
     private fun writeUpdate(updateInfo: WidgetMapUpdateInfo, project: Project) {
         WriteCommandAction.writeCommandAction(project).run(ThrowableRunnable<RuntimeException> {
             val operation = updateInfo.operation
-            // update model
-            updateWidgetMaps(updateInfo.modelFunction, operation.classSources(), operation.importsForModel(), operation.literal().containingModule())
-
             // update consumer
             updateInfo.modelConsumer
                 ?.takeIf { DialectDetector.isTypeScript(it) } // only update widgetMap declaration in TS files for now
-                ?.let { updateDeclarations(it, operation.declarationSources(), operation.importNamesForDeclarations(), operation.literal()) }
+                ?.let { updateDeclarations(it, operation.declarationSources(), operation.declarationsToRemove(), operation.importNamesForDeclarations(), operation.literal()) }
+
+            // update model
+            updateWidgetMaps(updateInfo.modelFunction, operation.classSources(), operation.importsForModel(), operation.literal().containingModule())
         })
     }
 
-    private fun updateDeclarations(consumer: JSClass, declarationSources: Map<String, CharSequence>, importsForConsumer: List<IES6ImportCollector.ES6ImportDescriptor>, model: IObjectLiteral) {
-        // replace fields
+    private fun updateDeclarations(consumer: JSClass, declarationSources: Map<String, CharSequence>, declarationsToRemove: Collection<String>, importsForConsumer: List<IES6ImportCollector.ES6ImportDescriptor>, model: IObjectLiteral) {
+        // replace or remove fields
         declarationSources.entries.forEach { replaceField(consumer, it.key, it.value) }
+        declarationsToRemove.forEach { removeField(consumer, it) }
 
         // add imports
+        ES6CreateImportUtil.optimizeImports(consumer)
+
         val modelFile = model.containingFile().orElse(null) ?: return
         val consumerFile = consumer.containingFile?.virtualFile?.resolveLocalPath() ?: return
         val module = model.containingModule()
@@ -236,10 +241,14 @@ object WidgetMapUpdater {
         return jsElement
     }
 
+    private fun removeField(ownerClass: JSClass, fieldName: String) {
+        val statement = ownerClass.findFieldByName(fieldName)?.let { parentStatementOf(it) } ?: return
+        (statement.prevSibling as? PsiWhiteSpace)?.delete()
+        statement.delete()
+    }
+
     private fun updateWidgetMaps(modelFunction: JSFunction, newSources: List<CharSequence>, importsForModel: List<IES6ImportCollector.ES6ImportDescriptor>, modelModule: INodeModule) {
         val psiFile = modelFunction.containingFile
-
-        importsForModel.forEach { ES6ImportUtils.createOrUpdateImport(it.element, it.alias, modelModule, modelFunction) }
 
         val topLevelElements = psiFile.children.toSet()
         val topLevelParent = PsiTreeUtil.findFirstParent(modelFunction, true) { topLevelElements.contains(it) } ?: return
@@ -252,7 +261,10 @@ object WidgetMapUpdater {
             sibling = topLevelParent.nextSibling
         }
         container.node.addChild(ASTFactory.whitespace("\n")) // ensure trailing newline
-        if (newSources.isEmpty()) return
+        if (newSources.isEmpty()) {
+            ES6CreateImportUtil.optimizeImports(psiFile)
+            return
+        }
 
         // add marker comment
         val markerComment = JSPsiElementFactory.createPsiComment(generatedWidgetMapsMarkerComment("\n"), psiFile)
@@ -265,6 +277,10 @@ object WidgetMapUpdater {
             lastInsert = container.addAfter(newWidgetMapPsi, lastInsert)
             addSpaceBefore(lastInsert)
         }
+
+        // add imports
+        importsForModel.forEach { ES6ImportUtils.createOrUpdateImport(it.element, it.alias, modelModule, modelFunction) }
+        ES6CreateImportUtil.optimizeImports(psiFile)
     }
 
     private fun addSpaceBefore(beforeChild: PsiElement) {

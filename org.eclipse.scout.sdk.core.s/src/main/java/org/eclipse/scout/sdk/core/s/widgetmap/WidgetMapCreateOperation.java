@@ -14,10 +14,12 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.builder.BuilderContext;
@@ -48,6 +50,7 @@ public class WidgetMapCreateOperation {
   // out
   private List<CharSequence> m_classSources;
   private Map<String /* widgetMap declaration field name */, CharSequence /* field declaration source */> m_declarationSources;
+  private Collection<String> m_declarationsToRemove;
   private List<ES6ImportDescriptor> m_importsForModel;
   private List<ES6ImportDescriptor> m_importNamesForDeclarations;
 
@@ -69,7 +72,10 @@ public class WidgetMapCreateOperation {
   protected void executeOperation() {
     Stream<INodeElementGenerator<?>> generators;
     Map<String, String> declarations = new HashMap<>();
+    Collection<String> expectedDeclarations;
     if (isPage()) {
+      expectedDeclarations = Set.of(ScoutJsCoreConstants.PROPERTY_NAME_DETAIL_FORM, ScoutJsCoreConstants.PROPERTY_NAME_DETAIL_TABLE);
+
       var detailFormGenerator = IdObjectTypeMapUtils.createDetailFormGeneratorForPage(modelName(), literal())
           .map(gen -> {
             var detailForm = gen.objectType().flatMap(ObjectType::newClassName).orElseThrow();
@@ -85,6 +91,8 @@ public class WidgetMapCreateOperation {
       generators = Stream.concat(detailFormGenerator, detailTableGenerator);
     }
     else {
+      expectedDeclarations = Set.of(ScoutJsCoreConstants.PROPERTY_NAME_WIDGET_MAP);
+
       generators = IdObjectTypeMapUtils.createWidgetMapGenerator(modelName(), literal(), mainWidget())
           .map(gen -> {
             var widgetMap = gen.map().orElseThrow();
@@ -98,15 +106,19 @@ public class WidgetMapCreateOperation {
     var modelImports = widgetMapSourcesAndImports.getValue();
     setImportsForModel(modelImports);
 
-    buildDeclarations(declarations);
+    buildDeclarations(declarations, expectedDeclarations);
   }
 
-  protected void buildDeclarations(Map<String, String> declarationInfo) {
+  protected void buildDeclarations(Map<String, String> declarationInfo, Collection<String> expectedDeclarations) {
     var declarationGenerators = declarationInfo.entrySet().stream()
         .map(e -> createFieldDeclaration(e.getKey(), literal().createDataType(e.getValue())));
     var declarationSourceAndImports = executeGenerators(declarationGenerators);
     setDeclarationSources(declarationSourceAndImports.getKey());
     setImportNamesForDeclarations(declarationSourceAndImports.getValue());
+
+    var declarationsToRemove = new HashSet<>(expectedDeclarations);
+    declarationsToRemove.removeAll(declarationSources().keySet());
+    setDeclarationsToRemove(declarationsToRemove);
   }
 
   protected static SimpleEntry<Map<String, CharSequence>, List<ES6ImportDescriptor>> executeGenerators(Stream<? extends INodeElementGenerator<?>> generators) {
@@ -205,6 +217,14 @@ public class WidgetMapCreateOperation {
 
   protected void setDeclarationSources(Map<String, CharSequence> declarationSources) {
     m_declarationSources = declarationSources;
+  }
+
+  public Collection<String> declarationsToRemove() {
+    return m_declarationsToRemove;
+  }
+
+  protected void setDeclarationsToRemove(Collection<String> declarationsToRemove) {
+    m_declarationsToRemove = declarationsToRemove;
   }
 
   public List<ES6ImportDescriptor> importsForModel() {
