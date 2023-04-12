@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.s.widgetmap;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -53,5 +54,23 @@ public class IdObjectTypeMapReference {
     return es6Class()
         .<IDataType> map(Function.identity())
         .orElseGet(() -> m_idObjectTypeMap.model().createDataType(name()));
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    var other = (IdObjectTypeMapReference) obj;
+    return Objects.equals(m_es6Class, other.m_es6Class)
+        && Objects.equals(m_idObjectTypeMap, other.m_idObjectTypeMap);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(m_es6Class, m_idObjectTypeMap);
   }
 }

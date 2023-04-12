@@ -120,6 +120,7 @@ public final class IdObjectTypeMapUtils {
 
   public static Optional<IdObjectTypeMapGenerator> createIdObjectTypeMapGenerator(IdObjectTypeMap map) {
     return Optional.ofNullable(map)
+        .filter(not(IdObjectTypeMap::isEmpty))
         .map(m -> new IdObjectTypeMapGenerator()
             .withMap(m));
   }
@@ -131,8 +132,8 @@ public final class IdObjectTypeMapUtils {
             .withObjectType(ot));
   }
 
-  public static Optional<IdObjectTypeMapGenerator> createWidgetMapGenerator(String widgetOrModelName, IObjectLiteral widgetModel) {
-    return WidgetMap.create(widgetOrModelName, widgetModel)
+  public static Optional<IdObjectTypeMapGenerator> createWidgetMapGenerator(String widgetOrModelName, IObjectLiteral widgetModel, IES6Class mainWidget) {
+    return WidgetMap.create(widgetOrModelName, widgetModel, mainWidget)
         .flatMap(IdObjectTypeMapUtils::createIdObjectTypeMapGenerator);
   }
 

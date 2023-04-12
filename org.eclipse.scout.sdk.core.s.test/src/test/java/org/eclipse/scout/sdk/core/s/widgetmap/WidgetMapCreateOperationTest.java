@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.typescript.builder.imports.IES6ImportCollector.ES6ImportDescriptor;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.testing.ExtendWithNodeModules;
@@ -226,6 +227,10 @@ public class WidgetMapCreateOperationTest {
     //                objectType: DocumentsBox
     //              },
     //              {
+    //                id: 'DocumentsBox2',
+    //                objectType: DocumentsBox
+    //              },
+    //              {
     //                id: 'NotesBox',
     //                objectType: NotesBox
     //              }
@@ -244,6 +249,7 @@ public class WidgetMapCreateOperationTest {
         "'TitleField': StringField;" +
         "'TabBox': TabBox;" +
         "'DocumentsBox': DocumentsBox;" +
+        "'DocumentsBox2': DocumentsBox;" +
         "'NotesBox': NotesBox;" +
         "} & DocumentsBoxWidgetMap & NotesBoxWidgetMap;"), operation.classSources());
 
@@ -256,6 +262,82 @@ public class WidgetMapCreateOperationTest {
 
     var declarationImports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
     assertEquals(List.of("SomeFormWithReferencedWidgetMapsWidgetMap"), declarationImports);
+  }
+
+  @Test
+  @ExtendWithNodeModules("SomeFormWithSuperWidgetMapModel")
+  public void testWidgetMapWithSuperWidgetMap(INodeModule module) {
+    var someFormModel = module.export("SomeFormWithSuperWidgetMapModel")
+        .filter(IFunction.class::isInstance)
+        .map(IFunction.class::cast)
+        .flatMap(IFunction::resultingObjectLiteral)
+        .orElseThrow();
+    var someForm = module.export("SomeFormWithSuperWidgetMap")
+        .filter(IES6Class.class::isInstance)
+        .map(IES6Class.class::cast)
+        .orElseThrow();
+
+    //    {
+    //      id: 'SomeForm',
+    //      rootGroupBox: {
+    //        id: 'MainBox',
+    //        objectType: GroupBox,
+    //        fields: [
+    //          {
+    //            id: 'TitleField',
+    //            objectType: StringField
+    //          }
+    //        ]
+    //      }
+    //    }
+
+    var operation = new WidgetMapCreateOperation();
+    operation.setLiteral(someFormModel);
+    operation.setMainWidget(someForm);
+    operation.execute();
+
+    assertEqualsIgnoreWhitespaces(List.of("export type SomeFormWithSuperWidgetMapWidgetMap = {" +
+        "'MainBox': GroupBox;" +
+        "'TitleField': StringField;" +
+        "} & SomeSuperClass2WidgetMap;"), operation.classSources());
+
+    var imports = operation.importsForModel().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("GroupBox", "StringField", "SomeSuperClass2WidgetMap"), imports);
+
+    var declarationSources = operation.declarationSources();
+    assertEquals(1, declarationSources.size());
+    assertEqualsIgnoreWhitespaces("declare widgetMap: SomeFormWithSuperWidgetMapWidgetMap;", declarationSources.get("widgetMap"));
+
+    var declarationImports = operation.importNamesForDeclarations().stream().map(ES6ImportDescriptor::nameForSource).toList();
+    assertEquals(List.of("SomeFormWithSuperWidgetMapWidgetMap"), declarationImports);
+  }
+
+  @Test
+  @ExtendWithNodeModules("SomeEmptyFormWithSuperWidgetMapModel")
+  public void testEmptyWidgetMapWithSuperWidgetMap(INodeModule module) {
+    var someFormModel = module.export("SomeEmptyFormWithSuperWidgetMapModel")
+        .filter(IFunction.class::isInstance)
+        .map(IFunction.class::cast)
+        .flatMap(IFunction::resultingObjectLiteral)
+        .orElseThrow();
+    var someForm = module.export("SomeEmptyFormWithSuperWidgetMap")
+        .filter(IES6Class.class::isInstance)
+        .map(IES6Class.class::cast)
+        .orElseThrow();
+
+    //    {
+    //      id: 'SomeForm'
+    //    }
+
+    var operation = new WidgetMapCreateOperation();
+    operation.setLiteral(someFormModel);
+    operation.setMainWidget(someForm);
+    operation.execute();
+
+    assertEquals(0, operation.classSources().size());
+    assertEquals(0, operation.importsForModel().size());
+    assertEquals(0, operation.declarationSources().size());
+    assertEquals(0, operation.importNamesForDeclarations().size());
   }
 
   @Test
@@ -328,7 +410,6 @@ public class WidgetMapCreateOperationTest {
 
     var operation = new WidgetMapCreateOperation();
     operation.setLiteral(somePageModel);
-    operation.setPage(true);
     operation.execute();
 
     assertEqualsIgnoreWhitespaces(List.of(

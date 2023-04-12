@@ -37,7 +37,7 @@ public class IdObjectTypeMapTest {
         .map(IFunction.class::cast)
         .flatMap(IFunction::resultingObjectLiteral)
         .orElseThrow();
-    var widgetMap = WidgetMap.create("SomeFormModel", someFormModel).orElseThrow();
+    var widgetMap = WidgetMap.create("SomeFormModel", someFormModel, null).orElseThrow();
 
     //    {
     //      id: 'SomeForm',
@@ -112,7 +112,7 @@ public class IdObjectTypeMapTest {
         .map(IFunction.class::cast)
         .flatMap(IFunction::resultingObjectLiteral)
         .orElseThrow();
-    var widgetMap = WidgetMap.create("SomeFormWithTableFieldModel", someFormModel).orElseThrow();
+    var widgetMap = WidgetMap.create("SomeFormWithTableFieldModel", someFormModel, null).orElseThrow();
 
     //    {
     //      id: 'SomeForm',
@@ -264,7 +264,7 @@ public class IdObjectTypeMapTest {
         .map(IFunction.class::cast)
         .flatMap(IFunction::resultingObjectLiteral)
         .orElseThrow();
-    var widgetMap = WidgetMap.create("SomeFormWithReferencedWidgetMapsModel", someFormModel).orElseThrow();
+    var widgetMap = WidgetMap.create("SomeFormWithReferencedWidgetMapsModel", someFormModel, null).orElseThrow();
 
     //    {
     //      id: 'SomeForm',
@@ -285,6 +285,10 @@ public class IdObjectTypeMapTest {
     //                objectType: DocumentsBox
     //              },
     //              {
+    //                id: 'DocumentsBox2',
+    //                objectType: DocumentsBox
+    //              },
+    //              {
     //                id: 'NotesBox',
     //                objectType: NotesBox
     //              }
@@ -296,8 +300,8 @@ public class IdObjectTypeMapTest {
 
     assertEquals("SomeFormWithReferencedWidgetMapsWidgetMap", widgetMap.name());
 
-    assertEquals(5, widgetMap.elements().size());
-    assertEquals(List.of("MainBox", "TitleField", "TabBox", "DocumentsBox", "NotesBox"), widgetMap.elements().keySet().stream().toList());
+    assertEquals(6, widgetMap.elements().size());
+    assertEquals(List.of("MainBox", "TitleField", "TabBox", "DocumentsBox", "DocumentsBox2", "NotesBox"), widgetMap.elements().keySet().stream().toList());
 
     assertEquals(2, widgetMap.idObjectTypeMapReferences().size());
     var idObjectTypeMapReferences = widgetMap.idObjectTypeMapReferences().stream().toList();
@@ -320,9 +324,89 @@ public class IdObjectTypeMapTest {
     assertNotNull(documentsBox);
     assertObjectType(documentsBoxObjectType, documentsBox.objectType());
 
+    var documentsBox2 = widgetMap.elements().get("DocumentsBox2");
+    assertNotNull(documentsBox2);
+    assertObjectType(documentsBoxObjectType, documentsBox2.objectType());
+
     var notesBox = widgetMap.elements().get("NotesBox");
     assertNotNull(notesBox);
     assertObjectType(notesBoxObjectType, notesBox.objectType());
+  }
+
+  @Test
+  @ExtendWithNodeModules("SomeFormWithSuperWidgetMapModel")
+  public void testWidgetMapWithSuperWidgetMap(INodeModule module) {
+    var groupBoxObjectType = createObjectType("GroupBox", module);
+    var stringFieldObjectType = createObjectType("StringField", module);
+
+    var someFormModel = module.export("SomeFormWithSuperWidgetMapModel")
+        .filter(IFunction.class::isInstance)
+        .map(IFunction.class::cast)
+        .flatMap(IFunction::resultingObjectLiteral)
+        .orElseThrow();
+    var someForm = module.export("SomeFormWithSuperWidgetMap")
+        .filter(IES6Class.class::isInstance)
+        .map(IES6Class.class::cast)
+        .orElseThrow();
+    var widgetMap = WidgetMap.create("SomeFormWithSuperWidgetMapModel", someFormModel, someForm).orElseThrow();
+
+    //    {
+    //      id: 'SomeForm',
+    //      rootGroupBox: {
+    //        id: 'MainBox',
+    //        objectType: GroupBox,
+    //        fields: [
+    //          {
+    //            id: 'TitleField',
+    //            objectType: StringField
+    //          }
+    //        ]
+    //      }
+    //    }
+
+    assertEquals("SomeFormWithSuperWidgetMapWidgetMap", widgetMap.name());
+
+    assertEquals(2, widgetMap.elements().size());
+    assertEquals(List.of("MainBox", "TitleField"), widgetMap.elements().keySet().stream().toList());
+
+    assertEquals(1, widgetMap.idObjectTypeMapReferences().size());
+    var idObjectTypeMapReferences = widgetMap.idObjectTypeMapReferences().stream().toList();
+    assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(findClassByObjectType("SomeSuperClass2WidgetMap", module)).orElseThrow(), idObjectTypeMapReferences.get(0));
+
+    var mainBox = widgetMap.elements().get("MainBox");
+    assertNotNull(mainBox);
+    assertObjectType(groupBoxObjectType, mainBox.objectType());
+
+    var titleField = widgetMap.elements().get("TitleField");
+    assertNotNull(titleField);
+    assertObjectType(stringFieldObjectType, titleField.objectType());
+  }
+
+  @Test
+  @ExtendWithNodeModules("SomeEmptyFormWithSuperWidgetMapModel")
+  public void testEmptyWidgetMapWithSuperWidgetMap(INodeModule module) {
+    var someFormModel = module.export("SomeEmptyFormWithSuperWidgetMapModel")
+        .filter(IFunction.class::isInstance)
+        .map(IFunction.class::cast)
+        .flatMap(IFunction::resultingObjectLiteral)
+        .orElseThrow();
+    var someForm = module.export("SomeEmptyFormWithSuperWidgetMap")
+        .filter(IES6Class.class::isInstance)
+        .map(IES6Class.class::cast)
+        .orElseThrow();
+    var widgetMap = WidgetMap.create("SomeEmptyFormWithSuperWidgetMapModel", someFormModel, someForm).orElseThrow();
+
+    //    {
+    //      id: 'SomeForm'
+    //    }
+
+    assertEquals("SomeEmptyFormWithSuperWidgetMapWidgetMap", widgetMap.name());
+
+    assertEquals(0, widgetMap.elements().size());
+
+    assertEquals(1, widgetMap.idObjectTypeMapReferences().size());
+    var idObjectTypeMapReferences = widgetMap.idObjectTypeMapReferences().stream().toList();
+    assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(findClassByObjectType("SomeSuperClass2WidgetMap", module)).orElseThrow(), idObjectTypeMapReferences.get(0));
   }
 
   @Test

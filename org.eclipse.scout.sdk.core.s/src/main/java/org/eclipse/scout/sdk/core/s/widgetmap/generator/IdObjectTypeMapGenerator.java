@@ -39,13 +39,15 @@ public class IdObjectTypeMapGenerator extends TypeAliasGenerator<IdObjectTypeMap
     withModifier(Modifier.EXPORT)
         .withElementName(Type.ensureValidName(map.name()));
 
-    var objectType = TypeGenerator.create();
-    map.elements().values().stream().map(this::createIdObjectTypeField)
-        .forEach(objectType::withField);
-
     var intersection = CompositeTypeGenerator.create()
-        .withFlavor(DataTypeFlavor.Intersection)
-        .withType(objectType);
+        .withFlavor(DataTypeFlavor.Intersection);
+
+    if (!map.elements().isEmpty()) {
+      var objectType = TypeGenerator.create();
+      map.elements().values().stream().map(this::createIdObjectTypeField)
+          .forEach(objectType::withField);
+      intersection.withType(objectType);
+    }
     map.idObjectTypeMapReferences().stream()
         .map(IdObjectTypeMapReference::reference)
         .forEach(ref -> intersection.withType(b -> b.ref(ref)));

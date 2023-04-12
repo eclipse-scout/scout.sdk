@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.core.typescript.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.field.IFieldGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.INodeElementGenerator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -40,6 +41,8 @@ public class WidgetMapCreateOperation {
 
   // in 
   private IObjectLiteral m_literal;
+  private IES6Class m_mainWidget;
+  private String m_modelName;
   private boolean m_isPage;
 
   // out
@@ -50,23 +53,30 @@ public class WidgetMapCreateOperation {
 
   public void execute() {
     validateOperation();
+    prepareOperation();
+    executeOperation();
+  }
 
-    var modelName = literal().containingFile()
-        .map(Path::getFileName)
-        .map(Path::toString)
-        .map(filename -> Strings.removeSuffix(filename, IWebConstants.TS_FILE_SUFFIX))
-        .orElseThrow(() -> Ensure.newFail("Model name can not be detected."));
+  protected void validateOperation() {
+    Ensure.notNull(literal(), "No object-literal provided.");
+  }
 
+  protected void prepareOperation() {
+    setModelName(calculateModelName());
+    setPage(calculatePage());
+  }
+
+  protected void executeOperation() {
     Stream<INodeElementGenerator<?>> generators;
     Map<String, String> declarations = new HashMap<>();
     if (isPage()) {
-      var detailFormGenerator = IdObjectTypeMapUtils.createDetailFormGeneratorForPage(modelName, literal())
+      var detailFormGenerator = IdObjectTypeMapUtils.createDetailFormGeneratorForPage(modelName(), literal())
           .map(gen -> {
             var detailForm = gen.objectType().flatMap(ObjectType::newClassName).orElseThrow();
             declarations.put(ScoutJsCoreConstants.PROPERTY_NAME_DETAIL_FORM, detailForm);
             return Stream.concat(Stream.of(gen), IdObjectTypeMapUtils.collectAdditionalGenerators(gen));
           }).orElseGet(Stream::empty);
-      var detailTableGenerator = IdObjectTypeMapUtils.createDetailTableGeneratorForPage(modelName, literal())
+      var detailTableGenerator = IdObjectTypeMapUtils.createDetailTableGeneratorForPage(modelName(), literal())
           .map(gen -> {
             var detailPage = gen.objectType().flatMap(ObjectType::newClassName).orElseThrow();
             declarations.put(ScoutJsCoreConstants.PROPERTY_NAME_DETAIL_TABLE, detailPage);
@@ -75,7 +85,7 @@ public class WidgetMapCreateOperation {
       generators = Stream.concat(detailFormGenerator, detailTableGenerator);
     }
     else {
-      generators = IdObjectTypeMapUtils.createWidgetMapGenerator(modelName, literal())
+      generators = IdObjectTypeMapUtils.createWidgetMapGenerator(modelName(), literal(), mainWidget())
           .map(gen -> {
             var widgetMap = gen.map().orElseThrow();
             declarations.put(ScoutJsCoreConstants.PROPERTY_NAME_WIDGET_MAP, widgetMap.name());
@@ -116,15 +126,37 @@ public class WidgetMapCreateOperation {
     return new SimpleEntry<>(src, context.importValidator().importCollector().imports());
   }
 
-  protected void validateOperation() {
-    Ensure.notNull(literal(), "No object-literal provided.");
-  }
-
   protected static IFieldGenerator<?> createFieldDeclaration(String name, IDataType dataType) {
     return FieldGenerator.create()
         .withElementName(name)
         .withModifier(Modifier.DECLARE)
         .withDataType(dataType);
+  }
+
+  protected String calculateModelName() {
+    return literal().containingFile()
+        .map(Path::getFileName)
+        .map(Path::toString)
+        .map(filename -> Strings.removeSuffix(filename, IWebConstants.TS_FILE_SUFFIX))
+        .orElseThrow(() -> Ensure.newFail("Model name can not be detected."));
+  }
+
+  protected boolean calculatePage() {
+    if (mainWidget() != null) {
+      return mainWidget()
+          .supers()
+          .withSuperInterfaces(false)
+          .stream()
+          .anyMatch(es6Class -> ScoutJsCoreConstants.CLASS_NAME_PAGE.equals(es6Class.name()));
+    }
+
+    // try to detect based on model name
+    return modelName().endsWith(ScoutJsCoreConstants.CLASS_NAME_PAGE)
+        || modelName().endsWith(ScoutJsCoreConstants.CLASS_NAME_PAGE + ScoutJsCoreConstants.MODEL_SUFFIX)
+        || modelName().contains("PageWithTable")
+        || modelName().contains("PageWithNodes")
+        || modelName().endsWith("TablePage" + ScoutJsCoreConstants.MODEL_SUFFIX)
+        || modelName().endsWith("NodePage" + ScoutJsCoreConstants.MODEL_SUFFIX);
   }
 
   public IObjectLiteral literal() {
@@ -135,11 +167,27 @@ public class WidgetMapCreateOperation {
     m_literal = literal;
   }
 
+  public IES6Class mainWidget() {
+    return m_mainWidget;
+  }
+
+  public void setMainWidget(IES6Class mainWidget) {
+    m_mainWidget = mainWidget;
+  }
+
+  public String modelName() {
+    return m_modelName;
+  }
+
+  protected void setModelName(String modelName) {
+    m_modelName = modelName;
+  }
+
   public boolean isPage() {
     return m_isPage;
   }
 
-  public void setPage(boolean page) {
+  protected void setPage(boolean page) {
     m_isPage = page;
   }
 
