@@ -45,6 +45,8 @@
   ]]></description>
 
   <change-notes><![CDATA[
+        <b>April 17, 2023</b><br>
+        Add live templates for DoNodes<br>
         <b>April 4, 2023</b><br>
         Adds WidgetMaps update menus<br>
         <b>March 31, 2023</b><br>
@@ -139,6 +141,9 @@
       <bundleName>messages.EclipseScoutBundle</bundleName>
       <category>Scout</category>
     </intentionAction>
+
+    <liveTemplateContext implementation="org.eclipse.scout.sdk.s2i.template.context.ScoutTemplateContextType$DoEntity"/>
+    <defaultLiveTemplates file="liveTemplates/Scout.xml"/>
   </extensions>
   <extensions defaultExtensionNs="org.jetbrains.idea.maven">
     <archetypesProvider implementation="org.eclipse.scout.sdk.s2i.maven.ScoutArchetypesProvider"/>
