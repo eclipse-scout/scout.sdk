@@ -1,0 +1,47 @@
+<!--
+  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~
+  ~ This program and the accompanying materials are made
+  ~ available under the terms of the Eclipse Public License 2.0
+  ~ which is available at https://www.eclipse.org/legal/epl-2.0/
+  ~
+  ~ SPDX-License-Identifier: EPL-2.0
+  -->
+<templateSet group="Scout">
+  <template resource-bundle="messages.EclipseScoutBundle" key="live.template.description.dov"
+            name="dov" toReformat="false" toShortenFQNames="true"
+            value="public org.eclipse.scout.rt.dataobject.DoValue&lt;$TYPE$&gt; $NAME$() {&#10;  return doValue(&quot;$NAME$&quot;);&#10;}">
+    <variable name="TYPE" expression="&quot;java.lang.Object&quot;" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="&quot;myDoValue&quot;" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="DO_ENTITY" value="true"/>
+    </context>
+  </template>
+  <template resource-bundle="messages.EclipseScoutBundle" key="live.template.description.dol"
+            name="dol" toReformat="false" toShortenFQNames="true"
+            value="public org.eclipse.scout.rt.dataobject.DoList&lt;$TYPE$&gt; $NAME$() {&#10;  return doList(&quot;$NAME$&quot;);&#10;}">
+    <variable name="TYPE" expression="&quot;java.lang.Object&quot;" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="&quot;myDoValue&quot;" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="DO_ENTITY" value="true"/>
+    </context>
+  </template>
+  <template resource-bundle="messages.EclipseScoutBundle" key="live.template.description.dos"
+            name="dos" toReformat="false" toShortenFQNames="true"
+            value="public org.eclipse.scout.rt.dataobject.DoSet&lt;$TYPE$&gt; $NAME$() {&#10;  return doSet(&quot;$NAME$&quot;);&#10;}">
+    <variable name="TYPE" expression="&quot;java.lang.Object&quot;" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="&quot;myDoValue&quot;" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="DO_ENTITY" value="true"/>
+    </context>
+  </template>
+  <template resource-bundle="messages.EclipseScoutBundle" key="live.template.description.doc"
+            name="doc" toReformat="false" toShortenFQNames="true"
+            value="public org.eclipse.scout.rt.dataobject.DoCollection&lt;$TYPE$&gt; $NAME$() {&#10;  return doCollection(&quot;$NAME$&quot;);&#10;}">
+    <variable name="TYPE" expression="&quot;java.lang.Object&quot;" defaultValue="" alwaysStopAt="true"/>
+    <variable name="NAME" expression="&quot;myDoValue&quot;" defaultValue="" alwaysStopAt="true"/>
+    <context>
+      <option name="DO_ENTITY" value="true"/>
+    </context>
+  </template>
+</templateSet>
