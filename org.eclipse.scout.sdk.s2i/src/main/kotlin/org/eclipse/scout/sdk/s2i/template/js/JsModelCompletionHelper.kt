@@ -76,7 +76,7 @@ object JsModelCompletionHelper {
 
     private fun getPropertyInfo(element: PsiElement?, prefix: String, requireNameInfo: Boolean): JsModelCompletionInfo? {
         if (element == null) return null
-        val property = PsiTreeUtil.getParentOfType(element, JSProperty::class.java) ?: return null
+        val property = PsiTreeUtil.getParentOfType(element, JSProperty::class.java, false) ?: return null
         var propertyName = property.name ?: return null
         val isNameCompletion = propertyName.endsWith(CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED)
         if (requireNameInfo != isNameCompletion) return null // early abort if not requested type

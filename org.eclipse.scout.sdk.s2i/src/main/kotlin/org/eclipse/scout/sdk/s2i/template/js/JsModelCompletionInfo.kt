@@ -14,6 +14,7 @@ import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
 import com.intellij.lang.javascript.psi.JSProperty
 import com.intellij.lang.javascript.psi.JSReferenceExpression
 import com.intellij.openapi.module.Module
+import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModels
@@ -45,7 +46,8 @@ data class JsModelCompletionInfo(
     }.stream()
 
     fun parentScoutProperty(): ScoutJsProperty? = m_parentScoutProperty.computeIfAbsentAndGet {
-        val infoForParentObject = JsModelCompletionHelper.getPropertyValueInfo(propertyPsi, searchPrefix) ?: return@computeIfAbsentAndGet null
+        val parentProperty = PsiTreeUtil.getParentOfType(propertyPsi, JSProperty::class.java) ?: return@computeIfAbsentAndGet null
+        val infoForParentObject = JsModelCompletionHelper.getPropertyValueInfo(parentProperty, searchPrefix) ?: return@computeIfAbsentAndGet null
         infoForParentObject.availableProperties()
             .filter { it.name() == infoForParentObject.propertyName }
             .filter { it.type().isChildModelSupported }
