@@ -14,7 +14,7 @@
     <variable name="TYPE" expression="&quot;java.lang.Object&quot;" defaultValue="" alwaysStopAt="true"/>
     <variable name="NAME" expression="&quot;myDoValue&quot;" defaultValue="" alwaysStopAt="true"/>
     <context>
-      <option name="JAVA_DECLARATION" value="true"/>
+      <option name="DO_ENTITY" value="true"/>
     </context>
   </template>
   <template resource-bundle="messages.EclipseScoutBundle" key="live.template.description.dol"
@@ -23,7 +23,7 @@
     <variable name="TYPE" expression="&quot;java.lang.Object&quot;" defaultValue="" alwaysStopAt="true"/>
     <variable name="NAME" expression="&quot;myDoValue&quot;" defaultValue="" alwaysStopAt="true"/>
     <context>
-      <option name="JAVA_DECLARATION" value="true"/>
+      <option name="DO_ENTITY" value="true"/>
     </context>
   </template>
   <template resource-bundle="messages.EclipseScoutBundle" key="live.template.description.dos"
@@ -32,7 +32,7 @@
     <variable name="TYPE" expression="&quot;java.lang.Object&quot;" defaultValue="" alwaysStopAt="true"/>
     <variable name="NAME" expression="&quot;myDoValue&quot;" defaultValue="" alwaysStopAt="true"/>
     <context>
-      <option name="JAVA_DECLARATION" value="true"/>
+      <option name="DO_ENTITY" value="true"/>
     </context>
   </template>
   <template resource-bundle="messages.EclipseScoutBundle" key="live.template.description.doc"
@@ -41,7 +41,7 @@
     <variable name="TYPE" expression="&quot;java.lang.Object&quot;" defaultValue="" alwaysStopAt="true"/>
     <variable name="NAME" expression="&quot;myDoValue&quot;" defaultValue="" alwaysStopAt="true"/>
     <context>
-      <option name="JAVA_DECLARATION" value="true"/>
+      <option name="DO_ENTITY" value="true"/>
     </context>
   </template>
 </templateSet>

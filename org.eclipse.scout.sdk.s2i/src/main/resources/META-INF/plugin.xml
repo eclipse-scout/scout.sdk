@@ -142,6 +142,7 @@
       <category>Scout</category>
     </intentionAction>
 
+    <liveTemplateContext implementation="org.eclipse.scout.sdk.s2i.template.context.ScoutTemplateContextType$DoEntity"/>
     <defaultLiveTemplates file="liveTemplates/Scout.xml"/>
   </extensions>
   <extensions defaultExtensionNs="org.jetbrains.idea.maven">
