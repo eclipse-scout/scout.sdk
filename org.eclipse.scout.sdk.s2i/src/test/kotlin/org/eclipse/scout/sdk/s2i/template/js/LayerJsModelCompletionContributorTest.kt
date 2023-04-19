@@ -31,8 +31,6 @@ class LayerJsModelCompletionContributorTest : AbstractJsModelCompletionContribut
 
     override fun getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents_StringFieldEx() = getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents(STRING_FIELD_EX_QUALIFIED_NAME)
 
-    override fun getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents_StringFieldExQualified() = getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents(STRING_FIELD_EX_QUALIFIED_NAME)
-
     override fun getValueCompletionWidgetExpectedFileContents(): Array<String?> =
         arrayOf("$ONLY_HERE_PROPERTY_NAME: { ${ScoutJsCoreConstants.PROPERTY_NAME_ID}: '${JsModelCompletionHelper.ID_DEFAULT_TEXT}', ${ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE}: '$STRING_FIELD_NAME' }")
 

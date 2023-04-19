@@ -125,7 +125,6 @@ object JsModelCompletionHelper {
         val lookupString = createLookupString(modelElement, completionInfo)
 
         var result = LookupElementBuilder.create(name, lookupString)
-            .withLookupString(name)
             .withLookupString(presentableName)
             .withCaseSensitivity(true)
             .withPresentableText(presentableName)

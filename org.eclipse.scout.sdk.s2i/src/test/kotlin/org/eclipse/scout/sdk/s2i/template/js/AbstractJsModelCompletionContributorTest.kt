@@ -275,13 +275,6 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
         doCompleteAssertContent(VALUE_COMPLETION_WIDGET_ARRAY_FILE, STRING_FIELD_EX_NAME, *getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents_StringFieldEx())
     }
 
-    fun testNameCompletionAdditionalWidgetInExistingArray_StringFieldExQualified() {
-        if (!hasLayerModule()) {
-            return
-        }
-        doCompleteAssertContent(VALUE_COMPLETION_WIDGET_ARRAY_FILE, STRING_FIELD_EX_QUALIFIED_NAME, *getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents_StringFieldExQualified())
-    }
-
     protected fun getImportFileContent(importName: String?, importModule: String?): String? {
         importName ?: return null
         importModule ?: return null
@@ -298,9 +291,6 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
     protected open fun getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents_StringField() = getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents(STRING_FIELD_NAME, STRING_FIELD_NAME, SCOUT_MODULE_NAME)
 
     protected open fun getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents_StringFieldEx() =
-        getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents(STRING_FIELD_EX_NAME, STRING_FIELD_EX_NAME, LAYER_MODULE_NAME)
-
-    protected open fun getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents_StringFieldExQualified() =
         getNameCompletionAdditionalWidgetInExistingArrayExpectedFileContents(STRING_FIELD_EX_NAME, STRING_FIELD_EX_NAME, LAYER_MODULE_NAME)
 
     fun testNameCompletionNumeric() {
