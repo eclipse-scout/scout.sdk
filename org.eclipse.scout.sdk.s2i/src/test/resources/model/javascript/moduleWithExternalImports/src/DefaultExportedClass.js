@@ -8,11 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export * from './DefaultExportedClass';
-export * from './LocalClass';
-export * from './SomeClass';
-export * from './TestClass';
-export * from './WithTypeRef';
 // noinspection JSUnusedGlobalSymbols
-export {default as SampleModel} from './SampleModel';
-export * from './ReferencedConstants';
+export default class DefaultExportedClass {
+
+  constructor() {
+  }
+}

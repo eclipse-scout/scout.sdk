@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.ecmascript6.psi.ES6ImportSpecifier
 import com.intellij.lang.ecmascript6.psi.ES6ImportSpecifierAlias
+import com.intellij.lang.ecmascript6.psi.ES6ImportedBinding
 import com.intellij.lang.javascript.psi.JSElement
 import com.intellij.lang.javascript.psi.JSField
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
@@ -46,6 +47,9 @@ class IdeaNodeModules(val project: Project) {
         var referencedElement = reference.resolve()
         if (referencedElement is ES6ImportSpecifierAlias) {
             referencedElement = referencedElement.findAliasedElement()
+        }
+        if (referencedElement is ES6ImportedBinding) {
+            referencedElement = referencedElement.findReferencedElements().firstOrNull()
         }
         if (referencedElement !is JSElement) return null
 
