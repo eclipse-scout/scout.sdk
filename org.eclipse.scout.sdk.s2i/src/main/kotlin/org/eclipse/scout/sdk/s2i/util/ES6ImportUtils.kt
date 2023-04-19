@@ -69,7 +69,8 @@ object ES6ImportUtils {
             val existingSpecifiers = existingImport.importSpecifiers
             if (!addToBindings && existingSpecifiers.any { it.referenceName == referenceName }) return // specifier import already exists
             val existingBindings = existingImport.importedBindings
-            if (addToBindings && existingBindings.any { it.declaredName == importName }) return // binding import already exists
+            if (addToBindings && (existingBindings.any { it.declaredName == importName }
+                        || existingSpecifiers.any { it.referenceName == "default" && it.alias?.name == importName })) return // binding import already exists
 
             // add new specifier to existing import declaration
             val specifiers = existingSpecifiers.map { it.text }.toMutableList()

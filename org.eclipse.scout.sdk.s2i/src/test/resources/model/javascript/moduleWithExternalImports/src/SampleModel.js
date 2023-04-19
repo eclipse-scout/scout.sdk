@@ -10,6 +10,7 @@
 
 import {NamedClazz, WildcardClass, AnotherClass as WithAlias} from '@eclipse-scout/sdk-export-js';
 import {LocalClass} from 'index';
+import DefaultExportedClass from './DefaultExportedClass';
 
 export default () => ({
   objectType: WildcardClass,
@@ -34,6 +35,10 @@ export default () => ({
     {
       id: 'Third',
       objectType: LocalClass
+    },
+    {
+      id: 'Fourth',
+      objectType: DefaultExportedClass
     }
   ]
 });

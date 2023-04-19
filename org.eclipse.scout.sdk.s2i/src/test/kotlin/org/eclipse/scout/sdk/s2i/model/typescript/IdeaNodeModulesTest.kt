@@ -108,11 +108,12 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
         val literal = arrow.resultingObjectLiteral().orElseThrow()
         assertEquals("WildcardClass", literal.propertyAsES6Class("objectType").orElseThrow().name())
         val fields = literal.propertyAs("fields", Array<IObjectLiteral>::class.java).orElseThrow()
-        assertEquals(3, fields.size)
+        assertEquals(4, fields.size)
 
         assertEquals("NamedDefaultClass", fields[0].propertyAsES6Class("objectType").orElseThrow().name())
         assertEquals("AnotherClass", fields[1].propertyAsES6Class("objectType").orElseThrow().name())
         assertEquals("LocalClass", fields[2].propertyAsES6Class("objectType").orElseThrow().name())
+        assertEquals("DefaultExportedClass", fields[3].propertyAsES6Class("objectType").orElseThrow().name())
     }
 
     fun testReferencedConstantValues() {
