@@ -31,9 +31,11 @@ class JsModelCacheStartup : StartupActivity, DumbAware {
 
     private fun preloadCache(project: Project) {
         val start = System.currentTimeMillis()
-        ModuleManager.getInstance(project).modules
+        val modules = ModuleManager.getInstance(project).modules
+        modules
             .filter { it.name.contains(".ui") }
             .filter { containsPackageJson(it) }
+            .ifEmpty { modules.filter { containsPackageJson(it) } }
             .sortedBy { it.name }
             .firstNotNullOfOrNull { JsModelManager.getOrCreateScoutJsModel(it) }
             ?.let {
