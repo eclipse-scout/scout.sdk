@@ -41,6 +41,7 @@ public final class ScoutJsCoreConstants {
   public static final String PROPERTY_NAME_WIDGET_MAP = "widgetMap";
   public static final String PROPERTY_NAME_COLUMN_MAP = "columnMap";
   public static final String PROPERTY_NAME_COLUMNS = "columns";
+  public static final String PROPERTY_NAME_EVENTS = "events";
   public static final String PROPERTY_NAME_DETAIL_FORM = "detailForm";
   public static final String PROPERTY_NAME_DETAIL_TABLE = "detailTable";
 

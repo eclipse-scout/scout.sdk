@@ -72,6 +72,7 @@ public class TypeScriptScoutObject implements IScoutJsObject {
         .withoutModifier(Modifier.STATIC)
         .stream()
         .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_EVENT_MAP))
+        .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_EVENTS))
         .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_SELF))
         .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_WIDGET_MAP));
     return JavaScriptScoutObject.createProperties(fields, createOverrides(), this);
