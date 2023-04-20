@@ -29,6 +29,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiManager
 import com.intellij.psi.PsiWhiteSpace
@@ -190,6 +191,8 @@ object WidgetMapUpdater {
     }
 
     private fun updateDeclarations(consumer: JSClass, declarationSources: Map<String, CharSequence>, declarationsToRemove: Collection<String>, importsForConsumer: List<IES6ImportCollector.ES6ImportDescriptor>, model: IObjectLiteral) {
+        commitDocument(consumer)
+
         // replace or remove fields
         declarationSources.entries.forEach { replaceField(consumer, it.key, it.value) }
         declarationsToRemove.forEach { removeField(consumer, it) }
@@ -248,6 +251,8 @@ object WidgetMapUpdater {
     }
 
     private fun updateWidgetMaps(modelFunction: JSFunction, newSources: List<CharSequence>, importsForModel: List<IES6ImportCollector.ES6ImportDescriptor>, modelModule: INodeModule) {
+        commitDocument(modelFunction)
+
         val psiFile = modelFunction.containingFile
 
         val topLevelElements = psiFile.children.toSet()
@@ -291,6 +296,12 @@ object WidgetMapUpdater {
         return "/* **************************************************************************" + nl +
                 "* GENERATED WIDGET MAPS" + nl +
                 "* **************************************************************************/" + nl
+    }
+
+    private fun commitDocument(element: PsiElement) {
+        val file = element.containingFile
+        val manager = PsiDocumentManager.getInstance(file.project)
+        manager.getDocument(file)?.let { manager.commitDocument(it) }
     }
 
     private data class WidgetMapUpdateInfo(val operation: WidgetMapCreateOperation, val modelFunction: JSFunction, val modelConsumer: JSClass?) {
