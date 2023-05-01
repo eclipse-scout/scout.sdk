@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import com.intellij.openapi.vfs.VirtualFile
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.core.typescript.model.api.JsonPointer
@@ -25,6 +26,7 @@ import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.SdkException
 import org.eclipse.scout.sdk.s2i.model.typescript.util.NodeModuleUtils
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
+import java.io.IOException
 import java.io.InputStreamReader
 import java.nio.file.Path
 import java.util.*
@@ -35,8 +37,14 @@ class IdeaPackageJson(private val ideaModule: IdeaNodeModule, private val module
 
     private val m_dependencies = FinalValue<Collection<NodeModuleSpi>>()
     private val m_packageJson = moduleDir.findChild(IPackageJson.FILE_NAME) ?: throw SdkException("Invalid Node module dir: '{}'. No {} found in this directory.", moduleDir, IPackageJson.FILE_NAME)
-
-    private val m_root by lazy { InputStreamReader(content()).use { JsonParser.parseReader(it) }.asJsonObject }
+    private val m_root by lazy {
+        try {
+            InputStreamReader(content()).use { JsonParser.parseReader(it) }.asJsonObject
+        } catch (e: IOException) {
+            SdkLog.warning("Unable to read file '{}'.", m_packageJson, e)
+            return@lazy null
+        }
+    }
 
     override fun createApi() = PackageJsonImplementor(this)
 
@@ -56,10 +64,11 @@ class IdeaPackageJson(private val ideaModule: IdeaNodeModule, private val module
             .toSet()
     }
 
-    override fun getString(name: String?) = m_root[name]?.takeIf { it.isJsonPrimitive }?.asString
+    override fun getString(name: String?) = m_root?.get(name)?.takeIf { it.isJsonPrimitive }?.asString
 
     override fun find(pointer: JsonPointer): Any? {
-        return Optional.ofNullable(pointer.find(GsonPointerElement(m_root)))
+        val jsonRoot = m_root ?: return null
+        return Optional.ofNullable(pointer.find(GsonPointerElement(jsonRoot)))
             .map { extractValue((it as GsonPointerElement).element) }
             .orElse(null)
     }

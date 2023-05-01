@@ -25,7 +25,12 @@ class JsModelCacheStartup : StartupActivity, DumbAware {
         // enforce service creation to ensure the psi listener is active
         project.getService(JsModelManager::class.java)
         IdeaEnvironment.computeInReadActionAsync(project) {
-            preloadCache(project)
+            if (!project.isInitialized) return@computeInReadActionAsync
+            try {
+                preloadCache(project)
+            } catch (e: Exception) {
+                SdkLog.warning("Error loading the Scout JS model cache.", e)
+            }
         }
     }
 

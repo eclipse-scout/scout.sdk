@@ -24,6 +24,7 @@ import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModels
+import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.core.typescript.model.api.NodeModulesProvider
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModulesProviderSpi
@@ -78,9 +79,7 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
     private inner class PsiListener : PsiTreeChangeAdapter() {
         override fun childrenChanged(event: PsiTreeChangeEvent) {
             val file = event.file ?: return
-            if (!file.isPhysical || !file.language.isKindOf(JavascriptLanguage.INSTANCE)) {
-                return
-            }
+            if (!file.language.isKindOf(JavascriptLanguage.INSTANCE) && IPackageJson.FILE_NAME != file.name) return
             m_delayedProcessor.submit(file)
         }
     }
@@ -89,6 +88,7 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
         if (!project.isInitialized || events.isEmpty()) return
         return events
             .asSequence()
+            .filter { it.isPhysical && !it.isDirectory && it.isValid }
             .map { it.virtualFile }
             .distinct() // events for the same file: only process once
             .forEach { remove(it) }

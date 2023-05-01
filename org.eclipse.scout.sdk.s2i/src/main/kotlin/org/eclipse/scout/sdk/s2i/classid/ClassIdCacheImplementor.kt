@@ -153,7 +153,10 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     internal fun processFileEvents(events: List<PsiFile>) {
         if (!project.isInitialized || events.isEmpty()) return
         val eventsByModule = computeInReadAction(project) {
-            events.toHashSet().groupBy { it.containingModule() /* read action required */ }
+            events
+                .filter { it.isValid && it.isPhysical }
+                .distinct()
+                .groupBy { it.containingModule() /* read action required */ }
         }
         IdeaEnvironment.callInIdeaEnvironmentSync(project, IdeaProgress.empty()) { env, _ ->
             eventsByModule.forEach { it.key?.let { module -> processModule(module, env, it.value) } }
@@ -204,9 +207,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     private inner class PsiListener : PsiTreeChangeAdapter() {
         override fun childrenChanged(event: PsiTreeChangeEvent) {
             val file = event.file ?: return
-            if (!file.language.isKindOf(JavaLanguage.INSTANCE) || !file.isValid || !file.isPhysical || file is PsiCompiledElement) {
-                return
-            }
+            if (!file.language.isKindOf(JavaLanguage.INSTANCE) || file is PsiCompiledElement) return
             m_delayedProcessor.submit(file)
         }
     }

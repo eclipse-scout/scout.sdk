@@ -14,6 +14,7 @@ import com.intellij.javascript.nodejs.PackageJsonDependency
 import com.intellij.lang.javascript.buildTools.npm.PackageJsonUtil
 import com.intellij.lang.javascript.modules.NodeModuleUtil
 import com.intellij.openapi.vfs.VirtualFile
+import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.core.util.SdkException
 
 object NodeModuleUtils {
@@ -28,7 +29,7 @@ object NodeModuleUtils {
      */
     private fun findDependenciesInNodeModulesDirs(moduleDir: VirtualFile, dependencyType: PackageJsonDependency): Collection<VirtualFile> {
         val modules = HashMap<String, VirtualFile>()
-        val packageJson = PackageJsonUtil.findChildPackageJsonFile(moduleDir) ?: throw SdkException("Cannot find 'package.json' for module '{}'.", moduleDir)
+        val packageJson = PackageJsonUtil.findChildPackageJsonFile(moduleDir) ?: throw SdkException("Cannot find '{}' for module '{}'.", IPackageJson.FILE_NAME, moduleDir)
         val packageJsonData = PackageJsonData.getOrCreate(packageJson)
         val dependencies = packageJsonData.allDependencyEntries
             .filter { it.value.dependencyType == dependencyType }
@@ -47,7 +48,7 @@ object NodeModuleUtils {
     /**
      * Collect [dependencies] in a "node_modules" directory and add them to [collector] if absent.
      */
-    private fun collectDependenciesInNodeModulesDir(nodeModulesDir: VirtualFile, collector: MutableMap<String, VirtualFile>, dependencies: Set<String>) {
+    private fun collectDependenciesInNodeModulesDir(nodeModulesDir: VirtualFile, collector: MutableMap<String, VirtualFile>, dependencies: Collection<String>) {
         dependencies.forEach { dependency ->
             val child = nodeModulesDir.findFileByRelativePath(dependency)
             if (child != null && child.isDirectory && child.isValid) {
