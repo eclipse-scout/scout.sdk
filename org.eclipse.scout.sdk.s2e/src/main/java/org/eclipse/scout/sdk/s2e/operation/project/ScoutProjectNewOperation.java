@@ -91,9 +91,11 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
   protected String getJavaVersion() {
     var supportedJavaVersions = ScoutProjectNewHelper.getSupportedJavaVersions(getScoutVersion());
     var supportedJavaVersionSet = Arrays.stream(supportedJavaVersions).boxed().collect(toSet());
-    var javaVersion = Arrays.stream(JavaRuntime.getVMInstallType(StandardVMType.ID_STANDARD_VM_TYPE).getVMInstalls())
-        .filter(vm -> vm instanceof IVMInstall2)
-        .map(vm -> (IVMInstall2) vm)
+    var javaVersion = Arrays.stream(JavaRuntime.getVMInstallTypes())
+        .filter(StandardVMType.class::isInstance)
+        .flatMap(t -> Arrays.stream(t.getVMInstalls()))
+        .filter(IVMInstall2.class::isInstance)
+        .map(IVMInstall2.class::cast)
         .map(IVMInstall2::getJavaVersion)
         .filter(Strings::hasText)
         .map(Version::new)

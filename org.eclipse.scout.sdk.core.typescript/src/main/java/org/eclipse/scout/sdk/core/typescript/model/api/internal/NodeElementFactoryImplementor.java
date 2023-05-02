@@ -79,7 +79,7 @@ public class NodeElementFactoryImplementor implements INodeElementFactory {
 
   @Override
   public IES6Class createClassWithTypeArguments(IES6Class clazz, List<IDataType> arguments) {
-    var args = (List<DataTypeSpi>) arguments.stream().filter(Objects::nonNull).map(IDataType::spi).toList();
+    var args = arguments.stream().filter(Objects::nonNull).map(IDataType::spi).toList();
     return m_spi.createClassWithTypeArgumentsDataType(clazz.spi(), args).api();
   }
 }

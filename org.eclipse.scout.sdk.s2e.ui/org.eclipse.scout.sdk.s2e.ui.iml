@@ -71,8 +71,8 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.ui.workbench.texteditor:3.16.600" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.ui.ide:3.19.100" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.equinox.p2.engine:2.7.500" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.bouncycastle:bcpg-jdk18on:1.72.2" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.bouncycastle:bcprov-jdk18on:1.72" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.bouncycastle:bcpg-jdk18on:1.73" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.bouncycastle:bcprov-jdk18on:1.73" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.equinox.p2.artifact.repository:1.4.500" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.tukaani:xz:1.9" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.equinox.p2.core:2.9.200" level="project" />

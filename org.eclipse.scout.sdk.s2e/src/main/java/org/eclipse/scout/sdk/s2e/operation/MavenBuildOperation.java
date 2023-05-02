@@ -10,12 +10,14 @@
 package org.eclipse.scout.sdk.s2e.operation;
 
 import static java.util.Collections.addAll;
+import static java.util.Comparator.naturalOrder;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutProgress;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -270,19 +272,17 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
 
   protected static IVMInstall getDefaultJvm() {
     var defaultVm = JavaRuntime.getDefaultVMInstall();
-    if (defaultVm != null && StandardVMType.ID_STANDARD_VM_TYPE.equals(defaultVm.getVMInstallType().getName())) {
+    if (defaultVm != null && defaultVm.getVMInstallType() instanceof StandardVMType) {
       return defaultVm;
     }
 
-    IVMInstall2 result = null;
-    for (var candidate : JavaRuntime.getVMInstallType(StandardVMType.ID_STANDARD_VM_TYPE).getVMInstalls()) {
-      if (candidate instanceof IVMInstall2 vm2) {
-        if (result == null || new Version(vm2.getJavaVersion()).compareTo(new Version(result.getJavaVersion())) > 0) {
-          result = vm2;
-        }
-      }
-    }
-    return (IVMInstall) result;
+    return (IVMInstall) Arrays.stream(JavaRuntime.getVMInstallTypes())
+        .filter(StandardVMType.class::isInstance)
+        .flatMap(t -> Arrays.stream(t.getVMInstalls()))
+        .filter(IVMInstall2.class::isInstance)
+        .map(IVMInstall2.class::cast)
+        .max(Comparator.comparing(vm -> new Version(vm.getJavaVersion()), naturalOrder()))
+        .orElse(null);
   }
 
   protected static void setJreContainerPath(ILaunchConfigurationWorkingCopy workingCopy, IResource container) throws CoreException {
