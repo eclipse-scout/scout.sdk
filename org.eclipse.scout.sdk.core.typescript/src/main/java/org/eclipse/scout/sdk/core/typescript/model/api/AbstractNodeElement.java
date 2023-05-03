@@ -9,12 +9,12 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.unmodifiableSet;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.eclipse.scout.sdk.core.typescript.builder.imports.ES6ImportCollector;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi;
@@ -85,12 +85,12 @@ public abstract class AbstractNodeElement<SPI extends NodeElementSpi> implements
   }
 
   @Override
-  public List<String> moduleExportNames() {
+  public Set<String> moduleExportNames() {
     var exportNames = containingModule().spi().elements().get(spi());
     if (exportNames == null) {
-      return emptyList();
+      return emptySet();
     }
-    return unmodifiableList(exportNames);
+    return unmodifiableSet(exportNames);
   }
 
   @Override

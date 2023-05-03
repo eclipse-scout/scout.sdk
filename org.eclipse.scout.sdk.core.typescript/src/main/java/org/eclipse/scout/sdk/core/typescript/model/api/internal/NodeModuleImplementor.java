@@ -10,8 +10,8 @@
 package org.eclipse.scout.sdk.core.typescript.model.api.internal;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
@@ -58,8 +58,8 @@ public class NodeModuleImplementor extends AbstractNodeElement<NodeModuleSpi> im
   }
 
   @Override
-  public List<String> moduleExportNames() {
-    return Collections.singletonList(name());
+  public Set<String> moduleExportNames() {
+    return Collections.singleton(name());
   }
 
   @Override

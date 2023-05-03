@@ -10,8 +10,8 @@
 package org.eclipse.scout.sdk.core.typescript.model.api;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi;
 import org.eclipse.scout.sdk.core.util.SourceRange;
@@ -31,7 +31,7 @@ public interface INodeElement {
 
   Optional<String> computeImportPathFrom(INodeElement queryLocation);
 
-  List<String> moduleExportNames();
+  Set<String> moduleExportNames();
 
   boolean isExportedFromModule();
 

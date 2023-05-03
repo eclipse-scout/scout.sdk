@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement.ExportType;
@@ -53,7 +54,7 @@ public class TestingNodeModuleSpi extends AbstractNodeElementSpi<INodeModule> im
   }
 
   @Override
-  public Map<NodeElementSpi, List<String>> elements() {
+  public Map<NodeElementSpi, Set<String>> elements() {
     // simple local implementation cannot parse elements
     return Collections.emptyMap();
   }

@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -239,14 +238,14 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
     return spi;
   }
 
-  private static SimpleEntry<NodeElementSpi, List<String>> createExport(Element exportElement, NodeModuleSpi moduleSpi) {
+  private static SimpleEntry<NodeElementSpi, Set<String>> createExport(Element exportElement, NodeModuleSpi moduleSpi) {
     var exportName = exportElement.getAttribute("name");
     var referencedElement = Xml.firstChildElement(exportElement, TAG_NAME_CLASS)
         .<NodeElementSpi> map(c -> createClass(c, moduleSpi))
         .or(() -> Xml.firstChildElement(exportElement, TAG_NAME_FUNCTION)
             .map(f -> createFunction(f, moduleSpi)))
         .orElseThrow(); // currently only classes can be exported and must be present
-    return new SimpleEntry<>(referencedElement, Collections.singletonList(exportName));
+    return new SimpleEntry<>(referencedElement, Collections.singleton(exportName));
   }
 
   @SuppressWarnings("TypeMayBeWeakened")

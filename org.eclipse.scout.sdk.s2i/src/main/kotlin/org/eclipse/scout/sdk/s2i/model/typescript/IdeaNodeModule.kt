@@ -44,7 +44,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
     private val m_mainPsi = FinalValue<JSFile>()
     private val m_source = FinalValue<Optional<SourceRange>>()
     private val m_packageJsonSpi = FinalValue<PackageJsonSpi>()
-    private val m_elements = FinalValue<Map<NodeElementSpi, List<String>>>()
+    private val m_elements = FinalValue<Map<NodeElementSpi, Set<String>>>()
     private val m_exports = FinalValue<Map<String, NodeElementSpi>>()
     private val m_elementsByPsi = FinalValue<Map<PsiElement, NodeElementSpi>>()
     private val m_classes = FinalValue<List<ES6ClassSpi>>()
@@ -74,13 +74,13 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
         return@computeIfAbsentAndGet unmodifiableMap(classesByPsi)
     }
 
-    override fun elements(): Map<NodeElementSpi, List<String> /* export name */> = m_elements.computeIfAbsentAndGet(this::computeNodeElements)
+    override fun elements(): Map<NodeElementSpi, Set<String> /* export name */> = m_elements.computeIfAbsentAndGet(this::computeNodeElements)
 
     override fun exports(): Map<String, NodeElementSpi> = m_exports.computeIfAbsentAndGet {
         val exports = elements().entries.stream()
             .flatMap { it.value.map { alias -> alias to it.key }.stream() }
             .collect(toMap({ it.first }, { it.second }, { _, b ->
-                SdkLog.warning("Duplicate export in '{}'.", packageJson().api().name())
+                SdkLog.warning("Duplicate export with name '{}' in index of module '{}'.", b.api().name(), packageJson().api().name())
                 b
             }, { LinkedHashMap() }))
         return@computeIfAbsentAndGet unmodifiableMap(exports)
@@ -90,14 +90,14 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
 
     fun resolveImport(importSpecifier: ES6ImportSpecifier) = moduleInventory.resolveImport(importSpecifier, this)
 
-    private fun computeNodeElements(): Map<NodeElementSpi, List<String>> {
+    private fun computeNodeElements(): Map<NodeElementSpi, Set<String>> {
         val exportedElements = resolveModuleExports()
         val notExportedElements = resolveNotExportedElements(exportedElements.keys)
 
-        val allElements = LinkedHashMap<NodeElementSpi, List<String>>(exportedElements.size + notExportedElements.size)
+        val allElements = LinkedHashMap<NodeElementSpi, Set<String>>(exportedElements.size + notExportedElements.size)
         notExportedElements.asSequence()
             .mapNotNull { createSpiForPsi(it) }
-            .map { it to emptyList<String>() }
+            .map { it to emptySet<String>() }
             .toMap(allElements)
         exportedElements.entries.asSequence()
             .mapNotNull { createSpiForPsi(it.key)?.let { spi -> spi to it.value } }
@@ -135,20 +135,23 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
         return fileName.endsWith(IWebConstants.JS_FILE_SUFFIX) || fileName.endsWith(IWebConstants.TS_FILE_SUFFIX)
     }
 
-    private fun resolveModuleExports(): Map<JSElement, List<String>> {
+    private fun resolveModuleExports(): Map<JSElement, Set<String>> {
         val mainPsi = mainPsi()
         if (mainPsi == null) {
             SdkLog.info("No entry point found for module '{}'. Module will not export anything.", packageJson().containingDir())
             return emptyMap()
         }
 
-        val result = LinkedHashMap<JSElement, MutableList<String>>()
+        val result = LinkedHashMap<JSElement, MutableSet<String>>()
         mainPsi.accept(object : JSRecursiveWalkingElementSkippingNestedFunctionsVisitor() {
             override fun skipLambdas() = true
             override fun visitES6ExportDeclaration(exportDeclaration: ES6ExportDeclaration) {
                 super.visitES6ExportDeclaration(exportDeclaration)
                 resolveExportedElements(exportDeclaration).forEach {
-                    result.computeIfAbsent(it.first) { ArrayList() }.add(it.second)
+                    val newExportName = result.computeIfAbsent(it.first) { LinkedHashSet() }.add(it.second)
+                    if (!newExportName) {
+                        SdkLog.warning("Duplicate export '{}' in index of module '{}'.", it.second, packageJson().api().name())
+                    }
                 }
             }
         })
