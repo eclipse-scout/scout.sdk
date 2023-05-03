@@ -38,20 +38,20 @@ class IdeaNodeModuleTestTs : AbstractModelTest("typescript/moduleWithExports") {
     }
 
     fun testExportAliasForExportFrom() {
-        assertEquals(listOf("NamedClazz"), myIdeaNodeModule.export("NamedClazz").orElseThrow().moduleExportNames())
+        assertEquals(setOf("NamedClazz"), myIdeaNodeModule.export("NamedClazz").orElseThrow().moduleExportNames())
     }
 
     fun testExportAliasForInterface() {
-        assertEquals(listOf("NamedInterface"), myIdeaNodeModule.export("NamedInterface").orElseThrow().moduleExportNames())
+        assertEquals(setOf("NamedInterface"), myIdeaNodeModule.export("NamedInterface").orElseThrow().moduleExportNames())
     }
 
     fun testExportAliasForVariable() {
-        assertEquals(listOf("NamedObj"), myIdeaNodeModule.export("NamedObj").orElseThrow().moduleExportNames())
-        assertEquals(listOf("wildcardVar"), myIdeaNodeModule.export("wildcardVar").orElseThrow().moduleExportNames())
+        assertEquals(setOf("NamedObj"), myIdeaNodeModule.export("NamedObj").orElseThrow().moduleExportNames())
+        assertEquals(setOf("wildcardVar"), myIdeaNodeModule.export("wildcardVar").orElseThrow().moduleExportNames())
     }
 
     fun testExportAliasForModule() {
-        assertEquals(listOf("@eclipse-scout/sdk-export-ts"), myIdeaNodeModule.moduleExportNames())
+        assertEquals(setOf("@eclipse-scout/sdk-export-ts"), myIdeaNodeModule.moduleExportNames())
     }
 
     fun testSourceOfInterface() {

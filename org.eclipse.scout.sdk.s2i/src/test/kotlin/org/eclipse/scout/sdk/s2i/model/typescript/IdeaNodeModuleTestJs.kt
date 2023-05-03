@@ -42,20 +42,20 @@ class IdeaNodeModuleTestJs : AbstractModelTest("javascript/moduleWithExports") {
     }
 
     fun testExportAliasForExportFrom() {
-        assertEquals(listOf("NamedClazz"), myIdeaNodeModule.export("NamedClazz").orElseThrow().moduleExportNames())
+        assertEquals(setOf("NamedClazz"), myIdeaNodeModule.export("NamedClazz").orElseThrow().moduleExportNames())
     }
 
     fun testExportAliasForClass() {
-        assertEquals(listOf("WildcardDefaultClass"), myIdeaNodeModule.export("WildcardDefaultClass").orElseThrow().moduleExportNames())
+        assertEquals(setOf("WildcardDefaultClass"), myIdeaNodeModule.export("WildcardDefaultClass").orElseThrow().moduleExportNames())
     }
 
     fun testExportAliasForVariable() {
-        assertEquals(listOf("namedVar"), myIdeaNodeModule.export("namedVar").orElseThrow().moduleExportNames())
-        assertEquals(listOf("utils"), myIdeaNodeModule.export("utils").orElseThrow().moduleExportNames())
+        assertEquals(setOf("namedVar"), myIdeaNodeModule.export("namedVar").orElseThrow().moduleExportNames())
+        assertEquals(setOf("utils"), myIdeaNodeModule.export("utils").orElseThrow().moduleExportNames())
     }
 
     fun testExportAliasForModule() {
-        assertEquals(listOf("@eclipse-scout/sdk-export-js"), myIdeaNodeModule.moduleExportNames())
+        assertEquals(setOf("@eclipse-scout/sdk-export-js"), myIdeaNodeModule.moduleExportNames())
     }
 
     fun testSourceOfClass() {

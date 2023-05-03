@@ -28,24 +28,24 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
 
         val externalElement = moduleSpi.resolveReferencedElement(external.javaScriptField)?.api() as IES6Class
         assertEquals("NamedDefaultClass", externalElement.name())
-        assertEquals(listOf("NamedClazz"), externalElement.moduleExportNames())
+        assertEquals(setOf("NamedClazz"), externalElement.moduleExportNames())
         assertEquals("@eclipse-scout/sdk-export-js", externalElement.containingModule().name())
 
         val localElement = moduleSpi.resolveReferencedElement(local.javaScriptField)?.api() as IES6Class
         assertEquals("LocalClass", localElement.name())
-        assertEquals(listOf("LocalClass"), localElement.moduleExportNames())
+        assertEquals(setOf("LocalClass"), localElement.moduleExportNames())
         assertEquals("@eclipse-scout/sdk-external-imports-js", localElement.containingModule().name())
         assertSame(testClass.containingModule(), localElement.containingModule())
 
         val wildElement = moduleSpi.resolveReferencedElement(wild.javaScriptField)?.api() as IES6Class
         assertEquals("WildcardClass", wildElement.name())
-        assertEquals(listOf("WildcardClass"), wildElement.moduleExportNames())
+        assertEquals(setOf("WildcardClass"), wildElement.moduleExportNames())
         assertEquals("@eclipse-scout/sdk-export-js", wildElement.containingModule().name())
         assertSame(externalElement.containingModule(), wildElement.containingModule())
 
         val aliasElement = moduleSpi.resolveReferencedElement(alias.javaScriptField)?.api() as IES6Class
         assertEquals("AnotherClass", aliasElement.name())
-        assertEquals(listOf("AnotherClass"), aliasElement.moduleExportNames())
+        assertEquals(setOf("AnotherClass"), aliasElement.moduleExportNames())
         assertEquals("@eclipse-scout/sdk-export-js", aliasElement.containingModule().name())
         assertSame(externalElement.containingModule(), aliasElement.containingModule())
     }
