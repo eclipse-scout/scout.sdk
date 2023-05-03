@@ -213,7 +213,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     }
 
     private inner class VfsListener : AsyncFileListener {
-        override fun prepareChange(events: MutableList<out VFileEvent>): AsyncFileListener.ChangeApplier? {
+        override fun prepareChange(events: List<VFileEvent>): AsyncFileListener.ChangeApplier? {
             val removedFiles = events.mapNotNull { toFileIfRemoved(it) }
             if (removedFiles.isEmpty()) {
                 return null

@@ -10,6 +10,8 @@
 package org.eclipse.scout.sdk.s2i.model.js
 
 import com.intellij.lang.javascript.JavascriptLanguage
+import com.intellij.lang.javascript.library.JSLibraryManager
+import com.intellij.lang.javascript.library.JSLibraryManager.JSLibraryManagerChangeListener
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
@@ -22,7 +24,6 @@ import com.intellij.psi.PsiTreeChangeEvent
 import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModels
-import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.core.typescript.model.api.NodeModulesProvider
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModulesProviderSpi
@@ -36,8 +37,8 @@ import java.util.concurrent.TimeUnit
 
 class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable {
 
-    private val m_delayedProcessor = DelayedBuffer(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true, this::processFileEvents)
     private val m_nodeModuleInventory = IdeaNodeModules(project)
+    private val m_busConnection = project.messageBus.connect()
 
     companion object {
         fun getOrCreateScoutJsModel(module: Module) = moduleDir(module)?.let {
@@ -52,8 +53,16 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
     }
 
     init {
-        PsiManager.getInstance(project).addPsiTreeChangeListener(PsiListener(), this)
+        PsiManager.getInstance(project).addPsiTreeChangeListener(PsiListener(project), this)
+        m_busConnection.subscribe(JSLibraryManager.TOPIC, JSLibraryChangeListener())
         NodeModulesProvider.registerProvider(project, this)
+    }
+
+    private class JSLibraryChangeListener : JSLibraryManagerChangeListener {
+        override fun onChange() {
+            NodeModulesProvider.clearNodeModules()
+            SdkLog.debug("NodeModule cache cleared because of JS library change.")
+        }
     }
 
     override fun create(nodeModuleDir: Path): Optional<NodeModuleSpi> {
@@ -71,32 +80,36 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
     }
 
     override fun dispose() {
+        m_busConnection.disconnect()
         NodeModulesProvider.clearNodeModules()
         NodeModulesProvider.removeProvider(project)
     }
 
-    private inner class PsiListener : PsiTreeChangeAdapter() {
+    private class PsiListener(private val project: Project) : PsiTreeChangeAdapter() {
+
+        private val m_delayedProcessor = DelayedBuffer(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true, this::processFileEvents)
+
         override fun childrenChanged(event: PsiTreeChangeEvent) {
             val file = event.file ?: return
-            if (!file.language.isKindOf(JavascriptLanguage.INSTANCE) && IPackageJson.FILE_NAME != file.name) return
+            if (!file.language.isKindOf(JavascriptLanguage.INSTANCE)) return
             m_delayedProcessor.submit(file)
         }
-    }
 
-    private fun processFileEvents(events: List<PsiFile>) {
-        if (!project.isInitialized || events.isEmpty()) return
-        val changedPaths = computeInReadAction(project) { // PsiElement.isValid may require read-action
-            events
-                .asSequence()
-                .filter { it.isPhysical && !it.isDirectory && it.isValid }
-                .map { it.virtualFile }
-                .distinct() // events for the same file: only process once
-                .mapNotNull { it.resolveLocalPath() }
-                .toList()
-        }
-        return changedPaths.forEach {
-            NodeModulesProvider.removeNodeModule(it)
-                .forEach { removedModule -> SdkLog.debug("NodeModule cache entry for '{}' removed.", removedModule.api()) }
+        private fun processFileEvents(events: List<PsiFile>) {
+            if (!project.isInitialized || events.isEmpty()) return
+            val changedPaths = computeInReadAction(project) { // PsiElement.isValid may require read-action
+                events
+                    .asSequence()
+                    .filter { it.isPhysical && !it.isDirectory && it.isValid }
+                    .map { it.virtualFile }
+                    .distinct() // events for the same file: only process once
+                    .mapNotNull { it.resolveLocalPath() }
+                    .toList()
+            }
+            return changedPaths.forEach {
+                NodeModulesProvider.removeNodeModule(it)
+                    .forEach { removedModule -> SdkLog.debug("NodeModule cache entry for '{}' removed.", removedModule.api()) }
+            }
         }
     }
 }
