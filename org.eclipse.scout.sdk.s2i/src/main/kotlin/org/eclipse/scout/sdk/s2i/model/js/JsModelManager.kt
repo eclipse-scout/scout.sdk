@@ -14,7 +14,6 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessModuleDir
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
@@ -22,13 +21,13 @@ import com.intellij.psi.PsiTreeChangeAdapter
 import com.intellij.psi.PsiTreeChangeEvent
 import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
-import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModels
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.core.typescript.model.api.NodeModulesProvider
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModulesProviderSpi
 import org.eclipse.scout.sdk.core.util.DelayedBuffer
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModules
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import java.nio.file.Path
@@ -86,15 +85,18 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
 
     private fun processFileEvents(events: List<PsiFile>) {
         if (!project.isInitialized || events.isEmpty()) return
-        return events
-            .asSequence()
-            .filter { it.isPhysical && !it.isDirectory && it.isValid }
-            .map { it.virtualFile }
-            .distinct() // events for the same file: only process once
-            .forEach { remove(it) }
+        val changedPaths = computeInReadAction(project) { // PsiElement.isValid may require read-action
+            events
+                .asSequence()
+                .filter { it.isPhysical && !it.isDirectory && it.isValid }
+                .map { it.virtualFile }
+                .distinct() // events for the same file: only process once
+                .mapNotNull { it.resolveLocalPath() }
+                .toList()
+        }
+        return changedPaths.forEach {
+            NodeModulesProvider.removeNodeModule(it)
+                .forEach { removedModule -> SdkLog.debug("NodeModule cache entry for '{}' removed.", removedModule.api()) }
+        }
     }
-
-    private fun remove(file: VirtualFile) = file.resolveLocalPath()
-        ?.let { NodeModulesProvider.removeNodeModule(it) }
-        ?.forEach { SdkLog.debug("Removed {} cache entry for '{}').", ScoutJsModel::class.java.simpleName, it) }
 }
