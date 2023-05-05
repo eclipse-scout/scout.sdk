@@ -41,7 +41,7 @@ class IdeaPackageJson(private val ideaModule: IdeaNodeModule, private val module
         try {
             InputStreamReader(content()).use { JsonParser.parseReader(it) }.asJsonObject
         } catch (e: IOException) {
-            SdkLog.warning("Unable to read file '{}'.", m_packageJson, e)
+            SdkLog.info("Unable to read file '{}'. Skipping module.", m_packageJson, e)
             return@lazy null
         }
     }

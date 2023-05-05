@@ -70,10 +70,12 @@ class CompatibilityMethodCaller<T> {
                 val resolvedParameterTypes = resolvedParameterTypes()
                 val resolvedClass = resolvedClass()
                 if (CONSTRUCTOR_NAME == methodName) {
-                    val constr = resolvedClass.getConstructor(*resolvedParameterTypes)
+                    val constr = resolvedClass.getDeclaredConstructor(*resolvedParameterTypes)
+                    constr.isAccessible = true
                     return { _, args -> constr.newInstance(*args) as R }
                 }
-                val method = resolvedClass.getMethod(methodName, *resolvedParameterTypes)
+                val method = resolvedClass.getDeclaredMethod(methodName, *resolvedParameterTypes)
+                method.isAccessible = true
                 return { obj, args -> method.invoke(obj, *args) as R }
             } catch (e: Throwable) {
                 SdkLog.debug("Skipping method '{}'.", methodName, onTrace(e))
