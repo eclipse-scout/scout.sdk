@@ -142,7 +142,7 @@
                 <property name="id">
                   <constantValue>
                     <type>String</type>
-                    <value>SomeTable</value>
+                    <value>project.SomeTable</value>
                   </constantValue>
                 </property>
                 <property name="objectType">

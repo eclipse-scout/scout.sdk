@@ -69,7 +69,7 @@ public class ColumnMap extends IdObjectTypeMap {
         .flatMap(Stream::of)
         .filter(cv -> cv.type() == ConstantValueType.ObjectLiteral)
         .flatMap(cv -> cv.asObjectLiteral().stream())
-        .map(ol -> IdObjectType.create(ol, usedNames()))
+        .map(ol -> IdObjectType.create(ol, usedNames(), scoutJsModel().orElse(null)))
         .flatMap(Optional::stream)
         .filter(idObjectType -> idObjectType.objectType().isInstanceOf(columnClass))
         .collect(Collectors.toMap(IdObjectType::id, identity(), (a, b) -> {

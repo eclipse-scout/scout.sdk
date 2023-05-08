@@ -29,10 +29,7 @@ import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiWhiteSpace
+import com.intellij.psi.*
 import com.intellij.psi.search.FileTypeIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.SearchScope
@@ -256,14 +253,32 @@ object WidgetMapUpdater {
         val psiFile = modelFunction.containingFile
 
         val topLevelElements = psiFile.children.toSet()
-        val topLevelParent = PsiTreeUtil.findFirstParent(modelFunction, true) { topLevelElements.contains(it) } ?: return
-        val container = topLevelParent.parent
+        var markerComment = topLevelElements.firstOrNull { it is PsiComment && it.text == generatedWidgetMapsMarkerComment("\n") }
 
-        // remove all after our top-level element (all after it must be widget maps)
-        var sibling = topLevelParent.nextSibling
+        if (newSources.isEmpty() && markerComment == null) {
+            // nothing to add, no previously created widget maps to remove
+            return
+        }
+
+        val lastTopLevelElement = if (newSources.isEmpty()) {
+            // nothing to add, remove the markerComment and everything after it
+            // -> everything after the first prevSibling of the markerComment that is not a whitespace
+            var sibling = markerComment?.prevSibling
+            while (sibling is PsiWhiteSpace) {
+                sibling = sibling.prevSibling
+            }
+            sibling
+        } else {
+            // something to add, remove everything after the markerComment or if it does not exist everything after the top-level parent of the modelFunction
+            markerComment ?: PsiTreeUtil.findFirstParent(modelFunction, true) { topLevelElements.contains(it) }
+        } ?: return
+        val container = lastTopLevelElement.parent
+
+        // remove everything after lastTopLevelElement (all after it must be widget maps)
+        var sibling = lastTopLevelElement.nextSibling
         while (sibling != null) {
             sibling.delete()
-            sibling = topLevelParent.nextSibling
+            sibling = lastTopLevelElement.nextSibling
         }
         container.node.addChild(ASTFactory.whitespace("\n")) // ensure trailing newline
         if (newSources.isEmpty()) {
@@ -271,10 +286,12 @@ object WidgetMapUpdater {
             return
         }
 
-        // add marker comment
-        val markerComment = JSPsiElementFactory.createPsiComment(generatedWidgetMapsMarkerComment("\n"), psiFile)
-        var lastInsert = container.addAfter(markerComment, topLevelParent)
-        addSpaceBefore(lastInsert)
+        // add marker comment if it does not exist already
+        if (markerComment == null) {
+            markerComment = container.addAfter(JSPsiElementFactory.createPsiComment(generatedWidgetMapsMarkerComment("\n"), psiFile), lastTopLevelElement) ?: return
+            addSpaceBefore(markerComment)
+        }
+        var lastInsert: PsiElement = markerComment
 
         // add new widget maps
         newSources.forEach {
@@ -295,7 +312,7 @@ object WidgetMapUpdater {
     fun generatedWidgetMapsMarkerComment(nl: String): String {
         return "/* **************************************************************************" + nl +
                 "* GENERATED WIDGET MAPS" + nl +
-                "* **************************************************************************/" + nl
+                "* **************************************************************************/"
     }
 
     private fun commitDocument(element: PsiElement) {

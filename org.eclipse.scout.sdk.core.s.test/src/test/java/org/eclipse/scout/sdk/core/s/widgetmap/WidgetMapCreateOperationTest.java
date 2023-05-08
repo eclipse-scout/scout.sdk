@@ -383,7 +383,7 @@ public class WidgetMapCreateOperationTest {
     //        }
     //      },
     //      detailTable: {
-    //        id: 'SomeTable', // OPTIONAL
+    //        id: 'project.SomeTable', // OPTIONAL
     //        objectType: Table,
     //        columns: [
     //          {

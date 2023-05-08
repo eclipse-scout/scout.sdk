@@ -462,7 +462,7 @@ public class IdObjectTypeMapTest {
     //        }
     //      },
     //      detailTable: {
-    //        id: 'SomeTable', // OPTIONAL
+    //        id: 'project.SomeTable', // OPTIONAL
     //        objectType: Table,
     //        columns: [
     //          {

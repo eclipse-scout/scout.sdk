@@ -14,6 +14,7 @@ import static java.util.Optional.empty;
 import java.util.Collection;
 import java.util.Optional;
 
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -35,10 +36,10 @@ public class IdObjectType {
     return ObjectType.create(es6Class, usedNames).map(e -> new IdObjectType(id, e));
   }
 
-  public static Optional<IdObjectType> create(IObjectLiteral objectLiteral, Collection<String> usedNames) {
+  public static Optional<IdObjectType> create(IObjectLiteral objectLiteral, Collection<String> usedNames, ScoutJsModel scoutJsModel) {
     return Optional.ofNullable(objectLiteral)
         .flatMap(ol -> create(
-            IdObjectTypeMapUtils.getId(ol).orElse(null),
+            IdObjectTypeMapUtils.getId(ol, scoutJsModel).orElse(null),
             IdObjectTypeMapUtils.getObjectType(ol).orElse(null),
             usedNames));
   }
