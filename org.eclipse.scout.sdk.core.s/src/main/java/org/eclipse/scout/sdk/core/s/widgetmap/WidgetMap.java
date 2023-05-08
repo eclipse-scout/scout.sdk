@@ -126,7 +126,7 @@ public class WidgetMap extends IdObjectTypeMap {
   }
 
   protected TreeVisitResult collectIdObjectType(IObjectLiteral element, Deque<IObjectLiteral> ancestors, Consumer<IdObjectType> collector) {
-    var idObjectType = IdObjectType.create(element, usedNames()).orElse(null);
+    var idObjectType = IdObjectType.create(element, usedNames(), scoutJsModel().orElse(null)).orElse(null);
     if (idObjectType == null) {
       return TreeVisitResult.CONTINUE;
     }
@@ -148,7 +148,7 @@ public class WidgetMap extends IdObjectTypeMap {
     var name = idObjectType.id();
     if (ScoutJsCoreConstants.CLASS_NAME_TABLE.equals(name) || name.equals(idObjectType.objectType().es6Class().name())) {
       name = Optional.ofNullable(ancestors.peekLast()) // get parent
-          .flatMap(ol -> IdObjectType.create(ol, usedNames()))
+          .flatMap(ol -> IdObjectType.create(ol, usedNames(), scoutJsModel().orElse(null)))
           .map(iot -> iot.id() + ScoutJsCoreConstants.CLASS_NAME_TABLE)
           .orElse(name);
     }

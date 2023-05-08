@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModels;
 import org.eclipse.scout.sdk.core.s.widgetmap.generator.IdObjectTypeMapGenerator;
 import org.eclipse.scout.sdk.core.s.widgetmap.generator.ObjectTypeGenerator;
 import org.eclipse.scout.sdk.core.typescript.generator.nodeelement.INodeElementGenerator;
@@ -102,10 +104,25 @@ public final class IdObjectTypeMapUtils {
    * *************************************************************************/
 
   public static Optional<String> getId(IObjectLiteral model) {
+    return getId(model, null);
+  }
+
+  public static Optional<String> getId(IObjectLiteral model, ScoutJsModel scoutJsModel) {
     return Optional.ofNullable(model)
         .flatMap(ol -> ol.property(ScoutJsCoreConstants.PROPERTY_NAME_ID))
         .flatMap(IConstantValue::asString)
+        .map(s -> removeNamespace(s, scoutJsModel, model.containingModule()))
         .flatMap(Strings::notBlank);
+  }
+
+  private static String removeNamespace(String s, ScoutJsModel scoutJsModel, INodeElement nodeElement) {
+    if (scoutJsModel == null && nodeElement == null) {
+      return s;
+    }
+    return Optional.ofNullable(scoutJsModel).or(() -> ScoutJsModels.create(nodeElement.containingModule()))
+        .flatMap(ScoutJsModel::namespace)
+        .map(namespace -> Strings.removePrefix(s, namespace + "."))
+        .orElse(s);
   }
 
   public static Optional<IES6Class> getObjectType(IObjectLiteral model) {

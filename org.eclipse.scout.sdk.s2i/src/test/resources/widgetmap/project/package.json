@@ -1,0 +1,8 @@
+{
+  "name": "@eclipse-scout/project",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@eclipse-scout/core": "1.0.0"
+  }
+}
