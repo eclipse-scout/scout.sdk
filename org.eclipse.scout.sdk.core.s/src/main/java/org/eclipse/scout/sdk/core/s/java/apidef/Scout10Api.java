@@ -3668,6 +3668,20 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
+  IScoutVariousApi.ScoutTextProviderService SCOUT_TEXT_PROVIDER_SERVICE = new ScoutTextProviderService();
+
+  @Override
+  default IScoutVariousApi.ScoutTextProviderService ScoutTextProviderService() {
+    return SCOUT_TEXT_PROVIDER_SERVICE;
+  }
+
+  class ScoutTextProviderService implements IScoutVariousApi.ScoutTextProviderService {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.shared.services.common.text.ScoutTextProviderService";
+    }
+  }
+
   IScoutVariousApi.CalendarMenuType CALENDAR_MENU_TYPE = new CalendarMenuType();
 
   @Override

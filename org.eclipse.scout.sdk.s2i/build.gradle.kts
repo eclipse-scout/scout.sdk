@@ -19,7 +19,7 @@ val scoutSdkVersion = "13.0.0-SNAPSHOT"
 val scoutSdkPluginVersion = "13.0.0.".plus(timestamp())
 
 val javaVersion = JavaVersion.VERSION_17
-val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "23.1-SNAPSHOT")
+val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "23.2-SNAPSHOT")
 val intellijVersion = projectPropertyOr("intellij_version", "IU-2022.2.3") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
 
 plugins {
@@ -43,7 +43,7 @@ dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", scoutSdkVersion)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.ecj", scoutSdkVersion)
     api("org.apache.poi", "poi-ooxml", "5.2.3")
-    testImplementation("org.mockito", "mockito-core", "4.11.0")
+    testImplementation("org.mockito", "mockito-core", "5.3.1")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.test", scoutSdkVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.typescript.test", scoutSdkVersion)

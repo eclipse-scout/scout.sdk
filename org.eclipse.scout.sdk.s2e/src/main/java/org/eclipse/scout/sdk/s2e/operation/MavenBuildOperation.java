@@ -318,7 +318,7 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
       return;
     }
 
-    var configuration = projectFacade.getResolverConfiguration();
+    var configuration = projectFacade.getConfiguration();
     if (configuration == null) {
       return;
     }

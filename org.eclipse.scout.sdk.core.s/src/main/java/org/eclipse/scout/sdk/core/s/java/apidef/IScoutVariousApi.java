@@ -14,6 +14,11 @@ import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
 @SuppressWarnings({"squid:S00100", "squid:S2166", "squid:S2176", "squid:S00118", "findbugs:NM_METHOD_NAMING_CONVENTION"}) // method naming conventions
 public interface IScoutVariousApi {
 
+  ScoutTextProviderService ScoutTextProviderService();
+
+  interface ScoutTextProviderService extends ITypeNameSupplier {
+  }
+
   CalendarMenuType CalendarMenuType();
 
   interface CalendarMenuType extends ITypeNameSupplier {

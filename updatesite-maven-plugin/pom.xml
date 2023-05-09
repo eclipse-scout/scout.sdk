@@ -28,7 +28,7 @@
     <scout.base.version>13.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <maven.model.dependency.version>3.8.7</maven.model.dependency.version>
-    <junit.version>5.9.1</junit.version>
+    <junit.version>5.9.3</junit.version>
   </properties>
 
   <dependencyManagement>
@@ -59,7 +59,7 @@
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <version>3.7.0</version>
+      <version>3.8.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -89,7 +89,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>3.7.0</version>
+        <version>3.8.2</version>
         <configuration>
           <goalPrefix>updatesite</goalPrefix>
           <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>

@@ -20,34 +20,33 @@
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s.test" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.test" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.9.1" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.9.3" level="project" />
     <orderEntry type="library" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-commons:1.9.1" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-commons:1.9.3" level="project" />
     <orderEntry type="library" name="Maven: org.apiguardian:apiguardian-api:1.1.2" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-launcher:1.9.1" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-engine:1.9.1" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.9.1" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-params:5.9.1" level="project" />
-    <orderEntry type="library" name="Maven: org.mockito:mockito-core:4.11.0" level="project" />
-    <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy:1.12.19" level="project" />
-    <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy-agent:1.12.19" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-launcher:1.9.3" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-engine:1.9.3" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.9.3" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-params:5.9.3" level="project" />
+    <orderEntry type="library" name="Maven: org.mockito:mockito-core:5.3.1" level="project" />
+    <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy:1.14.4" level="project" />
+    <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy-agent:1.14.4" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.objenesis:objenesis:3.3" level="project" />
     <orderEntry type="library" name="Maven: jakarta.annotation:jakarta.annotation-api:1.3.5" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.typescript.test" />
     <orderEntry type="library" name="Maven: org.glassfish:jakarta.json:2.0.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-embedder:3.8.6" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-settings:3.8.6" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-settings-builder:3.8.6" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-core:3.8.6" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-embedder:3.8.7" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-settings:3.8.7" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-settings-builder:3.8.7" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-core:3.8.7" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.sisu:org.eclipse.sisu.inject:0.3.5" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-plugin-api:3.8.6" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-model:3.8.6" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-model-builder:3.8.6" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-builder-support:3.8.6" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-plugin-api:3.8.7" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-model:3.8.7" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-model-builder:3.8.7" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-builder-support:3.8.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-api:1.6.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-util:1.6.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.shared:maven-shared-utils:3.3.4" level="project" />
-    <orderEntry type="library" name="Maven: commons-io:commons-io:2.11.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.inject:guice:no_aop:4.2.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:guava:30.1.1-jre" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:failureaccess:1.0.1" level="project" />
@@ -57,15 +56,15 @@
     <orderEntry type="library" name="Maven: org.eclipse.sisu:org.eclipse.sisu.plexus:0.3.5" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-sec-dispatcher:2.0" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-cipher:2.0" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.6" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-interpolation:1.26" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.7" level="project" />
     <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.8.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-compat:3.8.6" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-artifact:3.8.6" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-resolver-provider:3.8.6" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-repository-metadata:3.8.6" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-compat:3.8.7" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-artifact:3.8.7" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-resolver-provider:3.8.7" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-repository-metadata:3.8.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-impl:1.6.3" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-interpolation:1.26" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-component-annotations:2.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-connector-basic:1.6.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-spi:1.6.3" level="project" />
@@ -73,7 +72,7 @@
     <orderEntry type="library" name="Maven: io.takari.aether:aether-connector-okhttp:0.17.8" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.14.1" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.17.3" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-provider-api:3.5.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-provider-api:3.5.3" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.jersey.inject:jersey-hk2:2.37" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.jersey.core:jersey-common:2.37" level="project" />
     <orderEntry type="library" name="Maven: jakarta.ws.rs:jakarta.ws.rs-api:2.1.6" level="project" />
@@ -83,17 +82,19 @@
     <orderEntry type="library" name="Maven: org.glassfish.hk2:hk2-api:2.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.hk2:hk2-utils:2.6.1" level="project" />
     <orderEntry type="library" name="Maven: org.javassist:javassist:3.25.0-GA" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html.test:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.commons:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.json:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html.test:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.commons:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.json:23.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.5" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client.test:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:2.11.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client.test:23.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-math3:3.6.1" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.test:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.security:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.test:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.security:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.nls:23.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.google.http-client:google-http-client-apache-v2:1.42.3" level="project" />
     <orderEntry type="library" name="Maven: com.google.http-client:google-http-client:1.42.3" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
@@ -106,54 +107,55 @@
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.13" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.15" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:2.0.4" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.mom.api:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared.test:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform.test:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.mom.api:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared.test:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform.test:23.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.13.2" level="project" />
     <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject.test:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject.test:23.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: jakarta.servlet:jakarta.servlet-api:4.0.4" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.jaxws:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.jaxws:23.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: jakarta.xml.ws:jakarta.xml.ws-api:2.3.3" level="project" />
     <orderEntry type="library" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:2.3.3" level="project" />
     <orderEntry type="library" name="Maven: jakarta.xml.soap:jakarta.xml.soap-api:1.4.2" level="project" />
     <orderEntry type="library" name="Maven: com.sun.activation:jakarta.activation:1.2.2" level="project" />
     <orderEntry type="library" name="Maven: jakarta.jws:jakarta.jws-api:2.1.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:23.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:23.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: io.smallrye:jandex:3.0.5" level="project" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.ui.html:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.client:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.shared:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.client:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.shared:23.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core:3.31.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.resources:3.18.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.osgi:3.18.100" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.runtime:3.26.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.common:3.16.200" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.jobs:3.13.100" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.ui.html:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.client:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.shared:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.client:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.shared:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core:3.33.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.resources:3.18.200" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.osgi:3.18.300" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.runtime:3.26.100" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.common:3.17.100" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.jobs:3.13.300" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.registry:3.11.200" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.preferences:3.10.100" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.preferences:3.10.200" level="project" />
     <orderEntry type="library" name="Maven: org.osgi:org.osgi.service.prefs:1.1.2" level="project" />
     <orderEntry type="library" name="Maven: org.osgi:osgi.annotation:8.0.1" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.contenttype:3.8.200" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.equinox.app:1.6.200" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.filesystem:1.9.500" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.text:3.12.200" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.commands:3.10.200" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface.text:3.21.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.swt:3.121.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface:3.27.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.ibm.icu:icu4j:67.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core.manipulation:1.16.200" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.ltk.core.refactoring:3.13.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.text:3.12.300" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.commands:3.10.400" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jdt:ecj:3.33.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface.text:3.23.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.swt:3.123.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface:3.29.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.ibm.icu:icu4j:72.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.core.manipulation:1.18.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.ltk.core.refactoring:3.13.100" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.expressions:3.8.200" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.launching:3.19.700" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.debug.core:3.20.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.debug:3.19.300" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.launching:3.19.900" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.debug.core:3.20.100" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.jdt:org.eclipse.jdt.debug:3.20.100" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.core.variables:3.5.100" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.core.filebuffers:3.7.200" level="project" />
   </component>

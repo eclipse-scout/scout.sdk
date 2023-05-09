@@ -55,7 +55,7 @@
 
   <properties>
     <scout.osgi.version>13.0.0</scout.osgi.version>
-    <org.eclipse.scout.rt_version>23.1-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>23.2-SNAPSHOT</org.eclipse.scout.rt_version>
 
     <jdk.source.version>17</jdk.source.version>
     <jdk.min.version>${jdk.source.version}</jdk.min.version>
@@ -91,106 +91,107 @@
     <!-- dependencies to Eclipse artifacts -->
     <org.eclipse.compare.core>3.7.100</org.eclipse.compare.core>
     <org.eclipse.compare>3.8.500</org.eclipse.compare>
-    <org.eclipse.compare>3.8.200</org.eclipse.compare>
-    <org.eclipse.core.commands>3.10.200</org.eclipse.core.commands>
+    <org.eclipse.core.commands>3.10.400</org.eclipse.core.commands>
     <org.eclipse.core.contenttype>3.8.200</org.eclipse.core.contenttype>
-    <org.eclipse.core.databinding.observable>1.12.0</org.eclipse.core.databinding.observable>
-    <org.eclipse.core.databinding.property>1.9.0</org.eclipse.core.databinding.property>
-    <org.eclipse.core.databinding>1.11.100</org.eclipse.core.databinding>
+    <org.eclipse.core.databinding.observable>1.12.200</org.eclipse.core.databinding.observable>
+    <org.eclipse.core.databinding.property>1.9.200</org.eclipse.core.databinding.property>
+    <org.eclipse.core.databinding>1.12.0</org.eclipse.core.databinding>
     <org.eclipse.core.expressions>3.8.200</org.eclipse.core.expressions>
     <org.eclipse.core.filebuffers>3.7.200</org.eclipse.core.filebuffers>
     <org.eclipse.core.filesystem>1.9.500</org.eclipse.core.filesystem>
-    <org.eclipse.core.jobs>3.13.100</org.eclipse.core.jobs>
-    <org.eclipse.core.resources>3.18.0</org.eclipse.core.resources>
-    <org.eclipse.core.runtime>3.26.0</org.eclipse.core.runtime>
+    <org.eclipse.core.jobs>3.13.300</org.eclipse.core.jobs>
+    <org.eclipse.core.resources>3.18.200</org.eclipse.core.resources>
+    <org.eclipse.core.runtime>3.26.100</org.eclipse.core.runtime>
     <org.eclipse.core.variables>3.5.100</org.eclipse.core.variables>
-    <org.eclipse.debug.core>3.20.0</org.eclipse.debug.core>
-    <org.eclipse.debug.ui>3.17.0</org.eclipse.debug.ui>
-    <org.eclipse.e4.core.commands>1.0.200</org.eclipse.e4.core.commands>
+    <org.eclipse.debug.core>3.20.100</org.eclipse.debug.core>
+    <org.eclipse.debug.ui>3.17.200</org.eclipse.debug.ui>
+    <org.eclipse.e4.core.commands>1.0.400</org.eclipse.e4.core.commands>
     <org.eclipse.e4.core.contexts>1.11.0</org.eclipse.e4.core.contexts>
     <org.eclipse.e4.core.di.annotations>1.7.200</org.eclipse.e4.core.di.annotations>
     <org.eclipse.e4.core.di.extensions>0.17.200</org.eclipse.e4.core.di.extensions>
+    <org.eclipse.e4.core.di.extensions.supplier>0.16.400</org.eclipse.e4.core.di.extensions.supplier>
     <org.eclipse.e4.core.di>1.8.300</org.eclipse.e4.core.di>
-    <org.eclipse.e4.core.services>2.3.300</org.eclipse.e4.core.services>
-    <org.eclipse.e4.emf.xpath>0.3.0</org.eclipse.e4.emf.xpath>
-    <org.eclipse.e4.ui.bindings>0.13.100</org.eclipse.e4.ui.bindings>
-    <org.eclipse.e4.ui.css.core>0.13.300</org.eclipse.e4.ui.css.core>
-    <org.eclipse.e4.ui.css.swt.theme>0.13.100</org.eclipse.e4.ui.css.swt.theme>
-    <org.eclipse.e4.ui.css.swt>0.14.600</org.eclipse.e4.ui.css.swt>
-    <org.eclipse.e4.ui.di>1.4.0</org.eclipse.e4.ui.di>
-    <org.eclipse.e4.ui.dialogs>1.3.300</org.eclipse.e4.ui.dialogs>
-    <org.eclipse.e4.ui.ide>3.16.100</org.eclipse.e4.ui.ide>
-    <org.eclipse.e4.ui.model.workbench>2.2.200</org.eclipse.e4.ui.model.workbench>
-    <org.eclipse.e4.ui.services>1.5.0</org.eclipse.e4.ui.services>
-    <org.eclipse.e4.ui.widgets>1.3.0</org.eclipse.e4.ui.widgets>
-    <org.eclipse.e4.ui.workbench.addons.swt>1.4.400</org.eclipse.e4.ui.workbench.addons.swt>
-    <org.eclipse.e4.ui.workbench.renderers.swt>0.15.600</org.eclipse.e4.ui.workbench.renderers.swt>
-    <org.eclipse.e4.ui.workbench.swt>0.16.600</org.eclipse.e4.ui.workbench.swt>
-    <org.eclipse.e4.ui.workbench3>0.16.0</org.eclipse.e4.ui.workbench3>
-    <org.eclipse.e4.ui.workbench>1.13.200</org.eclipse.e4.ui.workbench>
-    <org.eclipse.emf.common>2.26.0</org.eclipse.emf.common>
-    <org.eclipse.emf.ecore.change>2.14.0</org.eclipse.emf.ecore.change>
-    <org.eclipse.emf.ecore.xmi>2.17.0</org.eclipse.emf.ecore.xmi>
-    <org.eclipse.emf.ecore>2.28.0</org.eclipse.emf.ecore>
+    <org.eclipse.e4.core.services>2.3.400</org.eclipse.e4.core.services>
+    <org.eclipse.e4.emf.xpath>0.3.200</org.eclipse.e4.emf.xpath>
+    <org.eclipse.e4.ui.bindings>0.13.300</org.eclipse.e4.ui.bindings>
+    <org.eclipse.e4.ui.css.core>0.13.500</org.eclipse.e4.ui.css.core>
+    <org.eclipse.e4.ui.css.swt.theme>0.13.300</org.eclipse.e4.ui.css.swt.theme>
+    <org.eclipse.e4.ui.css.swt>0.14.800</org.eclipse.e4.ui.css.swt>
+    <org.eclipse.e4.ui.di>1.4.200</org.eclipse.e4.ui.di>
+    <org.eclipse.e4.ui.dialogs>1.3.500</org.eclipse.e4.ui.dialogs>
+    <org.eclipse.e4.ui.ide>3.16.300</org.eclipse.e4.ui.ide>
+    <org.eclipse.e4.ui.model.workbench>2.3.0</org.eclipse.e4.ui.model.workbench>
+    <org.eclipse.e4.ui.services>1.5.200</org.eclipse.e4.ui.services>
+    <org.eclipse.e4.ui.widgets>1.3.200</org.eclipse.e4.ui.widgets>
+    <org.eclipse.e4.ui.workbench.addons.swt>1.4.600</org.eclipse.e4.ui.workbench.addons.swt>
+    <org.eclipse.e4.ui.workbench.renderers.swt>0.15.800</org.eclipse.e4.ui.workbench.renderers.swt>
+    <org.eclipse.e4.ui.workbench.swt>0.16.800</org.eclipse.e4.ui.workbench.swt>
+    <org.eclipse.e4.ui.workbench3>0.16.200</org.eclipse.e4.ui.workbench3>
+    <org.eclipse.e4.ui.workbench>1.14.100</org.eclipse.e4.ui.workbench>
+    <org.eclipse.emf.common>2.28.0</org.eclipse.emf.common>
+    <org.eclipse.emf.ecore.change>2.15.0</org.eclipse.emf.ecore.change>
+    <org.eclipse.emf.ecore.xmi>2.18.0</org.eclipse.emf.ecore.xmi>
+    <org.eclipse.emf.ecore>2.33.0</org.eclipse.emf.ecore>
     <org.eclipse.equinox.app>1.6.200</org.eclipse.equinox.app>
     <org.eclipse.equinox.bidi>1.4.200</org.eclipse.equinox.bidi>
-    <org.eclipse.equinox.common>3.16.200</org.eclipse.equinox.common>
+    <org.eclipse.equinox.common>3.17.100</org.eclipse.equinox.common>
     <org.eclipse.equinox.p2.core>2.9.200</org.eclipse.equinox.p2.core>
     <org.eclipse.equinox.p2.engine>2.7.500</org.eclipse.equinox.p2.engine>
     <org.eclipse.equinox.p2.metadata>2.6.300</org.eclipse.equinox.p2.metadata>
     <org.eclipse.equinox.p2.metadata.repository>1.4.100</org.eclipse.equinox.p2.metadata.repository>
-    <org.eclipse.equinox.preferences>3.10.100</org.eclipse.equinox.preferences>
+    <org.eclipse.equinox.preferences>3.10.200</org.eclipse.equinox.preferences>
     <org.eclipse.equinox.registry>3.11.200</org.eclipse.equinox.registry>
     <org.eclipse.equinox.security>1.3.1000</org.eclipse.equinox.security>
     <org.eclipse.help>3.9.100</org.eclipse.help>
-    <org.eclipse.jdt.core.manipulation>1.16.200</org.eclipse.jdt.core.manipulation>
-    <org.eclipse.jdt.core>3.31.0</org.eclipse.jdt.core>
-    <org.eclipse.jdt.debug.ui>3.12.800</org.eclipse.jdt.debug.ui>
-    <org.eclipse.jdt.debug>3.19.300</org.eclipse.jdt.debug>
-    <org.eclipse.jdt.junit.core>3.11.400</org.eclipse.jdt.junit.core>
-    <org.eclipse.jdt.junit.runtime>3.7.0</org.eclipse.jdt.junit.runtime>
-    <org.eclipse.jdt.junit>3.15.0</org.eclipse.jdt.junit>
-    <org.eclipse.jdt.launching>3.19.700</org.eclipse.jdt.launching>
-    <org.eclipse.jdt.ui>3.27.0</org.eclipse.jdt.ui>
-    <org.eclipse.jface.databinding>1.13.0</org.eclipse.jface.databinding>
-    <org.eclipse.jface.text>3.21.0</org.eclipse.jface.text>
-    <org.eclipse.jface>3.27.0</org.eclipse.jface>
-    <org.eclipse.ltk.core.refactoring>3.13.0</org.eclipse.ltk.core.refactoring>
+    <org.eclipse.jdt.core.manipulation>1.18.0</org.eclipse.jdt.core.manipulation>
+    <org.eclipse.jdt.core>3.33.0</org.eclipse.jdt.core>
+    <org.eclipse.jdt.debug.ui>3.12.1000</org.eclipse.jdt.debug.ui>
+    <org.eclipse.jdt.debug>3.20.100</org.eclipse.jdt.debug>
+    <org.eclipse.jdt.junit.core>3.11.600</org.eclipse.jdt.junit.core>
+    <org.eclipse.jdt.junit.runtime>3.7.100</org.eclipse.jdt.junit.runtime>
+    <org.eclipse.jdt.junit>3.15.200</org.eclipse.jdt.junit>
+    <org.eclipse.jdt.launching>3.19.900</org.eclipse.jdt.launching>
+    <org.eclipse.jdt.ui>3.28.0</org.eclipse.jdt.ui>
+    <org.eclipse.jface.databinding>1.14.100</org.eclipse.jface.databinding>
+    <org.eclipse.jface.text>3.23.0</org.eclipse.jface.text>
+    <org.eclipse.jface>3.29.0</org.eclipse.jface>
+    <org.eclipse.ltk.core.refactoring>3.13.100</org.eclipse.ltk.core.refactoring>
     <org.eclipse.ltk.ui.refactoring>3.12.200</org.eclipse.ltk.ui.refactoring>
-    <org.eclipse.osgi.services>3.11.0</org.eclipse.osgi.services>
-    <org.eclipse.osgi>3.18.100</org.eclipse.osgi>
-    <org.eclipse.search>3.14.200</org.eclipse.search>
-    <org.eclipse.swt>3.121.0</org.eclipse.swt>
-    <org.eclipse.team.core>3.9.500</org.eclipse.team.core>
-    <org.eclipse.team.ui>3.9.400</org.eclipse.team.ui>
-    <org.eclipse.text>3.12.200</org.eclipse.text>
-    <org.eclipse.ui.console>3.11.300</org.eclipse.ui.console>
-    <org.eclipse.ui.editors>3.14.400</org.eclipse.ui.editors>
-    <org.eclipse.ui.forms>3.11.400</org.eclipse.ui.forms>
-    <org.eclipse.ui.ide>3.19.100</org.eclipse.ui.ide>
-    <org.eclipse.ui.navigator.resources>3.8.400</org.eclipse.ui.navigator.resources>
-    <org.eclipse.ui.navigator>3.10.300</org.eclipse.ui.navigator>
-    <org.eclipse.ui.views.properties.tabbed>3.9.200</org.eclipse.ui.views.properties.tabbed>
-    <org.eclipse.ui.views>3.11.200</org.eclipse.ui.views>
-    <org.eclipse.ui.workbench.texteditor>3.16.600</org.eclipse.ui.workbench.texteditor>
-    <org.eclipse.ui.workbench>3.126.0</org.eclipse.ui.workbench>
-    <org.eclipse.ui>3.201.100</org.eclipse.ui>
-    <org.eclipse.urischeme>1.2.100</org.eclipse.urischeme>
-    <org.eclipse.equinox.simpleconfigurator.manipulator>2.2.0</org.eclipse.equinox.simpleconfigurator.manipulator>
-    <org.eclipse.equinox.p2.repository>2.6.200</org.eclipse.equinox.p2.repository>
+    <org.eclipse.osgi.services>3.11.100</org.eclipse.osgi.services>
+    <org.eclipse.osgi>3.18.300</org.eclipse.osgi>
+    <org.eclipse.search>3.14.400</org.eclipse.search>
+    <org.eclipse.swt>3.123.0</org.eclipse.swt>
+    <org.eclipse.team.core>3.9.700</org.eclipse.team.core>
+    <org.eclipse.team.ui>3.9.600</org.eclipse.team.ui>
+    <org.eclipse.text>3.12.300</org.eclipse.text>
+    <org.eclipse.ui.console>3.11.400</org.eclipse.ui.console>
+    <org.eclipse.ui.editors>3.15.0</org.eclipse.ui.editors>
+    <org.eclipse.ui.forms>3.11.600</org.eclipse.ui.forms>
+    <org.eclipse.ui.ide>3.20.100</org.eclipse.ui.ide>
+    <org.eclipse.ui.navigator.resources>3.8.600</org.eclipse.ui.navigator.resources>
+    <org.eclipse.ui.navigator>3.11.0</org.eclipse.ui.navigator>
+    <org.eclipse.ui.views.properties.tabbed>3.9.400</org.eclipse.ui.views.properties.tabbed>
+    <org.eclipse.ui.views>3.11.400</org.eclipse.ui.views>
+    <org.eclipse.ui.workbench.texteditor>3.16.700</org.eclipse.ui.workbench.texteditor>
+    <org.eclipse.ui.workbench>3.128.0</org.eclipse.ui.workbench>
+    <org.eclipse.ui>3.202.0</org.eclipse.ui>
+    <org.eclipse.urischeme>1.2.300</org.eclipse.urischeme>
+    <org.eclipse.equinox.simpleconfigurator.manipulator>2.2.100</org.eclipse.equinox.simpleconfigurator.manipulator>
+    <org.eclipse.equinox.p2.repository>2.6.300</org.eclipse.equinox.p2.repository>
     <org.eclipse.equinox.frameworkadmin>2.2.100</org.eclipse.equinox.frameworkadmin>
-    <org.eclipse.equinox.p2.artifact.repository>1.4.500</org.eclipse.equinox.p2.artifact.repository>
-    <org.eclipse.equinox.p2.jarprocessor>1.2.300</org.eclipse.equinox.p2.jarprocessor>
+    <org.eclipse.equinox.p2.artifact.repository>1.4.800</org.eclipse.equinox.p2.artifact.repository>
+    <org.eclipse.equinox.p2.jarprocessor>1.2.400</org.eclipse.equinox.p2.jarprocessor>
+    <org.osgi.service.event>1.4.1</org.osgi.service.event>
 
-    <icu4j>67.1</icu4j>
-    <ecj>3.31.0</ecj>
-    <junit.version>5.9.1</junit.version>
+    <icu4j>72.1</icu4j>
+    <ecj>3.33.0</ecj>
+    <junit.version>5.9.3</junit.version>
 
     <!-- versions to dependencies uploaded by scout -->
-    <org.eclipse.m2e.core>2.0.3.20220904-1704</org.eclipse.m2e.core>
-    <org.eclipse.m2e.core.ui>2.0.0.20220726-0936</org.eclipse.m2e.core.ui>
-    <org.eclipse.m2e.archetype.common>3.2.1.20220620-0742</org.eclipse.m2e.archetype.common>
-    <maven.model.dependency.version>3.8.6</maven.model.dependency.version>
+    <org.eclipse.m2e.core>2.0.7.20230307-1553</org.eclipse.m2e.core>
+    <org.eclipse.m2e.core.ui>2.0.4.20230305-1928</org.eclipse.m2e.core.ui>
+    <org.eclipse.m2e.archetype.common>3.2.103.20230102-2253</org.eclipse.m2e.archetype.common>
+    <maven.model.dependency.version>3.8.7</maven.model.dependency.version>
   </properties>
 
   <dependencyManagement>
@@ -515,6 +516,11 @@
       </dependency>
       <dependency>
         <groupId>org.eclipse.platform</groupId>
+        <artifactId>org.eclipse.e4.core.di.extensions.supplier</artifactId>
+        <version>${org.eclipse.e4.core.di.extensions.supplier}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.platform</groupId>
         <artifactId>org.eclipse.ui.views</artifactId>
         <version>${org.eclipse.ui.views}</version>
       </dependency>
@@ -708,7 +714,11 @@
         <artifactId>org.eclipse.equinox.p2.jarprocessor</artifactId>
         <version>${org.eclipse.equinox.p2.jarprocessor}</version>
       </dependency>
-
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.event</artifactId>
+        <version>${org.osgi.service.event}</version>
+      </dependency>
       <dependency>
         <groupId>org.eclipse.jdt</groupId>
         <artifactId>ecj</artifactId>
@@ -819,17 +829,17 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.4.5</version>
+        <version>1.4.7</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jul-to-slf4j</artifactId>
-        <version>2.0.6</version>
+        <version>2.0.7</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>2.0.6</version>
+        <version>2.0.7</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -869,7 +879,7 @@
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-provider-api</artifactId>
-        <version>3.5.1</version>
+        <version>3.5.3</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
@@ -880,7 +890,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>4.11.0</version>
+        <version>5.3.1</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
@@ -939,7 +949,7 @@
           <!-- use the javac compiler for the SDK because of bugs in ECJ concerning type arguments with Java 11 -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.10.1</version>
+          <version>3.11.0</version>
           <configuration>
             <compilerId>javac</compilerId>
           </configuration>

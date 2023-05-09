@@ -42,11 +42,21 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
 
     companion object {
         fun getOrCreateScoutJsModel(module: Module) = moduleDir(module)?.let {
-            ScoutJsModels.create(it, module.project).orElse(null)
+            try {
+                ScoutJsModels.create(it, module.project).orElse(null)
+            } catch (e: Exception) {
+                SdkLog.warning("Error creating Scout JS model for module '{}'.", module.name, e)
+                null
+            }
         }
 
         fun getOrCreateNodeModule(module: Module) = moduleDir(module)?.let {
-            NodeModulesProvider.createNodeModule(it, module.project).orElse(null)?.api()
+            try {
+                NodeModulesProvider.createNodeModule(it, module.project).orElse(null)?.api()
+            } catch (e: Exception) {
+                SdkLog.warning("Error creating NodeModule for module '{}'.", module.name, e)
+                null
+            }
         }
 
         private fun moduleDir(module: Module) = module.guessModuleDir()?.canonicalFile?.resolveLocalPath()

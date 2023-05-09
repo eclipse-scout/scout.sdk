@@ -164,8 +164,24 @@
       <id>add-datamodel.client-dependency-for-default-build</id>
       <activation>
         <property>
-          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (23.1) -->
+          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (23.2) -->
           <name>!org.eclipse.scout.rt_version</name>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.scout.rt</groupId>
+          <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>add-datamodel.client-dependency-for-23.1-build</id>
+      <activation>
+        <property>
+          <!-- add dependency for the scout version 23.1 -->
+          <name>org.eclipse.scout.rt_version</name>
+          <value>23.1-SNAPSHOT</value>
         </property>
       </activation>
       <dependencies>

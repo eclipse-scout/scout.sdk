@@ -33,13 +33,14 @@ import java.util.Properties;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.rt.security.ScoutSecurityTextProviderService;
-import org.eclipse.scout.rt.shared.services.common.text.ScoutTextProviderService;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutVariousApi;
 import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope;
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile;
@@ -113,11 +114,15 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
   }
 
   public static PropertiesTranslationStore createReadOnlyStore(IEnvironment env) {
-    return createTestingStore(env, true, ScoutTextProviderService.class.getName(), null);
+    return createTestingStore(env, true, getScoutTextProviderServiceName(env), null);
   }
 
   public static PropertiesTranslationStore createEmptyStore(IJavaEnvironment env) {
-    return new PropertiesTranslationStore(PropertiesTextProviderService.create(env.requireType(ScoutTextProviderService.class.getName())).orElseThrow());
+    return new PropertiesTranslationStore(PropertiesTextProviderService.create(env.requireTypeFrom(IScoutApi.class, IScoutVariousApi::ScoutTextProviderService)).orElseThrow());
+  }
+
+  private static String getScoutTextProviderServiceName(IEnvironment env) {
+    return ((TestingEnvironment) env).primaryEnvironment().requireApi(IScoutApi.class).ScoutTextProviderService().fqn();
   }
 
   private static IllegalArgumentException createExtensionNotRegisteredError() {
@@ -191,7 +196,7 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
     @Override
     public Stream<ITranslationStore> visibleStoresForJavaModule(Path modulePath, IEnvironment env, IProgress progress) {
       return Stream.of(
-          createTestingStore(env, false, ScoutTextProviderService.class.getName(), m_dir),
+          createTestingStore(env, false, getScoutTextProviderServiceName(env), m_dir),
           createTestingStore(env, true, ScoutSecurityTextProviderService.class.getName(), m_dir));
     }
 

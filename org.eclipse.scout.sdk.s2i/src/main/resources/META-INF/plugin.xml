@@ -45,14 +45,16 @@
   ]]></description>
 
   <change-notes><![CDATA[
+        <b>May 10, 2023</b><br>
+        Adds support for Scout 23.2<br>
         <b>April 17, 2023</b><br>
-        Add live templates for DoNodes<br>
+        Adds live templates for DoNodes<br>
         <b>April 4, 2023</b><br>
         Adds WidgetMaps update menus<br>
         <b>March 31, 2023</b><br>
         Adds code completion support for TypeScript models<br>
         <b>October 24, 2022</b><br>
-        Adds support for Scout 23<br>
+        Adds support for Scout 23.1<br>
         <b>May 09, 2022</b><br>
         Adds Postfix Completion for BEANS.get()<br>
         <b>April 27, 2022</b><br>

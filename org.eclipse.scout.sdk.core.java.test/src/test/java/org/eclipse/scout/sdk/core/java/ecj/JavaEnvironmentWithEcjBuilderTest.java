@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.nio.file.FileSystem;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.spi.FileSystemProvider;
@@ -43,7 +44,7 @@ public class JavaEnvironmentWithEcjBuilderTest {
     when(attributes.isDirectory()).thenReturn(isDirectory);
 
     var fsp = mock(FileSystemProvider.class);
-    when(fsp.readAttributes(any(), ArgumentMatchers.<Class<BasicFileAttributes>> any(), any())).thenReturn(attributes);
+    when(fsp.readAttributes(any(), ArgumentMatchers.<Class<BasicFileAttributes>> any(), any(LinkOption[].class))).thenReturn(attributes);
 
     var fs = mock(FileSystem.class);
     when(fs.provider()).thenReturn(fsp);

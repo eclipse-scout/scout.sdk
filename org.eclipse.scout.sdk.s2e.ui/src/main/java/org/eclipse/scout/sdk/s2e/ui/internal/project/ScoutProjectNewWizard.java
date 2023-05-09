@@ -109,7 +109,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
   protected static final class P_MappingDiscoveryJob extends MappingDiscoveryJob {
 
     public P_MappingDiscoveryJob(Collection<IProject> projects) {
-      super(projects);
+      super(projects, true);
     }
 
     @Override
