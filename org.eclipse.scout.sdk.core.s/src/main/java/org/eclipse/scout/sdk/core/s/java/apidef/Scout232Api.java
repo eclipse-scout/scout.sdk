@@ -13,9 +13,9 @@ import org.eclipse.scout.sdk.core.java.apidef.MaxApiLevel;
 
 @MaxApiLevel({23, 2})
 @SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
-public interface Scout23Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
+public interface Scout232Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
 
-  IScoutVariousApi.ScoutTextProviderService SCOUT_TEXT_PROVIDER_SERVICE = new Scout23Api.ScoutTextProviderService();
+  IScoutVariousApi.ScoutTextProviderService SCOUT_TEXT_PROVIDER_SERVICE = new Scout232Api.ScoutTextProviderService();
 
   @Override
   default IScoutVariousApi.ScoutTextProviderService ScoutTextProviderService() {
