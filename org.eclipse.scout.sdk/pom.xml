@@ -926,6 +926,13 @@
         <version>${org.eclipse.scout.rt_version}</version>
         <classifier>sources</classifier>
       </dependency>
+      <!-- NLS tests need sources of org.eclipse.scout.rt.nls.text.ScoutTextProviderService for Scout >= 23.2 -->
+      <dependency>
+        <groupId>org.eclipse.scout.rt</groupId>
+        <artifactId>org.eclipse.scout.rt.nls</artifactId>
+        <version>${org.eclipse.scout.rt_version}</version>
+        <classifier>sources</classifier>
+      </dependency>
       <dependency>
         <!-- NLS tests need sources of org.eclipse.scout.rt.security.ScoutSecurityTextProviderService -->
         <groupId>org.eclipse.scout.rt</groupId>
