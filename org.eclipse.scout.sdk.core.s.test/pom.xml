@@ -176,6 +176,24 @@
       </dependencies>
     </profile>
     <profile>
+      <id>add-nls.source-dependency-for-default-build</id>
+      <activation>
+        <property>
+          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (23.2) -->
+          <name>!org.eclipse.scout.rt_version</name>
+        </property>
+      </activation>
+      <dependencies>
+        <!-- NLS tests need sources of org.eclipse.scout.rt.nls.text.ScoutTextProviderService for Scout >= 23.2 -->
+        <dependency>
+          <groupId>org.eclipse.scout.rt</groupId>
+          <artifactId>org.eclipse.scout.rt.nls</artifactId>
+          <scope>test</scope>
+          <classifier>sources</classifier>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
       <id>add-datamodel.client-dependency-for-23.1-build</id>
       <activation>
         <property>
