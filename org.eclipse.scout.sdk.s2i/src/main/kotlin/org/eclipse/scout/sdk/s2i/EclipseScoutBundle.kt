@@ -22,16 +22,18 @@ import org.eclipse.scout.sdk.s2i.dataobject.DataObjectManager
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.eclipse.scout.sdk.s2i.element.ElementCreationManager
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerCache
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller
 import org.jetbrains.annotations.Nls
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
+import javax.swing.Icon
 
 @NonNls
 private const val RESOURCE_BUNDLE = "messages.EclipseScoutBundle"
 
 object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
 
-    val ScoutIcon = load("/META-INF/pluginIcon.svg")
+    val ScoutIcon = load("META-INF/pluginIcon.svg")
 
     @Nls
     fun message(@PropertyKey(resourceBundle = RESOURCE_BUNDLE) key: String, vararg params: Any): String =
@@ -41,13 +43,13 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
         project.getService(DerivedResourceManager::class.java)
 
     fun dataObjectManager(project: Project): DataObjectManager =
-            project.getService(DataObjectManager::class.java)
+        project.getService(DataObjectManager::class.java)
 
     fun autoCreateClassIdListener(project: Project): AutoCreateClassIdListener =
-            project.getService(AutoCreateClassIdListener::class.java)
+        project.getService(AutoCreateClassIdListener::class.java)
 
     fun classIdCache(project: Project): ClassIdCache =
-            project.getService(ClassIdCache::class.java)
+        project.getService(ClassIdCache::class.java)
 
     fun translationStoreManagerCache(project: Project): TranslationManagerCache =
         project.getService(TranslationManagerCache::class.java)
@@ -64,5 +66,15 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
                 || Strings.countMatches(PathManager.getSystemPath(), sandbox) > 0
     }
 
-    private fun load(path: String) = IconManager.getInstance().getIcon(path, EclipseScoutBundle::class.java)
+    /**
+     * can be removed as soon as IJ 2023.2 is the latest supported version
+     */
+    private fun load(path: String) = CompatibilityMethodCaller<Icon>()
+        .withCandidate(IconManager::class.java, "getIcon", String::class.java, ClassLoader::class.java) {
+            // for IJ >= 2023.2 use ClassLoader as second argument
+            it.invoke(IconManager.getInstance(), path, javaClass.classLoader)
+        }.withCandidate(IconManager::class.java, "getIcon", String::class.java, Class::class.java) {
+            // for IJ <= 2023.1: use Class as second argument
+            it.invoke(IconManager.getInstance(), path, javaClass)
+        }.invoke()
 }

@@ -135,5 +135,6 @@
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.shared:23.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.client:23.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.shared:23.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.nls:sources:23.2-SNAPSHOT" level="project" />
   </component>
 </module>
