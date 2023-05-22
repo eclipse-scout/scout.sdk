@@ -24,20 +24,18 @@ class NlsFileEditorProvider : FileEditorProvider, AsyncFileEditorProvider, DumbA
     override fun getEditorTypeId(): String = "Scout.nls"
 
     override fun accept(project: Project, file: VirtualFile) =
-            file.isValid
-                    && !file.isDirectory
-                    && file.exists()
-                    && project.isInitialized
-                    && file.containingModule(project) != null
-                    && file.fileType == NlsFileType.INSTANCE
+        file.isValid
+                && !file.isDirectory
+                && file.exists()
+                && project.isInitialized
+                && file.containingModule(project) != null
+                && file.fileType == NlsFileType.INSTANCE
 
     override fun createEditorAsync(project: Project, file: VirtualFile): AsyncFileEditorProvider.Builder = object : AsyncFileEditorProvider.Builder() {
-        override fun build(): FileEditor {
-            return NlsEditor(project, file)
-        }
+        override fun build(): FileEditor = createEditor(project, file)
     }
 
-    override fun createEditor(project: Project, file: VirtualFile): FileEditor = createEditorAsync(project, file).build()
+    override fun createEditor(project: Project, file: VirtualFile): FileEditor = NlsEditor(project, file)
 
     override fun getPolicy() = FileEditorPolicy.PLACE_BEFORE_DEFAULT_EDITOR
 }
