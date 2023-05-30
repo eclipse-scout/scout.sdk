@@ -1,0 +1,156 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.core.s.test/src/test/shared/nls
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.core.typescript.test/src/test/resources/org/eclipse/scout/sdk/core/typescript/model/api/internal/classicModule
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.core.typescript.test/src/test/resources/org/eclipse/scout/sdk/core/typescript/model/api/internal/emptyModule
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.core.typescript.test/src/test/resources/org/eclipse/scout/sdk/core/typescript/model/api/internal/esModule
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.core.typescript.test/src/test/resources/org/eclipse/scout/sdk/core/typescript/model/api/internal/minimalModule
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.core.typescript.test/src/test/resources/org/eclipse/scout/sdk/core/typescript/model/api/internal/nestedExportsModule
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.core.typescript.test/src/test/resources/org/eclipse/scout/sdk/core/typescript/model/api/internal/simpleModule
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.core.typescript.test/src/test/resources/org/eclipse/scout/sdk/core/typescript/model/api/internal/srcModule
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/dependencies/npm/core
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/dependencies/npm/layer
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/dependencies/npm/project
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/dependencies/npm/testing
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/dependencies/npm/types
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/dependencies/pnpm/core
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/dependencies/pnpm/layer
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/dependencies/pnpm/project
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/dependencies/pnpm/testing
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/javascript/moduleWithEnums
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/javascript/moduleWithExports
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/javascript/moduleWithExternalImports
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/typescript/moduleWithEnums
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/typescript/moduleWithExports
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/model/typescript/moduleWithExternalImports
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/template/js/contribution
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/template/js/layer
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/template/js/project
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/template/js/scout
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/template/js/scout_without_class_reference
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/widgetmap/project
+    schedule:
+      interval: daily
+
+  - package-ecosystem: npm
+    directory: /org.eclipse.scout.sdk.s2i/src/test/resources/widgetmap/scout
+    schedule:
+      interval: daily
+
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: daily
