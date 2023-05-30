@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
     <artifactId>org.eclipse.scout.sdk</artifactId>
-    <version>13.0.0-SNAPSHOT</version>
+    <version>13.0.16</version>
     <relativePath>../org.eclipse.scout.sdk</relativePath>
   </parent>
 
