@@ -90,6 +90,9 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
             duplicates().forEach { SdkLog.debug("Duplicate @ClassId value '{}' found for types {}.", it.key, it.value) }
         } catch (t: Exception) {
             SdkLog.warning("Error building @ClassId value cache.", t)
+        } catch (t: AssertionError) {
+            // assertion error might be thrown by PsiFile (e.g. "Stub count doesn't match stubbed node length" in FileTrees.reconcilePsi
+            SdkLog.warning("Error building @ClassId value cache.", t)
         } finally {
             m_cacheSetupRunning = false
         }
