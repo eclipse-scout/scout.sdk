@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.sdk.s2i.model.js
 
-import com.intellij.javascript.nodejs.library.NodeModulesDirectoryManager
-import com.intellij.javascript.nodejs.library.NodeModulesLibraryDirectory
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.Project
@@ -56,7 +54,17 @@ class PnpmLibraryRootUpdater(val project: Project) : AsyncFileListener, Disposab
         try {
             val start = System.currentTimeMillis()
             val nodeModulesDirectories = getNodeModulesDirectories()
-            nodeModulesDirectories.forEach { it.invalidateRoots() }
+            nodeModulesDirectories.forEach { directory ->
+                CompatibilityMethodCaller<Any>()
+                    .withCandidate("com.intellij.javascript.nodejs.library.node_modules.NodeModulesLibraryDirectory", "invalidateRoots") {
+                        // for IJ >= 2023.2 use ...library.node_modules.NodeModulesLibraryDirectory
+                        it.invoke(directory)
+                    }
+                    .withCandidate("com.intellij.javascript.nodejs.library.NodeModulesLibraryDirectory", "invalidateRoots") {
+                        // for IJ < 2023.2 use ...library.NodeModulesLibraryDirectory
+                        it.invoke(directory)
+                    }.invoke()
+            }
             ProjectRootManagerEx.getInstanceEx(project).makeRootsChange(EmptyRunnable.INSTANCE, RootsChangeRescanningInfo.TOTAL_RESCAN)
             SdkLog.info("Rescan of {} Node library roots took {}ms.", nodeModulesDirectories.size, System.currentTimeMillis() - start)
         } catch (t: Throwable) {
@@ -64,9 +72,17 @@ class PnpmLibraryRootUpdater(val project: Project) : AsyncFileListener, Disposab
         }
     }
 
-    private fun getNodeModulesDirectories(): List<NodeModulesLibraryDirectory> {
-        val nodeModulesDirectoryManager = NodeModulesDirectoryManager.getInstance(project)
-        return CompatibilityMethodCaller<List<NodeModulesLibraryDirectory>>()
+    private fun getNodeModulesDirectories(): List<Any> {
+        val nodeModulesDirectoryManager = CompatibilityMethodCaller<Any>()
+            .withCandidate("com.intellij.javascript.nodejs.library.node_modules.NodeModulesDirectoryManager", "getInstance", Project::class.java.name) {
+                // for IJ >= 2023.2 use ...library.node_modules.NodeModulesDirectoryManager
+                it.invokeStatic(project)
+            }
+            .withCandidate("com.intellij.javascript.nodejs.library.NodeModulesDirectoryManager", "getInstance", Project::class.java.name) {
+                // for IJ < 2023.2 use ...library.NodeModulesDirectoryManager
+                it.invokeStatic(project)
+            }.invoke()
+        return CompatibilityMethodCaller<List<Any>>()
             .withCandidate(nodeModulesDirectoryManager.javaClass, "buildNodeModulesDirectories") {
                 // for IJ >= 2023.1 use method name "buildNodeModulesDirectories"
                 it.invoke(nodeModulesDirectoryManager)
