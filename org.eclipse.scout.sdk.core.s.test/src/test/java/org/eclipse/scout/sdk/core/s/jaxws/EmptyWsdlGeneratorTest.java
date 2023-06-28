@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
  */
 public class EmptyWsdlGeneratorTest {
   @Test
-  public void testpackageToNamespace() {
+  public void testPackageToNamespace() {
     assertEquals("test.scout.eclipse.org", EmptyWsdlGenerator.packageToNamespace("Whatever", "org.eclipse.scout.test"));
     assertEquals("scout.eclipse.org", EmptyWsdlGenerator.packageToNamespace("test", "org.eclipse.scout.test"));
     assertEquals("", EmptyWsdlGenerator.packageToNamespace("test", ""));
