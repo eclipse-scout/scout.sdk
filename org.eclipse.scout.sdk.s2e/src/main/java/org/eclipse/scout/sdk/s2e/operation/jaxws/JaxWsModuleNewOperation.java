@@ -9,22 +9,15 @@
  */
 package org.eclipse.scout.sdk.s2e.operation.jaxws;
 
-import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
-import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
 import java.util.function.BiConsumer;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.m2e.core.MavenPlugin;
@@ -71,54 +64,15 @@ public class JaxWsModuleNewOperation implements BiConsumer<EclipseEnvironment, E
       var createdProjectDir = JaxWsModuleNewHelper.createModule(pomFile.getLocation().toFile().toPath(), getArtifactId(), env, progress.newChild(10));
 
       // import into workspace
-      setCreatedProject(importIntoWorkspace(createdProjectDir, progress.newChild(70)));
+      var createdProject = importIntoWorkspace(createdProjectDir, progress.newChild(70));
+      setCreatedProject(createdProject);
 
-      // refresh modified resources
-      var modifiedProjects = getAffectedProjects(createdProjectDir);
-      modifiedProjects.add(getCreatedProject()); // ensure the created project is in the set
-      modifiedProjects.add(getServerModule().getProject()); // ensure the modified server project is in the set
-
-      // run 'maven update' on created project because the parent and the dependencies have been modified
-      S2eUtils.mavenUpdate(modifiedProjects, false, true, false, false, progress.newChild(15).monitor());
+      // run 'maven update' on created project
+      S2eUtils.mavenUpdate(Collections.singleton(createdProject), false, true, false, true, progress.newChild(15).monitor());
     }
     catch (IOException | CoreException e) {
       throw new SdkException("Unable to create Jax-Ws Module.", e);
     }
-  }
-
-  @SuppressWarnings("MethodMayBeStatic")
-  protected Set<IProject> getAffectedProjects(Path createdProjectDir) throws IOException {
-    var parentPom = JaxWsModuleNewHelper.getParentPomOf(createdProjectDir.resolve(IMavenConstants.POM));
-    if (parentPom == null) {
-      return emptySet();
-    }
-
-    var parentReference = parentPom.normalize();
-    Collection<Path> modulesWithModifiedParent = new HashSet<>();
-    var root = ResourcesPlugin.getWorkspace().getRoot();
-    for (var candidate : root.getProjects()) {
-      var pom = candidate.getFile(IMavenConstants.POM);
-      if (pom != null && pom.exists()) {
-        var location = pom.getLocation();
-        if (location != null) {
-          var moduleLocation = location.toFile().toPath();
-          var parent = JaxWsModuleNewHelper.getParentPomOf(moduleLocation);
-          if (parent != null) {
-            var canonicalFile = parent.normalize();
-            if (parentReference.equals(canonicalFile)) {
-              modulesWithModifiedParent.add(moduleLocation.resolve(IMavenConstants.POM));
-            }
-          }
-        }
-      }
-    }
-    modulesWithModifiedParent.add(parentReference);
-
-    return modulesWithModifiedParent.stream()
-        .map(Path::toUri)
-        .flatMap(uri -> Arrays.stream(root.findFilesForLocationURI(uri)))
-        .map(IResource::getProject)
-        .collect(toSet());
   }
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
