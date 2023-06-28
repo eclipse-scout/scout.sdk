@@ -71,8 +71,8 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
           SdkLog.warning("Cannot detect used Scout version. Fallback to latest version.");
           return ScoutApi.latestMajorVersion() + ".0";
         });
-    var base = "https://eclipsescout.github.io/";
-    return base + majorAndMinor + "/technical-guide.html#webservices-with-jax-ws";
+    var base = "https://eclipsescout.github.io/scout-docs/";
+    return base + majorAndMinor + "/technical-guide/working-with-data/jax-ws.html";
   }
 
   public static void open(WebServiceNewOperation op, Display d) {
@@ -221,7 +221,7 @@ public class WebServiceMessageDialog extends MessageDialogWithToggle {
     for (var providerImpl : op.getCreatedProviderServiceImpls()) {
       msgBuilder.append("- ").append(providerImpl.elementName()).append('\n');
     }
-    msgBuilder.append("\nBy default this Web Service is configured to use Basic Authentication against credentials stored in the config.properties file. This may be changed by modifying the corresponding Entry Point Defintions:\n");
+    msgBuilder.append("\nBy default this Web Service is configured to use Basic Authentication against credentials stored in the config.properties file. This may be changed by modifying the corresponding Entry Point Definitions:\n");
     for (var entryPointDef : op.getCreatedEntryPointDefinitions()) {
       msgBuilder.append("- ").append(entryPointDef.elementName()).append('\n');
     }
