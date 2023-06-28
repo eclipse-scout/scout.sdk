@@ -15,6 +15,7 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -36,8 +37,8 @@ public class EditableTranslationFile extends AbstractTranslationPropertiesFile {
   private final Path m_file;
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-  public EditableTranslationFile(Path file, Language language) {
-    super(language, () -> toStream(file));
+  public EditableTranslationFile(Path file, Charset encoding, Language language) {
+    super(language, encoding, () -> toStream(file));
     m_file = Ensure.notNull(file);
   }
 

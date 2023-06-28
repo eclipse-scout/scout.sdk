@@ -9,6 +9,9 @@
  */
 package org.eclipse.scout.sdk.core.s.java.apidef;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+
 import org.eclipse.scout.sdk.core.java.apidef.MaxApiLevel;
 
 @MaxApiLevel({23, 2})
@@ -27,5 +30,10 @@ public interface Scout232Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     public String fqn() {
       return "org.eclipse.scout.rt.nls.text.ScoutTextProviderService";
     }
+  }
+
+  @Override
+  default Charset propertiesEncoding() {
+    return StandardCharsets.UTF_8;
   }
 }

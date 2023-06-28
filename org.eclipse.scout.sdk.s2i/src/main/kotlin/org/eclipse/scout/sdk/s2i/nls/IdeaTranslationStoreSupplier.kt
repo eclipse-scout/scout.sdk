@@ -111,7 +111,6 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
 
     protected fun loadTranslationFiles(psiClass: PsiClass, store: PropertiesTranslationStore, progress: IProgress): Boolean {
         val roots = findRootDirectories(psiClass) ?: return false
-        val prefix = store.service().filePrefix()
         val folder = store.service().folder()
         val translationFiles = roots
             .mapNotNull { it.findFileByRelativePath(folder) }
@@ -120,7 +119,7 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
             .flatMap { it.children.asSequence() }
             .filter { it.isValid }
             .filter { !it.isDirectory }
-            .mapNotNull { toTranslationPropertiesFile(it, prefix) }
+            .mapNotNull { toTranslationPropertiesFile(it, store) }
             .toList()
         if (translationFiles.isEmpty()) {
             SdkLog.warning("Skipping TextProviderService '{}' because no properties files could be found.", store.service().type().name())
@@ -147,13 +146,14 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
         return sourcesAndLibraries.asSequence()
     }
 
-    protected fun toTranslationPropertiesFile(file: VirtualFile, prefix: String): ITranslationPropertiesFile? {
-        val language = parseLanguageFromFileName(file.name, prefix).orElse(null) ?: return null
+    protected fun toTranslationPropertiesFile(file: VirtualFile, store: PropertiesTranslationStore): ITranslationPropertiesFile? {
+        val language = parseLanguageFromFileName(file.name, store.service().filePrefix()).orElse(null) ?: return null
+        val encoding = store.encoding()
         val path = file.resolveLocalPath()
         if (path != null) {
-            return EditableTranslationFile(path, language)
+            return EditableTranslationFile(path, encoding, language)
         }
-        return ReadOnlyTranslationFile({ file.inputStream }, language, file)
+        return ReadOnlyTranslationFile({ file.inputStream }, encoding, language, file)
     }
 
     private data class TypeMapping(val scoutType: IType?, val psiClass: PsiClass, val project: Project) {

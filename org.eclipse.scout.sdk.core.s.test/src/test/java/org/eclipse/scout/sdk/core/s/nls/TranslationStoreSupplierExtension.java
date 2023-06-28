@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -155,7 +156,7 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
         readOnlyProps.setProperty(TRANSLATION_KEY_1, KEY_1_VAL_OVERRIDDEN);
         var out = new ByteArrayOutputStream();
         readOnlyProps.store(out, "");
-        translationFiles.add(new ReadOnlyTranslationFile(() -> new ByteArrayInputStream(out.toByteArray()), Language.LANGUAGE_DEFAULT));
+        translationFiles.add(new ReadOnlyTranslationFile(() -> new ByteArrayInputStream(out.toByteArray()), StandardCharsets.UTF_8, Language.LANGUAGE_DEFAULT));
         when(txtSvc.order()).thenReturn(10000.0);
       }
       else {
@@ -180,7 +181,7 @@ public class TranslationStoreSupplierExtension implements BeforeEachCallback, Af
     }
 
     var language = parseLanguageFromFileName(file.getFileName().toString(), PROPERTIES_FILE_NAME_PREFIX).orElseThrow();
-    var props = new EditableTranslationFile(file, language);
+    var props = new EditableTranslationFile(file, StandardCharsets.UTF_8, language);
     assertTrue(props.load(new NullProgress()));
     return props;
   }

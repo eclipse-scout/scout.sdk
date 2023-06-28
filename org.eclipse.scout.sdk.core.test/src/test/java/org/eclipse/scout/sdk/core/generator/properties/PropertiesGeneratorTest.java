@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,13 +39,23 @@ public class PropertiesGeneratorTest {
   }
 
   @Test
-  public void testPropertiesEncode() {
+  public void testPropertiesLatin1() {
+    var key = "key";
+    var value = "ö\nä\r\nü";
+    var values = singletonMap(key, value);
+    var generator = PropertiesGenerator.create(values).withEncoding(StandardCharsets.ISO_8859_1);
+    var generatedSource = generator.toSource(identity(), new BuilderContext()).toString();
+    assertEquals("key=\\u00F6\\n\\u00E4\\r\\n\\u00FC\n", generatedSource);
+  }
+
+  @Test
+  public void testPropertiesUtf8() {
     var key = "key";
     var value = "ö\nä\r\nü";
     var values = singletonMap(key, value);
     var generator = PropertiesGenerator.create(values);
     var generatedSource = generator.toSource(identity(), new BuilderContext()).toString();
-    assertEquals("key=\\u00F6\\n\\u00E4\\r\\n\\u00FC\n", generatedSource);
+    assertEquals("key=" + "ö\\nä\\r\\nü\n", generatedSource);
   }
 
   @Test
@@ -61,7 +72,7 @@ public class PropertiesGeneratorTest {
     };
 
     var origContent = Stream.of(lines).collect(joining(lineSeparator()));
-    var generator = PropertiesGenerator.create(new ByteArrayInputStream(origContent.getBytes(PropertiesGenerator.ENCODING)));
+    var generator = PropertiesGenerator.create(new ByteArrayInputStream(origContent.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
 
     // test content (parse)
     assertEquals(Arrays.asList(lines[0], lines[1], lines[2]), generator.headerLines());

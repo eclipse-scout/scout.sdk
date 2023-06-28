@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -49,6 +50,11 @@ public interface ITranslationPropertiesFile {
    * @return {@code true} if the operation changed entries. {@code false} if it is the same as before.
    */
   boolean load(IProgress progress);
+
+  /**
+   * @return The encoding of the .properties file.
+   */
+  Optional<Charset> encoding();
 
   /**
    * @return A {@link Stream} with all keys that exist in this {@code .properties} file.

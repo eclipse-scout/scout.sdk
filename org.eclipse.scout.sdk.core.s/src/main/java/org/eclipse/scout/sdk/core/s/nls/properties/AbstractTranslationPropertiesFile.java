@@ -16,6 +16,7 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -45,12 +46,14 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
 
   private final Language m_language;
   private final Supplier<InputStream> m_inputSupplier;
+  private final Charset m_encoding; // may be null
 
   private PropertiesGenerator m_fileContent;
 
-  protected AbstractTranslationPropertiesFile(Language language, Supplier<InputStream> contentSupplier) {
+  protected AbstractTranslationPropertiesFile(Language language, Charset encoding, Supplier<InputStream> contentSupplier) {
     m_language = Ensure.notNull(language);
     m_inputSupplier = Ensure.notNull(contentSupplier);
+    m_encoding = encoding;
   }
 
   private Map<String, String> entries() {
@@ -58,6 +61,11 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
       throw newFail("Properties file has not been loaded yet.");
     }
     return m_fileContent.properties();
+  }
+
+  @Override
+  public Optional<Charset> encoding() {
+    return Optional.ofNullable(m_encoding);
   }
 
   @Override
@@ -108,7 +116,7 @@ public abstract class AbstractTranslationPropertiesFile implements ITranslationP
 
   private PropertiesGenerator readEntries() {
     try (var in = Ensure.notNull(m_inputSupplier.get())) {
-      return PropertiesGenerator.create(in);
+      return PropertiesGenerator.create(in, encoding().orElse(null /* use default */));
     }
     catch (IOException e) {
       throw new SdkException("Error reading properties file for language '{}'.", language(), e);

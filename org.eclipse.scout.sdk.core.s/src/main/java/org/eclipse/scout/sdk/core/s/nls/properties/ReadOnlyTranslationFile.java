@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.core.s.nls.properties;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.function.Supplier;
 
 import org.eclipse.scout.sdk.core.generator.properties.PropertiesGenerator;
@@ -26,12 +27,12 @@ public class ReadOnlyTranslationFile extends AbstractTranslationPropertiesFile {
 
   private final Object m_source;
 
-  public ReadOnlyTranslationFile(Supplier<InputStream> contentSupplier, Language language) {
-    this(contentSupplier, language, null);
+  public ReadOnlyTranslationFile(Supplier<InputStream> contentSupplier, Charset encoding, Language language) {
+    this(contentSupplier, encoding, language, null);
   }
 
-  public ReadOnlyTranslationFile(Supplier<InputStream> contentSupplier, Language language, Object source) {
-    super(language, contentSupplier);
+  public ReadOnlyTranslationFile(Supplier<InputStream> contentSupplier, Charset encoding, Language language, Object source) {
+    super(language, encoding, contentSupplier);
     m_source = source;
   }
 

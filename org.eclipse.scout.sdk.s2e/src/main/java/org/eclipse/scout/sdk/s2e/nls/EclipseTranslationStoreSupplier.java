@@ -134,7 +134,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
 
   private static boolean loadStoreFromWorkspace(IType jdtType, PropertiesTranslationStore store, IProgress progress) {
     try {
-      store.load(filesFromWorkspace(jdtType, store.service()), progress);
+      store.load(filesFromWorkspace(jdtType, store), progress);
       return true;
     }
     catch (JavaModelException e) {
@@ -160,22 +160,22 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     }
   }
 
-  private static Collection<ITranslationPropertiesFile> filesFromWorkspace(IJavaElement jdtType, PropertiesTextProviderService service) throws JavaModelException {
-    IPath translationPath = new org.eclipse.core.runtime.Path(service.folder());
-    return getFiles(jdtType.getJavaProject(), translationPath, service.filePrefix());
+  private static Collection<ITranslationPropertiesFile> filesFromWorkspace(IJavaElement jdtType, PropertiesTranslationStore store) throws JavaModelException {
+    var translationPath = new org.eclipse.core.runtime.Path(store.service().folder());
+    return getFiles(jdtType.getJavaProject(), translationPath, store);
   }
 
-  private static List<ITranslationPropertiesFile> getFiles(IJavaProject toLookAt, IPath path, String fileNamePrefix) throws JavaModelException {
+  private static List<ITranslationPropertiesFile> getFiles(IJavaProject toLookAt, IPath path, PropertiesTranslationStore store) throws JavaModelException {
     return getFoldersOfProject(toLookAt, path)
         .flatMap(EclipseTranslationStoreSupplier::filesInFolder)
-        .map(file -> toEditableTranslationFile(file, fileNamePrefix))
+        .map(file -> toEditableTranslationFile(file, store))
         .flatMap(Optional::stream)
         .collect(toList());
   }
 
-  private static Optional<ITranslationPropertiesFile> toEditableTranslationFile(IResource file, String fileNamePrefix) {
-    return parseLanguageFromFileName(file.getName(), fileNamePrefix)
-        .map(lang -> new EditableTranslationFile(file.getLocation().toFile().toPath(), lang));
+  private static Optional<ITranslationPropertiesFile> toEditableTranslationFile(IResource file, PropertiesTranslationStore store) {
+    return parseLanguageFromFileName(file.getName(), store.service().filePrefix())
+        .map(lang -> new EditableTranslationFile(file.getLocation().toFile().toPath(), store.encoding(), lang));
   }
 
   private static Stream<IFolder> getFoldersOfProject(IJavaProject project, IPath path) throws JavaModelException {
@@ -213,7 +213,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     }
   }
 
-  private static Collection<ITranslationPropertiesFile> filesFromPlatform(IPackageFragmentRoot r, @SuppressWarnings("TypeMayBeWeakened") PropertiesTranslationStore store) throws JavaModelException {
+  private static Collection<ITranslationPropertiesFile> filesFromPlatform(IPackageFragmentRoot r, PropertiesTranslationStore store) throws JavaModelException {
     var delim = '.';
     var packageFragment = store.service().folder().replace(PropertiesTextProviderService.FOLDER_SEGMENT_DELIMITER, delim);
     var textFolder = r.getPackageFragment(packageFragment);
@@ -227,7 +227,7 @@ public class EclipseTranslationStoreSupplier implements ITranslationStoreSupplie
     for (var o : textFolder.getNonJavaResources()) {
       if (o instanceof IStorage f) {
         parseLanguageFromFileName(f.getName(), fileNamePrefix)
-            .map(lang -> new ReadOnlyTranslationFile(() -> contentsOf(f), lang, f))
+            .map(lang -> new ReadOnlyTranslationFile(() -> contentsOf(f), store.encoding(), lang, f))
             .ifPresent(translationFiles::add);
       }
     }
