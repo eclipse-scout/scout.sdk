@@ -57,6 +57,8 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
+import org.eclipse.jdt.core.search.TypeNameMatch;
+import org.eclipse.jdt.core.search.TypeNameMatchRequestor;
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -119,7 +121,7 @@ public final class JdtUtils {
    * @param sourceProject
    *          The {@link IJavaProject} defining the classpath.
    * @param baseTypeFqn
-   *          The fully qualified name of the base class. The sub classes of this class are searched.
+   *          The fully qualified name of the base class. The subclasses of this class are searched.
    * @param monitor
    *          The monitor or {@code null}. If the monitor becomes canceled, the search is aborted and an incomplete
    *          result may be returned. The caller of this method is responsible to react on this fact based on the
@@ -147,7 +149,7 @@ public final class JdtUtils {
   }
 
   /**
-   * Gets all {@link IType}s on the classpath of the give {@link IJavaProject} that are sub types of the given baseType
+   * Gets all {@link IType}s on the classpath of the give {@link IJavaProject} that are subtypes of the given baseType
    * and fulfill the given filter. If the base type itself fulfills the given filter, it is included in the result.
    *
    * @param sourceProject
@@ -217,23 +219,23 @@ public final class JdtUtils {
    * @return A {@link Set} with all {@link IType}s
    */
   public static Set<IType> resolveJdtTypes(CharSequence fqn, IJavaSearchScope scope) {
-    //speed tuning, only search for last component of pattern, remaining checks are done in accept
+    //speed tuning, only search for last component of pattern, remaining checks are done in acceptTypeNameMatch
     var fastPat = JavaTypes.simpleName(fqn);
     Set<IType> matchList = new TreeSet<>(COMPARATOR);
     try {
-      new SearchEngine().search(SearchPattern.createPattern(fastPat, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH),
-          new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
-          scope, new SearchRequestor() {
-            @Override
-            public void acceptSearchMatch(SearchMatch match) {
-              var element = match.getElement();
-              if (element instanceof IType t) {
-                if (t.getFullyQualifiedName().contains(fqn)) {
-                  matchList.add(t);
-                }
-              }
-            }
-          }, null);
+      var requestor = new TypeNameMatchRequestor() {
+        @Override
+        public void acceptTypeNameMatch(TypeNameMatch match) {
+          var t = match.getType();
+          if (fqn.equals(t.getFullyQualifiedName())) {
+            matchList.add(t);
+          }
+        }
+      };
+      new SearchEngine().searchAllTypeNames(
+          null, SearchPattern.R_EXACT_MATCH, // search in any package. package matching is done in acceptTypeNameMatch
+          fastPat.toCharArray(), SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE,
+          IJavaSearchConstants.TYPE, scope, requestor, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, null);
     }
     catch (CoreException e) {
       throw new SdkException(e);
@@ -387,6 +389,7 @@ public final class JdtUtils {
         }
       }
     };
+
     for (var annotationType : resolveJdtTypes(annotationName, SearchEngine.createWorkspaceScope())) {
       if (monitor != null && monitor.isCanceled()) {
         return result;
@@ -431,7 +434,7 @@ public final class JdtUtils {
     }
     var isInWorkspace = element.getResource() != null;
     if (isInWorkspace) {
-      // if the element is in the workspace (not binary in a library): check on the project level. Otherwise the results of IJavaProject#isOnClasspath() may be wrong!
+      // if the element is in the workspace (not binary in a library): check on the project level. Otherwise, the results of IJavaProject#isOnClasspath() may be wrong!
       // do not calculate the classpath visibility based on the project for binary types because their project may be any project having this dependency which may be wrong.
       var javaProjectOfElement = element.getJavaProject();
       return project.equals(javaProjectOfElement) || project.isOnClasspath(javaProjectOfElement);
@@ -556,7 +559,7 @@ public final class JdtUtils {
       return null;
     }
 
-    Set<IJavaElement> jset = new HashSet<>(resources.size());
+    Set<IJavaElement> set = new HashSet<>(resources.size());
     for (var resource : resources) {
       if (resource == null || !resource.isAccessible()) {
         continue;
@@ -568,7 +571,7 @@ public final class JdtUtils {
           var project = (IProject) resource;
           try {
             if (project.isAccessible() && project.hasNature(JavaCore.NATURE_ID)) {
-              addJavaElement(jset, JavaCore.create(project));
+              addJavaElement(set, JavaCore.create(project));
             }
           }
           catch (CoreException e) {
@@ -576,14 +579,14 @@ public final class JdtUtils {
           }
           break;
         case IResource.FILE:
-          addJavaElement(jset, JavaCore.create((IFile) resource));
+          addJavaElement(set, JavaCore.create((IFile) resource));
           break;
         case IResource.FOLDER:
           try {
             resource.accept(proxy -> {
               if (proxy.getType() == IResource.FOLDER) {
                 var folder = (IFolder) proxy.requestResource();
-                addJavaElement(jset, JavaCore.create(folder));
+                addJavaElement(set, JavaCore.create(folder));
                 return true;
               }
               return false;
@@ -598,7 +601,7 @@ public final class JdtUtils {
           if (exists(model)) {
             try {
               for (var jp : model.getJavaProjects()) {
-                addJavaElement(jset, jp);
+                addJavaElement(set, jp);
               }
             }
             catch (JavaModelException e) {
@@ -610,10 +613,10 @@ public final class JdtUtils {
           throw new UnsupportedOperationException("Unknown resource type: " + type);
       }
     }
-    if (jset.isEmpty()) {
+    if (set.isEmpty()) {
       return null;
     }
-    return createJavaSearchScope(jset.toArray(new IJavaElement[0]));
+    return createJavaSearchScope(set.toArray(new IJavaElement[0]));
   }
 
   private static void addJavaElement(Collection<IJavaElement> collector, IJavaElement elementToAdd) {
@@ -696,7 +699,7 @@ public final class JdtUtils {
   }
 
   /**
-   * {@link Predicate} that only accepts public primary {@link IType}. Furthermore enum types and deprecated types are
+   * {@link Predicate} that only accepts public primary {@link IType}. Furthermore, enum types and deprecated types are
    * excluded.
    */
   public static class PublicPrimaryTypeFilter implements Predicate<IType> {
