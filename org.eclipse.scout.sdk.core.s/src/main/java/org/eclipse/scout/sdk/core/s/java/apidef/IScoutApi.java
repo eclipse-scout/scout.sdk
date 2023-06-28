@@ -10,6 +10,8 @@
 package org.eclipse.scout.sdk.core.s.java.apidef;
 
 
+import java.nio.charset.Charset;
+
 import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
 
 public interface IScoutApi extends IApiSpecification, IScoutAnnotationApi, IScoutInterfaceApi, IScoutAbstractApi, IScoutExtensionApi, IScoutVariousApi {
@@ -24,4 +26,9 @@ public interface IScoutApi extends IApiSpecification, IScoutAnnotationApi, IScou
    * @return The supported Java major version (e.g. 8 or 11)
    */
   int[] supportedJavaVersions();
+
+  /**
+   * @return The {@link Charset} to use for reading and writing .properties files.
+   */
+  Charset propertiesEncoding();
 }

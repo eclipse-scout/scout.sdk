@@ -13,6 +13,7 @@ import static java.util.Collections.unmodifiableMap;
 import static org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile.getPropertiesFileName;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.nls.IEditableTranslationStore;
 import org.eclipse.scout.sdk.core.s.nls.ITranslation;
 import org.eclipse.scout.sdk.core.s.nls.ITranslationEntry;
@@ -42,6 +44,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 public class PropertiesTranslationStore implements IEditableTranslationStore {
 
   private final PropertiesTextProviderService m_svc;
+  private final Charset m_encoding;
   private final Map<String, TranslationEntry> m_translations;
   private final Map<Language, ITranslationPropertiesFile> m_files;
   private final Set<ITranslationPropertiesFile> m_newFiles;
@@ -53,6 +56,7 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
     m_translations = new HashMap<>();
     m_files = new HashMap<>();
     m_newFiles = new HashSet<>();
+    m_encoding = svc.type().javaEnvironment().requireApi(IScoutApi.class).propertiesEncoding();
   }
 
   /**
@@ -193,12 +197,16 @@ public class PropertiesTranslationStore implements IEditableTranslationStore {
         .getParent();
 
     var fileName = getPropertiesFileName(service().filePrefix(), language);
-    ITranslationPropertiesFile newFile = new EditableTranslationFile(directory.resolve(fileName), language);
+    var newFile = new EditableTranslationFile(directory.resolve(fileName), encoding(), language);
     newFile.load(new NullProgress());
 
     setDirty(true);
     translationFiles().put(language, newFile);
     m_newFiles.add(newFile);
+  }
+
+  public Charset encoding() {
+    return m_encoding;
   }
 
   @Override

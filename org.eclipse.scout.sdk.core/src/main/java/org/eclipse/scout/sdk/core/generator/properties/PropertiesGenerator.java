@@ -19,6 +19,7 @@ import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -41,21 +43,18 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> {
 
-  /**
-   * The encoding used to load the content from an {@link InputStream}. As by the definition of the .properties file
-   * format.
-   */
-  public static final Charset ENCODING = StandardCharsets.ISO_8859_1;
+  private static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
   private static final Pattern LINE_SEPARATOR_REGEX = Pattern.compile(lineSeparator());
 
   private final Map<String, String> m_properties = new HashMap<>();
   private final List<String> m_headerLines = new ArrayList<>();
+  private Charset m_encoding = null; // uses default
 
   /**
    * @return A new empty {@link PropertiesGenerator}.
    */
   public static PropertiesGenerator create() {
-    return create((Map<String, String>) null);
+    return create(null);
   }
 
   /**
@@ -85,11 +84,14 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
    * 
    * @param in
    *          The {@link InputStream} in the .properties file format. Must not be {@code null}.
+   * @param encoding
+   *          The encoding to use when reading the .properties file. May be {@code null} to use the default encoding
+   *          (UTF-8).
    * @return A new {@link PropertiesGenerator} with the content from the given stream.
    * @throws IOException
    */
-  public static PropertiesGenerator create(InputStream in) throws IOException {
-    var result = new PropertiesGenerator(null, null);
+  public static PropertiesGenerator create(InputStream in, Charset encoding) throws IOException {
+    var result = new PropertiesGenerator(null, null).withEncoding(encoding);
     result.load(in);
     return result;
   }
@@ -113,7 +115,8 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
    * @throws IOException
    */
   public PropertiesGenerator load(InputStream input) throws IOException {
-    var content = toCharArray(fromInputStream(input, ENCODING));
+    var encoding = encoding().orElse(DEFAULT_ENCODING);
+    var content = toCharArray(fromInputStream(input, encoding));
     try (var reader = new BufferedReader(new CharArrayReader(content))) {
       readHeaderLines(reader);
     }
@@ -128,6 +131,26 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
    */
   public List<String> headerLines() {
     return m_headerLines;
+  }
+
+  /**
+   * @return The {@link Charset} to use when writing the .properties files. By default, UTF-8 is used.
+   */
+  public Optional<Charset> encoding() {
+    return Optional.ofNullable(m_encoding);
+  }
+
+  /**
+   * Sets the new {@link Charset} to use when writing .properties files. By default, UTF-8 is used. If
+   * {@link StandardCharsets#ISO_8859_1} is passed, characters are encoded as necessary.
+   * 
+   * @param newEncoding
+   *          The new {@link Charset} or {@code null} to use the default charset (UTF-8).
+   * @return this instance
+   */
+  public PropertiesGenerator withEncoding(Charset newEncoding) {
+    m_encoding = newEncoding;
+    return this;
   }
 
   /**
@@ -146,20 +169,37 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
   }
 
   protected Stream<String> getAsPropertiesEncodedLines() {
+    var encoding = encoding().orElse(DEFAULT_ENCODING);
+    var escapeUnicode = StandardCharsets.ISO_8859_1.equals(encoding); // use encoded content (non Latin-1 characters are written as their appropriate unicode hexadecimal value) for ISO-8859-1 encoding
+    var content = escapeUnicode ? getWithUnicodeEscape() : getWithoutUnicodeEscape();
+    return LINE_SEPARATOR_REGEX.splitAsStream(content)
+        .filter(line -> !isComment(line));
+  }
+
+  protected CharSequence getWithoutUnicodeEscape() {
     var prop = new Properties();
     prop.putAll(m_properties);
 
-    String content;
-    try (var out = new ByteArrayOutputStream()) {
-      prop.store(out, null);
-      content = out.toString(ENCODING);
+    try (var out = new StringWriter()) {
+      prop.store(out, null); // store to Writer performs NO unicode escape
+      return out.getBuffer();
     }
     catch (IOException e) {
       throw new SdkException("Error encoding properties", e);
     }
+  }
 
-    return LINE_SEPARATOR_REGEX.splitAsStream(content)
-        .filter(line -> !isComment(line));
+  protected CharSequence getWithUnicodeEscape() {
+    var prop = new Properties();
+    prop.putAll(m_properties);
+
+    try (var out = new ByteArrayOutputStream()) {
+      prop.store(out, null); // store to OutputStream performs unicode escape
+      return out.toString(StandardCharsets.ISO_8859_1);
+    }
+    catch (IOException e) {
+      throw new SdkException("Error encoding properties", e);
+    }
   }
 
   private static boolean isComment(CharSequence line) {

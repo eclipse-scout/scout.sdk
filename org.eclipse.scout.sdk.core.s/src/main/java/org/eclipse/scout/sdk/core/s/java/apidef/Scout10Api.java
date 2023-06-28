@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.s.java.apidef;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.java.JavaTypes;
@@ -26,6 +28,11 @@ public interface Scout10Api extends IScoutApi {
   @Override
   default int[] supportedJavaVersions() {
     return new int[]{8, 11};
+  }
+
+  @Override
+  default Charset propertiesEncoding() {
+    return StandardCharsets.ISO_8859_1;
   }
 
   IScoutAnnotationApi.ApplicationScoped APPLICATION_SCOPED_ANNOTATION = new ApplicationScoped();
