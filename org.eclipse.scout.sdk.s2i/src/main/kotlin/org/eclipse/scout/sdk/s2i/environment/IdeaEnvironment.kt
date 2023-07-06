@@ -59,9 +59,9 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
          * Executes the [task] synchronously in the current thread
          */
         fun <T> callInIdeaEnvironmentSync(project: Project, progressIndicator: IdeaProgress, task: (IdeaEnvironment, IdeaProgress) -> T): T =
-                IdeaEnvironment(project).use {
-                    return task(it, progressIndicator)
-                }
+            IdeaEnvironment(project).use {
+                return task(it, progressIndicator)
+            }
 
         /**
          * Asynchronously executes the given [task] in a [OperationTask]. The task is executed with an active [TransactionManager].
@@ -135,9 +135,9 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
     }
 
     override fun findType(fqn: String) = project
-            .findTypesByName(Ensure.notBlank(fqn), allScope(project))
-            .mapNotNull { it.toScoutType(this) }
-            .asStream()
+        .findTypesByName(Ensure.notBlank(fqn), allScope(project))
+        .mapNotNull { it.toScoutType(this) }
+        .asStream()
 
     override fun findJavaEnvironment(root: Path?): Optional<IJavaEnvironment> {
         var path = root
@@ -158,20 +158,22 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
     }
 
     fun toScoutJavaEnvironment(module: Module?): IJavaEnvironment? = module
-            ?.takeIf { it.isJavaModule() }
-            ?.let { getOrCreateEnv(it) }
-            ?.wrap()
+        ?.takeIf { it.isJavaModule() }
+        ?.let { getOrCreateEnv(it) }
+        ?.wrap()
 
     fun findClasspathEntry(classpathRoot: VirtualFile?): IClasspathEntry? = classpathRoot
-            ?.let { ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(it) }
-            ?.let { toScoutJavaEnvironment(it) }
-            ?.let { findClasspathEntry(classpathRoot, it) }
+        ?.let {
+            computeInReadAction(project) { ProjectRootManager.getInstance(project).fileIndex.getModuleForFile(it) }
+        }
+        ?.let { toScoutJavaEnvironment(it) }
+        ?.let { findClasspathEntry(classpathRoot, it) }
 
     protected fun findClasspathEntry(file: VirtualFile, env: IJavaEnvironment) = file.resolveLocalPath()?.let { filePath ->
         env.sourceFolders()
-                .filter { it.path().startsWith(filePath) }
-                .findAny()
-                .orElse(null)
+            .filter { it.path().startsWith(filePath) }
+            .findAny()
+            .orElse(null)
     }
 
     protected fun getOrCreateEnv(module: Module): JavaEnvironmentWithIdea = m_envs.computeIfAbsent(module.name) { createNewJavaEnvironmentFor(module) }
