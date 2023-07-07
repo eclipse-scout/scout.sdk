@@ -32,7 +32,7 @@ public class ScoutProjectNewTest {
     Path targetDirectory = null;
     try {
       targetDirectory = CoreScoutTestingUtils.createClassicTestProject();
-      runMavenCleanVerify(targetDirectory.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID));
+      runMavenCleanVerify(targetDirectory.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID).resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID));
     }
     finally {
       deleteDir(targetDirectory);
@@ -44,7 +44,7 @@ public class ScoutProjectNewTest {
     Path targetDirectory = null;
     try {
       targetDirectory = CoreScoutTestingUtils.createJsTestProject();
-      runMavenCleanVerify(targetDirectory.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID));
+      runMavenCleanVerify(targetDirectory.resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID).resolve(CoreScoutTestingUtils.PROJECT_ARTIFACT_ID));
     }
     finally {
       deleteDir(targetDirectory);
