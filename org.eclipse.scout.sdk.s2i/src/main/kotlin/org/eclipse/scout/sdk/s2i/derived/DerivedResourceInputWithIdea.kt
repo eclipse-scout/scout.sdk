@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.s2i.toIdea
 import org.eclipse.scout.sdk.s2i.toScoutType
 import java.util.*
 
-open class DerivedResourceInputWithIdea(val type: PsiClass, private val name: String? = type.name) : IDerivedResourceInput {
+open class DerivedResourceInputWithIdea(val type: PsiClass) : IDerivedResourceInput {
 
     override fun getSourceType(env: IEnvironment): Optional<IType> = computeInReadAction(env.toIdea().project, true) {
         try {
@@ -34,10 +34,11 @@ open class DerivedResourceInputWithIdea(val type: PsiClass, private val name: St
         }
     }
 
-    override fun getSourceFolderOf(t: IType, env: IEnvironment): Optional<IClasspathEntry> =
-            Optional.ofNullable(t.resolvePsi()
-                    ?.resolveSourceRoot()
-                    ?.let { env.toIdea().findClasspathEntry(it) })
+    override fun getSourceFolderOf(t: IType, env: IEnvironment): Optional<IClasspathEntry> = computeInReadAction(env.toIdea().project) {
+        Optional.ofNullable(t.resolvePsi()
+            ?.resolveSourceRoot()
+            ?.let { env.toIdea().findClasspathEntry(it) })
+    }
 
-    override fun toString() = name ?: "Unknown"
+    override fun toString() = type.name ?: "Unknown"
 }
