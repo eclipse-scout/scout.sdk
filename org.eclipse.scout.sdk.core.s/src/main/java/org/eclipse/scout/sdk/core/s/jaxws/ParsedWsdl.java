@@ -18,7 +18,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -259,10 +258,8 @@ public class ParsedWsdl {
    * @return The created {@link ParsedWsdl} instance
    * @throws WSDLException
    *           on an error parsing the WSDL
-   * @throws UnsupportedEncodingException
-   *           if the encoding is not supported
    */
-  public static ParsedWsdl create(URI documentBase, CharSequence wsdlContent, boolean loadSchemas) throws WSDLException, UnsupportedEncodingException {
+  public static ParsedWsdl create(URI documentBase, CharSequence wsdlContent, boolean loadSchemas) throws WSDLException {
     var wsdl = parseWsdl(documentBase, new InputSource(new CharSequenceInputStream(wsdlContent, StandardCharsets.UTF_8)));
     return create(wsdl, loadSchemas);
   }
@@ -281,10 +278,8 @@ public class ParsedWsdl {
    * @return The created {@link ParsedWsdl} instance
    * @throws WSDLException
    *           on an error parsing the WSDL
-   * @throws UnsupportedEncodingException
-   *           if the encoding is not supported
    */
-  public static ParsedWsdl create(URI documentBase, InputStream is, boolean loadSchemas) throws WSDLException, UnsupportedEncodingException {
+  public static ParsedWsdl create(URI documentBase, InputStream is, boolean loadSchemas) throws WSDLException {
     var wsdl = parseWsdl(documentBase, new InputSource(Ensure.notNull(is)));
     return create(wsdl, loadSchemas);
   }

@@ -227,7 +227,7 @@ public class StagingMojo extends AbstractStagingMojo {
   private static String getChildElementCount(Node node) {
     var childNodes = node.getChildNodes();
     var count = IntStream.range(0, childNodes.getLength()).filter(i -> childNodes.item(i) instanceof Element).count();
-    return "" + count;
+    return Long.toString(count);
   }
 
   private File downloadJar(String url, String jarName, String outputDir) throws MojoExecutionException {

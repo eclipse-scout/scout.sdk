@@ -30,6 +30,7 @@ import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
+import com.intellij.util.ui.JBUI
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.nls.ITranslationImportInfo
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
@@ -46,7 +47,10 @@ import org.eclipse.scout.sdk.s2i.resolvePsi
 import org.eclipse.scout.sdk.s2i.ui.IndexedFocusTraversalPolicy
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
 import org.eclipse.scout.sdk.s2i.util.Xlsx
-import java.awt.*
+import java.awt.Desktop
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import java.awt.Point
 import java.io.File
 import java.text.NumberFormat
 import java.util.concurrent.TimeUnit
@@ -75,7 +79,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
         typeFilterLayout.gridwidth = 1
         typeFilterLayout.gridheight = 1
         typeFilterLayout.fill = GridBagConstraints.HORIZONTAL
-        typeFilterLayout.insets = Insets(15, 7, 0, 0)
+        typeFilterLayout.insets = JBUI.insets(15, 7, 0, 0)
         add(TranslationFilterPanel(), typeFilterLayout)
 
         val tableLayout = GridBagConstraints()
@@ -84,7 +88,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
         tableLayout.gridwidth = 1
         tableLayout.gridheight = 1
         tableLayout.fill = GridBagConstraints.BOTH
-        tableLayout.insets = Insets(8, 8, 0, 0)
+        tableLayout.insets = JBUI.insets(8, 8, 0, 0)
         tableLayout.weightx = 1.0
         tableLayout.weighty = 1.0
         m_table.contextMenu = createContextMenu()
@@ -96,7 +100,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
         actionsLayout.gridwidth = 1
         actionsLayout.gridheight = 1
         actionsLayout.fill = GridBagConstraints.VERTICAL
-        actionsLayout.insets = Insets(8, 0, 0, 0)
+        actionsLayout.insets = JBUI.insetsTop(8)
         val toolbar = createToolbar()
         add(toolbar, actionsLayout)
 
@@ -472,7 +476,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
             filterLayout.gridy = 0
             filterLayout.fill = GridBagConstraints.HORIZONTAL
             filterLayout.weightx = 1.0
-            filterLayout.insets = Insets(0, 0, 0, 0)
+            filterLayout.insets = JBUI.emptyInsets()
             m_textFilter.document.addDocumentListener(object : DocumentAdapter() {
                 override fun textChanged(e: DocumentEvent) {
                     filterChanged()
@@ -484,14 +488,14 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
             val regexHelpLayout = GridBagConstraints()
             regexHelpLayout.gridx = 1
             regexHelpLayout.gridy = 0
-            regexHelpLayout.insets = Insets(0, 4, 0, 0)
+            regexHelpLayout.insets = JBUI.insetsLeft(4)
             m_regexHelpButton.isFocusable = true
             add(m_regexHelpButton, regexHelpLayout)
 
             val inheritedLayout = GridBagConstraints()
             inheritedLayout.gridx = 2
             inheritedLayout.gridy = 0
-            inheritedLayout.insets = Insets(0, 16, 0, 0)
+            inheritedLayout.insets = JBUI.insetsLeft(16)
             m_hideInherited.addActionListener { filterChanged() }
             m_hideInherited.toolTipText = message("hide.inherited.rows.desc", primaryStore.service().type().name())
             m_hideInherited.isFocusable = true
@@ -500,7 +504,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
             val readOnlyRowsLayout = GridBagConstraints()
             readOnlyRowsLayout.gridx = 3
             readOnlyRowsLayout.gridy = 0
-            readOnlyRowsLayout.insets = Insets(0, 12, 0, 0)
+            readOnlyRowsLayout.insets = JBUI.insetsLeft(12)
             m_hideRowsWithOnlyReadOnly.addActionListener { filterChanged() }
             m_hideRowsWithOnlyReadOnly.toolTipText = message("hide.dependency.translations.desc")
             m_hideRowsWithOnlyReadOnly.isFocusable = true
@@ -509,7 +513,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
             val readOnlyLanguagesLayout = GridBagConstraints()
             readOnlyLanguagesLayout.gridx = 4
             readOnlyLanguagesLayout.gridy = 0
-            readOnlyLanguagesLayout.insets = Insets(0, 12, 0, 4)
+            readOnlyLanguagesLayout.insets = JBUI.insets(0, 12, 0, 4)
             m_hideLanguagesWithOnlyReadOnly.addActionListener { filterChanged() }
             m_hideLanguagesWithOnlyReadOnly.toolTipText = message("hide.dependency.languages.desc")
             m_hideLanguagesWithOnlyReadOnly.isFocusable = true

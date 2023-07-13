@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.core.java.model.api.IMethod;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.testing.SdkAssertions;
 import org.eclipse.scout.sdk.core.util.Ensure;
+import org.eclipse.scout.sdk.core.util.SuperHierarchySpliterator.ISuperHierarchyElement;
 
 /**
  * <h3>{@link SdkJavaAssertions}</h3>
@@ -170,7 +171,7 @@ public final class SdkJavaAssertions {
     return type.methods().stream()
         .filter(method -> method.identifier(true).equals(methodId))
         .findAny()
-        .<AssertionError> orElseThrow(() -> {
+        .orElseThrow(() -> {
           var msg = message;
           if (msg == null) {
             var messageBuilder = new StringBuilder("Method '").append(methodName).append('\'');
@@ -185,7 +186,7 @@ public final class SdkJavaAssertions {
             messageBuilder.append(']');
             msg = messageBuilder.toString();
           }
-          throw new AssertionError(msg);
+          return new AssertionError(msg);
         });
   }
 
@@ -246,7 +247,7 @@ public final class SdkJavaAssertions {
     assertHasSuperInterfaces(type, interfaceTypes, "Type '" + type.name() + "' does not have the same interfaces!");
   }
 
-  public static void assertHasSuperInterfaces(IType type, String[] expectedInterfaces, String message) {
+  public static void assertHasSuperInterfaces(ISuperHierarchyElement<IType> type, String[] expectedInterfaces, String message) {
     var interfaces = type.superInterfaces()
         .map(IType::reference)
         .collect(toList());

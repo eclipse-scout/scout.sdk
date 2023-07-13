@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
  * <p>
  * Contains predefined {@link IJavaEnvironmentFactory Java environment factories}.
  * <p>
- * For a sample usage see {@link org.eclipse.scout.sdk.core.model.ecj}.
+ * For a sample usage see {@link org.eclipse.scout.sdk.core.java.model}.
  *
  * @since 7.1.0
  * @see EmptyJavaEnvironmentFactory

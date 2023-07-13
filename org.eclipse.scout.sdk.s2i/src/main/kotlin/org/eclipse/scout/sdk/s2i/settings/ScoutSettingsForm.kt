@@ -16,11 +16,11 @@ import com.intellij.ui.components.JBPanel
 import com.intellij.uiDesigner.core.GridConstraints
 import com.intellij.uiDesigner.core.GridLayoutManager
 import com.intellij.uiDesigner.core.Spacer
+import com.intellij.util.ui.JBUI
 import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import java.awt.Dimension
-import java.awt.Insets
 import java.util.*
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComboBox
@@ -36,7 +36,7 @@ class ScoutSettingsForm : JBPanel<ScoutSettingsForm>() {
     init {
         putClientProperty(m_htmlDisable, true)
 
-        layout = GridLayoutManager(4, 2, Insets(0, 0, 0, 0), -1, -1)
+        layout = GridLayoutManager(4, 2, JBUI.emptyInsets(), -1, -1)
 
         m_autoUpdateDerivedResources = JBCheckBox()
         m_autoUpdateDerivedResources.text = EclipseScoutBundle.message("automatically.update.generated.classes")

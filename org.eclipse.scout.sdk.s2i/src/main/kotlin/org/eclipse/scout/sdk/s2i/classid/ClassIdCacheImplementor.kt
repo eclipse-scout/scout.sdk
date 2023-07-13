@@ -190,11 +190,11 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
                     mappingsInFile[qualifiedName] = value
                 }
 
-                override fun visitField(field: PsiField?) {
+                override fun visitField(field: PsiField) {
                     // do not set into fields
                 }
 
-                override fun visitMethod(method: PsiMethod?) {
+                override fun visitMethod(method: PsiMethod) {
                     // do not step into methods
                 }
             })

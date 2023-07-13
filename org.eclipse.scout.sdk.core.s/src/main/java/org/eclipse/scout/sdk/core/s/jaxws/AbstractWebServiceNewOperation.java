@@ -15,7 +15,6 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 import static org.eclipse.scout.sdk.core.util.Strings.removeSuffix;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -252,7 +251,7 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     try {
       return ParsedWsdl.create(documentBase, getWsdlContent(), true);
     }
-    catch (WSDLException | UnsupportedEncodingException e) {
+    catch (WSDLException e) {
       throw new SdkException(e);
     }
   }

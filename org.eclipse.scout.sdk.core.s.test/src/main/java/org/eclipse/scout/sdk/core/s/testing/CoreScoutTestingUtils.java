@@ -284,7 +284,7 @@ public final class CoreScoutTestingUtils {
         .withWorkingDirectory(pomDir)
         .withProperty(MavenBuild.PROPERTY_INTERACTIVE_MODE, "false")
         .withOption(MavenBuild.OPTION_DEBUG);
-    if (goals != null && goals.length > 0) {
+    if (goals != null) {
       for (var goal : goals) {
         build.withGoal(goal);
       }

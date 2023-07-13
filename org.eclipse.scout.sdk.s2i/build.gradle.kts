@@ -26,7 +26,7 @@ plugins {
     id("java")
     id("maven-publish")
     id("idea")
-    id("org.jetbrains.intellij") version "1.13.3"
+    id("org.jetbrains.intellij") version "1.15.0"
     kotlin("jvm") version "1.7.22"
     id("net.linguica.maven-settings") version "0.5" // for maven settings
 }
@@ -60,7 +60,7 @@ allprojects {
 intellij {
     version.set(intellijVersion)
     downloadSources.set(true)
-    plugins.set(listOf("java", "maven", "copyright", "properties", "JavaScriptLanguage"))
+    plugins.set(listOf("java", "maven", "copyright", "properties", "JavaScriptLanguage" /* in newer IJ versions just called "JavaScript" */))
     updateSinceUntilBuild.set(false)
 }
 

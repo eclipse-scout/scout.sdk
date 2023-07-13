@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
  * main entry point to work with the Scout SDK Java model API using the "Eclipse Compiler for Java" (ECJ). See
  * {@link JavaEnvironmentFactories} for factories that create specific {@link IJavaEnvironment} setups.
  * <p>
- * For a sample usage see {@link org.eclipse.scout.sdk.core.model.ecj}.
+ * For a sample usage see {@link org.eclipse.scout.sdk.core.java.model}.
  *
  * @since 5.2.0
  * @see EmptyJavaEnvironmentFactory

@@ -35,6 +35,7 @@ import com.intellij.ui.components.JBPanel
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextArea
 import com.intellij.util.ui.JBDimension
+import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.PositionTracker
 import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator.*
@@ -66,7 +67,7 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
             { index -> m_model.translationForRow(index) },
             { row -> m_model.rowForTranslation(row as IStackedTranslation) })
     private val m_tableSorterFilter = TableRowSorter(m_model)
-    private val m_cellMargin = Insets(1, 4, 2, 2)
+    private val m_cellMargin = JBUI.insets(1, 4, 2, 2)
     private val m_editStartEvent = EventObject(this)
     private val m_fontHeight = FinalValue<Int>()
 
@@ -352,7 +353,7 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
             m_cellContentPanel.border = BorderFactory.createLineBorder(JBColor.border(), borderWidth)
             m_cellContentPanel.background = m_txt.background
             m_scrollPane.border = null
-            m_txt.margin = Insets(m_cellMargin.top - borderWidth, m_cellMargin.left - borderWidth, m_cellMargin.bottom, m_cellMargin.right)
+            m_txt.margin = JBUI.insets(m_cellMargin.top - borderWidth, m_cellMargin.left - borderWidth, m_cellMargin.bottom, m_cellMargin.right)
             m_txt.document.addDocumentListener(object : DocumentAdapter() {
                 override fun textChanged(e: DocumentEvent) {
                     onTextChanged()
@@ -371,8 +372,8 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
             m_cellContentPanel.add(
                     m_scrollPane, GridBagConstraints(
                     0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START,
-                    GridBagConstraints.BOTH, Insets(0, 0, 0, 0), 0, 0
-            )
+                    GridBagConstraints.BOTH, JBUI.emptyInsets(), 0, 0
+                )
             )
 
             if (supportMultiLine) {
@@ -380,8 +381,8 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
                 m_cellContentPanel.add(
                         newLineHelpButton, GridBagConstraints(
                         1, 0, 1, 1, 0.0, 0.0, GridBagConstraints.FIRST_LINE_END,
-                        GridBagConstraints.NONE, Insets(0, 0, 0, 0), 0, 0
-                )
+                        GridBagConstraints.NONE, JBUI.emptyInsets(), 0, 0
+                    )
                 )
             }
         }

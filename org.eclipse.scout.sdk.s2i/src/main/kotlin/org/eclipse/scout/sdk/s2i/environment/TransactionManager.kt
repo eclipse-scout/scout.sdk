@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.s2i.toIdea
 import org.eclipse.scout.sdk.s2i.toVirtualFile
 import java.nio.file.Path
 
-class TransactionManager constructor(val project: Project, val transactionName: String? = null) {
+class TransactionManager(val project: Project, val transactionName: String? = null) {
 
     companion object {
 
@@ -302,10 +302,7 @@ class TransactionManager constructor(val project: Project, val transactionName: 
         if (document == null) {
             return true // no document exists yet: new file
         }
-        if (!document.isWritable) {
-            return false
-        }
-        return true
+        return document.isWritable
     }
 
     private fun commitTransaction(documentMappings: MutableMap<Path, Pair<VirtualFile, Document?>?>, progress: IdeaProgress) = m_members.entries.minOfOrNull { commitMembersAndPersist(it.key, it.value, documentMappings, progress) } ?: false

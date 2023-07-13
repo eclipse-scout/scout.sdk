@@ -32,7 +32,6 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
-import java.awt.Insets
 import java.util.function.Supplier
 import javax.swing.BorderFactory
 import javax.swing.ButtonGroup
@@ -55,8 +54,8 @@ class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: Scout
     private val m_versionsComboBox = ComboBox(VersionComboBoxModel())
     private val m_loadingIcon = JBLabel(AnimatedIcon.Default.INSTANCE)
     private val m_showPreviewVersionsCheckBox = JBCheckBox(message("also.show.preview.versions"), false)
-    private val m_labelInsets = Insets(4, 10, 0, 15)
-    private val m_fieldInsets = Insets(4, 0, 0, 15)
+    private val m_labelInsets = JBUI.insets(4, 10, 0, 15)
+    private val m_fieldInsets = JBUI.insets(4, 0, 0, 15)
 
     init {
         m_namePanel = createNameGroup()
@@ -135,7 +134,7 @@ class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: Scout
         settingsPanel.border = BorderFactory.createTitledBorder(JBUI.Borders.customLineTop(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground()), message("project.settings"))
         settingsPanel.add(
             JBLabel(message("ui.lang")), GridBagConstraints(
-                0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, Insets(9, 10, 0, 0), 11, 0
+                0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, JBUI.insets(9, 10, 0, 0), 11, 0
             )
         )
         val uiLangRadioButtonGroup = ButtonGroup()
@@ -146,7 +145,7 @@ class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: Scout
         m_showPreviewVersionsCheckBox.addActionListener { updateVersionsAsync() }
         settingsPanel.add(
             m_javaButton, GridBagConstraints(
-                1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.HORIZONTAL, Insets(9, 0, 0, 15), 0, 0
+                1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.HORIZONTAL, JBUI.insets(9, 0, 0, 15), 0, 0
             )
         )
         settingsPanel.add(
@@ -156,17 +155,17 @@ class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: Scout
         )
         settingsPanel.add(
             JBLabel(message("scout.version")), GridBagConstraints(
-                0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, Insets(20, 10, 0, 15), 50, 0
+                0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.NONE, JBUI.insets(20, 10, 0, 15), 50, 0
             )
         )
         settingsPanel.add(
             m_versionsComboBox, GridBagConstraints(
-                1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, Insets(20, 0, 0, 5), 0, 0
+                1, 2, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, JBUI.insets(20, 0, 0, 5), 0, 0
             )
         )
         settingsPanel.add(
             m_loadingIcon, GridBagConstraints(
-                2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.HORIZONTAL, Insets(20, 0, 0, 17), 0, 0
+                2, 2, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.HORIZONTAL, JBUI.insets(20, 0, 0, 17), 0, 0
             )
         )
         settingsPanel.add(
@@ -176,7 +175,7 @@ class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: Scout
         )
         settingsPanel.add(
             JBLabel(message("use.newest.recommendation")), GridBagConstraints(
-                1, 4, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.HORIZONTAL, Insets(4, 2, 0, 15), 0, 0
+                1, 4, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_END, GridBagConstraints.HORIZONTAL, JBUI.insets(4, 2, 0, 15), 0, 0
             )
         )
         return settingsPanel
@@ -187,19 +186,19 @@ class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: Scout
         rootPanel.add(
             m_namePanel, GridBagConstraints(
                 0, 0, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START,
-                GridBagConstraints.HORIZONTAL, Insets(20, 8, 30, 8), 0, 0
+                GridBagConstraints.HORIZONTAL, JBUI.insets(20, 8, 30, 8), 0, 0
             )
         )
         rootPanel.add(
             m_settingsPanel, GridBagConstraints(
                 0, 1, 1, 1, 1.0, 0.0, GridBagConstraints.LINE_START,
-                GridBagConstraints.HORIZONTAL, Insets(0, 8, 30, 8), 0, 0
+                GridBagConstraints.HORIZONTAL, JBUI.insets(0, 8, 30, 8), 0, 0
             )
         )
         rootPanel.add(
             JPanel(), GridBagConstraints(
                 0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.LINE_START,
-                GridBagConstraints.HORIZONTAL, Insets(0, 8, 30, 8), 0, 0
+                GridBagConstraints.HORIZONTAL, JBUI.insets(0, 8, 30, 8), 0, 0
             )
         )
         return rootPanel

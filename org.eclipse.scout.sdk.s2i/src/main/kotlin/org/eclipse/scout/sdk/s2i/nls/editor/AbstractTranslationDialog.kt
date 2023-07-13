@@ -17,6 +17,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.*
+import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.Translation
@@ -51,29 +52,45 @@ abstract class AbstractTranslationDialog(val project: Project, val languages: Co
         rootPanel.preferredSize = Dimension(600, 300)
 
         // Key
-        rootPanel.add(JBLabel(NlsTableModel.KEY_COLUMN_HEADER_NAME), GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START,
-                GridBagConstraints.NONE, Insets(4, 0, 0, 15), 0, 0))
+        rootPanel.add(
+            JBLabel(NlsTableModel.KEY_COLUMN_HEADER_NAME), GridBagConstraints(
+                0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START,
+                GridBagConstraints.NONE, JBUI.insets(4, 0, 0, 15), 0, 0
+            )
+        )
         val keyField = TextFieldWithMaxLen(maxLength = 200)
         keyField.isFocusable = true
         initialKey?.let { keyField.text = it }
         m_keyTextField = keyField
-        rootPanel.add(keyField, GridBagConstraints(1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
-                GridBagConstraints.HORIZONTAL, Insets(4, 0, 0, 15), 0, 0))
+        rootPanel.add(
+            keyField, GridBagConstraints(
+                1, 0, 1, 1, 1.0, 0.0, GridBagConstraints.CENTER,
+                GridBagConstraints.HORIZONTAL, JBUI.insets(4, 0, 0, 15), 0, 0
+            )
+        )
 
         // Copy to clipboard
         val copyToClipboardField = JBCheckBox(message("copy.key.to.clipboard"), false)
         copyToClipboardField.toolTipText = message("copy.key.to.clipboard.desc")
         copyToClipboardField.isFocusable = true
         m_copyToClipboardField = copyToClipboardField
-        rootPanel.add(copyToClipboardField, GridBagConstraints(2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_END,
-                GridBagConstraints.NONE, Insets(4, 0, 0, 0), 0, 0))
+        rootPanel.add(
+            copyToClipboardField, GridBagConstraints(
+                2, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_END,
+                GridBagConstraints.NONE, JBUI.insetsTop(4), 0, 0
+            )
+        )
 
         // Tab pane
         val tabPane = createTabPane()
         tabPane.isFocusable = true
         m_tabPane = tabPane
-        rootPanel.add(tabPane, GridBagConstraints(0, 1, 3, 1, 1.0, 1.0, GridBagConstraints.PAGE_START,
-                GridBagConstraints.BOTH, Insets(10, 0, 0, 0), 0, 0))
+        rootPanel.add(
+            tabPane, GridBagConstraints(
+                0, 1, 3, 1, 1.0, 1.0, GridBagConstraints.PAGE_START,
+                GridBagConstraints.BOTH, JBUI.insetsTop(10), 0, 0
+            )
+        )
 
         // validation label
         val statusLabel = JBLabel()
@@ -81,8 +98,12 @@ abstract class AbstractTranslationDialog(val project: Project, val languages: Co
         statusLabel.preferredSize = Dimension(600, 40)
         statusLabel.verticalAlignment = JLabel.TOP
         m_errorStatusField = statusLabel
-        rootPanel.add(statusLabel, GridBagConstraints(0, 2, 3, 1, 1.0, 0.0, GridBagConstraints.LINE_START,
-                GridBagConstraints.HORIZONTAL, Insets(5, 7, 0, 0), 0, 0))
+        rootPanel.add(
+            statusLabel, GridBagConstraints(
+                0, 2, 3, 1, 1.0, 0.0, GridBagConstraints.LINE_START,
+                GridBagConstraints.HORIZONTAL, JBUI.insets(5, 7, 0, 0), 0, 0
+            )
+        )
 
         isOKActionEnabled = false
         installValidation()
@@ -120,7 +141,7 @@ abstract class AbstractTranslationDialog(val project: Project, val languages: Co
         languages.sorted().forEach {
             val txt = JBTextArea()
             txt.font = keyTextField().font
-            txt.margin = Insets(5, 7, 5, 5)
+            txt.margin = JBUI.insets(5, 7, 5, 5)
             txt.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, setOf(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0)))
             txt.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, setOf(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK)))
             m_languageTextFields[it] = txt

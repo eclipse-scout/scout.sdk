@@ -15,7 +15,6 @@ import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.SdkException
 import java.lang.reflect.InvocationTargetException
 
-@Suppress("unused")
 class CompatibilityMethodCaller<T> {
 
     companion object {

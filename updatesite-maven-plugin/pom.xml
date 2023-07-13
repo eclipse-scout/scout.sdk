@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_plugin_config-master</artifactId>
-    <version>23.1.0</version>
+    <version>23.2.0-SNAPSHOT</version>
     <relativePath />
   </parent>
 
@@ -27,7 +27,7 @@
   <properties>
     <scout.base.version>13.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
-    <maven.model.dependency.version>3.8.7</maven.model.dependency.version>
+    <maven.model.dependency.version>3.9.3</maven.model.dependency.version>
     <junit.version>5.9.3</junit.version>
   </properties>
 
@@ -89,7 +89,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>3.8.2</version>
+        <version>3.9.0</version>
         <configuration>
           <goalPrefix>updatesite</goalPrefix>
           <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
