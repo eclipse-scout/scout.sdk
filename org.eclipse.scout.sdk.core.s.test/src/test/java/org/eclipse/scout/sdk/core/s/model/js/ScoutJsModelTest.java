@@ -11,9 +11,11 @@ package org.eclipse.scout.sdk.core.s.model.js;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
@@ -66,5 +68,25 @@ public class ScoutJsModelTest {
         .map(INodeElement::name)
         .toList();
     assertEquals(Arrays.asList(expectedDependencyNames), dependencyNames);
+  }
+
+  @Test
+  @ExtendWithNodeModules("ScoutJsModelTestWithEnums")
+  public void testScoutJsModelTestWithEnums(INodeModule scoutCore) {
+    var model = ScoutJsModels.create(scoutCore).orElseThrow();
+
+    var realEnumTS = model.findScoutEnums().withName("RealEnumTS").first().orElse(null);
+    assertNotNull(realEnumTS);
+    assertEquals(List.of("FIRST", "SECOND", "THIRD"), realEnumTS.constants());
+
+    var vertical = model.findScoutEnums().withName("Vertical").first().orElse(null);
+    assertNull(vertical);
+    var verticalEnum = model.findScoutEnums().withName("VerticalEnum").first().orElse(null);
+    assertNotNull(verticalEnum);
+    assertEquals(List.of("TOP", "BOTTOM"), verticalEnum.constants());
+
+    var horizontal = model.findScoutEnums().withName("Horizontal").first().orElse(null);
+    assertNotNull(horizontal);
+    assertEquals(List.of("LEFT", "RIGHT"), horizontal.constants());
   }
 }

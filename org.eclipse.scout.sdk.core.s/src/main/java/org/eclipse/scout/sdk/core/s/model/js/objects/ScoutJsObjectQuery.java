@@ -83,11 +83,4 @@ public class ScoutJsObjectQuery extends AbstractScoutJsElementQuery<IScoutJsObje
 
     return result;
   }
-
-  private static Predicate<IScoutJsObject> appendOrCreateFilter(Predicate<IScoutJsObject> existing, Predicate<IScoutJsObject> toAppend) {
-    if (existing == null) {
-      return toAppend;
-    }
-    return existing.and(toAppend);
-  }
 }

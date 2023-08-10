@@ -26,6 +26,7 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
 
   private boolean m_includeDependencies;
   private boolean m_includeSelf = true;
+  private String m_name;
   private Set<IES6Class> m_declaringClasses;
 
   protected AbstractScoutJsElementQuery(ScoutJsModel model) {
@@ -57,6 +58,15 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
   public TYPE withIncludeSelf(boolean includeSelf) {
     m_includeSelf = includeSelf;
     return thisInstance();
+  }
+
+  public TYPE withName(String name) {
+    m_name = name;
+    return thisInstance();
+  }
+
+  protected String name() {
+    return m_name;
   }
 
   public TYPE withDeclaringClasses(Stream<? extends IES6Class> declaringClasses) {
@@ -106,10 +116,22 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
   protected Predicate<E> createFilter() {
     Predicate<E> result = null;
 
+    var name = name();
+    if (name != null) {
+      result = appendOrCreateFilter(result, e -> name().equals(e.name()));
+    }
+
     var declaringClassFilter = declaringClasses();
     if (declaringClassFilter != null) { // empty set means result is empty
-      result = e -> declaringClassFilter.contains(e.declaringClass());
+      result = appendOrCreateFilter(result, e -> declaringClassFilter.contains(e.declaringClass()));
     }
     return result;
+  }
+
+  protected static <E extends IScoutJsElement> Predicate<E> appendOrCreateFilter(Predicate<E> existing, Predicate<E> toAppend) {
+    if (existing == null) {
+      return toAppend;
+    }
+    return existing.and(toAppend);
   }
 }

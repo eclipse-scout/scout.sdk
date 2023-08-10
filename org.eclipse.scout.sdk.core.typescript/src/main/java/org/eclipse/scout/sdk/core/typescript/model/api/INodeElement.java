@@ -22,6 +22,10 @@ public interface INodeElement {
 
   Optional<Path> containingFile();
 
+  Optional<String> containingFileName();
+
+  boolean isTypeScript();
+
   NodeElementSpi spi();
 
   String name();

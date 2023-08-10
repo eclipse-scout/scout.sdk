@@ -319,7 +319,7 @@ object JsModelCompletionHelper {
         override fun icon(): Icon {
             val property = property()
             if (property.type().isChildModelSupported) {
-                if (property.scoutJsObject().scoutJsModel().supportsTypeScript()) {
+                if (property.scoutJsObject().declaringClass().isTypeScript) {
                     return JavaScriptPsiIcons.Classes.TypeScriptClass
                 }
                 return JavaScriptPsiIcons.Classes.JavaScriptClass
@@ -338,7 +338,7 @@ object JsModelCompletionHelper {
     data class JsObjectValueLookupElement(val propertyValue: ScoutJsObjectPropertyValue) : ScoutJsModelLookupElement {
         override fun property(): ScoutJsProperty = propertyValue.property()
         override fun icon(): Icon {
-            if (propertyValue.scoutJsObject.scoutJsModel().supportsTypeScript()) {
+            if (propertyValue.scoutJsObject.declaringClass().isTypeScript) {
                 return JavaScriptPsiIcons.Classes.TypeScriptClass
             }
             return JavaScriptPsiIcons.Classes.JavaScriptClass

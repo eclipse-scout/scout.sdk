@@ -14,6 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,9 +29,9 @@ import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 import org.eclipse.scout.sdk.core.s.model.js.objects.JavaScriptScoutObject;
 import org.eclipse.scout.sdk.core.s.model.js.objects.ScoutJsObjectQuery;
 import org.eclipse.scout.sdk.core.s.model.js.objects.TypeScriptScoutObject;
-import org.eclipse.scout.sdk.core.typescript.IWebConstants;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.IVariable;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
@@ -48,7 +49,6 @@ public class ScoutJsModel {
   private final FinalValue<Optional<String>> m_namespace;
   private final FinalValue<List<IScoutJsObject>> m_objects;
   private final FinalValue<List<IScoutJsEnum>> m_enums;
-  private final FinalValue<Boolean> m_supportsTypeScript;
   private final FinalValue<Boolean> m_useClassReference;
 
   protected ScoutJsModel(INodeModule module, IES6Class widgetClass) {
@@ -57,7 +57,6 @@ public class ScoutJsModel {
     m_namespace = new FinalValue<>();
     m_objects = new FinalValue<>();
     m_enums = new FinalValue<>();
-    m_supportsTypeScript = new FinalValue<>();
     m_useClassReference = new FinalValue<>();
   }
 
@@ -71,20 +70,20 @@ public class ScoutJsModel {
 
   protected List<IScoutJsObject> parseScoutObjects() {
     var widgetClass = widgetClass();
-    Stream<IScoutJsObject> objects;
-    if (supportsTypeScript()) {
-      objects = nodeModule()
-          .classes()
-          .filter(c -> !c.isTypeAlias() && !c.isEnum())
-          .map(element -> TypeScriptScoutObject.create(this, element).orElseThrow());
-    }
-    else {
-      objects = nodeModule()
-          .classes()
-          .filter(c -> !c.name().endsWith("Adapter") && !c.name().endsWith(ScoutJsCoreConstants.MODEL_SUFFIX))
-          .flatMap(element -> JavaScriptScoutObject.create(this, element, widgetClass).stream());
-    }
-    return objects.toList();
+    return Stream.concat(
+        // TypeScript: parse model
+        nodeModule()
+            .classes()
+            .filter(INodeElement::isTypeScript)
+            .filter(c -> !c.isTypeAlias() && !c.isEnum())
+            .map(element -> TypeScriptScoutObject.create(this, element).orElseThrow()),
+        // JavaScript: parse class
+        nodeModule()
+            .classes()
+            .filter(Predicate.not(INodeElement::isTypeScript))
+            .filter(c -> !c.name().endsWith("Adapter") && !c.name().endsWith(ScoutJsCoreConstants.MODEL_SUFFIX))
+            .flatMap(element -> JavaScriptScoutObject.create(this, element, widgetClass).stream()))
+        .toList();
   }
 
   public ScoutJsEnumQuery findScoutEnums() {
@@ -96,28 +95,28 @@ public class ScoutJsModel {
   }
 
   protected List<IScoutJsEnum> parseScoutEnums() {
-    Stream<IScoutJsEnum> enums;
-    if (supportsTypeScript()) {
-      enums = Stream.concat(
-          nodeModule().classes()
-              .flatMap(element -> ES6ClassTypeAliasScoutEnum.create(this, element).stream()),
-          nodeModule().classes()
-              .flatMap(element -> ES6ClassEnumScoutEnum.create(this, element).stream()));
-    }
-    else {
-      enums = Stream.concat(
-          nodeModule().classes()
-              .flatMap(element -> element.fields()
-                  .withModifier(Modifier.STATIC)
-                  .stream()
-                  .filter(field -> field.dataType().flatMap(IDataType::objectLiteral).isPresent())
-                  .flatMap(field -> VariableScoutEnum.create(this, field).stream())),
-          nodeModule().elements().stream()
-              .filter(IVariable.class::isInstance)
-              .map(IVariable.class::cast)
-              .flatMap(variable -> VariableScoutEnum.create(this, variable).stream()));
-    }
-    return enums.toList();
+    return Stream.concat(
+        // TypeScript: parse enums and enum-like type aliases (EnumObject<T>)
+        nodeModule().classes()
+            .filter(INodeElement::isTypeScript)
+            .flatMap(element -> Stream.concat(
+                ES6ClassEnumScoutEnum.create(this, element).stream(),
+                ES6ClassTypeAliasScoutEnum.create(this, element).stream())),
+        // JavaScript: parse static fields and variables
+        Stream.concat(
+            nodeModule().classes()
+                .filter(Predicate.not(INodeElement::isTypeScript))
+                .flatMap(element -> element.fields()
+                    .withModifier(Modifier.STATIC)
+                    .stream()
+                    .filter(field -> field.dataType().flatMap(IDataType::objectLiteral).isPresent())
+                    .flatMap(field -> VariableScoutEnum.create(this, field).stream())),
+            nodeModule().elements().stream()
+                .filter(Predicate.not(INodeElement::isTypeScript))
+                .filter(IVariable.class::isInstance)
+                .map(IVariable.class::cast)
+                .flatMap(variable -> VariableScoutEnum.create(this, variable).stream())))
+        .toList();
   }
 
   /**
@@ -154,14 +153,6 @@ public class ScoutJsModel {
       }
     }
     return added;
-  }
-
-  public boolean supportsTypeScript() {
-    // TypeScript is supported if the main file is written in TypeScript
-    return m_supportsTypeScript.computeIfAbsentAndGet(() -> nodeModule().packageJson()
-        .main()
-        .filter(main -> main.endsWith(IWebConstants.TS_FILE_SUFFIX))
-        .isPresent());
   }
 
   public IES6Class widgetClass() {

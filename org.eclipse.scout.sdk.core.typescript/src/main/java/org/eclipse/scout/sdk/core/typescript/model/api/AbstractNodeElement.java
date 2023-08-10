@@ -16,18 +16,22 @@ import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 
+import org.eclipse.scout.sdk.core.typescript.IWebConstants;
 import org.eclipse.scout.sdk.core.typescript.builder.imports.ES6ImportCollector;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SourceRange;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 public abstract class AbstractNodeElement<SPI extends NodeElementSpi> implements INodeElement {
   private final SPI m_spi;
+  private final FinalValue<Optional<String>> m_containingFileName;
   private final FinalValue<Optional<SourceRange>> m_source;
 
   protected AbstractNodeElement(SPI spi) {
     m_spi = Ensure.notNull(spi);
+    m_containingFileName = new FinalValue<>();
     m_source = new FinalValue<>();
   }
 
@@ -44,6 +48,16 @@ public abstract class AbstractNodeElement<SPI extends NodeElementSpi> implements
   @Override
   public Optional<Path> containingFile() {
     return spi().containingFile();
+  }
+
+  @Override
+  public Optional<String> containingFileName() {
+    return m_containingFileName.computeIfAbsentAndGet(() -> containingFile().map(Path::getFileName).map(Path::toString));
+  }
+
+  @Override
+  public boolean isTypeScript() {
+    return containingFileName().map(fileName -> Strings.endsWith(fileName, IWebConstants.TS_FILE_SUFFIX, false)).orElse(false);
   }
 
   @Override
