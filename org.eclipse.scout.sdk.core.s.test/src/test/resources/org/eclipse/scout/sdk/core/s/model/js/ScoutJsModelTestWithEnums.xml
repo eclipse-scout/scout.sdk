@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~
+  ~ This program and the accompanying materials are made
+  ~ available under the terms of the Eclipse Public License 2.0
+  ~ which is available at https://www.eclipse.org/legal/epl-2.0/
+  ~
+  ~ SPDX-License-Identifier: EPL-2.0
+  -->
+<module name="@eclipse-scout/core">
+  <export name="Widget">
+    <class name="Widget"></class>
+  </export>
+  <export name="EnumObject">
+    <class name="EnumObject"></class>
+  </export>
+  <export name="RealEnumTS">
+    <class name="RealEnumTS" file="RealEnumTS.ts" enum="true">
+      <field name="FIRST">
+        <constantValue>
+          <type>String</type>
+          <value>first</value>
+        </constantValue>
+      </field>
+      <field name="SECOND">
+        <constantValue>
+          <type>String</type>
+          <value>second</value>
+        </constantValue>
+      </field>
+      <field name="THIRD">
+        <constantValue>
+          <type>String</type>
+          <value>third</value>
+        </constantValue>
+      </field>
+    </class>
+  </export>
+  <export name="ClassTS">
+    <class name="ClassTS" file="ClassTS.ts">
+      <field name="Vertical">
+        <modifier name="STATIC"></modifier>
+        <constantValue>
+          <type>ObjectLiteral</type>
+          <value>
+            <objectLiteral>
+              <property name="TOP">
+                <constantValue>
+                  <type>String</type>
+                  <value>top</value>
+                </constantValue>
+              </property>
+              <property name="BOTTOM">
+                <constantValue>
+                  <type>String</type>
+                  <value>bottom</value>
+                </constantValue>
+              </property>
+            </objectLiteral>
+          </value>
+        </constantValue>
+      </field>
+    </class>
+  </export>
+  <export name="VerticalEnum">
+    <class name="VerticalEnum" file="VerticalEnum.ts">
+      <typeAlias>
+        <ref name="EnumObject" module="@eclipse-scout/core">
+          <typeArgument>
+            <typeOf>
+              <ref name="ClassTS" module="@eclipse-scout/core">
+                <field name="Vertical"></field>
+              </ref>
+            </typeOf>
+          </typeArgument>
+        </ref>
+      </typeAlias>
+    </class>
+  </export>
+  <export name="ClassJS">
+    <class name="ClassJS" file="ClassJS.js">
+      <field name="Horizontal">
+        <modifier name="STATIC"></modifier>
+        <constantValue>
+          <type>ObjectLiteral</type>
+          <value>
+            <objectLiteral>
+              <property name="LEFT">
+                <constantValue>
+                  <type>String</type>
+                  <value>left</value>
+                </constantValue>
+              </property>
+              <property name="RIGHT">
+                <constantValue>
+                  <type>String</type>
+                  <value>right</value>
+                </constantValue>
+              </property>
+            </objectLiteral>
+          </value>
+        </constantValue>
+      </field>
+    </class>
+  </export>
+</module>

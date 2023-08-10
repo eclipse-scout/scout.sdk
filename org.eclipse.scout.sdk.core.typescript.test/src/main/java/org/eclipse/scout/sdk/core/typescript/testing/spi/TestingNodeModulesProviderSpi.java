@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toCollection;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -35,19 +36,25 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue.ConstantValueType;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
+import org.eclipse.scout.sdk.core.typescript.model.api.IObjectLiteral;
+import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.ES6ClassImplementor;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.FieldImplementor;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.FunctionImplementor;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.NodeModuleImplementor;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.ObjectLiteralImplementor;
 import org.eclipse.scout.sdk.core.typescript.model.api.internal.PackageJsonImplementor;
+import org.eclipse.scout.sdk.core.typescript.model.api.internal.TypeOfImplementor;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeOwnerSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi;
@@ -56,6 +63,7 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModulesProviderSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ObjectLiteralSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
+import org.eclipse.scout.sdk.core.typescript.model.spi.TypeOfSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
@@ -70,9 +78,13 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
   public static final String TAG_NAME_INDEX = "index";
   public static final String TAG_NAME_REF = "ref";
   public static final String TAG_NAME_FIELD = "field";
+  public static final String TAG_NAME_MODIFIER = "modifier";
   public static final String TAG_NAME_DATA_TYPE = "dataType";
   public static final String TAG_NAME_CLASS = "class";
   public static final String TAG_NAME_SUPER_CLASS = "superClass";
+  public static final String TAG_NAME_TYPE_ALIAS = "typeAlias";
+  public static final String TAG_NAME_TYPE_ARGUMENT = "typeArgument";
+  public static final String TAG_NAME_TYPE_OF = "typeOf";
   public static final String TAG_NAME_FUNCTION = "function";
   public static final String TAG_NAME_OBJECT_LITERAL = "objectLiteral";
   public static final String TAG_NAME_PROPERTY = "property";
@@ -209,6 +221,11 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
       var factory = (TestingNodeElementFactorySpi) moduleSpi.nodeElementFactory();
       return factory.getOrCreateDataTypeSpi(dataTypeName);
     });
+    var isEnum = Boolean.parseBoolean(classElement.getAttribute("enum"));
+    when(spi.isEnum()).thenReturn(isEnum);
+    var typeAliasElement = Xml.firstChildElement(classElement, TAG_NAME_TYPE_ALIAS).orElse(null);
+    when(spi.isTypeAlias()).thenReturn(typeAliasElement != null);
+    when(spi.aliasedDataType()).thenAnswer(invocation -> Optional.ofNullable(resolveAliasedType(typeAliasElement, moduleSpi)));
 
     var fields = Xml.childElementsWithTagName(classElement, TAG_NAME_FIELD).stream()
         .map(f -> createField(f, moduleSpi))
@@ -232,10 +249,28 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
     when(spi.api()).thenReturn(result);
     when(spi.containingModule()).thenReturn(moduleSpi);
 
-    createDataType(fieldElement, spi, moduleSpi);
+    var modifiers = Xml.childElementsWithTagName(fieldElement, TAG_NAME_MODIFIER).stream()
+        .map(TestingNodeModulesProviderSpi::createModifier)
+        .collect(toSet());
+    when(spi.hasModifier(any(Modifier.class))).thenAnswer(invocation -> modifiers.contains(invocation.<Modifier> getArgument(0)));
+
+    var constantValue = Xml.firstChildElement(fieldElement, TAG_NAME_CONSTANT_VALUE)
+        .map(cv -> createConstantValue(cv, moduleSpi, name))
+        .orElse(null);
+    when(spi.constantValue()).thenReturn(constantValue);
+    if (constantValue != null) {
+      when(spi.dataType()).thenAnswer(invocation -> constantValue.dataType().map(IDataType::spi).orElse(null));
+    }
+    else {
+      createDataType(fieldElement, spi, moduleSpi);
+    }
     createContainingFile(fieldElement, spi);
 
     return spi;
+  }
+
+  private static Modifier createModifier(Element modifierElement) {
+    return Modifier.valueOf(modifierElement.getAttribute("name"));
   }
 
   private static SimpleEntry<NodeElementSpi, Set<String>> createExport(Element exportElement, NodeModuleSpi moduleSpi) {
@@ -288,8 +323,10 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
 
     var properties = Xml.childElementsWithTagName(objectLiteralElement, TAG_NAME_PROPERTY).stream()
         .flatMap(prop -> Xml.firstChildElement(prop, TAG_NAME_CONSTANT_VALUE)
-            .map(cv -> createConstantValue(cv, moduleSpi))
-            .map(cv -> new SimpleEntry<>(prop.getAttribute("name"), cv)).stream())
+            .map(cv -> {
+              var name = prop.getAttribute("name");
+              return new SimpleEntry<>(name, createConstantValue(cv, moduleSpi, name));
+            }).stream())
         .collect(toMap(SimpleEntry::getKey, SimpleEntry::getValue, (a, b) -> b, LinkedHashMap::new));
     when(spi.properties()).thenReturn(properties);
 
@@ -306,7 +343,7 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
   }
 
   @SuppressWarnings("TypeMayBeWeakened")
-  private static IConstantValue createConstantValue(Element constantValueElement, NodeModuleSpi moduleSpi) {
+  private static IConstantValue createConstantValue(Element constantValueElement, NodeModuleSpi moduleSpi, String parentName) {
     var constantValue = mock(IConstantValue.class);
 
     var type = Xml.firstChildElement(constantValueElement, TAG_NAME_TYPE)
@@ -314,6 +351,14 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
         .map(ConstantValueType::valueOf)
         .orElse(ConstantValueType.Unknown);
     when(constantValue.type()).thenReturn(type);
+
+    when(constantValue.dataType()).thenAnswer(invocation -> Optional.ofNullable(switch (type) {
+      case Boolean -> ((TestingNodeElementFactorySpi) moduleSpi.nodeElementFactory()).getOrCreateDataTypeSpi(TypeScriptTypes._boolean);
+      case Numeric -> ((TestingNodeElementFactorySpi) moduleSpi.nodeElementFactory()).getOrCreateDataTypeSpi(TypeScriptTypes._number);
+      case String -> ((TestingNodeElementFactorySpi) moduleSpi.nodeElementFactory()).getOrCreateDataTypeSpi(TypeScriptTypes._string);
+      case ObjectLiteral -> moduleSpi.nodeElementFactory().createObjectLiteralDataType(parentName, constantValue.asObjectLiteral().map(IObjectLiteral::spi).orElse(null));
+      default -> null;
+    }).map(DataTypeSpi::api));
 
     var valueElement = Xml.firstChildElement(constantValueElement, TAG_NAME_VALUE).orElseThrow();
 
@@ -347,13 +392,13 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
         .map(t -> Xml.childElementsWithTagName(valueElement, TAG_NAME_CONSTANT_VALUE));
     when(constantValue.asArray()).thenAnswer(invocation -> constantValueElements
         .map(cvs -> cvs.stream()
-            .map(cv -> createConstantValue(cv, moduleSpi))
+            .map(cv -> createConstantValue(cv, moduleSpi, parentName))
             .toArray(IConstantValue[]::new)));
 
     return constantValue;
   }
 
-  private static <T extends NodeElementSpi> T resolveRefSpi(Element refElement, NodeModuleSpi moduleSpi, Class<T> expectedType) {
+  private static <T> T resolveRefSpi(Element refElement, NodeModuleSpi moduleSpi, Class<T> expectedType) {
     return Optional.of(resolveRef(refElement, moduleSpi.api(), INodeElement.class))
         .map(INodeElement::spi)
         .filter(expectedType::isInstance)
@@ -361,12 +406,73 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
         .orElseThrow();
   }
 
-  private static <T extends INodeElement> T resolveRef(Element refElement, INodeModule module, Class<T> expectedType) {
+  private static <T> T resolveRef(Element refElement, INodeModule module, Class<T> expectedType) {
     var refModuleName = refElement.getAttribute("module");
     var refModule = module.name().equals(refModuleName) ? module : module.packageJson().dependency(refModuleName).orElseThrow();
+    var refFieldElement = Xml.firstChildElement(refElement, TAG_NAME_FIELD).orElse(null);
+    var typeArguments = Xml.childElementsWithTagName(refElement, TAG_NAME_TYPE_ARGUMENT).stream()
+        .map(e -> resolveTypeArgument(e, module.spi()))
+        .filter(Objects::nonNull)
+        .map(DataTypeSpi::api)
+        .collect(toList());
     return refModule.export(refElement.getAttribute("name"))
+        .map(export -> {
+          if (export instanceof IES6Class es6Class && refFieldElement != null) {
+            return es6Class.field(refFieldElement.getAttribute("name")).orElse(null);
+          }
+          if (export instanceof IES6Class es6Class && !typeArguments.isEmpty()) {
+            return module.nodeElementFactory().createClassWithTypeArguments(es6Class, typeArguments);
+          }
+          return export;
+        })
         .filter(expectedType::isInstance)
         .map(expectedType::cast)
         .orElseThrow();
+  }
+
+  @SuppressWarnings("TypeMayBeWeakened")
+  private static DataTypeSpi resolveAliasedType(Element typeAliasElement, NodeModuleSpi moduleSpi) {
+    if (typeAliasElement == null) {
+      return null;
+    }
+
+    var refElement = Xml.firstChildElement(typeAliasElement, TAG_NAME_REF).orElse(null);
+    if (refElement != null) {
+      return resolveRefSpi(refElement, moduleSpi, DataTypeSpi.class);
+    }
+
+    return null;
+  }
+
+  @SuppressWarnings("TypeMayBeWeakened")
+  private static DataTypeSpi resolveTypeArgument(Element typeArgumentElement, NodeModuleSpi moduleSpi) {
+    if (typeArgumentElement == null) {
+      return null;
+    }
+
+    var refElement = Xml.firstChildElement(typeArgumentElement, TAG_NAME_REF).orElse(null);
+    if (refElement != null) {
+      return resolveRefSpi(refElement, moduleSpi, DataTypeSpi.class);
+    }
+
+    var typeOfElement = Xml.firstChildElement(typeArgumentElement, TAG_NAME_TYPE_OF).orElse(null);
+    if (typeOfElement != null) {
+      return createTypeOf(typeOfElement, moduleSpi);
+    }
+
+    return null;
+  }
+
+  @SuppressWarnings("TypeMayBeWeakened")
+  private static TypeOfSpi createTypeOf(Element typeOfElement, NodeModuleSpi moduleSpi) {
+    var spi = mock(TypeOfSpi.class);
+    when(spi.name()).thenReturn("");
+    var result = new TypeOfImplementor(spi);
+    when(spi.api()).thenReturn(result);
+    when(spi.containingModule()).thenReturn(moduleSpi);
+
+    when(spi.dataTypeOwner()).thenAnswer(invocation -> resolveRefSpi(Xml.firstChildElement(typeOfElement, TAG_NAME_REF).orElseThrow(), moduleSpi, DataTypeOwnerSpi.class));
+
+    return spi;
   }
 }
