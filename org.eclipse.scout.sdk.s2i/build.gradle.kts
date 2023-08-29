@@ -103,7 +103,7 @@ publishing {
     publications {
         // add plugin zip to publications so that it is included in the deployed artifacts
         create<MavenPublication>("mavenJava") {
-            artifact("${layout.buildDirectory}/distributions/$group-$version.zip")
+            artifact("${layout.buildDirectory.asFile.get()}/distributions/$group-$version.zip")
             from(components["java"])
         }
     }
