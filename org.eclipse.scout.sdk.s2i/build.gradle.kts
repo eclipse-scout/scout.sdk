@@ -43,7 +43,7 @@ dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", scoutSdkVersion)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.ecj", scoutSdkVersion)
     api("org.apache.poi", "poi-ooxml", "5.2.3")
-    testImplementation("org.mockito", "mockito-core", "5.3.1")
+    testImplementation("org.mockito", "mockito-core", "5.5.0")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.test", scoutSdkVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.typescript.test", scoutSdkVersion)
@@ -70,7 +70,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.2", "IU-2023.2"))
+        ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.5", "IU-2023.2.1"))
         subsystemsToCheck.set("without-android")
         failureLevel.set(FailureLevel.ALL)
     }
@@ -103,7 +103,7 @@ publishing {
     publications {
         // add plugin zip to publications so that it is included in the deployed artifacts
         create<MavenPublication>("mavenJava") {
-            artifact("$buildDir/distributions/$group-$version.zip")
+            artifact("${layout.buildDirectory}/distributions/$group-$version.zip")
             from(components["java"])
         }
     }

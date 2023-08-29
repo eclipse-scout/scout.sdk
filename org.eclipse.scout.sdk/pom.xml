@@ -185,7 +185,7 @@
 
     <icu4j>72.1</icu4j>
     <ecj>3.33.0</ecj>
-    <junit.version>5.9.3</junit.version>
+    <junit.version>5.10.0</junit.version>
 
     <!-- versions to dependencies uploaded by scout -->
     <org.eclipse.m2e.core>2.0.7.20230307-1553</org.eclipse.m2e.core>
@@ -829,7 +829,7 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.4.8</version>
+        <version>1.4.11</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -890,7 +890,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>5.3.1</version>
+        <version>5.5.0</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
