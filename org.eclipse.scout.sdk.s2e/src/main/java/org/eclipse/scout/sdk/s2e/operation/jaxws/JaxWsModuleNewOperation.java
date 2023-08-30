@@ -14,15 +14,30 @@ import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.jdt.core.IClasspathAttribute;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.ClasspathAttribute;
+import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.scout.sdk.core.java.ISourceFolders;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.jaxws.JaxWsModuleNewHelper;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -69,10 +84,50 @@ public class JaxWsModuleNewOperation implements BiConsumer<EclipseEnvironment, E
 
       // run 'maven update' on created project
       S2eUtils.mavenUpdate(Collections.singleton(createdProject), false, true, false, true, progress.newChild(15).monitor());
+      ensureGeneratedFoldersInClasspath(createdProject);
     }
     catch (IOException | CoreException e) {
       throw new SdkException("Unable to create Jax-Ws Module.", e);
     }
+  }
+
+  protected static void ensureGeneratedFoldersInClasspath(IProject createdProject) {
+    try {
+      var jp = JavaCore.create(createdProject);
+      if (!JdtUtils.exists(jp)) {
+        return;
+      }
+      if (isGeneratedClasspathPresent(jp)) {
+        return; // already present
+      }
+
+      var origCp = jp.getRawClasspath();
+      Collection<IClasspathEntry> entries = new ArrayList<>(origCp.length + 2);
+      entries.addAll(Arrays.asList(origCp));
+      entries.add(createClasspathEntry(jp, ISourceFolders.GENERATED_WS_IMPORT_SOURCE_FOLDER));
+      entries.add(createClasspathEntry(jp, ISourceFolders.GENERATED_ANNOTATIONS_SOURCE_FOLDER));
+      jp.setRawClasspath(entries.toArray(IClasspathEntry[]::new), true, null);
+    }
+    catch (CoreException e) {
+      SdkLog.info("Unable to compute classpath of created JAX-WS module '{}'.", createdProject.getName());
+    }
+  }
+
+  protected static IClasspathEntry createClasspathEntry(IJavaElement jp, String projectRelPath) {
+    var projectPath = jp.getPath();
+    return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_SOURCE, projectPath.append(projectRelPath),
+        new IPath[0], new IPath[0], null, null, projectPath.append("target/classes"), false, null, false, new IClasspathAttribute[]{
+            new ClasspathAttribute(IClasspathAttribute.OPTIONAL, Boolean.TRUE.toString()),
+            new ClasspathAttribute("maven.pomderived", Boolean.TRUE.toString())
+        });
+  }
+
+  protected static boolean isGeneratedClasspathPresent(IJavaProject jp) throws JavaModelException {
+    return Arrays.stream(jp.getRawClasspath())
+        .map(IClasspathEntry::getPath)
+        .filter(Objects::nonNull)
+        .map(IPath::toPortableString)
+        .anyMatch(p -> p.contains(ISourceFolders.GENERATED_WS_IMPORT_SOURCE_FOLDER) || p.contains(ISourceFolders.GENERATED_ANNOTATIONS_SOURCE_FOLDER));
   }
 
   @SuppressWarnings("findbugs:NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
