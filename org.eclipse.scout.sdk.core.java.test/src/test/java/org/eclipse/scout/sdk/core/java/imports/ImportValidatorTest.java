@@ -165,7 +165,7 @@ public class ImportValidatorTest {
     assertEquals(JavaTypes._int, intName);
 
     Collection<String> importsToCreate = toStringList(iv.createImportDeclarations());
-    assertEquals(new ArrayList<String>(), importsToCreate);
+    assertEquals(new ArrayList<>(), importsToCreate);
   }
 
   @Test
