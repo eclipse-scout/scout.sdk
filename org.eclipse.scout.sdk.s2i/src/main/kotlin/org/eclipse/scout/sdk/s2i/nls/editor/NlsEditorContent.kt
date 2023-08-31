@@ -166,9 +166,10 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
     private fun createContextMenuActionGroup(): DefaultActionGroup {
         val group = DefaultActionGroup()
         group.add(TranslationEditAction(true))
-        group.add(TranslationRemoveAction(true))
         group.addSeparator()
         group.add(TranslationLocateActionGroup(true))
+        group.addSeparator()
+        group.add(TranslationRemoveAction(true))
         return group
     }
 
@@ -182,6 +183,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
         val result = DefaultActionGroup()
         result.add(TranslationEditAction())
         result.add(TranslationNewAction())
+        result.addSeparator()
         result.add(TranslationRemoveAction())
         if (translationManager.allEditableStores().count() > 1) {
             result.add(TranslationNewActionGroup())
