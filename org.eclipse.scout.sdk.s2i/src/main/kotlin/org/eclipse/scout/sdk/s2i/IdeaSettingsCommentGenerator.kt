@@ -98,7 +98,7 @@ open class IdeaSettingsCommentGenerator : IDefaultElementCommentGeneratorSpi, St
         val virtualFile = path.toVirtualFile() ?: return null
         val psiFile = computeInReadAction(project) { psiManager.findFile(virtualFile) } ?: return null
 
-        val raw = copyrightManager.getCopyrightOptions(psiFile)?.notice ?: return null
+        val raw = computeInReadAction(project) { copyrightManager.getCopyrightOptions(psiFile)?.notice } ?: return null
         return VelocityHelper.evaluate(psiFile, project, module, EntityUtil.decode(raw))
     }
 
