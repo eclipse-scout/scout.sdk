@@ -190,7 +190,6 @@
     <!-- versions to dependencies uploaded by scout -->
     <org.eclipse.m2e.core>2.0.7.20230307-1553</org.eclipse.m2e.core>
     <org.eclipse.m2e.core.ui>2.0.4.20230305-1928</org.eclipse.m2e.core.ui>
-    <org.eclipse.m2e.archetype.common>3.2.103.20230102-2253</org.eclipse.m2e.archetype.common>
     <maven.model.dependency.version>3.8.7</maven.model.dependency.version>
   </properties>
 
@@ -786,11 +785,6 @@
         <artifactId>org.eclipse.m2e.core.ui</artifactId>
         <version>${org.eclipse.m2e.core.ui}</version>
       </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.deps</groupId>
-        <artifactId>org.eclipse.m2e.archetype.common</artifactId>
-        <version>${org.eclipse.m2e.archetype.common}</version>
-      </dependency>
 
       <dependency>
         <groupId>com.ibm.icu</groupId>
@@ -850,16 +844,6 @@
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-compat</artifactId>
         <version>${maven.model.dependency.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.archetype</groupId>
-        <artifactId>archetype-catalog</artifactId>
-        <version>3.2.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.archetype</groupId>
-        <artifactId>archetype-common</artifactId>
-        <version>3.2.1</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
