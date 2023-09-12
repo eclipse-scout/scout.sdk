@@ -64,11 +64,6 @@
       <version>${org.eclipse.m2e.core}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
-      <artifactId>org.eclipse.m2e.archetype.common</artifactId>
-      <version>${org.eclipse.m2e.archetype.common}</version>
-    </dependency>
-    <dependency>
       <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.ui.console</artifactId>
       <version>${org.eclipse.ui.console}</version>

@@ -68,28 +68,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
-      <artifactId>org.eclipse.m2e.archetype.common</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.archetype</groupId>
-      <artifactId>archetype-catalog</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.archetype</groupId>
-      <artifactId>archetype-common</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-project</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -134,7 +114,6 @@
               org.eclipse.jdt.launching;bundle-version="[3.19.700,4)";visibility:=reexport,
               org.eclipse.text;bundle-version="[3.12.200,4)";visibility:=reexport,
               org.eclipse.m2e.maven.runtime;bundle-version="[3.8.701,4.0)";visibility:=reexport,
-              org.eclipse.m2e.archetype.common;bundle-version="[3.2.103,4.0)";visibility:=reexport,
               org.eclipse.m2e.core;bundle-version="[2.0.7,3)";visibility:=reexport
             </Require-Bundle>
 

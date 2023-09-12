@@ -26,14 +26,14 @@
     To update the Eclipse artifacts needed by the Maven class-loader side of Eclipse Scout SDK:
 
     1.  If needed, update the source p2 repository below
-    2.  Update versions in the parent POM: ${org.eclipse.m2e.core}, ${org.eclipse.m2e.core.ui}, ${org.eclipse.m2e.archetype.common}, ...
+    2.  Update versions in the parent POM: ${org.eclipse.m2e.core}, ${org.eclipse.m2e.core.ui}, ...
     3a. For deploying snapshots (to be used by Eclipse Scout SDK snapshots)
         - In org.eclipse.scout.sdk.s2e.releng/, execute
           mvn clean deploy
     3b. For deploying releases (to be used by Tycho releases):
         - Prerequisite: 1. you need to have GPG properly set up, see https://central.sonatype.org/publish/requirements/gpg/
                         2. if not already present: you need to add the server with id 'ossrh' into your settings.xml including the corresponding credentials (e.g. oss sonatype username/password)
-        - Make sure that ${org.eclipse.m2e.core}, ${org.eclipse.m2e.core.ui}, ${org.eclipse.m2e.archetype.common},... in the parent POM don't have a '-SNAPSHOT' suffix
+        - Make sure that ${org.eclipse.m2e.core}, ${org.eclipse.m2e.core.ui},... in the parent POM don't have a '-SNAPSHOT' suffix
         3b.1 For full deploy: In org.eclipse.scout.sdk.s2e.releng/, execute
              mvn clean deploy -P deploy-releases
         3b.2 For single additional deps: In org.eclipse.scout.sdk.s2e.releng/, execute
@@ -127,10 +127,6 @@
               <version>${org.eclipse.m2e.core}</version>
             </iu>
             <iu>
-              <id>org.eclipse.m2e.archetype.common</id>
-              <version>${org.eclipse.m2e.archetype.common}</version>
-            </iu>
-            <iu>
               <id>org.eclipse.m2e.core.ui</id>
               <version>${org.eclipse.m2e.core.ui}</version>
             </iu>
@@ -217,17 +213,6 @@
                   <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.ui.pom</pomFile>
                 </configuration>
               </execution>
-              <execution>
-                <id>deploy-m2e-archetype-common</id>
-                <goals>
-                  <goal>deploy-file</goal>
-                </goals>
-                <phase>deploy</phase>
-                <configuration>
-                  <file>${downloaded}/org.eclipse.m2e.archetype.common_${org.eclipse.m2e.archetype.common}.jar</file>
-                  <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.archetype.common.pom</pomFile>
-                </configuration>
-              </execution>
             </executions>
           </plugin>
         </plugins>
@@ -277,22 +262,6 @@
                     <arg>--pinentry-mode</arg>
                     <arg>loopback</arg>
                   </gpgArguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>deploy-m2e-archetype-common</id>
-                <goals>
-                  <goal>sign-and-deploy-file</goal>
-                </goals>
-                <phase>deploy</phase>
-                <configuration>
-                  <file>${downloaded}/org.eclipse.m2e.archetype.common_${org.eclipse.m2e.archetype.common}.jar</file>
-                  <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.archetype.common.pom</pomFile>
-                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
-                  <gpgArguments>
-            		<arg>--pinentry-mode</arg>
-            		<arg>loopback</arg>
-         		  </gpgArguments>
                 </configuration>
               </execution>
             </executions>
