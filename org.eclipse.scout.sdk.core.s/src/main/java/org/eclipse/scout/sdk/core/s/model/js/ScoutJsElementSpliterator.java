@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
-public abstract class AbstractScoutJsElementSpliterator<E extends IScoutJsElement> implements Spliterator<E> {
+public class ScoutJsElementSpliterator<E extends IScoutJsElement> implements Spliterator<E> {
 
   private final Function<ScoutJsModel, Collection<E>> m_scoutElementsProvider;
   private final Deque<INodeModule> m_dependencyDek;
@@ -32,7 +32,7 @@ public abstract class AbstractScoutJsElementSpliterator<E extends IScoutJsElemen
   private final IES6Class m_widgetClass;
   private Iterator<E> m_currentModelElementsIterator; // points to the elements of the currently active ScoutJsModel
 
-  protected AbstractScoutJsElementSpliterator(ScoutJsModel start, boolean includeStart, boolean includeDependencies, Function<ScoutJsModel, Collection<E>> scoutElementsProvider) {
+  public ScoutJsElementSpliterator(ScoutJsModel start, boolean includeStart, boolean includeDependencies, Function<ScoutJsModel, Collection<E>> scoutElementsProvider) {
     m_scoutElementsProvider = Ensure.notNull(scoutElementsProvider);
     m_widgetClass = start.widgetClass();
     if (includeDependencies) {

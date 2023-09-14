@@ -11,7 +11,13 @@ package org.eclipse.scout.sdk.core.typescript.model.api;
 
 import java.util.Optional;
 
+/**
+ * Represents all elements having an {@link IDataType} (like variables or a typeof data type).
+ */
 public interface IDataTypeOwner {
 
+  /**
+   * @return The {@link IDataType} of this element or an empty {@link Optional} if the data type cannot be computed.
+   */
   Optional<IDataType> dataType();
 }

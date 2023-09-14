@@ -17,6 +17,16 @@ import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertySubType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 
+/**
+ * Override for properties that point to Scout NLS translation keys.<br>
+ * These are properties mentioned in:
+ * 
+ * <pre>
+ * this.resolveTextKeys(['propertyName1', 'propertyName2']);
+ * or
+ * texts.resolveTextProperty(this, 'propertyName');
+ * </pre>
+ */
 public class NlsPropertyOverride extends AbstractStringArrayMethodCallOverride {
 
   public static final Pattern REGEX_NLS_KEYS = Pattern.compile(PROPERTY_TYPE_METHOD_REGEX_PREFIX + ScoutJsCoreConstants.FUNCTION_NAME_RESOLVE_TEXT_KEYS + PROPERTY_TYPE_METHOD_REGEX_SUFFIX);

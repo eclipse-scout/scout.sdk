@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 
 import org.eclipse.scout.sdk.core.s.model.js.AbstractScoutJsElementQuery;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsElementSpliterator;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 
@@ -54,8 +55,8 @@ public class ScoutJsObjectQuery extends AbstractScoutJsElementQuery<IScoutJsObje
   }
 
   @Override
-  protected ScoutJsObjectSpliterator createSpliterator() {
-    return new ScoutJsObjectSpliterator(model(), isIncludeSelf(), isIncludeDependencies());
+  protected ScoutJsElementSpliterator<IScoutJsObject> createSpliterator() {
+    return new ScoutJsElementSpliterator<>(model(), isIncludeSelf(), isIncludeDependencies(), ScoutJsModel::scoutObjects);
   }
 
   @Override

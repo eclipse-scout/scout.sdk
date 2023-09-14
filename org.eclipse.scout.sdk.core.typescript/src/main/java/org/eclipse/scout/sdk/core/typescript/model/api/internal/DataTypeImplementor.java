@@ -13,6 +13,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.AbstractNodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeAssignableEvaluator;
 import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeNameEvaluator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataTypeVisitor;
 import org.eclipse.scout.sdk.core.typescript.model.spi.DataTypeSpi;
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor;
 import org.eclipse.scout.sdk.core.util.visitor.TreeTraversals;

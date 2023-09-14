@@ -19,6 +19,9 @@ import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.api.NodeModulesProvider;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
 
+/**
+ * Main access to {@link ScoutJsModel} instances.
+ */
 public final class ScoutJsModels {
 
   @SuppressWarnings("StaticCollection")
@@ -41,12 +44,31 @@ public final class ScoutJsModels {
     removed.forEach(removedModule -> scoutJsModels.keySet().removeIf(m -> m.spi() == removedModule));
   }
 
+  /**
+   * Gets or creates a {@link ScoutJsModel} for the {@link INodeModule} at the given {@link Path}.
+   * 
+   * @param nodeModuleDir
+   *          The directory that declares the node module. Must contain a package.json file.
+   * @param context
+   *          A context in which the {@link INodeModule} should be created (see
+   *          {@link NodeModulesProvider#createNodeModule(Path, Object)}).
+   * @return The {@link ScoutJsModel} of the node module at given directory or an empty {@link Optional} if there is no
+   *         Scout JS module at the given location.
+   */
   public static Optional<ScoutJsModel> create(Path nodeModuleDir, Object context) {
     return NodeModulesProvider.createNodeModule(nodeModuleDir, context)
         .map(NodeModuleSpi::api)
         .flatMap(ScoutJsModels::create);
   }
 
+  /**
+   * Gets or creates the {@link ScoutJsModel} for the {@link INodeModule} given.
+   * 
+   * @param module
+   *          The {@link INodeModule} for which the {@link ScoutJsModel} should be computed.
+   * @return The {@link ScoutJsModel} of the node module given or an empty {@link Optional} if the node module is no
+   *         Scout JS module.
+   */
   public static Optional<ScoutJsModel> create(INodeModule module) {
     return create(module, null);
   }

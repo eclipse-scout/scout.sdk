@@ -13,6 +13,11 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+/**
+ * Evaluator to test if a datatype fulfills a given {@link Predicate}.<br>
+ * The evaluator handles all {@link IDataType#flavor() flavors} and uses the given children supplier to step into union
+ * and intersection data types. The {@link Predicate} is called for arrays and single flavors only.
+ */
 public class DataTypeFulfillsEvaluator {
 
   private final Predicate<IDataType> m_evalStrategy;
@@ -27,6 +32,13 @@ public class DataTypeFulfillsEvaluator {
     m_childrenSupplier = childrenSupplier;
   }
 
+  /**
+   * Checks if the given {@link IDataType} fulfills the {@link Predicate} of this evaluator.
+   * 
+   * @param dataType
+   *          The {@link IDataType} to check. If {@code null}, {@code false} is returned.
+   * @return {@code true} if the given {@link IDataType} fulfills the {@link Predicate} of this evaluator.
+   */
   public boolean fulfills(IDataType dataType) {
     if (dataType == null) {
       return false;

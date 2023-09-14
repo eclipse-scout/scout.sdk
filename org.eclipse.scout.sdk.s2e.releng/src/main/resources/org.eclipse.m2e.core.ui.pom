@@ -32,7 +32,7 @@
   </licenses>
 
   <scm>
-    <url>httphttps://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git</url>
+    <url>https://github.com/eclipse-scout/scout.sdk</url>
   </scm>
 
   <developers>

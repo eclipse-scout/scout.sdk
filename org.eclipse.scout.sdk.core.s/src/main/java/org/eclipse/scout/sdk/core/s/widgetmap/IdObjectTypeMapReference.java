@@ -53,7 +53,7 @@ public class IdObjectTypeMapReference {
   public IDataType reference() {
     return es6Class()
         .<IDataType> map(Function.identity())
-        .orElseGet(() -> m_idObjectTypeMap.model().createDataType(name()));
+        .orElseGet(() -> m_idObjectTypeMap.model().spi().createDataType(name()).api());
   }
 
   @Override

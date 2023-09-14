@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import org.eclipse.scout.sdk.s2i.model.typescript.util.exportType
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
 import java.util.*
+import java.util.Collections.unmodifiableMap
 
 open class IdeaJavaScriptObjectLiteral(protected val ideaModule: IdeaNodeModule, internal val jsObjectLiteral: JSObjectLiteralExpression) : AbstractNodeElementSpi<IObjectLiteral>(ideaModule), ObjectLiteralSpi {
 
@@ -41,7 +42,7 @@ open class IdeaJavaScriptObjectLiteral(protected val ideaModule: IdeaNodeModule,
     override fun createDataType(name: String) = DataTypeSpiUtils.createDataType(name, jsObjectLiteral, ideaModule)
 
     override fun properties(): Map<String, IConstantValue> = m_properties.computeIfAbsentAndGet {
-        return@computeIfAbsentAndGet Collections.unmodifiableMap(collectProperties())
+        return@computeIfAbsentAndGet unmodifiableMap(collectProperties())
     }
 
     fun collectProperties(): Map<String, IConstantValue> {

@@ -17,5 +17,9 @@ public interface ITypeOf extends IDataType, IDataTypeOwner {
   @Override
   TypeOfSpi spi();
 
+  /**
+   * @return The element this typeof operator points to. This is the element referenced after the {@code typeof}
+   *         keyword.
+   */
   Optional<IDataTypeOwner> dataTypeOwner();
 }

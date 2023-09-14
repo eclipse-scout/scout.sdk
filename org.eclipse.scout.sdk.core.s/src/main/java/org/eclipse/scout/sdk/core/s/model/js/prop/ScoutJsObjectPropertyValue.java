@@ -11,6 +11,14 @@ package org.eclipse.scout.sdk.core.s.model.js.prop;
 
 import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 
+/**
+ * An {@link IScoutJsPropertyValue} targeting an {@link IScoutJsObject}.
+ * 
+ * @param scoutJsObject
+ *          The object this value points at. Must not be {@code null}.
+ * @param property
+ *          The owner property. Must not be {@code null}.
+ */
 public record ScoutJsObjectPropertyValue(IScoutJsObject scoutJsObject, ScoutJsProperty property) implements IScoutJsPropertyValue {
   @Override
   public String name() {

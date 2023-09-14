@@ -9,9 +9,10 @@
  */
 package org.eclipse.scout.sdk.core.typescript.model.spi;
 
+import static java.util.Collections.unmodifiableCollection;
+
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeNameEvaluator;
@@ -69,7 +70,7 @@ public class SimpleCompositeDataTypeSpi extends AbstractNodeElementSpi<IDataType
 
   @Override
   public Collection<DataTypeSpi> childTypes() {
-    return Collections.unmodifiableCollection(m_componentDataTypes);
+    return unmodifiableCollection(m_componentDataTypes);
   }
 
   @Override

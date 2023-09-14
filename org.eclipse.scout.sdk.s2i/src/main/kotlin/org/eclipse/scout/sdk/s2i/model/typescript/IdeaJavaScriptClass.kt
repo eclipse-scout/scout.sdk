@@ -58,7 +58,7 @@ open class IdeaJavaScriptClass(protected val ideaModule: IdeaNodeModule, interna
 
     override fun name(): String = m_name.computeIfAbsentAndGet { javaScriptClass.name }
 
-    override fun hasModifier(modifier: Modifier) = javaScriptClass.hasModifier(modifier.toModifierType())
+    override fun hasModifier(modifier: Modifier?) = modifier != null && javaScriptClass.hasModifier(modifier.toModifierType())
 
     override fun childTypes(): Collection<DataTypeSpi> = aliasedDataType().map { listOf(it) }.orElseGet { emptyList<DataTypeSpi>() }
 

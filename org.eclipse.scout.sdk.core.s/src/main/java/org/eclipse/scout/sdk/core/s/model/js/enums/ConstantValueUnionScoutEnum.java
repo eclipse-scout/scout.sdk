@@ -15,7 +15,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
@@ -31,6 +30,13 @@ import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
+/**
+ * Enum like data type based on TypeScript unions with literals like:
+ * 
+ * <pre>
+ * orientation: 'top' | 'right' | 'bottom' | 'left';
+ * </pre>
+ */
 public class ConstantValueUnionScoutEnum implements IScoutJsEnum {
 
   private final ScoutJsModel m_scoutJsModel;
@@ -100,7 +106,7 @@ public class ConstantValueUnionScoutEnum implements IScoutJsEnum {
         .map(IConstantValue::value)
         .flatMap(Optional::stream)
         .map(Object::toString)
-        .collect(Collectors.toList());
+        .toList();
   }
 
   @Override

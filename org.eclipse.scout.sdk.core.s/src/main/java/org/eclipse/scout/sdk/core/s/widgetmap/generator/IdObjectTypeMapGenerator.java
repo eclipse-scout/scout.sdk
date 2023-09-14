@@ -60,7 +60,7 @@ public class IdObjectTypeMapGenerator extends TypeAliasGenerator<IdObjectTypeMap
     var es6Class = objectType.es6Class();
     var dataType = objectType
         .newClassName()
-        .map(objectLiteral::createDataType)
+        .map(name -> objectLiteral.spi().createDataType(name).api())
         .orElseGet(() -> {
           var typeParameterCount = es6Class.typeParameters()
               .map(ITypeParameter::defaultConstraint)
@@ -71,7 +71,7 @@ public class IdObjectTypeMapGenerator extends TypeAliasGenerator<IdObjectTypeMap
           }
           var typeArgs = Stream.generate(() -> TypeScriptTypes._any)
               .limit(typeParameterCount)
-              .map(objectLiteral::createDataType)
+              .map(any -> objectLiteral.spi().createDataType(any).api())
               .toList();
           return es6Class.containingModule().nodeElementFactory().createClassWithTypeArguments(es6Class, typeArgs);
         });
@@ -82,10 +82,20 @@ public class IdObjectTypeMapGenerator extends TypeAliasGenerator<IdObjectTypeMap
         .withDataType(dataType);
   }
 
+  /**
+   * @return The {@link IdObjectTypeMap} that will be generated.
+   */
   public Optional<IdObjectTypeMap> map() {
     return Optional.ofNullable(m_map);
   }
 
+  /**
+   * Sets the {@link IdObjectTypeMap} that will be generated as part of this {@link TypeAliasGenerator}.
+   * 
+   * @param map
+   *          The new {@link IdObjectTypeMap}.
+   * @return This generator.
+   */
   public IdObjectTypeMapGenerator withMap(IdObjectTypeMap map) {
     m_map = map;
     return this;

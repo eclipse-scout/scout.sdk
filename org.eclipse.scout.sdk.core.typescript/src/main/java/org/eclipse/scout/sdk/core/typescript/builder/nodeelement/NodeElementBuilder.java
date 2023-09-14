@@ -9,8 +9,9 @@
  */
 package org.eclipse.scout.sdk.core.typescript.builder.nodeelement;
 
+import static java.util.stream.Collectors.joining;
+
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.typescript.builder.TypeScriptSourceBuilderWrapper;
@@ -40,12 +41,12 @@ public class NodeElementBuilder<TYPE extends INodeElementBuilder<TYPE>> extends 
 
   @Override
   public TYPE appendModifiers(Collection<Modifier> modifiers) {
-    if (modifiers != null && !modifiers.isEmpty()) {
-      append(modifiers.stream()
-          .map(Modifier::keyword)
-          .collect(Collectors.joining(" ")))
-              .space();
+    if (modifiers == null || modifiers.isEmpty()) {
+      return thisInstance();
     }
-    return thisInstance();
+    var modifierKeywords = modifiers.stream()
+        .map(Modifier::keyword)
+        .collect(joining(" "));
+    return append(modifierKeywords).space();
   }
 }

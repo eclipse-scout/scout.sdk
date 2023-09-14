@@ -25,6 +25,30 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IVariable;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
+/**
+ * Enum based on a variable initialized with an object literal. Example as nested field:
+ * 
+ * <pre>
+ * class DeclaringClass {
+ *   static MyEnum = {
+ *       a: 'first',
+ *       b: 'second',
+ *       c: 'third'
+ *   };
+ * }
+ * </pre>
+ * 
+ * or as top level variable:
+ * 
+ * <pre>
+ * const RoundingMode = {
+ *   UP: 'UP',
+ *   DOWN: 'DOWN',
+ *   CEILING: 'CEILING',
+ *   FLOOR: 'FLOOR'
+ * };
+ * </pre>
+ */
 public class VariableScoutEnum implements IScoutJsEnum {
 
   private final ScoutJsModel m_scoutJsModel;
@@ -76,9 +100,10 @@ public class VariableScoutEnum implements IScoutJsEnum {
 
   @Override
   public String referenceName() {
-    return IScoutJsElement.toQualifiedName(Optional.ofNullable(declaringClass())
+    var namespace = Optional.ofNullable(declaringClass())
         .map(IES6Class::name)
-        .orElse(null), name());
+        .orElse(null);
+    return IScoutJsElement.toQualifiedName(namespace, name());
   }
 
   @Override

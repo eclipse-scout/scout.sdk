@@ -29,6 +29,7 @@ import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.s.model.js.enums.ConstantValueUnionScoutEnum;
 import org.eclipse.scout.sdk.core.s.model.js.enums.IScoutJsEnum;
+import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
 import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeAssignableEvaluator;
 import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeNameEvaluator;
@@ -40,6 +41,9 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
+/**
+ * Specifies the data type of {@link ScoutJsProperty}. Use {@link ScoutJsProperty#type()} to access it.
+ */
 public class ScoutJsPropertyType {
 
   @SuppressWarnings("StaticCollection")
@@ -83,22 +87,51 @@ public class ScoutJsPropertyType {
     return toStringBuilder.toString();
   }
 
+  /**
+   * @return The {@link ScoutJsPropertySubType} of this type.
+   * @see #dataType()
+   */
   public ScoutJsPropertySubType subType() {
     return m_subType;
   }
 
+  /**
+   * @return The {@link IDataType} of this type. Maybe an empty {@link Optional} if the datatype cannot be detected.
+   * @see #subType()
+   */
   public Optional<IDataType> dataType() {
     return Optional.ofNullable(m_dataType);
   }
 
+  /**
+   * @return The owning {@link ScoutJsProperty} this type belongs to.
+   */
   public ScoutJsProperty declaringProperty() {
     return m_declaringProperty;
   }
 
+  /**
+   * @return {@code true} if this data type is a reference to a {@link IES6Class}. E.g. to a LookupCall.
+   * @see #isChildModelSupported()
+   */
   public boolean isClassType() {
     return m_dataType != null && m_dataType.visit((childType, l, i) -> childType instanceof IES6Class ? TreeVisitResult.TERMINATE : TreeVisitResult.CONTINUE) == TreeVisitResult.TERMINATE;
   }
 
+  /**
+   * Checks if this data type supports the declaration of a child model. Example of a table child model:
+   * 
+   * <pre>
+   * id: 'MyTableField',
+   * table: {
+   *   id: 'MyTable',
+   *   autoResizeColumns: true
+   * },
+   * columns: []
+   * </pre>
+   * 
+   * @return {@code true} if this data type supports the declaration as child model.
+   */
   public boolean isChildModelSupported() {
     return m_isModelSupported.computeIfAbsentAndGet(() -> {
       if (m_dataType == null) {
@@ -127,12 +160,19 @@ public class ScoutJsPropertyType {
     return TreeVisitResult.CONTINUE;
   }
 
+  /**
+   * @return A display name that identifies this data type which can be e.g. shown to an end user.
+   */
   public Optional<String> displayName() {
     return dataType()
         .flatMap(ScoutJsCoreDataTypesUnwrapVisitor::unwrap)
         .map(d -> new DataTypeNameEvaluator(ScoutJsCoreDataTypesUnwrapVisitor::unwrappedChildren).eval(d));
   }
 
+  /**
+   * @return All {@link ScoutJsProperty properties} that this data type has (including all supers). Only contains a
+   *         value if this {@link ScoutJsPropertyType} points to a {@link IScoutJsObject}.
+   */
   public Stream<ScoutJsProperty> possibleChildProperties() {
     return m_childProperties
         .computeIfAbsentAndGet(() -> collectPossibleProperties(m_dataType, declaringProperty().scoutJsObject().scoutJsModel()).values())
@@ -158,7 +198,7 @@ public class ScoutJsPropertyType {
             .withDeclaringClass(clazz)
             .withIncludeDependencies(true)
             .first().stream()
-            .flatMap(o -> o.findProperties().withSuperClasses(true).stream())
+            .flatMap(o -> o.findProperties().withSupers(true).stream())
             .forEach(p -> collector.put(p.name(), p));
       }
       return TreeVisitResult.CONTINUE;
@@ -179,6 +219,15 @@ public class ScoutJsPropertyType {
         .collect(Collectors.toMap(ScoutJsProperty::name, Function.identity(), Ensure::failOnDuplicates, LinkedHashMap::new));
   }
 
+  /**
+   * Checks if this data type is assignable from the given {@link IDataType}. In other words: Checks if the given
+   * {@link IDataType} could be assigned to a variable with this data type.
+   * 
+   * @param child
+   *          The {@link IDataType} to check if it can be assigned to this data type. Must not be {@code null}.
+   * @return {@code true} if the given {@link IDataType} can be assigned to this {@link #dataType() data type}.
+   * @see DataTypeAssignableEvaluator
+   */
   public boolean isAssignableFrom(IDataType child) {
     return dataType()
         .map(dt -> dt.flavor() == DataTypeFlavor.Array ? dt.childTypes().findAny().orElse(null) : dt)
@@ -187,10 +236,19 @@ public class ScoutJsPropertyType {
         .isPresent();
   }
 
+  /**
+   * @return {@code true} if this data type is an {@link IScoutJsEnum}.
+   * @see #scoutJsEnums()
+   */
   public boolean isEnumLike() {
     return !getScoutJsEnums().isEmpty();
   }
 
+  /**
+   * @return Gets the {@link IScoutJsEnum} this data type points to. Use {@link #isEnumLike()} to check if enums are
+   *         available.
+   * @see #isEnumLike()
+   */
   public Stream<IScoutJsEnum> scoutJsEnums() {
     return getScoutJsEnums().stream();
   }
@@ -210,14 +268,24 @@ public class ScoutJsPropertyType {
         .collect(toCollection(LinkedHashSet::new)));
   }
 
+  /**
+   * @return {@code true} if this data type is an array (and therefore the {@link #declaringProperty()} contains an
+   *         array of this {@link #dataType()}).
+   */
   public boolean isArray() {
     return m_dataType != null && m_dataType.flavor() == DataTypeFlavor.Array;
   }
 
+  /**
+   * @return {@code true} if this is a boolean data type.
+   */
   public boolean isBoolean() {
     return TypeScriptTypes._boolean.equals(dataTypeName());
   }
 
+  /**
+   * @return {@code true} if this is a string property.
+   */
   public boolean isString() {
     return TypeScriptTypes._string.equals(dataTypeName());
   }

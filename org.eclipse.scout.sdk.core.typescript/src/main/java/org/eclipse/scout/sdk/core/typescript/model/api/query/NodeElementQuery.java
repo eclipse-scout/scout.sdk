@@ -13,10 +13,14 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
+import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
+/**
+ * By default, returns all {@link INodeElement}s that exist in a module without the elements of dependencies.
+ */
 public class NodeElementQuery extends AbstractQuery<INodeElement> {
 
   private final NodeModuleSpi m_moduleSpi;
@@ -27,6 +31,14 @@ public class NodeElementQuery extends AbstractQuery<INodeElement> {
     m_moduleSpi = Ensure.notNull(module);
   }
 
+  /**
+   * Limit the {@link INodeElement elements} to the ones that are exported from the {@link INodeModule} with given name.
+   * Default is not filtering by export name.
+   * 
+   * @param exportName
+   *          The export name or {@code null} for not filtering by export name.
+   * @return This query.
+   */
   public NodeElementQuery withExportName(String exportName) {
     m_exportName = exportName;
     return this;
@@ -36,6 +48,14 @@ public class NodeElementQuery extends AbstractQuery<INodeElement> {
     return m_exportName;
   }
 
+  /**
+   * Search for {@link INodeElement elements} in the start {@link INodeModule} only or include all its runtime
+   * dependencies recursively. Default is {@code false}.
+   * 
+   * @param recursive
+   *          {@code true} for recursive search, {@code false} to only search in the start {@link INodeModule}.
+   * @return This query.
+   */
   public NodeElementQuery withRecursive(boolean recursive) {
     m_recursive = recursive;
     return this;

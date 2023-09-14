@@ -9,7 +9,16 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js.prop;
 
+/**
+ * Possible subtypes
+ */
 public enum ScoutJsPropertySubType {
+  /**
+   * Used for properties of type 'string' which point to Scout NLS text keys.
+   */
   TEXT_KEY,
+  /**
+   * No subtype
+   */
   NOTHING
 }

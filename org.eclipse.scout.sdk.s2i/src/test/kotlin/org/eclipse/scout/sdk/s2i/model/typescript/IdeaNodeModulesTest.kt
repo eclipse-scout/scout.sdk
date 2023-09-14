@@ -69,8 +69,8 @@ class IdeaNodeModulesTest : AbstractModelTest("javascript/moduleWithExternalImpo
         assertEquals(4, literal.find("/fields/1/subElements/1/numberITem").orElseThrow().convertTo(Int::class.java).orElseThrow())
 
         // with escaped keys
-        assertEquals("keyWithTilde", literal.find("/fields/1/m~0n").orElseThrow().asString().orElseThrow()) // ~0 = /
-        assertEquals("keyWithSlash", literal.find("/fields/1/a~1b").orElseThrow().asString().orElseThrow()) // ~1 = ~
+        assertEquals("keyWithTilde", literal.find("/fields/1/m~0n").orElseThrow().asString().orElseThrow()) // ~0 = ~
+        assertEquals("keyWithSlash", literal.find("/fields/1/a~1b").orElseThrow().asString().orElseThrow()) // ~1 = /
 
         // root element
         assertSame(literal, literal.find("").orElseThrow().asObjectLiteral().orElseThrow())

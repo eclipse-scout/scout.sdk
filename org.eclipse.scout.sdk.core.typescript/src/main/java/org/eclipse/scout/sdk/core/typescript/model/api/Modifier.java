@@ -11,6 +11,9 @@ package org.eclipse.scout.sdk.core.typescript.model.api;
 
 import org.eclipse.scout.sdk.core.util.Ensure;
 
+/**
+ * JavaScript and TypeScript modifiers with the corresponding source keyword.
+ */
 public enum Modifier {
   DYNAMIC("dynamic"),
   NATIVE("native"),
@@ -37,6 +40,9 @@ public enum Modifier {
     this.keyword = Ensure.notNull(keyword);
   }
 
+  /**
+   * @return The keyword of this modifier as it occurs in the source code.
+   */
   public String keyword() {
     return keyword;
   }

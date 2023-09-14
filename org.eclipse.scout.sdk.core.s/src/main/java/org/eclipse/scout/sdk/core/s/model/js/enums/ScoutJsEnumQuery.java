@@ -12,9 +12,14 @@ package org.eclipse.scout.sdk.core.s.model.js.enums;
 import java.util.function.Predicate;
 
 import org.eclipse.scout.sdk.core.s.model.js.AbstractScoutJsElementQuery;
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsElementSpliterator;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 
+/**
+ * Query to retrieve {@link IScoutJsEnum}s of a {@link ScoutJsModel}.<br>
+ * By default, this query returns all {@link IScoutJsEnum}s directly declared in the {@link ScoutJsModel}.
+ */
 public class ScoutJsEnumQuery extends AbstractScoutJsElementQuery<IScoutJsEnum, ScoutJsEnumQuery> {
 
   private IDataType m_fulfillDataType;
@@ -23,6 +28,15 @@ public class ScoutJsEnumQuery extends AbstractScoutJsElementQuery<IScoutJsEnum, 
     super(model);
   }
 
+  /**
+   * Limits the {@link IScoutJsEnum enums} returned to the ones that could be assigned to the given {@link IDataType}
+   * (see {@link IScoutJsEnum#fulfills(IDataType)}).
+   * 
+   * @param dataType
+   *          The {@link IDataType} to which it should be compatible or {@code null} for no filtering by
+   *          {@link IDataType}.
+   * @return This query.
+   */
   public ScoutJsEnumQuery withFulfillsDataType(IDataType dataType) {
     m_fulfillDataType = dataType;
     return this;
@@ -33,8 +47,8 @@ public class ScoutJsEnumQuery extends AbstractScoutJsElementQuery<IScoutJsEnum, 
   }
 
   @Override
-  protected ScoutJsEnumSpliterator createSpliterator() {
-    return new ScoutJsEnumSpliterator(model(), isIncludeSelf(), isIncludeDependencies());
+  protected ScoutJsElementSpliterator<IScoutJsEnum> createSpliterator() {
+    return new ScoutJsElementSpliterator<>(model(), isIncludeSelf(), isIncludeDependencies(), ScoutJsModel::scoutEnums);
   }
 
   @Override
@@ -43,15 +57,8 @@ public class ScoutJsEnumQuery extends AbstractScoutJsElementQuery<IScoutJsEnum, 
 
     var fulfillDataType = fulfillDataType();
     if (fulfillDataType != null) {
-      Predicate<IScoutJsEnum> fulfillDataTypeFilter = e -> e.fulfills(fulfillDataType);
-      if (result == null) {
-        result = fulfillDataTypeFilter;
-      }
-      else {
-        result = result.and(fulfillDataTypeFilter);
-      }
+      result = AbstractScoutJsElementQuery.appendOrCreateFilter(result, e -> e.fulfills(fulfillDataType));
     }
-
     return result;
   }
 }

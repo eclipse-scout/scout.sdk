@@ -17,12 +17,17 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
 
+/**
+ * Query that finds {@link ScoutJsProperty properties} of a {@link IScoutJsObject}. By default, all
+ * {@link ScoutJsProperty properties} directly declared in the {@link IScoutJsObject} are returned (ignoring all
+ * supers).
+ */
 public class ScoutJsPropertyQuery extends AbstractQuery<ScoutJsProperty> {
 
   private final IScoutJsObject m_object;
 
   private String m_name;
-  private boolean m_includeSuperClasses;
+  private boolean m_includeSupers;
 
   public ScoutJsPropertyQuery(IScoutJsObject object) {
     m_object = object;
@@ -32,6 +37,13 @@ public class ScoutJsPropertyQuery extends AbstractQuery<ScoutJsProperty> {
     return m_object;
   }
 
+  /**
+   * Limits the resulting properties to the one having the name given.
+   * 
+   * @param name
+   *          The {@link ScoutJsProperty#name() name} of the property or {@code null} for no filtering by name.
+   * @return This query.
+   */
   public ScoutJsPropertyQuery withName(String name) {
     m_name = name;
     return this;
@@ -41,13 +53,20 @@ public class ScoutJsPropertyQuery extends AbstractQuery<ScoutJsProperty> {
     return m_name;
   }
 
-  public ScoutJsPropertyQuery withSuperClasses(boolean includeSuperClasses) {
-    m_includeSuperClasses = includeSuperClasses;
+  /**
+   * Specifies if {@link ScoutJsProperty properties} from super classes or super interfaces should be returned as well.
+   * 
+   * @param includeSupers
+   *          To include all properties of all super {@link IScoutJsObject objects} as well.
+   * @return This query.
+   */
+  public ScoutJsPropertyQuery withSupers(boolean includeSupers) {
+    m_includeSupers = includeSupers;
     return this;
   }
 
-  protected boolean isIncludeSuperClasses() {
-    return m_includeSuperClasses;
+  protected boolean isIncludeSupers() {
+    return m_includeSupers;
   }
 
   @Override
@@ -76,7 +95,7 @@ public class ScoutJsPropertyQuery extends AbstractQuery<ScoutJsProperty> {
 
   protected void updateOrAddSuperPropertyIfNecessary(Map<String, ScoutJsProperty> properties, ScoutJsProperty inheritedProperty) {
     BiFunction<String, ScoutJsProperty, ScoutJsProperty> chooseProperty = (name, lower) -> ScoutJsProperty.choose(inheritedProperty, lower);
-    if (isIncludeSuperClasses()) {
+    if (isIncludeSupers()) {
       // with super classes is requested: choose the better one if existing, add if not yet part of the result
       properties.compute(inheritedProperty.name(), chooseProperty);
     }

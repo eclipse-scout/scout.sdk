@@ -197,7 +197,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
             setOf(
                 ScoutJsCoreConstants.PROPERTY_NAME_ID, ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE, VISIBLE_PROPERTY_NAME, NAME_PROPERTY_NAME, FIELDS_PROPERTY_NAME, CHILD_PROPERTY_NAME,
                 STATE_PROPERTY_NAME, LABEL_PROPERTY_NAME, ONLY_HERE_PROPERTY_NAME, MAX_LENGTH_PROPERTY_NAME, FIELD_STYLE_PROPERTY_NAME, SELECTED_TAB_PROPERTY_NAME
-            ), stringField.findProperties().withSuperClasses(true).stream().map { it.name() }.collect(toSet())
+            ), stringField.findProperties().withSupers(true).stream().map { it.name() }.collect(toSet())
         )
 
         // validate model of StringField.FieldStyle enum
@@ -233,7 +233,7 @@ abstract class AbstractJsModelCompletionContributorTest : JavaCodeInsightFixture
                 STATE_PROPERTY_NAME, LABEL_PROPERTY_NAME, ONLY_HERE_PROPERTY_NAME, MAX_LENGTH_PROPERTY_NAME, MIN_LENGTH_PROPERTY_NAME, FIELD_STYLE_PROPERTY_NAME, SELECTED_TAB_PROPERTY_NAME
             ), stringFieldEx
                 .findProperties()
-                .withSuperClasses(true)
+                .withSupers(true)
                 .stream()
                 .map { it.name() }
                 .collect(toSet())

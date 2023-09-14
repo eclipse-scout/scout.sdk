@@ -111,7 +111,7 @@ public class WidgetMapCreateOperation {
 
   protected void buildDeclarations(Map<String, String> declarationInfo, Collection<String> expectedDeclarations) {
     var declarationGenerators = declarationInfo.entrySet().stream()
-        .map(e -> createFieldDeclaration(e.getKey(), literal().createDataType(e.getValue())));
+        .map(e -> createFieldDeclaration(e.getKey(), literal().spi().createDataType(e.getValue()).api()));
     var declarationSourceAndImports = executeGenerators(declarationGenerators);
     setDeclarationSources(declarationSourceAndImports.getKey());
     setImportNamesForDeclarations(declarationSourceAndImports.getValue());
@@ -163,12 +163,13 @@ public class WidgetMapCreateOperation {
     }
 
     // try to detect based on model name
-    return modelName().endsWith(ScoutJsCoreConstants.CLASS_NAME_PAGE)
-        || modelName().endsWith(ScoutJsCoreConstants.CLASS_NAME_PAGE + ScoutJsCoreConstants.MODEL_SUFFIX)
-        || modelName().contains("PageWithTable")
-        || modelName().contains("PageWithNodes")
-        || modelName().endsWith("TablePage" + ScoutJsCoreConstants.MODEL_SUFFIX)
-        || modelName().endsWith("NodePage" + ScoutJsCoreConstants.MODEL_SUFFIX);
+    var modelName = modelName();
+    return modelName.endsWith(ScoutJsCoreConstants.CLASS_NAME_PAGE)
+        || modelName.endsWith(ScoutJsCoreConstants.CLASS_NAME_PAGE + ScoutJsCoreConstants.MODEL_SUFFIX)
+        || modelName.contains("PageWithTable")
+        || modelName.contains("PageWithNodes")
+        || modelName.endsWith("TablePage" + ScoutJsCoreConstants.MODEL_SUFFIX)
+        || modelName.endsWith("NodePage" + ScoutJsCoreConstants.MODEL_SUFFIX);
   }
 
   public IObjectLiteral literal() {

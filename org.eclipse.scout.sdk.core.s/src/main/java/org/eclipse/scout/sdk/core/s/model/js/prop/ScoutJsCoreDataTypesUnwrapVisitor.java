@@ -15,11 +15,16 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataTypeVisitor;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
-import org.eclipse.scout.sdk.core.typescript.model.api.internal.IDataTypeVisitor;
 import org.eclipse.scout.sdk.core.util.visitor.IBreadthFirstVisitor;
 import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult;
 
+/**
+ * An {@link IDataTypeVisitor} that steps into known @eclipse-scout/core data types (e.g. "ObjectOrChildModel",
+ * "ChildModelOf", "ObjectOrModel", "FullModelOf", "ModelOf", "InitModelOf", "StatusOrModel" or "LookupCallOrModel").
+ * For such types it directly steps into the targeted original type instead.
+ */
 public class ScoutJsCoreDataTypesUnwrapVisitor implements IDataTypeVisitor {
 
   private final IBreadthFirstVisitor<IDataType> m_wrappedVisitor;

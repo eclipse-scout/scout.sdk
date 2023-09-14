@@ -19,6 +19,10 @@ import org.eclipse.scout.sdk.core.typescript.model.api.spliterator.PackageJsonDe
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
+/**
+ * By default, this query returns all {@link INodeModule modules} which are declared in the "dependencies" attribute of
+ * the package.json of a {@link INodeModule} (direct runtime dependencies).
+ */
 public class DependencyQuery extends AbstractQuery<INodeModule> {
 
   private final NodeModuleSpi m_rootModule;
@@ -34,8 +38,8 @@ public class DependencyQuery extends AbstractQuery<INodeModule> {
    * Limits the {@link INodeModule} to the one with the given name.
    *
    * @param name
-   *          The name to search. Default is not filtering on name.
-   * @return this
+   *          The name to search. Default is not filtering by name.
+   * @return This query.
    */
   public DependencyQuery withName(String name) {
     m_name = name;
@@ -46,6 +50,14 @@ public class DependencyQuery extends AbstractQuery<INodeModule> {
     return m_name;
   }
 
+  /**
+   * Specifies if the start {@link INodeModule} itself should be part of the resulting dependencies or not. Default is
+   * {@code false}.
+   * 
+   * @param withSelf
+   *          {@code true} if the start module should be included.
+   * @return This query.
+   */
   public DependencyQuery withSelf(boolean withSelf) {
     m_withSelf = withSelf;
     return this;
@@ -55,6 +67,13 @@ public class DependencyQuery extends AbstractQuery<INodeModule> {
     return m_withSelf;
   }
 
+  /**
+   * Specifies if only direct dependencies or all dependencies recursively should be returned. Default is {@code false}.
+   * 
+   * @param recursive
+   *          {@code true} for recursive dependencies, {@code false} if only direct dependencies should be returned.
+   * @return This query.
+   */
   public DependencyQuery withRecursive(boolean recursive) {
     m_recursive = recursive;
     return this;

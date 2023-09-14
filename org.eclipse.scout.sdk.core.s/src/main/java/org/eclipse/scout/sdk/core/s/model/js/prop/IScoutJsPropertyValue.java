@@ -9,8 +9,20 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js.prop;
 
+import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
+
+/**
+ * A computed possible value for a {@link ScoutJsProperty}. Use
+ * {@link ScoutJsProperty#computePossibleValues(ScoutJsModel)} to get instances.
+ */
 public interface IScoutJsPropertyValue {
+  /**
+   * @return The value name.
+   */
   String name();
 
+  /**
+   * @return The {@link ScoutJsProperty} to which this value matches.
+   */
   ScoutJsProperty property();
 }

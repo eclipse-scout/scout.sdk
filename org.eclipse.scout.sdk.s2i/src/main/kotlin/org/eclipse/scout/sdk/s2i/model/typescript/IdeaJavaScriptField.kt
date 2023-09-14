@@ -32,7 +32,7 @@ open class IdeaJavaScriptField(protected val ideaModule: IdeaNodeModule, interna
 
     override fun name() = javaScriptField.name
 
-    override fun hasModifier(modifier: Modifier) = javaScriptField.hasModifier(modifier.toModifierType())
+    override fun hasModifier(modifier: Modifier?) = modifier != null && javaScriptField.hasModifier(modifier.toModifierType())
 
     override fun isOptional(): Boolean = (javaScriptField as? JSOptionalOwner)?.isOptional ?: false
 

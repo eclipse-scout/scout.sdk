@@ -18,9 +18,19 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
-import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
+/**
+ * Enums based on TypeScript enum keyword like:
+ * 
+ * <pre>
+ * enum LogLevel {
+ *   INFO = 'info',
+ *   WARN = 'warn',
+ *   ERROR = 'error'
+ * }
+ * </pre>
+ */
 public class ES6ClassEnumScoutEnum implements IScoutJsEnum {
 
   private final ScoutJsModel m_scoutJsModel;
@@ -29,7 +39,7 @@ public class ES6ClassEnumScoutEnum implements IScoutJsEnum {
 
   protected ES6ClassEnumScoutEnum(ScoutJsModel scoutJsModel, IES6Class clazz) {
     m_scoutJsModel = scoutJsModel;
-    m_class = Ensure.notNull(clazz);
+    m_class = clazz;
     m_constants = new FinalValue<>();
   }
 

@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.typescript.builder.imports;
 
+import static java.util.Collections.unmodifiableSet;
+
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,7 +25,7 @@ import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 
 public class ES6ImportCollector implements IES6ImportCollector {
-  private final Map<String, ES6ImportDescriptor> m_imports;
+  private final Map<String /* alias or data type name */, ES6ImportDescriptor> m_imports;
   private final Map<IDataType, ES6ImportDescriptor> m_descriptors;
 
   public ES6ImportCollector() {
@@ -32,9 +34,9 @@ public class ES6ImportCollector implements IES6ImportCollector {
   }
 
   @Override
-  public ES6ImportDescriptor add(String usedName, IDataType element, String alias) {
+  public ES6ImportDescriptor add(IDataType element, String alias) {
     var d = new ES6ImportDescriptor(Ensure.notNull(element), alias);
-    var previous = m_imports.put(Ensure.notBlank(usedName), d);
+    var previous = m_imports.put(d.nameForSource(), d);
     Ensure.isTrue(previous == null);
     m_descriptors.put(element, d);
     return d;
@@ -47,7 +49,7 @@ public class ES6ImportCollector implements IES6ImportCollector {
 
   @Override
   public Set<String> usedNames() {
-    return m_imports.keySet();
+    return unmodifiableSet(m_imports.keySet());
   }
 
   @Override
@@ -59,7 +61,7 @@ public class ES6ImportCollector implements IES6ImportCollector {
 
   @Override
   public void registerReservedName(String name) {
-    m_imports.put(name, null);
+    m_imports.put(Ensure.notNull(name), null);
   }
 
   public static String buildRelativeImportPath(Path importer, Path imported) {

@@ -13,5 +13,8 @@ import org.eclipse.scout.sdk.core.builder.IBuilderContext;
 import org.eclipse.scout.sdk.core.typescript.builder.imports.IES6ImportValidator;
 
 public interface ITypeScriptBuilderContext extends IBuilderContext {
+  /**
+   * @return The {@link IES6ImportValidator} of this {@link IBuilderContext}. Is never {@code null}.
+   */
   IES6ImportValidator importValidator();
 }

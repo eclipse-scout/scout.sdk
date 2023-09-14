@@ -9,6 +9,14 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js.prop;
 
+/**
+ * {@link Boolean} value for a {@link ScoutJsProperty} of type {@link ScoutJsPropertyType#isBoolean()}.
+ * 
+ * @param value
+ *          The boolean value
+ * @param property
+ *          The owner property
+ */
 public record ScoutJsBooleanPropertyValue(boolean value, ScoutJsProperty property) implements IScoutJsPropertyValue {
   @Override
   public String name() {

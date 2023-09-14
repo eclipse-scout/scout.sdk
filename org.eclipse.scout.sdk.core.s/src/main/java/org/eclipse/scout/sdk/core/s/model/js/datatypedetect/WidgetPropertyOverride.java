@@ -16,6 +16,14 @@ import org.eclipse.scout.sdk.core.s.model.js.objects.JavaScriptScoutObject;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
+/**
+ * Override for properties that are of type Widget.<br>
+ * These are properties mentioned in:
+ *
+ * <pre>
+ * this._addWidgetProperties(['fields', 'children', 'child', 'selectedTab']);
+ * </pre>
+ */
 public class WidgetPropertyOverride extends AbstractStringArrayMethodCallOverride {
 
   public static final Pattern REGEX_WIDGET_PROPERTY_TYPE = Pattern.compile(PROPERTY_TYPE_METHOD_REGEX_PREFIX + ScoutJsCoreConstants.FUNCTION_NAME_ADD_WIDGET_PROPERTIES + PROPERTY_TYPE_METHOD_REGEX_SUFFIX);

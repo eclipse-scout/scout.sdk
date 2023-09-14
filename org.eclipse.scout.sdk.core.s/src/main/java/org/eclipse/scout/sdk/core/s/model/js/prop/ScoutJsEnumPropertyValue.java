@@ -11,9 +11,19 @@ package org.eclipse.scout.sdk.core.s.model.js.prop;
 
 import org.eclipse.scout.sdk.core.s.model.js.enums.IScoutJsEnum;
 
+/**
+ * {@link IScoutJsPropertyValue} for an {@link IScoutJsEnum} element.
+ * 
+ * @param scoutJsEnum
+ *          The owning {@link IScoutJsEnum}. Must not be {@code null}.
+ * @param enumConstant
+ *          The constant element name. Must not be {@code null}.
+ * @param property
+ *          The owner {@link ScoutJsProperty}. Must not be {@code null}.
+ */
 public record ScoutJsEnumPropertyValue(IScoutJsEnum scoutJsEnum, String enumConstant, ScoutJsProperty property) implements IScoutJsPropertyValue {
   @Override
   public String name() {
-    return scoutJsEnum.referenceName() + "." + enumConstant;
+    return scoutJsEnum.referenceName() + '.' + enumConstant;
   }
 }

@@ -37,12 +37,12 @@ public class NodeElementFactoryImplementor implements INodeElementFactory {
 
   @Override
   public IField createSyntheticField(String name, IDataType dataType, IES6Class declaringClass) {
-    return m_spi.createSyntheticField(name, Ensure.notNull(dataType).spi(), Ensure.notNull(declaringClass).spi()).api();
+    return m_spi.createSyntheticField(name, dataType.spi(), declaringClass.spi()).api();
   }
 
   @Override
   public IDataType createObjectLiteralDataType(String name, IObjectLiteral objectLiteral) {
-    return m_spi.createObjectLiteralDataType(name, Ensure.notNull(objectLiteral).spi()).api();
+    return m_spi.createObjectLiteralDataType(name, objectLiteral.spi()).api();
   }
 
   @Override
@@ -54,6 +54,7 @@ public class NodeElementFactoryImplementor implements INodeElementFactory {
   public IDataType createUnionDataType(Collection<IDataType> componentDataTypes) {
     return Optional.ofNullable(componentDataTypes)
         .map(types -> types.stream()
+            .filter(Objects::nonNull)
             .map(IDataType::spi)
             .collect(toCollection(LinkedHashSet::new)))
         .map(m_spi::createUnionDataType)
@@ -65,6 +66,7 @@ public class NodeElementFactoryImplementor implements INodeElementFactory {
   public IDataType createIntersectionDataType(Collection<IDataType> componentDataTypes) {
     return Optional.ofNullable(componentDataTypes)
         .map(types -> types.stream()
+            .filter(Objects::nonNull)
             .map(IDataType::spi)
             .collect(toCollection(LinkedHashSet::new)))
         .map(m_spi::createIntersectionDataType)
@@ -74,12 +76,15 @@ public class NodeElementFactoryImplementor implements INodeElementFactory {
 
   @Override
   public IDataType createConstantValueDataType(IConstantValue constantValue) {
-    return m_spi.createConstantValueDataType(Ensure.notNull(constantValue)).api();
+    return m_spi.createConstantValueDataType(constantValue).api();
   }
 
   @Override
   public IES6Class createClassWithTypeArguments(IES6Class clazz, List<IDataType> arguments) {
-    var args = arguments.stream().filter(Objects::nonNull).map(IDataType::spi).toList();
+    var args = arguments.stream()
+        .filter(Objects::nonNull)
+        .map(IDataType::spi)
+        .toList();
     return m_spi.createClassWithTypeArgumentsDataType(clazz.spi(), args).api();
   }
 }

@@ -24,8 +24,20 @@ import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.ITypeOf;
 import org.eclipse.scout.sdk.core.typescript.model.api.IVariable;
-import org.eclipse.scout.sdk.core.util.Ensure;
 
+/**
+ * Enum based on a TypeScript type alias. E.g.:
+ * 
+ * <pre>
+ * type DisplayHint = EnumObject&lt;typeof Form.DisplayHint&gt;
+ * </pre>
+ * 
+ * or
+ * 
+ * <pre>
+ * type EnumLike = 'A' | 'B' | 'C';
+ * </pre>
+ */
 public class ES6ClassTypeAliasScoutEnum implements IScoutJsEnum {
 
   private final ScoutJsModel m_scoutJsModel;
@@ -34,8 +46,8 @@ public class ES6ClassTypeAliasScoutEnum implements IScoutJsEnum {
 
   protected ES6ClassTypeAliasScoutEnum(ScoutJsModel scoutJsModel, IES6Class clazz, IScoutJsEnum wrappedEnum) {
     m_scoutJsModel = scoutJsModel;
-    m_class = Ensure.notNull(clazz);
-    m_wrappedEnum = Ensure.notNull(wrappedEnum);
+    m_class = clazz;
+    m_wrappedEnum = wrappedEnum;
   }
 
   public static Optional<IScoutJsEnum> create(ScoutJsModel owner, IES6Class clazz) {
@@ -45,8 +57,7 @@ public class ES6ClassTypeAliasScoutEnum implements IScoutJsEnum {
     var aliasedType = Optional.of(clazz)
         .flatMap(IES6Class::aliasedDataType);
 
-    if (aliasedType.map(dataType -> ScoutJsCoreConstants.CLASS_NAME_ENUM_OBJECT.equals(dataType.name()))
-        .orElse(false)) {
+    if (aliasedType.filter(dataType -> ScoutJsCoreConstants.CLASS_NAME_ENUM_OBJECT.equals(dataType.name())).isPresent()) {
       return aliasedType.stream()
           .flatMap(IDataType::typeArguments)
           .findFirst()

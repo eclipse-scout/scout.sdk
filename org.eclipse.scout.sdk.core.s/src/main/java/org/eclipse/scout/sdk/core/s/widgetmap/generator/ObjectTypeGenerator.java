@@ -55,7 +55,7 @@ public class ObjectTypeGenerator extends TypeGenerator<ObjectTypeGenerator> {
     return FieldGenerator.create()
         .withElementName(fieldName)
         .withModifier(Modifier.DECLARE)
-        .withDataType(objectLiteral.createDataType(name));
+        .withDataType(objectLiteral.spi().createDataType(name).api());
   }
 
   protected static IFieldGenerator<?> createWidgetMapField(IdObjectTypeMap map) {

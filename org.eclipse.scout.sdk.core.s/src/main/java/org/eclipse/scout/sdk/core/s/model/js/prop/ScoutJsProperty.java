@@ -15,12 +15,15 @@ import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel;
 import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.PropertyDataTypeDetector;
 import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
-import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
 
+/**
+ * Represents a property of an {@link IScoutJsObject}. Use {@link IScoutJsObject#properties()} or
+ * {@link IScoutJsObject#findProperties()} to access properties of such an object.
+ */
 public class ScoutJsProperty {
 
   private final FinalValue<ScoutJsPropertyType> m_type;
@@ -28,7 +31,7 @@ public class ScoutJsProperty {
   private final IScoutJsObject m_scoutJsObject;
   private final IField m_field;
 
-  public ScoutJsProperty(IScoutJsObject scoutJsObject, IField field, PropertyDataTypeDetector dataTypeDetector) {
+  protected ScoutJsProperty(IScoutJsObject scoutJsObject, IField field, PropertyDataTypeDetector dataTypeDetector) {
     m_scoutJsObject = Ensure.notNull(scoutJsObject);
     m_field = Ensure.notNull(field);
     m_type = new FinalValue<>();
@@ -47,20 +50,23 @@ public class ScoutJsProperty {
     m_detector = null;
   }
 
-  public static ScoutJsProperty createSynthetic(IScoutJsObject owner, String propertyName, IDataType dataType) {
-    var syntheticField = owner.scoutJsModel().nodeModule().nodeElementFactory()
-        .createSyntheticField(propertyName, dataType, owner.declaringClass());
-    return new ScoutJsProperty(owner, syntheticField);
-  }
-
+  /**
+   * @return The {@link IField} this {@link ScoutJsProperty} is based on.
+   */
   public IField field() {
     return m_field;
   }
 
+  /**
+   * @return The owner {@link IScoutJsObject}.
+   */
   public IScoutJsObject scoutJsObject() {
     return m_scoutJsObject;
   }
 
+  /**
+   * @return The {@link ScoutJsPropertyType data type} of this property.
+   */
   public ScoutJsPropertyType type() {
     return m_type.computeIfAbsentAndGet(this::detectType);
   }
@@ -69,10 +75,17 @@ public class ScoutJsProperty {
     return m_detector.detect(this);
   }
 
+  /**
+   * @return The property name. Is the same as the {@link IField#name()}.
+   */
   public String name() {
     return field().name();
   }
 
+  /**
+   * @return {@code true} if this property is the Scout {@value ScoutJsCoreConstants#PROPERTY_NAME_OBJECT_TYPE}
+   *         property.
+   */
   public boolean isObjectType() {
     return ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE.equals(name());
   }
@@ -93,6 +106,15 @@ public class ScoutJsProperty {
     return lower;
   }
 
+  /**
+   * Computes possible values for this {@link ScoutJsProperty} if possible.
+   * 
+   * @param scope
+   *          The {@link ScoutJsModel} scope for which the values should be computed. It specifies which possible values
+   *          are accessible. These are all elements in this scope model and all exported elements from all
+   *          dependencies. Must not be {@code null}.
+   * @return A {@link Stream} with possible values for this property based on the {@link ScoutJsModel} scope given.
+   */
   public Stream<? extends IScoutJsPropertyValue> computePossibleValues(ScoutJsModel scope) {
     var type = type();
     if (type.isBoolean()) {

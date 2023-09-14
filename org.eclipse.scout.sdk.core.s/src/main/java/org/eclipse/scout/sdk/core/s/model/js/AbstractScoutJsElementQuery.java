@@ -42,6 +42,14 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
     return (TYPE) this;
   }
 
+  /**
+   * Specifies if {@link IScoutJsElement elements} from runtime dependencies (recursively) should be included.
+   * 
+   * @param includeDependencies
+   *          {@code true} to search for {@link IScoutJsElement} instances in the transitive dependencies. Default is
+   *          {@code false}.
+   * @return This query.
+   */
   public TYPE withIncludeDependencies(boolean includeDependencies) {
     m_includeDependencies = includeDependencies;
     return thisInstance();
@@ -51,15 +59,32 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
     return m_includeDependencies;
   }
 
-  protected boolean isIncludeSelf() {
-    return m_includeSelf;
-  }
-
+  /**
+   * Specifies if {@link IScoutJsElement elements} from the root {@link ScoutJsModel} should be included. Default is
+   * {@code true}.
+   * 
+   * @param includeSelf
+   *          {@code true} to include elements from the root {@link ScoutJsModel}, {@code false} to skip elements in the
+   *          root model.
+   * @return This query.
+   */
   public TYPE withIncludeSelf(boolean includeSelf) {
     m_includeSelf = includeSelf;
     return thisInstance();
   }
 
+  protected boolean isIncludeSelf() {
+    return m_includeSelf;
+  }
+
+  /**
+   * Filter the resulting {@link IScoutJsElement elements} to elements having exactly the given name (according to
+   * {@link IScoutJsElement#name()}). Default is not filtered by name.
+   * 
+   * @param name
+   *          The name to filter or {@code null} for no filtering by name.
+   * @return This query.
+   */
   public TYPE withName(String name) {
     m_name = name;
     return thisInstance();
@@ -69,6 +94,16 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
     return m_name;
   }
 
+  /**
+   * Limits the resulting {@link IScoutJsElement elements} to the ones that are declared by the {@link IES6Class
+   * classes} given. Default is not filtering by declaring {@link IES6Class}.
+   * 
+   * @param declaringClasses
+   *          A {@link Stream} returning all the declaring {@link IES6Class classes} whose corresponding
+   *          {@link IScoutJsElement}s should be returned. {@code null} if the elements should not be filtered by
+   *          declaring classes.
+   * @return This query.
+   */
   public TYPE withDeclaringClasses(Stream<? extends IES6Class> declaringClasses) {
     if (declaringClasses == null) {
       m_declaringClasses = null;
@@ -81,6 +116,16 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
     return thisInstance();
   }
 
+  /**
+   * Limits the resulting {@link IScoutJsElement elements} to the ones that are declared by the {@link IES6Class
+   * classes} given. Default is not filtering by declaring {@link IES6Class}.
+   *
+   * @param declaringClasses
+   *          A {@link Collection} holding all the declaring {@link IES6Class classes} whose corresponding
+   *          {@link IScoutJsElement}s should be returned. {@code null} if the elements should not be filtered by
+   *          declaring classes.
+   * @return This query.
+   */
   public TYPE withDeclaringClasses(Collection<? extends IES6Class> declaringClasses) {
     if (declaringClasses == null) {
       m_declaringClasses = null;
@@ -89,6 +134,15 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
     return withDeclaringClasses(declaringClasses.stream());
   }
 
+  /**
+   * Limits the resulting {@link IScoutJsElement element} to the one that is declared by the {@link IES6Class} given.
+   * Default is not filtering by declaring {@link IES6Class}.
+   *
+   * @param declaringClass
+   *          A declaring {@link IES6Class} whose corresponding {@link IScoutJsElement} should be returned. {@code null}
+   *          if the elements should not be filtered by declaring classes.
+   * @return This query.
+   */
   public TYPE withDeclaringClass(IES6Class declaringClass) {
     if (declaringClass == null) {
       m_declaringClasses = null;
@@ -111,14 +165,14 @@ public abstract class AbstractScoutJsElementQuery<E extends IScoutJsElement, TYP
     return stream.filter(filter);
   }
 
-  protected abstract AbstractScoutJsElementSpliterator<E> createSpliterator();
+  protected abstract ScoutJsElementSpliterator<E> createSpliterator();
 
   protected Predicate<E> createFilter() {
     Predicate<E> result = null;
 
     var name = name();
     if (name != null) {
-      result = appendOrCreateFilter(result, e -> name().equals(e.name()));
+      result = appendOrCreateFilter(null, e -> name().equals(e.name()));
     }
 
     var declaringClassFilter = declaringClasses();

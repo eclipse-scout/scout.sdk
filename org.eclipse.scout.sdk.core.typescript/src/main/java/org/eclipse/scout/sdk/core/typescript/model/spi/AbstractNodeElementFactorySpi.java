@@ -58,7 +58,7 @@ public abstract class AbstractNodeElementFactorySpi implements NodeElementFactor
 
   @Override
   public SyntheticFieldSpi createSyntheticField(String name, DataTypeSpi dataType, ES6ClassSpi declaringClass) {
-    return getOrCreate(new CompositeObject(name, SyntheticFieldSpi.class), id -> new SyntheticFieldSpi(containingModule(), name, dataType, declaringClass));
+    return getOrCreate(new CompositeObject(name, declaringClass, SyntheticFieldSpi.class), id -> new SyntheticFieldSpi(containingModule(), name, dataType, declaringClass));
   }
 
   @Override

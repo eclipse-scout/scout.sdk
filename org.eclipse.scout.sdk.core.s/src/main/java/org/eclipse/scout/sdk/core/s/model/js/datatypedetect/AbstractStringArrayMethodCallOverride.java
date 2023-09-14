@@ -27,6 +27,14 @@ import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.util.SourceRange;
 import org.eclipse.scout.sdk.core.util.Strings;
 
+/**
+ * Data type override base class for detection using string array arguments to a function call.<br>
+ * Example declaring three boolean properties using a string array method call (the string array holds the properties):
+ * 
+ * <pre>
+ *   this._addBooleanProperties(['isFirst', 'isSecond', 'isThird']);
+ * </pre>
+ */
 public abstract class AbstractStringArrayMethodCallOverride implements IPropertyDataTypeOverride {
 
   protected static final String PROPERTY_TYPE_METHOD_REGEX_PREFIX = "this\\.";

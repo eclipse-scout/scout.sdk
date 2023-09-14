@@ -38,7 +38,7 @@ data class JsModelCompletionInfo(
     fun availableProperties() = m_properties.computeIfAbsentAndGet {
         val scoutObject = declaringScoutObjectByObjectType()
         if (scoutObject != null) return@computeIfAbsentAndGet scoutObject.findProperties()
-            .withSuperClasses(true)
+            .withSupers(true)
             .stream().toList()
 
         val parentProperty = parentScoutProperty() ?: return@computeIfAbsentAndGet emptyList()

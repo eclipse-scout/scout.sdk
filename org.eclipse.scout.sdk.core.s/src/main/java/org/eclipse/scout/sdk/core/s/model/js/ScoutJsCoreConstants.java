@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js;
 
+import static java.util.Collections.emptySet;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,6 +18,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
+
+/**
+ * Scout JS Core Constants. This includes API constants like class, function or property names. In the future such API
+ * definitions might be externalized to a version dependent {@link IApiSpecification}.
+ */
 @SuppressWarnings("StaticCollection")
 public final class ScoutJsCoreConstants {
 
@@ -29,6 +39,9 @@ public final class ScoutJsCoreConstants {
    */
   public static final String SCOUT_JS_CORE_MODULE_NAME = "@eclipse-scout/core";
 
+  /**
+   * Suffix for a Scout JS model file
+   */
   public static final String MODEL_SUFFIX = "Model";
   public static final String JQUERY = "JQuery";
   public static final String NAMESPACE = "scout";
@@ -74,7 +87,10 @@ public final class ScoutJsCoreConstants {
   public static final String CLASS_NAME_ENUM_OBJECT = "EnumObject";
   public static final String CLASS_NAME_COLUMN = "Column";
 
-  public static final String CLASS_NAME_SUFFIX_MODEL = "Model";
+  /**
+   * Suffix for a model class (e.g. TableModel).
+   */
+  public static final String CLASS_NAME_SUFFIX_MODEL = MODEL_SUFFIX;
   public static final String CLASS_NAME_SUFFIX_WIDGET_MAP = "WidgetMap";
   public static final String CLASS_NAME_SUFFIX_COLUMN_MAP = "ColumnMap";
 
@@ -101,16 +117,20 @@ public final class ScoutJsCoreConstants {
   private ScoutJsCoreConstants() {
   }
 
+  /**
+   * Gets the properties for the given {@link IES6Class} name which look like a public property but should never be part
+   * of a {@link IScoutJsObject#properties()} (should therefore behave like a private property). This is basically
+   * interesting for JavaScript files which do not have a dedicated model class defining all available properties.
+   * 
+   * @param className
+   *          The class name for which the excluded properties should be returned.
+   * @return A set with all the property names that are excluded in the given class name.
+   */
   public static Set<String> getExcludedProperties(String className) {
     var exclusionsForClass = EXCLUDED_PROPERTIES.get(className);
     if (exclusionsForClass == null) {
-      return Collections.emptySet();
+      return emptySet();
     }
     return exclusionsForClass;
-  }
-
-  public static boolean isExcludedPropertyName(String className, String propertyName) {
-    var exclusionsForClass = getExcludedProperties(className);
-    return exclusionsForClass.contains(propertyName);
   }
 }

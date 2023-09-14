@@ -15,6 +15,10 @@ import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 
+/**
+ * Evaluator that checks if an {@link IDataType} can be assigned to other {@link IDataType datatypes} (assignment
+ * compatible)
+ */
 public class DataTypeAssignableEvaluator implements Predicate<IDataType> {
 
   private final IDataType m_childType;
@@ -40,6 +44,15 @@ public class DataTypeAssignableEvaluator implements Predicate<IDataType> {
     return !clazz.isEnum() && !clazz.isTypeAlias();
   }
 
+  /**
+   * Checks if the child {@link IDataType} this evaluator was created with, can be assigned to the {@link IDataType}
+   * given.
+   * 
+   * @param base
+   *          The {@link IDataType} to check against.
+   * @return {@code true} if the {@link IDataType} of this evaluator can be assigned to the given {@link IDataType}.
+   *         Meaning the given {@link IDataType} is more "open" or the same as the {@link IDataType} of this evaluator.
+   */
   public boolean fulfills(IDataType base) {
     if (base == null) {
       return false;

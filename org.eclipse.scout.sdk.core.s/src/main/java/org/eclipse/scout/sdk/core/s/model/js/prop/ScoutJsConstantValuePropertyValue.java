@@ -9,8 +9,17 @@
  */
 package org.eclipse.scout.sdk.core.s.model.js.prop;
 
+import org.eclipse.scout.sdk.core.s.model.js.enums.ConstantValueUnionScoutEnum;
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue;
 
+/**
+ * Possible constant value for a {@link ConstantValueUnionScoutEnum}
+ * 
+ * @param value
+ *          The constant. Must not be {@code null}.
+ * @param property
+ *          The owner property. Must not be {@code null}.
+ */
 public record ScoutJsConstantValuePropertyValue(IConstantValue value, ScoutJsProperty property) implements IScoutJsPropertyValue {
   @Override
   public String name() {

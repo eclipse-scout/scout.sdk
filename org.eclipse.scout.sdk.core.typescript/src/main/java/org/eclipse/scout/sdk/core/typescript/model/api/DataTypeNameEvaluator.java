@@ -18,6 +18,10 @@ import java.util.stream.Stream;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType.DataTypeFlavor;
 import org.eclipse.scout.sdk.core.util.Strings;
 
+/**
+ * Computes the name of an {@link IDataType}. It handles array, union and intersection types and includes type arguments
+ * where available.
+ */
 public class DataTypeNameEvaluator {
 
   private final Function<IDataType, Stream<IDataType>> m_childrenSupplier;
@@ -30,6 +34,14 @@ public class DataTypeNameEvaluator {
     m_childrenSupplier = childrenSupplier;
   }
 
+  /**
+   * Computes the name (as used in the source) of the {@link IDataType} given.
+   * 
+   * @param type
+   *          The {@link IDataType} for which the name should be computed or {@code null} (in that case {@code null} is
+   *          returned).
+   * @return The computed name of the {@link IDataType}.
+   */
   public String eval(IDataType type) {
     if (type == null) {
       return null;
@@ -55,7 +67,7 @@ public class DataTypeNameEvaluator {
         .map(this::eval)
         .collect(joining(", "));
     if (!Strings.isEmpty(args)) {
-      args = "<" + args + ">";
+      args = '<' + args + '>';
     }
     return nameForLeafType(type) + args;
   }
@@ -79,7 +91,7 @@ public class DataTypeNameEvaluator {
       case Single -> false;
     };
     if (requiresParentheses) {
-      return "(" + componentDataTypeName + ")";
+      return '(' + componentDataTypeName + ')';
     }
     return componentDataTypeName;
   }

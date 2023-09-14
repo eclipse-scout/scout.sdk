@@ -13,9 +13,17 @@ import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi;
 
+/**
+ * Represents a JavaScript or TypeScript (arrow-)function
+ */
 public interface IFunction extends INodeElement {
   @Override
   FunctionSpi spi();
 
+  /**
+   * Tries to detect if this function returns an object literal and returns it if found.
+   * 
+   * @return The {@link IObjectLiteral} that this function returns (if found).
+   */
   Optional<IObjectLiteral> resultingObjectLiteral();
 }

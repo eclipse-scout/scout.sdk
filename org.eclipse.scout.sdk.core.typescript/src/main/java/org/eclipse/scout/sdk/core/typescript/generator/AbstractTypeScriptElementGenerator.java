@@ -60,8 +60,8 @@ public abstract class AbstractTypeScriptElementGenerator<TYPE extends ITypeScrip
   }
 
   public static ITypeScriptSourceBuilder<?> ensureTypeScriptSourceBuilder(ISourceBuilder<?> inner) {
-    if (inner instanceof ITypeScriptSourceBuilder<?>) {
-      return (ITypeScriptSourceBuilder<?>) inner;
+    if (inner instanceof ITypeScriptSourceBuilder<?> tsBuilder) {
+      return tsBuilder;
     }
     return TypeScriptSourceBuilder.create(inner);
   }

@@ -38,9 +38,6 @@ public class ES6ImportValidator implements IES6ImportValidator {
   private class UniqueNameEvaluator extends DataTypeNameEvaluator {
     @Override
     protected String nameForLeafType(IDataType type) {
-      if (type.isPrimitive()) {
-        return type.name();
-      }
       return computeUniqueNameAndRegisterUsage(type);
     }
   }
@@ -51,15 +48,17 @@ public class ES6ImportValidator implements IES6ImportValidator {
 
   protected String computeUniqueNameAndRegisterUsage(IDataType type) {
     var name = type.name();
-    if (isBuiltInType(name)) {
-      return name; // not import required
+    if (type.isPrimitive()) {
+      return name;
     }
-
+    if (isBuiltInType(name)) {
+      return name; // no import required
+    }
     var collector = importCollector();
     var usedNamesForSource = collector.usedNames();
     if (!usedNamesForSource.contains(name)) {
       // first with that name: use without alias
-      return collector.add(name, type, null).nameForSource();
+      return collector.add(type, null).nameForSource();
     }
     var existing = collector.descriptorFor(type);
     if (existing != null) {
@@ -69,7 +68,7 @@ public class ES6ImportValidator implements IES6ImportValidator {
 
     // a new element with an already used name: register with new alias
     var newAlias = getUniqueAlias(name, usedNamesForSource);
-    return collector.add(newAlias, type, newAlias).nameForSource();
+    return collector.add(type, newAlias).nameForSource();
   }
 
   public static String getUniqueAlias(String origName, Collection<String> usedNames) {

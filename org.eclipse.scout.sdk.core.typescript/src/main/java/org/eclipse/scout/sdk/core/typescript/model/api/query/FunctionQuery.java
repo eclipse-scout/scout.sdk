@@ -12,10 +12,14 @@ package org.eclipse.scout.sdk.core.typescript.model.api.query;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.FunctionSpi;
 
+/**
+ * By default, the query returns all {@link IFunction functions} directly declared in an {@link IES6Class}.
+ */
 public class FunctionQuery extends AbstractQuery<IFunction> {
 
   private final ES6ClassSpi m_es6ClassSpi;
@@ -25,6 +29,14 @@ public class FunctionQuery extends AbstractQuery<IFunction> {
     m_es6ClassSpi = es6Class;
   }
 
+  /**
+   * Limit the {@link IFunction functions} returned to the ones having exactly the given name. In case there are
+   * overloads, this may result in several functions! By default, there is no filtering by name.
+   * 
+   * @param name
+   *          The name to filter or {@code null} for no filtering by name.
+   * @return This query.
+   */
   public FunctionQuery withName(String name) {
     m_name = name;
     return this;

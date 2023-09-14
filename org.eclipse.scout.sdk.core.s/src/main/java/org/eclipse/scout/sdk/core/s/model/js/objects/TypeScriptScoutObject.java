@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.IPropertyDataTypeOve
 import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.KnownStringPropertiesOverride;
 import org.eclipse.scout.sdk.core.s.model.js.datatypedetect.NlsPropertyOverride;
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty;
+import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsPropertyFactory;
 import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
@@ -75,11 +76,11 @@ public class TypeScriptScoutObject implements IScoutJsObject {
         .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_EVENTS))
         .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_SELF))
         .filter(f -> !f.name().equals(ScoutJsCoreConstants.PROPERTY_NAME_WIDGET_MAP));
-    return JavaScriptScoutObject.createProperties(fields, createOverrides(), this);
+    return ScoutJsPropertyFactory.createProperties(fields, createOverrides(), this);
   }
 
   protected List<IPropertyDataTypeOverride> createOverrides() {
-    var stringType = Ensure.notNull(declaringClass().createDataType(TypeScriptTypes._string));
+    var stringType = Ensure.notNull(declaringClass().spi().createDataType(TypeScriptTypes._string).api());
     return Arrays.asList(
         new NlsPropertyOverride(this, stringType),
         new KnownStringPropertiesOverride(this, stringType));
@@ -90,6 +91,11 @@ public class TypeScriptScoutObject implements IScoutJsObject {
     return m_init.computeIfAbsentAndGet(() -> declaringClass().functions().withName(ScoutJsCoreConstants.FUNCTION_NAME_INIT).stream().toList());
   }
 
+  /**
+   * @return The TypeScript model of this {@link IScoutJsObject} (data type of the
+   *         {@value ScoutJsCoreConstants#PROPERTY_NAME_MODEL} field of the {@link #declaringClass()}). E.g.
+   *         "{@code declare model: FormModel;}".
+   */
   public Optional<IES6Class> model() {
     return m_model.computeIfAbsentAndGet(() -> findClassField(ScoutJsCoreConstants.PROPERTY_NAME_MODEL));
   }

@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.core.typescript.builder.TypeScriptBuilderContext;
 public interface ITypeScriptElementGenerator<TYPE extends ITypeScriptElementGenerator<TYPE>> extends ISourceGenerator<ISourceBuilder<?>> {
 
   /**
-   * @return The name of the element if it is context independent. Otherwise, an empty {@link Optional} is returned.
+   * @return The name of the element if present. Otherwise, an empty {@link Optional} is returned.
    */
   Optional<String> elementName();
 

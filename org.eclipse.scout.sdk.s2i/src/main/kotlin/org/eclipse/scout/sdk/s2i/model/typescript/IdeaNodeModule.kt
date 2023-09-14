@@ -62,7 +62,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
     override fun createApi() = NodeModuleImplementor(this, packageJson())
 
     override fun classes(): List<ES6ClassSpi> = m_classes.computeIfAbsentAndGet {
-        elementsByPsi().values.asSequence()
+        elements().keys.asSequence()
             .mapNotNull { it as? ES6ClassSpi }
             .toList()
     }
@@ -74,7 +74,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
         return@computeIfAbsentAndGet unmodifiableMap(classesByPsi)
     }
 
-    override fun elements(): Map<NodeElementSpi, Set<String> /* export name */> = m_elements.computeIfAbsentAndGet(this::computeNodeElements)
+    override fun elements(): Map<NodeElementSpi, Set<String> /* export names */> = m_elements.computeIfAbsentAndGet(this::computeNodeElements)
 
     override fun exports(): Map<String, NodeElementSpi> = m_exports.computeIfAbsentAndGet {
         val exports = elements().entries.stream()

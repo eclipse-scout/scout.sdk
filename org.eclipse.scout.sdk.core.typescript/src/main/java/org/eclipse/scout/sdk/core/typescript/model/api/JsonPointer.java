@@ -15,6 +15,11 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 
+/**
+ * Implementation for <a href="https://www.rfc-editor.org/rfc/rfc6901">JavaScript Object Notation (JSON)
+ * Pointer</a>.<br>
+ * See {@link #compile(CharSequence)} for examples on how to use it.
+ */
 public final class JsonPointer {
 
   private final String[] m_tokens; // may be null
@@ -25,6 +30,22 @@ public final class JsonPointer {
     m_raw = pointer;
   }
 
+  /**
+   * Creates a new pointer based on the given path.<br>
+   * <br>
+   * Examples:
+   * <ul>
+   * <li>/objectAttrib/subObjectAttrib/attribute</li>
+   * <li>/arrayAttribute/1/subArray/0/subSubArray/2</li>
+   * <li>/obj/m~0n (tilde needs to be escaped: ~0 = ~, so the attributes name is "m~n")</li>
+   * <li>/obj/m~1n (slash needs to be escaped: ~1 = /, so the attributes name is "m/n")</li>
+   * <li>null (points to the root)</li>
+   * </ul>
+   * 
+   * @param pointer
+   *          The pointer path. It points to the root element of the json structure if {@code null}.
+   * @return The compiled {@link JsonPointer}
+   */
   public static JsonPointer compile(CharSequence pointer) {
     if (Strings.isEmpty(pointer)) {
       return new JsonPointer(null, pointer);
@@ -39,6 +60,9 @@ public final class JsonPointer {
     return new JsonPointer(tokens, pointer);
   }
 
+  /**
+   * Adapter for generic json-structure like elements.
+   */
   public interface IJsonPointerElement {
     int arrayLength();
 

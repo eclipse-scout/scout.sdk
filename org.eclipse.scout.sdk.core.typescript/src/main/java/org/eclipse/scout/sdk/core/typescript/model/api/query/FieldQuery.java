@@ -12,12 +12,16 @@ package org.eclipse.scout.sdk.core.typescript.model.api.query;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IField;
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier;
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
+/**
+ * By default, the query returns all fields directly declared in an {@link IES6Class}.
+ */
 public class FieldQuery extends AbstractQuery<IField> {
 
   private final ES6ClassSpi m_es6ClassSpi;
@@ -33,8 +37,8 @@ public class FieldQuery extends AbstractQuery<IField> {
    * Limits the {@link IField} to the one with the given name.
    *
    * @param name
-   *          The name to search. Default is not filtering on name.
-   * @return this
+   *          The name to search. Default is not filtering by name.
+   * @return This query.
    */
   public FieldQuery withName(String name) {
     m_name = name;
@@ -45,6 +49,15 @@ public class FieldQuery extends AbstractQuery<IField> {
     return m_name;
   }
 
+  /**
+   * Limit the {@link IField fields} to the ones not having the given {@link Modifier}. Default is not filtering on
+   * {@link Modifier}.
+   * 
+   * @param modifier
+   *          All {@link IField fields} having this {@link Modifier} will be excluded. If {@code null} nothing is
+   *          excluded.
+   * @return This query.
+   */
   public FieldQuery withoutModifier(Modifier modifier) {
     m_notAllowedModifier = modifier;
     return this;
@@ -54,6 +67,15 @@ public class FieldQuery extends AbstractQuery<IField> {
     return m_notAllowedModifier;
   }
 
+  /**
+   * Limit the {@link IField fields} to the ones having the given {@link Modifier}. Default is not filtering on
+   * {@link Modifier}.
+   *
+   * @param modifier
+   *          Only {@link IField fields} having this {@link Modifier} will be included. If {@code null} nothing is
+   *          filtered.
+   * @return This query.
+   */
   public FieldQuery withModifier(Modifier modifier) {
     m_requiredModifier = modifier;
     return this;

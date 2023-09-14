@@ -37,7 +37,7 @@ open class IdeaJavaScriptVariable(protected val ideaModule: IdeaNodeModule, inte
 
     override fun resolveContainingFile() = javaScriptVariable.containingFile?.virtualFile?.resolveLocalPath()
 
-    override fun hasModifier(modifier: Modifier) = javaScriptVariable.hasModifier(modifier.toModifierType())
+    override fun hasModifier(modifier: Modifier?) = modifier != null && javaScriptVariable.hasModifier(modifier.toModifierType())
 
     override fun name() = javaScriptVariable.name
 

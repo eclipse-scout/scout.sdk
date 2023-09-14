@@ -38,7 +38,7 @@ open class IdeaJavaScriptAssignmentExpressionAsField internal constructor(
 
     override fun isOptional() = false
 
-    override fun hasModifier(modifier: Modifier) = false
+    override fun hasModifier(modifier: Modifier?) = false
 
     override fun constantValue(): IConstantValue = m_constantValue.computeIfAbsentAndGet {
         ideaModule.nodeElementFactory().createConstantValue(javaScriptAssignmentExpression.rOperand)

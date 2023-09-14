@@ -119,11 +119,6 @@ public class ES6ClassImplementor extends DataTypeImplementor<ES6ClassSpi> implem
   }
 
   @Override
-  public IDataType createDataType(String name) {
-    return spi().createDataType(name).api();
-  }
-
-  @Override
   public Stream<IDataType> typeArguments() {
     return spi().typeArguments().stream()
         .map(DataTypeSpi::api);

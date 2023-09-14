@@ -25,7 +25,7 @@ public interface INodeElementBuilder<TYPE extends INodeElementBuilder<TYPE>> ext
    * Appends the source representation of the given modifiers including a trailing space.
    *
    * @param modifiers
-   *          The modifiers to append.
+   *          The modifiers to append. May be {@code null}.
    * @return This builder
    */
   TYPE appendModifiers(Collection<Modifier> modifiers);

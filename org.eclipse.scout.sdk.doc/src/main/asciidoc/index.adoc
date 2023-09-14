@@ -15,7 +15,7 @@ This document describes the Scout SDK software architecture and explains importa
 
 NOTE: This document is not complete.
 Contributions are welcome! +
-If you like to help, please create a Gerrit change for Repository https://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/.
+If you like to help, please create a Pull Request for repository https://github.com/eclipse-scout/scout.sdk.
 Thanks!
 
 == Module Overview
@@ -31,14 +31,16 @@ image::overview.svg[module overview]
 === Core Modules
 
 The primary core module is the `org.eclipse.scout.sdk.core` library (blue modules in <<img-overview>>).
-It contains classes to deal with source code in general and Java source code in particular.
-Furthermore, various utility classes are provided to support common use cases (like xml parsing or string operations).
-This module contains no Scout specific code.
-More details on this module and how to use it is explained later in this document.
+It contains classes to deal with source code in general.
+Furthermore, various utility classes are provided to support common use cases (like XML parsing or string operations).
+This module contains no Scout specific or programming language specific code.
 
-The `org.eclipse.scout.sdk.core.s` (please note the extra `s` at the end) introduces Scout specific classes, e.g. to create a form data or page (orange in <<img-overview>>).
+There are additional core modules for Java and TypeScript source parsing and source creation.
+While the Java module contains all necessary code to parse Java source code (provided by `ecj`), the TypeScript module only contains a service provider interface definition (SPI) and requires an external parser which implements this interface.
 
-For both parts corresponding `test` modules are available holding classes to support unit testing.
+The `org.eclipse.scout.sdk.core.s` (please note the extra `s` at the end) introduces Scout specific classes, e.g. to create a FormData or Page (orange in <<img-overview>>).
+
+For all parts corresponding `test` modules are available holding classes to support unit testing.
 
 === IDE specific modules
 
@@ -52,24 +54,25 @@ This is not the case for the IntelliJ plugin for which all aspects are implement
 
 == Architecture
 
-This section describes the architecture principles used by the Scout SDK. For illustration, it is explained with the IntelliJ plugin as example, but the concepts are the same for the Eclipse plugins.
+This section describes the architecture principles used by the Scout SDK.For illustration, it is explained with the IntelliJ plugin as example, but the concepts are the same for the Eclipse plugins.
 
 [#img-architecture]
 .Scout SDK architecture overview shown for the IntelliJ plugin. The concepts are the same for the Eclipse plugins except that it is divided into multiple modules as explained in <<IDE specific modules>>.
 image::architecture.svg[architecture]
 
-=== Core
+[#core-java]
+=== core.java
 
-The core module provides classes for two main topics:
+The `core.java` modules provide classes for two main topics:
 
 . Parse Java code into a model representation.
-. Build source code (most importantly Java source code, but not limited to it).
+. Build new Java source code.
 
 These two topics are explained in the next chapters.
 
-==== Java Parsing
+==== Parsing
 
-The package `org.eclipse.scout.sdk.core.model` contains classes that represent Java code (source or binary bytecode) as a model.
+The package `org.eclipse.scout.sdk.core.java.model` contains classes that represent Java code (source or binary bytecode) as a model.
 It contains no Java parser itself.
 Such a parser is contributed using a service provider interface (SPI).
 See <<SPI>> for more details.
@@ -79,7 +82,7 @@ In the next chapters the models and their usages are explained.
 
 ===== Java Classpath Environment
 
-The main entry point is the `org.eclipse.scout.sdk.core.model.api.IJavaEnvironment` which represents a Java class path.
+The main entry point is the `org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment` which represents a Java class path.
 It provides methods to retrieve Java types by name returning a model of type `IType` (see <<Type>>).
 
 Such an environment can be created by using the `JavaEnvironmentWithEcjBuilder` or one of the predefined factories as shown in <<source-running-classpath>> (see <<SPI>> for more details).
@@ -96,7 +99,7 @@ include::{codedir}/PrintClasspathSample.java[tags=printRunningClassPath]
 
 ===== Type
 
-An `org.eclipse.scout.sdk.core.model.api.IType` represents a Java type (e.g. class, interface, enum, array or primitive type) and provides access to super classes or interfaces, inner (nested) types, annotations, type-parameters, methods, fields and more.
+An `org.eclipse.scout.sdk.core.java.model.api.IType` represents a Java type (e.g. class, interface, enum, array or primitive type) and provides access to super classes or interfaces, inner (nested) types, annotations, type-parameters, methods, fields and more.
 See <<source-methods-of-list>> for an example.
 
 [#source-methods-of-list]
@@ -116,7 +119,7 @@ This returns an `IType`.
 
 ===== Compilation Unit
 
-The `org.eclipse.scout.sdk.core.model.api.ICompilationUnit` represent a `*.java` file and provides access to the imports (`IImport`) and `IPackage` and may contain multiple `IType` instances.
+The `org.eclipse.scout.sdk.core.java.model.api.ICompilationUnit` represent a `*.java` file and provides access to the imports (`IImport`) and `IPackage` and may contain multiple `IType` instances.
 
 An `ICompilationUnit` may be `synthetic` which means it is created from a `\*.class` file instead a `*.java` file.
 In that case it only contains a single `IType` (the one matching the `\*.class` file) and no imports (as no imports are available in a `*.class` file).
@@ -143,7 +146,7 @@ Only the default Java bootstrap classpath is available.
 
 ===== Annotation
 
-The `org.eclipse.scout.sdk.core.model.api.IAnnotation` represents a Java annotation which may be present on any `IAnnotatable` element (<<Member>>, `IMethodParameter`, `IPackage`).
+The `org.eclipse.scout.sdk.core.java.model.api.IAnnotation` represents a Java annotation which may be present on any `IAnnotatable` element (<<Member>>, `IMethodParameter`, `IPackage`).
 
 It may contain `IAnnotationElement` instances in case the annotation has attributes. `IAnnotationElement` instances have a value of type `IMetaValue` which corresponds to a compile-time constant (see <<Constant Values>>).
 
@@ -204,7 +207,7 @@ The `IType` instances can be filtered by flags, name and simple name.
 
 ===== SPI
 
-The `org.eclipse.scout.sdk.core` module contains the Java model implementation including queries, annotations and various other helper classes as explained before.
+The `org.eclipse.scout.sdk.core.java` module contains the Java model implementation including queries, annotations and various other helper classes as explained before.
 
 It does not contain a Java source and bytecode parser.
 Instead, this functionality is externalized using a service provider interface.
@@ -212,17 +215,17 @@ This has the advantage that the parser may be exchanged without breaking the mod
 It also provides the capability to use multiple parsers for dedicated environments or requirements.
 
 Therefore, the `core` module is not standalone but requires an SPI implementation to run.
-The SPI can be found in the package `org.eclipse.scout.sdk.core.model.spi`.
+The SPI can be found in the package `org.eclipse.scout.sdk.core.java.model.spi`.
 The model functionality is then built on top of the SPI instances.
 
 Currently, there is one SPI implementation available.
-It exists in the `org.eclipse.scout.sdk.core.ecj` module and uses the https://wiki.eclipse.org/JDT_Core_Programmer_Guide/ECJ[Eclipse Compiler for Java] as parser.
+It exists in the `org.eclipse.scout.sdk.core.java.ecj` module and uses the https://wiki.eclipse.org/JDT_Core_Programmer_Guide/ECJ[Eclipse Compiler for Java] as parser.
 It also contains the predefined `IJavaEnvironment` factories (like `EmptyJavaEnvironmentFactory`, `RunningJavaEnvironmentFactory`, `JavaEnvironmentWithEcjBuilder`) used in the samples of this document.
 
 In the future more parsers might be added e.g. to include the `core` module into IntelliJ IDEA without requiring the `ecj` dependency but using the IntelliJ parser (https://plugins.jetbrains.com/docs/intellij/psi.html[PSI]) instead.
 Another parser could be the https://openjdk.java.net/groups/compiler/guide/compilerAPI.html[javac] already built into the JDK.
 
-==== Build Source
+==== Source Creation
 
 The source code generation uses five main types of classes:
 
@@ -231,7 +234,7 @@ They contain methods to append source fragments similar to a `StringBuilder`.
 . Generators: A generator is responsible for appending the necessary source fragments into source builders so that they result in a specific element.
 There are e.g. generators to create classes or methods.
 There might also be generators for business elements like a Scout form or page.
-. Transformers: A transformer is like an adapter that converts a parsed Java model (see <<Java Parsing>>) into a modifiable generator.
+. Transformers: A transformer is like an adapter that converts a parsed Java model (see <<core-java>>) into a modifiable generator.
 During the transformation from model to generator modifications might be applied.
 . Import Collectors: Classes helping to automatically create imports as needed and deciding where to use simple versus full qualification for references.
 . API definitions: Version dependent information about an API for which source code should be generated.
@@ -262,7 +265,7 @@ There is also an `OutputStream` based implementation called `StreamSourceBuilder
 Prints `Hello World!` (with a trailing line separator).
 
 Source builders may be used for any source code of any language but there may be specific ones for certain languages.
-There is e.g. a source builder for Java code (`org.eclipse.scout.sdk.core.builder.java.IJavaSourceBuilder`) which adds methods for Java specific source elements like a semicolon or a reference to a Java type.
+There is e.g. a source builder for Java code (`org.eclipse.scout.sdk.core.java.builder.IJavaSourceBuilder`) which adds methods for Java specific source elements like a semicolon or a reference to a Java type.
 Such a language specific source builder may also introduce more attributes on the context as done for Java with the `IJavaBuilderContext`.
 In addition to the normal context properties the `IJavaBuilderContext` also includes an `IJavaEnvironment` (see <<Java Classpath Environment>>) used to perform classpath dependent tasks like the `import` resolution.
 
@@ -387,7 +390,7 @@ This section explains how get a modifiable generator from a model instance and t
 
 ====== From Model to Generator
 
-The Java model classes (see <<Java Parsing>>) can be converted to `ISourceGenerator` instances to apply modifications.
+The Java model classes (see <<core-java>>) can be converted to `ISourceGenerator` instances to apply modifications.
 This is done with the method `toWorkingCopy` which exists for all Java models and returns an `ISourceGenerator`.
 
 By default, such a generator creates source similar to the model it was created from.
@@ -450,15 +453,15 @@ Call `reload` to discard any loaded classes to ensure the next parse uses the ne
 
 ===== Import Collector
 
-Import collectors (base interface `org.eclipse.scout.sdk.core.imports.IImportCollector`) are used in an `IJavaBuilderContext` to collect all imports used.
+Import collectors (base interface `org.eclipse.scout.sdk.core.java.imports.IImportCollector`) are used in an `IJavaBuilderContext` to collect all imports used.
 This also works with complex references like `AbstractMap<String, List<OutputStream>>` where `AbstractMap`, `List` and `OutputStream` would be imported automatically.
-The collectors also knows about names which don't need an import (like the `String` class because the `java.lang` package is always automatically imported).
+The collector also knows about names which don't need an import (like the `String` class because the `java.lang` package is always automatically imported).
 
 Furthermore, import collectors decide whether a reference can be inserted using its simple name (and adding the required `import`) or if a full qualification is required (e.g. because such a simple name is already imported).
 
 To use this feature it is best practice when building source code to always refer to other classes using `IJavaSourceBuilder#ref()` or one of its overloads.
 
-===== API Definition
+==== API Definition
 
 When generating source code the created code must always match a certain API (e.g. the Java API) to be valid.
 Therefore, a generator needs to know the e.g. class- and method names of the API to build the correct source.
@@ -472,7 +475,7 @@ An API definition holds all necessary information (like names of classes, method
 .UML diagram illustrating the core API definition classes and a sample Java API.
 image::apidef.png[API definition]
 
-The main entry point to retrieve an API definition is the `org.eclipse.scout.sdk.core.apidef.Api` class.
+The main entry point to retrieve an API definition is the `org.eclipse.scout.sdk.core.java.apidef.Api` class.
 It allows to create a definition (`create` method) or to get the version of a specific API (`version` method).
 Both methods take the type of API as class (of type `IApiSpecification`) and an `IJavaEnvironment` defining the classpath to search in.
 The `Api` class will then search for an `IApiProvider` accepting the class given and will use this provider to detect which version of this API is available in the `IJavaEnvironment`.
@@ -512,10 +515,10 @@ include::{codedir}/OptionalApiSample.java[tags=optionalApiSample]
 <1> The method is only called if the `Java9Api` is available.
 
 NOTE:  The `Java9Api` does not need to re-implement the `longClassName` or `stringClassName` methods as these are already part of the `Java8Api`.
-So for a Java 9 classpath the resulting API definition contains both specifications and it is sufficient if a method is only implemented on one specification available.
+So for a Java 9 classpath the resulting API definition contains both specifications, and it is sufficient if a method is only implemented on one specification available.
 This eliminates redundant code as a new API specification may only contain the changes to the previous one.
 
-====== Using API Definitions in Generators
+===== Using API Definitions in Generators
 
 As generators have no context (and therefore no `IJavaEnvironment`), the final API names cannot be computed when configuring the generator.
 Instead, the API class and the method on that class which returns the required value is passed to the generator.
@@ -529,7 +532,70 @@ An example is shown in <<source-generator-with-api>>.
 include::{codedir}/GeneratorWithApiSample.java[tags=generatorWithApi]
 ----
 
-=== Core.s
+=== core.typescript
+
+The `core.typescript` module provide classes for two main topics:
+
+. Parse TypeScript and JavaScript code into a model representation.
+. Build new TypeScript and JavaScript source code.
+
+These two topics are explained in the next chapters.
+
+==== Parsing
+
+The package `org.eclipse.scout.sdk.core.typescript.model` contains classes that represents JavaScript or TypeScript code as a parsed model.
+It contains no JavaScript or TypeScript parser itself.Parses are contributed using a service provider interface (SPI).
+Currently only one parser based on the WebStorm engine is available.
+It is included in the Scout IntelliJ plugin (see <<s2i>>).
+As a consequence the parser is only available in a running IntelliJ instance and is therefore also not available for the Eclipse plugins.
+
+There are model classes available for the most important JavaScript or TypeScript elements (like classes, functions, variables).
+
+===== Node Module
+
+The root element is the `INodeModule` class which represents a single Node module.
+It contains all other elements together with the `IPackageJson` that defines module.
+
+===== Object Literals
+
+JavaScript or TypeScript object literals are represented by the `IObjectLiteral` model class.
+Here is a sample object literal assigned to a constant:
+
+[source,javascript,indent=0]
+.Example constant with an object literal as value.
+----
+export const VariableWithObjectLiteral = {
+  text: 'left',
+  missing: null,
+  num: 3.21,
+  nested: {
+    a: false,
+    b: true
+  },
+  array: ['a', 'b', 'c']
+};
+
+----
+
+The following listing explains how to access the value of 'b' in this object literal:
+
+[source,java,indent=0]
+.Example how to access values of an object literal in an INodeModule.
+----
+include::{codedir}/ObjectLiteralSample.java[tags=objectLiteralSample]
+----
+
+<1> Gets the exported element from the node module
+<2> As exported elements may be of various types (e.g. classes, functions, variables) it is converted to a variable here.
+<3> Gets the value of the variable (right hand side)
+<4> Converts the value to an object literal.
+<5> The resulting Optional will be empty if the value is no object literal.
+<6> Gets the value of the property named 'nested' as object literal throwing if it cannot be found or is no object literal.
+<7> On this nested object literal gets the value of the property named 'b' throwing if no such property exists.
+<8> Reads the value as boolean throwing if it is no valid boolean.
+<9> Will print the value 'true'.
+
+=== core.s
 
 The `org.eclipse.scout.sdk.core.s` module uses the concepts of the `core` module discussed in the previous chapter to create Scout specific elements:
 
@@ -605,9 +671,9 @@ It starts in the lower left corner.
 * *Translations*: Is the main entry point which provides static factory methods to obtain other instances.
 The most important method is `createManager` which creates a `org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager` instance for a Scout module.
 * *TranslationManager*: This class provides several methods to read and modify Scout texts that are visible in the context of a Scout module.
-It may respect texts available through Java dependencies (pom.xml) as well as Node dependencies (package.json).
-* *Language*: Represents a single text language. E.g.
-English (`en`) or British English (`en_GB`).
+The context may respect texts available through Java dependencies (pom.xml) as well as Node dependencies (package.json).
+* *Language*: Represents a single text language.
+E.g. English (`en`) or British English (`en_GB`).
 There is also a `default` language used as fallback.
 * *ITranslation*: Represents a text key and the corresponding texts for several languages.
 * *ITranslationEntry*: A special translation that holds all texts for a key in all languages that exist in a single `TextProviderService`.
@@ -620,7 +686,7 @@ It is always bound to a Scout `TextProviderService` as all texts in Scout come f
 * *IEditableTranslationStore*: A special storage for texts that supports modifications.
 
 The other classes (shown in green) represent the current storage implementation using Java `.properties` files.
-Typically these classes are not used directly.
+Typically, these classes are not used directly.
 The `PropertiesTranslationStore` holds all `.properties` files of a `TextProviderService` and updates them accordingly.
 The `EditableTranslationFile` represents a `.properties` file on the local file system which can be updated while the `ReadOnlyTranslationFile` belongs to `.properties` files in binary archives (e.g. a `.jar` file) that cannot be modified.
 
@@ -653,10 +719,12 @@ Furthermore, have a look at the following useful helper classes:
 ----
 include::{codedir}/ExampleTest.java[tags=exampleTest]
 ----
-<1> Only exexutes the test if min the `IJavaApi` version 11 can be found in the `IJavaEnvironment` created by the `RunningJavaEnvironmentFactory`.
+
+<1> Only executes the test if min the `IJavaApi` version 11 can be found in the `IJavaEnvironment` created by the `RunningJavaEnvironmentFactory`.
 <2> Executes the given generator, registers the created source in the `IJavaEnvironment` (see <<From Generator to Model>>) and checks the generated source for compile errors.
 
-=== S2i
+[#s2i]
+=== s2i
 
 The `s2i` module represents the Scout plugin for https://www.jetbrains.com/idea/[IntelliJ IDEA].
 

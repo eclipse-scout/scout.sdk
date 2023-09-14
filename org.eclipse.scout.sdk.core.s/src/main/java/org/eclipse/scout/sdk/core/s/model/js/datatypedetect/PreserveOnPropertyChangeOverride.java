@@ -15,6 +15,14 @@ import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants;
 import org.eclipse.scout.sdk.core.s.model.js.objects.JavaScriptScoutObject;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 
+/**
+ * Override for properties that point to other Widgets by string id.<br>
+ * These are properties mentioned in:
+ *
+ * <pre>
+ * this._addPreserveOnPropertyChangeProperties(['selectedTab']);
+ * </pre>
+ */
 public class PreserveOnPropertyChangeOverride extends AbstractStringArrayMethodCallOverride {
 
   public static final Pattern REGEX_PRESERVE_PROPERTY_TYPE = Pattern.compile(PROPERTY_TYPE_METHOD_REGEX_PREFIX + ScoutJsCoreConstants.FUNCTION_NAME_ADD_PRESERVE_ON_PROPERTY_CHANGE_PROPERTIES + PROPERTY_TYPE_METHOD_REGEX_SUFFIX);
