@@ -42,9 +42,6 @@ open class IdeaMavenRunner : IMavenRunnerSpi, StartupActivity, DumbAware {
      */
     override fun runActivity(project: Project) {
         MavenRunner.set(this)
-
-        // Scout requires sources to be present e.g. to parse text services (NLS)
-        MavenProjectsManager.getInstance(project).importingSettings.isDownloadSourcesAutomatically = true
     }
 
     override fun execute(build: MavenBuild, env: IEnvironment, progress: IProgress) {

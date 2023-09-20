@@ -92,6 +92,7 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <notificationGroup displayType="BALLOON" id="scout.notification" key="notification.group.name"/>
+    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.maven.MavenSourcesAutoDownloader"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaLogger"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.nls.IdeaTranslationStoreSupplier"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator"/>
