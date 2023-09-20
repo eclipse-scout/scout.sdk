@@ -156,7 +156,7 @@ public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
         if (lineNumber > 0) {
           msg.append(lineNumber);
         }
-        if (msg.length() > 0) {
+        if (!msg.isEmpty()) {
           msg.append(' ');
         }
         msg.append(txt);

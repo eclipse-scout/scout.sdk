@@ -9,11 +9,11 @@
  */
 package org.eclipse.scout.sdk.s2i.maven
 
-import com.intellij.openapi.progress.runBlockingMaybeCancellable
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.util.concurrency.AppExecutorUtil
+import kotlinx.coroutines.runBlocking
 import org.apache.commons.lang3.ClassUtils
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
@@ -49,7 +49,7 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
                 .functions
                 .find { it.name == "downloadArtifacts" }
         } catch (e: Throwable) {
-            SdkLog.debug("") // TODO
+            SdkLog.debug("Could not find MavenProjectsManagerEx. Skipping Maven sources auto download.", e)
             null
         }
     }
@@ -76,7 +76,7 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
 
         private fun runAsync(action: suspend () -> Unit) {
             AppExecutorUtil.getAppExecutorService().execute {
-                runBlockingMaybeCancellable { action() }
+                runBlocking { action() }
             }
         }
     }

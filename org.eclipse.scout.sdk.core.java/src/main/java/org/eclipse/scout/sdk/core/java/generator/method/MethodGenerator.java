@@ -351,7 +351,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     if (sb.length() > 1 && sb.charAt(0) == 'm' && sb.charAt(1) == '_') {
       sb.delete(0, 2);
     }
-    if (sb.length() > 0) {
+    if (!sb.isEmpty()) {
       // ensure start with upper case
       sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
     }

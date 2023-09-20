@@ -355,38 +355,38 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
 
     var buf = new StringBuilder();
     for (var typeParameterName : typeParameterNames) {
-      if (buf.length() > 0) {
+      if (!buf.isEmpty()) {
         buf.append(lineDelimiter).append(lineStart);
       }
       buf.append("@param ").append(JavaTypes.C_GENERIC_START).append(typeParameterName).append(JavaTypes.C_GENERIC_END);
     }
     for (var paramName : paramNames) {
-      if (buf.length() > 0) {
+      if (!buf.isEmpty()) {
         buf.append(lineDelimiter).append(lineStart);
       }
       buf.append("@param ").append(paramName);
     }
     if (returnType != null && !JavaTypes._void.equals(returnType)) {
-      if (buf.length() > 0) {
+      if (!buf.isEmpty()) {
         buf.append(lineDelimiter).append(lineStart);
       }
       buf.append("@return");
     }
     if (exceptionNames != null) {
       for (var exceptionName : exceptionNames) {
-        if (buf.length() > 0) {
+        if (!buf.isEmpty()) {
           buf.append(lineDelimiter).append(lineStart);
         }
         buf.append("@throws ").append(exceptionName);
       }
     }
     if (isDeprecated) {
-      if (buf.length() > 0) {
+      if (!buf.isEmpty()) {
         buf.append(lineDelimiter).append(lineStart);
       }
       buf.append("@deprecated");
     }
-    if (buf.length() == 0 && isAllCommentWhitespace(lineStart)) {
+    if (buf.isEmpty() && isAllCommentWhitespace(lineStart)) {
       var prevLine = textBuffer.getLineOfOffset(offset) - 1;
       if (prevLine > 0) {
         var prevRegion = textBuffer.getLineInformation(prevLine);

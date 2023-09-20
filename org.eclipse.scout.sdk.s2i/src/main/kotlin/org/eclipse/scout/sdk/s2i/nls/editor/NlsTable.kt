@@ -327,18 +327,18 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
         }
     }
 
-    private inner class NewLineAction(private val txt: JBTextArea) : DumbAwareAction(
-            null, message(
+    private inner class NewLineAction(private val m_txt: JBTextArea) : DumbAwareAction(
+        null, message(
             "insert.new.line.x",
             getKeystrokeText(getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK))
-    ), AllIcons.Actions.SearchNewLine
+        ), AllIcons.Actions.SearchNewLine
     ) {
         init {
             templatePresentation.hoveredIcon = AllIcons.Actions.SearchNewLineHover
         }
 
         override fun actionPerformed(e: AnActionEvent) {
-            DefaultEditorKit.InsertBreakAction().actionPerformed(ActionEvent(txt, 0, "action"))
+            DefaultEditorKit.InsertBreakAction().actionPerformed(ActionEvent(m_txt, 0, "action"))
         }
     }
 

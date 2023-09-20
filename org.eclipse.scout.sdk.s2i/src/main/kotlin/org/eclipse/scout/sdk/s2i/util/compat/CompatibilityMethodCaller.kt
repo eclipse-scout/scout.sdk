@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.util.compat
 
+import org.apache.commons.lang3.ClassUtils
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
 import org.eclipse.scout.sdk.core.util.FinalValue
@@ -41,10 +42,10 @@ class CompatibilityMethodCaller<T> {
         return selectedDescriptor.handler(ResolvedMethod(selectedDescriptor, methodCallable))
     }
 
-    class ResolvedMethod<R>(val descriptor: MethodDescriptor<R>, private val callable: (Any?, Array<out Any?>) -> R) {
+    class ResolvedMethod<R>(val descriptor: MethodDescriptor<R>, private val m_callable: (Any?, Array<out Any?>) -> R) {
 
         fun invoke(obj: Any?, vararg parameters: Any?) = try {
-            callable(obj, parameters)
+            m_callable(obj, parameters)
         } catch (e: InvocationTargetException) {
             throw e.targetException
         }
@@ -82,7 +83,7 @@ class CompatibilityMethodCaller<T> {
             }
         }
 
-        private fun resolveClass(fqn: String): Class<*> = CompatibilityMethodCaller::class.java.classLoader.loadClass(fqn)
+        private fun resolveClass(fqn: String): Class<*> = ClassUtils.getClass(CompatibilityMethodCaller::class.java.classLoader, fqn, true)
 
         fun resolvedClass(): Class<*> = m_resolvedClass.computeIfAbsentAndGet {
             resolveClass(declaringClassFqn)

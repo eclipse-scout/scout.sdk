@@ -567,7 +567,7 @@ public final class JdtUtils {
 
       var type = resource.getType();
       switch (type) {
-        case IResource.PROJECT:
+        case IResource.PROJECT -> {
           var project = (IProject) resource;
           try {
             if (project.isAccessible() && project.hasNature(JavaCore.NATURE_ID)) {
@@ -577,11 +577,9 @@ public final class JdtUtils {
           catch (CoreException e) {
             throw new SdkException(e);
           }
-          break;
-        case IResource.FILE:
-          addJavaElement(set, JavaCore.create((IFile) resource));
-          break;
-        case IResource.FOLDER:
+        }
+        case IResource.FILE -> addJavaElement(set, JavaCore.create((IFile) resource));
+        case IResource.FOLDER -> {
           try {
             resource.accept(proxy -> {
               if (proxy.getType() == IResource.FOLDER) {
@@ -595,8 +593,8 @@ public final class JdtUtils {
           catch (CoreException e) {
             throw new SdkException(e);
           }
-          break;
-        case IResource.ROOT:
+        }
+        case IResource.ROOT -> {
           var model = JavaCore.create((IWorkspaceRoot) resource);
           if (exists(model)) {
             try {
@@ -608,9 +606,8 @@ public final class JdtUtils {
               throw new SdkException(e);
             }
           }
-          break;
-        default:
-          throw new UnsupportedOperationException("Unknown resource type: " + type);
+        }
+        default -> throw new UnsupportedOperationException("Unknown resource type: " + type);
       }
     }
     if (set.isEmpty()) {

@@ -228,7 +228,7 @@ public abstract class AbstractDtoGenerator<TYPE extends AbstractDtoGenerator<TYP
         .filter(base::endsWith)
         .findFirst()
         .ifPresent(suffix -> result.append(base, 0, base.length() - suffix.length()));
-    if (result.length() < 1) {
+    if (result.isEmpty()) {
       // has none of the suffixes
       result.append(base);
     }

@@ -557,7 +557,7 @@ public final class Strings {
     if (text == null) {
       return null;
     }
-    if (text.length() < 1) {
+    if (text.isEmpty()) {
       return "";
     }
 
@@ -754,7 +754,7 @@ public final class Strings {
    * @return {@code true} if the CharSequence is empty or {@code null}
    */
   public static boolean isEmpty(CharSequence cs) {
-    return cs == null || cs.length() == 0;
+    return cs == null || cs.isEmpty();
   }
 
   /**
@@ -1014,7 +1014,7 @@ public final class Strings {
    */
   @SuppressWarnings("pmd:NPathComplexity")
   public static CharSequence replaceEach(CharSequence text, CharSequence[] searchList, CharSequence[] replacementList) {
-    if (text == null || text.length() == 0) {
+    if (text == null || text.isEmpty()) {
       return text;
     }
     if (searchList == null || searchList.length == 0) {
@@ -1040,7 +1040,7 @@ public final class Strings {
 
     // index of replace array that will replace the search string found
     for (var i = 0; i < searchLength; i++) {
-      if (noMoreMatchesForReplIndex[i] || searchList[i] == null || searchList[i].length() == 0 || replacementList[i] == null) {
+      if (noMoreMatchesForReplIndex[i] || searchList[i] == null || searchList[i].isEmpty() || replacementList[i] == null) {
         continue;
       }
       tempIndex = indexOf(searchList[i], text);
@@ -1080,7 +1080,7 @@ public final class Strings {
       replaceIndex = INDEX_NOT_FOUND;
       // find the next earliest match
       for (var i = 0; i < searchLength; i++) {
-        if (noMoreMatchesForReplIndex[i] || searchList[i] == null || searchList[i].length() == 0 || replacementList[i] == null) {
+        if (noMoreMatchesForReplIndex[i] || searchList[i] == null || searchList[i].isEmpty() || replacementList[i] == null) {
           continue;
         }
         tempIndex = indexOf(searchList[i], text, start);
@@ -1538,7 +1538,7 @@ public final class Strings {
    * @return The string with the suffix removed.
    */
   public static String removeSuffix(String string, CharSequence suffix, boolean isCaseSensitive) {
-    if (endsWith(string, suffix, isCaseSensitive) && suffix.length() > 0) {
+    if (endsWith(string, suffix, isCaseSensitive) && !suffix.isEmpty()) {
       return string.substring(0, string.length() - suffix.length());
     }
     return string;

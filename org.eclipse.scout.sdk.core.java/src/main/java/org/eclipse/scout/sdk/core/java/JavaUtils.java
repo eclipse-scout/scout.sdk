@@ -220,22 +220,12 @@ public final class JavaUtils {
     for (var idx = 0; idx < length; idx++) {
       var ch = s.charAt(idx);
       switch (ch) {
-        case '\b':
-          buffer.append("\\b");
-          break;
-        case '\t':
-          buffer.append("\\t");
-          break;
-        case '\n':
-          buffer.append("\\n");
-          break;
-        case '\f':
-          buffer.append("\\f");
-          break;
-        case '\r':
-          buffer.append("\\r");
-          break;
-        default:
+        case '\b' -> buffer.append("\\b");
+        case '\t' -> buffer.append("\\t");
+        case '\n' -> buffer.append("\\n");
+        case '\f' -> buffer.append("\\f");
+        case '\r' -> buffer.append("\\r");
+        default -> {
           if (ch == '\\') {
             buffer.append("\\\\");
           }
@@ -254,6 +244,7 @@ public final class JavaUtils {
           else {
             buffer.append(ch);
           }
+        }
       }
     }
     if (surroundWithStringDelimiter && stringDelimiter != null) {

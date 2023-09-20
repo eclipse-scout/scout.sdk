@@ -24,8 +24,8 @@ import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.callIn
 import org.eclipse.scout.sdk.s2i.toScoutProgress
 import java.util.concurrent.TimeUnit
 
-open class OperationTask(title: String, project: Project, private val transactionManager: TransactionManager? = null, private val task: (IdeaProgress) -> Unit)
-    : Task.Backgroundable(project, title, true, PerformInBackgroundOption.ALWAYS_BACKGROUND) {
+open class OperationTask(title: String, project: Project, private val m_transactionManager: TransactionManager? = null, private val m_task: (IdeaProgress) -> Unit) :
+    Task.Backgroundable(project, title, true, PerformInBackgroundOption.ALWAYS_BACKGROUND) {
 
     private val m_progress = FinalValue<ProgressIndicator>()
     private val m_listeners = EventListenerList()
@@ -38,15 +38,15 @@ open class OperationTask(title: String, project: Project, private val transactio
         val workForCommit = 10
         val workForTask = 1000
         scoutProgress.init(workForTask + workForCommit, title)
-        if (transactionManager == null) {
+        if (m_transactionManager == null) {
             // new independent top level transaction
             callInNewTransaction(project, title, { scoutProgress.newChild(workForCommit) }) {
-                task(scoutProgress.newChild(workForTask))
+                m_task(scoutProgress.newChild(workForTask))
             }
         } else {
             // new asynchronous task running in existing parent transaction
-            callInExistingTransaction(transactionManager) {
-                task(scoutProgress.newChild(workForTask))
+            callInExistingTransaction(m_transactionManager) {
+                m_task(scoutProgress.newChild(workForTask))
             }
         }
         SdkLog.debug("Task '{}' finished after {}ms.", title, System.currentTimeMillis() - start)

@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.util.Strings
 import java.util.*
 import javax.swing.JComponent
 
-open class ScoutSettings(private val project: Project) : SearchableConfigurable {
+open class ScoutSettings(private val m_project: Project) : SearchableConfigurable {
 
     companion object Current {
 
@@ -97,24 +97,24 @@ open class ScoutSettings(private val project: Project) : SearchableConfigurable 
     private fun getTranslationLanguageInUi() = m_form.translationLanguage
 
     override fun isModified() =
-            isAutoUpdateDerivedResourcesInUi() != isAutoUpdateDerivedResources(project)
-                    || isAutoCreateClassIdAnnotationsInUi() != isAutoCreateClassIdAnnotations(project)
-                    || getTranslationLanguageInUi() != getTranslationLanguage(project)
+        isAutoUpdateDerivedResourcesInUi() != isAutoUpdateDerivedResources(m_project)
+                || isAutoCreateClassIdAnnotationsInUi() != isAutoCreateClassIdAnnotations(m_project)
+                || getTranslationLanguageInUi() != getTranslationLanguage(m_project)
 
     override fun getId() = CONFIGURABLE_ID
 
     override fun getDisplayName() = DISPLAY_NAME
 
     override fun apply() {
-        setAutoUpdateDerivedResources(project, isAutoUpdateDerivedResourcesInUi())
-        setAutoCreateClassIdAnnotations(project, isAutoCreateClassIdAnnotationsInUi())
-        setTranslationLanguage(project, getTranslationLanguageInUi())
+        setAutoUpdateDerivedResources(m_project, isAutoUpdateDerivedResourcesInUi())
+        setAutoCreateClassIdAnnotations(m_project, isAutoCreateClassIdAnnotationsInUi())
+        setTranslationLanguage(m_project, getTranslationLanguageInUi())
     }
 
     override fun reset() {
-        m_form.isAutoUpdateDerivedResources = isAutoUpdateDerivedResources(project)
-        m_form.isAutoCreateClassId = isAutoCreateClassIdAnnotations(project)
-        m_form.translationLanguage = getTranslationLanguage(project)
+        m_form.isAutoUpdateDerivedResources = isAutoUpdateDerivedResources(m_project)
+        m_form.isAutoCreateClassId = isAutoCreateClassIdAnnotations(m_project)
+        m_form.translationLanguage = getTranslationLanguage(m_project)
     }
 
     override fun createComponent(): JComponent? {

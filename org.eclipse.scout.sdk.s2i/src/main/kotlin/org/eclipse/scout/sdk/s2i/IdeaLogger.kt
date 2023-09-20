@@ -89,10 +89,10 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
         notification.notify(null)
     }
 
-    private class ShowThrowableAction(private val throwable: Throwable) : NotificationAction(message("details") + "...") {
+    private class ShowThrowableAction(private val m_throwable: Throwable) : NotificationAction(message("details") + "...") {
         override fun actionPerformed(e: AnActionEvent, notification: Notification) {
             val pos = JBPopupFactory.getInstance().guessBestPopupLocation(e.dataContext)
-            val detailsText = Strings.fromThrowable(throwable)
+            val detailsText = Strings.fromThrowable(m_throwable)
             val textArea = JBTextArea(detailsText, 40, 150)
             textArea.isEditable = false
             val scrollPane = JBScrollPane(textArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED)

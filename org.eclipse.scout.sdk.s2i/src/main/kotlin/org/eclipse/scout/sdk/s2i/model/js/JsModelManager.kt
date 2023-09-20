@@ -95,7 +95,7 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
         NodeModulesProvider.removeProvider(project)
     }
 
-    private class PsiListener(private val project: Project) : PsiTreeChangeAdapter() {
+    private class PsiListener(private val m_project: Project) : PsiTreeChangeAdapter() {
 
         private val m_delayedProcessor = DelayedBuffer(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true, this::processFileEvents)
 
@@ -106,8 +106,8 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
         }
 
         private fun processFileEvents(events: List<PsiFile>) {
-            if (!project.isInitialized || events.isEmpty()) return
-            val changedPaths = computeInReadAction(project) { // PsiElement.isValid may require read-action
+            if (!m_project.isInitialized || events.isEmpty()) return
+            val changedPaths = computeInReadAction(m_project) { // PsiElement.isValid may require read-action
                 events
                     .asSequence()
                     .filter { it.isPhysical && !it.isDirectory && it.isValid }

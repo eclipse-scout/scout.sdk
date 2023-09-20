@@ -115,11 +115,11 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
     }
 
     private class TemplateListener(
-        private val templateDescriptor: TemplateDescriptor,
-        private val editor: Editor,
-        private val settingsManager: CodeStyleSettingsManager,
-        private val origSettings: CodeStyleSettings?,
-        private val positionSupplier: () -> Int
+        private val m_templateDescriptor: TemplateDescriptor,
+        private val m_editor: Editor,
+        private val m_settingsManager: CodeStyleSettingsManager,
+        private val m_origSettings: CodeStyleSettings?,
+        private val m_positionSupplier: () -> Int
     ) : TemplateEditingAdapter() {
 
         override fun templateCancelled(template: Template?) {
@@ -145,20 +145,20 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
                     return start
                 }
             }
-            return positionSupplier()
+            return m_positionSupplier()
         }
 
         private fun resetTemporarySettings() {
-            if (origSettings != null) {
-                settingsManager.setTemporarySettings(origSettings)
+            if (m_origSettings != null) {
+                m_settingsManager.setTemporarySettings(m_origSettings)
             } else {
-                settingsManager.dropTemporarySettings()
+                m_settingsManager.dropTemporarySettings()
             }
         }
 
         private fun resolveInnerTypeGetterContainer(createdClass: PsiClass): Pair<PsiClass, String>? {
             val containingModule = createdClass.containingModule() ?: return null
-            for (info in templateDescriptor.innerTypeGetterInfos()) {
+            for (info in m_templateDescriptor.innerTypeGetterInfos()) {
                 val container = if (info.lookupType == TemplateDescriptor.InnerTypeGetterLookupType.CLOSEST) {
                     val innerTypeGetterBase = containingModule.findTypeByName(info.definitionClassFqn) ?: continue
                     findEnclosingInstanceInScope(innerTypeGetterBase, createdClass, alwaysTrue(), false)
@@ -176,9 +176,9 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
 
         private fun insertInnerTypeGetter(insertPos: Int) {
             if (insertPos < 0) return
-            val project = editor.project ?: return
+            val project = m_editor.project ?: return
             if (UndoManager.getInstance(project).isUndoInProgress) return
-            val document = editor.document
+            val document = m_editor.document
             val psiDocumentManager = PsiDocumentManager.getInstance(project)
             val file = psiDocumentManager.getPsiFile(document) ?: return
             val element = file.findElementAt(insertPos) ?: return

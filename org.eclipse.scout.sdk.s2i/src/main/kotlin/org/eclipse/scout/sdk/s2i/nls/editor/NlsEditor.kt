@@ -42,7 +42,7 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
 
-class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserDataHolderBase(), FileEditor {
+class NlsEditor(val project: Project, private val m_virtualFile: VirtualFile) : UserDataHolderBase(), FileEditor {
 
     private val m_root = RootPanel()
 
@@ -66,7 +66,7 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
                 // do not schedule directly. instead, schedule after this paint. Otherwise, there might be ArrayIndexOutOfBoundsExceptions in swing.
                 ApplicationManager.getApplication().invokeLater {
                     FileDocumentManager.getInstance().saveAllDocuments() // ensures all changes are visible to the loader.
-                    TranslationManagerLoader.createModalLoader(vFile, project, Translations.DependencyScope.ALL)
+                    TranslationManagerLoader.createModalLoader(m_virtualFile, project, Translations.DependencyScope.ALL)
                         .withErrorHandler { onLoadError(it) }
                         .withManagerCreatedHandler { onManagerCreated(it) }
                         .queue()
@@ -111,7 +111,7 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
     }
 
     private fun doReloadCheck() = IdeaEnvironment.computeInReadActionAsync(project) {
-        val newManager = vFile.containingModule(project)
+        val newManager = m_virtualFile.containingModule(project)
             ?.let { TranslationManagerLoader.createManager(it, Translations.DependencyScope.ALL, false, null) }
             ?.manager ?: return@computeInReadActionAsync
         if (!newManager.contentEquals(m_manager)) {
@@ -122,7 +122,7 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
     private fun showPropertiesFilesChangedOutsideEditorMessage() = ApplicationManager.getApplication().invokeLater {
         val parent = m_content
         val message = message("translations.changed.reload.question")
-        val title = vFile.name
+        val title = m_virtualFile.name
         val icon = Messages.getQuestionIcon()
         val result = if (parent == null) Messages.showYesNoDialog(project, message, title, icon) else Messages.showYesNoDialog(parent, message, title, icon)
         setReloadCheckNecessary(false) // reload will be scheduled just afterwards or user not interested in the changes
@@ -161,7 +161,7 @@ class NlsEditor(val project: Project, private val vFile: VirtualFile) : UserData
 
     private fun isEditorActive() = m_editorActive
 
-    override fun getFile() = vFile
+    override fun getFile() = m_virtualFile
 
     override fun isModified() = false
 

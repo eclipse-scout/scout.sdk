@@ -176,7 +176,7 @@ public class TranslationManager {
     // remove not allowed characters from the first segment
     var firstSegment = new StringBuilder(segments[0]);
     //noinspection CharacterComparison
-    while (firstSegment.length() > 0 && !((firstSegment.charAt(0) >= 'a' && firstSegment.charAt(0) <= 'z') || (firstSegment.charAt(0) >= 'A' && firstSegment.charAt(0) <= 'Z'))) {
+    while (!firstSegment.isEmpty() && !((firstSegment.charAt(0) >= 'a' && firstSegment.charAt(0) <= 'z') || (firstSegment.charAt(0) >= 'A' && firstSegment.charAt(0) <= 'Z'))) {
       firstSegment.deleteCharAt(0);
     }
     segments[0] = firstSegment.toString();
@@ -184,7 +184,7 @@ public class TranslationManager {
     // remove not allowed characters from the last segment
     if (segments.length > 1) {
       var lastSegment = new StringBuilder(segments[segments.length - 1]);
-      while (lastSegment.length() > 0 && (lastSegment.charAt(lastSegment.length() - 1) == '.' || lastSegment.charAt(lastSegment.length() - 1) == '-')) {
+      while (!lastSegment.isEmpty() && (lastSegment.charAt(lastSegment.length() - 1) == '.' || lastSegment.charAt(lastSegment.length() - 1) == '-')) {
         lastSegment.deleteCharAt(lastSegment.length() - 1);
       }
       segments[segments.length - 1] = lastSegment.toString();

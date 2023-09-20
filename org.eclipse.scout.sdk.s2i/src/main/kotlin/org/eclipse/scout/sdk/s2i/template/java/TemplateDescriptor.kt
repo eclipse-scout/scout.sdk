@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.s2i.template.BoolVariableAdapter
 import org.eclipse.scout.sdk.s2i.template.EnumVariableAdapter
 import org.eclipse.scout.sdk.s2i.template.VariableDescriptor
 
-class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader = TemplateDescriptor::class.java.classLoader) {
+class TemplateDescriptor(val id: String, private val m_resourceLoader: ClassLoader = TemplateDescriptor::class.java.classLoader) {
 
     companion object {
         const val VARIABLE_NAME = "name"
@@ -55,7 +55,7 @@ class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader
         withVariable(PREDEFINED_VARIABLE_COMPLETE) { VariableDescriptor(PREDEFINED_VARIABLE_COMPLETE, "complete()") }
     }
 
-    constructor(original: TemplateDescriptor) : this(original.id, original.resourceLoader) {
+    constructor(original: TemplateDescriptor) : this(original.id, original.m_resourceLoader) {
         m_name = original.m_name
         m_description = original.m_description
         m_superClassInfo = original.m_superClassInfo
@@ -103,7 +103,7 @@ class TemplateDescriptor(val id: String, private val resourceLoader: ClassLoader
 
     fun source(): String = m_source.computeIfAbsentAndGet {
         val templatePath = id.replace('.', '/') + ".txt"
-        resourceLoader.getResource(templatePath)?.readText() ?: throw newFail("Template source could not be found on classpath '{}' in classloader '{}'.", templatePath, resourceLoader)
+        m_resourceLoader.getResource(templatePath)?.readText() ?: throw newFail("Template source could not be found on classpath '{}' in classloader '{}'.", templatePath, m_resourceLoader)
     }
 
     fun copy() = TemplateDescriptor(this)

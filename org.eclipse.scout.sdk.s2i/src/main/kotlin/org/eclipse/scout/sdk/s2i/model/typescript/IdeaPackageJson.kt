@@ -33,10 +33,10 @@ import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.StreamSupport
 
-class IdeaPackageJson(private val ideaModule: IdeaNodeModule, private val moduleDir: VirtualFile) : AbstractNodeElementSpi<IPackageJson>(ideaModule), PackageJsonSpi {
+class IdeaPackageJson(private val m_ideaModule: IdeaNodeModule, private val m_moduleDir: VirtualFile) : AbstractNodeElementSpi<IPackageJson>(m_ideaModule), PackageJsonSpi {
 
     private val m_dependencies = FinalValue<Collection<NodeModuleSpi>>()
-    private val m_packageJson = moduleDir.findChild(IPackageJson.FILE_NAME) ?: throw SdkException("Invalid Node module dir: '{}'. No {} found in this directory.", moduleDir, IPackageJson.FILE_NAME)
+    private val m_packageJson = m_moduleDir.findChild(IPackageJson.FILE_NAME) ?: throw SdkException("Invalid Node module dir: '{}'. No {} found in this directory.", m_moduleDir, IPackageJson.FILE_NAME)
     private val m_root by lazy {
         try {
             InputStreamReader(content()).use { JsonParser.parseReader(it) }.asJsonObject
@@ -52,15 +52,15 @@ class IdeaPackageJson(private val ideaModule: IdeaNodeModule, private val module
 
     override fun exportType() = INodeElement.ExportType.NONE
 
-    override fun containingDir() = moduleDir.resolveLocalPath()
+    override fun containingDir() = m_moduleDir.resolveLocalPath()
 
     override fun resolveContainingFile(): Path = api().location()
 
-    override fun existsFile(relPath: String) = moduleDir.findFileByRelativePath(relPath) != null
+    override fun existsFile(relPath: String) = m_moduleDir.findFileByRelativePath(relPath) != null
 
     override fun dependencies(): Collection<NodeModuleSpi> = m_dependencies.computeIfAbsentAndGet {
-        NodeModuleUtils.findDependenciesInNodeModulesDirs(moduleDir).asSequence()
-            .mapNotNull { ideaModule.moduleInventory.getOrCreateModule(it) }
+        NodeModuleUtils.findDependenciesInNodeModulesDirs(m_moduleDir).asSequence()
+            .mapNotNull { m_ideaModule.moduleInventory.getOrCreateModule(it) }
             .toSet()
     }
 

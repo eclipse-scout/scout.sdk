@@ -20,28 +20,28 @@ import java.util.function.Consumer
 /**
  * Unwraps [ExecutionException] when getting the result from the future
  */
-internal class WrappingCancellablePromise<T>(private val inner: CancellablePromise<T>) : AsyncPromise<T>() {
+internal class WrappingCancellablePromise<T>(private val m_inner: CancellablePromise<T>) : AsyncPromise<T>() {
 
     override fun blockingGet(timeout: Int) = try {
-        inner.blockingGet(timeout)
+        m_inner.blockingGet(timeout)
     } catch (e: Throwable) {
         throw unwrap(e)
     }
 
     override fun blockingGet(timeout: Int, timeUnit: TimeUnit) = try {
-        inner.blockingGet(timeout, timeUnit)
+        m_inner.blockingGet(timeout, timeUnit)
     } catch (e: Throwable) {
         throw unwrap(e)
     }
 
     override fun get(): T = try {
-        inner.get()
+        m_inner.get()
     } catch (e: Throwable) {
         throw unwrap(e)
     }
 
     override fun get(timeout: Long, unit: TimeUnit): T = try {
-        inner.get(timeout, unit)
+        m_inner.get(timeout, unit)
     } catch (e: Throwable) {
         throw unwrap(e)
     }
@@ -52,30 +52,30 @@ internal class WrappingCancellablePromise<T>(private val inner: CancellablePromi
     }
 
     override fun <SUB_RESULT : Any?> then(done: Function<in T, out SUB_RESULT>): CancellablePromise<SUB_RESULT> =
-            WrappingCancellablePromise(inner.then(done) as CancellablePromise<SUB_RESULT>)
+        WrappingCancellablePromise(m_inner.then(done) as CancellablePromise<SUB_RESULT>)
 
     override fun <SUB_RESULT : Any?> thenAsync(doneF: Function<in T, out Promise<SUB_RESULT>>): CancellablePromise<SUB_RESULT> =
-            WrappingCancellablePromise(inner.thenAsync(doneF) as CancellablePromise<SUB_RESULT>)
+        WrappingCancellablePromise(m_inner.thenAsync(doneF) as CancellablePromise<SUB_RESULT>)
 
     override fun onSuccess(handler: Consumer<in T>): AsyncPromise<T> =
-            WrappingCancellablePromise(inner.onSuccess(handler))
+        WrappingCancellablePromise(m_inner.onSuccess(handler))
 
     override fun onError(rejected: Consumer<in Throwable>): AsyncPromise<T> =
-            WrappingCancellablePromise(inner.onError(rejected))
+        WrappingCancellablePromise(m_inner.onError(rejected))
 
     override fun processed(child: Promise<in T>): CancellablePromise<T> =
-            WrappingCancellablePromise(inner.processed(child) as CancellablePromise<T>)
+        WrappingCancellablePromise(m_inner.processed(child) as CancellablePromise<T>)
 
     override fun onProcessed(processed: Consumer<in T?>) =
-            WrappingCancellablePromise(inner.onProcessed(processed))
+        WrappingCancellablePromise(m_inner.onProcessed(processed))
 
-    override fun getState() = inner.state
+    override fun getState() = m_inner.state
 
-    override fun cancel() = inner.cancel()
+    override fun cancel() = m_inner.cancel()
 
-    override fun cancel(mayInterruptIfRunning: Boolean) = inner.cancel(mayInterruptIfRunning)
+    override fun cancel(mayInterruptIfRunning: Boolean) = m_inner.cancel(mayInterruptIfRunning)
 
-    override fun isCancelled() = inner.isCancelled
+    override fun isCancelled() = m_inner.isCancelled
 
-    override fun isDone() = inner.isDone
+    override fun isDone() = m_inner.isDone
 }

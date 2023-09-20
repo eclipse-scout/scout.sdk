@@ -120,7 +120,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
 
   protected void addConvenienceMethodsMarkerCommentToFirst(Collection<Replacement> replacements) {
     replacements.stream()
-        .filter(r -> r.newSource().length() > 0) // not a delete replacement
+        .filter(r -> !r.newSource().isEmpty()) // not a delete replacement
         .findFirst()
         .ifPresent(r -> r.setNewSource(lineSeparator() + ScoutDoMethodGenerator.convenienceMethodsMarkerComment(lineSeparator()) + lineSeparator() + r.newSource()));
   }

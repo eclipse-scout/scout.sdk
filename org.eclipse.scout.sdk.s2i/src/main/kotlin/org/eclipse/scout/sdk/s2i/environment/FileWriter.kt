@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.toVirtualFile
 import java.nio.file.Path
 
-open class FileWriter(val targetFile: Path, private val content: CharSequence, val project: Project) : TransactionMember {
+open class FileWriter(val targetFile: Path, private val m_content: CharSequence, val project: Project) : TransactionMember {
 
     override fun file(): Path = targetFile
 
@@ -46,7 +46,7 @@ open class FileWriter(val targetFile: Path, private val content: CharSequence, v
             SdkLog.warning("Cannot load document for file '{}' to change its content.", targetFile)
             return false
         }
-        document.setText(content)
+        document.setText(m_content)
         progress.worked(1)
         return true
     }

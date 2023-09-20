@@ -153,7 +153,7 @@ public class JreInfo {
       }
       if (startsWith(line, prefix, false)) {
         var value = withoutQuotes(trim(line.substring(prefix.length())));
-        if (value.length() > 0) {
+        if (!value.isEmpty()) {
           return parseVersion(value);
         }
       }

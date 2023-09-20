@@ -20,7 +20,7 @@ import javax.swing.table.TableModel
 /**
  * A [JBTable] which tries to preserve selection, column width and sort order when the table data or structure changes.
  */
-open class TablePreservingSelection(model: TableModel, private val indexToRowMapper: (Int) -> Any, private val rowToIndexMapper: (Any) -> Int) : JBTable(model) {
+open class TablePreservingSelection(model: TableModel, private val m_indexToRowMapper: (Int) -> Any, private val m_rowToIndexMapper: (Any) -> Int) : JBTable(model) {
 
     private var m_selectionListenerArmed = true
     private val m_selectedRows = ArrayList<Any>()
@@ -73,7 +73,7 @@ open class TablePreservingSelection(model: TableModel, private val indexToRowMap
 
         // compute new indices
         val newRowIndices = m_selectedRows
-                .map { rowToIndexMapper(it) }
+            .map { m_rowToIndexMapper(it) }
                 .filter { it >= 0 }
                 .map { convertRowIndexToView(it) }
         val newColIndices = selectedHeaders
@@ -150,8 +150,8 @@ open class TablePreservingSelection(model: TableModel, private val indexToRowMap
         }
         m_selectedRows.clear()
         m_selectedRows.addAll(
-                selectedRows
-                        .map { convertRowIndexToModel(it) }
-                        .map { indexToRowMapper(it) })
+            selectedRows
+                .map { convertRowIndexToModel(it) }
+                .map { m_indexToRowMapper(it) })
     }
 }

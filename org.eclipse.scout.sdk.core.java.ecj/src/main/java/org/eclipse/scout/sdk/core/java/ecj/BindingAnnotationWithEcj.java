@@ -94,7 +94,7 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
 
     // fill declared values
     var resultArr = new AnnotationElementSpi[defaultsMap.size()];
-    if (declaredPairs != null && declaredPairs.length > 0) {
+    if (declaredPairs != null) {
       for (var declaredPair : declaredPairs) {
         var v = createAnnotationElementSpi(declaredPair, false, owner, env);
         var idx = elementPositionMap.get(v.getElementName());

@@ -246,9 +246,9 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
     private inner class TranslationNewActionGroup : AbstractStoresAction(message("create.new.translation.in.service"), message("create.new.translation.in"),
         AllIcons.CodeStyle.AddNewSectionRule, translationManager.allEditableStores().collect(toList()), { TranslationNewDialogOpenAction(it) })
 
-    private inner class TranslationNewDialogOpenAction(private val store: ITranslationStore) : DumbAwareAction(store.service().type().elementName()) {
+    private inner class TranslationNewDialogOpenAction(private val m_store: ITranslationStore) : DumbAwareAction(m_store.service().type().elementName()) {
         override fun actionPerformed(e: AnActionEvent) {
-            val dialog = TranslationNewDialog(project, store, translationManager)
+            val dialog = TranslationNewDialog(project, m_store, translationManager)
             val ok = dialog.showAndGet()
             if (ok) {
                 val createdTranslation = dialog.createdTranslation() ?: return
@@ -311,7 +311,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
             val textLocateAction = TranslationTextLocateAction(selectedTranslation, selectedLanguages[0])
             val group = DefaultActionGroup(listOf(servicesLocateAction, textLocateAction))
             val popup = JBPopupFactory.getInstance().createActionGroupPopup(templatePresentation.text, group, e.dataContext, JBPopupFactory.ActionSelectionAid.NUMBERING, false)
-            popup.showUnderneathOf(e.inputEvent.component)
+            e.inputEvent?.component?.let { popup.showUnderneathOf(it) }
         }
     }
 
@@ -324,9 +324,9 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
     private inner class TranslationServicesLocateAction(stores: List<ITranslationStore>) : AbstractStoresAction(message("jump.to.text.service"), message("choose.text.service"),
         AllIcons.Nodes.Services, stores, { TranslationServiceLocateAction(it) })
 
-    private inner class TranslationServiceLocateAction(private val store: ITranslationStore) : DumbAwareAction(store.service().type().elementName(), null, AllIcons.Nodes.Services) {
+    private inner class TranslationServiceLocateAction(private val m_store: ITranslationStore) : DumbAwareAction(m_store.service().type().elementName(), null, AllIcons.Nodes.Services) {
         override fun actionPerformed(e: AnActionEvent) {
-            store.service().type().resolvePsi()?.navigate(true)
+            m_store.service().type().resolvePsi()?.navigate(true)
         }
     }
 
@@ -466,7 +466,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
                 val popupActions = storesWithoutDuplicates.map { task(it) }
                 val group = DefaultActionGroup(popupActions)
                 val popup = JBPopupFactory.getInstance().createActionGroupPopup(groupTitle, group, e.dataContext, JBPopupFactory.ActionSelectionAid.NUMBERING, false)
-                popup.showUnderneathOf(e.inputEvent.component)
+                e.inputEvent?.component?.let { popup.showUnderneathOf(it) }
             }
         }
     }

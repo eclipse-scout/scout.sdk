@@ -44,45 +44,32 @@ public final class SimpleGenerators {
   }
 
   public static ISourceGenerator<IExpressionBuilder<?>> createMetaValueGenerator(IMetaValue mv, IWorkingCopyTransformer transformer) {
-    switch (mv.type()) {
-      case Null:
-        return b -> b.append("null");
-      case Int:
-        return b -> b.append(mv.as(Integer.class));
-      case Byte:
-        return b -> b.append(mv.as(Byte.class));
-      case Short:
-        return b -> b.append(mv.as(Short.class));
-      case Char:
-        return b -> b.append('\'')
-            .append(mv.as(Character.class))
-            .append('\'');
-      case Float:
-        return b -> b.append(mv.as(Float.class))
-            .append('f');
-      case Double:
-        return b -> b.append(mv.as(Double.class));
-      case Bool:
-        return b -> b.append(mv.as(Boolean.class));
-      case Long:
-        return b -> b.append(mv.as(Long.class))
-            .append('L');
-      case String:
-        return b -> b.stringLiteral(mv.as(String.class));
-      case Type:
-        return b -> b.classLiteral(mv.as(IType.class).reference(true));
-      case Enum:
+    return switch (mv.type()) {
+      case Null -> b -> b.append("null");
+      case Int -> b -> b.append(mv.as(Integer.class));
+      case Byte -> b -> b.append(mv.as(Byte.class));
+      case Short -> b -> b.append(mv.as(Short.class));
+      case Char -> b -> b.append('\'')
+          .append(mv.as(Character.class))
+          .append('\'');
+      case Float -> b -> b.append(mv.as(Float.class))
+          .append('f');
+      case Double -> b -> b.append(mv.as(Double.class));
+      case Bool -> b -> b.append(mv.as(Boolean.class));
+      case Long -> b -> b.append(mv.as(Long.class))
+          .append('L');
+      case String -> b -> b.stringLiteral(mv.as(String.class));
+      case Type -> b -> b.classLiteral(mv.as(IType.class).reference(true));
+      case Enum -> {
         var field = mv.as(IField.class);
-        return b -> b.enumValue(field.requireDeclaringType().name(), field.elementName());
-      case Annotation:
-        return transformAnnotation(mv.as(IAnnotation.class), transformer)
-            .<ISourceGenerator<IExpressionBuilder<?>>> map(g -> b -> b.append(g))
-            .orElseGet(ISourceGenerator::empty);
-      case Array:
-        return createArrayMetaValueGenerator((IArrayMetaValue) mv, transformer);
-      default:
-        return b -> b.append("UNKNOWN(").append(mv.type().toString()).append(", ").append(mv.toString()).append(')');
-    }
+        yield b -> b.enumValue(field.requireDeclaringType().name(), field.elementName());
+      }
+      case Annotation -> transformAnnotation(mv.as(IAnnotation.class), transformer)
+          .<ISourceGenerator<IExpressionBuilder<?>>> map(g -> b -> b.append(g))
+          .orElseGet(ISourceGenerator::empty);
+      case Array -> createArrayMetaValueGenerator((IArrayMetaValue) mv, transformer);
+      default -> b -> b.append("UNKNOWN(").append(mv.type().toString()).append(", ").append(mv.toString()).append(')');
+    };
   }
 
   public static ISourceGenerator<IExpressionBuilder<?>> createArrayMetaValueGenerator(IArrayMetaValue mv, IWorkingCopyTransformer transformer) {

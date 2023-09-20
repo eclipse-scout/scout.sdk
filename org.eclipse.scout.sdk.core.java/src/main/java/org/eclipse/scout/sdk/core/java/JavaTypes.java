@@ -314,7 +314,7 @@ public final class JavaTypes {
    */
   public static boolean isArray(CharSequence fqn) {
     return fqn != null
-        && fqn.length() > 0
+        && !fqn.isEmpty()
         && fqn.charAt(fqn.length() - 1) == ']';
   }
 
