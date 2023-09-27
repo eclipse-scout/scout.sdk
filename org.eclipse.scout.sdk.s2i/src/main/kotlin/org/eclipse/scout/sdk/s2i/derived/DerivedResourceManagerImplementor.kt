@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.sdk.s2i.derived
 
-import com.intellij.AppTopics
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
@@ -37,6 +36,7 @@ import org.eclipse.scout.sdk.s2i.environment.TransactionManager
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.callInExistingTransaction
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
 import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
+import org.eclipse.scout.sdk.s2i.util.compat.AppTopics
 import java.util.Collections.emptyList
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
@@ -76,7 +76,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
             return@synchronized
         }
         m_busConnection = project.messageBus.connect()
-        m_busConnection?.subscribe(AppTopics.FILE_DOCUMENT_SYNC, DocumentSyncListener())
+        m_busConnection?.subscribe(AppTopics.fileDocumentSync(), DocumentSyncListener())
     }
 
     private fun unsubscribe() = synchronized(this) {

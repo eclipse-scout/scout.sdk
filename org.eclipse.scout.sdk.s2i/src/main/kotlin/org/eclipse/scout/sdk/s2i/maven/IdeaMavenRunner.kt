@@ -31,7 +31,6 @@ import org.jetbrains.idea.maven.execution.MavenRunnerParameters
 import org.jetbrains.idea.maven.execution.MavenRunnerSettings
 import org.jetbrains.idea.maven.project.MavenGeneralSettings
 import org.jetbrains.idea.maven.project.MavenProjectsManager
-import org.jetbrains.idea.maven.utils.MavenUtil
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -66,14 +65,10 @@ open class IdeaMavenRunner : IMavenRunnerSpi, StartupActivity, DumbAware {
 
     protected fun getGeneralSettings(project: Project, build: MavenBuild): MavenGeneralSettings {
         val projectsManager = MavenProjectsManager.getInstance(project)
-        val mavenHome = MavenUtil.resolveMavenHomeDirectory(projectsManager.generalSettings.mavenHome)
-                ?: throw Ensure.newFail("No valid Maven installation found. " +
-                        "Either set the home directory in the configuration dialog or set the M2_HOME environment variable on your system.")
         val debug = SdkLog.isDebugEnabled() || build.hasOption(MavenBuild.OPTION_DEBUG)
         val generalSettings = projectsManager.generalSettings.clone()
         generalSettings.beginUpdate()
         try {
-            generalSettings.mavenHome = mavenHome.path
             generalSettings.isAlwaysUpdateSnapshots = build.hasOption(MavenBuild.OPTION_UPDATE_SNAPSHOTS)
             generalSettings.isNonRecursive = build.hasOption(MavenBuild.OPTION_NON_RECURSIVE)
             generalSettings.isWorkOffline = build.hasOption(MavenBuild.OPTION_OFFLINE)

@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.sdk.s2i.nls
 
-import com.intellij.AppTopics
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -24,6 +23,7 @@ import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile
 import org.eclipse.scout.sdk.core.util.TtlCache
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader.createManager
+import org.eclipse.scout.sdk.s2i.util.compat.AppTopics
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
@@ -42,7 +42,7 @@ class TranslationManagerCache(val project: Project) : Disposable {
 
     init {
         m_busConnection = project.messageBus.connect()
-        m_busConnection?.subscribe(AppTopics.FILE_DOCUMENT_SYNC, DocumentSyncListener())
+        m_busConnection?.subscribe(AppTopics.fileDocumentSync(), DocumentSyncListener())
     }
 
     /**
