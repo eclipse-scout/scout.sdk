@@ -197,7 +197,7 @@ public class StructuredType implements IStructuredType {
     for (var cat : categories) {
       var references = getElementsInternal(cat);
       if (references != null && !references.isEmpty()) {
-        for (IJavaElement reference : references) {
+        for (var reference : references) {
           if (reference.elementName().compareTo(siblingName) > 0) {
             return reference;
           }

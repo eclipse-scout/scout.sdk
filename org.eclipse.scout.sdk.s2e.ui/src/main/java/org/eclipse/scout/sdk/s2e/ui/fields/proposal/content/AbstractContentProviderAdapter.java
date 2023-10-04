@@ -133,7 +133,7 @@ public abstract class AbstractContentProviderAdapter extends BaseLabelProvider
       }
 
       Collection<Object> result = new ArrayList<>(proposals.size());
-      for (Object o : proposals) {
+      for (var o : proposals) {
         if (monitor != null && monitor.isCanceled()) {
           break;
         }

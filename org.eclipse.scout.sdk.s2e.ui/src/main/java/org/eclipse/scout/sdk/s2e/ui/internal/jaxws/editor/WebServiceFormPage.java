@@ -732,7 +732,7 @@ public class WebServiceFormPage extends FormPage {
   }
 
   protected boolean isValidPackage(Iterable<? extends TextField> fields) {
-    for (TextField field : fields) {
+    for (var field : fields) {
       if (field.isEnabled()) {
         var status = AbstractCompilationUnitNewWizardPage.validatePackageName(field.getText());
         if (!status.isOK()) {

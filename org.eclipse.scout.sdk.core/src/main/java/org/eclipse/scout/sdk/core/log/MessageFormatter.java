@@ -99,7 +99,7 @@ public final class MessageFormatter {
       }
     }
     else if (o instanceof Iterable<?> it) {
-      for (Object element : it) {
+      for (var element : it) {
         searchForThrowables(element, collector);
       }
     }

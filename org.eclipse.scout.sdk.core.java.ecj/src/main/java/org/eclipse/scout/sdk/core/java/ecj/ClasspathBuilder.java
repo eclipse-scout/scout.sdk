@@ -130,7 +130,7 @@ public class ClasspathBuilder {
       version = null; // multi release JARs are not supported before Java 9.
     }
 
-    for (ClasspathEntry cpe : paths) {
+    for (var cpe : paths) {
       if (result.containsKey(cpe)) {
         continue; // skip duplicates. using the first of all duplicates on the cp
       }

@@ -134,7 +134,7 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
   protected List<IProject> importIntoWorkspace(EclipseProgress progress) throws CoreException {
     List<Path> subFolders;
     try (var files = Files.list(getTargetDirectory().resolve(getArtifactId()))) {
-      subFolders = files.collect(toList());
+      subFolders = files.toList();
     }
     catch (IOException e) {
       throw new CoreException(new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "Unable to list content of " + getTargetDirectory(), e));

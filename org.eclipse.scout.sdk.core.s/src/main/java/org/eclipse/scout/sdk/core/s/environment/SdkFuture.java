@@ -90,7 +90,7 @@ public class SdkFuture<V> extends CompletableFuture<Supplier<V>> implements IFut
     }
 
     Collection<Throwable> errors = new ArrayList<>();
-    for (IFuture<?> future : futures) {
+    for (var future : futures) {
       if (future == null) {
         continue;
       }

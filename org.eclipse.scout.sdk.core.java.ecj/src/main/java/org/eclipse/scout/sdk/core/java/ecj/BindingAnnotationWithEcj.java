@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.jdt.internal.compiler.ast.Annotation;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
@@ -104,7 +103,7 @@ public class BindingAnnotationWithEcj extends AbstractJavaElementWithEcj<IAnnota
 
     var pos = 0;
     Map<String, AnnotationElementSpi> result = new LinkedHashMap<>(defaultsMap.size());
-    for (Entry<String, ?> e : defaultsMap.entrySet()) {
+    for (var e : defaultsMap.entrySet()) {
       var declaredElement = resultArr[pos];
       if (declaredElement == null) {
         // add default value

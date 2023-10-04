@@ -13,9 +13,9 @@ import com.intellij.openapi.roots.LanguageLevelProjectExtension
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.testFramework.builders.JavaModuleFixtureBuilder
 import com.intellij.testFramework.fixtures.JavaCodeInsightFixtureTestCase
-import com.intellij.util.io.isFile
 import org.eclipse.scout.sdk.core.java.ecj.JreInfo
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
+import kotlin.io.path.isRegularFile
 
 abstract class AbstractTestCaseWithRunningClasspathModule : JavaCodeInsightFixtureTestCase() {
 
@@ -35,7 +35,7 @@ abstract class AbstractTestCaseWithRunningClasspathModule : JavaCodeInsightFixtu
             .addJdk(jreHome.toString())
             .setLanguageLevel(m_javaLanguageLevel)
         JreInfo.runningUserClassPath(jreHome)
-            .filter { it.isFile() }
+            .filter { it.isRegularFile() }
             .forEach { moduleBuilder.addLibrary(it.fileName.toString(), it.toString()) }
     }
 }
