@@ -13,7 +13,7 @@
     xmlns="https://www.eclipse.org/schema/common"
     targetNamespace="https://www.eclipse.org/schema/common">
 
-  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="https://www.w3.org/2009/01/xml.xsd"/>
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
 
   <xs:simpleType name="CodeTypeType">
     <xs:restriction base="xs:string">
