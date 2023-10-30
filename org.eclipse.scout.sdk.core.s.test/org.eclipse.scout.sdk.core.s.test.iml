@@ -91,11 +91,13 @@
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.json:22.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.4" level="project" />
+    <orderEntry type="library" name="Maven: commons-fileupload:commons-fileupload:1.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:sources:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.jboss:jandex:2.4.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-api:1.28.0" level="project" />
+    <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-context:1.28.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.security:22.0-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.google.http-client:google-http-client-apache-v2:1.40.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.http-client:google-http-client:1.40.1" level="project" />
