@@ -49,7 +49,6 @@
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/out" />
     </content>
-    <orderEntry type="jdk" jdkName="IntelliJ IDEA IU-201.7846.76" jdkType="IDEA JDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s" />
@@ -479,10 +478,12 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.quartz-scheduler:quartz:2.3.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:jcl-over-slf4j:1.7.32" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.slf4j:slf4j-api:1.7.32" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: io.opentelemetry:opentelemetry-api:1.28.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.junit.platform:junit-platform-engine:1.7.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.junit.platform:junit-platform-commons:1.7.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.apiguardian:apiguardian-api:1.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.opentest4j:opentest4j:1.2.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: io.opentelemetry:opentelemetry-context:1.28.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.apache.httpcomponents:httpcore:4.4.14" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: commons-logging:commons-logging:1.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: io.opencensus:opencensus-contrib-http-util:0.28.0" level="project" />
@@ -495,5 +496,6 @@
     <orderEntry type="library" scope="TEST" name="Gradle: org.checkerframework:checker-compat-qual:2.5.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.errorprone:error_prone_annotations:2.5.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: io.grpc:grpc-context:1.27.2" level="project" />
+    <orderEntry type="jdk" jdkName="IntelliJ IDEA IU-201.7846.76" jdkType="IDEA JDK" />
   </component>
 </module>

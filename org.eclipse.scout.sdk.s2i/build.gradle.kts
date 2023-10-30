@@ -86,7 +86,7 @@ intellij {
     }
 
     tasks.withType<RunPluginVerifierTask> {
-        setIdeVersions(listOf("IU-2020.2.4", "IU-2020.3.4", "IU-2021.1.3", "IU-2021.2"))
+        setIdeVersions(listOf("IU-2020.2.4", "IU-2020.3.4", "IU-2021.1.3", "IU-2021.2.4"))
         setSubsystemsToCheck("without-android")
         failureLevel = FailureLevel.ALL
     }
