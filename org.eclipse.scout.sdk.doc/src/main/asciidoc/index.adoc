@@ -219,7 +219,7 @@ The SPI can be found in the package `org.eclipse.scout.sdk.core.java.model.spi`.
 The model functionality is then built on top of the SPI instances.
 
 Currently, there is one SPI implementation available.
-It exists in the `org.eclipse.scout.sdk.core.java.ecj` module and uses the https://wiki.eclipse.org/JDT_Core_Programmer_Guide/ECJ[Eclipse Compiler for Java] as parser.
+It exists in the `org.eclipse.scout.sdk.core.java.ecj` module and uses the https://github.com/eclipse-jdt/eclipse.jdt.core/wiki/ECJ[Eclipse Compiler for Java] as parser.
 It also contains the predefined `IJavaEnvironment` factories (like `EmptyJavaEnvironmentFactory`, `RunningJavaEnvironmentFactory`, `JavaEnvironmentWithEcjBuilder`) used in the samples of this document.
 
 In the future more parsers might be added e.g. to include the `core` module into IntelliJ IDEA without requiring the `ecj` dependency but using the IntelliJ parser (https://plugins.jetbrains.com/docs/intellij/psi.html[PSI]) instead.
