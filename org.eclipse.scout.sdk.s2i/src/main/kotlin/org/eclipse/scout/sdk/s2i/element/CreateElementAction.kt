@@ -130,7 +130,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
                 return@callInIdeaEnvironment null
             }
 
-            var pkg = getPackageNameByDirectory(dir.virtualFile, project)
+            var pkg = IdeaEnvironment.computeInReadAction(dir.project) { getPackageNameByDirectory(dir.virtualFile, project) }
             val lastIndexOf = name.lastIndexOf(".")
             if (lastIndexOf > 0) pkg += "." + name.substring(0, lastIndexOf)
             val elementName = capitalize(name.substring(lastIndexOf + 1, name.length)).toString()
