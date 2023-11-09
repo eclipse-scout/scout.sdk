@@ -25,7 +25,11 @@ import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
 import com.intellij.openapi.ui.Messages.*
 import com.intellij.openapi.vfs.LocalFileSystem
+import com.intellij.openapi.vfs.encoding.EncodingProjectManager
 import com.intellij.psi.PsiManager
+import org.eclipse.scout.sdk.core.java.apidef.Api
+import org.eclipse.scout.sdk.core.java.apidef.ApiVersion
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper.createProject
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants
@@ -35,6 +39,7 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaE
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.jetbrains.idea.maven.project.MavenProjectsManager
 import org.jetbrains.idea.maven.utils.MavenUtil
+import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -56,6 +61,7 @@ class ScoutModuleBuilder : ModuleBuilder() {
     override fun setupRootModel(modifiableRootModel: ModifiableRootModel) {
         val path = contentEntryPath?.let { Paths.get(it) } ?: return
         val project = modifiableRootModel.project
+        adjustProjectEncodings(project)
         MavenUtil.runWhenInitialized(project) {
             createFromArchetype(project, path)
         }
@@ -67,6 +73,16 @@ class ScoutModuleBuilder : ModuleBuilder() {
         }.thenAccept {
             importModules(project, path)
         }
+    }
+
+    private fun adjustProjectEncodings(project: Project) {
+        val scoutApi = Api.create(IScoutApi::class.java, ApiVersion.parse(scoutVersion).orElse(ApiVersion.LATEST))
+        val propertiesEncoding = scoutApi.propertiesEncoding()
+
+        val encodingManager = EncodingProjectManager.getInstance(project)
+        encodingManager.defaultCharsetName = StandardCharsets.UTF_8.name()
+        encodingManager.setDefaultCharsetForPropertiesFiles(null, propertiesEncoding)
+        encodingManager.setNative2AsciiForPropertiesFiles(null, StandardCharsets.ISO_8859_1.equals(propertiesEncoding))
     }
 
     private fun importModules(project: Project, path: Path) {
