@@ -160,36 +160,20 @@
         </dependency>
       </dependencies>
     </profile>
+
     <profile>
-      <id>add-datamodel.client-dependency-for-default-build</id>
+      <id>add-datamodel.client-dependency-for-22.0-build</id>
       <activation>
         <property>
-          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (23.2) -->
-          <name>!org.eclipse.scout.rt_version</name>
+          <!-- add dependency for the scout version 22.0 -->
+          <name>org.eclipse.scout.rt_version</name>
+          <value>22.0-SNAPSHOT</value>
         </property>
       </activation>
       <dependencies>
         <dependency>
           <groupId>org.eclipse.scout.rt</groupId>
           <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>add-nls.source-dependency-for-default-build</id>
-      <activation>
-        <property>
-          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (23.2) -->
-          <name>!org.eclipse.scout.rt_version</name>
-        </property>
-      </activation>
-      <dependencies>
-        <!-- NLS tests need sources of org.eclipse.scout.rt.nls.text.ScoutTextProviderService for Scout >= 23.2 -->
-        <dependency>
-          <groupId>org.eclipse.scout.rt</groupId>
-          <artifactId>org.eclipse.scout.rt.nls</artifactId>
-          <scope>test</scope>
-          <classifier>sources</classifier>
         </dependency>
       </dependencies>
     </profile>
@@ -210,18 +194,70 @@
       </dependencies>
     </profile>
     <profile>
-      <id>add-datamodel.client-dependency-for-22.0-build</id>
+      <id>add-datamodel.client-dependency-for-23.2-build</id>
       <activation>
         <property>
-          <!-- add dependency for the scout version 22.0 -->
+          <!-- add dependency for the scout version 23.2 -->
           <name>org.eclipse.scout.rt_version</name>
-          <value>22.0-SNAPSHOT</value>
+          <value>23.2-SNAPSHOT</value>
         </property>
       </activation>
       <dependencies>
         <dependency>
           <groupId>org.eclipse.scout.rt</groupId>
           <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>add-datamodel.client-dependency-for-default-build</id>
+      <activation>
+        <property>
+          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (24.1) -->
+          <name>!org.eclipse.scout.rt_version</name>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.scout.rt</groupId>
+          <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>add-nls.source-dependency-for-23.2-build</id>
+      <activation>
+        <property>
+          <!-- add dependency for the scout version 23.2 -->
+          <name>org.eclipse.scout.rt_version</name>
+          <value>23.2-SNAPSHOT</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.scout.rt</groupId>
+          <artifactId>org.eclipse.scout.rt.nls</artifactId>
+          <scope>test</scope>
+          <classifier>sources</classifier>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>add-nls.source-dependency-for-default-build</id>
+      <activation>
+        <property>
+          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (24.1) -->
+          <name>!org.eclipse.scout.rt_version</name>
+        </property>
+      </activation>
+      <dependencies>
+        <!-- NLS tests need sources of org.eclipse.scout.rt.nls.text.ScoutTextProviderService for Scout >= 23.2 -->
+        <dependency>
+          <groupId>org.eclipse.scout.rt</groupId>
+          <artifactId>org.eclipse.scout.rt.nls</artifactId>
+          <scope>test</scope>
+          <classifier>sources</classifier>
         </dependency>
       </dependencies>
     </profile>

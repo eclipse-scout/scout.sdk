@@ -58,7 +58,6 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
     override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
     override fun update(e: AnActionEvent) {
-        super.update(e)
         val dataContext = e.dataContext
         val presentation = e.presentation
         val file = LangDataKeys.VIRTUAL_FILE.getData(dataContext)

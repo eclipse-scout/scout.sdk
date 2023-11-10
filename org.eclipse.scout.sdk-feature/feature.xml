@@ -30,14 +30,14 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="https://download.eclipse.org/releases/2023-03/"/>
-      <discovery label="%updateSiteName" url="https://download.eclipse.org/releases/2023-03/"/>
+      <update label="%updateSiteName" url="https://download.eclipse.org/releases/2023-09/"/>
+      <discovery label="%updateSiteName" url="https://download.eclipse.org/releases/2023-09/"/>
    </url>
 
    <requires>
-      <import feature="org.eclipse.platform" version="4.25.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.jdt" version="3.18.1300" match="greaterOrEqual"/>
-      <import feature="org.eclipse.m2e.feature" version="2.2.1" match="greaterOrEqual"/>
+      <import feature="org.eclipse.platform" version="4.29.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.jdt" version="3.19.200" match="greaterOrEqual"/>
+      <import feature="org.eclipse.m2e.feature" version="2.4.100" match="greaterOrEqual"/>
       <import plugin="javax.wsdl" version="1.6.2" match="greaterOrEqual"/> <!-- Is included in the p2 update site via category.xml -->
    </requires>
 
