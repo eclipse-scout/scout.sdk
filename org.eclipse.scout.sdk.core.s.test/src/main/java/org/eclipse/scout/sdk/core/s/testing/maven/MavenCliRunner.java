@@ -12,11 +12,8 @@ package org.eclipse.scout.sdk.core.s.testing.maven;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.logging.Level;
 
 import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.MavenCli;
@@ -79,7 +75,7 @@ public class MavenCliRunner implements IMavenRunnerSpi {
       //noinspection ResultOfMethodCallIgnored
       SdkConsole.getConsoleSpi(); // enforce init of logging SPI
       var mavenArgs = getMavenArgs(new LinkedHashSet<>(options), goals, new LinkedHashMap<>(props));
-      runMavenInSandbox(mavenArgs, workingDirectory, SdkLog.getLogLevel(), loader);
+      runMavenInSandbox(mavenArgs, workingDirectory, loader);
     }
     finally {
       stopOkHttp(loader);
@@ -133,24 +129,15 @@ public class MavenCliRunner implements IMavenRunnerSpi {
     return args.toArray(new String[0]);
   }
 
-  protected static void runMavenInSandbox(String[] mavenArgs, Path workingDirectory, Level level, ClassLoader loader) throws IOException {
-    var charset = StandardCharsets.UTF_8.name();
-    try (var bOut = new ByteArrayOutputStream();
-         var out = new PrintStream(bOut, true, charset);
-         var bErr = new ByteArrayOutputStream();
-         var err = new PrintStream(bErr, true, charset)) {
-      loader.loadClass(SdkConsole.class.getName()).getMethod("getConsoleSpi").invoke(null); // enforce init of out streams before they are changed by maven-cli
-      loader.loadClass(SdkLog.class.getName()).getMethod("setLogLevel", Level.class).invoke(null, level); // copy log level to new classloader
-
+  protected static void runMavenInSandbox(String[] mavenArgs, Path workingDirectory, ClassLoader loader) throws IOException {
+    try {
       // start maven call
       var mavenCli = loader.loadClass(MavenCli.class.getName());
       var doMain = mavenCli.getMethod("doMain", String[].class, String.class, PrintStream.class, PrintStream.class);
-      var ret = doMain.invoke(mavenCli.getConstructor().newInstance(), mavenArgs, workingDirectory.toAbsolutePath().toString(), out, err);
-
-      logStream(Level.INFO, bOut, charset);
+      //noinspection UseOfSystemOutOrSystemErr
+      var ret = doMain.invoke(mavenCli.getConstructor().newInstance(), mavenArgs, workingDirectory.toAbsolutePath().toString(), System.out, System.err);
       int result = (Integer) ret;
       if (result != 0) {
-        logStream(Level.SEVERE, bErr, charset);
         throw new IOException(MAVEN_CALL_FAILED_MSG);
       }
     }
@@ -182,14 +169,6 @@ public class MavenCliRunner implements IMavenRunnerSpi {
     }
     catch (Throwable e) {
       SdkLog.error("Potential Memory-Leak: Cannot stop OkHttp client!", e);
-    }
-  }
-
-  protected static void logStream(Level level, ByteArrayOutputStream stream, String charset) throws UnsupportedEncodingException {
-    var outString = stream.toString(charset);
-    if (Strings.hasText(outString)) {
-      //noinspection HardcodedLineSeparator
-      SdkLog.log(level, "Output of embedded Maven call:\nMVN-BEGIN\n{}\nMVN-END\n", outString);
     }
   }
 }

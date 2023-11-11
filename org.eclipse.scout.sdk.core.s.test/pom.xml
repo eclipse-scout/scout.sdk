@@ -67,6 +67,14 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-slf4j-provider</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-file</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.maven.resolver</groupId>
       <artifactId>maven-resolver-connector-basic</artifactId>
     </dependency>
@@ -85,13 +93,9 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-provider-api</artifactId>
-    </dependency>
-    <dependency>
       <!-- replace for excluded javax.annotation -->
       <!-- replace for excluded javax.inject -->
-      <!-- in fact we would only need: -->
+      <!-- in fact, we would only need: -->
       <!-- jakarta.annotation:jakarta.annotation-api and (org.glassfish.hk2.external:jakarta.inject or jakarta.inject:jakarta.inject-api) -->
       <!-- but we use same as everywhere in scout -->
       <groupId>org.glassfish.jersey.inject</groupId>

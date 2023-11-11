@@ -9,6 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.s.testing.maven;
 
+import static java.util.function.Function.identity;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -18,10 +20,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
@@ -46,49 +51,52 @@ public final class MavenSandboxClassLoaderFactory {
     // the code source of these classes will be the source of the classpath of the sandbox classloader.
     Collection<String> baseClasses = Arrays.asList(
         MavenCliRunner.class.getName(),
-        "javax.annotation.PostConstruct", // javax.annotation-api
-        "org.apache.commons.lang3.StringUtils", // apache-commons-lang3 for guice
-        "org.apache.commons.io.DirectoryWalker", // commons-io
-        "org.eclipse.scout.sdk.core.log.SdkLog", // sdk.core for logging
-        "org.apache.maven.cli.MavenCli", // maven-embedder
-        "org.apache.maven.settings.Settings", // maven-settings
-        "org.apache.maven.Maven", // maven-core
-        "org.apache.maven.model.Site", // maven-model
-        "org.apache.maven.settings.building.DefaultSettingsBuilder", // maven-settings-builder
-        "org.apache.maven.artifact.repository.metadata.Metadata", // maven-repository-metadata
-        "org.apache.maven.artifact.Artifact", // maven-artifact
-        "org.apache.maven.repository.internal.MavenAetherModule", // maven-aether-provider
-        "org.eclipse.aether.impl.ArtifactResolver", // aether-impl
-        "com.google.inject.Guice", // sisu-guice
-        "javax.inject.Inject", // javax.inject
-        "org.codehaus.plexus.interpolation.Interpolator", // plexus-interpolation
-        "org.apache.maven.plugin.AbstractMojo", // maven-plugin-api
-        "org.apache.maven.model.building.ModelBuilder", // maven-model-builder
-        "org.apache.maven.building.ProblemCollector", // maven-builder-support
-        "com.google.common.base.Predicate", // guava
-        "com.google.common.util.concurrent.internal.InternalFutureFailureAccess", // guava failureaccess
-        "org.apache.maven.artifact.ArtifactStatus", // maven-compat
-        "org.apache.maven.shared.utils.logging.MessageUtils", // maven-shared-utils
-        "org.codehaus.plexus.util.CachedMap", // plexus-utils
-        "org.codehaus.plexus.classworlds.ClassWorld", // plexus-classworlds
-        "org.codehaus.plexus.ContainerConfiguration", // org.eclipse.sisu.plexus
-        "org.eclipse.sisu.inject.MutableBeanLocator", // org.eclipse.sisu.inject
-        "org.codehaus.plexus.component.annotations.Requirement", // plexus-component-annotations
-        "org.sonatype.plexus.components.sec.dispatcher.SecDispatcher", // plexus-sec-dispatcher
-        "org.sonatype.plexus.components.cipher.PlexusCipher", // plexus-cipher
-        "org.apache.commons.cli.CommandLineParser", // commons-cli
-        "org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory", // maven-resolver-connector-basic
-        "org.eclipse.aether.RepositoryCache", // aether-api
-        "org.eclipse.aether.spi.connector.RepositoryConnector", // aether-spi
-        "org.eclipse.aether.util.ChecksumUtils", // aether-util
-        "org.eclipse.aether.transport.wagon.WagonProvider", // maven-resolver-transport-wagon
+
+        // Maven:
         "io.takari.aether.client.AetherClient", // aether-connector-okhttp
+        "org.aopalliance.intercept.MethodInterceptor", // aop-alliance
+        "org.apache.commons.lang3.StringUtils", // apache-commons-lang3 for guice
+        "com.google.inject.Guice", // guice
+        "org.apache.maven.artifact.Artifact", // maven-artifact
+        "org.apache.maven.building.ProblemCollector", // maven-builder-support
+        "org.apache.maven.artifact.ArtifactStatus", // maven-compat
+        "org.apache.maven.Maven", // maven-core
+        "org.apache.maven.cli.MavenCli", // maven-embedder
+        "org.apache.maven.model.Site", // maven-model
+        "org.apache.maven.model.building.ModelBuilder", // maven-model-builder
+        "org.apache.maven.plugin.AbstractMojo", // maven-plugin-api
+        "org.apache.maven.artifact.repository.metadata.Metadata", // maven-repository-metadata
+        "org.eclipse.aether.RepositoryCache", // maven-resolver-api
+        "org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory", // maven-resolver-connector-basic
+        "org.eclipse.aether.internal.impl.synccontext.legacy.DefaultSyncContextFactory", // maven-resolver-impl
+        "org.eclipse.aether.named.NamedLock", // maven-resolver-named-locks
+        "org.apache.maven.repository.internal.ModelCacheFactory", // maven-resolver-provider
+        "org.eclipse.aether.spi.connector.RepositoryConnector", // maven-resolver-spi
+        "org.eclipse.aether.transport.wagon.WagonProvider", // maven-resolver-transport-wagon
+        "org.eclipse.aether.util.ChecksumUtils", // maven-resolver-util
+        "org.apache.maven.settings.Settings", // maven-settings
+        "org.apache.maven.settings.building.DefaultSettingsBuilder", // maven-settings-builder
+        "org.apache.maven.shared.utils.logging.MessageUtils", // maven-shared-utils
+        "org.slf4j.impl.MavenSimpleLogger", // maven-slf4j-provider
         "okhttp3.ConnectionPool", // okhttp
         "okio.Okio", // okio
-        "org.slf4j.ILoggerFactory", //slf4j-api
+        "org.eclipse.sisu.inject.MutableBeanLocator", // org.eclipse.sisu.inject
+        "org.codehaus.plexus.ContainerConfiguration", // org.eclipse.sisu.plexus
+        "org.sonatype.plexus.components.cipher.PlexusCipher", // plexus-cipher
+        "org.codehaus.plexus.classworlds.ClassWorld", // plexus-classworlds
+        "org.codehaus.plexus.component.annotations.Requirement", // plexus-component-annotations
+        "org.codehaus.plexus.interpolation.Interpolator", // plexus-interpolation
+        "org.sonatype.plexus.components.sec.dispatcher.SecDispatcher", // plexus-sec-dispatcher
+        "org.codehaus.plexus.util.CachedMap", // plexus-utils
+        "org.apache.maven.wagon.providers.file.FileWagon", // wagon-file
         "org.apache.maven.wagon.AbstractWagon", // wagon-provider-api
-        "javax.annotation.processing.RoundEnvironment", // javax.annotations.processing (APT)
-        "javax.jws.WebService", // javax.jws-api
+
+        // Maven dependencies:
+        "org.apache.commons.cli.CommandLineParser", // commons-cli
+        "javax.inject.Inject", // javax.inject
+        "com.google.common.base.Predicate", // guava
+        "com.google.common.util.concurrent.internal.InternalFutureFailureAccess", // guava failureAccess
+        "org.slf4j.ILoggerFactory", // slf4j-api
         "javax.annotation.PostConstruct" // javax.annotations-api
     );
     return getJarsUrls(baseClasses);
@@ -104,7 +112,8 @@ public final class MavenSandboxClassLoaderFactory {
   static URL[] getJarsUrls(Collection<String> baseClasses) {
     return baseClasses.stream()
         .map(MavenSandboxClassLoaderFactory::getJarContaining)
-        .toArray(URL[]::new);
+        .collect(Collectors.toMap(identity(), identity(), Ensure::failOnDuplicates, LinkedHashMap::new))
+        .keySet().toArray(new URL[0]);
   }
 
   /**

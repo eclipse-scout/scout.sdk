@@ -846,6 +846,11 @@
         <version>${maven.model.dependency.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-slf4j-provider</artifactId>
+        <version>${maven.model.dependency.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.maven.resolver</groupId>
         <artifactId>maven-resolver-connector-basic</artifactId>
         <version>1.9.14</version>
@@ -863,6 +868,11 @@
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>
         <artifactId>wagon-provider-api</artifactId>
+        <version>3.5.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-file</artifactId>
         <version>3.5.3</version>
       </dependency>
       <dependency>

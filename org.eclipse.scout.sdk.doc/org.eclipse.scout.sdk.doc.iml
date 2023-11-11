@@ -66,13 +66,15 @@
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-impl:1.9.14" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-named-locks:1.9.14" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-component-annotations:2.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-provider-api:3.5.3" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-slf4j-provider:3.9.4" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-file:3.5.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-connector-basic:1.9.14" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-spi:1.9.14" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-transport-wagon:1.9.14" level="project" />
     <orderEntry type="library" name="Maven: io.takari.aether:aether-connector-okhttp:0.17.8" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.14.1" level="project" />
     <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.17.3" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-provider-api:3.5.3" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.jersey.inject:jersey-hk2:2.37" level="project" />
     <orderEntry type="library" name="Maven: org.glassfish.jersey.core:jersey-common:2.37" level="project" />
     <orderEntry type="library" name="Maven: jakarta.ws.rs:jakarta.ws.rs-api:2.1.6" level="project" />
