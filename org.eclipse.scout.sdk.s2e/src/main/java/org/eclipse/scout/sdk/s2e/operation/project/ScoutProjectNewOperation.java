@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.function.BiConsumer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -37,6 +39,8 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.IMavenProjectImportResult;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
+import org.eclipse.scout.sdk.core.log.SdkLog;
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.util.SdkException;
@@ -66,6 +70,8 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
   @Override
   public void accept(EclipseEnvironment env, EclipseProgress progress) {
     try {
+      setPropertiesEncoding();
+
       // create project on disk (using archetype)
       progress.init(100, toString());
       ScoutProjectNewHelper.createProject(getTargetDirectory(), getGroupId(), getArtifactId(), getDisplayName(), isUseJsClient(), getJavaVersion(), getScoutVersion(), env, progress.newChild(5));
@@ -78,6 +84,27 @@ public class ScoutProjectNewOperation implements BiConsumer<EclipseEnvironment, 
     }
     catch (Exception e) {
       throw new SdkException("Unable to create Scout Project.", e);
+    }
+  }
+
+  protected void setPropertiesEncoding() {
+    var contentTypeManager = Platform.getContentTypeManager();
+    var propertiesContentType = contentTypeManager.getContentType("org.eclipse.jdt.core.javaProperties");
+    if (propertiesContentType == null) {
+      return;
+    }
+
+    var propertiesEncoding = ScoutApi.create(getScoutVersion()).propertiesEncoding();
+    if (StandardCharsets.ISO_8859_1.equals(propertiesEncoding)) {
+      return; // is the default. Nothing to change
+    }
+
+    var propertiesEncodingName = propertiesEncoding.name();
+    try {
+      propertiesContentType.setDefaultCharset(propertiesEncodingName);
+    }
+    catch (CoreException e) {
+      SdkLog.warning("Unable to set default encoding for .properties files to '{}'.", propertiesEncodingName);
     }
   }
 

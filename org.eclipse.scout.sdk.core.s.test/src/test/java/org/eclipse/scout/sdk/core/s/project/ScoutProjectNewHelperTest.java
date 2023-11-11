@@ -17,9 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 
-import org.eclipse.scout.sdk.core.java.apidef.Api;
 import org.eclipse.scout.sdk.core.java.apidef.ApiVersion;
-import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,7 @@ public class ScoutProjectNewHelperTest {
 
   @Test
   public void testGetSupportedJavaVersions() {
-    var latest = Api.create(IScoutApi.class, ApiVersion.LATEST).supportedJavaVersions();
+    var latest = ScoutApi.create(ApiVersion.LATEST).supportedJavaVersions();
     assertArrayEquals(latest, getSupportedJavaVersions(null));
     assertArrayEquals(latest, getSupportedJavaVersions(IMavenConstants.LATEST));
     assertArrayEquals(latest, getSupportedJavaVersions("latest"));

@@ -28,11 +28,10 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.java.ISourceFolders;
-import org.eclipse.scout.sdk.core.java.apidef.Api;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.jaxws.AbstractWebServiceNewOperation;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
@@ -128,7 +127,7 @@ public class WebServiceNewOperation extends AbstractWebServiceNewOperation {
     var factoryPathFile = getProjectRoot().resolve(FACTORY_PATH_FILE_NAME);
     var scoutVersion = scoutVersionOf(getJaxWsProject(), EclipseEnvironment.narrow(env))
         .orElseThrow(() -> newFail("JaxWs module '{}' has no Scout dependency.", getJaxWsProject().getElementName()));
-    var scoutApi = Api.create(IScoutApi.class, scoutVersion);
+    var scoutApi = ScoutApi.create(scoutVersion);
     var generator = new FactoryPathGenerator()
         .withRtVersion(scoutVersion.asString())
         .withJaxWsConstants(scoutApi.JaxWsConstants());

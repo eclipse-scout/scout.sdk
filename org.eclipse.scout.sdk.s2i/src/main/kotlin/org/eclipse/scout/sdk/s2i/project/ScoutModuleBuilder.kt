@@ -27,9 +27,7 @@ import com.intellij.openapi.ui.Messages.*
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.encoding.EncodingProjectManager
 import com.intellij.psi.PsiManager
-import org.eclipse.scout.sdk.core.java.apidef.Api
-import org.eclipse.scout.sdk.core.java.apidef.ApiVersion
-import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper.createProject
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants
@@ -76,9 +74,7 @@ class ScoutModuleBuilder : ModuleBuilder() {
     }
 
     private fun adjustProjectEncodings(project: Project) {
-        val scoutApi = Api.create(IScoutApi::class.java, ApiVersion.parse(scoutVersion).orElse(ApiVersion.LATEST))
-        val propertiesEncoding = scoutApi.propertiesEncoding()
-
+        val propertiesEncoding = ScoutApi.create(scoutVersion).propertiesEncoding()
         val encodingManager = EncodingProjectManager.getInstance(project)
         encodingManager.defaultCharsetName = StandardCharsets.UTF_8.name()
         encodingManager.setDefaultCharsetForPropertiesFiles(null, propertiesEncoding)

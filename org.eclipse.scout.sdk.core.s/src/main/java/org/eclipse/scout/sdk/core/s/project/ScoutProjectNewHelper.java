@@ -24,13 +24,11 @@ import java.util.stream.IntStream;
 import javax.xml.transform.TransformerException;
 
 import org.eclipse.scout.sdk.core.java.JavaTypes;
-import org.eclipse.scout.sdk.core.java.apidef.Api;
 import org.eclipse.scout.sdk.core.java.apidef.ApiVersion;
 import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenArtifactVersions;
@@ -250,15 +248,8 @@ public final class ScoutProjectNewHelper {
    * @return The supported major Java versions (e.g. 8 or 11 or 17) for the Scout version given. If the given Scout
    *         version is invalid, the supported Java version of the newest Scout version is returned.
    */
-  public static int[] getSupportedJavaVersions(String scoutVersion) {
-    ApiVersion scoutApiVersion;
-    if (Strings.isBlank(scoutVersion) || IMavenConstants.LATEST.equalsIgnoreCase(scoutVersion)) {
-      scoutApiVersion = ApiVersion.LATEST;
-    }
-    else {
-      scoutApiVersion = ApiVersion.parse(scoutVersion).orElse(ApiVersion.LATEST);
-    }
-    return Api.create(IScoutApi.class, scoutApiVersion).supportedJavaVersions();
+  public static int[] getSupportedJavaVersions(CharSequence scoutVersion) {
+    return ScoutApi.create(scoutVersion).supportedJavaVersions();
   }
 
   /**
