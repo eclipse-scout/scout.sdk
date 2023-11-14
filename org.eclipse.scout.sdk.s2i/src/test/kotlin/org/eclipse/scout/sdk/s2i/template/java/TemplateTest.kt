@@ -159,10 +159,9 @@ class TemplateTest : AbstractTestCaseWithRunningClasspathModule() {
         doCompletionAndAssertNoCompileErrors("TestCodeType", message("template.Code"))
     }
 
-//    TODO [mvi]: Why is this failing on CI?
-//    fun testCompletionFormHandler() {
-//        doCompletionAndAssertNoCompileErrors("TestFormExtension", message("template.FormHandler"))
-//    }
+    fun testCompletionFormHandler() {
+        doCompletionAndAssertNoCompileErrors("TestFormExtension", message("template.FormHandler"))
+    }
 
     fun testCompletionColumn() {
         doCompletionAndAssertNoCompileErrors("TestTableFieldForm", message("template.Column"))

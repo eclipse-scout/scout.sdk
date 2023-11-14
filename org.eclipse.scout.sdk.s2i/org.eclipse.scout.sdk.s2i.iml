@@ -127,7 +127,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:winp:2022.2.3" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: com.jetbrains:ant:2022.2.3" level="project" />
     <orderEntry type="library" name="Gradle: wsdl4j:wsdl4j:1.6.2" level="project" />
-    <orderEntry type="library" name="Gradle: org.eclipse.jdt:ecj:3.35.0" level="project" />
+    <orderEntry type="library" name="Gradle: org.eclipse.jdt:ecj:3.34.0" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.poi:poi:5.2.4" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.poi:poi-ooxml-lite:5.2.4" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.xmlbeans:xmlbeans:5.1.1" level="project" />

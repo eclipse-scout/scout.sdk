@@ -13,7 +13,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.ecj" />
-    <orderEntry type="library" name="Maven: org.eclipse.jdt:ecj:3.35.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jdt:ecj:3.34.0" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" />

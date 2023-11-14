@@ -151,7 +151,7 @@
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.filesystem:1.10.100" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.text:3.13.100" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.platform:org.eclipse.core.commands:3.11.100" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jdt:ecj:3.35.0" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jdt:ecj:3.34.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface.text:3.24.100" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.swt:3.124.100" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.platform:org.eclipse.jface:3.31.0" level="project" />
