@@ -18,6 +18,7 @@ import org.apache.commons.lang3.ClassUtils
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.jetbrains.idea.maven.project.MavenProjectsManager
+import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.functions
@@ -71,12 +72,24 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
 
         private fun scheduleMavenSourcesDownload() {
             if (!m_manager.hasProjects()) return
-            runAsync { m_downloadArtifactsFun.callSuspend(m_manager, *arrayOf(m_manager.projects, null, true, false)) }
+            runAsync {
+                try {
+                    m_downloadArtifactsFun.callSuspend(m_manager, *arrayOf(m_manager.projects, null, true, false))
+                } catch (e: InvocationTargetException) {
+                    throw e.targetException
+                }
+            }
         }
 
         private fun runAsync(action: suspend () -> Unit) {
             AppExecutorUtil.getAppExecutorService().execute {
-                runBlocking { action() }
+                runBlocking {
+                    try {
+                        action()
+                    } catch (e: Exception) {
+                        SdkLog.warning("Error downloading Maven sources.", e)
+                    }
+                }
             }
         }
     }
