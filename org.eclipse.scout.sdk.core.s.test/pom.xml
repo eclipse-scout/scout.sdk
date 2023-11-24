@@ -108,6 +108,12 @@
       </exclusions>
     </dependency>
 
+    <!-- To extract tar archives -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+    </dependency>
+
     <!-- Scout RT Dependencies to test against -->
     <dependency>
       <groupId>org.eclipse.scout.rt</groupId>
