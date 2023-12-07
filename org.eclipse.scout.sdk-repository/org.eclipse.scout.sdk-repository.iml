@@ -8,6 +8,14 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.apache.aries.spifly:org.apache.aries.spifly.dynamic.bundle:1.3.7" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm:9.6" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm-commons:9.6" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm-tree:9.6" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm-util:9.6" level="project" />
+    <orderEntry type="library" name="Maven: org.ow2.asm:asm-analysis:9.6" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-nop:2.0.9" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.9" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.s2e" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java" />
