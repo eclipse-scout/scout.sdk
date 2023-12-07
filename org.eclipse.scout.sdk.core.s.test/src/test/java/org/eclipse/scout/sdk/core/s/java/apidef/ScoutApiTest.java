@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.s.java.apidef;
 import static java.util.Collections.emptyMap;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertApiValid;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertNoCompileErrors;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -52,6 +53,24 @@ public class ScoutApiTest {
   @Test
   public void testScoutApiMatches(IJavaEnvironment env) {
     assertApiValid(IScoutApi.class, env, ScoutApiTest::onlyInvalid);
+  }
+
+  @Test
+  public void testSupportedJavaVersions() {
+    assertArrayEquals(new int[]{8, 11}, ScoutApi.create("10.0").supportedJavaVersions());
+    assertArrayEquals(new int[]{8, 11}, ScoutApi.create("11.0-SNAPSHOT").supportedJavaVersions());
+    assertArrayEquals(new int[]{8, 11}, ScoutApi.create("11.0.15").supportedJavaVersions());
+    assertArrayEquals(new int[]{11}, ScoutApi.create("22.0.1").supportedJavaVersions());
+    assertArrayEquals(new int[]{11}, ScoutApi.create("22.0.9").supportedJavaVersions());
+    assertArrayEquals(new int[]{11}, ScoutApi.create("22.0.10").supportedJavaVersions());
+    assertArrayEquals(new int[]{11, 17}, ScoutApi.create("22.0.11").supportedJavaVersions());
+    assertArrayEquals(new int[]{11, 17}, ScoutApi.create("22.0").supportedJavaVersions());
+    assertArrayEquals(new int[]{11, 17}, ScoutApi.create("23.2").supportedJavaVersions());
+    assertArrayEquals(new int[]{17}, ScoutApi.create("24.1-SNAPSHOT").supportedJavaVersions());
+    assertArrayEquals(new int[]{17}, ScoutApi.create("24.2-SNAPSHOT").supportedJavaVersions());
+    assertArrayEquals(new int[]{17}, ScoutApi.create("24.1").supportedJavaVersions());
+    assertArrayEquals(new int[]{17}, ScoutApi.create("24.1.0").supportedJavaVersions());
+    assertArrayEquals(new int[]{17}, ScoutApi.create("24.1.165").supportedJavaVersions());
   }
 
   private static Map<String, String> onlyInvalid(Map<String, String> candidates, IType type, IScoutApi api) {
