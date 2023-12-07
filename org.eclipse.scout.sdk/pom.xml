@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_plugin_config-master</artifactId>
-    <version>23.2.0</version>
+    <version>24.1-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
@@ -184,7 +184,7 @@
     <org.osgi.service.event>1.4.1</org.osgi.service.event>
 
     <icu4j>74.1</icu4j>
-    <ecj>3.34.0</ecj> <!-- Do not use 3.35 because of bugs in constant Annotation parameter resolve -->
+    <ecj>3.36.0</ecj>
     <junit.version>5.10.1</junit.version>
 
     <!-- versions to dependencies uploaded by scout -->
@@ -823,7 +823,7 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.4.11</version>
+        <version>1.4.14</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -889,7 +889,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>5.7.0</version>
+        <version>5.8.0</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
