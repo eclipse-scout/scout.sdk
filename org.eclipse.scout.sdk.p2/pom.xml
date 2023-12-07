@@ -162,8 +162,8 @@
   </scm>
 
   <issueManagement>
-    <system>Bugzilla</system>
-    <url>https://bugs.eclipse.org/bugs/buglist.cgi?classification=Technology;component=Scout SDK;product=Scout;query_format=advanced</url>
+    <system>GitHub</system>
+    <url>https://github.com/eclipse-scout/scout.sdk/issues</url>
   </issueManagement>
 
   <repositories>

@@ -945,6 +945,29 @@
         <artifactId>org.eclipse.scout.rt.chart.ui.html</artifactId>
         <version>${org.eclipse.scout.rt_version}</version>
       </dependency>
+
+      <!-- dependency convergence -->
+      <!-- may be deleted and re-created as needed on other version updates -->
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>3.5.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-annotations</artifactId>
+        <version>2.1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-classworlds</artifactId>
+        <version>2.7.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okio</groupId>
+        <artifactId>okio</artifactId>
+        <version>1.17.3</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -990,7 +1013,6 @@
             <checkCompileClasspath>true</checkCompileClasspath>
             <checkRuntimeClasspath>true</checkRuntimeClasspath>
             <checkTestClasspath>true</checkTestClasspath>
-            <quiet>false</quiet>
             <preferLocal>true</preferLocal>
             <useResultFile>false</useResultFile>
             <includePomProjects>true</includePomProjects>
@@ -1074,8 +1096,8 @@
   </scm>
 
   <issueManagement>
-    <system>Bugzilla</system>
-    <url>https://bugs.eclipse.org/bugs/buglist.cgi?classification=Technology;component=Scout SDK;product=Scout;query_format=advanced</url>
+    <system>GitHub</system>
+    <url>https://github.com/eclipse-scout/scout.sdk/issues</url>
   </issueManagement>
 
   <repositories>
