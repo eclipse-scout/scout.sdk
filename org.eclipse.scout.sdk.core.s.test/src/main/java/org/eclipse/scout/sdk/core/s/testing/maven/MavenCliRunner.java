@@ -22,7 +22,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 import org.apache.maven.cli.CLIManager;
 import org.apache.maven.cli.MavenCli;
@@ -35,7 +34,6 @@ import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 
-import okhttp3.internal.connection.RealConnectionPool;
 
 /**
  * <h3>{@link MavenCliRunner}</h3>
@@ -45,7 +43,6 @@ import okhttp3.internal.connection.RealConnectionPool;
 @SuppressWarnings({"AccessOfSystemProperties", "CallToNativeMethodWhileLocked"})
 public class MavenCliRunner implements IMavenRunnerSpi {
 
-  private static final String OK_HTTP_KEEP_ALIVE = "http.keepAlive";
   private static final String MAVEN_CALL_FAILED_MSG = "Maven call failed.";
 
   @Override
@@ -64,12 +61,10 @@ public class MavenCliRunner implements IMavenRunnerSpi {
 
   protected static synchronized void execute(Path workingDirectory, Set<String> options, Collection<String> goals, Map<String, String> props, ClassLoader loader) throws IOException {
     var oldMultiModuleProjectDir = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
-    var oldHttpKeepAlive = System.getProperty(OK_HTTP_KEEP_ALIVE);
     var oldContextClassLoader = Thread.currentThread().getContextClassLoader(); // backup context class loader because maven-cli changes it
     var origSystemIn = System.in; // backup system.in and provide a dummy because maven-cli closes the stream.
     try {
       System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, workingDirectory.toAbsolutePath().toString());
-      System.setProperty(OK_HTTP_KEEP_ALIVE, Boolean.toString(false)); // disable OkHttp keepAlive
       System.setIn(new ByteArrayInputStream(new byte[]{}));
       Thread.currentThread().setContextClassLoader(loader);
       //noinspection ResultOfMethodCallIgnored
@@ -78,7 +73,6 @@ public class MavenCliRunner implements IMavenRunnerSpi {
       runMavenInSandbox(mavenArgs, workingDirectory, loader);
     }
     finally {
-      stopOkHttp(loader);
       Thread.currentThread().setContextClassLoader(oldContextClassLoader);
       System.setIn(origSystemIn);
       if (oldMultiModuleProjectDir == null) {
@@ -86,13 +80,6 @@ public class MavenCliRunner implements IMavenRunnerSpi {
       }
       else {
         System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, oldMultiModuleProjectDir);
-      }
-
-      if (oldHttpKeepAlive == null) {
-        System.clearProperty(OK_HTTP_KEEP_ALIVE);
-      }
-      else {
-        System.setProperty(OK_HTTP_KEEP_ALIVE, oldHttpKeepAlive);
       }
     }
   }
@@ -143,32 +130,6 @@ public class MavenCliRunner implements IMavenRunnerSpi {
     }
     catch (ReflectiveOperationException e) {
       throw new IOException(e);
-    }
-  }
-
-  /**
-   * Tries to stop the OkHttp resources.
-   */
-  @SuppressWarnings({"deprecation", "squid:S1181"}) // Throwable and Error should not be caught
-  protected static void stopOkHttp(ClassLoader loader) {
-    try {
-      var poolClass = loader.loadClass(RealConnectionPool.class.getName());
-      var field = poolClass.getDeclaredField("executor");
-      field.setAccessible(true);
-      var executor = (ExecutorService) field.get(null);
-      executor.shutdownNow();
-
-      for (var candidate : Thread.getAllStackTraces().keySet()) {
-        var threadName = candidate.getName();
-        if ("Okio Watchdog".equals(threadName) || "OkHttp ConnectionPool".equals(threadName)) {
-          candidate.setUncaughtExceptionHandler((t, e) -> SdkLog.debug("Okio Thread terminated", e));
-          //noinspection CallToThreadStopSuspendOrResumeManager
-          candidate.stop();
-        }
-      }
-    }
-    catch (Throwable e) {
-      SdkLog.error("Potential Memory-Leak: Cannot stop OkHttp client!", e);
     }
   }
 }

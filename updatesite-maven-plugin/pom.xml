@@ -27,7 +27,7 @@
   <properties>
     <scout.base.version>13.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
-    <maven.model.dependency.version>3.9.4</maven.model.dependency.version>
+    <maven.model.dependency.version>3.9.5</maven.model.dependency.version>
     <junit.version>5.10.1</junit.version>
   </properties>
 

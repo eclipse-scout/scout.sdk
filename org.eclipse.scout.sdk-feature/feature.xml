@@ -25,31 +25,31 @@
       %copyright
    </copyright>
 
-   <license url="%licenseURL">
-      %license
-   </license>
+  <license url="%licenseURL">
+    %license
+  </license>
 
-   <url>
-      <update label="%updateSiteName" url="https://download.eclipse.org/releases/2023-09/"/>
-      <discovery label="%updateSiteName" url="https://download.eclipse.org/releases/2023-09/"/>
-   </url>
+  <url>
+    <update label="%updateSiteName" url="https://download.eclipse.org/releases/2023-12/"/>
+    <discovery label="%updateSiteName" url="https://download.eclipse.org/releases/2023-12/"/>
+  </url>
 
-   <requires>
-      <import feature="org.eclipse.platform" version="4.29.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.jdt" version="3.19.200" match="greaterOrEqual"/>
-      <import feature="org.eclipse.m2e.feature" version="2.4.100" match="greaterOrEqual"/>
-      <import plugin="javax.wsdl" version="1.6.2" match="greaterOrEqual"/> <!-- Is included in the p2 update site via category.xml -->
-   </requires>
+  <requires>
+    <import feature="org.eclipse.platform" version="4.30.0" match="greaterOrEqual"/>
+    <import feature="org.eclipse.jdt" version="3.19.300" match="greaterOrEqual"/>
+    <import feature="org.eclipse.m2e.feature" version="2.4.200" match="greaterOrEqual"/>
+    <import plugin="javax.wsdl" version="1.6.2" match="greaterOrEqual"/> <!-- Is included in the p2 update site via category.xml -->
+  </requires>
 
-   <plugin
-         id="org.eclipse.scout.sdk.s2e"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"/>
+  <plugin
+      id="org.eclipse.scout.sdk.s2e"
+      download-size="0"
+      install-size="0"
+      version="0.0.0"/>
 
-   <plugin
-         id="org.eclipse.scout.sdk.s2e.doc"
-         download-size="0"
+  <plugin
+      id="org.eclipse.scout.sdk.s2e.doc"
+      download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>

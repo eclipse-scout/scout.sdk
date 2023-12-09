@@ -53,10 +53,12 @@ public final class MavenSandboxClassLoaderFactory {
         MavenCliRunner.class.getName(),
 
         // Maven:
-        "io.takari.aether.client.AetherClient", // aether-connector-okhttp
         "org.aopalliance.intercept.MethodInterceptor", // aop-alliance
         "org.apache.commons.lang3.StringUtils", // apache-commons-lang3 for guice
         "com.google.inject.Guice", // guice
+        "org.apache.http.client.HttpClient", // httpclient
+        "org.apache.http.HttpHost", // httpcore
+        "org.apache.commons.logging.Log", // jcl-over-slf4j
         "org.apache.maven.artifact.Artifact", // maven-artifact
         "org.apache.maven.building.ProblemCollector", // maven-builder-support
         "org.apache.maven.artifact.ArtifactStatus", // maven-compat
@@ -72,14 +74,13 @@ public final class MavenSandboxClassLoaderFactory {
         "org.eclipse.aether.named.NamedLock", // maven-resolver-named-locks
         "org.apache.maven.repository.internal.ModelCacheFactory", // maven-resolver-provider
         "org.eclipse.aether.spi.connector.RepositoryConnector", // maven-resolver-spi
+        "org.eclipse.aether.transport.file.FileTransporter", // maven-resolver-transport-file
+        "org.eclipse.aether.transport.http.HttpTransporter", // maven-resolver-transport-http
         "org.eclipse.aether.transport.wagon.WagonProvider", // maven-resolver-transport-wagon
         "org.eclipse.aether.util.ChecksumUtils", // maven-resolver-util
         "org.apache.maven.settings.Settings", // maven-settings
         "org.apache.maven.settings.building.DefaultSettingsBuilder", // maven-settings-builder
         "org.apache.maven.shared.utils.logging.MessageUtils", // maven-shared-utils
-        "org.slf4j.impl.MavenSimpleLogger", // maven-slf4j-provider
-        "okhttp3.ConnectionPool", // okhttp
-        "okio.Okio", // okio
         "org.eclipse.sisu.inject.MutableBeanLocator", // org.eclipse.sisu.inject
         "org.codehaus.plexus.ContainerConfiguration", // org.eclipse.sisu.plexus
         "org.sonatype.plexus.components.cipher.PlexusCipher", // plexus-cipher
@@ -89,10 +90,16 @@ public final class MavenSandboxClassLoaderFactory {
         "org.sonatype.plexus.components.sec.dispatcher.SecDispatcher", // plexus-sec-dispatcher
         "org.codehaus.plexus.util.CachedMap", // plexus-utils
         "org.apache.maven.wagon.providers.file.FileWagon", // wagon-file
+        "org.apache.maven.wagon.providers.http.HttpWagon", // wagon-http
+        "org.apache.maven.wagon.shared.http.AbstractHttpClientWagon", // wagon-http-shared
         "org.apache.maven.wagon.AbstractWagon", // wagon-provider-api
+
+        // logging:
+        "org.slf4j.simple.SimpleLogger",
 
         // Maven dependencies:
         "org.apache.commons.cli.CommandLineParser", // commons-cli
+        "org.apache.commons.codec.BinaryDecoder", // commons-codec
         "javax.inject.Inject", // javax.inject
         "com.google.common.base.Predicate", // guava
         "com.google.common.util.concurrent.internal.InternalFutureFailureAccess", // guava failureAccess

@@ -34,17 +34,17 @@
     <orderEntry type="library" name="Maven: jakarta.annotation:jakarta.annotation-api:1.3.5" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.typescript.test" />
     <orderEntry type="library" name="Maven: org.glassfish:jakarta.json:2.0.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-embedder:3.9.4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-settings:3.9.4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-settings-builder:3.9.4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-core:3.9.4" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-embedder:3.9.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-settings:3.9.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-settings-builder:3.9.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-core:3.9.5" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.sisu:org.eclipse.sisu.inject:0.3.5" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-plugin-api:3.9.4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-model:3.9.4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-model-builder:3.9.4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-builder-support:3.9.4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-api:1.9.14" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-util:1.9.14" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-plugin-api:3.9.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-model:3.9.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-model-builder:3.9.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-builder-support:3.9.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-api:1.9.16" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-util:1.9.16" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.shared:maven-shared-utils:3.3.4" level="project" />
     <orderEntry type="library" name="Maven: com.google.inject:guice:5.1.0" level="project" />
     <orderEntry type="library" name="Maven: aopalliance:aopalliance:1.0" level="project" />
@@ -59,31 +59,29 @@
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.9" level="project" />
     <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.5.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.12.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-compat:3.9.4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-artifact:3.9.4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-resolver-provider:3.9.4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-repository-metadata:3.9.4" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-impl:1.9.14" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-named-locks:1.9.14" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-compat:3.9.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-artifact:3.9.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-resolver-provider:3.9.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-repository-metadata:3.9.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-impl:1.9.16" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-named-locks:1.9.16" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-component-annotations:2.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-provider-api:3.5.3" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven:maven-slf4j-provider:3.9.4" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven:maven-slf4j-provider:3.9.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-file:3.5.3" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-connector-basic:1.9.14" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-spi:1.9.14" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-transport-wagon:1.9.14" level="project" />
-    <orderEntry type="library" name="Maven: io.takari.aether:aether-connector-okhttp:0.17.8" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okhttp3:okhttp:3.14.1" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.17.3" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.jersey.inject:jersey-hk2:2.37" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.jersey.core:jersey-common:2.37" level="project" />
-    <orderEntry type="library" name="Maven: jakarta.ws.rs:jakarta.ws.rs-api:2.1.6" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.hk2.external:jakarta.inject:2.6.1" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.hk2:osgi-resource-locator:1.0.3" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.hk2:hk2-locator:2.6.1" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.hk2:hk2-api:2.6.1" level="project" />
-    <orderEntry type="library" name="Maven: org.glassfish.hk2:hk2-utils:2.6.1" level="project" />
-    <orderEntry type="library" name="Maven: org.javassist:javassist:3.25.0-GA" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-http:3.5.3" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-http-shared:3.5.3" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.14" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:2.0.9" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-transport-file:1.9.16" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-spi:1.9.16" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-transport-http:1.9.16" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.16" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-connector-basic:1.9.16" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-transport-wagon:1.9.16" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.inject:jakarta.inject-api:1.0.5" level="project" />
+    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.16.0" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:2.0.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-compress:1.25.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html.test:24.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html:24.1-SNAPSHOT" level="project" />
@@ -108,7 +106,6 @@
     <orderEntry type="library" name="Maven: org.apache.httpcomponents.client5:httpclient5:5.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents.core5:httpcore5:5.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents.core5:httpcore5-h2:5.2" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:2.0.7" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.mom.api:24.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.uinotification:24.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.api.data:24.1-SNAPSHOT" level="project" />

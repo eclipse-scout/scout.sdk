@@ -130,7 +130,7 @@
             <Require-Bundle>
               org.eclipse.scout.sdk.s2e;bundle-version="[13.0,13.1)";visibility:=reexport,
               org.eclipse.scout.sdk.s2e.doc;bundle-version="[13.0,13.1)";visibility:=reexport,
-              org.eclipse.jdt.ui;bundle-version="[3.27,4)";visibility:=reexport,
+              org.eclipse.jdt.ui;bundle-version="[3.31,4)";visibility:=reexport,
               org.eclipse.jdt.debug.ui;bundle-version="[3.12.800,4)";visibility:=reexport,
               org.eclipse.ui.workbench.texteditor;bundle-version="[3.16.600,4)";visibility:=reexport,
               org.eclipse.ui.workbench;bundle-version="[3.126,4)";visibility:=reexport,

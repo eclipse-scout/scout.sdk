@@ -105,6 +105,11 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.ui.navigator</artifactId>
+      <version>${org.eclipse.ui.navigator}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
       <version>${org.eclipse.ltk.core.refactoring}</version>
     </dependency>
