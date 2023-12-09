@@ -108,6 +108,11 @@ public abstract class AbstractTypeProposal extends CUCorrectionProposal implemen
     m_asyncProposalProviders = new ArrayList<>();
   }
 
+  @Override
+  protected boolean useDelegateToCreateTextChange() {
+    return false;
+  }
+
   protected abstract void fillRewrite(AstNodeFactory factory, Type superType) throws CoreException;
 
   @Override
