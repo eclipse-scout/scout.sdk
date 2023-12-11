@@ -91,7 +91,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
     private fun acceptLanguageFilter(candidate: Language) = m_languageFilter?.invoke(candidate) ?: true
 
     private fun buildCache(forceReload: Boolean = false): Boolean {
-        val newTranslations = translationManager.allTranslations().collect(toList())
+        val newTranslations = translationManager.allTranslations().toList()
         val newLanguages = newTranslations.stream()
             .filter { acceptTranslationFilter(it) }
             .flatMap { it.languagesOfAllStores() }
@@ -101,7 +101,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
             .collect(toList())
 
         if (forceReload || m_translations == null || m_languages != newLanguages) {
-            m_translations = newTranslations
+            m_translations = ArrayList(newTranslations)
             m_languages = newLanguages
             fireTableStructureChanged()
             return true
@@ -194,7 +194,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
         }
 
         private fun handleEvents(events: List<TranslationManagerEvent>) {
-            val doFullReload = events.size > 100 || events.any { it.type() == TranslationManagerEvent.TYPE_RELOAD }
+            val doFullReload = events.size > 100 || events.any { it.type() == TranslationManagerEvent.TYPE_RELOAD || it.type() == TranslationManagerEvent.TYPE_NEW_LANGUAGE }
             val needsSave = events.any {
                 it.type() == TranslationManagerEvent.TYPE_REMOVE_TRANSLATION
                         || it.type() == TranslationManagerEvent.TYPE_NEW_TRANSLATION
@@ -240,11 +240,6 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
             TranslationManagerEvent.TYPE_NEW_TRANSLATION -> translationsAdded(event)
             TranslationManagerEvent.TYPE_KEY_CHANGED -> translationKeyChanged(event)
             TranslationManagerEvent.TYPE_UPDATE_TRANSLATION -> translationsUpdated(event)
-            TranslationManagerEvent.TYPE_NEW_LANGUAGE -> {
-                buildCache()
-                -1
-            }
-
             else -> -1
         }
 

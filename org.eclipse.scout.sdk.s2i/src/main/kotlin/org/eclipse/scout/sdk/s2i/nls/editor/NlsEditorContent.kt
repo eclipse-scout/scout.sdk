@@ -61,7 +61,7 @@ import javax.swing.Icon
 import javax.swing.JComponent
 import javax.swing.event.DocumentEvent
 
-class NlsEditorContent(val project: Project, val translationManager: TranslationManager, val primaryStore: ITranslationStore) : JBPanel<NlsEditorContent>(GridBagLayout()) {
+class NlsEditorContent(val project: Project, val translationManager: TranslationManager, var primaryStore: ITranslationStore) : JBPanel<NlsEditorContent>(GridBagLayout()) {
 
     private val m_table = NlsTable(translationManager, project)
     private val m_textFilter = TextFieldWithMaxLen(maxLength = 2000)

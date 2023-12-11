@@ -25,6 +25,7 @@ import com.intellij.openapi.vfs.newvfs.events.VFileEvent
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBPanel
 import com.intellij.util.concurrency.AppExecutorUtil
+import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.TextProviderService
 import org.eclipse.scout.sdk.core.s.nls.Translations
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
@@ -100,7 +101,21 @@ class NlsEditor(val project: Project, private val m_virtualFile: VirtualFile) : 
         if (hasReload) {
             // on reload: forget about any pending reload checks
             setReloadCheckNecessary(false)
+
+            // update primary store in content as reloading creates a new instance
+            // otherwise e.g. the Excel import stores in the old instance which is never saved!
+            findNewPrimaryStore()?.let { m_content?.primaryStore = it }
         }
+    }
+
+    private fun findNewPrimaryStore(): ITranslationStore? {
+        val old = m_content?.primaryStore ?: return null
+        return m_manager.allStores()
+            .filter { it.service().equals(old.service()) }
+            .findFirst()
+            .or { m_manager.primaryEditableStore() }
+            .or { m_manager.allStores().findFirst() }
+            .orElse(null)
     }
 
     private fun onLoadError(e: Throwable) = ApplicationManager.getApplication().invokeLater {
