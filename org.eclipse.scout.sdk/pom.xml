@@ -1256,5 +1256,87 @@
         </plugins>
       </build>
     </profile>
+
+    <!-- convergence rule is only supported in 24.1 or newer -->
+    <profile>
+      <id>disable-convergence-for-23.2-build</id>
+      <activation>
+        <property>
+          <name>org.eclipse.scout.rt_version</name>
+          <value>23.2-SNAPSHOT</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <configuration>
+              <rulesToSkip>dependencyConvergence</rulesToSkip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>disable-convergence-for-22.0-build</id>
+      <activation>
+        <property>
+          <name>org.eclipse.scout.rt_version</name>
+          <value>22.0-SNAPSHOT</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <configuration>
+              <rulesToSkip>dependencyConvergence</rulesToSkip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>disable-convergence-for-11.0-build</id>
+      <activation>
+        <property>
+          <name>org.eclipse.scout.rt_version</name>
+          <value>11.0-SNAPSHOT</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <configuration>
+              <rulesToSkip>dependencyConvergence</rulesToSkip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>disable-convergence-for-10.0-build</id>
+      <activation>
+        <property>
+          <name>org.eclipse.scout.rt_version</name>
+          <value>10.0.0-SNAPSHOT</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <configuration>
+              <rulesToSkip>dependencyConvergence</rulesToSkip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 </project>
