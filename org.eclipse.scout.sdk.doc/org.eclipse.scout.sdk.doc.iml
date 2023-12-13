@@ -98,8 +98,8 @@
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.nls:24.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.google.http-client:google-http-client:1.42.3" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
-    <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.16" level="project" />
-    <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:1.3" level="project" />
+    <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.23.0" level="project" />
+    <orderEntry type="library" name="Maven: com.google.j2objc:j2objc-annotations:2.8" level="project" />
     <orderEntry type="library" name="Maven: io.opencensus:opencensus-api:0.31.1" level="project" />
     <orderEntry type="library" name="Maven: io.grpc:grpc-context:1.27.2" level="project" />
     <orderEntry type="library" name="Maven: io.opencensus:opencensus-contrib-http-util:0.31.1" level="project" />
@@ -123,7 +123,7 @@
     <orderEntry type="library" name="Maven: jakarta.jws:jakarta.jws-api:2.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:24.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: io.smallrye:jandex:3.0.5" level="project" />
+    <orderEntry type="library" name="Maven: io.smallrye:jandex:3.1.6" level="project" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
     <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-api:1.31.0" level="project" />
     <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-context:1.31.0" level="project" />
