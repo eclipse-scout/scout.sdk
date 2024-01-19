@@ -22,13 +22,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.junit.jupiter.api.Test;
 
-import formdata.client.ui.forms.IgnoredFieldsForm;
-
 public class IgnoredFieldsFormTest {
 
   @Test
   public void testCreateFormData() {
-    createFormDataAssertNoCompileErrors(IgnoredFieldsForm.class.getName(), IgnoredFieldsFormTest::testApiOfIgnoredFieldsFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.IgnoredFieldsForm", IgnoredFieldsFormTest::testApiOfIgnoredFieldsFormData);
   }
 
   /**

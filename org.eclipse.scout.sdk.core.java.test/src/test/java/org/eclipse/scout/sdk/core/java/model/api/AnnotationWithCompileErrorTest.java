@@ -15,11 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.math.RoundingMode;
 
-import javax.annotation.Generated;
-
 import org.eclipse.scout.sdk.core.java.fixture.ClassWithAnnotationConstants;
 import org.eclipse.scout.sdk.core.java.fixture.managed.AnnotationWithArrayValues;
-import org.eclipse.scout.sdk.core.java.model.annotation.GeneratedAnnotation;
+import org.eclipse.scout.sdk.core.java.fixture.managed.ArrayValueAnnot;
 import org.eclipse.scout.sdk.core.java.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.java.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.junit.jupiter.api.Test;
@@ -38,14 +36,14 @@ public class AnnotationWithCompileErrorTest {
     var className = "ClassWithCompileError";
     var pck = "test";
     var testClass = "package " + pck + ";\n\n" +
-        "@" + Generated.class.getName() + "(null)\n" +
+        "@" + org.eclipse.scout.sdk.core.java.fixture.ArrayValueAnnot.class.getName() + "(null)\n" +
         "public class " + className + " {}\n";
 
     var type = registerCompilationUnit(env, testClass, pck, className);
     assertFalse(env.compileErrors(type).isEmpty());
 
-    var generatedValue = type.annotations().withManagedWrapper(GeneratedAnnotation.class).first().orElseThrow().value();
-    assertEquals(0, generatedValue.length);
+    var arrayValueAnnot = type.annotations().withManagedWrapper(ArrayValueAnnot.class).first().orElseThrow().value();
+    assertEquals(0, arrayValueAnnot.length);
   }
 
   @Test
@@ -56,7 +54,7 @@ public class AnnotationWithCompileErrorTest {
         "import " + org.eclipse.scout.sdk.core.java.fixture.AnnotationWithArrayValues.class.getName() + ";\n" +
         "import " + ClassWithAnnotationConstants.class.getName() + ";\n" +
         "import " + org.eclipse.scout.sdk.core.java.fixture.AnnotationWithSingleValues.class.getName() + ";\n" +
-        "import " + Generated.class.getName() + ";\n" +
+        "import " + org.eclipse.scout.sdk.core.java.fixture.ArrayValueAnnot.class.getName() + ";\n" +
         "import " + RoundingMode.class.getName() + ";\n\n" +
         "@AnnotationWithArrayValues(\n" +
         "      nums = {21, 22},\n" +
@@ -65,7 +63,7 @@ public class AnnotationWithCompileErrorTest {
         "      types = {Float.class, Float.class},\n" +
         "      annos = {\n" +
         "          @AnnotationWithSingleValues(type = Double.class, enumValue = RoundingMode.HALF_EVEN, num = 31, string = \"asdf\"),\n" + // <-- compile error here: anno element is mandatory
-        "          @AnnotationWithSingleValues(type = Double.class, enumValue = RoundingMode.HALF_EVEN, num = 32, string = ClassWithAnnotationConstants.DELTA, anno = @Generated(\"gen\")}),\n" + // <-- compile error here (curly brace at the end)
+        "          @AnnotationWithSingleValues(type = Double.class, enumValue = RoundingMode.HALF_EVEN, num = 32, string = ClassWithAnnotationConstants.DELTA, anno = @ArrayValueAnnot(\"gen\")}),\n" + // <-- compile error here (curly brace at the end)
         "      })\n" +
         "public class " + className + " {}\n";
 

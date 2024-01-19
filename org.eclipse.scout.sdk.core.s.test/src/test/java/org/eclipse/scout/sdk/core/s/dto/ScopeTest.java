@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,12 +20,10 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTy
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.junit.jupiter.api.Test;
-
-import formdata.client.scope.extended.ExtendedScopeTestForm;
-import formdata.client.scope.field.AbstractScopeTestGroupBox;
-import formdata.client.scope.orig.ScopeTestForm;
 
 /**
  * <h3>{@link ScopeTest}</h3>
@@ -41,24 +39,26 @@ public class ScopeTest {
    */
   @Test
   public void testScope() {
-    createFormDataAssertNoCompileErrors(AbstractScopeTestGroupBox.class.getName(), ScopeTest::testApiOfAbstractScopeTestGroupBoxData);
-    createFormDataAssertNoCompileErrors(ScopeTestForm.class.getName(), ScopeTest::testApiOfScopeTestFormData);
-    createFormDataAssertNoCompileErrors(ExtendedScopeTestForm.class.getName(), ScopeTest::testApiOfExtendedScopeTestFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.scope.field.AbstractScopeTestGroupBox", ScopeTest::testApiOfAbstractScopeTestGroupBoxData);
+    createFormDataAssertNoCompileErrors("formdata.client.scope.orig.ScopeTestForm", ScopeTest::testApiOfScopeTestFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.scope.extended.ExtendedScopeTestForm", ScopeTest::testApiOfExtendedScopeTestFormData);
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfAbstractScopeTestGroupBoxData(IType abstractScopeTestGroupBoxData) {
-    assertHasFlags(abstractScopeTestGroupBoxData, 1025);
-    assertHasSuperClass(abstractScopeTestGroupBoxData, "org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData");
+    var scoutApi = abstractScopeTestGroupBoxData.javaEnvironment().requireApi(IScoutApi.class);
+
+    assertHasFlags(abstractScopeTestGroupBoxData, Flags.AccPublic | Flags.AccAbstract);
+    assertHasSuperClass(abstractScopeTestGroupBoxData, scoutApi.AbstractFormFieldData());
     assertEquals(1, abstractScopeTestGroupBoxData.annotations().stream().count(), "annotation count");
-    assertAnnotation(abstractScopeTestGroupBoxData, "javax.annotation.Generated");
+    assertAnnotation(abstractScopeTestGroupBoxData, scoutApi.Generated());
 
     // fields of AbstractScopeTestGroupBoxData
     assertEquals(1, abstractScopeTestGroupBoxData.fields().stream().count(), "field count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData'");
     var serialVersionUID = assertFieldExist(abstractScopeTestGroupBoxData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
+    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
@@ -70,14 +70,14 @@ public class ScopeTest {
     assertEquals(1, abstractScopeTestGroupBoxData.innerTypes().stream().count(), "inner types count of 'AbstractScopeTestGroupBoxData'");
     // type Process
     var process = assertTypeExists(abstractScopeTestGroupBoxData, "Process");
-    assertHasFlags(process, 9);
+    assertHasFlags(process, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(process, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.util.Set<java.lang.Long>>");
     assertEquals(0, process.annotations().stream().count(), "annotation count");
 
     // fields of Process
     assertEquals(1, process.fields().stream().count(), "field count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData$Process'");
     var serialVersionUID1 = assertFieldExist(process, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
+    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
 
@@ -87,18 +87,20 @@ public class ScopeTest {
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfScopeTestFormData(IType scopeTestFormData) {
-    assertHasFlags(scopeTestFormData, 1);
-    assertHasSuperClass(scopeTestFormData, "org.eclipse.scout.rt.shared.data.form.AbstractFormData");
+    var scoutApi = scopeTestFormData.javaEnvironment().requireApi(IScoutApi.class);
+
+    assertHasFlags(scopeTestFormData, Flags.AccPublic);
+    assertHasSuperClass(scopeTestFormData, scoutApi.AbstractFormData());
     assertEquals(1, scopeTestFormData.annotations().stream().count(), "annotation count");
-    assertAnnotation(scopeTestFormData, "javax.annotation.Generated");
+    assertAnnotation(scopeTestFormData, scoutApi.Generated());
 
     // fields of ScopeTestFormData
     assertEquals(1, scopeTestFormData.fields().stream().count(), "field count of 'formdata.shared.scope.orig.ScopeTestFormData'");
     var serialVersionUID = assertFieldExist(scopeTestFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
+    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
@@ -110,14 +112,14 @@ public class ScopeTest {
     assertEquals(1, scopeTestFormData.innerTypes().stream().count(), "inner types count of 'ScopeTestFormData'");
     // type ProcessesBox
     var processesBox = assertTypeExists(scopeTestFormData, "ProcessesBox");
-    assertHasFlags(processesBox, 9);
+    assertHasFlags(processesBox, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(processesBox, "formdata.shared.scope.field.AbstractScopeTestGroupBoxData");
     assertEquals(0, processesBox.annotations().stream().count(), "annotation count");
 
     // fields of ProcessesBox
     assertEquals(1, processesBox.fields().stream().count(), "field count of 'formdata.shared.scope.orig.ScopeTestFormData$ProcessesBox'");
     var serialVersionUID1 = assertFieldExist(processesBox, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
+    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
 
@@ -127,19 +129,21 @@ public class ScopeTest {
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfExtendedScopeTestFormData(IType extendedScopeTestFormData) {
-    assertHasFlags(extendedScopeTestFormData, 1);
+    var scoutApi = extendedScopeTestFormData.javaEnvironment().requireApi(IScoutApi.class);
+
+    assertHasFlags(extendedScopeTestFormData, Flags.AccPublic);
     assertHasSuperClass(extendedScopeTestFormData, "formdata.shared.scope.orig.ScopeTestFormData");
     assertEquals(2, extendedScopeTestFormData.annotations().stream().count(), "annotation count");
-    assertAnnotation(extendedScopeTestFormData, "org.eclipse.scout.rt.platform.Replace");
-    assertAnnotation(extendedScopeTestFormData, "javax.annotation.Generated");
+    assertAnnotation(extendedScopeTestFormData, scoutApi.Replace());
+    assertAnnotation(extendedScopeTestFormData, scoutApi.Generated());
 
     // fields of ExtendedScopeTestFormData
     assertEquals(1, extendedScopeTestFormData.fields().stream().count(), "field count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData'");
     var serialVersionUID = assertFieldExist(extendedScopeTestFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
+    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
@@ -154,15 +158,15 @@ public class ScopeTest {
     assertEquals(2, extendedScopeTestFormData.innerTypes().stream().count(), "inner types count of 'ExtendedScopeTestFormData'");
     // type AnliegenBox
     var anliegenBox = assertTypeExists(extendedScopeTestFormData, "AnliegenBox");
-    assertHasFlags(anliegenBox, 9);
+    assertHasFlags(anliegenBox, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(anliegenBox, "formdata.shared.scope.orig.ScopeTestFormData$ProcessesBox");
     assertEquals(1, anliegenBox.annotations().stream().count(), "annotation count");
-    assertAnnotation(anliegenBox, "org.eclipse.scout.rt.platform.Replace");
+    assertAnnotation(anliegenBox, scoutApi.Replace());
 
     // fields of AnliegenBox
     assertEquals(1, anliegenBox.fields().stream().count(), "field count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData$AnliegenBox'");
     var serialVersionUID1 = assertFieldExist(anliegenBox, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
+    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
 
@@ -171,15 +175,15 @@ public class ScopeTest {
     assertEquals(0, anliegenBox.innerTypes().stream().count(), "inner types count of 'AnliegenBox'");
     // type ExtendedProcess
     var extendedProcess = assertTypeExists(extendedScopeTestFormData, "ExtendedProcess");
-    assertHasFlags(extendedProcess, 9);
+    assertHasFlags(extendedProcess, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(extendedProcess, "formdata.shared.scope.field.AbstractScopeTestGroupBoxData$Process");
     assertEquals(1, extendedProcess.annotations().stream().count(), "annotation count");
-    assertAnnotation(extendedProcess, "org.eclipse.scout.rt.platform.Replace");
+    assertAnnotation(extendedProcess, scoutApi.Replace());
 
     // fields of ExtendedProcess
     assertEquals(1, extendedProcess.fields().stream().count(), "field count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData$ExtendedProcess'");
     var serialVersionUID2 = assertFieldExist(extendedProcess, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, 26);
+    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID2, "long");
     assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
 
@@ -187,5 +191,4 @@ public class ScopeTest {
 
     assertEquals(0, extendedProcess.innerTypes().stream().count(), "inner types count of 'ExtendedProcess'");
   }
-
 }

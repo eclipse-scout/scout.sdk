@@ -221,11 +221,14 @@ public class ImportCollector implements IImportCollector {
         if (packageName.startsWith("javax.")) {
           return 2 * factor;
         }
-        if (packageName.startsWith("org.")) {
+        if (packageName.startsWith("jakarta.")) {
           return 3 * factor;
         }
+        if (packageName.startsWith("org.")) {
+          return 4 * factor;
+        }
       }
-      return 4 * factor;
+      return 5 * factor;
     }
 
     public StringBuilder getImport() {
@@ -251,7 +254,7 @@ public class ImportCollector implements IImportCollector {
   }
 
   /**
-   * Sort in the following order: java, javax, org, other
+   * Sort in the following order: java, javax, jakarta, org, other
    */
   private static final class ImportComparator implements Comparator<ImportElement>, Serializable {
     private static final long serialVersionUID = 1L;

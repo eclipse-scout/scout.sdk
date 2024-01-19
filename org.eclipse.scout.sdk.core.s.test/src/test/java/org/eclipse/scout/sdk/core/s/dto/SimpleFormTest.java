@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,27 +25,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.junit.jupiter.api.Test;
-
-import formdata.client.ui.forms.SimpleForm;
 
 public class SimpleFormTest {
 
   @Test
   public void testCreateFormData() {
-    createFormDataAssertNoCompileErrors(SimpleForm.class.getName(), SimpleFormTest::testApiOfSimpleFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.SimpleForm", SimpleFormTest::testApiOfSimpleFormData);
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfSimpleFormData(IType simpleFormData) {
+    var scoutApi = simpleFormData.javaEnvironment().requireApi(IScoutApi.class);
+
     assertHasFlags(simpleFormData, Flags.AccPublic);
-    assertHasSuperClass(simpleFormData, "org.eclipse.scout.rt.shared.data.form.AbstractFormData");
+    assertHasSuperClass(simpleFormData, scoutApi.AbstractFormData());
     assertHasSuperInterfaces(simpleFormData, new String[]{"formdata.shared.IFormDataInterface02", "formdata.shared.IFormDataInterface03"});
     assertEquals(2, simpleFormData.annotations().stream().count(), "annotation count");
-    assertValidDtoClassIdValue(assertAnnotation(simpleFormData, "org.eclipse.scout.rt.platform.classid.ClassId"));
-    assertAnnotation(simpleFormData, "javax.annotation.Generated");
+    // --> manual modification
+    assertValidDtoClassIdValue(assertAnnotation(simpleFormData, scoutApi.ClassId()));
+    // <-- manual modification
+    assertAnnotation(simpleFormData, scoutApi.Generated());
 
     // fields of SimpleFormData
     assertEquals(1, simpleFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData'");
@@ -80,43 +83,29 @@ public class SimpleFormTest {
     var getSimpleNr = assertMethodExist(simpleFormData, "getSimpleNr");
     assertMethodReturnType(getSimpleNr, "java.lang.Long");
     assertEquals(0, getSimpleNr.annotations().stream().count(), "annotation count");
-    var getSimpleNrProperty = assertMethodExist(simpleFormData, "getSimpleNrProperty");
-    assertMethodReturnType(getSimpleNrProperty, "formdata.shared.services.process.SimpleFormData$SimpleNrProperty");
-    assertEquals(0, getSimpleNrProperty.annotations().stream().count(), "annotation count");
     var setSimpleNr = assertMethodExist(simpleFormData, "setSimpleNr", new String[]{"java.lang.Long"});
     assertMethodReturnType(setSimpleNr, "void");
     assertEquals(0, setSimpleNr.annotations().stream().count(), "annotation count");
+    var getSimpleNrProperty = assertMethodExist(simpleFormData, "getSimpleNrProperty");
+    assertMethodReturnType(getSimpleNrProperty, "formdata.shared.services.process.SimpleFormData$SimpleNrProperty");
+    assertEquals(0, getSimpleNrProperty.annotations().stream().count(), "annotation count");
 
     assertEquals(8, simpleFormData.innerTypes().stream().count(), "inner types count of 'SimpleFormData'");
-    // type SimpleNrProperty
-    var simpleNrProperty = assertTypeExists(simpleFormData, "SimpleNrProperty");
-    assertHasFlags(simpleNrProperty, Flags.AccPublic | Flags.AccStatic);
-    assertHasSuperClass(simpleNrProperty, "org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData<java.lang.Long>");
-    assertEquals(0, simpleNrProperty.annotations().stream().count(), "annotation count");
-
-    // fields of SimpleNrProperty
-    assertEquals(1, simpleNrProperty.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SimpleNrProperty'");
-    var serialVersionUID1 = assertFieldExist(simpleNrProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
-
-    assertEquals(0, simpleNrProperty.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SimpleNrProperty'");
-
-    assertEquals(0, simpleNrProperty.innerTypes().stream().count(), "inner types count of 'SimpleNrProperty'");
     // type Date
     var date = assertTypeExists(simpleFormData, "Date");
     assertHasFlags(date, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(date, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.lang.Integer>");
     assertEquals(1, date.annotations().stream().count(), "annotation count");
-    assertValidDtoClassIdValue(assertAnnotation(date, "org.eclipse.scout.rt.platform.classid.ClassId"));
+    // --> manual modification
+    assertValidDtoClassIdValue(assertAnnotation(date, scoutApi.ClassId()));
+    // <-- manual modification
 
     // fields of Date
     assertEquals(1, date.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$Date'");
-    var serialVersionUID2 = assertFieldExist(date, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID2, "long");
-    assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
+    var serialVersionUID1 = assertFieldExist(date, "serialVersionUID");
+    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
+    assertFieldType(serialVersionUID1, "long");
+    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
 
     assertEquals(0, date.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$Date'");
 
@@ -126,14 +115,16 @@ public class SimpleFormTest {
     assertHasFlags(double1, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(double1, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.math.BigDecimal>");
     assertEquals(1, double1.annotations().stream().count(), "annotation count");
-    assertValidDtoClassIdValue(assertAnnotation(double1, "org.eclipse.scout.rt.platform.classid.ClassId"));
+    // --> manual modification
+    assertValidDtoClassIdValue(assertAnnotation(double1, scoutApi.ClassId()));
+    // <-- manual modification
 
     // fields of Double
     assertEquals(1, double1.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$Double'");
-    var serialVersionUID3 = assertFieldExist(double1, "serialVersionUID");
-    assertHasFlags(serialVersionUID3, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID3, "long");
-    assertEquals(0, serialVersionUID3.annotations().stream().count(), "annotation count");
+    var serialVersionUID2 = assertFieldExist(double1, "serialVersionUID");
+    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
+    assertFieldType(serialVersionUID2, "long");
+    assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
 
     assertEquals(0, double1.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$Double'");
 
@@ -143,14 +134,16 @@ public class SimpleFormTest {
     assertHasFlags(multiTypeArgsBox, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(multiTypeArgsBox, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<formdata.shared.TestRunnable>");
     assertEquals(1, multiTypeArgsBox.annotations().stream().count(), "annotation count");
-    assertValidDtoClassIdValue(assertAnnotation(multiTypeArgsBox, "org.eclipse.scout.rt.platform.classid.ClassId"));
+    // --> manual modification
+    assertValidDtoClassIdValue(assertAnnotation(multiTypeArgsBox, scoutApi.ClassId()));
+    // <-- manual modification
 
     // fields of MultiTypeArgsBox
     assertEquals(1, multiTypeArgsBox.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$MultiTypeArgsBox'");
-    var serialVersionUID4 = assertFieldExist(multiTypeArgsBox, "serialVersionUID");
-    assertHasFlags(serialVersionUID4, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID4, "long");
-    assertEquals(0, serialVersionUID4.annotations().stream().count(), "annotation count");
+    var serialVersionUID3 = assertFieldExist(multiTypeArgsBox, "serialVersionUID");
+    assertHasFlags(serialVersionUID3, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
+    assertFieldType(serialVersionUID3, "long");
+    assertEquals(0, serialVersionUID3.annotations().stream().count(), "annotation count");
 
     assertEquals(0, multiTypeArgsBox.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$MultiTypeArgsBox'");
 
@@ -160,14 +153,16 @@ public class SimpleFormTest {
     assertHasFlags(sampleComposer, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(sampleComposer, "org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerData");
     assertEquals(1, sampleComposer.annotations().stream().count(), "annotation count");
-    assertValidDtoClassIdValue(assertAnnotation(sampleComposer, "org.eclipse.scout.rt.platform.classid.ClassId"));
+    // --> manual modification
+    assertValidDtoClassIdValue(assertAnnotation(sampleComposer, scoutApi.ClassId()));
+    // <-- manual modification
 
     // fields of SampleComposer
     assertEquals(1, sampleComposer.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SampleComposer'");
-    var serialVersionUID5 = assertFieldExist(sampleComposer, "serialVersionUID");
-    assertHasFlags(serialVersionUID5, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID5, "long");
-    assertEquals(0, serialVersionUID5.annotations().stream().count(), "annotation count");
+    var serialVersionUID4 = assertFieldExist(sampleComposer, "serialVersionUID");
+    assertHasFlags(serialVersionUID4, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
+    assertFieldType(serialVersionUID4, "long");
+    assertEquals(0, serialVersionUID4.annotations().stream().count(), "annotation count");
 
     assertEquals(0, sampleComposer.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SampleComposer'");
 
@@ -177,14 +172,16 @@ public class SimpleFormTest {
     assertHasFlags(sampleDate, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(sampleDate, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.util.Date>");
     assertEquals(1, sampleDate.annotations().stream().count(), "annotation count");
-    assertValidDtoClassIdValue(assertAnnotation(sampleDate, "org.eclipse.scout.rt.platform.classid.ClassId"));
+    // --> manual modification
+    assertValidDtoClassIdValue(assertAnnotation(sampleDate, scoutApi.ClassId()));
+    // <-- manual modification
 
     // fields of SampleDate
     assertEquals(1, sampleDate.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SampleDate'");
-    var serialVersionUID6 = assertFieldExist(sampleDate, "serialVersionUID");
-    assertHasFlags(serialVersionUID6, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID6, "long");
-    assertEquals(0, serialVersionUID6.annotations().stream().count(), "annotation count");
+    var serialVersionUID5 = assertFieldExist(sampleDate, "serialVersionUID");
+    assertHasFlags(serialVersionUID5, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
+    assertFieldType(serialVersionUID5, "long");
+    assertEquals(0, serialVersionUID5.annotations().stream().count(), "annotation count");
 
     assertEquals(0, sampleDate.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SampleDate'");
 
@@ -194,14 +191,16 @@ public class SimpleFormTest {
     assertHasFlags(sampleSmart, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(sampleSmart, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.lang.Long>");
     assertEquals(1, sampleSmart.annotations().stream().count(), "annotation count");
-    assertValidDtoClassIdValue(assertAnnotation(sampleSmart, "org.eclipse.scout.rt.platform.classid.ClassId"));
+    // --> manual modification
+    assertValidDtoClassIdValue(assertAnnotation(sampleSmart, scoutApi.ClassId()));
+    // <-- manual modification
 
     // fields of SampleSmart
     assertEquals(1, sampleSmart.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SampleSmart'");
-    var serialVersionUID7 = assertFieldExist(sampleSmart, "serialVersionUID");
-    assertHasFlags(serialVersionUID7, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID7, "long");
-    assertEquals(0, serialVersionUID7.annotations().stream().count(), "annotation count");
+    var serialVersionUID6 = assertFieldExist(sampleSmart, "serialVersionUID");
+    assertHasFlags(serialVersionUID6, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
+    assertFieldType(serialVersionUID6, "long");
+    assertEquals(0, serialVersionUID6.annotations().stream().count(), "annotation count");
 
     assertEquals(0, sampleSmart.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SampleSmart'");
 
@@ -211,18 +210,36 @@ public class SimpleFormTest {
     assertHasFlags(sampleString, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(sampleString, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.lang.String>");
     assertEquals(1, sampleString.annotations().stream().count(), "annotation count");
-    assertValidDtoClassIdValue(assertAnnotation(sampleString, "org.eclipse.scout.rt.platform.classid.ClassId"));
+    // --> manual modification
+    assertValidDtoClassIdValue(assertAnnotation(sampleString, scoutApi.ClassId()));
+    // <-- manual modification
 
     // fields of SampleString
     assertEquals(1, sampleString.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SampleString'");
-    var serialVersionUID8 = assertFieldExist(sampleString, "serialVersionUID");
-    assertHasFlags(serialVersionUID8, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID8, "long");
-    assertEquals(0, serialVersionUID8.annotations().stream().count(), "annotation count");
+    var serialVersionUID7 = assertFieldExist(sampleString, "serialVersionUID");
+    assertHasFlags(serialVersionUID7, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
+    assertFieldType(serialVersionUID7, "long");
+    assertEquals(0, serialVersionUID7.annotations().stream().count(), "annotation count");
 
     assertEquals(0, sampleString.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SampleString'");
 
     assertEquals(0, sampleString.innerTypes().stream().count(), "inner types count of 'SampleString'");
+    // type SimpleNrProperty
+    var simpleNrProperty = assertTypeExists(simpleFormData, "SimpleNrProperty");
+    assertHasFlags(simpleNrProperty, Flags.AccPublic | Flags.AccStatic);
+    assertHasSuperClass(simpleNrProperty, "org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData<java.lang.Long>");
+    assertEquals(0, simpleNrProperty.annotations().stream().count(), "annotation count");
+
+    // fields of SimpleNrProperty
+    assertEquals(1, simpleNrProperty.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SimpleNrProperty'");
+    var serialVersionUID8 = assertFieldExist(simpleNrProperty, "serialVersionUID");
+    assertHasFlags(serialVersionUID8, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
+    assertFieldType(serialVersionUID8, "long");
+    assertEquals(0, serialVersionUID8.annotations().stream().count(), "annotation count");
+
+    assertEquals(0, simpleNrProperty.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SimpleNrProperty'");
+
+    assertEquals(0, simpleNrProperty.innerTypes().stream().count(), "inner types count of 'SimpleNrProperty'");
   }
 
   private static void assertValidDtoClassIdValue(IAnnotation classId) {

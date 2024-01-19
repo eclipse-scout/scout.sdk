@@ -156,10 +156,11 @@ Annotations can be wrapped with a typed annotation model simplifying the access 
 [source,java,indent=0]
 .Print annotation element value
 ----
-include::{codedir}/PrintAnnotationElementValues.java[tags=printAnnotationElementValues]
+include::{codedir}/PrintAnnotationElementValue.java[tags=printAnnotationElementValue]
 ----
-<1> Gets the annotations for which the annotation type matches the `GeneratedAnnotation` model (in this case `javax.annotation.Generated`) and wraps the `IAnnotation` into an instance of `GeneratedAnnotation` (typed).
-<2> The `GeneratedAnnotation` has named getters like `comments()` in this example which correspond to the matching annotation attribute.
+
+<1> Gets the annotations for which the annotation type matches the `ClassIdAnnotation` model (in this case `org.eclipse.scout.rt.platform.classid.ClassId`) and wraps the `IAnnotation` into an instance of `ClassIdAnnotation` (typed).
+<2> The `ClassIdAnnotation` has named getters like `value()` in this example which correspond to the matching annotation attribute.
 
 ===== Constant Values
 

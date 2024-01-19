@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -46,8 +46,6 @@ public final class JaxWsUtils {
   public static final String BINDINGS_CLASS_ELEMENT_NAME = "class";
   public static final String BINDING_PACKAGE_ELEMENT_NAME = "package";
   public static final String BINDINGS_NODE_ATTRIBUTE_NAME = "node";
-  public static final String JAX_WS_NAMESPACE = "http://java.sun.com/xml/ns/jaxws";
-  public static final String JAX_B_NAMESPACE = "http://java.sun.com/xml/ns/jaxb";
   public static final String BINDINGS_ELEMENT_NAME = "bindings";
   public static final String GENERATE_ELEMENT_ATTRIBUTE_NAME = "generateElementProperty";
   public static final String GLOBAL_BINDINGS_ELEMENT_NAME = "globalBindings";
@@ -282,12 +280,12 @@ public final class JaxWsUtils {
    * @throws XPathExpressionException
    *           if there is an error in the xpath expression
    */
-  public static Element getJaxWsBindingElement(String nodeValue, Node document) throws XPathExpressionException {
+  public static Element getJaxWsBindingElement(String nodeValue, Node document, String jaxWsNamespace) throws XPathExpressionException {
     var xPath = new StringBuilder();
     var prefix = "jaxws";
     var p = prefix + ':';
     xPath.append(p).append(BINDINGS_ELEMENT_NAME).append('/').append(p).append(BINDINGS_ELEMENT_NAME);
-    var bindings = Xml.evaluateXPath(xPath.toString(), document, prefix, JAX_WS_NAMESPACE);
+    var bindings = Xml.evaluateXPath(xPath.toString(), document, prefix, jaxWsNamespace);
     for (var binding : bindings) {
       var nodeAttribValue = binding.getAttribute(BINDINGS_NODE_ATTRIBUTE_NAME);
       if (nodeValue.equals(nodeAttribValue)) {

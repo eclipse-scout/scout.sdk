@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,10 +17,10 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHa
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.junit.jupiter.api.Test;
-
-import formdata.client.ui.forms.ReplacingForm;
 
 /**
  * <h3>{@link ReplacingFormTest}</h3> Tests that a FormData has an @Replace annotation if the corresponding form as
@@ -31,23 +31,25 @@ import formdata.client.ui.forms.ReplacingForm;
 public class ReplacingFormTest {
   @Test
   public void testCreateFormData() {
-    createFormDataAssertNoCompileErrors(ReplacingForm.class.getName(), ReplacingFormTest::testApiOfReplacingFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.ReplacingForm", ReplacingFormTest::testApiOfReplacingFormData);
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfReplacingFormData(IType replacingFormData) {
-    assertHasFlags(replacingFormData, 1);
+    var scoutApi = replacingFormData.javaEnvironment().requireApi(IScoutApi.class);
+
+    assertHasFlags(replacingFormData, Flags.AccPublic);
     assertHasSuperClass(replacingFormData, "formdata.shared.ui.forms.AnnotationCopyTestFormData");
     assertEquals(2, replacingFormData.annotations().stream().count(), "annotation count");
-    assertAnnotation(replacingFormData, "org.eclipse.scout.rt.platform.Replace");
-    assertAnnotation(replacingFormData, "javax.annotation.Generated");
+    assertAnnotation(replacingFormData, scoutApi.Replace());
+    assertAnnotation(replacingFormData, scoutApi.Generated());
 
     // fields of ReplacingFormData
     assertEquals(1, replacingFormData.fields().stream().count(), "field count of 'formdata.shared.ui.forms.ReplacingFormData'");
     var serialVersionUID = assertFieldExist(replacingFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
+    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 

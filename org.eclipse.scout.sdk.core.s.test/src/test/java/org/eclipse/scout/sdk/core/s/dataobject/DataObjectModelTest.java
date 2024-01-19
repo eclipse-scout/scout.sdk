@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import dataobject.BaseDo;
 import dataobject.ChildDo;
 import dataobject.IgnoredDo;
-import dataobject.SampleDo;
 
 @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class)
 public class DataObjectModelTest {
@@ -62,7 +61,7 @@ public class DataObjectModelTest {
   @Test
   public void testIgnore(IJavaEnvironment env) {
     assertFalse(wrap(env.requireType(IgnoredDo.class.getName())).isPresent());
-    var model = wrap(env.requireType(SampleDo.class.getName())).orElseThrow();
+    var model = wrap(env.requireType("dataobject.SampleDo")).orElseThrow();
     var nodeNames = model.nodes().stream()
         .map(DataObjectNode::name)
         .sorted()

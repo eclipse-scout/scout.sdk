@@ -22,13 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.junit.jupiter.api.Test;
 
-import formdata.client.ui.forms.FormWithGroupBoxesForm;
 
 public class FormWithGroupboxesTest {
 
   @Test
   public void testCreateFormData() {
-    createFormDataAssertNoCompileErrors(FormWithGroupBoxesForm.class.getName(), FormWithGroupboxesTest::testApiOfFormWithGroupBoxesFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.FormWithGroupBoxesForm", FormWithGroupboxesTest::testApiOfFormWithGroupBoxesFormData);
   }
 
   /**

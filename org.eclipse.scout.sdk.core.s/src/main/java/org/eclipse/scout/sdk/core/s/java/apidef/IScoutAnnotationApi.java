@@ -201,4 +201,15 @@ public interface IScoutAnnotationApi {
   interface AttributeName extends ITypeNameSupplier {
     String valueElementName();
   }
+
+  Generated Generated();
+
+  interface Generated extends ITypeNameSupplier {
+
+    String valueElementName();
+
+    String dateElementName();
+
+    String commentsElementName();
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.apidef.Api;
 import org.eclipse.scout.sdk.core.java.apidef.Api.ChildElementType;
 import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
+import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.java.builder.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.java.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
@@ -190,6 +191,14 @@ public final class SdkJavaAssertions {
         });
   }
 
+  public static void assertMethodReturnType(IMethod method, ITypeNameSupplier expectedType) {
+    assertMethodReturnType(method, expectedType.fqn());
+  }
+
+  public static void assertMethodReturnType(IMethod method, ITypeNameSupplier expectedType, String message) {
+    assertMethodReturnType(method, expectedType.fqn(), message);
+  }
+
   public static void assertMethodReturnType(IMethod method, String expectedType) {
     assertMethodReturnType(method, expectedType, "Method return type not equal!");
   }
@@ -234,6 +243,14 @@ public final class SdkJavaAssertions {
     assertEquals(expectedType, typeRef, message);
   }
 
+  public static void assertHasSuperClass(IType type, ITypeNameSupplier expectedSuperClass) {
+    assertHasSuperClass(type, expectedSuperClass.fqn());
+  }
+
+  public static void assertHasSuperClass(IType type, ITypeNameSupplier expectedSuperClass, String message) {
+    assertHasSuperClass(type, expectedSuperClass.fqn(), message);
+  }
+
   public static void assertHasSuperClass(IType type, String expectedSuperClass) {
     assertHasSuperClass(type, expectedSuperClass, "Type '" + type.name() + "' does not have expected supertype!");
   }
@@ -252,6 +269,13 @@ public final class SdkJavaAssertions {
         .map(IType::reference)
         .collect(toList());
     assertEquals(Arrays.asList(expectedInterfaces), interfaces, message);
+  }
+
+  /**
+   * Asserts that the given annotation exists on the given object.
+   */
+  public static IAnnotation assertAnnotation(IAnnotatable annotatable, ITypeNameSupplier annotation) {
+    return assertAnnotation(annotatable, annotation.fqn());
   }
 
   /**

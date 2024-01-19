@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,10 +20,10 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTy
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createPageDataAssertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.junit.jupiter.api.Test;
-
-import formdata.client.ui.desktop.outline.pages.ReplacingPage;
 
 /**
  * <h3>{@link ReplacingPageTest}</h3>
@@ -33,23 +33,25 @@ import formdata.client.ui.desktop.outline.pages.ReplacingPage;
 public class ReplacingPageTest {
   @Test
   public void testPageWithTableExtensionData() {
-    createPageDataAssertNoCompileErrors(ReplacingPage.class.getName(), ReplacingPageTest::testApiOfReplacingPageData);
+    createPageDataAssertNoCompileErrors("formdata.client.ui.desktop.outline.pages.ReplacingPage", ReplacingPageTest::testApiOfReplacingPageData);
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfReplacingPageData(IType replacingPageData) {
-    assertHasFlags(replacingPageData, 1);
+    var scoutApi = replacingPageData.javaEnvironment().requireApi(IScoutApi.class);
+
+    assertHasFlags(replacingPageData, Flags.AccPublic);
     assertHasSuperClass(replacingPageData, "formdata.shared.services.pages.BaseTablePageData");
     assertEquals(2, replacingPageData.annotations().stream().count(), "annotation count");
-    assertAnnotation(replacingPageData, "org.eclipse.scout.rt.platform.Replace");
-    assertAnnotation(replacingPageData, "javax.annotation.Generated");
+    assertAnnotation(replacingPageData, scoutApi.Replace());
+    assertAnnotation(replacingPageData, scoutApi.Generated());
 
     // fields of ReplacingPageData
     assertEquals(1, replacingPageData.fields().stream().count(), "field count of 'formdata.shared.services.pages.ReplacingPageData'");
     var serialVersionUID = assertFieldExist(replacingPageData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
+    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
@@ -85,14 +87,14 @@ public class ReplacingPageTest {
     assertEquals(1, replacingPageData.innerTypes().stream().count(), "inner types count of 'ReplacingPageData'");
     // type ReplacingRowData
     var replacingRowData = assertTypeExists(replacingPageData, "ReplacingRowData");
-    assertHasFlags(replacingRowData, 9);
+    assertHasFlags(replacingRowData, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(replacingRowData, "formdata.shared.services.pages.BaseTablePageData$BaseTableRowData");
     assertEquals(0, replacingRowData.annotations().stream().count(), "annotation count");
 
     // fields of ReplacingRowData
     assertEquals(1, replacingRowData.fields().stream().count(), "field count of 'formdata.shared.services.pages.ReplacingPageData$ReplacingRowData'");
     var serialVersionUID1 = assertFieldExist(replacingRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
+    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
 
@@ -100,5 +102,4 @@ public class ReplacingPageTest {
 
     assertEquals(0, replacingRowData.innerTypes().stream().count(), "inner types count of 'ReplacingRowData'");
   }
-
 }

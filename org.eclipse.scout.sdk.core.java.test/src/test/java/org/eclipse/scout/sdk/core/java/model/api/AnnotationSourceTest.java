@@ -49,7 +49,7 @@ public class AnnotationSourceTest {
     assertAnnotationValue(a, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_UP", null);
     assertAnnotationValue(a, "string", MetaValueType.String, String.class, "\"one\"", null);
     assertAnnotationValue(a, "type", MetaValueType.Type, TypeImplementor.class, "String.class", null);
-    assertAnnotationValue(a, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated(\"g\")", null);
+    assertAnnotationValue(a, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ArrayValueAnnot(\"g\")", null);
   }
 
   @Test
@@ -131,7 +131,7 @@ public class AnnotationSourceTest {
     assertAnnotationValue(a, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_UP", null);
     assertAnnotationValue(a, "string", MetaValueType.String, String.class, "\"one\"", null);
     assertAnnotationValue(a, "type", MetaValueType.Type, TypeImplementor.class, "String.class", null);
-    assertAnnotationValue(a, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated(\"g\")", null);
+    assertAnnotationValue(a, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@ArrayValueAnnot(\"g\")", null);
   }
 
   @Test

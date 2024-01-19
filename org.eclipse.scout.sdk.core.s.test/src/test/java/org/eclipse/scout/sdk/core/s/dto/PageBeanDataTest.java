@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,18 +22,10 @@ import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createPage
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createRowDataAssertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.junit.jupiter.api.Test;
-
-import formdata.client.ui.desktop.outline.pages.BaseTablePage;
-import formdata.client.ui.desktop.outline.pages.BaseWithExtendedTableTablePage;
-import formdata.client.ui.desktop.outline.pages.ExtendedExtendedTablePageWithExtendedTable;
-import formdata.client.ui.desktop.outline.pages.ExtendedTablePage;
-import formdata.client.ui.desktop.outline.pages.ExtendedTablePageWithoutExtendedTable;
-import formdata.client.ui.desktop.outline.pages.PageWithTableExtension;
 
 /**
  * <h3>{@link PageBeanDataTest}</h3>
@@ -44,32 +36,32 @@ public class PageBeanDataTest {
 
   @Test
   public void testPageWithTableExtensionData() {
-    createRowDataAssertNoCompileErrors(PageWithTableExtension.class.getName(), PageBeanDataTest::testApiOfPageWithTableExtensionData);
+    createRowDataAssertNoCompileErrors("formdata.client.ui.desktop.outline.pages.PageWithTableExtension", PageBeanDataTest::testApiOfPageWithTableExtensionData);
   }
 
   @Test
   public void testAbstractTableField() {
-    createPageDataAssertNoCompileErrors(BaseTablePage.class.getName(), PageBeanDataTest::testApiOfBaseTablePageData);
+    createPageDataAssertNoCompileErrors("formdata.client.ui.desktop.outline.pages.BaseTablePage", PageBeanDataTest::testApiOfBaseTablePageData);
   }
 
   @Test
   public void testExtendedTablePage() {
-    createPageDataAssertNoCompileErrors(ExtendedTablePage.class.getName(), PageBeanDataTest::testApiOfExtendedTablePageData);
+    createPageDataAssertNoCompileErrors("formdata.client.ui.desktop.outline.pages.ExtendedTablePage", PageBeanDataTest::testApiOfExtendedTablePageData);
   }
 
   @Test
   public void testExtendedTablePageWithoutExtendedTable() {
-    createPageDataAssertNoCompileErrors(ExtendedTablePageWithoutExtendedTable.class.getName(), PageBeanDataTest::testApiOfExtendedTablePageWithoutExtendedTableData);
+    createPageDataAssertNoCompileErrors("formdata.client.ui.desktop.outline.pages.ExtendedTablePageWithoutExtendedTable", PageBeanDataTest::testApiOfExtendedTablePageWithoutExtendedTableData);
   }
 
   @Test
   public void testBaseWithExtendedTableTablePage() {
-    createPageDataAssertNoCompileErrors(BaseWithExtendedTableTablePage.class.getName(), PageBeanDataTest::testApiOfBaseWithExtendedTableTablePageData);
+    createPageDataAssertNoCompileErrors("formdata.client.ui.desktop.outline.pages.BaseWithExtendedTableTablePage", PageBeanDataTest::testApiOfBaseWithExtendedTableTablePageData);
   }
 
   @Test
   public void testExtendedExtendedTablePageWithExtendedTable() {
-    createPageDataAssertNoCompileErrors(ExtendedExtendedTablePageWithExtendedTable.class.getName(), PageBeanDataTest::testApiOfExtendedExtendedTablePageWithExtendedTableData);
+    createPageDataAssertNoCompileErrors("formdata.client.ui.desktop.outline.pages.ExtendedExtendedTablePageWithExtendedTable", PageBeanDataTest::testApiOfExtendedExtendedTablePageWithExtendedTableData);
   }
 
   /**
@@ -146,75 +138,95 @@ public class PageBeanDataTest {
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfExtendedTablePageData(IType extendedTablePageData) {
-    // type ExtendedTablePageData
-    assertHasFlags(extendedTablePageData, 1);
+    var scoutApi = extendedTablePageData.javaEnvironment().requireApi(IScoutApi.class);
+
+    assertHasFlags(extendedTablePageData, Flags.AccPublic);
     assertHasSuperClass(extendedTablePageData, "formdata.shared.services.pages.BaseTablePageData");
-    assertAnnotation(extendedTablePageData, "javax.annotation.Generated");
+    assertEquals(1, extendedTablePageData.annotations().stream().count(), "annotation count");
+    assertAnnotation(extendedTablePageData, scoutApi.Generated());
 
     // fields of ExtendedTablePageData
-    assertEquals(1, extendedTablePageData.fields().stream().count(), "field count of 'ExtendedTablePageData'");
+    assertEquals(1, extendedTablePageData.fields().stream().count(), "field count of 'formdata.shared.services.pages.ExtendedTablePageData'");
     var serialVersionUID = assertFieldExist(extendedTablePageData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
+    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID, "long");
+    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
-    assertEquals(7, extendedTablePageData.methods().stream().count(), "method count of 'ExtendedTablePageData'");
+    assertEquals(7, extendedTablePageData.methods().stream().count(), "method count of 'formdata.shared.services.pages.ExtendedTablePageData'");
     var addRow = assertMethodExist(extendedTablePageData, "addRow");
     assertMethodReturnType(addRow, "formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData");
+    assertEquals(1, addRow.annotations().stream().count(), "annotation count");
     assertAnnotation(addRow, "java.lang.Override");
     var addRow1 = assertMethodExist(extendedTablePageData, "addRow", new String[]{"int"});
     assertMethodReturnType(addRow1, "formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData");
+    assertEquals(1, addRow1.annotations().stream().count(), "annotation count");
     assertAnnotation(addRow1, "java.lang.Override");
     var createRow = assertMethodExist(extendedTablePageData, "createRow");
     assertMethodReturnType(createRow, "formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData");
+    assertEquals(1, createRow.annotations().stream().count(), "annotation count");
     assertAnnotation(createRow, "java.lang.Override");
     var getRowType = assertMethodExist(extendedTablePageData, "getRowType");
     assertMethodReturnType(getRowType, "java.lang.Class<? extends org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData>");
+    assertEquals(1, getRowType.annotations().stream().count(), "annotation count");
     assertAnnotation(getRowType, "java.lang.Override");
     var getRows = assertMethodExist(extendedTablePageData, "getRows");
     assertMethodReturnType(getRows, "formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData[]");
+    assertEquals(1, getRows.annotations().stream().count(), "annotation count");
     assertAnnotation(getRows, "java.lang.Override");
     var rowAt = assertMethodExist(extendedTablePageData, "rowAt", new String[]{"int"});
     assertMethodReturnType(rowAt, "formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData");
+    assertEquals(1, rowAt.annotations().stream().count(), "annotation count");
     assertAnnotation(rowAt, "java.lang.Override");
     var setRows = assertMethodExist(extendedTablePageData, "setRows", new String[]{"formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData[]"});
     assertMethodReturnType(setRows, "void");
+    assertEquals(0, setRows.annotations().stream().count(), "annotation count");
 
     assertEquals(1, extendedTablePageData.innerTypes().stream().count(), "inner types count of 'ExtendedTablePageData'");
     // type ExtendedTableRowData
     var extendedTableRowData = assertTypeExists(extendedTablePageData, "ExtendedTableRowData");
-    assertHasFlags(extendedTableRowData, 9);
+    assertHasFlags(extendedTableRowData, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(extendedTableRowData, "formdata.shared.services.pages.BaseTablePageData$BaseTableRowData");
+    assertEquals(0, extendedTableRowData.annotations().stream().count(), "annotation count");
 
     // fields of ExtendedTableRowData
-    assertEquals(5, extendedTableRowData.fields().stream().count(), "field count of 'ExtendedTableRowData'");
+    assertEquals(5, extendedTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData'");
     var serialVersionUID1 = assertFieldExist(extendedTableRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
+    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID1, "long");
+    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
     var intermediate = assertFieldExist(extendedTableRowData, "intermediate");
-    assertHasFlags(intermediate, 25);
-    assertFieldType(intermediate, String.class.getName());
+    assertHasFlags(intermediate, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
+    assertFieldType(intermediate, "java.lang.String");
+    assertEquals(0, intermediate.annotations().stream().count(), "annotation count");
     var ignoredColumnEx = assertFieldExist(extendedTableRowData, "ignoredColumnEx");
-    assertHasFlags(ignoredColumnEx, 25);
-    assertFieldType(ignoredColumnEx, String.class.getName());
+    assertHasFlags(ignoredColumnEx, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
+    assertFieldType(ignoredColumnEx, "java.lang.String");
+    assertEquals(0, ignoredColumnEx.annotations().stream().count(), "annotation count");
     var m_intermediate = assertFieldExist(extendedTableRowData, "m_intermediate");
-    assertHasFlags(m_intermediate, 2);
-    assertFieldType(m_intermediate, BigDecimal.class.getName());
+    assertHasFlags(m_intermediate, Flags.AccPrivate);
+    assertFieldType(m_intermediate, "java.math.BigDecimal");
+    assertEquals(0, m_intermediate.annotations().stream().count(), "annotation count");
     var m_ignoredColumnEx = assertFieldExist(extendedTableRowData, "m_ignoredColumnEx");
-    assertHasFlags(m_ignoredColumnEx, 2);
+    assertHasFlags(m_ignoredColumnEx, Flags.AccPrivate);
     assertFieldType(m_ignoredColumnEx, "java.util.Date");
+    assertEquals(0, m_ignoredColumnEx.annotations().stream().count(), "annotation count");
 
-    assertEquals(4, extendedTableRowData.methods().stream().count(), "method count of 'ExtendedTableRowData'");
+    assertEquals(4, extendedTableRowData.methods().stream().count(), "method count of 'formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData'");
     var getIntermediate = assertMethodExist(extendedTableRowData, "getIntermediate");
-    assertMethodReturnType(getIntermediate, BigDecimal.class.getName());
-    var setIntermediate = assertMethodExist(extendedTableRowData, "setIntermediate", new String[]{BigDecimal.class.getName()});
+    assertMethodReturnType(getIntermediate, "java.math.BigDecimal");
+    assertEquals(0, getIntermediate.annotations().stream().count(), "annotation count");
+    var setIntermediate = assertMethodExist(extendedTableRowData, "setIntermediate", new String[]{"java.math.BigDecimal"});
     assertMethodReturnType(setIntermediate, "void");
+    assertEquals(0, setIntermediate.annotations().stream().count(), "annotation count");
     var getIgnoredColumnEx = assertMethodExist(extendedTableRowData, "getIgnoredColumnEx");
     assertMethodReturnType(getIgnoredColumnEx, "java.util.Date");
+    assertEquals(0, getIgnoredColumnEx.annotations().stream().count(), "annotation count");
     var setIgnoredColumnEx = assertMethodExist(extendedTableRowData, "setIgnoredColumnEx", new String[]{"java.util.Date"});
     assertMethodReturnType(setIgnoredColumnEx, "void");
+    assertEquals(0, setIgnoredColumnEx.annotations().stream().count(), "annotation count");
 
     assertEquals(0, extendedTableRowData.innerTypes().stream().count(), "inner types count of 'ExtendedTableRowData'");
   }
@@ -411,34 +423,41 @@ public class PageBeanDataTest {
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfPageWithTableExtensionData(IType pageWithTableExtensionData) {
-    // type PageWithTableExtensionData
-    assertHasFlags(pageWithTableExtensionData, 1);
-    assertHasSuperInterfaces(pageWithTableExtensionData, new String[]{Serializable.class.getName()});
-    assertAnnotation(pageWithTableExtensionData, "org.eclipse.scout.rt.platform.extension.Extends");
-    assertAnnotation(pageWithTableExtensionData, "javax.annotation.Generated");
+    var scoutApi = pageWithTableExtensionData.javaEnvironment().requireApi(IScoutApi.class);
+
+    assertHasFlags(pageWithTableExtensionData, Flags.AccPublic);
+    assertHasSuperClass(pageWithTableExtensionData, "java.lang.Object");
+    assertHasSuperInterfaces(pageWithTableExtensionData, new String[]{"java.io.Serializable"});
+    assertEquals(2, pageWithTableExtensionData.annotations().stream().count(), "annotation count");
+    assertAnnotation(pageWithTableExtensionData, scoutApi.Extends());
+    assertAnnotation(pageWithTableExtensionData, scoutApi.Generated());
 
     // fields of PageWithTableExtensionData
-    assertEquals(3, pageWithTableExtensionData.fields().stream().count(), "field count of 'PageWithTableExtensionData'");
+    assertEquals(3, pageWithTableExtensionData.fields().stream().count(), "field count of 'formdata.shared.services.pages.PageWithTableExtensionData'");
     var serialVersionUID = assertFieldExist(pageWithTableExtensionData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
+    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID, "long");
+    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
     var bigDecimalTest = assertFieldExist(pageWithTableExtensionData, "bigDecimalTest");
-    assertHasFlags(bigDecimalTest, 25);
-    assertFieldType(bigDecimalTest, String.class.getName());
+    assertHasFlags(bigDecimalTest, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
+    assertFieldType(bigDecimalTest, "java.lang.String");
+    assertEquals(0, bigDecimalTest.annotations().stream().count(), "annotation count");
     var m_bigDecimalTest = assertFieldExist(pageWithTableExtensionData, "m_bigDecimalTest");
-    assertHasFlags(m_bigDecimalTest, 2);
-    assertFieldType(m_bigDecimalTest, BigDecimal.class.getName());
+    assertHasFlags(m_bigDecimalTest, Flags.AccPrivate);
+    assertFieldType(m_bigDecimalTest, "java.math.BigDecimal");
+    assertEquals(0, m_bigDecimalTest.annotations().stream().count(), "annotation count");
 
-    assertEquals(2, pageWithTableExtensionData.methods().stream().count(), "method count of 'PageWithTableExtensionData'");
+    assertEquals(2, pageWithTableExtensionData.methods().stream().count(), "method count of 'formdata.shared.services.pages.PageWithTableExtensionData'");
     var getBigDecimalTest = assertMethodExist(pageWithTableExtensionData, "getBigDecimalTest");
-    assertMethodReturnType(getBigDecimalTest, BigDecimal.class.getName());
-    var setBigDecimalTest = assertMethodExist(pageWithTableExtensionData, "setBigDecimalTest", new String[]{BigDecimal.class.getName()});
+    assertMethodReturnType(getBigDecimalTest, "java.math.BigDecimal");
+    assertEquals(0, getBigDecimalTest.annotations().stream().count(), "annotation count");
+    var setBigDecimalTest = assertMethodExist(pageWithTableExtensionData, "setBigDecimalTest", new String[]{"java.math.BigDecimal"});
     assertMethodReturnType(setBigDecimalTest, "void");
+    assertEquals(0, setBigDecimalTest.annotations().stream().count(), "annotation count");
 
     assertEquals(0, pageWithTableExtensionData.innerTypes().stream().count(), "inner types count of 'PageWithTableExtensionData'");
   }
-
 }

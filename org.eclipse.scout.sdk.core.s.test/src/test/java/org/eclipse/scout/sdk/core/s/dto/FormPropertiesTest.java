@@ -22,13 +22,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.junit.jupiter.api.Test;
 
-import formdata.client.ui.forms.PropertyTestForm;
-
 public class FormPropertiesTest {
 
   @Test
   public void testCreateFormData() {
-    createFormDataAssertNoCompileErrors(PropertyTestForm.class.getName(), FormPropertiesTest::testApiOfPropertyTestFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.PropertyTestForm", FormPropertiesTest::testApiOfPropertyTestFormData);
   }
 
   /**

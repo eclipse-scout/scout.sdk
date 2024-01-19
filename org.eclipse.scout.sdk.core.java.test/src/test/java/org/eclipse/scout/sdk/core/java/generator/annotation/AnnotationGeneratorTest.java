@@ -50,12 +50,6 @@ public class AnnotationGeneratorTest {
   }
 
   @Test
-  public void testGenerated() {
-    assertEquals("@Generated(value = \"Generator\", comments = \"This class is auto generated. No manual modifications recommended.\")", AnnotationGenerator.createGenerated("Generator").toJavaSource().toString());
-    assertEquals("@Generated(value = \"Generator\", comments = \"Test\\\"Comment\")", AnnotationGenerator.createGenerated("Generator", "Test\"Comment").toJavaSource().toString());
-  }
-
-  @Test
   public void testDeprecated() {
     assertEquals("@Deprecated", AnnotationGenerator.createDeprecated().toJavaSource().toString());
   }

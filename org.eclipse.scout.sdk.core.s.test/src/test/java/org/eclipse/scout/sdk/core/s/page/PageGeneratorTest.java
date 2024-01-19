@@ -24,8 +24,6 @@ import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEn
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import formdata.shared.services.pages.BaseTablePageData;
-
 /**
  * <h3>{@link PageGeneratorTest}</h3>
  *
@@ -47,7 +45,7 @@ public class PageGeneratorTest {
           .withElementName("IMyPageService" + i)
           .withMethod(MethodGenerator.create()
               .withElementName(dataFetchMethodName)
-              .withReturnType(BaseTablePageData.class.getName())
+              .withReturnType("formdata.shared.services.pages.BaseTablePageData")
               .withParameter(MethodParameterGenerator.create()
                   .withElementName("filter")
                   .withDataTypeFrom(IScoutApi.class, api -> api.SearchFilter().fqn())));
@@ -61,7 +59,7 @@ public class PageGeneratorTest {
           .withElementName("MyTablePage" + i)
           .withClassIdValue("whatever")
           .withTableClassIdValue("whatever2")
-          .withPageData(BaseTablePageData.class.getName())
+          .withPageData("formdata.shared.services.pages.BaseTablePageData")
           .withDataFetchMethodName(dataFetchMethodName)
           .asPageWithTable(true)
           .withFlags(i == 1 ? Flags.AccAbstract : Flags.AccPublic)

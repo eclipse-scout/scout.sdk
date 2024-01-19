@@ -220,4 +220,28 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
   public static IAnnotationGenerator<?> createReplace() {
     return create().withAnnotationNameFrom(IScoutApi.class, IScoutApi::Replace);
   }
+
+  /**
+   * @param typeThatGeneratedTheCode
+   *          The name of the class the generated (derived) element is based on. Must not be blank.
+   * @return A new {@code Generated} {@link IAnnotationGenerator} with the specified value and a default comment.
+   */
+  public static IAnnotationGenerator<?> createGenerated(CharSequence typeThatGeneratedTheCode) {
+    return createGenerated(typeThatGeneratedTheCode, "This class is auto generated. No manual modifications recommended.");
+  }
+
+  /**
+   * @param typeThatGeneratedTheCode
+   *          The name of the class the generated (derived) element is based on. Must not be blank.
+   * @param comments
+   *          The comment value of the {@code Generated} annotation. May be {@code null}.
+   * @return A new {@code Generated} {@link IAnnotationGenerator} with the specified value and comment.
+   */
+  public static IAnnotationGenerator<?> createGenerated(CharSequence typeThatGeneratedTheCode, CharSequence comments) {
+    var generator = create()
+        .withAnnotationNameFrom(IScoutApi.class, IScoutApi::Generated)
+        .withElementFrom(IScoutApi.class, api -> api.Generated().valueElementName(), b -> b.stringLiteral(Ensure.notBlank(typeThatGeneratedTheCode)));
+    Strings.notBlank(comments).ifPresent(c -> generator.withElementFrom(IScoutApi.class, api -> api.Generated().commentsElementName(), b -> b.stringLiteral(c)));
+    return generator;
+  }
 }

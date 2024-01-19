@@ -22,13 +22,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.junit.jupiter.api.Test;
 
-import formdata.client.ui.template.formfield.AbstractExternalGroupBox;
-
 public class ExternalGroupboxTest {
 
   @Test
   public void testCreateFormData() {
-    createFormDataAssertNoCompileErrors(AbstractExternalGroupBox.class.getName(), ExternalGroupboxTest::testApiOfAbstractExternalGroupBoxData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.template.formfield.AbstractExternalGroupBox", ExternalGroupboxTest::testApiOfAbstractExternalGroupBoxData);
   }
 
   /**

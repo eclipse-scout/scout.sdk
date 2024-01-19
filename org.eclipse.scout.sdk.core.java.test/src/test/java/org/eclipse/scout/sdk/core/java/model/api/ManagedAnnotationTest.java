@@ -15,19 +15,17 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.math.RoundingMode;
 
-import javax.annotation.Generated;
-
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.fixture.ClassWithAnnotationWithArrayValues;
 import org.eclipse.scout.sdk.core.java.fixture.ClassWithAnnotationWithDefaultValues;
 import org.eclipse.scout.sdk.core.java.fixture.ClassWithAnnotationWithShortValueForIntField;
 import org.eclipse.scout.sdk.core.java.fixture.ClassWithAnnotationWithSingleValues;
-import org.eclipse.scout.sdk.core.java.fixture.ClassWithScalarGeneratedAnnotation;
+import org.eclipse.scout.sdk.core.java.fixture.ClassWithScalarArrayValueAnnot;
 import org.eclipse.scout.sdk.core.java.fixture.ValueAnnot;
 import org.eclipse.scout.sdk.core.java.fixture.managed.AnnotationWithArrayValues;
 import org.eclipse.scout.sdk.core.java.fixture.managed.AnnotationWithDefaultValues;
 import org.eclipse.scout.sdk.core.java.fixture.managed.AnnotationWithSingleValues;
-import org.eclipse.scout.sdk.core.java.model.annotation.GeneratedAnnotation;
+import org.eclipse.scout.sdk.core.java.fixture.managed.ArrayValueAnnot;
 import org.eclipse.scout.sdk.core.java.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.java.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.junit.jupiter.api.Test;
@@ -47,7 +45,7 @@ public class ManagedAnnotationTest {
     assertEquals("one", a.string());
     assertEquals(env.requireType(RoundingMode.class.getName()).fields().withName("HALF_UP").first().orElseThrow(), a.enumValue());
     assertEquals(env.requireType(String.class.getName()), a.type());
-    assertEquals(env.requireType(Generated.class.getName()), a.anno().type());
+    assertEquals(env.requireType(org.eclipse.scout.sdk.core.java.fixture.ArrayValueAnnot.class.getName()), a.anno().type());
     assertEquals("g", a.anno().element("value").orElseThrow().value().as(String.class));
   }
 
@@ -71,7 +69,7 @@ public class ManagedAnnotationTest {
 
     assertEquals(JavaTypes.Integer, annot[1].type().name());
     assertEquals(12, annot[1].num());
-    assertArrayEquals(new String[]{"g2"}, annot[1].anno().wrap(GeneratedAnnotation.class).value());
+    assertArrayEquals(new String[]{"g2"}, annot[1].anno().wrap(ArrayValueAnnot.class).value());
   }
 
   @Test
@@ -95,7 +93,7 @@ public class ManagedAnnotationTest {
     assertEquals(env.requireType(String.class.getName()), a.type((IType) null));
     assertEquals(env.requireType(ValueAnnot.class.getName()), a.anno((IAnnotation) null).type());
     assertEquals("g1", a.anno((IAnnotation) null).element("value").orElseThrow().value().as(String.class));
-    assertArrayEquals(new String[]{"g1"}, a.generated().value());
+    assertArrayEquals(new String[]{"g1"}, a.arrayValueAnnot().value());
   }
 
   @Test
@@ -139,19 +137,17 @@ public class ManagedAnnotationTest {
   /**
    * annotation declares array, but usage only sets a scalar value, which is allowed by java
    * <p>
-   * {@code @Generated("g")} and <code>@Generated({"a","b","c"})</code>
+   * {@code @ArrayValueAnnot("g")} and <code>@ArrayValueAnnot({"a","b","c"})</code>
    */
   @Test
   public void testArrayCoercion(IJavaEnvironment env) {
-    var t = env.requireType(ClassWithScalarGeneratedAnnotation.class.getName());
-    var a = t.annotations().withManagedWrapper(GeneratedAnnotation.class).first().orElseThrow();
+    var t = env.requireType(ClassWithScalarArrayValueAnnot.class.getName());
+    var a = t.annotations().withManagedWrapper(ArrayValueAnnot.class).first().orElseThrow();
     assertArrayEquals(new String[]{"g"}, a.value());
   }
 
   /**
    * annotation declares int, but usage is short
-   * <p>
-   * {@code @Generated("g")} and <code>@Generated({"a","b","c"})</code>
    */
   @Test
   public void testNumberCoercion(IJavaEnvironment env) {

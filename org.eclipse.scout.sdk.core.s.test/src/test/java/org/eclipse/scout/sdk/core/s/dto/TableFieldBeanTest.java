@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,15 +20,10 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTy
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.junit.jupiter.api.Test;
-
-import formdata.client.ui.forms.BaseWithExtendedTableForm;
-import formdata.client.ui.forms.ChildWithExtendedTableForm;
-import formdata.client.ui.forms.ColumnWithoutTypeForm;
-import formdata.client.ui.forms.replace.TableFieldBaseForm;
-import formdata.client.ui.forms.replace.TableFieldExForm;
-import formdata.client.ui.template.formfield.AbstractAddressTableField;
 
 /**
  * <h3>{@link TableFieldBeanTest}</h3>
@@ -48,27 +43,27 @@ public class TableFieldBeanTest {
   }
 
   private static void testColumnWithoutType() {
-    createFormDataAssertNoCompileErrors(ColumnWithoutTypeForm.class.getName(), TableFieldBeanTest::testApiOfColumnWithoutTypeFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.ColumnWithoutTypeForm", TableFieldBeanTest::testApiOfColumnWithoutTypeFormData);
   }
 
   private static void testAbstractTableField() {
-    createFormDataAssertNoCompileErrors(AbstractAddressTableField.class.getName(), TableFieldBeanTest::testApiOfAbstractAddressTableFieldData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.template.formfield.AbstractAddressTableField", TableFieldBeanTest::testApiOfAbstractAddressTableFieldData);
   }
 
   private static void testTableFieldBaseFormData() {
-    createFormDataAssertNoCompileErrors(TableFieldBaseForm.class.getName(), TableFieldBeanTest::testApiOfTableFieldBaseFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.replace.TableFieldBaseForm", TableFieldBeanTest::testApiOfTableFieldBaseFormData);
   }
 
   private static void testTableFieldExFormData() {
-    createFormDataAssertNoCompileErrors(TableFieldExForm.class.getName(), TableFieldBeanTest::testApiOfTableFieldExFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.replace.TableFieldExForm", TableFieldBeanTest::testApiOfTableFieldExFormData);
   }
 
   private static void testBaseWithExtendedTableFormData() {
-    createFormDataAssertNoCompileErrors(BaseWithExtendedTableForm.class.getName(), TableFieldBeanTest::testApiOfBaseWithExtendedTableFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.BaseWithExtendedTableForm", TableFieldBeanTest::testApiOfBaseWithExtendedTableFormData);
   }
 
   private static void testChildWithExtendedTableFormData() {
-    createFormDataAssertNoCompileErrors(ChildWithExtendedTableForm.class.getName(), TableFieldBeanTest::testApiOfChildWithExtendedTableFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.ChildWithExtendedTableForm", TableFieldBeanTest::testApiOfChildWithExtendedTableFormData);
   }
 
   /**
@@ -938,18 +933,20 @@ public class TableFieldBeanTest {
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfColumnWithoutTypeFormData(IType columnWithoutTypeFormData) {
-    assertHasFlags(columnWithoutTypeFormData, 1);
-    assertHasSuperClass(columnWithoutTypeFormData, "org.eclipse.scout.rt.shared.data.form.AbstractFormData");
+    var scoutApi = columnWithoutTypeFormData.javaEnvironment().requireApi(IScoutApi.class);
+
+    assertHasFlags(columnWithoutTypeFormData, Flags.AccPublic);
+    assertHasSuperClass(columnWithoutTypeFormData, scoutApi.AbstractFormData());
     assertEquals(1, columnWithoutTypeFormData.annotations().stream().count(), "annotation count");
-    assertAnnotation(columnWithoutTypeFormData, "javax.annotation.Generated");
+    assertAnnotation(columnWithoutTypeFormData, scoutApi.Generated());
 
     // fields of ColumnWithoutTypeFormData
     assertEquals(1, columnWithoutTypeFormData.fields().stream().count(), "field count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData'");
     var serialVersionUID = assertFieldExist(columnWithoutTypeFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
+    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
@@ -961,14 +958,14 @@ public class TableFieldBeanTest {
     assertEquals(1, columnWithoutTypeFormData.innerTypes().stream().count(), "inner types count of 'ColumnWithoutTypeFormData'");
     // type MyTable
     var myTable = assertTypeExists(columnWithoutTypeFormData, "MyTable");
-    assertHasFlags(myTable, 9);
-    assertHasSuperClass(myTable, "org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData");
+    assertHasFlags(myTable, Flags.AccPublic | Flags.AccStatic);
+    assertHasSuperClass(myTable, scoutApi.AbstractTableFieldBeanData());
     assertEquals(0, myTable.annotations().stream().count(), "annotation count");
 
     // fields of MyTable
     assertEquals(1, myTable.fields().stream().count(), "field count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable'");
     var serialVersionUID1 = assertFieldExist(myTable, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
+    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
 
@@ -1004,22 +1001,22 @@ public class TableFieldBeanTest {
     assertEquals(1, myTable.innerTypes().stream().count(), "inner types count of 'MyTable'");
     // type MyTableRowData
     var myTableRowData = assertTypeExists(myTable, "MyTableRowData");
-    assertHasFlags(myTableRowData, 9);
-    assertHasSuperClass(myTableRowData, "org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData");
+    assertHasFlags(myTableRowData, Flags.AccPublic | Flags.AccStatic);
+    assertHasSuperClass(myTableRowData, scoutApi.AbstractTableRowData());
     assertEquals(0, myTableRowData.annotations().stream().count(), "annotation count");
 
     // fields of MyTableRowData
     assertEquals(3, myTableRowData.fields().stream().count(), "field count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData'");
     var serialVersionUID2 = assertFieldExist(myTableRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, 26);
+    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID2, "long");
     assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
     var my = assertFieldExist(myTableRowData, "my");
-    assertHasFlags(my, 25);
+    assertHasFlags(my, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(my, "java.lang.String");
     assertEquals(0, my.annotations().stream().count(), "annotation count");
     var m_my = assertFieldExist(myTableRowData, "m_my");
-    assertHasFlags(m_my, 2);
+    assertHasFlags(m_my, Flags.AccPrivate);
     assertFieldType(m_my, "java.lang.Object");
     assertEquals(0, m_my.annotations().stream().count(), "annotation count");
 
@@ -1033,5 +1030,4 @@ public class TableFieldBeanTest {
 
     assertEquals(0, myTableRowData.innerTypes().stream().count(), "inner types count of 'MyTableRowData'");
   }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -143,7 +143,7 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
     loadBindings();
     progress.worked(10);
 
-    loadJaxwsBindingFile();
+    loadJaxwsBindingFile(getScoutApi().getJaxWsNamespace());
     progress.worked(10);
 
     // consumer
@@ -518,7 +518,7 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
     }
   }
 
-  protected void loadJaxwsBindingFile() {
+  protected void loadJaxwsBindingFile(String jaxWsNamespace) {
     if (m_bindings.isEmpty()) {
       return;
     }
@@ -529,7 +529,7 @@ public class WebServiceFormPageInput implements Comparable<WebServiceFormPageInp
         var rootTag = document.getDocumentElement();
         if (JaxWsUtils.BINDINGS_ELEMENT_NAME.equals(rootTag.getLocalName())) {
           var rootNs = rootTag.getNamespaceURI();
-          if (JaxWsUtils.JAX_WS_NAMESPACE.equals(rootNs)) {
+          if (jaxWsNamespace.equals(rootNs)) {
             m_jaxwsBindingFiles.add(candidate);
           }
         }

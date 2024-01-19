@@ -11,7 +11,6 @@ package org.eclipse.scout.sdk.core.java.fixture;
 
 import java.math.RoundingMode;
 
-import javax.annotation.Generated;
 
 public @interface AnnotationWithDefaultValues {
   int num() default 1;
@@ -22,5 +21,5 @@ public @interface AnnotationWithDefaultValues {
 
   Class<?> type() default String.class;
 
-  Generated anno() default @Generated("g");
+  ArrayValueAnnot anno() default @ArrayValueAnnot("g");
 }

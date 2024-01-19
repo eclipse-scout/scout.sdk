@@ -21,23 +21,16 @@ import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
 import org.junit.jupiter.api.Test;
 
-import formdata.client.extensions.MultiColumnExtension;
-import formdata.client.extensions.ThirdIntegerColumn;
-import formdata.client.ui.desktop.outline.pages.BaseTablePage;
-import formdata.client.ui.desktop.outline.pages.PageWithTableExtension;
-import formdata.client.ui.desktop.outline.pages.PageWithoutTableExtension;
-import formdata.client.ui.forms.ListBoxForm;
-
 @ExtendWithJavaEnvironmentFactory(ScoutClientJavaEnvironmentFactory.class)
 public class DtoUpdateHandlerTest {
 
   @Test
   public void testFindDataAnnotationForFormData(IJavaEnvironment env) {
     // no table page
-    assertFalse(findDataAnnotationForFormData(env.requireType(ThirdIntegerColumn.class.getName())).isPresent());
+    assertFalse(findDataAnnotationForFormData(env.requireType("formdata.client.extensions.ThirdIntegerColumn")).isPresent());
 
     // IPageWithTable
-    assertTrue(findDataAnnotationForFormData(env.requireType(ListBoxForm.class.getName())).isPresent());
+    assertTrue(findDataAnnotationForFormData(env.requireType("formdata.client.ui.forms.ListBoxForm")).isPresent());
   }
 
   @Test
@@ -45,10 +38,10 @@ public class DtoUpdateHandlerTest {
     var scoutApi = env.requireApi(IScoutApi.class);
 
     // no table page
-    assertFalse(findDataAnnotationForPageData(env.requireType(ThirdIntegerColumn.class.getName()), scoutApi).isPresent());
+    assertFalse(findDataAnnotationForPageData(env.requireType("formdata.client.extensions.ThirdIntegerColumn"), scoutApi).isPresent());
 
     // IPageWithTable
-    assertTrue(findDataAnnotationForPageData(env.requireType(BaseTablePage.class.getName()), scoutApi).isPresent());
+    assertTrue(findDataAnnotationForPageData(env.requireType("formdata.client.ui.desktop.outline.pages.BaseTablePage"), scoutApi).isPresent());
   }
 
   @Test
@@ -56,16 +49,16 @@ public class DtoUpdateHandlerTest {
     var scoutApi = env.requireApi(IScoutApi.class);
 
     // IColumn
-    assertTrue(findDataAnnotationForRowData(env.requireType(ThirdIntegerColumn.class.getName()), scoutApi).isPresent());
+    assertTrue(findDataAnnotationForRowData(env.requireType("formdata.client.extensions.ThirdIntegerColumn"), scoutApi).isPresent());
 
     // ITableExtension
-    assertTrue(findDataAnnotationForRowData(env.requireType(MultiColumnExtension.class.getName()), scoutApi).isPresent());
+    assertTrue(findDataAnnotationForRowData(env.requireType("formdata.client.extensions.MultiColumnExtension"), scoutApi).isPresent());
 
     // IPageWithTableExtension with nested ITableExtensions (may contain columns)
-    assertTrue(findDataAnnotationForRowData(env.requireType(PageWithTableExtension.class.getName()), scoutApi).isPresent());
+    assertTrue(findDataAnnotationForRowData(env.requireType("formdata.client.ui.desktop.outline.pages.PageWithTableExtension"), scoutApi).isPresent());
 
     // IPageWithTableExtension without nested ITableExtensions (may not contain columns)
-    assertFalse(findDataAnnotationForRowData(env.requireType(PageWithoutTableExtension.class.getName()), scoutApi).isPresent());
+    assertFalse(findDataAnnotationForRowData(env.requireType("formdata.client.ui.desktop.outline.pages.PageWithoutTableExtension"), scoutApi).isPresent());
   }
 
 }

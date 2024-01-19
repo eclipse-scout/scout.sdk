@@ -25,14 +25,12 @@ import org.eclipse.scout.sdk.core.s.testing.context.TestingEnvironment;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import nls.TestUiTextContributor;
-
 @ExtendWith(TranslationStoreSupplierExtension.class)
 @ExtendWithTestingEnvironment(primary = @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class))
 public class UiTextContributorTest {
   @Test
   public void testContributorKeys(TestingEnvironment env) {
-    var contributor = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().orElseThrow());
+    var contributor = new UiTextContributor(env.findType("nls.TestUiTextContributor").findAny().orElseThrow());
     contributor.load(new NullProgress());
 
     var keys = contributor.keys().collect(toSet());
@@ -49,14 +47,14 @@ public class UiTextContributorTest {
   @Test
   @SuppressWarnings({"SimplifiableJUnitAssertion", "ConstantConditions", "EqualsWithItself", "EqualsBetweenInconvertibleTypes"})
   public void testToStringEquals(TestingEnvironment env) {
-    var contributor1 = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().orElseThrow());
+    var contributor1 = new UiTextContributor(env.findType("nls.TestUiTextContributor").findAny().orElseThrow());
     contributor1.load(new NullProgress());
-    var contributor2 = new UiTextContributor(env.findType(TestUiTextContributor.class.getName()).findAny().orElseThrow());
+    var contributor2 = new UiTextContributor(env.findType("nls.TestUiTextContributor").findAny().orElseThrow());
     contributor1.load(new NullProgress());
     var contributor3 = new UiTextContributor(env.findType(Long.class.getName()).findAny().orElseThrow());
     contributor1.load(new NullProgress());
 
-    assertEquals(UiTextContributor.class.getSimpleName() + " [" + TestUiTextContributor.class.getName() + "]", contributor1.toString());
+    assertEquals(UiTextContributor.class.getSimpleName() + " [nls.TestUiTextContributor]", contributor1.toString());
     assertFalse(contributor1.equals(null));
     assertTrue(contributor1.equals(contributor1));
     assertFalse(contributor1.equals(""));

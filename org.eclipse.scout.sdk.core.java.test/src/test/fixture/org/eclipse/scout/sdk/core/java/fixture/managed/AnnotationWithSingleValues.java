@@ -13,7 +13,6 @@ import java.util.function.Supplier;
 
 import org.eclipse.scout.sdk.core.java.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
-import org.eclipse.scout.sdk.core.java.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.AbstractManagedAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IField;
@@ -89,7 +88,7 @@ public class AnnotationWithSingleValues extends AbstractManagedAnnotation {
 
   // direct convert to wrapped type
 
-  public GeneratedAnnotation generated() {
-    return getValue("anno", GeneratedAnnotation.class, null);
+  public ArrayValueAnnot arrayValueAnnot() {
+    return getValue("anno", ArrayValueAnnot.class, null);
   }
 }

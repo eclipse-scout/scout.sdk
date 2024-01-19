@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.s.dto;
 import java.util.Optional;
 
 import org.eclipse.scout.sdk.core.java.builder.comment.IJavaElementCommentBuilder;
-import org.eclipse.scout.sdk.core.java.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.java.generator.compilationunit.CompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.java.generator.compilationunit.ICompilationUnitGenerator;
 import org.eclipse.scout.sdk.core.java.generator.type.ITypeGenerator;
@@ -24,6 +23,7 @@ import org.eclipse.scout.sdk.core.s.dto.table.TableRowDataGenerator;
 import org.eclipse.scout.sdk.core.s.java.annotation.DataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.java.annotation.FormDataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.generator.annotation.ScoutAnnotationGenerator;
 
 /**
  * Contains utilities for DTO creation
@@ -108,7 +108,7 @@ public final class DtoGeneratorFactory {
         .withType(dtoGeneratorForModel
             .withElementName(targetPrimaryTypeName)
             .withComment(b -> b.appendJavaDocComment(GENERATED_JAVADOC))
-            .withAnnotation(AnnotationGenerator.createGenerated(modelType.name(), GENERATED_MSG)));
+            .withAnnotation(ScoutAnnotationGenerator.createGenerated(modelType.name(), GENERATED_MSG)));
 
   }
 }

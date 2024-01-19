@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -280,19 +280,31 @@ public final class Api {
 
   /**
    * Dumps the given {@link IApiSpecification} into a {@link Map} data structure.
-   * 
+   *
    * @param api
    *          The {@link IApiSpecification} to dump. Must not be {@code null}.
    * @return The dump
    * @see #dump(ITypeNameSupplier)
    */
   public static Map<String /* fqn of all ITypeNameSupplier in the API */, Map<ChildElementType, Map<String /* method name in the ITypeNameSupplier */, String /* method value */>>> dump(IApiSpecification api) {
+    return collectTypeNameSuppliers(api)
+        .map(Entry::getValue)
+        .map(Api::dump)
+        .collect(toMap(Entry::getKey, Entry::getValue, (a, b) -> a /* it does not matter which one to keep */));
+  }
+
+  /**
+   * Collects all {@link ITypeNameSupplier}s of the given {@link IApiSpecification}.
+   *
+   * @param api
+   *          The {@link IApiSpecification} to collect {@link ITypeNameSupplier}s from. Must not be {@code null}.
+   * @return A stream of all method names returning an {@link ITypeNameSupplier} and the corresponding result.
+   */
+  public static Stream<Entry<String, ITypeNameSupplier>> collectTypeNameSuppliers(IApiSpecification api) {
     return Arrays.stream(Ensure.notNull(api).getClass().getMethods())
         .filter(m -> m.getParameterCount() == 0)
         .filter(m -> ITypeNameSupplier.class.isAssignableFrom(m.getReturnType()))
-        .map(m -> (ITypeNameSupplier) invoke(m, api))
-        .map(Api::dump)
-        .collect(toMap(Entry::getKey, Entry::getValue, (a, b) -> a /* it does not matter which one to keep */));
+        .map(m -> new SimpleImmutableEntry<>(m.getName(), (ITypeNameSupplier) invoke(m, api)));
   }
 
   /**

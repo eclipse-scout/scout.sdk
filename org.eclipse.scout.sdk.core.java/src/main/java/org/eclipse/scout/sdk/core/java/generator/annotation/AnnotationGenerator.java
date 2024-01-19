@@ -35,7 +35,6 @@ import org.eclipse.scout.sdk.core.java.builder.JavaBuilderContextFunction;
 import org.eclipse.scout.sdk.core.java.builder.expression.ExpressionBuilder;
 import org.eclipse.scout.sdk.core.java.builder.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.java.generator.AbstractJavaElementGenerator;
-import org.eclipse.scout.sdk.core.java.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.java.transformer.DefaultWorkingCopyTransformer;
@@ -106,30 +105,6 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
   public static IAnnotationGenerator<?> createOverride() {
     return new AnnotationGenerator<>()
         .withElementName(Override.class.getName());
-  }
-
-  /**
-   * @param typeThatGeneratedTheCode
-   *          The name of the class the generated (derived) element is based on. Must not be blank.
-   * @return A new {@code Generated} {@link IAnnotationGenerator} with the specified value and a default comment.
-   */
-  public static IAnnotationGenerator<?> createGenerated(CharSequence typeThatGeneratedTheCode) {
-    return createGenerated(typeThatGeneratedTheCode, "This class is auto generated. No manual modifications recommended.");
-  }
-
-  /**
-   * @param typeThatGeneratedTheCode
-   *          The name of the class the generated (derived) element is based on. Must not be blank.
-   * @param comments
-   *          The comment value of the {@code Generated} annotation. May be {@code null}.
-   * @return A new {@code Generated} {@link IAnnotationGenerator} with the specified value and comment.
-   */
-  public static IAnnotationGenerator<?> createGenerated(CharSequence typeThatGeneratedTheCode, CharSequence comments) {
-    var result = new AnnotationGenerator<>()
-        .withElementName(GeneratedAnnotation.FQN)
-        .withElement(GeneratedAnnotation.VALUE_ELEMENT_NAME, b -> b.stringLiteral(Ensure.notBlank(typeThatGeneratedTheCode)));
-    Strings.notBlank(comments).ifPresent(c -> result.withElement(GeneratedAnnotation.COMMENTS_ELEMENT_NAME, b -> b.stringLiteral(c)));
-    return result;
   }
 
   /**

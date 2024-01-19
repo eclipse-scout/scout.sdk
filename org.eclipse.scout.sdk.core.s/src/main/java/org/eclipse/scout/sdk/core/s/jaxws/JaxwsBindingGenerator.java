@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,20 +27,24 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class JaxwsBindingGenerator implements ISourceGenerator<ISourceBuilder<?>> {
 
+  private String m_jaxBNamespace;
+  private String m_jaxWsNamespace;
   private String m_wsPackage;
   private URI m_wsdlLocation;
   private Iterable<JaxWsBindingMapping> m_names = emptyList();
 
   @Override
   public void generate(ISourceBuilder<?> builder) {
+    var jaxBNamespace = jaxBNamespace().orElseThrow();
+    var jaxWsNamespace = jaxWsNamespace().orElseThrow();
     var wsdlLocation = wsdlLocation().orElseThrow();
     var wsPackage = wsPackage().orElseThrow();
 
     builder.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>").nl();
-    builder.append("<!-- binding to customize webservice artifacts (jaxws-namespace: ").append(JaxWsUtils.JAX_WS_NAMESPACE).append(" -->").nl();
+    builder.append("<!-- binding to customize webservice artifacts (jaxws-namespace: ").append(jaxWsNamespace).append(" -->").nl();
     builder.append("<jaxws:bindings wsdlLocation=\"").append(wsdlLocation.toString()).append('"').nl();
-    builder.append("  xmlns:jaxws=\"").append(JaxWsUtils.JAX_WS_NAMESPACE).append('"').nl();
-    builder.append("  xmlns:jaxb=\"").append(JaxWsUtils.JAX_B_NAMESPACE).append('"').nl();
+    builder.append("  xmlns:jaxws=\"").append(jaxWsNamespace).append('"').nl();
+    builder.append("  xmlns:jaxb=\"").append(jaxBNamespace).append('"').nl();
     builder.append("  xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\"").nl();
     builder.append("  xmlns:xjc=\"http://java.sun.com/xml/ns/jaxb/xjc\"").nl();
     builder.append("  xmlns:javaee=\"http://java.sun.com/xml/ns/javaee\"").nl();
@@ -61,6 +65,24 @@ public class JaxwsBindingGenerator implements ISourceGenerator<ISourceBuilder<?>
       builder.append("  </jaxws:bindings>").nl();
     }
     builder.append("</jaxws:bindings>").nl();
+  }
+
+  public Optional<String> jaxBNamespace() {
+    return Strings.notBlank(m_jaxBNamespace);
+  }
+
+  public JaxwsBindingGenerator withJaxBNamespace(String jaxBNamespace) {
+    m_jaxBNamespace = jaxBNamespace;
+    return this;
+  }
+
+  public Optional<String> jaxWsNamespace() {
+    return Strings.notBlank(m_jaxWsNamespace);
+  }
+
+  public JaxwsBindingGenerator withJaxWsNamespace(String jaxWsNamespace) {
+    m_jaxWsNamespace = jaxWsNamespace;
+    return this;
   }
 
   public Optional<String> wsPackage() {

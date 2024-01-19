@@ -16,8 +16,6 @@ import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEn
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import formdata.client.ui.forms.FormWithHighOrders;
-
 /**
  * <h3>{@link OrderAnnotationTest}</h3>
  *
@@ -38,7 +36,7 @@ public class OrderAnnotationTest {
     Assertions.assertEquals(15.0, OrderAnnotation.getNewViewOrderValue(type, scoutApi.IFormField(), first.source().orElseThrow().end() + 1), DELTA);
     Assertions.assertEquals(2000.0, OrderAnnotation.getNewViewOrderValue(type, scoutApi.IFormField(), second.source().orElseThrow().end() + 1), DELTA);
 
-    var formWithHighOrders = env.requireType(FormWithHighOrders.class.getName());
+    var formWithHighOrders = env.requireType("formdata.client.ui.forms.FormWithHighOrders");
     var mainBox = formWithHighOrders.innerTypes().first().orElseThrow();
     var aGroupBox = mainBox.innerTypes().first().orElseThrow();
     Assertions.assertEquals(99382716061728384.0d, OrderAnnotation.getNewViewOrderValue(mainBox, scoutApi.IFormField(), aGroupBox.source().orElseThrow().end() + 1), DELTA);

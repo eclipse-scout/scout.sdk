@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -380,8 +380,11 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
         SdkLog.warning("Zero length path found for jax-ws binding content of URI '{}'. Skipping.", uri);
       }
       else {
+        var scoutApi = getSourceFolder().javaEnvironment().requireApi(IScoutApi.class);
         var generator = new JaxwsBindingGenerator()
             .withNames(binding.getValue())
+            .withJaxBNamespace(scoutApi.getJaxBNamespace())
+            .withJaxWsNamespace(scoutApi.getJaxWsNamespace())
             .withWsdlLocation(relPath)
             .withWsPackage(targetPackage);
         var jaxwsBindingContent = env.executeGenerator(generator, getSourceFolder());
@@ -391,9 +394,13 @@ public abstract class AbstractWebServiceNewOperation implements BiConsumer<IEnvi
     return result;
   }
 
-  protected static Path createJaxbBinding(Path wsdlBindingsFolder, IEnvironment env, IProgress progress) {
+  protected Path createJaxbBinding(Path wsdlBindingsFolder, IEnvironment env, IProgress progress) {
+    var scoutApi = getSourceFolder().javaEnvironment().requireApi(IScoutApi.class);
+    var generator = new JaxbBindingGenerator()
+        .withJaxBNamespace(scoutApi.getJaxBNamespace())
+        .withJaxBVersion(scoutApi.getJaxBVersion());
     var jaxbBindingXmlFile = wsdlBindingsFolder.resolve(JaxWsUtils.JAXB_BINDINGS_FILE_NAME);
-    env.writeResource(new JaxbBindingGenerator(), jaxbBindingXmlFile, progress);
+    env.writeResource(generator, jaxbBindingXmlFile, progress);
     return jaxbBindingXmlFile;
   }
 

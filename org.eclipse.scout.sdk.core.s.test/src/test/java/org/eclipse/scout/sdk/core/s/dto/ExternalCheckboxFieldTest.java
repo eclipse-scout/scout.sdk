@@ -19,13 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.junit.jupiter.api.Test;
 
-import formdata.client.ui.template.formfield.AbstractTestCheckboxField;
-
 public class ExternalCheckboxFieldTest {
 
   @Test
   public void testCreateFormData() {
-    createFormDataAssertNoCompileErrors(AbstractTestCheckboxField.class.getName(), ExternalCheckboxFieldTest::testApiOfAbstractTestCheckboxFieldData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.template.formfield.AbstractTestCheckboxField", ExternalCheckboxFieldTest::testApiOfAbstractTestCheckboxFieldData);
   }
 
   /**

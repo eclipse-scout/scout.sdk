@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,50 +20,56 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTy
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.junit.jupiter.api.Test;
-
-import formdata.client.ui.forms.ListBoxForm;
 
 public class ListBoxFormTest {
 
   @Test
   public void testCreateFormData() {
-    createFormDataAssertNoCompileErrors(ListBoxForm.class.getName(), ListBoxFormTest::testApiOfListBoxFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.ListBoxForm", ListBoxFormTest::testApiOfListBoxFormData);
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfListBoxFormData(IType listBoxFormData) {
-    // type ListBoxFormData
-    assertHasFlags(listBoxFormData, 1);
-    assertHasSuperClass(listBoxFormData, "org.eclipse.scout.rt.shared.data.form.AbstractFormData");
-    assertAnnotation(listBoxFormData, "javax.annotation.Generated");
+    var scoutApi = listBoxFormData.javaEnvironment().requireApi(IScoutApi.class);
+
+    assertHasFlags(listBoxFormData, Flags.AccPublic);
+    assertHasSuperClass(listBoxFormData, scoutApi.AbstractFormData());
+    assertEquals(1, listBoxFormData.annotations().stream().count(), "annotation count");
+    assertAnnotation(listBoxFormData, scoutApi.Generated());
 
     // fields of ListBoxFormData
-    assertEquals(1, listBoxFormData.fields().stream().count(), "field count of 'ListBoxFormData'");
+    assertEquals(1, listBoxFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.ListBoxFormData'");
     var serialVersionUID = assertFieldExist(listBoxFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
+    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID, "long");
+    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
-    assertEquals(1, listBoxFormData.methods().stream().count(), "method count of 'ListBoxFormData'");
+    assertEquals(1, listBoxFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.ListBoxFormData'");
     var getListBox = assertMethodExist(listBoxFormData, "getListBox");
     assertMethodReturnType(getListBox, "formdata.shared.services.process.ListBoxFormData$ListBox");
+    assertEquals(0, getListBox.annotations().stream().count(), "annotation count");
 
     assertEquals(1, listBoxFormData.innerTypes().stream().count(), "inner types count of 'ListBoxFormData'");
     // type ListBox
     var listBox = assertTypeExists(listBoxFormData, "ListBox");
-    assertHasFlags(listBox, 9);
+    assertHasFlags(listBox, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(listBox, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.util.Set<java.lang.Long>>");
+    assertEquals(0, listBox.annotations().stream().count(), "annotation count");
 
     // fields of ListBox
-    assertEquals(1, listBox.fields().stream().count(), "field count of 'ListBox'");
+    assertEquals(1, listBox.fields().stream().count(), "field count of 'formdata.shared.services.process.ListBoxFormData$ListBox'");
     var serialVersionUID1 = assertFieldExist(listBox, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
+    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID1, "long");
+    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
 
-    assertEquals(0, listBox.methods().stream().count(), "method count of 'ListBox'");
+    assertEquals(0, listBox.methods().stream().count(), "method count of 'formdata.shared.services.process.ListBoxFormData$ListBox'");
 
     assertEquals(0, listBox.innerTypes().stream().count(), "inner types count of 'ListBox'");
   }

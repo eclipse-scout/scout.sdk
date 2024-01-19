@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.core.s.dataobject;
 
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertEqualsRefFile;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertEqualsVersionedRefFile;
 
 import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.testing.apidef.ApiRequirement;
@@ -66,6 +67,6 @@ public class DataObjectGeneratorTest {
         .withNode("stringValues", DataObjectNodeKind.LIST, String.class.getName())
         .withNodeFunc("intValues", DataObjectNodeKind.COLLECTION, c -> Integer.class.getName())
         .withNodeFrom("lookupRowSet", DataObjectNodeKind.SET, IScoutApi.class, api -> api.ILookupRow().fqn());
-    assertEqualsRefFile(env, REF_FILE_FOLDER + "DataObject2.txt", generator);
+    assertEqualsVersionedRefFile(env, REF_FILE_FOLDER, "DataObject2.txt", generator);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -179,15 +179,17 @@ public class WebServiceUpdateOperation implements BiConsumer<IEnvironment, IProg
     try {
       for (var jaxwsBindingFile : jaxwsBindingFiles) {
         var document = Xml.get(jaxwsBindingFile);
-        var prefix = document.lookupPrefix(JaxWsUtils.JAX_WS_NAMESPACE);
+        var scoutApi = env.findJavaEnvironment(jaxwsBindingFile).orElseThrow().requireApi(IScoutApi.class);
+        var jaxWsNamespace = scoutApi.getJaxWsNamespace();
+        var prefix = document.lookupPrefix(jaxWsNamespace);
         for (var up : m_bindingClassUpdates) {
-          var nodeElement = JaxWsUtils.getJaxWsBindingElement(up.getNodeValue(), document);
+          var nodeElement = JaxWsUtils.getJaxWsBindingElement(up.getNodeValue(), document, jaxWsNamespace);
           Xml.firstChildElement(nodeElement, JaxWsUtils.BINDINGS_CLASS_ELEMENT_NAME)
               .ifPresent(e -> e.setAttribute(JaxWsUtils.BINDINGS_NAME_ATTRIBUTE, up.getClassName()));
         }
 
         // package
-        var packageElement = JaxWsUtils.getJaxWsBindingElement(JaxWsUtils.PACKAGE_XPATH, document);
+        var packageElement = JaxWsUtils.getJaxWsBindingElement(JaxWsUtils.PACKAGE_XPATH, document, jaxWsNamespace);
         if (packageElement == null) {
           packageElement = document.createElement(prefix + ':' + JaxWsUtils.BINDINGS_ELEMENT_NAME);
           packageElement.setAttribute(JaxWsUtils.BINDINGS_NODE_ATTRIBUTE_NAME, JaxWsUtils.PACKAGE_XPATH);

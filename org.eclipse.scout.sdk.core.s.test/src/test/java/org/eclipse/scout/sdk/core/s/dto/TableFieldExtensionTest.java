@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,13 +21,12 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTy
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.MetaValueType;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.junit.jupiter.api.Test;
-
-import formdata.client.extensions.ExtensionToAbstractTableFieldTemplate;
-import formdata.client.extensions.SimpleTableFormExtensionWithTable;
 
 /**
  * <h3>{@link TableFieldExtensionTest}</h3>
@@ -38,28 +37,30 @@ public class TableFieldExtensionTest {
 
   @Test
   public void testAbstractTableFieldExtension() {
-    createFormDataAssertNoCompileErrors(ExtensionToAbstractTableFieldTemplate.class.getName(), TableFieldExtensionTest::testApiOfExtensionToAbstractTableFieldTemplateData);
+    createFormDataAssertNoCompileErrors("formdata.client.extensions.ExtensionToAbstractTableFieldTemplate", TableFieldExtensionTest::testApiOfExtensionToAbstractTableFieldTemplateData);
   }
 
   @Test
   public void testTableFieldExtension() {
-    createFormDataAssertNoCompileErrors(SimpleTableFormExtensionWithTable.class.getName(), TableFieldExtensionTest::testApiOfSimpleTableFormExtensionWithTableData);
+    createFormDataAssertNoCompileErrors("formdata.client.extensions.SimpleTableFormExtensionWithTable", TableFieldExtensionTest::testApiOfSimpleTableFormExtensionWithTableData);
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfExtensionToAbstractTableFieldTemplateData(IType extensionToAbstractTableFieldTemplateData) {
-    assertHasFlags(extensionToAbstractTableFieldTemplateData, 1);
-    assertHasSuperClass(extensionToAbstractTableFieldTemplateData, "org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData");
+    var scoutApi = extensionToAbstractTableFieldTemplateData.javaEnvironment().requireApi(IScoutApi.class);
+
+    assertHasFlags(extensionToAbstractTableFieldTemplateData, Flags.AccPublic);
+    assertHasSuperClass(extensionToAbstractTableFieldTemplateData, scoutApi.AbstractFormFieldData());
     assertEquals(2, extensionToAbstractTableFieldTemplateData.annotations().stream().count(), "annotation count");
-    assertAnnotation(extensionToAbstractTableFieldTemplateData, "org.eclipse.scout.rt.platform.extension.Extends");
-    assertAnnotation(extensionToAbstractTableFieldTemplateData, "javax.annotation.Generated");
+    assertAnnotation(extensionToAbstractTableFieldTemplateData, scoutApi.Extends());
+    assertAnnotation(extensionToAbstractTableFieldTemplateData, scoutApi.Generated());
 
     // fields of ExtensionToAbstractTableFieldTemplateData
     assertEquals(1, extensionToAbstractTableFieldTemplateData.fields().stream().count(), "field count of 'formdata.shared.extension.ExtensionToAbstractTableFieldTemplateData'");
     var serialVersionUID = assertFieldExist(extensionToAbstractTableFieldTemplateData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
+    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
@@ -68,26 +69,28 @@ public class TableFieldExtensionTest {
     assertEquals(1, extensionToAbstractTableFieldTemplateData.innerTypes().stream().count(), "inner types count of 'ExtensionToAbstractTableFieldTemplateData'");
     // type CustomAbstractAdvisorTableFieldTableExtensionRowData
     var customAbstractAdvisorTableFieldTableExtensionRowData = assertTypeExists(extensionToAbstractTableFieldTemplateData, "CustomAbstractAdvisorTableFieldTableExtensionRowData");
-    assertHasFlags(customAbstractAdvisorTableFieldTableExtensionRowData, 9);
+    assertHasFlags(customAbstractAdvisorTableFieldTableExtensionRowData, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(customAbstractAdvisorTableFieldTableExtensionRowData, "java.lang.Object");
     assertHasSuperInterfaces(customAbstractAdvisorTableFieldTableExtensionRowData, new String[]{"java.io.Serializable"});
     assertEquals(1, customAbstractAdvisorTableFieldTableExtensionRowData.annotations().stream().count(), "annotation count");
-    var rowDataExtendsAnnot = assertAnnotation(customAbstractAdvisorTableFieldTableExtensionRowData, "org.eclipse.scout.rt.platform.extension.Extends");
+    // --> manual modification
+    var rowDataExtendsAnnot = assertAnnotation(customAbstractAdvisorTableFieldTableExtensionRowData, scoutApi.Extends());
     assertValueOfRowDataExtendsAnnotation("formdata.shared.services.process.AbstractAddressTableFieldData$AbstractAddressTableRowData", rowDataExtendsAnnot);
+    // <-- manual modification
 
     // fields of CustomAbstractAdvisorTableFieldTableExtensionRowData
     assertEquals(3, customAbstractAdvisorTableFieldTableExtensionRowData.fields().stream().count(),
         "field count of 'formdata.shared.extension.ExtensionToAbstractTableFieldTemplateData$CustomAbstractAdvisorTableFieldTableExtensionRowData'");
     var serialVersionUID1 = assertFieldExist(customAbstractAdvisorTableFieldTableExtensionRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
+    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
     var added = assertFieldExist(customAbstractAdvisorTableFieldTableExtensionRowData, "added");
-    assertHasFlags(added, 25);
+    assertHasFlags(added, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(added, "java.lang.String");
     assertEquals(0, added.annotations().stream().count(), "annotation count");
     var m_added = assertFieldExist(customAbstractAdvisorTableFieldTableExtensionRowData, "m_added");
-    assertHasFlags(m_added, 2);
+    assertHasFlags(m_added, Flags.AccPrivate);
     assertFieldType(m_added, "java.lang.Boolean");
     assertEquals(0, m_added.annotations().stream().count(), "annotation count");
 
@@ -104,19 +107,21 @@ public class TableFieldExtensionTest {
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfSimpleTableFormExtensionWithTableData(IType simpleTableFormExtensionWithTableData) {
-    assertHasFlags(simpleTableFormExtensionWithTableData, 1);
-    assertHasSuperClass(simpleTableFormExtensionWithTableData, "org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData");
+    var scoutApi = simpleTableFormExtensionWithTableData.javaEnvironment().requireApi(IScoutApi.class);
+
+    assertHasFlags(simpleTableFormExtensionWithTableData, Flags.AccPublic);
+    assertHasSuperClass(simpleTableFormExtensionWithTableData, scoutApi.AbstractFormFieldData());
     assertEquals(2, simpleTableFormExtensionWithTableData.annotations().stream().count(), "annotation count");
-    assertAnnotation(simpleTableFormExtensionWithTableData, "org.eclipse.scout.rt.platform.extension.Extends");
-    assertAnnotation(simpleTableFormExtensionWithTableData, "javax.annotation.Generated");
+    assertAnnotation(simpleTableFormExtensionWithTableData, scoutApi.Extends());
+    assertAnnotation(simpleTableFormExtensionWithTableData, scoutApi.Generated());
 
     // fields of SimpleTableFormExtensionWithTableData
     assertEquals(1, simpleTableFormExtensionWithTableData.fields().stream().count(), "field count of 'formdata.shared.extension.SimpleTableFormExtensionWithTableData'");
     var serialVersionUID = assertFieldExist(simpleTableFormExtensionWithTableData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
+    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
@@ -125,24 +130,27 @@ public class TableFieldExtensionTest {
     assertEquals(1, simpleTableFormExtensionWithTableData.innerTypes().stream().count(), "inner types count of 'SimpleTableFormExtensionWithTableData'");
     // type TestTableFieldExtensionRowData
     var testTableFieldExtensionRowData = assertTypeExists(simpleTableFormExtensionWithTableData, "TestTableFieldExtensionRowData");
-    assertHasFlags(testTableFieldExtensionRowData, 9);
+    assertHasFlags(testTableFieldExtensionRowData, Flags.AccPublic | Flags.AccStatic);
+    assertHasSuperClass(testTableFieldExtensionRowData, "java.lang.Object");
     assertHasSuperInterfaces(testTableFieldExtensionRowData, new String[]{"java.io.Serializable"});
     assertEquals(1, testTableFieldExtensionRowData.annotations().stream().count(), "annotation count");
-    var rowDataExtendsAnnot = assertAnnotation(testTableFieldExtensionRowData, "org.eclipse.scout.rt.platform.extension.Extends");
+    // --> manual modification
+    var rowDataExtendsAnnot = assertAnnotation(testTableFieldExtensionRowData, scoutApi.Extends());
     assertValueOfRowDataExtendsAnnotation("formdata.shared.services.process.SimpleTableFormData$TestTable$TestTableRowData", rowDataExtendsAnnot);
+    // <-- manual modification
 
     // fields of TestTableFieldExtensionRowData
     assertEquals(3, testTableFieldExtensionRowData.fields().stream().count(), "field count of 'formdata.shared.extension.SimpleTableFormExtensionWithTableData$TestTableFieldExtensionRowData'");
     var serialVersionUID1 = assertFieldExist(testTableFieldExtensionRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
+    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
     var contributed = assertFieldExist(testTableFieldExtensionRowData, "contributed");
-    assertHasFlags(contributed, 25);
+    assertHasFlags(contributed, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(contributed, "java.lang.String");
     assertEquals(0, contributed.annotations().stream().count(), "annotation count");
     var m_contributed = assertFieldExist(testTableFieldExtensionRowData, "m_contributed");
-    assertHasFlags(m_contributed, 2);
+    assertHasFlags(m_contributed, Flags.AccPrivate);
     assertFieldType(m_contributed, "java.math.BigDecimal");
     assertEquals(0, m_contributed.annotations().stream().count(), "annotation count");
 

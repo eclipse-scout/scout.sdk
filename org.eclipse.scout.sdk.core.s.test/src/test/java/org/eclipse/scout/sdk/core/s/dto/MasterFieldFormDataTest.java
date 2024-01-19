@@ -22,8 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.junit.jupiter.api.Test;
 
-import formdata.client.ui.forms.MasterFieldTestForm;
-
 /**
  * <h3>{@link MasterFieldFormDataTest}</h3>
  *
@@ -32,7 +30,7 @@ import formdata.client.ui.forms.MasterFieldTestForm;
 public class MasterFieldFormDataTest {
   @Test
   public void testCreateFormData() {
-    createFormDataAssertNoCompileErrors(MasterFieldTestForm.class.getName(), MasterFieldFormDataTest::testApiOfMasterFieldTestFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.MasterFieldTestForm", MasterFieldFormDataTest::testApiOfMasterFieldTestFormData);
   }
 
   /**

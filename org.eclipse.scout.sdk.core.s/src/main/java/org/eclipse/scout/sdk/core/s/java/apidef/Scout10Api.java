@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -3935,6 +3935,21 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
+  @Override
+  default String getJaxBNamespace() {
+    return "http://java.sun.com/xml/ns/jaxb";
+  }
+
+  @Override
+  default String getJaxBVersion() {
+    return "2.1";
+  }
+
+  @Override
+  default String getJaxWsNamespace() {
+    return "http://java.sun.com/xml/ns/jaxws";
+  }
+
   IScoutVariousApi.ACCESS ACCESS = new ACCESS();
 
   @Override
@@ -4630,6 +4645,35 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String doListMethodName() {
       return "doList";
+    }
+  }
+
+  IScoutAnnotationApi.Generated GENERATED = new Generated();
+
+  @Override
+  default IScoutAnnotationApi.Generated Generated() {
+    return GENERATED;
+  }
+
+  class Generated implements IScoutAnnotationApi.Generated {
+    @Override
+    public String fqn() {
+      return "javax.annotation.Generated";
+    }
+
+    @Override
+    public String valueElementName() {
+      return "value";
+    }
+
+    @Override
+    public String dateElementName() {
+      return "date";
+    }
+
+    @Override
+    public String commentsElementName() {
+      return "comments";
     }
   }
 }

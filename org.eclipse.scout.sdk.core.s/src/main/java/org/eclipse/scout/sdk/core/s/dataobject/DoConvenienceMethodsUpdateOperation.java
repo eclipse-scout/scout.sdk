@@ -32,10 +32,8 @@ import org.eclipse.scout.sdk.core.java.builder.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.java.builder.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.java.builder.comment.JavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.java.generator.IAnnotatableGenerator;
-import org.eclipse.scout.sdk.core.java.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.java.generator.annotation.IAnnotationGenerator;
 import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.java.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IMethod;
@@ -44,6 +42,7 @@ import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IFuture;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.environment.SdkFuture;
+import org.eclipse.scout.sdk.core.s.java.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutAnnotationApi;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.java.generator.annotation.ScoutAnnotationGenerator;
@@ -102,7 +101,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
 
     // already existing methods which are no longer necessary: all annotated methods which are not updated
     dataObjectType.methods()
-        .withAnnotation(GeneratedAnnotation.FQN)
+        .withAnnotationFrom(IScoutApi.class, IScoutApi::Generated)
         .stream()
         .filter(m -> !replacedMethods.contains(m))
         .filter(this::hasDoConvenienceGeneratedAnnotation)
@@ -257,7 +256,7 @@ public class DoConvenienceMethodsUpdateOperation implements BiConsumer<IEnvironm
   }
 
   protected IAnnotationGenerator<?> createGenerated() {
-    return AnnotationGenerator.createGenerated("DoConvenienceMethodsGenerator", null);
+    return ScoutAnnotationGenerator.createGenerated("DoConvenienceMethodsGenerator", null);
   }
 
   protected static class Replacement {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,11 +14,20 @@ import static java.util.stream.Collectors.joining;
 import java.beans.Introspector;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.JavaUtils;
+import org.eclipse.scout.sdk.core.java.apidef.Api;
+import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.java.imports.IImportCollector;
 import org.eclipse.scout.sdk.core.java.imports.IImportValidator;
 import org.eclipse.scout.sdk.core.java.imports.ImportCollector;
@@ -26,8 +35,10 @@ import org.eclipse.scout.sdk.core.java.imports.ImportValidator;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.java.model.api.IField;
+import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.api.IMethod;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.util.FinalValue;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.junit.jupiter.api.Assertions;
@@ -43,13 +54,22 @@ public class ApiTestGenerator {
 
   private final IType m_element;
   private final Set<String> m_usedMemberNames;
+  private final List<ApiInfo> m_apiInfos;
 
   public ApiTestGenerator(IType element) {
-    m_element = element;
-    m_usedMemberNames = new HashSet<>();
+    this(element, List.of());
   }
 
-  protected static void buildField(IField field, String fieldVarName, StringBuilder source, String flagsRef) {
+  public ApiTestGenerator(IType element, List<Class<? extends IApiSpecification>> apis) {
+    m_element = element;
+    m_usedMemberNames = new HashSet<>();
+    m_apiInfos = Optional.ofNullable(apis).stream()
+        .flatMap(Collection::stream)
+        .map(api -> new ApiInfo(api, element.javaEnvironment(), this::getMemberName))
+        .collect(Collectors.toList());
+  }
+
+  protected void buildField(IField field, String fieldVarName, StringBuilder source, String flagsRef) {
     source.append("assertHasFlags(").append(fieldVarName).append(", ").append(getFlagsSource(field.flags(), flagsRef)).append(");").append(NL);
     source.append("assertFieldType(").append(fieldVarName).append(", ").append(JavaUtils.toStringLiteral(field.dataType().reference())).append(");").append(NL);
     createAnnotationsAsserts(field, source, fieldVarName);
@@ -76,11 +96,12 @@ public class ApiTestGenerator {
     }
   }
 
-  public static void createAnnotationsAsserts(IAnnotatable annotatable, StringBuilder source, String annotatableRef) {
+  protected void createAnnotationsAsserts(IAnnotatable annotatable, StringBuilder source, String annotatableRef) {
     var annotations = annotatable.annotations().stream().toList();
     var string = annotations.stream()
         .map(a -> a.type().reference())
-        .map(annotationRef -> "assertAnnotation(" + annotatableRef + ", \"" + annotationRef + "\");" + NL)
+        .map(this::typeNameSupplierOrFqnStringLiteral)
+        .map(annotationRef -> "assertAnnotation(" + annotatableRef + ", " + annotationRef + ");" + NL)
         .collect(joining("", "assertEquals(" + annotations.size() + ", " + annotatableRef + ".annotations().stream().count(), \"annotation count\");" + NL, ""));
     source.append(string);
   }
@@ -96,7 +117,18 @@ public class ApiTestGenerator {
     sourceBuilder.append("*/").append(NL);
 
     sourceBuilder.append("private static void testApiOf").append(m_element.elementName()).append('(').append("IType ").append(typeVarName).append(") {").append(NL);
-    buildType(m_element, typeVarName, sourceBuilder, validator);
+
+    var methodBodyBuilder = new StringBuilder();
+    buildType(m_element, typeVarName, methodBodyBuilder, validator);
+
+    var usedApis = m_apiInfos.stream().filter(ApiInfo::used).toList();
+    usedApis.forEach(apiInfo -> sourceBuilder.append("var ").append(apiInfo.memberName()).append(" = ")
+        .append(typeVarName).append(".javaEnvironment().requireApi(").append(apiInfo.apiClass().getSimpleName()).append(".class);").append(NL));
+    if (!usedApis.isEmpty()) {
+      sourceBuilder.append(NL);
+    }
+
+    sourceBuilder.append(methodBodyBuilder);
     sourceBuilder.append('}');
 
     collector.addStaticImport(SdkJavaAssertions.class.getName() + ".assertAnnotation");
@@ -112,6 +144,8 @@ public class ApiTestGenerator {
     collector.addStaticImport(Assertions.class.getName() + ".assertArrayEquals");
     collector.addStaticImport(Assertions.class.getName() + ".assertEquals");
     collector.addStaticImport(Assertions.class.getName() + ".assertTrue");
+
+    usedApis.forEach(api -> collector.addImport(api.apiClass.getName()));
 
     var result = new StringBuilder();
     collector.createImportDeclarations()
@@ -129,11 +163,12 @@ public class ApiTestGenerator {
     // super type
     type.superClass()
         .map(IType::reference)
+        .map(this::typeNameSupplierOrFqnStringLiteral)
         .ifPresent(ref -> source
             .append("assertHasSuperClass(")
-            .append(typeVarName).append(", \"")
+            .append(typeVarName).append(", ")
             .append(ref)
-            .append("\");")
+            .append(");")
             .append(NL));
 
     // interfaces
@@ -141,7 +176,7 @@ public class ApiTestGenerator {
     if (!interfaces.isEmpty()) {
       source.append("assertHasSuperInterfaces(").append(typeVarName).append(", new String[]{");
       for (var i = 0; i < interfaces.size(); i++) {
-        source.append(JavaUtils.toStringLiteral(interfaces.get(i).reference()));
+        source.append(typeNameSupplierFqnCallOrFqnStringLiteral(interfaces.get(i).reference()));
         if (i < interfaces.size() - 1) {
           source.append(", ");
         }
@@ -171,7 +206,7 @@ public class ApiTestGenerator {
       var parameterTypes = method.parameters().stream().toList();
       if (!parameterTypes.isEmpty()) {
         source.append(parameterTypes.stream()
-            .map(parameterType -> JavaUtils.toStringLiteral(parameterType.dataType().reference()))
+            .map(parameterType -> typeNameSupplierFqnCallOrFqnStringLiteral(parameterType.dataType().reference()))
             .collect(joining(", ", ", new String[]{", "}")));
       }
       source.append(");").append(NL);
@@ -192,18 +227,19 @@ public class ApiTestGenerator {
     }
   }
 
-  protected static void buildMethod(IMethod method, String methodVarName, StringBuilder source) {
+  protected void buildMethod(IMethod method, String methodVarName, StringBuilder source) {
     if (method.isConstructor()) {
       source.append("assertTrue(").append(methodVarName).append(".isConstructor());").append(NL);
     }
 
     method.returnType()
         .map(IType::reference)
+        .map(this::typeNameSupplierOrFqnStringLiteral)
         .ifPresent(ref -> source.append("assertMethodReturnType(")
             .append(methodVarName)
-            .append(", \"")
+            .append(", ")
             .append(ref)
-            .append("\");")
+            .append(");")
             .append(NL));
 
     createAnnotationsAsserts(method, source, methodVarName);
@@ -224,4 +260,50 @@ public class ApiTestGenerator {
     return memberName;
   }
 
+  private Optional<String> typeNameSupplier(String fqn) {
+    return m_apiInfos.stream()
+        .map(apiInfo -> apiInfo.findTypeNameSupplier(fqn))
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .findFirst();
+  }
+
+  private String typeNameSupplierOrFqnStringLiteral(String fqn) {
+    return typeNameSupplier(fqn).orElse("\"" + fqn + "\"");
+  }
+
+  private String typeNameSupplierFqnCallOrFqnStringLiteral(String fqn) {
+    return typeNameSupplier(fqn)
+        .map(tns -> tns + ".fqn()")
+        .orElse("\"" + fqn + "\"");
+  }
+
+  private record ApiInfo(Class<? extends IApiSpecification> apiClass, IJavaEnvironment env, Function<String, String> getMemberName,
+      FinalValue<Map<String, String>> typeNameSuppliersFinalValue, FinalValue<String> memberNameFinalValue) {
+
+    private ApiInfo(Class<? extends IApiSpecification> apiClass, IJavaEnvironment env, Function<String, String> getMemberName) {
+      this(apiClass, env, getMemberName,
+          new FinalValue<>(), new FinalValue<>());
+    }
+
+    public Map<String, String> typeNameSuppliers() {
+      return typeNameSuppliersFinalValue().computeIfAbsentAndGet(() -> env.api(apiClass())
+          .map(api -> Api.collectTypeNameSuppliers(api)
+              .collect(Collectors.toMap(e -> e.getValue().fqn(), Entry::getKey, (a, b) -> a)))
+          .orElse(Map.of()));
+    }
+
+    public String memberName() {
+      return memberNameFinalValue().computeIfAbsentAndGet(() -> getMemberName().apply(Strings.removePrefix(apiClass.getSimpleName(), "I")));
+    }
+
+    public boolean used() {
+      return memberNameFinalValue().isSet();
+    }
+
+    public Optional<String> findTypeNameSupplier(String fqn) {
+      return Optional.ofNullable(typeNameSuppliers().get(fqn))
+          .map(tns -> memberName() + "." + tns + "()");
+    }
+  }
 }

@@ -18,14 +18,6 @@ import org.eclipse.scout.sdk.core.java.testing.context.ExtendWithJavaEnvironment
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutClientJavaEnvironmentFactory;
 import org.junit.jupiter.api.Test;
 
-import formdata.client.ui.desktop.outline.pages.ExtendedTablePage;
-import formdata.client.ui.forms.AnnotationCopyTestForm;
-import formdata.client.ui.forms.BaseWithExtendedTableForm;
-import formdata.client.ui.forms.FormWithGroupBoxesForm;
-import formdata.client.ui.forms.ListBoxForm;
-import formdata.client.ui.forms.SimpleForm;
-import formdata.client.ui.forms.TableFieldForm;
-
 /**
  * <h3>{@link WellformTest}</h3>
  *
@@ -52,19 +44,18 @@ public class WellformTest {
   public void testWellform(IJavaEnvironment env) {
     var wf = new Wellformer("\n", true);
 
-    Class<?>[] testingClasses = new Class[]{
-        AnnotationCopyTestForm.class,
-        BaseWithExtendedTableForm.class,
-        FormWithGroupBoxesForm.class,
-        ListBoxForm.class,
-        SimpleForm.class,
-        TableFieldForm.class,
-        ExtendedTablePage.class
+    var names = new String[]{
+        "formdata.client.ui.forms.AnnotationCopyTestForm",
+        "formdata.client.ui.forms.BaseWithExtendedTableForm",
+        "formdata.client.ui.forms.FormWithGroupBoxesForm",
+        "formdata.client.ui.forms.ListBoxForm",
+        "formdata.client.ui.forms.SimpleForm",
+        "formdata.client.ui.forms.TableFieldForm",
+        "formdata.client.ui.desktop.outline.pages.ExtendedTablePage"
     };
 
-    for (var c : testingClasses) {
+    for (var name : names) {
       var out = new StringBuilder();
-      var name = c.getName();
       var type = env.requireType(name);
 
       var cuSource = type.requireCompilationUnit().source().orElseThrow().asCharSequence();

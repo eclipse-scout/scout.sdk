@@ -1,0 +1,91 @@
+package test.pck;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
+import jakarta.annotation.Generated;
+
+import org.eclipse.scout.rt.dataobject.DoCollection;
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoSet;
+import org.eclipse.scout.rt.dataobject.DoValue;
+import org.eclipse.scout.rt.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.TypeVersion;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+
+import dataobject.context.FixtureTypeVersions.SdkFixture_1_0_0_0;
+
+@TypeName("sdk.MyTest")
+@TypeVersion(SdkFixture_1_0_0_0.class)
+public class MyTestDo extends DoEntity {
+public DoValue<Long> longValue() {
+return doValue("longValue");
+}
+public DoList<String> stringValues() {
+return doList("stringValues");
+}
+public DoCollection<Integer> intValues() {
+return doCollection("intValues");
+}
+public DoSet<ILookupRow> lookupRowSet() {
+return doSet("lookupRowSet");
+}
+
+/* **************************************************************************
+   * GENERATED CONVENIENCE METHODS
+   * *************************************************************************/
+
+@Generated("DoConvenienceMethodsGenerator")
+public MyTestDo withLongValue(Long longValue) {
+longValue().set(longValue);
+return this;
+}
+@Generated("DoConvenienceMethodsGenerator")
+public Long getLongValue() {
+return longValue().get();
+}
+@Generated("DoConvenienceMethodsGenerator")
+public MyTestDo withStringValues(Collection<? extends String> stringValues) {
+stringValues().updateAll(stringValues);
+return this;
+}
+@Generated("DoConvenienceMethodsGenerator")
+public MyTestDo withStringValues(String... stringValues) {
+stringValues().updateAll(stringValues);
+return this;
+}
+@Generated("DoConvenienceMethodsGenerator")
+public List<String> getStringValues() {
+return stringValues().get();
+}
+@Generated("DoConvenienceMethodsGenerator")
+public MyTestDo withIntValues(Collection<? extends Integer> intValues) {
+intValues().updateAll(intValues);
+return this;
+}
+@Generated("DoConvenienceMethodsGenerator")
+public MyTestDo withIntValues(Integer... intValues) {
+intValues().updateAll(intValues);
+return this;
+}
+@Generated("DoConvenienceMethodsGenerator")
+public Collection<Integer> getIntValues() {
+return intValues().get();
+}
+@Generated("DoConvenienceMethodsGenerator")
+public MyTestDo withLookupRowSet(Collection<? extends ILookupRow> lookupRowSet) {
+lookupRowSet().updateAll(lookupRowSet);
+return this;
+}
+@Generated("DoConvenienceMethodsGenerator")
+public MyTestDo withLookupRowSet(ILookupRow... lookupRowSet) {
+lookupRowSet().updateAll(lookupRowSet);
+return this;
+}
+@Generated("DoConvenienceMethodsGenerator")
+public Set<ILookupRow> getLookupRowSet() {
+return lookupRowSet().get();
+}
+}

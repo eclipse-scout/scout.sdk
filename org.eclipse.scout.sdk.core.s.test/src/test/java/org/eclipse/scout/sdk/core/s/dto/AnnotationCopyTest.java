@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,10 +20,10 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTy
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.junit.jupiter.api.Test;
-
-import formdata.client.ui.forms.AnnotationCopyTestForm;
 
 /**
  * <h3>{@link AnnotationCopyTest}</h3>
@@ -33,22 +33,24 @@ import formdata.client.ui.forms.AnnotationCopyTestForm;
 public class AnnotationCopyTest {
   @Test
   public void testCreateFormData() {
-    createFormDataAssertNoCompileErrors(AnnotationCopyTestForm.class.getName(), AnnotationCopyTest::testApiOfAnnotationCopyTestFormData);
+    createFormDataAssertNoCompileErrors("formdata.client.ui.forms.AnnotationCopyTestForm", AnnotationCopyTest::testApiOfAnnotationCopyTestFormData);
   }
 
   /**
-   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator
    */
   private static void testApiOfAnnotationCopyTestFormData(IType annotationCopyTestFormData) {
-    assertHasFlags(annotationCopyTestFormData, 1);
-    assertHasSuperClass(annotationCopyTestFormData, "org.eclipse.scout.rt.shared.data.form.AbstractFormData");
+    var scoutApi = annotationCopyTestFormData.javaEnvironment().requireApi(IScoutApi.class);
+
+    assertHasFlags(annotationCopyTestFormData, Flags.AccPublic);
+    assertHasSuperClass(annotationCopyTestFormData, scoutApi.AbstractFormData());
     assertEquals(1, annotationCopyTestFormData.annotations().stream().count(), "annotation count");
-    assertAnnotation(annotationCopyTestFormData, "javax.annotation.Generated");
+    assertAnnotation(annotationCopyTestFormData, scoutApi.Generated());
 
     // fields of AnnotationCopyTestFormData
     assertEquals(1, annotationCopyTestFormData.fields().stream().count(), "field count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData'");
     var serialVersionUID = assertFieldExist(annotationCopyTestFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
+    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID, "long");
     assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
 
@@ -60,7 +62,7 @@ public class AnnotationCopyTest {
     assertEquals(1, annotationCopyTestFormData.innerTypes().stream().count(), "inner types count of 'AnnotationCopyTestFormData'");
     // type First
     var first = assertTypeExists(annotationCopyTestFormData, "First");
-    assertHasFlags(first, 9);
+    assertHasFlags(first, Flags.AccPublic | Flags.AccStatic);
     assertHasSuperClass(first, "org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<java.lang.String>");
     assertEquals(1, first.annotations().stream().count(), "annotation count");
     assertAnnotation(first, "formdata.shared.SharedAnnotation");
@@ -68,7 +70,7 @@ public class AnnotationCopyTest {
     // fields of First
     assertEquals(1, first.fields().stream().count(), "field count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData$First'");
     var serialVersionUID1 = assertFieldExist(first, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
+    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(serialVersionUID1, "long");
     assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
 

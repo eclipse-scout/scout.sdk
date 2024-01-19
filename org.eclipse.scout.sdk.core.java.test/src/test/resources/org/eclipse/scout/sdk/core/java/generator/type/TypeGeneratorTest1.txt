@@ -2,7 +2,6 @@
 * Default Testing Comment for
 * Type TestClass
 */
-@Generated(value = "GeneratorType", comments = "Comments")
 public final class TestClass<T extends Comparable> extends AbstractMap implements CharSequence, Comparable {
 private final class FirstInnerType {
 

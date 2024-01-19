@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.builder.JavaBuilderContext;
 import org.eclipse.scout.sdk.core.java.builder.comment.IJavaElementCommentBuilder;
 import org.eclipse.scout.sdk.core.java.fixture.InterfaceWithTypeParam;
+import org.eclipse.scout.sdk.core.java.fixture.ValueAnnot;
 import org.eclipse.scout.sdk.core.java.generator.annotation.AnnotationGenerator;
 import org.eclipse.scout.sdk.core.java.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.java.generator.field.IFieldGenerator;
@@ -32,7 +33,6 @@ import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.java.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.java.generator.methodparam.MethodParameterGenerator;
 import org.eclipse.scout.sdk.core.java.generator.typeparam.TypeParameterGenerator;
-import org.eclipse.scout.sdk.core.java.model.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.testing.FixtureHelper.CoreJavaEnvironmentWithSourceFactory;
 import org.eclipse.scout.sdk.core.java.testing.context.DefaultCommentGeneratorExtension;
@@ -83,7 +83,6 @@ public class TypeGeneratorTest {
     var generator = TypeGenerator.create()
         .asPublic()
         .asFinal()
-        .withAnnotation(AnnotationGenerator.createGenerated("GeneratorType", "Comments"))
         .withComment(IJavaElementCommentBuilder::appendDefaultElementComment)
         .withElementName("TestClass")
         .withInterfaces(interfaces)
@@ -250,8 +249,9 @@ public class TypeGeneratorTest {
             .withElementName(idFieldName)
             .withValue(b -> b.stringLiteral("value")));
     primary.withType(inner)
-        .withAnnotation(AnnotationGenerator.createGenerated("whatever")
-            .withElement(GeneratedAnnotation.VALUE_ELEMENT_NAME, b -> b.ref(inner.fullyQualifiedName()).dot().append(idFieldName)))
+        .withAnnotation(AnnotationGenerator.create()
+            .withElementName(ValueAnnot.class.getName())
+            .withElement("value", b -> b.ref(inner.fullyQualifiedName()).dot().append(idFieldName)))
         .withMethod(MethodGenerator.create()
             .withElementName("setter")
             .withReturnType(JavaTypes._void)
