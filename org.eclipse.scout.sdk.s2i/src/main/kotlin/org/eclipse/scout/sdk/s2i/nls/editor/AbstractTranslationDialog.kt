@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -34,7 +34,8 @@ import javax.swing.*
 import javax.swing.event.DocumentEvent
 
 @Suppress("LeakingThis")
-abstract class AbstractTranslationDialog(val project: Project, val languages: Collection<Language>, val translationManager: TranslationManager, val initialKey: String? = null, val initialLanguageShown: Language? = null) : DialogWrapper(project, true, IdeModalityType.PROJECT) {
+abstract class AbstractTranslationDialog(val project: Project, val languages: Collection<Language>, val translationManager: TranslationManager, val initialKey: String? = null, val initialLanguageShown: Language? = null) :
+    DialogWrapper(project, true, IdeModalityType.IDE) {
 
     private val m_dimensionKey = "scout.nls.translationDialog"
     private val m_languageTextFields = LinkedHashMap<Language, JBTextArea>()

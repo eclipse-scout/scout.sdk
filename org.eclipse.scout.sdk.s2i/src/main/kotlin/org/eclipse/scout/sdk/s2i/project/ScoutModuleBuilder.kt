@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,13 +20,13 @@ import com.intellij.openapi.module.StdModuleTypes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.SdkTypeId
-import com.intellij.openapi.projectRoots.impl.SdkVersionUtil
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.ui.configuration.ModulesProvider
 import com.intellij.openapi.ui.Messages.*
 import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.encoding.EncodingProjectManager
 import com.intellij.psi.PsiManager
+import org.eclipse.scout.sdk.core.java.ecj.JreInfo
 import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper.createProject
@@ -108,10 +108,7 @@ class ScoutModuleBuilder : ModuleBuilder() {
         if (nameLocationSettings != null) {
             nameLocationSettings.moduleName = artifactId
         }
-
-        javaVersion = settingsStep.context.projectJdk.homePath
-            ?.let { SdkVersionUtil.getJdkVersionInfo(it)?.version?.feature }
-
+        javaVersion = settingsStep.context.projectJdk.homePath?.let { JreInfo(Paths.get(it)).feature() }
         return super.modifySettingsStep(settingsStep)
     }
 

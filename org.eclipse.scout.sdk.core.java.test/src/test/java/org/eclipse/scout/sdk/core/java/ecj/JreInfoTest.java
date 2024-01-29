@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.java.ecj;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
@@ -70,15 +71,16 @@ public class JreInfoTest {
         BUILD_TYPE="commercial"
         """;
 
-    assertIsJavaVersion("11", java11Content);
-    assertIsJavaVersion("10", java10Content);
-    assertIsJavaVersion("9", java9Content);
-    assertIsJavaVersion("1.8", java8Content);
-    assertIsJavaVersion("12.2", java122Content);
+    assertJavaVersion("11", 11, java11Content);
+    assertJavaVersion("10", 10, java10Content);
+    assertJavaVersion("9", 9, java9Content);
+    assertJavaVersion("1.8", 8, java8Content);
+    assertJavaVersion("12.2", 12, java122Content);
   }
 
-  protected static void assertIsJavaVersion(String expectedJavaVersion, String fileContent) {
+  protected static void assertJavaVersion(String expectedJavaVersion, int expectedFeatureLevel, String fileContent) {
     var version = JreInfo.parseVersion(asList(Pattern.compile("\\n").split(fileContent)));
     assertEquals(expectedJavaVersion, version);
+    assertEquals(expectedFeatureLevel, JreInfo.computeFeatureLevel(Objects.requireNonNull(version)));
   }
 }

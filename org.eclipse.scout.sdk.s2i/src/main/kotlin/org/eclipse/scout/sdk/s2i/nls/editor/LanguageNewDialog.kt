@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import java.util.*
 import javax.swing.JComponent
 
-class LanguageNewDialog(val project: Project, val store: ITranslationStore, val translationManager: TranslationManager) : DialogWrapper(project, true, IdeModalityType.PROJECT) {
+class LanguageNewDialog(val project: Project, val store: ITranslationStore, val translationManager: TranslationManager) : DialogWrapper(project, true, IdeModalityType.IDE) {
 
     private var m_comboBox: ComboBox<Language>? = null
 

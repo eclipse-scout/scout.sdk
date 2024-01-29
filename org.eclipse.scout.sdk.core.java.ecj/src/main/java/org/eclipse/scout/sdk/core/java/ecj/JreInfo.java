@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -52,6 +52,7 @@ public class JreInfo {
   private final Path m_jreHome;
   private final String m_version;
   private final FinalValue<List<Path>> m_bootClasspath;
+  private final int m_feature;
 
   /**
    * @param jreHome
@@ -65,6 +66,7 @@ public class JreInfo {
     var jrt = jreHome.resolve("lib").resolve(JRTUtil.JRT_FS_JAR);
     m_supportsJrtModules = Files.isReadable(jrt) && Files.isRegularFile(jrt); // supports module system (Java 9 and newer)
     m_version = computeVersion(jreHome);
+    m_feature = computeFeatureLevel(m_version);
     m_bootClasspath = new FinalValue<>();
   }
 
@@ -83,6 +85,14 @@ public class JreInfo {
    */
   public String version() {
     return m_version;
+  }
+
+  /**
+   * @return The major Java feature level. Corresponds to the first number of 9+ format (<b>9</b>.0.1) or the second
+   *         number of 1.x format (1.<b>8</b>.0_60).
+   */
+  public int feature() {
+    return m_feature;
   }
 
   /**
@@ -131,6 +141,20 @@ public class JreInfo {
     return unmodifiableList(result);
   }
 
+  protected static int computeFeatureLevel(String version) {
+    if (version.startsWith("1.") && version.length() > 2) {
+      // format 1.8: use part after the dot
+      return Integer.parseInt(version, 2, version.length(), 10);
+    }
+    var dotPos = version.indexOf('.');
+    if (dotPos > 0) {
+      // format 17.4: use part before the dot
+      return Integer.parseInt(version, 0, dotPos, 10);
+    }
+    // format 11
+    return Integer.parseInt(version);
+  }
+
   protected static String computeVersion(Path jreHome) {
     var release = jreHome.resolve("release");
     if (!Files.isReadable(release) || !Files.isRegularFile(release)) {
@@ -138,7 +162,8 @@ public class JreInfo {
     }
 
     try {
-      return Ensure.notNull(parseVersion(readAllLines(release, StandardCharsets.UTF_8)), "Cannot parse Java version for location '{}'.", jreHome);
+      var parsedVersion = parseVersion(readAllLines(release, StandardCharsets.UTF_8));
+      return Ensure.notNull(parsedVersion, "Cannot parse Java version for location '{}'.", jreHome);
     }
     catch (IOException e) {
       throw new SdkException("Error parsing Java release file: '{}'.", jreHome, e);
