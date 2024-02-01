@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,8 @@ import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.jetbrains.idea.maven.project.MavenProjectsManager
 import java.lang.reflect.InvocationTargetException
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.functions
@@ -57,6 +59,8 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
 
     private class MavenManagerListener(private val m_manager: MavenProjectsManager, private val m_downloadArtifactsFun: KFunction<*>) : MavenProjectsManager.Listener {
 
+        private var m_future: Future<*>? = null
+
         init {
             // in case the manager is already active when the startup activity is executed (then the 'activated' event will not be fired anymore)
             scheduleMavenSourcesDownload()
@@ -81,16 +85,22 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
             }
         }
 
+        @Synchronized
         private fun runAsync(action: suspend () -> Unit) {
-            AppExecutorUtil.getAppExecutorService().execute {
+            val future = m_future
+            if (future != null) {
+                future.cancel(false)
+                m_future = null
+            }
+            m_future = AppExecutorUtil.getAppScheduledExecutorService().schedule({
                 runBlocking {
                     try {
                         action()
-                    } catch (e: Exception) {
-                        SdkLog.warning("Error downloading Maven sources.", e)
+                    } catch (e: Throwable) {
+                        SdkLog.info("Error downloading Maven sources.", e)
                     }
                 }
-            }
+            }, 5, TimeUnit.SECONDS)
         }
     }
 }
