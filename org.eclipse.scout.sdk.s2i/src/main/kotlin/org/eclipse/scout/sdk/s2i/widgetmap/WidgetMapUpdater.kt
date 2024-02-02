@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,7 +24,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
@@ -69,7 +68,7 @@ object WidgetMapUpdater {
     }
 
     fun updateAsync(scope: SearchScope, project: Project) {
-        object : Task.Backgroundable(project, message("update.widgetMap.in.scope"), true, PerformInBackgroundOption.ALWAYS_BACKGROUND) {
+        object : Task.Backgroundable(project, message("update.widgetMap.in.scope"), true) {
             override fun run(indicator: ProgressIndicator) {
                 updateScope(scope, project, IdeaProgress(indicator))
             }

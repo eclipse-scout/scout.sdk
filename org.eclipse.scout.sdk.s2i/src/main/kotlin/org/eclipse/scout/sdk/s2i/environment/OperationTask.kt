@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,6 @@
 package org.eclipse.scout.sdk.s2i.environment
 
 import com.intellij.openapi.progress.EmptyProgressIndicator
-import com.intellij.openapi.progress.PerformInBackgroundOption
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
@@ -25,7 +24,7 @@ import org.eclipse.scout.sdk.s2i.toScoutProgress
 import java.util.concurrent.TimeUnit
 
 open class OperationTask(title: String, project: Project, private val m_transactionManager: TransactionManager? = null, private val m_task: (IdeaProgress) -> Unit) :
-    Task.Backgroundable(project, title, true, PerformInBackgroundOption.ALWAYS_BACKGROUND) {
+    Task.Backgroundable(project, title, true) {
 
     private val m_progress = FinalValue<ProgressIndicator>()
     private val m_listeners = EventListenerList()
@@ -53,8 +52,8 @@ open class OperationTask(title: String, project: Project, private val m_transact
     }
 
     fun cancel(): Boolean = m_progress.opt()
-            .map { it.cancel(); true; }
-            .orElse(false)
+        .map { it.cancel(); true; }
+        .orElse(false)
 
     fun schedule() = schedule<Unit>()
 
