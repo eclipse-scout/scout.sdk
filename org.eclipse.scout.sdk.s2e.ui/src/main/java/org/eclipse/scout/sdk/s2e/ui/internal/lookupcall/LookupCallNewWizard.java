@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -62,8 +62,8 @@ public class LookupCallNewWizard extends AbstractWizard implements INewWizard {
     var serverSourceFolder = m_page1.getServerSourceFolder();
     if (JdtUtils.exists(serverSourceFolder)) {
       op.setServerSourceFolder(input.environment().toScoutSourceFolder(serverSourceFolder));
+      op.setLookupServiceSuperType(m_page1.getServiceImplSuperType().getFullyQualifiedName());
     }
-    op.setLookupServiceSuperType(m_page1.getServiceImplSuperType().getFullyQualifiedName());
 
     IJavaProject testProject;
     if (op.getTestSourceFolder() == null) {
