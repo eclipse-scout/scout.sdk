@@ -22,14 +22,14 @@
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java.ecj" />
     <orderEntry type="library" name="Maven: org.eclipse.jdt:ecj:3.36.0" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.10.1" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.10.2" level="project" />
     <orderEntry type="library" name="Maven: org.opentest4j:opentest4j:1.3.0" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-commons:1.10.1" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-commons:1.10.2" level="project" />
     <orderEntry type="library" name="Maven: org.apiguardian:apiguardian-api:1.1.2" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-launcher:1.10.1" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-engine:1.10.1" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.10.1" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-params:5.10.1" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-launcher:1.10.2" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-engine:1.10.2" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.10.2" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-params:5.10.2" level="project" />
     <orderEntry type="library" name="Maven: org.mockito:mockito-core:5.10.0" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy:1.14.11" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy-agent:1.14.11" level="project" />
@@ -58,7 +58,7 @@
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-sec-dispatcher:2.0" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-cipher:2.0" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.plexus:plexus-interpolation:1.26" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.11" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.12" level="project" />
     <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.5.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.12.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven:maven-compat:3.9.5" level="project" />
@@ -74,7 +74,7 @@
     <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-http:3.5.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.wagon:wagon-http-shared:3.5.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.14" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:2.0.11" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:jcl-over-slf4j:2.0.12" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-transport-file:1.9.16" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-spi:1.9.16" level="project" />
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-transport-http:1.9.16" level="project" />
@@ -83,27 +83,27 @@
     <orderEntry type="library" name="Maven: org.apache.maven.resolver:maven-resolver-transport-wagon:1.9.16" level="project" />
     <orderEntry type="library" name="Maven: jakarta.inject:jakarta.inject-api:1.0.5" level="project" />
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.16.0" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:2.0.11" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-simple:2.0.12" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-compress:1.25.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html.test:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client.test:24.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html.test:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client.test:24.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-math3:3.6.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html:sources:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.commons:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.json:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:sources:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:24.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.ui.html:sources:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.commons:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.client:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.json:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared:sources:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:24.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: io.smallrye:jandex:3.1.6" level="project" />
     <orderEntry type="library" name="Maven: jakarta.annotation:jakarta.annotation-api:2.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
     <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-api:1.34.1" level="project" />
     <orderEntry type="library" name="Maven: io.opentelemetry:opentelemetry-context:1.34.1" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.security:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.api.data:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.nls:24.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.security:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.api.data:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.nls:24.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: com.google.http-client:google-http-client:1.43.3" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
     <orderEntry type="library" name="Maven: com.google.errorprone:error_prone_annotations:2.23.0" level="project" />
@@ -114,30 +114,30 @@
     <orderEntry type="library" name="Maven: org.apache.httpcomponents.client5:httpclient5:5.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents.core5:httpcore5:5.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents.core5:httpcore5-h2:5.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.security:sources:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.test:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.mom.api:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.uinotification:24.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.security:sources:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.test:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.mom.api:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.uinotification:24.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: jakarta.servlet:jakarta.servlet-api:5.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared.test:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform.test:24.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared.test:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform.test:24.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.13.2" level="project" />
     <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject.test:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.jaxws:24.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject.test:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.jaxws:24.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: jakarta.xml.ws:jakarta.xml.ws-api:3.0.1" level="project" />
     <orderEntry type="library" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:3.0.1" level="project" />
     <orderEntry type="library" name="Maven: jakarta.xml.soap:jakarta.xml.soap-api:2.0.1" level="project" />
     <orderEntry type="library" name="Maven: com.sun.activation:jakarta.activation:2.0.1" level="project" />
     <orderEntry type="library" name="Maven: jakarta.jws:jakarta.jws-api:3.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.ui.html:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.client:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.shared:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.client:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.shared:24.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.nls:sources:24.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.ui.html:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.client:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.shared:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.client:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.datamodel.shared:24.2-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.nls:sources:24.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: javax.annotation:javax.annotation-api:1.3.2" level="project" />
   </component>
 </module>

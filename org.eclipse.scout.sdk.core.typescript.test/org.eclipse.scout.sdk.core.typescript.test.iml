@@ -14,14 +14,14 @@
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.typescript" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.test" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.10.1" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-api:5.10.2" level="project" />
     <orderEntry type="library" name="Maven: org.opentest4j:opentest4j:1.3.0" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-commons:1.10.1" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-commons:1.10.2" level="project" />
     <orderEntry type="library" name="Maven: org.apiguardian:apiguardian-api:1.1.2" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-launcher:1.10.1" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-engine:1.10.1" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.10.1" level="project" />
-    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-params:5.10.1" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-launcher:1.10.2" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.platform:junit-platform-engine:1.10.2" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.10.2" level="project" />
+    <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-params:5.10.2" level="project" />
     <orderEntry type="library" name="Maven: org.mockito:mockito-core:5.10.0" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy:1.14.11" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy-agent:1.14.11" level="project" />

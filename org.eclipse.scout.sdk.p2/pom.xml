@@ -35,7 +35,7 @@
     <eclipse_gerrit_username/>
     <scout.base.version>13.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
-    <org.eclipse.scout.rt_version>24.1-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>24.2-SNAPSHOT</org.eclipse.scout.rt_version>
   </properties>
 
   <dependencyManagement>
@@ -59,7 +59,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-nop</artifactId>
-      <version>2.0.11</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk.s2e</groupId>

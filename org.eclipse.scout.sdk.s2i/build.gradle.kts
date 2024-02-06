@@ -19,14 +19,14 @@ val scoutSdkVersion = "13.0.0-SNAPSHOT"
 val scoutSdkPluginVersion = "13.0.0.".plus(timestamp())
 
 val javaVersion = JavaVersion.VERSION_17
-val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "24.1-SNAPSHOT")
+val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "24.2-SNAPSHOT")
 val intellijVersion = projectPropertyOr("intellij_version", "IU-2022.2.3") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
 
 plugins {
     id("java")
     id("maven-publish")
     id("idea")
-    id("org.jetbrains.intellij") version "1.17.0"
+    id("org.jetbrains.intellij") version "1.17.1"
     kotlin("jvm") version "1.7.22"
     id("net.linguica.maven-settings") version "0.5" // for maven settings
 }
