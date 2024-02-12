@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,6 +14,7 @@ import com.intellij.openapi.ui.ValidationInfo
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.Translation
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator
+import org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateDefaultText
 import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
@@ -25,6 +26,10 @@ class TranslationNewDialog(project: Project, val store: ITranslationStore, manag
 
     init {
         title = EclipseScoutBundle.message("create.new.translation.in.x", store.service().type().elementName())
+    }
+
+    override fun validateDefaultTextField(key: String, defaultLanguageText: String): ValidationInfo? {
+        return toValidationInfo(validateDefaultText(defaultLanguageText, key, translationManager, store))
     }
 
     override fun doSave(result: Translation) {

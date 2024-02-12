@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,7 +33,7 @@ public final class TranslationInputValidator {
   }
 
   public static IStatus validateDefaultTranslation(CharSequence defaultTranslation) {
-    return toStatus(validateDefaultText(defaultTranslation, null));
+    return toStatus(validateDefaultText(defaultTranslation, null, null));
   }
 
   public static IStatus validateNlsKey(TranslationManager manager, ITranslationStore target, String key) {

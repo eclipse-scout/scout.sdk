@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,23 +40,76 @@ public final class TranslationValidator {
   /**
    * Checks if the given {@link ITranslation} contains a valid value for the default language.
    *
-   * @param newText
-   *          The new text for the default language
-   * @param current
-   *          An optional currently existing {@link IStackedTranslation}. If provided it is used to detect if there is
-   *          another store with higher order available that provides a default language text. In that case it is
-   *          accepted that the current value is empty.
+   * @param newTranslation
+   *          The {@link ITranslation} to validate. Must not be {@code null}.
+   * @param existing
+   *          An optional currently existing {@link IStackedTranslation} to which the given translation belongs. If
+   *          provided it is used to detect if there is another store with higher order available, that already provides
+   *          a default language text. In that case it is accepted that the current value is empty.
+   * @param target
+   *          An optional target store in which the default text would be saved. Used to detect, if there is another
+   *          store with higher order available, that already provides a default language text. In that case it is
+   *          accepted that the current value is empty. May be {@code null}. Then the
+   *          {@link IStackedTranslation#primaryEditableStore()} is used. Requires an existing
+   *          {@link IStackedTranslation} to be passed (former parameter).
    * @return {@link #DEFAULT_TRANSLATION_MISSING_ERROR} if there is no default language or
    *         {@link #TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING} if there is an inherited one that will become
    *         active or {@link #OK}.
    */
-  public static int validateDefaultText(CharSequence newText, IStackedTranslation current) {
-    if (Strings.hasText(newText)) {
+  public static int validateDefaultText(ITranslation newTranslation, IStackedTranslation existing, ITranslationStore target) {
+    var defaultLangText = newTranslation.text(Language.LANGUAGE_DEFAULT).orElse(null);
+    return validateDefaultText(defaultLangText, existing, target);
+  }
+
+  /**
+   * Checks if the given text contains a valid value for the default language.
+   * 
+   * @param newDefaultText
+   *          The new text for the default language
+   * @param key
+   *          The key of the translation to which the new default text belongs
+   * @param manager
+   *          The {@link TranslationManager} to use for the validation. Must not be {@code null}.
+   * @param target
+   *          An optional target store in which the default text would be saved. Used to detect, if there is another
+   *          store with higher order available, that already provides a default language text. In that case it is
+   *          accepted that the current value is empty. May be {@code null}. Then the
+   *          {@link IStackedTranslation#primaryEditableStore()} is used.
+   * @return {@link #DEFAULT_TRANSLATION_MISSING_ERROR} if there is no default language or
+   *         {@link #TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING} if there is an inherited one that will become
+   *         active or {@link #OK}.
+   */
+  public static int validateDefaultText(CharSequence newDefaultText, String key, TranslationManager manager, ITranslationStore target) {
+    var translation = manager.translation(key).orElse(null);
+    return validateDefaultText(newDefaultText, translation, target);
+  }
+
+  /**
+   * Checks if the given text contains a valid value for the default language.
+   *
+   * @param newDefaultText
+   *          The new text for the default language
+   * @param existing
+   *          An optional currently existing {@link IStackedTranslation} to which the new default text belongs. If
+   *          provided it is used to detect if there is another store with higher order available, that already provides
+   *          a default language text. In that case it is accepted that the current value is empty.
+   * @param target
+   *          An optional target store in which the default text would be saved. Used to detect, if there is another
+   *          store with higher order available, that already provides a default language text. In that case it is
+   *          accepted that the current value is empty. May be {@code null}. Then the
+   *          {@link IStackedTranslation#primaryEditableStore()} is used. Requires an existing
+   *          {@link IStackedTranslation} to be passed (former parameter).
+   * @return {@link #DEFAULT_TRANSLATION_MISSING_ERROR} if there is no default language or
+   *         {@link #TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING} if there is an inherited one that will become
+   *         active or {@link #OK}.
+   */
+  public static int validateDefaultText(CharSequence newDefaultText, IStackedTranslation existing, ITranslationStore target) {
+    if (Strings.hasText(newDefaultText)) {
       return OK; // if there is a new text it is always ok
     }
 
     // if the new text is empty its only allowed if there is another store providing a default text
-    if (isOverriding(current, Language.LANGUAGE_DEFAULT)) {
+    if (isOverriding(existing, Language.LANGUAGE_DEFAULT, target)) {
       return TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING;
     }
     return DEFAULT_TRANSLATION_MISSING_ERROR;
@@ -79,20 +132,21 @@ public final class TranslationValidator {
       return OK; // if there is a new text it is always ok
     }
 
-    if (isOverriding(current, language)) {
+    if (isOverriding(current, language, null)) {
       return TEXT_INHERITED_BECOMES_ACTIVE_IF_REMOVED_WARNING;
     }
     return OK;
   }
 
-  private static boolean isOverriding(IStackedTranslation current, Language language) {
+  private static boolean isOverriding(IStackedTranslation current, Language language, ITranslationStore target) {
     if (current == null || language == null) {
       return false;
     }
-    return current.entry(language)
-        .map(ITranslationEntry::store)
-        .filter(s -> current.isOverriding(language, s))
-        .isPresent();
+    var targetStore = target;
+    if (targetStore == null) {
+      targetStore = current.primaryEditableStore().orElseThrow();
+    }
+    return current.isOverriding(language, targetStore);
   }
 
   /**
@@ -168,8 +222,16 @@ public final class TranslationValidator {
       return OK;
     }
 
+    if (target == null) {
+      return OK; // no more validation possible without target store
+    }
+
     if (target.containsKey(keyToValidate)) {
       return KEY_ALREADY_EXISTS_ERROR;
+    }
+
+    if (manager == null) {
+      return OK; // no more validation possible without manager
     }
 
     var hasStoresWithKeyOverridden = manager.allStores()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -70,6 +70,7 @@ public final class TranslationTestsHelper {
     when(mock.languages()).thenAnswer(invocation -> allEntries.stream().flatMap(ITranslation::languages).distinct());
     when(mock.service()).thenReturn(svc);
     when(mock.entries()).then(invocation -> allEntries.stream());
+    when(mock.containsLanguage(any(Language.class))).then(invocation -> allEntries.stream().anyMatch(t -> t.texts().containsKey(invocation.getArgument(0, Language.class))));
 
     if (isEditable) {
       var editableStore = (IEditableTranslationStore) mock;

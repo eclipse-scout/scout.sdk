@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -75,6 +75,9 @@ public class StackedTranslation extends Translation implements IStackedTranslati
 
   @Override
   public boolean isOverriding(Language language, ITranslationStore store) {
+    if (language == null || store == null) {
+      return false;
+    }
     if (!store.containsLanguage(language)) {
       return false;
     }

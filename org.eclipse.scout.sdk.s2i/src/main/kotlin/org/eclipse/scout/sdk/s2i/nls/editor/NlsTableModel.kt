@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -171,7 +171,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
                 .max().orElse(OK)
         }
         if (columnIndex == DEFAULT_LANGUAGE_COLUMN_INDEX) {
-            return validateDefaultText(newCellValue, selectedTranslation)
+            return validateDefaultText(newCellValue, selectedTranslation, null)
         }
         val selectedLanguage = languageForColumn(columnIndex)
         return validateText(newCellValue, selectedTranslation, selectedLanguage)

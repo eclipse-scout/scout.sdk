@@ -19,6 +19,7 @@ import com.intellij.ui.JBColor
 import com.intellij.ui.components.*
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.nls.Language
 import org.eclipse.scout.sdk.core.s.nls.Translation
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator.*
@@ -162,16 +163,18 @@ abstract class AbstractTranslationDialog(val project: Project, val languages: Co
             }
         }
         keyTextField()
-                .takeIf { it.isEnabled }
-                ?.document
-                ?.addDocumentListener(triggerValidation)
+            .takeIf { it.isEnabled }
+            ?.document
+            ?.addDocumentListener(triggerValidation)
         m_languageTextFields.values
-                .filter { it.isEnabled }
-                .forEach { it.document.addDocumentListener(triggerValidation) }
+            .filter { it.isEnabled }
+            .forEach { it.document.addDocumentListener(triggerValidation) }
     }
 
     protected open fun validateValues(): MutableList<ValidationInfo?> {
-        return mutableListOf(validateDefaultTextField())
+        val defaultText = defaultLanguageTextField().text
+        val key = keyTextField().text
+        return mutableListOf(validateDefaultTextField(key, defaultText))
     }
 
     private fun setErrorStatus(infos: List<ValidationInfo>) {
@@ -195,7 +198,7 @@ abstract class AbstractTranslationDialog(val project: Project, val languages: Co
     }
 
     private fun validationInfoToHtml(info: ValidationInfo): String {
-        val color = htmlColorString(if (info.warning) MessageType.WARNING.borderColor else UIUtil.getErrorForeground())
+        val color = htmlColorString(if (info.warning) MessageType.WARNING.titleForeground else UIUtil.getErrorForeground())
         val message = Strings.escapeHtml(info.message)
         return "<font color=\"${color}\">$message</font>"
     }
@@ -210,10 +213,7 @@ abstract class AbstractTranslationDialog(val project: Project, val languages: Co
                 if (blue.length == 1) "0$blue" else blue
     }
 
-    protected open fun validateDefaultTextField(): ValidationInfo? {
-        val defaultText = defaultLanguageTextField().text
-        return toValidationInfo(validateDefaultText(defaultText, translationManager.translation(keyTextField().text).orElse(null)))
-    }
+    protected abstract fun validateDefaultTextField(key: String, defaultLanguageText: String): ValidationInfo?
 
     protected open fun toValidationInfo(errorCode: Int): ValidationInfo? {
         val info = when (errorCode) {
@@ -245,8 +245,8 @@ abstract class AbstractTranslationDialog(val project: Project, val languages: Co
         val key = keyTextField().text
         val result = Translation(key)
         m_languageTextFields.entries
-                .filter { Strings.hasText(it.value.text) }
-                .forEach { result.putText(it.key, it.value.text) }
+            .filter { Strings.hasText(it.value.text) }
+            .forEach { result.putText(it.key, it.value.text) }
         return result
     }
 
@@ -254,12 +254,16 @@ abstract class AbstractTranslationDialog(val project: Project, val languages: Co
         if (!okAction.isEnabled) {
             return
         }
-        val translation = resultingTranslation()
-        doSave(translation)
-        if (m_copyToClipboardField?.isSelected == true) {
-            CoreUtils.setTextToClipboard(translation.key())
+        try {
+            val translation = resultingTranslation()
+            doSave(translation)
+            if (m_copyToClipboardField?.isSelected == true) {
+                CoreUtils.setTextToClipboard(translation.key())
+            }
+            close(OK_EXIT_CODE)
+        } catch (e: Exception) {
+            SdkLog.warning("Unable to save translation with key '{}'.", keyTextField().text, e)
         }
-        close(OK_EXIT_CODE)
     }
 
     protected abstract fun doSave(result: Translation)

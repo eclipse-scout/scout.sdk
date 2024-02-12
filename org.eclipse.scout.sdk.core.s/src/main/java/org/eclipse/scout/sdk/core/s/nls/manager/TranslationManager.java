@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,6 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.isForbidden;
-import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateDefaultText;
 import static org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateKey;
 import static org.eclipse.scout.sdk.core.s.nls.manager.TranslationManagerEvent.createAddLanguageEvent;
 import static org.eclipse.scout.sdk.core.s.nls.manager.TranslationManagerEvent.createAddTranslationEvent;
@@ -57,6 +56,7 @@ import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.s.nls.TextProviderService;
 import org.eclipse.scout.sdk.core.s.nls.Translation;
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreComparator;
+import org.eclipse.scout.sdk.core.s.nls.TranslationValidator;
 import org.eclipse.scout.sdk.core.s.nls.Translations;
 import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope;
 import org.eclipse.scout.sdk.core.util.Ensure;
@@ -496,15 +496,12 @@ public class TranslationManager {
     return setTranslationInternal(newTranslation, target, true);
   }
 
-  public IStackedTranslation setTranslationInternal(ITranslation newTranslation, ITranslationStore targetStore, boolean enforceTargetStore) {
+  protected IStackedTranslation setTranslationInternal(ITranslation newTranslation, ITranslationStore targetStore, boolean enforceTargetStore) {
     Ensure.notNull(newTranslation, "A translation must be specified.");
     Ensure.isTrue(targetStore == null || m_stores.contains(targetStore), "Store of wrong manager.");
-    Ensure.isFalse(isForbidden(validateKey(newTranslation.key())), "Invalid key");
+    Ensure.isFalse(isForbidden(validateKey(newTranslation.key())), "Invalid key.");
 
     var existingEntry = m_translations.get(newTranslation.key());
-    Ensure.isFalse(isForbidden(validateDefaultText(newTranslation.text(Language.LANGUAGE_DEFAULT).orElse(null), existingEntry)),
-        "Translation validation failed. Ensure a valid key and default text is available.");
-
     if (existingEntry == null || enforceTargetStore) {
       // writes the translation to the store given (or the default editable)
       return setTranslationToSpecificStore(newTranslation, existingEntry, targetStore);
@@ -516,8 +513,8 @@ public class TranslationManager {
   }
 
   protected IStackedTranslation setTranslationToSpecificStore(ITranslation newTranslation, StackedTranslation existingEntry, ITranslationStore target) {
-    var editableStore = toEditableStore(Optional.ofNullable(target).orElseGet(() -> primaryEditableStore()
-        .orElseThrow(() -> newFail("Cannot create new entries. All translation stores are read-only."))));
+    var editableStore = findStoreForTranslation(target, existingEntry);
+    validateDefaultText(newTranslation, existingEntry, editableStore);
     var result = new FinalValue<IStackedTranslation>();
     runAndFireChanged(() -> {
       var createdTranslation = editStoreObservingLanguages(editableStore, s -> s.setTranslation(newTranslation));
@@ -536,12 +533,20 @@ public class TranslationManager {
     return result.get();
   }
 
+  protected IEditableTranslationStore findStoreForTranslation(ITranslationStore explicit, IStackedTranslation toComputeDefaultStore) {
+    return toEditableStore(
+        Optional.ofNullable(explicit)
+            .or(() -> Optional.ofNullable(toComputeDefaultStore).flatMap(IStackedTranslation::primaryEditableStore))
+            .or(this::primaryEditableStore)
+            .orElseThrow(() -> newFail("Cannot write entries. All translation stores are read-only.")));
+  }
+
+  protected static void validateDefaultText(ITranslation newTranslation, IStackedTranslation existing, ITranslationStore target) {
+    Ensure.isFalse(isForbidden(TranslationValidator.validateDefaultText(newTranslation, existing, target)), "Translation validation failed. Ensure a valid default text is available.");
+  }
+
   protected TranslationManagerEvent setTranslationToCurrentStores(ITranslation newTranslation, StackedTranslation entryToUpdate, ITranslationStore storeForNewLanguages) {
-    var storeForNew = Optional.ofNullable(storeForNewLanguages)
-        .or(entryToUpdate::primaryEditableStore)
-        .or(this::primaryEditableStore)
-        .map(TranslationManager::toEditableStore)
-        .orElseThrow();
+    var storeForNew = findStoreForTranslation(storeForNewLanguages, entryToUpdate);
     var changedLanguagesByStore = changedLanguages(newTranslation, entryToUpdate)
         .collect(groupingBy(changedLang -> entryToUpdate.entry(changedLang)
             .map(ITranslationEntry::store)
@@ -549,12 +554,15 @@ public class TranslationManager {
             .map(TranslationManager::toEditableStore)
             .orElse(storeForNew)));
     changedLanguagesByStore.entrySet().stream()
-        .map(e -> writeTranslationToStore(e.getKey(), e.getValue(), newTranslation))
+        .map(e -> writeTranslationToStore(e.getKey(), e.getValue(), newTranslation, entryToUpdate))
         .forEach(entryToUpdate::entryUpdated);
     return createUpdateTranslationEvent(this, entryToUpdate);
   }
 
-  protected ITranslationEntry writeTranslationToStore(IEditableTranslationStore store, Iterable<Language> languagesToUpdate, ITranslation newTranslation) {
+  protected ITranslationEntry writeTranslationToStore(IEditableTranslationStore store, Collection<Language> languagesToUpdate, ITranslation newTranslation, IStackedTranslation entryToUpdate) {
+    if (languagesToUpdate.contains(Language.LANGUAGE_DEFAULT)) {
+      validateDefaultText(newTranslation, entryToUpdate, store);
+    }
     var key = newTranslation.key();
     var updateForStore = store.get(key)
         .map(Translation::new)
