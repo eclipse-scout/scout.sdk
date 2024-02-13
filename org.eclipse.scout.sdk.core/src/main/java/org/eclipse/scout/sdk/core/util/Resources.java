@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -199,8 +199,8 @@ public final class Resources {
         .uri(uri)
         .version(Version.HTTP_2)
         .timeout(timeout)
-        .setHeader(HEADER_PRAGMA, "no-cache") // HTTP/1.0
-        .setHeader(HEADER_CACHE_CONTROL, "no-cache, no-store, must-revalidate") // HTTP/1.1
+        .setHeader(HEADER_PRAGMA, "no-cache")
+        .setHeader(HEADER_CACHE_CONTROL, "no-cache, max-age=0, must-revalidate")
         .setHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP) // support gzip compression
         .GET()
         .build();
