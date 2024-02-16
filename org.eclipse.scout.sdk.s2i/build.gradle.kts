@@ -70,7 +70,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.5", "IU-2023.2.5", "IU-2023.3.3", "IU-2024.1"))
+        ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.5", "IU-2023.2.5", "IU-2023.3.4", "IU-2024.1"))
         subsystemsToCheck.set("without-android")
         failureLevel.set(FailureLevel.ALL)
     }
