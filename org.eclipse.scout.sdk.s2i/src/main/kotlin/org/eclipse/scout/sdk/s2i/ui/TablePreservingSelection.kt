@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.ui
 
-import com.intellij.ui.table.JBTable
+import javax.swing.JTable
 import javax.swing.JViewport
 import javax.swing.RowSorter
 import javax.swing.SortOrder
@@ -18,9 +18,9 @@ import javax.swing.table.TableColumn
 import javax.swing.table.TableModel
 
 /**
- * A [JBTable] which tries to preserve selection, column width and sort order when the table data or structure changes.
+ * A [JTable] which tries to preserve selection, column width and sort order when the table data or structure changes.
  */
-open class TablePreservingSelection(model: TableModel, private val m_indexToRowMapper: (Int) -> Any, private val m_rowToIndexMapper: (Any) -> Int) : JBTable(model) {
+open class TablePreservingSelection(model: TableModel, private val m_indexToRowMapper: (Int) -> Any, private val m_rowToIndexMapper: (Any) -> Int) : JTable(model) {
 
     private var m_selectionListenerArmed = true
     private val m_selectedRows = ArrayList<Any>()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -91,7 +91,6 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
         m_table.rowSelectionAllowed = true
         m_table.columnSelectionAllowed = false
         m_table.cellSelectionEnabled = true
-        m_table.setEnableAntialiasing(true)
         m_table.putClientProperty("terminateEditOnFocusLost", true)
         m_table.setShowGrid(true)
         m_table.gridColor = JBColor.border()
