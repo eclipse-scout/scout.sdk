@@ -11,7 +11,7 @@
 <feature
     id="org.eclipse.scout.sdk-feature"
     label="%featureName"
-    version="13.0.0.qualifier"
+    version="13.0.30"
     provider-name="%providerName"
     plugin="org.eclipse.scout.sdk.s2e"
     license-feature="org.eclipse.license"
