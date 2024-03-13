@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.maven
 
+import com.intellij.openapi.application.AccessToken
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
@@ -18,7 +19,7 @@ import org.apache.commons.lang3.ClassUtils
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.jetbrains.idea.maven.project.MavenProjectsManager
-import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.Method
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KFunction
@@ -38,9 +39,10 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
 
         // add listener to automatically schedule a sources download when necessary (is not done automatically on IJ >= 2023.2)
         val downloadArtifactsFun = getDownloadArtifactsFun()
+        val resetThreadContextFunction = getResetThreadContextFunction()
         if (downloadArtifactsFun != null) {
             val disposable = EclipseScoutBundle.derivedResourceManager(project) // project level service: remove listener on service (=project) disposal
-            manager.addManagerListener(MavenManagerListener(manager, downloadArtifactsFun), disposable)
+            manager.addManagerListener(MavenManagerListener(manager, downloadArtifactsFun, resetThreadContextFunction), disposable)
         }
     }
 
@@ -57,7 +59,19 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
         }
     }
 
-    private class MavenManagerListener(private val m_manager: MavenProjectsManager, private val m_downloadArtifactsFun: KFunction<*>) : MavenProjectsManager.Listener {
+    // can be removed as soon as IJ 2023.2 is the latest supported version. Use code from DownloadAllSourcesAndDocsAction as replacement
+    private fun getResetThreadContextFunction(): Method? {
+        return try {
+            ClassUtils.getClass(this::class.java.classLoader, "com.intellij.concurrency.ThreadContext", true)
+                .declaredMethods
+                .find { it.name == "resetThreadContext" }
+        } catch (e: Throwable) {
+            SdkLog.debug("Could not find ThreadContext. Skipping Maven sources auto download.", e)
+            null
+        }
+    }
+
+    private class MavenManagerListener(private val m_manager: MavenProjectsManager, private val m_downloadArtifactsFun: KFunction<*>, private val m_resetThreadContextFunction: Method?) : MavenProjectsManager.Listener {
 
         private var m_future: Future<*>? = null
 
@@ -78,9 +92,16 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
             if (!m_manager.hasProjects()) return
             runAsync {
                 try {
-                    m_downloadArtifactsFun.callSuspend(m_manager, *arrayOf(m_manager.projects, null, true, false))
-                } catch (e: InvocationTargetException) {
-                    throw e.targetException
+                    val accessToken = m_resetThreadContextFunction?.invoke(null) as AccessToken?
+                    if (accessToken != null) {
+                        accessToken.use {
+                            m_downloadArtifactsFun.callSuspend(m_manager, *arrayOf(m_manager.projects, null, true, false))
+                        }
+                    } else {
+                        m_downloadArtifactsFun.callSuspend(m_manager, *arrayOf(m_manager.projects, null, true, false))
+                    }
+                } catch (e: Throwable) {
+                    SdkLog.info("Error downloading Maven sources.", e)
                 }
             }
         }
@@ -100,7 +121,7 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
                         SdkLog.info("Error downloading Maven sources.", e)
                     }
                 }
-            }, 5, TimeUnit.SECONDS)
+            }, 8, TimeUnit.SECONDS)
         }
     }
 }

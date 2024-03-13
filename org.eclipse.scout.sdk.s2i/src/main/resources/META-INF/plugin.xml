@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2024 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -154,7 +154,7 @@
   </extensions>
 
   <actions>
-    <group id="org.eclipse.scout.sdk.s2i.ScoutMenu" text="Scout">
+    <group id="org.eclipse.scout.sdk.s2i.ScoutMenu" popup="true" text="Scout">
       <add-to-group group-id="MainMenu" relative-to-action="ToolsMenu" anchor="after"/>
       <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu"
               class="org.eclipse.scout.sdk.s2i.derived.UpdateAllDerivedResourcesMenu"/>
@@ -165,7 +165,6 @@
               class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInFileMenu">
         <keyboard-shortcut keymap="$default" first-keystroke="control alt shift O"/>
       </action>
-
     </group>
 
     <group id="org.eclipse.scout.sdk.s2i.ScoutElementActionGroup"
