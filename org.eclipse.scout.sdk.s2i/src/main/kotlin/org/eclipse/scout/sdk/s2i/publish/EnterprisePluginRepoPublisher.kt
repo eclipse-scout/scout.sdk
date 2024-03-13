@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.Node
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
+import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.*
 import java.util.*
@@ -73,7 +74,7 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         }
 
         fun printUsage() {
-            val pathSep = System.getProperty("path.separator")
+            val pathSep = File.pathSeparator
             println("usage:")
             println(
                 "java -cp blockmap-1.0.5.jar${pathSep}jackson-annotations-2.13.4.jar${pathSep}jackson-core-2.13.4.jar${pathSep}jackson-databind-2.13.4.2.jar${pathSep}" + // Blockmap Libs

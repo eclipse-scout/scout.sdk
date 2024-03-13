@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.scout.sdk.core.java.apidef.ApiVersion;
@@ -137,7 +136,7 @@ public final class ScoutFixtureHelper {
           .map(v -> resourcesPathWithPrefix + v)
           .map(folder -> withResourcesPrefix ? folder : Strings.removePrefix(folder, RESOURCES_PREFIX))
           .map(folder -> folder + "/")
-          .collect(Collectors.toList());
+          .toList();
     }
     catch (IOException e) {
       throw new SdkException(e);
