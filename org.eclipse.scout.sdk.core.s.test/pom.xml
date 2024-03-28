@@ -111,8 +111,8 @@
 
     <!-- To extract tar archives -->
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
     </dependency>
 
     <!-- Scout RT Dependencies to test against -->

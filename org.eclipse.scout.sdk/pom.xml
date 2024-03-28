@@ -876,9 +876,9 @@
         <version>1.9.16</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-compress</artifactId>
-        <version>1.26.1</version>
+        <groupId>org.apache.ant</groupId>
+        <artifactId>ant</artifactId>
+        <version>${master_plugin_ant_version}</version>
       </dependency>
       <dependency>
         <groupId>commons-codec</groupId>
@@ -959,11 +959,6 @@
 
       <!-- dependency convergence -->
       <!-- may be deleted and re-created as needed on other version updates -->
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>3.14.0</version>
-      </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>

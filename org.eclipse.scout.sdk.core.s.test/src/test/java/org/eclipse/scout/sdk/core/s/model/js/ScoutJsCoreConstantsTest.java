@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,8 +33,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.tools.tar.TarEntry;
+import org.apache.tools.tar.TarInputStream;
 import org.eclipse.scout.sdk.core.java.JavaUtils;
 import org.eclipse.scout.sdk.core.java.apidef.ApiVersion;
 import org.eclipse.scout.sdk.core.log.SdkLog;
@@ -225,8 +225,8 @@ public class ScoutJsCoreConstantsTest {
       return null; // module could not be found
     }
     var targetDir = m_tempDir.resolve(name).normalize();
-    try (var remote = Resources.httpGet(url); var gzip = new GZIPInputStream(remote); var tar = new TarArchiveInputStream(gzip)) {
-      TarArchiveEntry entry;
+    try (var remote = Resources.httpGet(url); var gzip = new GZIPInputStream(remote); var tar = new TarInputStream(gzip)) {
+      TarEntry entry;
       while ((entry = tar.getNextEntry()) != null) {
         var extractTo = targetDir.resolve(entry.getName()).normalize();
         if (!extractTo.startsWith(targetDir)) {
