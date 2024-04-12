@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,7 @@ import java.util.HashSet;
 
 import org.eclipse.scout.sdk.core.typescript.model.api.DataTypeNameEvaluator;
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
+import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 
 public class ES6ImportValidator implements IES6ImportValidator {
 
@@ -53,6 +54,9 @@ public class ES6ImportValidator implements IES6ImportValidator {
     }
     if (isBuiltInType(name)) {
       return name; // no import required
+    }
+    if (type instanceof IES6Class es6Class) {
+      type = es6Class.withoutTypeArguments();
     }
     var collector = importCollector();
     var usedNamesForSource = collector.usedNames();

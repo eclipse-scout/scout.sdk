@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -205,7 +205,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
 
     internal fun resolveExportTarget(element: PsiElement): List<JSElement> {
         var candidate: JSElement? = element as? JSElement
-        if (element.node.elementType == JSTokenTypes.EXPORT_KEYWORD) {
+        if (element.node?.elementType == JSTokenTypes.EXPORT_KEYWORD) {
             candidate = element.parent as? JSElement
         }
         if (candidate is JSAttributeList) {

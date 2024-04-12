@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.s2i.model.typescript
 
 import com.intellij.lang.javascript.psi.*
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptAsExpression
+import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeArgumentList
 import com.intellij.lang.javascript.psi.util.ExpressionUtil
 import org.eclipse.scout.sdk.core.typescript.model.api.IConstantValue
 import org.eclipse.scout.sdk.core.typescript.model.api.IDataType
@@ -21,6 +22,7 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.nio.file.Path
@@ -38,13 +40,31 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
     private val m_dataType = FinalValue<IDataType?>()
 
     fun unwrappedElement() = m_unwrappedElement.computeIfAbsentAndGet {
-        val unwrappedElement = unwrapTypeScriptAsExpression(element)
+        var unwrappedElement = unwrapJSParenthesizedExpression(element)
+        unwrappedElement = unwrapTypeScriptAsExpression(unwrappedElement)
+        unwrappedElement = unwrapTypeScriptExpressionWithTypeArguments(unwrappedElement)
         unwrapJSNewExpression(unwrappedElement)
     }
 
     override fun containingFile(): Optional<Path> = m_containingFile.computeIfAbsentAndGet { Optional.ofNullable(element?.containingFile?.virtualFile?.resolveLocalPath()) }
 
+    protected fun unwrapJSParenthesizedExpression(element: JSElement?) = if (element is JSParenthesizedExpression) element.innerExpression else element
+
     protected fun unwrapTypeScriptAsExpression(element: JSElement?) = if (element is TypeScriptAsExpression) element.expression else element
+
+    protected fun unwrapTypeScriptExpressionWithTypeArguments(element: JSElement?) = CompatibilityMethodCaller<JSElement?>()
+        .withCandidate("com.intellij.lang.javascript.psi.TypeScriptExpressionWithTypeArguments", "getExpression") {
+            // for IJ >= 2023.2 a JSReferenceExpression and its TypeScriptTypeArgumentList is wrapped in a TypeScriptExpressionWithTypeArguments => unwrap it and return its expression
+            if (it.descriptor.resolvedClass().isInstance(element)) {
+                return@withCandidate it.invoke(element)
+            }
+            element
+        }
+        .withCandidate("java.lang.Object", "toString") {
+            // for IJ < 2023.2 TypeScriptExpressionWithTypeArguments does not exists => no need to unwrap anything
+            element
+        }
+        .invoke() ?: element
 
     protected fun unwrapJSNewExpression(element: JSElement?) = if (element is JSNewExpression) element.methodExpression else element
 
@@ -52,7 +72,11 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
         (unwrappedElement() as? JSReferenceExpression)?.let { ideaModule.resolveReferencedElement(it) }
     }
 
-    fun referencedES6Class() = m_referencedES6Class.computeIfAbsentAndGet { referencedElement() as? ES6ClassSpi }
+    fun referencedES6Class() = m_referencedES6Class.computeIfAbsentAndGet {
+        val referencedClass = referencedElement() as? ES6ClassSpi ?: return@computeIfAbsentAndGet null
+        val typeArgumentList = unwrappedElement()?.nextSibling as? TypeScriptTypeArgumentList ?: return@computeIfAbsentAndGet referencedClass
+        DataTypeSpiUtils.resolveTypeArguments(referencedClass, typeArgumentList.typeArguments, ideaModule)
+    }
 
     fun referencedConstantValue() = m_referencedConstantValue.computeIfAbsentAndGet {
         referencedES6Class()?.let { return@computeIfAbsentAndGet null }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,6 +36,15 @@ export class SomeClass<TArg0, TArg1 extends Promise<string> | string, TArg2 exte
 
   myRefDef: WildcardClassAlias;
   myRefInfer = new WildcardClassAlias();
+
+  myRefGenericsNumberDef: Generics<number>;
+  myRefGenericsNumberInfer = new Generics<number>();
+
+  myRefGenericsBooleanDef: (Generics<boolean>);
+  myRefGenericsBooleanInfer = (new Generics<boolean>());
+
+  myRefGenericsStringDef: Generics;
+  myRefGenericsStringInfer = new Generics();
 
   myStaticStringRefInfer = SomeClass.myStaticStringDef;
   myEnumRefInfer = SomeClass.myEnumInfer.b;
@@ -80,3 +89,8 @@ type BC = {
   b: number;
   c: number;
 };
+
+// noinspection JSUnusedGlobalSymbols
+export class Generics<TType = string> {
+  prop?: TType;
+}
