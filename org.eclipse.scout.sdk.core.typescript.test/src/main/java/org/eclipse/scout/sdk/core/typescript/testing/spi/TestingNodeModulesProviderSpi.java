@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -460,7 +460,10 @@ public class TestingNodeModulesProviderSpi implements NodeModulesProviderSpi {
       return createTypeOf(typeOfElement, moduleSpi);
     }
 
-    return null;
+    return Strings.notBlank(typeArgumentElement.getTextContent())
+        .map(TestingNodeElementFactorySpi::newDataType)
+        .map(IDataType::spi)
+        .orElse(null);
   }
 
   @SuppressWarnings("TypeMayBeWeakened")

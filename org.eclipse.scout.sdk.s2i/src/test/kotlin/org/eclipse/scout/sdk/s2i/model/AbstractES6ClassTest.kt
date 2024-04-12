@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,7 +25,12 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
     }
 
     protected fun assertES6Class(es6Class: IES6Class) {
-        assertEquals(if (isAssignmentPossible()) 30 else 16, es6Class.fields().withoutModifier(Modifier.STATIC).stream().count())
+        val expectedFieldCount: Long = if (isAssignmentPossible()) {
+            if (isGenericsPossible()) 36 else 30
+        } else {
+            if (isGenericsPossible()) 19 else 16
+        }
+        assertEquals(expectedFieldCount, es6Class.fields().withoutModifier(Modifier.STATIC).stream().count())
 
         assertFieldDefAndInfer(myString(), es6Class)
         assertFieldDefAndInfer(myNumber(), es6Class)
@@ -35,6 +40,11 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
         assertFieldDefAndInfer(myObject(), es6Class)
         assertFieldDefAndInfer(myAny(), es6Class)
         assertFieldDefAndInfer(myRef(), es6Class)
+        if (isGenericsPossible()) {
+            assertFieldDefAndInfer(myRefGenericsNumber(), es6Class)
+            assertFieldDefAndInfer(myRefGenericsBoolean(), es6Class)
+            assertFieldDefAndInfer(myRefGenericsString(), es6Class)
+        }
         assertFieldDefAndInfer(myStringArray(), es6Class)
         assertFieldDefAndInfer(myNumberArray(), es6Class)
         assertFieldDef(myStringNumberUnion(), es6Class)
@@ -116,11 +126,29 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
         if (expectedDataType.isES6Class) {
             assertTrue(dataType is IES6Class)
         }
+
+        val remainingExpectedTypeArguments = expectedDataType.typeArguments.toMutableSet()
+        assertTrue(
+            dataType.typeArguments()
+                .map {
+                    remainingExpectedTypeArguments.removeIf { expectedTypeArgument ->
+                        try {
+                            assertDataType(expectedTypeArgument, it)
+                            true
+                        } catch (e: AssertionError) {
+                            false
+                        }
+                    }
+                }
+                .filter { !it }
+                .isEmpty())
     }
 
     protected open fun isAssignmentPossible() = true
 
     protected open fun isOptionalPossible() = true
+
+    protected open fun isGenericsPossible() = true
 
     protected open fun isInferPossible(field: ExpectedField) =
         when (field.dataType.flavor) {
@@ -179,6 +207,36 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
         "myRef",
         ExpectedDataType(
             "WildcardClass",
+            isES6Class = true
+        )
+    )
+
+    protected open fun myRefGenericsNumber() = ExpectedField(
+        "myRefGenericsNumber",
+        ExpectedDataType(
+            "Generics",
+            isES6Class = true,
+            typeArguments = setOf(
+                ExpectedDataType(TypeScriptTypes._number)
+            )
+        )
+    )
+
+    protected open fun myRefGenericsBoolean() = ExpectedField(
+        "myRefGenericsBoolean",
+        ExpectedDataType(
+            "Generics",
+            isES6Class = true,
+            typeArguments = setOf(
+                ExpectedDataType(TypeScriptTypes._boolean)
+            )
+        )
+    )
+
+    protected open fun myRefGenericsString() = ExpectedField(
+        "myRefGenericsString",
+        ExpectedDataType(
+            "Generics",
             isES6Class = true
         )
     )
@@ -356,6 +414,7 @@ abstract class AbstractES6ClassTest(val es6ClassName: String, fixturePath: Strin
     protected inner class ExpectedDataType(
         val name: String?,
         val isES6Class: Boolean = false,
+        val typeArguments: Set<ExpectedDataType> = emptySet(),
         val flavor: DataTypeFlavor = DataTypeFlavor.Single,
         val componentDataTypes: Set<ExpectedDataType> = emptySet(),
         val arrayDimension: Int = 0

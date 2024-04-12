@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 
 // @ts-expect-error
 import {WildcardClass as WildcardClassAlias, WildcardType} from '@eclipse-scout/sdk-export-ts';
+import {Generics} from './index';
 
 // noinspection JSUnusedGlobalSymbols
 export interface SomeInterface {
@@ -21,6 +22,9 @@ export interface SomeInterface {
   myObjectDef: object;
   myAnyDef?: any;
   myRefDef: WildcardClassAlias;
+  myRefGenericsNumberDef: Generics<number>;
+  myRefGenericsBooleanDef: (Generics<boolean>);
+  myRefGenericsStringDef: Generics;
   myStringArrayDef?: string[][];
   myNumberArrayDef: number[];
   myStringNumberUnionDef: string | number;

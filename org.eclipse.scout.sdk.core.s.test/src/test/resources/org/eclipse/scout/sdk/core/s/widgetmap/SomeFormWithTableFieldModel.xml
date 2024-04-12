@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2024 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -56,6 +56,29 @@
                                 <type>ES6Class</type>
                                 <value>
                                   <ref name="StringField" module="@eclipse-scout/core"></ref>
+                                </value>
+                              </constantValue>
+                            </property>
+                          </objectLiteral>
+                        </value>
+                      </constantValue>
+                      <constantValue>
+                        <type>ObjectLiteral</type>
+                        <value>
+                          <objectLiteral>
+                            <property name="id">
+                              <constantValue>
+                                <type>String</type>
+                                <value>TypeField</value>
+                              </constantValue>
+                            </property>
+                            <property name="objectType">
+                              <constantValue>
+                                <type>ES6Class</type>
+                                <value>
+                                  <ref name="SmartField" module="@eclipse-scout/core">
+                                    <typeArgument>number</typeArgument>
+                                  </ref>
                                 </value>
                               </constantValue>
                             </property>
@@ -252,14 +275,16 @@
                                                 <property name="id">
                                                   <constantValue>
                                                     <type>String</type>
-                                                    <value>TextColumn</value>
+                                                    <value>ObjectColumn</value>
                                                   </constantValue>
                                                 </property>
                                                 <property name="objectType">
                                                   <constantValue>
                                                     <type>ES6Class</type>
                                                     <value>
-                                                      <ref name="Column" module="@eclipse-scout/core"></ref>
+                                                      <ref name="Column" module="@eclipse-scout/core">
+                                                        <typeArgument>object</typeArgument>
+                                                      </ref>
                                                     </value>
                                                   </constantValue>
                                                 </property>
@@ -324,6 +349,13 @@
     </export>
     <export name="StringField">
       <class name="StringField">
+        <superClass>
+          <ref name="FormField" module="@eclipse-scout/core"></ref>
+        </superClass>
+      </class>
+    </export>
+    <export name="SmartField">
+      <class name="SmartField">
         <superClass>
           <ref name="FormField" module="@eclipse-scout/core"></ref>
         </superClass>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.core.s.widgetmap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,10 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.scout.sdk.core.typescript.TypeScriptTypes;
+import org.eclipse.scout.sdk.core.typescript.model.api.IDataType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class;
 import org.eclipse.scout.sdk.core.typescript.model.api.IFunction;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule;
 import org.eclipse.scout.sdk.core.typescript.testing.ExtendWithNodeModules;
+import org.eclipse.scout.sdk.core.typescript.testing.spi.TestingNodeElementFactorySpi;
 import org.junit.jupiter.api.Test;
 
 public class IdObjectTypeMapTest {
@@ -102,9 +106,18 @@ public class IdObjectTypeMapTest {
 
     var groupBoxObjectType = createObjectType("GroupBox", module);
     var stringFieldObjectType = createObjectType("StringField", module);
+    var smartFieldObjectType = createObjectType("SmartField", module);
+    var smartFieldNumberObjectType = createObjectType(module.nodeElementFactory()
+        .createClassWithTypeArguments(
+            smartFieldObjectType.es6Class(),
+            List.of(TestingNodeElementFactorySpi.newDataType(TypeScriptTypes._number))));
     var tableFieldObjectType = createObjectType("TableField", module);
     var menuObjectType = createObjectType("Menu", module);
     var columnObjectType = createObjectType("Column", module);
+    var columnObjectObjectType = createObjectType(module.nodeElementFactory()
+        .createClassWithTypeArguments(
+            columnObjectType.es6Class(),
+            List.of(TestingNodeElementFactorySpi.newDataType(TypeScriptTypes._object))));
     var numberColumnObjectType = createObjectType("NumberColumn", module);
 
     var someFormModel = module.export("SomeFormWithTableFieldModel")
@@ -123,6 +136,10 @@ public class IdObjectTypeMapTest {
     //          {
     //            id: 'TitleField',
     //            objectType: StringField
+    //          },
+    //          {
+    //            id: 'TypeField',
+    //            objectType: SmartField<number>
     //          },
     //          {
     //            id: 'SomeTableField',
@@ -160,8 +177,8 @@ public class IdObjectTypeMapTest {
     //              objectType: FancyTable,
     //              columns: [
     //                {
-    //                  id: 'TextColumn',
-    //                  objectType: Column
+    //                  id: 'ObjectColumn',
+    //                  objectType: Column<object>
     //                }
     //              ]
     //            }
@@ -172,8 +189,8 @@ public class IdObjectTypeMapTest {
 
     assertEquals("SomeFormWithTableFieldWidgetMap", widgetMap.name());
 
-    assertEquals(6, widgetMap.elements().size());
-    assertEquals(List.of("MainBox", "TitleField", "SomeTableField", "SomeTable", "FancyTableField", "Table"), widgetMap.elements().keySet().stream().toList());
+    assertEquals(7, widgetMap.elements().size());
+    assertEquals(List.of("MainBox", "TitleField", "TypeField", "SomeTableField", "SomeTable", "FancyTableField", "Table"), widgetMap.elements().keySet().stream().toList());
 
     assertEquals(1, widgetMap.idObjectTypeMapReferences().size());
 
@@ -184,6 +201,10 @@ public class IdObjectTypeMapTest {
     var titleField = widgetMap.elements().get("TitleField");
     assertNotNull(titleField);
     assertObjectType(stringFieldObjectType, titleField.objectType());
+
+    var typeField = widgetMap.elements().get("TypeField");
+    assertNotNull(typeField);
+    assertObjectType(smartFieldNumberObjectType, typeField.objectType());
 
     var someTableField = widgetMap.elements().get("SomeTableField");
     assertNotNull(someTableField);
@@ -240,14 +261,14 @@ public class IdObjectTypeMapTest {
     assertEquals("FancyTableFieldTableColumnMap", fancyTableFieldTableColumnMap.name());
 
     assertEquals(1, fancyTableFieldTableColumnMap.elements().size());
-    assertEquals(List.of("TextColumn"), fancyTableFieldTableColumnMap.elements().keySet().stream().toList());
+    assertEquals(List.of("ObjectColumn"), fancyTableFieldTableColumnMap.elements().keySet().stream().toList());
 
     assertEquals(1, fancyTableFieldTableColumnMap.idObjectTypeMapReferences().size());
     assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(findClassByObjectType("FancyTableColumnMap", module)).orElseThrow(), fancyTableFieldTableColumnMap.idObjectTypeMapReferences().stream().findFirst().orElseThrow());
 
-    var textColumn = fancyTableFieldTableColumnMap.elements().get("TextColumn");
-    assertNotNull(textColumn);
-    assertObjectType(columnObjectType, textColumn.objectType());
+    var objectColumn = fancyTableFieldTableColumnMap.elements().get("ObjectColumn");
+    assertNotNull(objectColumn);
+    assertObjectType(columnObjectObjectType, objectColumn.objectType());
   }
 
   @Test
@@ -555,8 +576,30 @@ public class IdObjectTypeMapTest {
 
   private static void assertObjectType(ObjectType expected, ObjectType actual) {
     assertNotNull(actual);
-    assertSame(expected.es6Class(), actual.es6Class());
+    assertSame(expected.es6Class().withoutTypeArguments(), actual.es6Class().withoutTypeArguments());
+    assertTypeArguments(expected.es6Class().typeArguments().toList(), actual.es6Class().typeArguments().toList());
     assertEquals(expected.newClassName(), actual.newClassName());
+  }
+
+  private static void assertES6Class(IES6Class expected, IES6Class actual) {
+    assertSame(expected.withoutTypeArguments(), actual.withoutTypeArguments());
+    assertTypeArguments(expected.typeArguments().toList(), actual.typeArguments().toList());
+  }
+
+  private static void assertTypeArguments(List<IDataType> expected, List<IDataType> actual) {
+    assertNotNull(actual);
+    assertEquals(expected.size(), actual.size());
+    for (var i = 0; i < expected.size(); i++) {
+      var e = expected.get(i);
+      var a = actual.get(i);
+      if (e instanceof IES6Class expectedES6Class) {
+        var actualES6Class = assertInstanceOf(IES6Class.class, a);
+        assertES6Class(expectedES6Class, actualES6Class);
+        continue;
+      }
+      assertEquals(e.isPrimitive(), a.isPrimitive());
+      assertEquals(e.name(), a.name());
+    }
   }
 
   private static void assertIdObjectTypeMapReference(IdObjectTypeMapReference expected, IdObjectTypeMapReference actual) {

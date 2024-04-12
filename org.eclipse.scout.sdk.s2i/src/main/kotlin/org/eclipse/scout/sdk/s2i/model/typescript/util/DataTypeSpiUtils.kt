@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.s2i.model.typescript.util
 
 import com.intellij.lang.javascript.psi.*
+import com.intellij.lang.javascript.psi.ecma6.JSTypeDeclaration
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptAsExpression
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptLiteralType
 import com.intellij.lang.javascript.psi.ecma6.TypeScriptTypeofType
@@ -104,11 +105,14 @@ object DataTypeSpiUtils {
 
         if (reference !is ES6ClassSpi) return reference
         if (sourceElement !is JSTypeArgumentsOwner) return reference
-        val typeArgumentClasses = sourceElement
-            .typeArguments
+        return resolveTypeArguments(reference, sourceElement.typeArguments, module)
+    }
+
+    fun resolveTypeArguments(es6Class: ES6ClassSpi, typeArguments: Array<out JSTypeDeclaration>, module: IdeaNodeModule): ES6ClassSpi? {
+        val typeArgumentClasses = typeArguments
             .mapNotNull { createDataType(it.jsType, module) }
-        if (typeArgumentClasses.isEmpty()) return reference
-        return module.nodeElementFactory().createClassWithTypeArgumentsDataType(reference, typeArgumentClasses)
+        if (typeArgumentClasses.isEmpty()) return es6Class
+        return module.nodeElementFactory().createClassWithTypeArgumentsDataType(es6Class, typeArgumentClasses)
     }
 
     private fun createDataType(objectLiteral: JSObjectLiteralExpression, module: IdeaNodeModule): DataTypeSpi? {

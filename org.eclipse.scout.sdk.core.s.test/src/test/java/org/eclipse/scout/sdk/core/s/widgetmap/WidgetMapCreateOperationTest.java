@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -108,6 +108,10 @@ public class WidgetMapCreateOperationTest {
     //            objectType: StringField
     //          },
     //          {
+    //            id: 'TypeField',
+    //            objectType: SmartField<number>
+    //          },
+    //          {
     //            id: 'SomeTableField',
     //            objectType: TableField,
     //            table: {
@@ -143,8 +147,8 @@ public class WidgetMapCreateOperationTest {
     //              objectType: FancyTable,
     //              columns: [
     //                {
-    //                  id: 'TextColumn',
-    //                  objectType: Column
+    //                  id: 'ObjectColumn',
+    //                  objectType: Column<object>
     //                }
     //              ]
     //            }
@@ -161,6 +165,7 @@ public class WidgetMapCreateOperationTest {
         "export type SomeFormWithTableFieldWidgetMap = {" +
             "'MainBox': GroupBox;" +
             "'TitleField': StringField;" +
+            "'TypeField': SmartField<number>;" +
             "'SomeTableField': TableField;" +
             "'SomeTable': SomeTable;" +
             "'FancyTableField': TableField;" +
@@ -182,14 +187,14 @@ public class WidgetMapCreateOperationTest {
             "declare columnMap: FancyTableFieldTableColumnMap;" +
             "}",
         "export type FancyTableFieldTableColumnMap = {" +
-            "'TextColumn': Column;" +
+            "'ObjectColumn': Column<object>;" +
             "} & FancyTableColumnMap;"
 
     ), operation.classSources());
 
     var imports = operation.importsForModel().stream().map(ES6ImportDescriptor::nameForSource).toList();
-    assertEquals(List.of("GroupBox", "StringField", "TableField", "SomeTable", "FancyTableFieldTable", "SomeTableWidgetMap", "Table", "SomeTableColumnMap", "Menu", "NumberColumn", "Column", "FancyTable", "FancyTableFieldTableColumnMap",
-        "FancyTableColumnMap"), imports);
+    assertEquals(List.of("GroupBox", "StringField", "SmartField", "TableField", "SomeTable", "FancyTableFieldTable", "SomeTableWidgetMap", "Table", "SomeTableColumnMap", "Menu", "NumberColumn", "Column", "FancyTable",
+        "FancyTableFieldTableColumnMap", "FancyTableColumnMap"), imports);
 
     var declarationSources = operation.declarationSources();
     assertEquals(1, declarationSources.size());
