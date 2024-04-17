@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.sdk.core.s.java.builder.body;
 
+import static org.eclipse.scout.sdk.core.util.Strings.isBlank;
+
 import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.java.builder.body.IMethodBodyBuilder;
@@ -22,6 +25,7 @@ import org.eclipse.scout.sdk.core.java.builder.expression.IExpressionBuilder;
 import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutVariousApi;
+import org.eclipse.scout.sdk.core.util.Ensure;
 
 /**
  * <h3>{@link ScoutMethodBodyBuilder}</h3>
@@ -126,5 +130,26 @@ public class ScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TYPE>> 
     }
     throwVeto.parenthesisClose().parenthesisClose().semicolon();
     return throwVeto;
+  }
+
+  @Override
+  public TYPE appendFieldReference(String fieldRef) {
+    Ensure.notBlank(fieldRef, "No field reference provided.");
+
+    // split into class and field if possible
+    // "ID" -> "ID"
+    // "a.b.c.d.SomeClass.MY_FIELD" -> "a.b.c.d.SomeClass" & "MY_FIELD"
+    var lastDotIndex = fieldRef.lastIndexOf(JavaTypes.C_DOT);
+    if (lastDotIndex < 0) {
+      return append(fieldRef);
+    }
+
+    var className = fieldRef.substring(0, lastDotIndex);
+    var fieldName = fieldRef.substring(lastDotIndex + 1);
+    if (isBlank(className) || isBlank(fieldName)) {
+      return ref(fieldRef);
+    }
+
+    return ref(className).dot().append(fieldName);
   }
 }

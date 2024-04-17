@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.core.s.form;
 
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertEqualsRefFile;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertEqualsVersionedRefFile;
 
 import org.eclipse.scout.sdk.core.java.generator.method.MethodGenerator;
 import org.eclipse.scout.sdk.core.java.generator.methodparam.MethodParameterGenerator;
@@ -40,10 +41,10 @@ public class FormGeneratorTest {
   @Test
   public void testFullFormStack(IJavaEnvironment env) {
     // permission
-    var permGenerator = new PermissionGenerator<>()
+    var permGenerator = new PermissionGenerator()
         .withElementName("MyPermission")
         .withPackageName("org.eclipse.scout.sdk.core.s.test.shared");
-    assertEqualsRefFile(env, REF_FILE_FOLDER + "FormTest1.txt", permGenerator);
+    assertEqualsVersionedRefFile(env, REF_FILE_FOLDER, "FormTest1.txt", permGenerator);
     var createdPermission = assertNoCompileErrors(env, permGenerator);
 
     // formData

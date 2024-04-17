@@ -4676,4 +4676,19 @@ public interface Scout10Api extends IScoutApi {
       return "comments";
     }
   }
+
+  @Override
+  default boolean createPermissionIdField() {
+    return false;
+  }
+
+  @Override
+  default String getPermissionIdFieldDataTypeFqn() {
+    return String.class.getName();
+  }
+
+  @Override
+  default void appendPermissionIdFieldValue(IExpressionBuilder<?> builder, String permissionName) {
+    builder.stringLiteral(permissionName);
+  }
 }

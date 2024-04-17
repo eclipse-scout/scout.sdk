@@ -178,4 +178,14 @@ public interface IScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TY
    * @return this builder
    */
   TYPE appendThrowVetoException(CharSequence nlsKeyName, ISourceGenerator<IExpressionBuilder<?>> varArg);
+
+  /**
+   * Appends a reference to the given field. If the given reference looks like {@code "a.b.c.d.SomeClass.MY_FIELD"} an
+   * import to {@code "a.b.c.d.SomeClass"} is added and {@code "SomeClass.MY_FIELD"} appended.
+   *
+   * @param fieldRef
+   *          The field reference to append.
+   * @return this builder
+   */
+  TYPE appendFieldReference(String fieldRef);
 }

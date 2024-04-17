@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -127,7 +127,7 @@ public final class ScoutApi {
 
     @Override
     public Collection<Class<? extends IApiSpecification>> knownApis() {
-      return Arrays.asList(Scout10Api.class, Scout11Api.class, Scout22010Api.class, Scout22Api.class, Scout231Api.class, Scout232Api.class, Scout241Api.class);
+      return Arrays.asList(Scout10Api.class, Scout11Api.class, Scout22010Api.class, Scout22Api.class, Scout231Api.class, Scout232Api.class, Scout241Api.class, Scout242Api.class);
     }
 
     @Override
