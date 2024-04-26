@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -45,6 +45,11 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
             try {
                 ScoutJsModels.create(it, module.project).orElse(null)
             } catch (e: Exception) {
+                SdkLog.warning("Error creating Scout JS model for module '{}'.", module.name, e)
+                null
+            } catch (e: AssertionError) {
+                // Might be thrown if a VCS update is changing files while creating the ScoutJsModel
+                // E.g. thrown from ResolveScopeManagerImpl.getDefaultResolveScope when the old file gets invalid.
                 SdkLog.warning("Error creating Scout JS model for module '{}'.", module.name, e)
                 null
             }
