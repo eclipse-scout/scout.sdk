@@ -14,8 +14,8 @@
     <orderEntry type="library" name="Maven: org.ow2.asm:asm-tree:9.6" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm-util:9.6" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm-analysis:9.6" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-nop:2.0.12" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.12" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-nop:2.0.13" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.13" level="project" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.s2e" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.s" />
     <orderEntry type="module" module-name="org.eclipse.scout.sdk.core.java" />
