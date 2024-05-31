@@ -9,21 +9,17 @@
  */
 package org.eclipse.scout.sdk.s2i.maven
 
-import com.intellij.openapi.application.AccessToken
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import com.intellij.util.concurrency.AppExecutorUtil
-import kotlinx.coroutines.runBlocking
 import org.apache.commons.lang3.ClassUtils
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.jetbrains.idea.maven.project.MavenProjectsManager
-import java.lang.reflect.Method
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KFunction
-import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.functions
 
 /**
@@ -39,39 +35,26 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
 
         // add listener to automatically schedule a sources download when necessary (is not done automatically on IJ >= 2023.2)
         val downloadArtifactsFun = getDownloadArtifactsFun()
-        val resetThreadContextFunction = getResetThreadContextFunction()
         if (downloadArtifactsFun != null) {
             val disposable = EclipseScoutBundle.derivedResourceManager(project) // project level service: remove listener on service (=project) disposal
-            manager.addManagerListener(MavenManagerListener(manager, downloadArtifactsFun, resetThreadContextFunction), disposable)
+            manager.addManagerListener(MavenManagerListener(manager, downloadArtifactsFun), disposable)
         }
     }
 
-    // can be removed as soon as IJ 2023.2 is the latest supported version. Use code from DownloadAllSourcesAndDocsAction as replacement
+    // can be removed as soon as IJ 2023.3 is the latest supported version. Use code from DownloadAllSourcesAndDocsAction as replacement
     private fun getDownloadArtifactsFun(): KFunction<*>? {
-        return try {
+        val mavenProjectsManagerExClass = try {
             ClassUtils.getClass(this::class.java.classLoader, "org.jetbrains.idea.maven.project.MavenProjectsManagerEx", true)
-                .kotlin
-                .functions
-                .find { it.name == "downloadArtifacts" }
         } catch (e: Throwable) {
             SdkLog.debug("Could not find MavenProjectsManagerEx. Skipping Maven sources auto download.", e)
             null
-        }
+        } ?: return null // class does not exist before 2023.2 but is also not necessary: nothing to do.
+
+        val scheduleDownloadArtifacts = mavenProjectsManagerExClass.kotlin.functions.find { it.name == "scheduleDownloadArtifacts" } // used in IJ >= 2023.3
+        return scheduleDownloadArtifacts ?: mavenProjectsManagerExClass.kotlin.functions.find { it.name == "downloadArtifactsSync" } // used in IJ 2023.2
     }
 
-    // can be removed as soon as IJ 2023.2 is the latest supported version. Use code from DownloadAllSourcesAndDocsAction as replacement
-    private fun getResetThreadContextFunction(): Method? {
-        return try {
-            ClassUtils.getClass(this::class.java.classLoader, "com.intellij.concurrency.ThreadContext", true)
-                .declaredMethods
-                .find { it.name == "resetThreadContext" }
-        } catch (e: Throwable) {
-            SdkLog.debug("Could not find ThreadContext. Skipping Maven sources auto download.", e)
-            null
-        }
-    }
-
-    private class MavenManagerListener(private val m_manager: MavenProjectsManager, private val m_downloadArtifactsFun: KFunction<*>, private val m_resetThreadContextFunction: Method?) : MavenProjectsManager.Listener {
+    private class MavenManagerListener(private val m_manager: MavenProjectsManager, private val m_downloadArtifactsFun: KFunction<*>) : MavenProjectsManager.Listener {
 
         private var m_future: Future<*>? = null
 
@@ -92,14 +75,7 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
             if (!m_manager.hasProjects()) return
             runAsync {
                 try {
-                    val accessToken = m_resetThreadContextFunction?.invoke(null) as AccessToken?
-                    if (accessToken != null) {
-                        accessToken.use {
-                            m_downloadArtifactsFun.callSuspend(m_manager, *arrayOf(m_manager.projects, null, true, false))
-                        }
-                    } else {
-                        m_downloadArtifactsFun.callSuspend(m_manager, *arrayOf(m_manager.projects, null, true, false))
-                    }
+                    m_downloadArtifactsFun.call(m_manager, *arrayOf(m_manager.projects, null, true, false))
                 } catch (e: Throwable) {
                     SdkLog.info("Error downloading Maven sources.", e)
                 }
@@ -107,21 +83,13 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
         }
 
         @Synchronized
-        private fun runAsync(action: suspend () -> Unit) {
+        private fun runAsync(action: () -> Unit) {
             val future = m_future
             if (future != null) {
                 future.cancel(false)
                 m_future = null
             }
-            m_future = AppExecutorUtil.getAppScheduledExecutorService().schedule({
-                runBlocking {
-                    try {
-                        action()
-                    } catch (e: Throwable) {
-                        SdkLog.info("Error downloading Maven sources.", e)
-                    }
-                }
-            }, 8, TimeUnit.SECONDS)
+            m_future = AppExecutorUtil.getAppScheduledExecutorService().schedule(action, 8, TimeUnit.SECONDS)
         }
     }
 }

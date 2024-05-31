@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,8 +18,6 @@ import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.module.Module
 import com.intellij.psi.PsiElement
-import com.intellij.refactoring.suggested.endOffset
-import com.intellij.refactoring.suggested.startOffset
 import org.eclipse.scout.sdk.core.s.ISdkConstants
 import org.eclipse.scout.sdk.core.s.nls.TranslationStoreComparator
 import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
@@ -43,7 +41,7 @@ object NlsCompletionHelper {
     fun computeLookupElements(module: Module, psiElement: PsiElement): List<LookupElementBuilder> {
         // compute original element so that the translation key may be modified. the completion clone will be discarded
         val psiFile = psiElement.containingFile.originalFile
-        val element = psiFile.findElementAt(psiElement.startOffset)?.parent ?: return emptyList()
+        val element = psiFile.findElementAt(psiElement.textRange.startOffset)?.parent ?: return emptyList()
         val translationSpec = element.translationSpec() ?: return emptyList()
         val manager = createManager(module, translationSpec.translationDependencyScope, true) ?: return emptyList()
         val elements = manager.allTranslations()
@@ -100,7 +98,7 @@ object NlsCompletionHelper {
         val newElement = translationSpec.createNewLiteral(nlsKey)
         WriteAction.run<RuntimeException> {
             val inserted = translationSpec.element.replace(newElement)
-            caret.moveToOffset(inserted.endOffset)
+            caret.moveToOffset(inserted.textRange.endOffset)
         }
     }
 
