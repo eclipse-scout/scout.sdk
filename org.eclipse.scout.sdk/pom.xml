@@ -185,7 +185,7 @@
 
     <icu4j>74.1</icu4j>
     <ecj>3.36.0</ecj>
-    <junit.version>5.10.2</junit.version>
+    <junit.version>5.10.3</junit.version>
 
     <!-- versions to dependencies uploaded by scout -->
     <org.eclipse.m2e.core>2.4.1.20231119-0901</org.eclipse.m2e.core>
@@ -883,13 +883,13 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.17.0</version>
+        <version>1.17.1</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <scope>test</scope>
-        <version>33.2.0-jre</version>
+        <version>33.2.1-jre</version>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
