@@ -72,7 +72,15 @@ tasks {
     runPluginVerifier {
         ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.7", "IU-2023.2.7", "IU-2023.3.7", "IU-2024.1.4", "IU-2024.2"))
         subsystemsToCheck.set("without-android")
-        failureLevel.set(FailureLevel.ALL)
+
+        // all except EXPERIMENTAL_API_USAGES because of false positive in IJ 2024.2 with PsiExternalReferenceHost which is actually not marked as experimental.
+        // can be removed as soon as the new intellij gradle plugin is used and the false positive is fixed in plugin verifier. Then FailureLevel.ALL should be used.
+        failureLevel.set(
+            listOf(
+                FailureLevel.COMPATIBILITY_WARNINGS, FailureLevel.COMPATIBILITY_PROBLEMS, FailureLevel.DEPRECATED_API_USAGES, FailureLevel.SCHEDULED_FOR_REMOVAL_API_USAGES,
+                FailureLevel.INTERNAL_API_USAGES, FailureLevel.OVERRIDE_ONLY_API_USAGES, FailureLevel.NON_EXTENDABLE_API_USAGES, FailureLevel.PLUGIN_STRUCTURE_WARNINGS, FailureLevel.MISSING_DEPENDENCIES, FailureLevel.INVALID_PLUGIN
+            )
+        )
     }
 
     withType<JavaCompile>().configureEach {
