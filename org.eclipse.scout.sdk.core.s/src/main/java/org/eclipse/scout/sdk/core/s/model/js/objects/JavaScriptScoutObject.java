@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.core.util.FinalValue;
 
 public class JavaScriptScoutObject implements IScoutJsObject {
 
-  private static final Pattern REGEX_CONSTANT = Pattern.compile("[A-Z_]+");
+  private static final Pattern REGEX_CONSTANT = Pattern.compile("[A-Z_0-9]+");
 
   private final ScoutJsModel m_scoutJsModel;
   private final IES6Class m_class;
