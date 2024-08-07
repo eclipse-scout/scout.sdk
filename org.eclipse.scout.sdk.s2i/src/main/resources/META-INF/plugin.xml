@@ -123,9 +123,9 @@
                      implementationClass="org.eclipse.scout.sdk.s2i.classid.MissingClassIdInspection"/>
     <localInspection language="JAVA" shortName="DuplicateClassId" groupName="Scout" enabledByDefault="false" level="ERROR" key="duplicate.classid.inspection.displayName"
                      implementationClass="org.eclipse.scout.sdk.s2i.classid.DuplicateClassIdInspection"/>
-    <localInspection shortName="MissingTranslation" groupName="Scout" enabledByDefault="true" level="WARNING" key="missing.translation.inspection.displayName" language=""
+    <localInspection shortName="MissingTranslation" groupName="Scout" enabledByDefault="true" level="WARNING" key="missing.translation.inspection.displayName"
                      implementationClass="org.eclipse.scout.sdk.s2i.nls.inspection.MissingTranslationInspection"/>
-    <globalInspection shortName="UnusedTranslation" groupName="Scout" enabledByDefault="false" level="WARNING" key="unused.translation.inspection.displayName" language=""
+    <globalInspection shortName="UnusedTranslation" groupName="Scout" enabledByDefault="false" level="WARNING" key="unused.translation.inspection.displayName"
                       implementationClass="org.eclipse.scout.sdk.s2i.nls.inspection.UnusedTranslationInspection"/>
     <fileType name="Scout National Language Support" extensions="nls" fieldName="INSTANCE" implementationClass="org.eclipse.scout.sdk.s2i.nls.NlsFileType"/>
     <fileEditorProvider implementation="org.eclipse.scout.sdk.s2i.nls.editor.NlsFileEditorProvider"/>

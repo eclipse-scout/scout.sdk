@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -142,7 +142,9 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
     override fun findJavaEnvironment(root: Path?): Optional<IJavaEnvironment> {
         var path = root
         while (path != null) {
-            val env = path.toVirtualFile()?.containingModule(project)?.let { toScoutJavaEnvironment(it) }
+            val currentPath = path
+            val module = computeInReadAction(project) { currentPath.toVirtualFile()?.containingModule(project) }
+            val env = module?.let { toScoutJavaEnvironment(it) }
             if (env != null) {
                 return Optional.of(env)
             }

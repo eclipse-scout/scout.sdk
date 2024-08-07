@@ -9,11 +9,9 @@
  */
 package org.eclipse.scout.sdk.s2i.nls.editor
 
+import com.intellij.CommonBundle
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.DialogPanel
-import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.openapi.ui.MessageType
-import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.openapi.ui.*
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.JBColor
 import com.intellij.ui.components.*
@@ -31,6 +29,7 @@ import org.eclipse.scout.sdk.s2i.ui.IndexedFocusTraversalPolicy
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
 import java.awt.*
 import java.awt.event.KeyEvent
+import java.util.*
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 
@@ -233,6 +232,8 @@ abstract class AbstractTranslationDialog(val project: Project, val languages: Co
         return info.asWarning().withOKEnabled()
     }
 
+    fun languageTextFields(): Map<Language, JBTextArea> = Collections.unmodifiableMap(m_languageTextFields)
+
     fun languageTextField(language: Language): JBTextArea? = m_languageTextFields[language]
 
     fun defaultLanguageTextField() = m_languageTextFields[Language.LANGUAGE_DEFAULT]!!
@@ -249,6 +250,21 @@ abstract class AbstractTranslationDialog(val project: Project, val languages: Co
             .forEach { result.putText(it.key, it.value.text) }
         return result
     }
+
+    override fun doCancelAction() {
+        if (isDialogChanged()) {
+            val discardChanges = Messages.showDialog(
+                project, message("close.and.discard.confirmation.text"), message("close.and.discard.confirmation.title"),
+                arrayOf(CommonBundle.getYesButtonText(), CommonBundle.getNoButtonText()), 1, Messages.getQuestionIcon()
+            ) == Messages.YES
+            if (!discardChanges) {
+                return // abort cancellation
+            }
+        }
+        super.doCancelAction()
+    }
+
+    protected abstract fun isDialogChanged(): Boolean
 
     override fun doOKAction() {
         if (!okAction.isEnabled) {

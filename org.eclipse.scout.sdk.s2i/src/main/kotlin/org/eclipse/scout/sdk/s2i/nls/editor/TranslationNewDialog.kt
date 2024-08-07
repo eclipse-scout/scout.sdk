@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.s2i.nls.editor
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.ValidationInfo
+import org.apache.logging.log4j.util.Strings
 import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.Translation
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator
@@ -34,6 +35,11 @@ class TranslationNewDialog(project: Project, val store: ITranslationStore, manag
 
     override fun doSave(result: Translation) {
         m_createdTranslation = translationManager.setTranslationToStore(result, store)
+    }
+
+    override fun isDialogChanged(): Boolean {
+        // dialog is changed in case any text is entered in key or a language field
+        return Strings.isNotEmpty(keyTextField().text) || languageTextFields().values.any { Strings.isNotEmpty(it.text) }
     }
 
     override fun validateValues(): MutableList<ValidationInfo?> {

@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.core.s.nls.Translation
 import org.eclipse.scout.sdk.core.s.nls.TranslationValidator.validateDefaultText
 import org.eclipse.scout.sdk.core.s.nls.manager.IStackedTranslation
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
+import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import java.util.stream.Collectors.toList
 
@@ -30,6 +31,12 @@ class TranslationEditDialog(project: Project, val translation: IStackedTranslati
 
     override fun validateDefaultTextField(key: String, defaultLanguageText: String): ValidationInfo? {
         return toValidationInfo(validateDefaultText(defaultLanguageText, translation, null))
+    }
+
+    override fun isDialogChanged() = languageTextFields().any {
+        val language = it.key
+        val textFieldContent = it.value.text
+        translation.text(language).orElse("") != Strings.notEmpty(textFieldContent).orElse("")
     }
 
     override fun doSave(result: Translation) {
