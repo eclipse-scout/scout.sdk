@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -107,6 +107,8 @@ public interface IScoutMethodBodyBuilder<TYPE extends IScoutMethodBodyBuilder<TY
    *          The api class that contains the class name of the bean. May be {@code null} in case the supplied
    *          beanNameProvider can handle a {@code null} input.
    * @param beanNameProvider
+   *          A {@link Function} to be called to obtain the {@link ITypeNameSupplier} whose fully qualified name should
+   *          be used as bean class literal.
    * @param <T>
    *          The api type
    * @return this builder

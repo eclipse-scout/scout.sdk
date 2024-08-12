@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -165,6 +165,7 @@ public class EclipseWorkspaceWalker {
    * @param monitor
    *          For progress monitoring or cancellation. May be {@code null}.
    * @throws CoreException
+   *           if this method fails
    */
   public void walk(BiConsumer<WorkspaceFile, IProgress> visitor, IProgressMonitor monitor) throws CoreException {
     Ensure.notNull(visitor);

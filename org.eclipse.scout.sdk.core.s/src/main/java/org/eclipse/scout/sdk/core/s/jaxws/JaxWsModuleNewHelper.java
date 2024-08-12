@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -96,6 +96,7 @@ public final class JaxWsModuleNewHelper {
    *          The progress monitor
    * @return The path to the created jaxws module directory.
    * @throws IOException
+   *           If the files or directories could not be created.
    */
   public static Path createModule(Path targetModulePomFile, String artifactId, IEnvironment env, IProgress progress) throws IOException {
     return createModuleImpl(targetModulePomFile, artifactId, env, progress);

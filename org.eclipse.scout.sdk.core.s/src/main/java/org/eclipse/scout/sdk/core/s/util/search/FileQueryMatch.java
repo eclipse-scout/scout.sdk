@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -41,7 +41,9 @@ public class FileQueryMatch extends FileRange {
    * @param start
    *          The zero based start index.
    * @param end
+   *          The zero based end index.
    * @param severity
+   *          The severity of the {@link FileQueryMatch}. One of the {@link Level} constants.
    */
   public FileQueryMatch(Path file, Path module, CharSequence textOfRange, int start, int end, int severity) {
     super(file, module, textOfRange, start, end);

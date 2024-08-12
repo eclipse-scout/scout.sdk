@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.typescript.generator.type;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.typescript.builder.ITypeScriptSourceBuilder;
 import org.eclipse.scout.sdk.core.typescript.generator.ITypeScriptElementGenerator;
@@ -50,6 +49,7 @@ public interface ICompositeTypeGenerator<TYPE extends ICompositeTypeGenerator<TY
    * Set the array dimension of this {@link ICompositeTypeGenerator}.
    *
    * @param dimension
+   *          The array dimension (>= 0)
    * @return This generator.
    */
   TYPE withArrayDimension(int dimension);
@@ -63,7 +63,7 @@ public interface ICompositeTypeGenerator<TYPE extends ICompositeTypeGenerator<TY
    * Adds the specified type to this {@link ICompositeTypeGenerator}.
    *
    * @param type
-   *          The {@link ISourceGenerator<ISourceBuilder<?>>} to add. Must not be {@code null}.
+   *          The {@link ISourceGenerator} to add. Must not be {@code null}.
    * @return This generator.
    */
   TYPE withType(ISourceGenerator<? super ITypeScriptSourceBuilder<?>> type);

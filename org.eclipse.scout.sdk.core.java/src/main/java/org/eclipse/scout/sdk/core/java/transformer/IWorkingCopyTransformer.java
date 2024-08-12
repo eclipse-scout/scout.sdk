@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -264,7 +264,6 @@ public interface IWorkingCopyTransformer {
    * 
    * @param input
    *          The input element to remove.
-   * @param <G>
    * @return always {@code null} which removes the element.
    */
   static <G> G remove(ITransformInput<?, G> input) {
@@ -274,7 +273,6 @@ public interface IWorkingCopyTransformer {
   /**
    * This method can be called if an {@link IWorkingCopyTransformer} would like to completely remove an element.
    * 
-   * @param <G>
    * @return always {@code null} which removes the element.
    */
   default <G> G remove() {

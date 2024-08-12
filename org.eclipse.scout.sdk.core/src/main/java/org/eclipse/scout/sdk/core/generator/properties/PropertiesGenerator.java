@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -89,6 +89,7 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
    *          (UTF-8).
    * @return A new {@link PropertiesGenerator} with the content from the given stream.
    * @throws IOException
+   *           while reading from the given {@link InputStream}.
    */
   public static PropertiesGenerator create(InputStream in, Charset encoding) throws IOException {
     var result = new PropertiesGenerator(null, null).withEncoding(encoding);
@@ -113,6 +114,7 @@ public class PropertiesGenerator implements ISourceGenerator<ISourceBuilder<?>> 
    *          The {@link InputStream} in the .properties file format. Must not be {@code null}.
    * @return This generator.
    * @throws IOException
+   *           while reading from the given {@link InputStream}.
    */
   public PropertiesGenerator load(InputStream input) throws IOException {
     var encoding = encoding().orElse(DEFAULT_ENCODING);

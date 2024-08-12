@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -52,8 +52,7 @@ public class ArrayMetaValue extends AbstractMetaValue implements IArrayMetaValue
    * Returns the input array with all null elements removed. Implementation detail: only creates a new array if
    * required. If the input array contains no null elements the input is returned!
    *
-   * @param original
-   * @return . Never returns {@code null} or an array with {@code null} elements
+   * @return Never returns {@code null} or an array with {@code null} elements
    */
   protected static IMetaValue[] withoutNullElements(IMetaValue[] original) {
     if (original == null) {
