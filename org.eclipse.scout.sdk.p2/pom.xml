@@ -20,7 +20,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk.p2</artifactId>
-  <version>13.0.0-SNAPSHOT</version>
+  <version>13.0.39</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout SDK P2</name>
   <description>Eclipse Scout SDK - Eclipse Features/Repository</description>
@@ -35,7 +35,7 @@
     <eclipse_gerrit_username/>
     <scout.base.version>13.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
-    <org.eclipse.scout.rt_version>24.2-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>24.2.0-beta.6</org.eclipse.scout.rt_version>
   </properties>
 
   <dependencyManagement>
