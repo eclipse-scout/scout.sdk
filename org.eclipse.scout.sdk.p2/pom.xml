@@ -35,7 +35,7 @@
     <eclipse_gerrit_username/>
     <scout.base.version>13.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
-    <org.eclipse.scout.rt_version>24.2-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>25.1-SNAPSHOT</org.eclipse.scout.rt_version>
   </properties>
 
   <dependencyManagement>

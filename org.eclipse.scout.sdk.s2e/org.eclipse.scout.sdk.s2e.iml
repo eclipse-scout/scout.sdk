@@ -42,12 +42,12 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.core.filebuffers:3.8.200" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.search.core:3.16.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.scout.sdk.deps:org.eclipse.m2e.core:2.4.1.20231119-0901" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:2.0.13" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:guava:33.2.1-jre" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:2.0.16" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:guava:33.3.0-jre" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:failureaccess:1.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.checkerframework:checker-qual:3.42.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.checkerframework:checker-qual:3.43.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.google.errorprone:error_prone_annotations:2.23.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.google.j2objc:j2objc-annotations:2.8" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.maven:maven-model:3.9.5" level="project" />

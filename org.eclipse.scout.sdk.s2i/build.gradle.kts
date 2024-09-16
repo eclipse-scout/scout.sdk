@@ -19,7 +19,7 @@ val scoutSdkVersion = "13.0.0-SNAPSHOT"
 val scoutSdkPluginVersion = "13.0.0.".plus(timestamp())
 
 val javaVersion = JavaVersion.VERSION_17
-val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "24.2-SNAPSHOT")
+val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "25.1-SNAPSHOT")
 val intellijVersion = projectPropertyOr("intellij_version", "IU-2022.2.3") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
 
 plugins {
@@ -43,7 +43,7 @@ dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", scoutSdkVersion)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.ecj", scoutSdkVersion)
     api("org.apache.poi", "poi-ooxml", "5.3.0")
-    testImplementation("org.mockito", "mockito-core", "5.12.0")
+    testImplementation("org.mockito", "mockito-core", "5.13.0")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.test", scoutSdkVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.typescript.test", scoutSdkVersion)
@@ -70,7 +70,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.7", "IU-2023.2.7", "IU-2023.3.7", "IU-2024.1.4", "IU-2024.2"))
+        ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.7", "IU-2023.2.8", "IU-2023.3.8", "IU-2024.1.6", "IU-2024.2.1", "IU-2024.3"))
         subsystemsToCheck.set("without-android")
 
         // all except EXPERIMENTAL_API_USAGES because of false positive in IJ 2024.2 with PsiExternalReferenceHost which is actually not marked as experimental.
