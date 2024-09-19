@@ -119,7 +119,8 @@
     <orderEntry type="library" name="Maven: jakarta.xml.ws:jakarta.xml.ws-api:3.0.1" level="project" />
     <orderEntry type="library" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:3.0.1" level="project" />
     <orderEntry type="library" name="Maven: jakarta.xml.soap:jakarta.xml.soap-api:2.0.1" level="project" />
-    <orderEntry type="library" name="Maven: com.sun.activation:jakarta.activation:2.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.angus:angus-activation:2.0.2" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.activation:jakarta.activation-api:2.1.3" level="project" />
     <orderEntry type="library" name="Maven: jakarta.jws:jakarta.jws-api:3.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:25.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:25.1-SNAPSHOT" level="project" />
