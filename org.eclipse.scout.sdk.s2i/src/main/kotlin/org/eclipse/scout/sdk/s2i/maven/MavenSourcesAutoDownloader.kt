@@ -72,6 +72,7 @@ class MavenSourcesAutoDownloader : StartupActivity, DumbAware {
         }
 
         private fun scheduleMavenSourcesDownload() {
+            if (m_manager.generalSettings.isWorkOffline) return
             if (!m_manager.hasProjects()) return
             runAsync {
                 try {
