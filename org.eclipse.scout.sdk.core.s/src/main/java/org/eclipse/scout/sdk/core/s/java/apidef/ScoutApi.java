@@ -127,7 +127,7 @@ public final class ScoutApi {
 
     @Override
     public Collection<Class<? extends IApiSpecification>> knownApis() {
-      return Arrays.asList(Scout10Api.class, Scout11Api.class, Scout22010Api.class, Scout22Api.class, Scout231Api.class, Scout232Api.class, Scout241Api.class, Scout242Api.class);
+      return Arrays.asList(Scout10Api.class, Scout11Api.class, Scout22010Api.class, Scout22Api.class, Scout231Api.class, Scout232Api.class, Scout241Api.class, Scout242Api.class, Scout251Api.class);
     }
 
     @Override

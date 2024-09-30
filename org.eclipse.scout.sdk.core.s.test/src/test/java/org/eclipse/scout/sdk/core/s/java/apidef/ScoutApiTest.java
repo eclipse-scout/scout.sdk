@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -71,6 +71,11 @@ public class ScoutApiTest {
     assertArrayEquals(new int[]{17}, ScoutApi.create("24.1").supportedJavaVersions());
     assertArrayEquals(new int[]{17}, ScoutApi.create("24.1.0").supportedJavaVersions());
     assertArrayEquals(new int[]{17}, ScoutApi.create("24.1.165").supportedJavaVersions());
+    assertArrayEquals(new int[]{17}, ScoutApi.create("24.2.13").supportedJavaVersions());
+    assertArrayEquals(new int[]{21}, ScoutApi.create("25.1").supportedJavaVersions());
+    assertArrayEquals(new int[]{21}, ScoutApi.create("25.1-SNAPSHOT").supportedJavaVersions());
+    assertArrayEquals(new int[]{21}, ScoutApi.create("25.1.0").supportedJavaVersions());
+    assertArrayEquals(new int[]{21}, ScoutApi.create("25.1.1234").supportedJavaVersions());
   }
 
   private static Map<String, String> onlyInvalid(Map<String, String> candidates, IType type, IScoutApi api) {
