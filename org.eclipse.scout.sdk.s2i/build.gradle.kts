@@ -70,7 +70,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.7", "IU-2023.2.8", "IU-2023.3.8", "IU-2024.1.6", "IU-2024.2.1", "IU-2024.3"))
+        ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.7", "IU-2023.2.8", "IU-2023.3.8", "IU-2024.1.6", "IU-2024.2.3", "IU-2024.3"))
         subsystemsToCheck.set("without-android")
 
         // all except EXPERIMENTAL_API_USAGES because of false positive in IJ 2024.2 with PsiExternalReferenceHost which is actually not marked as experimental.
