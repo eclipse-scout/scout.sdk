@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -46,6 +46,9 @@ public class WebServiceUpdateOperationTest {
 
   @Test
   public void testUpdateWebServiceConsumer() throws IOException {
+    if ("25.1-SNAPSHOT".equals(CoreScoutTestingUtils.currentScoutVersion())) {
+      return; // archetype currently not supported for 25.1 as this uses Java 21 and the current maven-master has no Java 21 capable compiler yet. Enable again as soon as the new maven-master is deployed.
+    }
     var root = CoreScoutTestingUtils.createClassicTestProject();
     try {
       WebServiceNewOperationTest.runCreateJaxWsModule(testUpdateConsumer(root));
@@ -59,6 +62,9 @@ public class WebServiceUpdateOperationTest {
 
   @Test
   public void testUpdateWebServiceProvider() throws IOException {
+    if ("25.1-SNAPSHOT".equals(CoreScoutTestingUtils.currentScoutVersion())) {
+      return; // archetype currently not supported for 25.1 as this uses Java 21 and the current maven-master has no Java 21 capable compiler yet. Enable again as soon as the new maven-master is deployed.
+    }
     var root = CoreScoutTestingUtils.createClassicTestProject();
     try {
       WebServiceNewOperationTest.runCreateJaxWsModule(testUpdateProvider(root));
