@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -34,6 +34,7 @@ import com.intellij.psi.util.InheritanceUtil.findEnclosingInstanceInScope
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.ThrowableRunnable
 import org.eclipse.scout.sdk.core.java.model.api.PropertyBean
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.util.Ensure.newFail
 import org.eclipse.scout.sdk.core.util.Strings
@@ -99,7 +100,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
         template.isToIndent = true
         template.setValue(Template.Property.USE_STATIC_IMPORT_IF_POSSIBLE, false)
         TemplateImplUtil.parseVariableNames(source).forEach { addVariable(it, template) }
-        template.parseSegments()
+        SdkLog.debug("Template with {} segments created.", template.segmentsCount) // calls parseSegments internally which is no public API
         return template
     }
 

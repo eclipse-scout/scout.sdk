@@ -34,6 +34,7 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.elementType
 import com.intellij.util.ThrowableRunnable
 import org.eclipse.scout.sdk.core.java.JavaUtils
+import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
 import org.eclipse.scout.sdk.core.s.model.js.prop.*
 import org.eclipse.scout.sdk.core.s.nls.query.TranslationPatterns
@@ -281,10 +282,10 @@ object JsModelCompletionHelper {
         template.isDeactivated = false
         template.isToIndent = true
         template.setValue(Template.Property.USE_STATIC_IMPORT_IF_POSSIBLE, false)
-        template.parseSegments()
         TemplateImplUtil.parseVariableNames(source)
             .mapNotNull { ALL_VARIABLES[it] }
             .forEach { addVariable(it, template, defaultValueProvider) }
+        SdkLog.debug("Template with {} segments created.", template.segmentsCount) // calls parseSegments internally which is no public API
         return template
     }
 
