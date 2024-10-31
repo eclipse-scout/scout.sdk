@@ -73,12 +73,15 @@ tasks {
         ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.7", "IU-2023.2.8", "IU-2023.3.8", "IU-2024.1.6", "IU-2024.2.3", "IU-2024.3"))
         subsystemsToCheck.set("without-android")
 
-        // all except EXPERIMENTAL_API_USAGES because of false positive in IJ 2024.2 with PsiExternalReferenceHost which is actually not marked as experimental.
-        // can be removed as soon as the new intellij gradle plugin is used and the false positive is fixed in plugin verifier. Then FailureLevel.ALL should be used.
+        // all except EXPERIMENTAL_API_USAGES and OVERRIDE_ONLY_API_USAGES
+        // - EXPERIMENTAL_API_USAGES is excluded because of false positive in IJ 2024.2 with PsiExternalReferenceHost which is actually not marked as experimental.
+        //   can be removed as soon as the new intellij gradle plugin is used and the false positive is fixed in plugin verifier.
+        // - OVERRIDE_ONLY_API_USAGES reported because of invoking AnAction.actionPerformed when delegating. Use ActionWrapperUtil#actionPerformed which is only available in newer IJ versions.
+        // After upgrade FailureLevel.ALL should be used.
         failureLevel.set(
             listOf(
                 FailureLevel.COMPATIBILITY_WARNINGS, FailureLevel.COMPATIBILITY_PROBLEMS, FailureLevel.DEPRECATED_API_USAGES, FailureLevel.SCHEDULED_FOR_REMOVAL_API_USAGES,
-                FailureLevel.INTERNAL_API_USAGES, FailureLevel.OVERRIDE_ONLY_API_USAGES, FailureLevel.NON_EXTENDABLE_API_USAGES, FailureLevel.PLUGIN_STRUCTURE_WARNINGS, FailureLevel.MISSING_DEPENDENCIES, FailureLevel.INVALID_PLUGIN
+                FailureLevel.INTERNAL_API_USAGES, FailureLevel.NON_EXTENDABLE_API_USAGES, FailureLevel.PLUGIN_STRUCTURE_WARNINGS, FailureLevel.MISSING_DEPENDENCIES, FailureLevel.INVALID_PLUGIN
             )
         )
     }
