@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper.createProject
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants
+import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.scoutIcon
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment
@@ -117,12 +118,23 @@ class ScoutModuleBuilder : ModuleBuilder() {
         if (selectedJavaMajorVersion != null) {
             val supportedJavaVersions = ScoutProjectNewHelper.getSupportedJavaVersions(scoutVersion)
             if (!supportedJavaVersions.contains(selectedJavaMajorVersion)) {
-                val msg = message("jdk.not.supported.msg", selectedJavaMajorVersion, scoutVersion ?: IMavenConstants.LATEST, supportedJavaVersions.joinToString(", "))
-                val result = showOkCancelDialog(msg, message("jdk.not.supported.title"), getYesButton(), getNoButton(), getWarningIcon())
+                val result = showJdkNotSupportedMessage(selectedJavaMajorVersion, supportedJavaVersions)
                 if (result != OK) return false
             }
         }
         return super.validate(currentProject, project)
+    }
+
+    private fun showJdkNotSupportedMessage(selectedJavaMajorVersion: Int, supportedJavaVersions: IntArray): Int {
+        val msg = message(
+            "jdk.not.supported.msg",
+            selectedJavaMajorVersion, scoutVersion ?: IMavenConstants.LATEST, supportedJavaVersions.joinToString(", ")
+        )
+        val result = FinalValue<Int>()
+        ApplicationManager.getApplication().invokeAndWait {
+            result.setIfAbsent(showOkCancelDialog(msg, message("jdk.not.supported.title"), getYesButton(), getNoButton(), getWarningIcon()))
+        }
+        return result.get()
     }
 
     override fun getBuilderId(): String? = javaClass.name

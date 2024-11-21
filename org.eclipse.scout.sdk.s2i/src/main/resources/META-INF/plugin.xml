@@ -84,7 +84,7 @@
   ]]></change-notes>
 
   <!-- please see https://jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="222.4345.14"/>
+  <idea-version since-build="222.4345.14" until-build="243.*"/>
 
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
