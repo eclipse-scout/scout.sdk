@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Test;
 public class ResourcesTest {
   @Test
   public void testHttpGet() throws IOException {
-    var uri = "https://www.eclipse.org/scout/";
+    var uri = "https://eclipse.dev/scout/";
     try (var in = Resources.httpGet(uri)) {
       assertTrue(in.read() >= 0);
     }
@@ -80,7 +80,7 @@ public class ResourcesTest {
 
     // there is a response (eclipse 404 page), but error status code
     assertThrows(IOException.class, () -> {
-      try (var in = Resources.httpGet("https://www.eclipse.org/scout-not-existing-xyzabc/")) {
+      try (var in = Resources.httpGet("https://eclipse.dev/scout-not-existing-xyzabc/")) {
         fail("Cannot be found " + in);
       }
     });
