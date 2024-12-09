@@ -49,6 +49,13 @@
       <artifactId>maven-core</artifactId>
       <version>${maven.model.dependency.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <!-- classes are part of org.codehaus.plexus:plexus-utils too -->
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-xml</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
