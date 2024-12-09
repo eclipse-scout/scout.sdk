@@ -43,7 +43,7 @@ dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", scoutSdkVersion)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.ecj", scoutSdkVersion)
     api("org.apache.poi", "poi-ooxml", "5.3.0")
-    testImplementation("org.mockito", "mockito-core", "5.13.0")
+    testImplementation("org.mockito", "mockito-core", "5.14.2")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.test", scoutSdkVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.typescript.test", scoutSdkVersion)
@@ -70,7 +70,7 @@ tasks {
     }
 
     runPluginVerifier {
-        ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.7", "IU-2023.2.8", "IU-2023.3.8", "IU-2024.1.6", "IU-2024.2.3", "IU-2024.3"))
+        ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.7", "IU-2023.2.8", "IU-2023.3.8", "IU-2024.1.7", "IU-2024.2.5", "IU-2024.3.1"))
         subsystemsToCheck.set("without-android")
 
         // all except EXPERIMENTAL_API_USAGES and OVERRIDE_ONLY_API_USAGES
