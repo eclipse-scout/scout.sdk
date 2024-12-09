@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -57,9 +57,7 @@ public class EcjAstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
     var result = new CompilerOptions();
     result.produceDebugAttributes = 0;
     result.complianceLevel = ClassFileConstants.getLatestJDKLevel();
-    result.originalComplianceLevel = result.complianceLevel;
     result.sourceLevel = result.complianceLevel;
-    result.originalSourceLevel = result.complianceLevel;
     result.targetJDK = result.complianceLevel;
     result.verbose = SdkLog.isLevelEnabled(VERBOSE_LOG_LEVEL);
     result.preserveAllLocalVariables = true;
