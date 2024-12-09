@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -395,7 +395,7 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     var numBuckets = 4;
     Map<Integer, List<ClasspathEntry>> buckets = new HashMap<>(numBuckets);
     for (var entry : allEntries) {
-      buckets.computeIfAbsent(bucketOf(entry), ArrayList::new).add(entry);
+      buckets.computeIfAbsent(bucketOf(entry, Files::isDirectory), ArrayList::new).add(entry);
     }
     Collection<ClasspathEntry> grouped = new ArrayList<>(allEntries.size());
     for (var i = 0; i < numBuckets; i++) {
@@ -412,9 +412,9 @@ public class JavaEnvironmentWithEcjBuilder<T extends JavaEnvironmentWithEcjBuild
     grouped.addAll(bucketContent);
   }
 
-  protected static Integer bucketOf(ClasspathEntry entry) {
+  protected static Integer bucketOf(ClasspathEntry entry, Function<Path, Boolean> isDirectoryFunction) {
     var result = 0;
-    if (!Files.isDirectory(entry.path())) {
+    if (!isDirectoryFunction.apply(entry.path())) {
       result++;
     }
     if (entry.mode() == ClasspathSpi.MODE_BINARY) {
