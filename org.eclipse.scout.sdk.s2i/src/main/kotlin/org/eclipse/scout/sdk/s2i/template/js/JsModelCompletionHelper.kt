@@ -311,7 +311,7 @@ object JsModelCompletionHelper {
             val s = StringBuilder()
             m_wrappings.map { it.first }.forEach { s.append(it) }
             s.append(m_builder)
-            m_wrappings.reversed().map { it.second }.forEach { s.append(it) }
+            m_wrappings.asReversed().map { it.second }.forEach { s.append(it) }
             return s.toString()
         }
     }

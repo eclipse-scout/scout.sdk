@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -145,12 +145,12 @@ class SourceFolderHelper(val project: Project, val sourceFolder: SourceFolder, t
         var startTier: ITier<*>? = null
         // example 1: d > f
         // example 2: h > i
-        val pathToTier = TierTree.topDownPath(null, tier).reversed()
+        val pathToTier = TierTree.topDownPath(null, tier).asReversed()
             .takeWhile { t ->
                 startTier = t
                 return@takeWhile !m_tierSourceFolderBundleMap.containsKey(t) && !pathToExistingTier.contains(t)
             }
-            .reversed()
+            .asReversed()
 
         if (pathToExistingTier.contains(startTier)) {
             // we need to compute sourceFolderBundles for all elements from the end of pathToExistingTier until startTier
