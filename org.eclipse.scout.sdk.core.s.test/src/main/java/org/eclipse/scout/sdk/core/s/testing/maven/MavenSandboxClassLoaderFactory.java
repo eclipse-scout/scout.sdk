@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -54,7 +54,6 @@ public final class MavenSandboxClassLoaderFactory {
 
         // Maven:
         "org.aopalliance.intercept.MethodInterceptor", // aop-alliance
-        "org.apache.commons.lang3.StringUtils", // apache-commons-lang3 for guice
         "com.google.inject.Guice", // guice
         "org.apache.http.client.HttpClient", // httpclient
         "org.apache.http.HttpHost", // httpcore

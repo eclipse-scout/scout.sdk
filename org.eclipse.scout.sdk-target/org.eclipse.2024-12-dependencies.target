@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="Scout SDK Eclipse 2023-12 Dependencies" sequenceNumber="60">
+<?pde version="3.8"?><target name="Scout SDK Eclipse 2024-12 Dependencies" sequenceNumber="61">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.e4.rcp.feature.group" version="0.0.0"/>
@@ -70,7 +70,32 @@
 <unit id="org.objectweb.asm.commons" version="0.0.0"/>
 <unit id="org.objectweb.asm.tree" version="0.0.0"/>
 <unit id="org.objectweb.asm.tree.analysis" version="0.0.0"/>
-<repository location="https://download.eclipse.org/releases/2023-12/"/>
+<unit id="org.eclipse.equinox.http.service.api" version="0.0.0"/>
+<unit id="org.osgi.service.http.whiteboard" version="0.0.0"/>
+<unit id="org.apache.commons.commons-beanutils" version="0.0.0"/>
+<unit id="org.apache.commons.collections" version="0.0.0"/>
+<unit id="org.jdom" version="0.0.0"/>
+<unit id="org.apache.xmlgraphics" version="0.0.0"/>
+<unit id="org.commonmark" version="0.0.0"/>
+<unit id="org.commonmark-gfm-tables" version="0.0.0"/>
+<unit id="org.junit" version="0.0.0"/>
+<unit id="junit-jupiter-api" version="0.0.0"/>
+<unit id="junit-platform-commons" version="0.0.0"/>
+<unit id="org.opentest4j" version="0.0.0"/>
+<unit id="junit-platform-engine" version="0.0.0"/>
+<unit id="junit-jupiter-engine" version="0.0.0"/>
+<unit id="org.mortbay.jasper.apache-el" version="0.0.0"/>
+<unit id="junit-platform-launcher" version="0.0.0"/>
+<unit id="junit-jupiter-migrationsupport" version="0.0.0"/>
+<unit id="junit-jupiter-params" version="0.0.0"/>
+<unit id="junit-vintage-engine" version="0.0.0"/>
+<unit id="junit-platform-runner" version="0.0.0"/>
+<unit id="junit-platform-suite-api" version="0.0.0"/>
+<unit id="junit-platform-suite-commons" version="0.0.0"/>
+<unit id="junit-platform-suite-engine" version="0.0.0"/>
+<unit id="org.apiguardian.api" version="0.0.0"/>
+<unit id="org.tukaani.xz" version="0.0.0"/>
+<repository location="https://download.eclipse.org/releases/2024-12/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="com.google.guava" version="27.1.0.v20221112-0806"/>

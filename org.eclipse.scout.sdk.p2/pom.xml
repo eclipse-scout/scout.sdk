@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_p2_plugin_config-master</artifactId>
-    <version>24.1.2</version>
+    <version>25.1-SNAPSHOT</version>
     <relativePath/>
   </parent>
 
@@ -107,7 +107,7 @@
                 <groupId>org.eclipse.scout.sdk</groupId>
                 <artifactId>org.eclipse.scout.sdk-target</artifactId>
                 <version>${project.version}</version>
-                <classifier>org.eclipse.2023-12-dependencies</classifier>
+                <classifier>org.eclipse.2024-12-dependencies</classifier>
               </artifact>
             </target>
           </configuration>

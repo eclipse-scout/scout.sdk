@@ -53,6 +53,12 @@
           <groupId>javax.annotation</groupId>
           <artifactId>jsr250-api</artifactId>
         </exclusion>
+
+        <!-- classes are part of org.codehaus.plexus:plexus-utils too -->
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-xml</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -63,6 +69,12 @@
         <exclusion>
           <groupId>javax.inject</groupId>
           <artifactId>javax.inject</artifactId>
+        </exclusion>
+
+        <!-- classes are part of org.codehaus.plexus:plexus-utils too -->
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-xml</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

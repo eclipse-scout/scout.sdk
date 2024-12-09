@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -54,13 +54,47 @@ public class FileSystemWithOverride extends FileSystem {
 
   @Override
   public char[][] getModulesDeclaringPackage(char[][] packageName, char[] moduleName) {
-    if (!hasModule(moduleName)) {
-      var fqnWithSlash = CharOperation.concatWith(packageName, '/');
-      if (overrideSupport().containsPackage(fqnWithSlash)) {
-        return new char[][]{ModuleBinding.UNNAMED};
+    var classpathModules = super.getModulesDeclaringPackage(packageName, moduleName);
+    if (hasModule(moduleName)) {
+      return classpathModules; // no need to check in override as Scout does not support the module system
+    }
+    if (containsUnnamedModuleName(classpathModules)) {
+      return classpathModules; // unnamed module already in the list: cannot add anything more
+    }
+
+    var fqnWithSlash = CharOperation.concatWith(packageName, '/');
+    if (!overrideSupport().containsPackage(fqnWithSlash)) {
+      return classpathModules; // nothing found in overrides
+    }
+
+    // An override was found and the unnamed module is not yet in the list: Add to existing modules
+    return withUnnamedModule(classpathModules);
+  }
+
+  protected static char[][] withUnnamedModule(char[][] existing) {
+    if (existing == null) {
+      // no other modules: only the unnamed module is the result
+      return new char[][]{ModuleBinding.UNNAMED};
+    }
+
+    // add unnamed to existing list
+    var result = new char[existing.length + 1][];
+    System.arraycopy(existing, 0, result, 0, existing.length);
+    result[existing.length] = ModuleBinding.UNNAMED;
+    return result;
+  }
+
+  protected static boolean containsUnnamedModuleName(char[][] moduleNames) {
+    if (moduleNames == null || moduleNames.length < 1) {
+      return false;
+    }
+    //noinspection Convert2streamapi
+    for (var module : moduleNames) {
+      if (CharOperation.equals(module, ModuleBinding.UNNAMED)) {
+        return true; // unnamed module already in the list
       }
     }
-    return super.getModulesDeclaringPackage(packageName, moduleName);
+    return false;
   }
 
   @Override
