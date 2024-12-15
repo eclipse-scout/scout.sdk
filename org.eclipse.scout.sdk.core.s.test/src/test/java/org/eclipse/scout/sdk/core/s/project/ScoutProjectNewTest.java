@@ -29,9 +29,6 @@ public class ScoutProjectNewTest {
 
   @Test
   public void testHelloWorldArchetype() throws IOException {
-    if ("25.1-SNAPSHOT".equals(CoreScoutTestingUtils.currentScoutVersion())) {
-      return; // archetype currently not supported for 25.1 as this uses Java 21 and the current maven-master has no Java 21 capable compiler yet. Enable again as soon as the new maven-master is deployed.
-    }
     Path targetDirectory = null;
     try {
       targetDirectory = CoreScoutTestingUtils.createClassicTestProject();
@@ -44,9 +41,6 @@ public class ScoutProjectNewTest {
 
   @Test
   public void testHelloJsArchetype() throws IOException {
-    if ("25.1-SNAPSHOT".equals(CoreScoutTestingUtils.currentScoutVersion())) {
-      return; // archetype currently not supported for 25.1 as this uses Java 21 and the current maven-master has no Java 21 capable compiler yet. Enable again as soon as the new maven-master is deployed.
-    }
     Path targetDirectory = null;
     try {
       targetDirectory = CoreScoutTestingUtils.createJsTestProject();
