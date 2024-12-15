@@ -21,10 +21,6 @@
   <artifactId>org.eclipse.scout.sdk.core.s.test</artifactId>
   <name>${project.groupId}:${project.artifactId}</name>
 
-  <properties>
-    <master_test_jvmMemory>-Xms512m -Xmx2560m</master_test_jvmMemory>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
