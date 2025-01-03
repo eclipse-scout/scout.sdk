@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -74,14 +74,14 @@ public class ResourcesTest {
     // not existing host (connect exception)
     assertThrows(IOException.class, () -> {
       try (var in = Resources.httpGet("https://www.eclipse.orgggg/scout-not-existing-xyzabc/")) {
-        fail("Cannot be found " + in);
+        fail("Should not come here. GET should throw because host could not be found. " + in);
       }
     });
 
     // there is a response (eclipse 404 page), but error status code
     assertThrows(IOException.class, () -> {
-      try (var in = Resources.httpGet("https://eclipse.dev/scout-not-existing-xyzabc/")) {
-        fail("Cannot be found " + in);
+      try (var in = Resources.httpGet("https://www.eclipse.org/scout-not-existing-xyzabc/")) {
+        fail("Should not come here. GET should throw directly because given URL must return a 404 HTTP status code. " + in);
       }
     });
   }
