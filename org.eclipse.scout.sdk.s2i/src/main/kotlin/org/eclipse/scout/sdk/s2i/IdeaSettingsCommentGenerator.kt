@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -96,10 +96,11 @@ open class IdeaSettingsCommentGenerator : IDefaultElementCommentGeneratorSpi, St
 
         val project = module.project
         val virtualFile = path.toVirtualFile() ?: return null
-        val psiFile = computeInReadAction(project) { psiManager.findFile(virtualFile) } ?: return null
-
-        val raw = computeInReadAction(project) { copyrightManager.getCopyrightOptions(psiFile)?.notice } ?: return null
-        return VelocityHelper.evaluate(psiFile, project, module, EntityUtil.decode(raw))
+        return computeInReadAction(project) {
+            val psiFile = psiManager.findFile(virtualFile) ?: return@computeInReadAction null
+            val notice = copyrightManager.getCopyrightOptions(psiFile)?.notice ?: return@computeInReadAction null
+            return@computeInReadAction VelocityHelper.evaluate(psiFile, project, module, EntityUtil.decode(notice))
+        }
     }
 
     override fun createTypeComment(target: ITypeGenerator<*>): ISourceGenerator<ICommentBuilder<*>> {
