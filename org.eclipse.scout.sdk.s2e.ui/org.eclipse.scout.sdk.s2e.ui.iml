@@ -81,7 +81,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.e4.ui.workbench.addons.swt:1.5.600" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.emf:org.eclipse.emf.ecore.xmi:2.38.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.e4.core.di.extensions:0.18.300" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: jakarta.annotation:jakarta.annotation-api:2.0.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: jakarta.annotation:jakarta.annotation-api:2.1.1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.e4.core.commands:1.1.500" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.e4.ui.workbench:1.16.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.emf:org.eclipse.emf.ecore.change:2.17.0" level="project" />
@@ -118,7 +118,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.xmlgraphics:batik-constants:1.18" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.xmlgraphics:batik-i18n:1.18" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.apache.xmlgraphics:xmlgraphics-commons:2.10" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Maven: commons-io:commons-io:2.15.0" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Maven: commons-io:commons-io:2.18.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.ui.navigator:3.12.600" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.ui.navigator.resources:3.9.500" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.ui.views.properties.tabbed:3.10.400" level="project" />
@@ -135,8 +135,8 @@
     <orderEntry type="library" scope="TEST" name="Maven: com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.checkerframework:checker-qual:3.43.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.google.errorprone:error_prone_annotations:2.23.0" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.google.j2objc:j2objc-annotations:2.8" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.errorprone:error_prone_annotations:2.36.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.j2objc:j2objc-annotations:3.0.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.compare.core:3.8.600" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.slf4j:slf4j-api:2.0.16" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.128.0" level="project" />
@@ -218,34 +218,34 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.security:25.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.api.data:25.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.nls:25.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: com.google.http-client:google-http-client:1.43.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.http-client:google-http-client:1.45.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.grpc:grpc-context:1.68.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.grpc:grpc-api:1.68.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.opencensus:opencensus-api:0.31.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.grpc:grpc-context:1.27.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: io.opencensus:opencensus-contrib-http-util:0.31.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.apache.httpcomponents.client5:httpclient5:5.2.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.apache.httpcomponents.core5:httpcore5:5.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.apache.httpcomponents.core5:httpcore5-h2:5.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.httpcomponents.client5:httpclient5:5.4.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.httpcomponents.core5:httpcore5:5.3.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.httpcomponents.core5:httpcore5-h2:5.3.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.mom.api:25.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.uinotification:25.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: jakarta.servlet:jakarta.servlet-api:5.0.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: jakarta.servlet:jakarta.servlet-api:6.0.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.shared.test:25.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform.test:25.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.13.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject.test:25.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.server.jaxws:25.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: jakarta.xml.ws:jakarta.xml.ws-api:3.0.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:3.0.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: jakarta.xml.soap:jakarta.xml.soap-api:2.0.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: jakarta.xml.ws:jakarta.xml.ws-api:4.0.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:4.0.2" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: jakarta.xml.soap:jakarta.xml.soap-api:3.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.angus:angus-activation:2.0.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: jakarta.activation:jakarta.activation-api:2.1.3" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: jakarta.jws:jakarta.jws-api:3.0.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.dataobject:25.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.platform:25.1-SNAPSHOT" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.smallrye:jandex:3.1.6" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: org.quartz-scheduler:quartz:2.3.2" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.opentelemetry:opentelemetry-api:1.34.1" level="project" />
-    <orderEntry type="library" scope="TEST" name="Maven: io.opentelemetry:opentelemetry-context:1.34.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.smallrye:jandex:3.2.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.quartz-scheduler:quartz:2.5.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.opentelemetry:opentelemetry-api:1.44.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: io.opentelemetry:opentelemetry-context:1.44.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.ui.html:25.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.client:25.1-SNAPSHOT" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.eclipse.scout.rt:org.eclipse.scout.rt.chart.shared:25.1-SNAPSHOT" level="project" />
