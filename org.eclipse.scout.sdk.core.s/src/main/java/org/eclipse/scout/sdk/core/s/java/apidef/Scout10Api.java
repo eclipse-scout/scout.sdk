@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -4439,6 +4439,16 @@ public interface Scout10Api extends IScoutApi {
     @Override
     public String jwsFactoryPath() {
       return "jakarta/jws/jakarta.jws-api/1.1.1/jakarta.jws-api-1.1.1.jar";
+    }
+
+    @Override
+    public String annotationApiPath() {
+      return "jakarta/annotation/jakarta.annotation-api/1.3.5/jakarta.annotation-api-1.3.5.jar";
+    }
+
+    @Override
+    public String wsApiPath() {
+      return "jakarta/xml/ws/jakarta.xml.ws-api/2.3.3/jakarta.xml.ws-api-2.3.3.jar";
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,9 +43,12 @@ public class FactoryPathGenerator implements ISourceGenerator<ISourceBuilder<?>>
         .append("/org.eclipse.scout.rt.server.jaxws-").append(scoutVersion).append(".jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
     builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/").append(jaxWsConstants.servletFactoryPath()).append("\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
     builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/").append(jaxWsConstants.slf4jFactoryPath()).append("\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
-    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/").append(jaxWsConstants.jwsFactoryPath()).append("\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
-    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/jakarta/annotation/jakarta.annotation-api/1.3.5/jakarta.annotation-api-1.3.5.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
-    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/jakarta/xml/ws/jakarta.xml.ws-api/2.3.3/jakarta.xml.ws-api-2.3.3.jar\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
+    var jwsApi = jaxWsConstants.jwsFactoryPath();
+    if (Strings.hasText(jwsApi)) {
+      builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/").append(jwsApi).append("\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
+    }
+    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/").append(jaxWsConstants.annotationApiPath()).append("\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
+    builder.append("  <factorypathentry kind=\"VARJAR\" id=\"M2_REPO/").append(jaxWsConstants.wsApiPath()).append("\" enabled=\"true\" runInBatchMode=\"false\"/>").nl();
     builder.append("</factorypath>").nl();
   }
 
