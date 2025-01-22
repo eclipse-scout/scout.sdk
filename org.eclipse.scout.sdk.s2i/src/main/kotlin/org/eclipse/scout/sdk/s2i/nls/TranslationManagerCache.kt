@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.s2i.nls
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
@@ -23,10 +24,10 @@ import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile
 import org.eclipse.scout.sdk.core.util.TtlCache
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader.createManager
-import org.eclipse.scout.sdk.s2i.util.compat.AppTopics
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
+@Service(Service.Level.PROJECT)
 class TranslationManagerCache(val project: Project) : Disposable {
 
     companion object {
@@ -42,7 +43,7 @@ class TranslationManagerCache(val project: Project) : Disposable {
 
     init {
         m_busConnection = project.messageBus.connect()
-        m_busConnection?.subscribe(AppTopics.fileDocumentSync(), DocumentSyncListener())
+        m_busConnection?.subscribe(FileDocumentManagerListener.TOPIC, DocumentSyncListener())
     }
 
     /**

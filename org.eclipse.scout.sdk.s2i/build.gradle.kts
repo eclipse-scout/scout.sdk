@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,27 +8,27 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import org.jetbrains.intellij.tasks.RunPluginVerifierTask.FailureLevel
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.extensions.intellijPlatform
+import org.jetbrains.intellij.platform.gradle.models.ProductRelease
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.time.Clock
 import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-val scoutSdkVersion = "13.0.0-SNAPSHOT"
-val scoutSdkPluginVersion = "13.0.0.".plus(timestamp())
-
-val javaVersion = JavaVersion.VERSION_17
+val scoutSdkVersion = "14.0.0-SNAPSHOT"
+val scoutSdkPluginVersion = "14.0.0.".plus(timestamp())
 val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "25.1-SNAPSHOT")
-val intellijVersion = projectPropertyOr("intellij_version", "IU-2022.2.3") // use "IU-LATEST-EAP-SNAPSHOT" to test against the latest IJ snapshot
 
 plugins {
     id("java")
     id("maven-publish")
-    id("idea")
-    id("org.jetbrains.intellij") version "1.17.4"
-    kotlin("jvm") version "1.7.22"
-    id("net.linguica.maven-settings") version "0.5" // for maven settings
+    id("org.jetbrains.intellij.platform") version "2.2.1" // See https://github.com/JetBrains/intellij-platform-gradle-plugin
+    kotlin("jvm") version "2.1.0"
+    id("io.github.rmanibus.maven-settings") version "0.8" // for maven settings
 }
 
 group = "org.eclipse.scout.sdk.s2i"
@@ -37,64 +37,76 @@ version = scoutSdkVersion
 repositories {
     mavenLocal()
     mavenCentral()
+    intellijPlatform {
+        defaultRepositories()
+    }
 }
 
 dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", scoutSdkVersion)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.ecj", scoutSdkVersion)
-    api("org.apache.poi", "poi-ooxml", "5.3.0")
-    testImplementation("org.mockito", "mockito-core", "5.14.2")
+    implementation("org.apache.poi", "poi-ooxml", "5.4.0")
+    testImplementation("org.mockito", "mockito-core", "5.15.2")
+    testImplementation("junit", "junit", "4.13.2")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.test", scoutSdkVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.typescript.test", scoutSdkVersion)
+
+    intellijPlatform {
+        intellijIdeaUltimate("2024.3.2")
+        bundledPlugins(listOf("com.intellij.java", "org.jetbrains.idea.maven", "com.intellij.copyright", "com.intellij.properties", "JavaScript"))
+        pluginVerifier()
+        testFramework(TestFrameworkType.Platform)
+        testFramework(TestFrameworkType.JUnit5)
+        testFramework(TestFrameworkType.Plugin.Java)
+        testFramework(TestFrameworkType.Plugin.JavaScript)
+        testFramework(TestFrameworkType.Plugin.Maven)
+        testFramework(TestFrameworkType.Bundled)
+    }
 }
 
 allprojects {
     java {
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
-// See https://github.com/JetBrains/gradle-intellij-plugin/
-intellij {
-    version.set(intellijVersion)
-    downloadSources.set(true)
-    plugins.set(listOf("java", "maven", "copyright", "properties", "JavaScriptLanguage" /* in newer IJ versions just called "JavaScript" */))
-    updateSinceUntilBuild.set(false)
+intellijPlatform {
+    pluginConfiguration {
+        version = scoutSdkPluginVersion
+        ideaVersion {
+            sinceBuild = "243.23654"
+            untilBuild = provider { null }
+        }
+    }
+    pluginVerification {
+        failureLevel = VerifyPluginTask.FailureLevel.ALL
+        verificationReportsFormats = VerifyPluginTask.VerificationReportsFormats.ALL
+        subsystemsToCheck = VerifyPluginTask.Subsystems.WITHOUT_ANDROID
+        ides {
+            // for releases:
+            // ide(IntelliJPlatformType.IntellijIdeaUltimate, "2025.1")
+            select {
+                types = listOf(IntelliJPlatformType.IntellijIdeaUltimate)
+                channels = listOf(ProductRelease.Channel.EAP)
+                sinceBuild = "251"
+            }
+        }
+    }
+}
+
+kotlin {
+    jvmToolchain(21)
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_21
+    }
 }
 
 tasks {
-    patchPluginXml {
-        version.set(scoutSdkPluginVersion)
-    }
-
-    runPluginVerifier {
-        ideVersions.set(listOf("IU-2022.3.3", "IU-2023.1.7", "IU-2023.2.8", "IU-2023.3.8", "IU-2024.1.7", "IU-2024.2.5", "IU-2024.3.1"))
-        subsystemsToCheck.set("without-android")
-
-        // all except EXPERIMENTAL_API_USAGES and OVERRIDE_ONLY_API_USAGES
-        // - EXPERIMENTAL_API_USAGES is excluded because of false positive in IJ 2024.2 with PsiExternalReferenceHost which is actually not marked as experimental.
-        //   can be removed as soon as the new intellij gradle plugin is used and the false positive is fixed in plugin verifier.
-        // - OVERRIDE_ONLY_API_USAGES reported because of invoking AnAction.actionPerformed when delegating. Use ActionWrapperUtil#actionPerformed which is only available in newer IJ versions.
-        // After upgrade FailureLevel.ALL should be used.
-        failureLevel.set(
-            listOf(
-                FailureLevel.COMPATIBILITY_WARNINGS, FailureLevel.COMPATIBILITY_PROBLEMS, FailureLevel.DEPRECATED_API_USAGES, FailureLevel.SCHEDULED_FOR_REMOVAL_API_USAGES,
-                FailureLevel.INTERNAL_API_USAGES, FailureLevel.NON_EXTENDABLE_API_USAGES, FailureLevel.PLUGIN_STRUCTURE_WARNINGS, FailureLevel.MISSING_DEPENDENCIES, FailureLevel.INVALID_PLUGIN
-            )
-        )
-    }
-
     withType<JavaCompile>().configureEach {
-        sourceCompatibility = javaVersion.toString()
-        targetCompatibility = javaVersion.toString()
-    }
-
-    withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = javaVersion.toString()
-        }
+        sourceCompatibility = JavaVersion.VERSION_21.toString()
+        targetCompatibility = JavaVersion.VERSION_21.toString()
     }
 
     withType<Test> {

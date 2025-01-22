@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -101,7 +101,7 @@ public class FormFieldProposal extends AbstractTypeProposal {
     // specify the cursor position after form field creation
     List<BodyDeclaration> bodyDeclarations = formFieldType.bodyDeclarations();
     if (!bodyDeclarations.isEmpty()) {
-      setEndPosition(getRewrite().track(bodyDeclarations.get(bodyDeclarations.size() - 1)));
+      setEndPosition(getRewrite().track(bodyDeclarations.getLast()));
     }
     else {
       setEndPosition(new WrappedTrackedNodePosition(getRewrite().track(formFieldType.getSuperclassType()), 2, 0));

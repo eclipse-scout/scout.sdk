@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -244,6 +244,7 @@ public final class SpiWithEcjUtils {
   }
 
   static TypeSpi bindingToType(JavaEnvironmentWithEcj env, TypeBinding b, TypeSpi declaringType, boolean isWildCard, Supplier<? extends TypeBinding> newElementLookupStrategy) {
+    //noinspection IfCanBeSwitch
     if (b == null) {
       return null;
     }
@@ -301,9 +302,9 @@ public final class SpiWithEcjUtils {
 
   /**
    * @param owner
-   *          The owner whose declaring type should be returned.
+   *     The owner whose declaring type should be returned.
    * @return the declaring type for this element. For {@link TypeSpi} this is the {@link TypeSpi} itself and NOT the
-   *         enclosing type {@link TypeSpi#getDeclaringType()}
+   * enclosing type {@link TypeSpi#getDeclaringType()}
    */
   static TypeSpi declaringTypeOf(JavaElementSpi owner) {
     if (owner instanceof TypeSpi) {
@@ -422,13 +423,6 @@ public final class SpiWithEcjUtils {
         declaredAnnotations = b.sourceField().annotations;
       }
     }
-    else if (owner instanceof BindingTypeParameterWithEcj) {
-      var b = ((BindingTypeParameterWithEcj) owner).getInternalBinding();
-      b = (TypeVariableBinding) nvl(b.original(), b);
-      if (b.declaringElement instanceof SourceTypeBinding) {
-        declaredAnnotations = ((SourceTypeBinding) b.declaringElement).scope.referenceContext.annotations;
-      }
-    }
     if (declaredAnnotations != null && annotationSpi instanceof BindingAnnotationWithEcj) {
       var binding = ((BindingAnnotationWithEcj) annotationSpi).getInternalBinding();
 
@@ -473,7 +467,6 @@ public final class SpiWithEcjUtils {
     var lock = ((AbstractJavaEnvironment) owner.getJavaEnvironment()).lock();
 
     AnnotationBinding[] annotations;
-    //noinspection SynchronizationOnLocalVariableOrMethodParameter
     synchronized (lock) {
       annotations = binding.getAnnotations();
     }
@@ -506,6 +499,7 @@ public final class SpiWithEcjUtils {
    */
   @SuppressWarnings("pmd:NPathComplexity")
   static Object compileExpression(Expression expression, ClassScope scopeForTypeLookup, JavaEnvironmentWithEcj env) {
+    //noinspection IfCanBeSwitch
     if (expression == null) {
       return null;
     }
@@ -603,6 +597,7 @@ public final class SpiWithEcjUtils {
     if (compiledValue == null || Constant.NotAConstant.equals(compiledValue)) {
       return null;
     }
+    //noinspection IfCanBeSwitch
     if (compiledValue instanceof NullLiteral) {
       return MetaValueFactory.createNull();
     }

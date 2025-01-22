@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,7 +32,7 @@ public final class Language implements Comparable<Language> {
   /**
    * Represents the default language used if no other language matches.
    */
-  public static final Language LANGUAGE_DEFAULT = new Language(new Locale("default"));
+  public static final Language LANGUAGE_DEFAULT = new Language(Locale.of("default"));
 
   private static final Pattern LANGUAGE_PATTERN = Pattern.compile('^' + LANGUAGE_REGEX + '$');
 
@@ -127,7 +127,7 @@ public final class Language implements Comparable<Language> {
       else if (variantIso.startsWith("_")) {
         variantIso = variantIso.substring(1);
       }
-      return Optional.of(new Language(new Locale(languageIso, countryIso, variantIso)));
+      return Optional.of(new Language(Locale.of(languageIso, countryIso, variantIso)));
     }
     return Optional.empty();
   }

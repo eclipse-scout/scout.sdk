@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,7 +37,7 @@ object TranslationManagerLoader {
 
     data class TranslationManagerLoaderResult(val manager: TranslationManager, val primaryStore: ITranslationStore?, val nlsFile: VirtualFile?, val module: Module)
 
-    class ModalLoader(val module: Module, val nlsFile: VirtualFile?, val scope: DependencyScope?, title: String?) : Task.Modal(module.project, title ?: message("loading.translations"), true) {
+    class ModalLoader(val nlsFile: VirtualFile, project: Project, val scope: DependencyScope?, title: String?) : Task.Modal(project, title ?: message("loading.translations"), true) {
 
         private var m_errorHandler: ((Throwable) -> Unit)? = null
         private var m_managerCreatedHandler: ((TranslationManagerLoaderResult?) -> Unit)? = null
@@ -53,11 +53,12 @@ object TranslationManagerLoader {
         }
 
         override fun run(indicator: ProgressIndicator) {
+            val module = nlsFile.containingModule(project) ?: throw newFail("Module of file '{}' not found.", nlsFile)
             m_managerCreatedHandler?.invoke(createManager(module, scope, false, nlsFile))
         }
 
         override fun onThrowable(error: Throwable) {
-            val handler = m_errorHandler ?: { SdkLog.error("Error computing texts for module '{}'.", module.name, it) }
+            val handler = m_errorHandler ?: { SdkLog.error("Error computing texts for file '{}'.", nlsFile, it) }
             handler(error)
         }
     }
@@ -73,8 +74,7 @@ object TranslationManagerLoader {
      * @param title An optional title to display in the modal progress bar
      */
     fun createModalLoader(nlsFile: VirtualFile, project: Project, scope: DependencyScope?, title: String? = null): ModalLoader {
-        val module = nlsFile.containingModule(project) ?: throw newFail("Module of file '{}' not found.", nlsFile)
-        return ModalLoader(module, nlsFile, scope, title)
+        return ModalLoader(nlsFile, project, scope, title)
     }
 
     /**
@@ -141,7 +141,7 @@ object TranslationManagerLoader {
             }
         } catch (e: IndexNotReadyException) {
             // in case the current call is already in a read-action.
-            // then the creator of the read-action must know that the index is not ready and may retry it afterwards
+            // then the creator of the read-action must know that the index is not ready and may retry it afterward
             throw e
         } catch (e: RuntimeException) {
             SdkLog.error("Error computing texts for module '{}'.", modulePath, e)

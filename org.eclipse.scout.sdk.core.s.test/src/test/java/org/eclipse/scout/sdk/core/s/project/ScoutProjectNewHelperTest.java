@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -52,8 +52,8 @@ public class ScoutProjectNewHelperTest {
     assertFalse(javaScriptPreview.isEmpty());
     assertTrue(javaRelease.size() <= javaPreview.size());
     assertTrue(javaScriptRelease.size() <= javaScriptPreview.size());
-    assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("10.")));
-    assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("11.")));
     assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("22.")));
+    assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("23.")));
+    assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("24.")));
   }
 }

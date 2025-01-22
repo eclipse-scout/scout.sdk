@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.s2i.dataobject
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.psi.JavaPsiFacade
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.PsiModifier
@@ -27,9 +27,9 @@ import java.util.stream.Stream
 import kotlin.streams.asSequence
 import kotlin.streams.asStream
 
-open class IdeaDoContextResolver : DoContextResolvers.IDoContextResolver, StartupActivity, DumbAware {
+open class IdeaDoContextResolver : DoContextResolvers.IDoContextResolver, ProjectActivity, DumbAware {
 
-    override fun runActivity(project: Project) {
+    override suspend fun execute(project: Project) {
         DoContextResolvers.set(this)
     }
 

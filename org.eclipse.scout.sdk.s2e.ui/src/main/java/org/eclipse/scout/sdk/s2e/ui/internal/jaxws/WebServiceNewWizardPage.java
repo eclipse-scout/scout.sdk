@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,8 @@ package org.eclipse.scout.sdk.s2e.ui.internal.jaxws;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -394,7 +396,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       return null;
     }
     try {
-      var path = new URL(url).getPath();
+      var path = new URI(url).toURL().getPath();
       if (Strings.hasText(path)) {
         var lastSlashPos = path.lastIndexOf('/');
         if (lastSlashPos >= 0) {
@@ -451,7 +453,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       var elements = Xml.evaluateXPath(bindingFilesXpathBuilder.toString(), S2eUtils.getPomDocument(project), prefix, IMavenConstants.POM_XML_NAMESPACE);
       //noinspection RedundantIfStatement
       if (elements.isEmpty() && containsWsdl(wsdlFolder)) {
-        // these are jaxws project that contain wsdls but they are not listed in the pom (auto discovery).
+        // these are jaxws project that contain WSDLs, but they are not listed in the pom (auto discovery).
         // we do not support these because when adding a new wsdl to the pom, the existing ones will be ignored.
         return false;
       }
@@ -658,12 +660,13 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     }
 
     try {
-      var url = new URL(wsdlUrl);
+      var url = new URI(wsdlUrl).toURL();
       if (Objects.equals(m_lastParsedWsdlUrl, url)) {
         return m_lastParsedWsdlUrlStatus;
       }
 
       fieldToCheck.setEnabled(false);
+      //noinspection ExtractMethodRecommender
       Job parseRemoteWsdl = new AbstractJob("parse WSDL") {
         @Override
         protected void execute(IProgressMonitor monitor) {
@@ -693,7 +696,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
       parseRemoteWsdl.setUser(false);
       parseRemoteWsdl.schedule();
     }
-    catch (MalformedURLException e) {
+    catch (MalformedURLException | URISyntaxException e) {
       return new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, "The given WSDL URL is not valid.", e);
     }
 

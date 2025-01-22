@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -509,7 +509,7 @@ public class NlsTableController extends ViewerComparator {
    * Use a translation entry with a unique id so that the hashCode does not change when the wrapped entry's hashCode
    * changes. Otherwise, we cannot find it anymore (because we do hashLookup in the table).
    */
-  private static final class TranslationTableEntry {
+  protected static final class TranslationTableEntry {
     private final IStackedTranslation m_entry;
     private final long m_id;
 

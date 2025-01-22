@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,6 +47,7 @@ const val BLOCKMAP_FILENAME = "blockmap.json"
 const val HASH_FILENAME_SUFFIX = ".hash.json"
 
 
+@Suppress("ReplacePrintlnWithLogging")
 open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: Path, val repoUrl: String?) {
 
     companion object {
@@ -78,8 +79,8 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
             println("usage:")
             println(
                 "java -cp blockmap-1.0.5.jar${pathSep}jackson-annotations-2.13.4.jar${pathSep}jackson-core-2.13.4.jar${pathSep}jackson-databind-2.13.4.2.jar${pathSep}" + // Blockmap Libs
-                        "kotlin-stdlib-1.7.20.jar${pathSep}kotlin-stdlib-common-1.7.20.jar${pathSep}kotlin-stdlib-jdk8-1.7.20.jar${pathSep}" + // Kotlin libs
-                        "org.eclipse.scout.sdk.core-13.0.0-SNAPSHOT.jar${pathSep}org.eclipse.scout.sdk.s2i-13.0.0-SNAPSHOT.jar" + // Scout SDK libs
+                        "kotlin-stdlib-2.1.0.jar${pathSep}kotlin-stdlib-common-2.1.0.jar${pathSep}kotlin-stdlib-jdk8-2.1.0.jar${pathSep}" + // Kotlin libs
+                        "org.eclipse.scout.sdk.core-14.0.0-SNAPSHOT.jar${pathSep}org.eclipse.scout.sdk.s2i-14.0.0-SNAPSHOT.jar" + // Scout SDK libs
                         " org.eclipse.scout.sdk.s2i.publish.EnterprisePluginRepoPublisher /path/to/plugin.zip /path/to/enterprise/repoDir [https://host/path-to-repo]"
             )
         }

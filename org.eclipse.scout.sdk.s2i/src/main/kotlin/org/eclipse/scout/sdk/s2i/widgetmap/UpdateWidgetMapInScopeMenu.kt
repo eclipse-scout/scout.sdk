@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.chooseAnalysisScope
 
-class UpdateWidgetMapInScopeMenu : AnAction(message("update.widgetMap.in.scope") + "...", message("update.widgetMap.in.scope.desc"), null) {
+class UpdateWidgetMapInScopeMenu : AnAction() {
 
     companion object {
         private val UNSUPPORTED_SCOPE_TYPES: List<Int> = listOf(AnalysisScope.MODULE, AnalysisScope.MODULES)

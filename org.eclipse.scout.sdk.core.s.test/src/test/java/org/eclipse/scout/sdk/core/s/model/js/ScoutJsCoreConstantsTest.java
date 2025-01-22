@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -104,7 +104,7 @@ public class ScoutJsCoreConstantsTest {
     });
     assertFalse(result.isEmpty(), "Could not find class '" + classToFind + "'.");
     assertEquals(1, result.size(), "Multiple results found for class '" + classToFind + "': " + result);
-    return result.get(0);
+    return result.getFirst();
   }
 
   private static Map<String, MemberNames> buildClassMap() {
@@ -139,6 +139,7 @@ public class ScoutJsCoreConstantsTest {
         try {
           var fieldValue = (String) field.get(null);
           String declaringClass;
+          //noinspection IfCanBeSwitch
           if (ScoutJsCoreConstants.PROPERTY_NAME_EVENTS.equals(fieldValue)) {
             declaringClass = "EventEmitter";
             classMap.put(declaringClass, new MemberNames());

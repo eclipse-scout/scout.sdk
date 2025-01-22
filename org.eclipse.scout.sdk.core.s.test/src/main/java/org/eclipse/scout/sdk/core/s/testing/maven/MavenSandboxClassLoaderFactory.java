@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -208,7 +208,7 @@ public final class MavenSandboxClassLoaderFactory {
     }
 
     try {
-      var fileUrl = new URL(url, "target/classes/");
+      var fileUrl = url.toURI().resolve("target/classes/").toURL();
       var f = Paths.get(fileUrl.toURI());
       if (Files.isReadable(f) || Files.isDirectory(f)) {
         return fileUrl;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.core.java.JavaTypes;
  *
  * @since 7.0.0
  */
-class TypeReferenceDescriptor {
+public class TypeReferenceDescriptor {
   private final String m_packageName;
   private final String m_simpleName;
   private final String m_qualifier;

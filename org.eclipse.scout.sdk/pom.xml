@@ -20,7 +20,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk</artifactId>
-  <version>13.0.0-SNAPSHOT</version>
+  <version>14.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout SDK</name>
   <description>Eclipse Scout SDK</description>
@@ -54,10 +54,10 @@
   </modules>
 
   <properties>
-    <scout.osgi.version>13.0.0</scout.osgi.version>
+    <scout.osgi.version>14.0.0</scout.osgi.version>
     <org.eclipse.scout.rt_version>25.1-SNAPSHOT</org.eclipse.scout.rt_version>
 
-    <jdk.source.version>17</jdk.source.version>
+    <jdk.source.version>21</jdk.source.version>
     <jdk.min.version>${jdk.source.version}</jdk.min.version>
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.sdk/target/jacoco-all.exec</master_coverage_jacoco_destFile>
@@ -186,7 +186,7 @@
 
     <icu4j>76.1</icu4j>
     <ecj>3.40.0</ecj>
-    <junit.version>5.11.3</junit.version>
+    <junit.version>5.11.4</junit.version>
 
     <!-- versions to dependencies uploaded by scout -->
     <org.eclipse.m2e.core>2.7.0.20241001-1350</org.eclipse.m2e.core>
@@ -199,92 +199,92 @@
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.test</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.java</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.java.ecj</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.java.test</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.typescript</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.typescript.test</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s.test</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
         <classifier>sources</classifier>
       </dependency>
 
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e.test</artifactId>
-        <version>13.0.0-SNAPSHOT</version>
+        <version>${project.version}</version>
       </dependency>
 
       <!-- Build Dependencies -->

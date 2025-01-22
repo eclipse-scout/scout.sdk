@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,6 +47,7 @@ import org.eclipse.scout.sdk.s2i.resolvePsi
 import org.eclipse.scout.sdk.s2i.ui.IndexedFocusTraversalPolicy
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
 import org.eclipse.scout.sdk.s2i.util.Xlsx
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller
 import java.awt.Desktop
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -154,7 +155,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
 
         return try {
             Pattern.compile(searchText, Pattern.CASE_INSENSITIVE)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Pattern.compile(Pattern.quote(searchText), Pattern.CASE_INSENSITIVE)
         }.asPredicate()
     }
@@ -240,10 +241,11 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
 
         override fun getActionUpdateThread() = ActionUpdateThread.BGT
 
-        override fun actionPerformed(e: AnActionEvent) = TranslationNewDialogOpenAction(primaryStore).actionPerformed(e)
+        override fun actionPerformed(e: AnActionEvent) = ActionWrapperUtil.actionPerformed(e, this, TranslationNewDialogOpenAction(primaryStore))
     }
 
-    private inner class TranslationNewActionGroup : AbstractStoresAction(message("create.new.translation.in.service"), message("create.new.translation.in"),
+    private inner class TranslationNewActionGroup : AbstractStoresAction(
+        message("create.new.translation.in.service"), message("create.new.translation.in"),
         AllIcons.CodeStyle.AddNewSectionRule, translationManager.allEditableStores().collect(toList()), { TranslationNewDialogOpenAction(it) })
 
     private inner class TranslationNewDialogOpenAction(private val m_store: ITranslationStore) : DumbAwareAction(m_store.service().type().elementName()) {
@@ -304,7 +306,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
 
             val servicesLocateAction = if (stores.size == 1) TranslationServiceLocateAction(stores[0]) else TranslationServicesLocateAction(stores)
             if (selectedLanguages.size != 1 || !selectedTranslation.text(selectedLanguages[0]).isPresent) {
-                servicesLocateAction.actionPerformed(e)
+                ActionWrapperUtil.actionPerformed(e, this, servicesLocateAction)
                 return
             }
 
@@ -321,7 +323,8 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
         }
     }
 
-    private inner class TranslationServicesLocateAction(stores: List<ITranslationStore>) : AbstractStoresAction(message("jump.to.text.service"), message("choose.text.service"),
+    private inner class TranslationServicesLocateAction(stores: List<ITranslationStore>) : AbstractStoresAction(
+        message("jump.to.text.service"), message("choose.text.service"),
         AllIcons.Nodes.Services, stores, { TranslationServiceLocateAction(it) })
 
     private inner class TranslationServiceLocateAction(private val m_store: ITranslationStore) : DumbAwareAction(m_store.service().type().elementName(), null, AllIcons.Nodes.Services) {
@@ -435,11 +438,29 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
         override fun getActionUpdateThread() = ActionUpdateThread.EDT
 
         override fun actionPerformed(e: AnActionEvent) {
-            val fileSaverDescriptor = FileSaverDescriptor(message("export.translations"), message("export.translations.desc"), "xlsx")
-            val file = FileChooserFactory.getInstance().createSaveFileDialog(fileSaverDescriptor, project)
-                .save(null as VirtualFile? /* cast required for IJ 2020.3 compatibility (overloads) */, null)
+            // Can be removed as soon as IJ 2025.1 is the newest supported version
+            val newFileSaverDescriptor = CompatibilityMethodCaller<FileSaverDescriptor>()
+                .withCandidate(FileSaverDescriptor::class.java, CompatibilityMethodCaller.CONSTRUCTOR_NAME, String::class.java, String::class.java) {
+                    // >= IJ 2025.1: no argument for extensions filter
+                    return@withCandidate it.invokeStatic(message("export.translations"), message("export.translations.desc"))
+                }
+                .withCandidate(FileSaverDescriptor::class.java, CompatibilityMethodCaller.CONSTRUCTOR_NAME, String::class.java, String::class.java, Array<String>::class.java) {
+                    // <= IJ 2024.3: with extra vararg argument for extension filters (not used)
+                    return@withCandidate it.invokeStatic(message("export.translations"), message("export.translations.desc"), emptyArray<String>())
+                }
+
+            val extension = "xlsx"
+            val fileSaverDescriptor = newFileSaverDescriptor.invoke()
+            fileSaverDescriptor.withExtensionFilter(extension)
+            var file = FileChooserFactory.getInstance().createSaveFileDialog(fileSaverDescriptor, project)
+                .save(null as VirtualFile? /* cast required (overloads) */, null)
                 ?.file ?: return
             val tableData = m_table.visibleData()
+
+            val suffix = ".$extension"
+            if (!file.name.endsWith(suffix)) {
+                file = File(file.parent, file.name + suffix)
+            }
             OperationTask(message("export.translations"), project) { doExport(tableData, file) }.schedule()
         }
 
@@ -461,7 +482,7 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
 
             val storesWithoutDuplicates = stores.distinct()
             if (storesWithoutDuplicates.size == 1) {
-                task(storesWithoutDuplicates[0]).actionPerformed(e)
+                ActionWrapperUtil.actionPerformed(e, this, task(storesWithoutDuplicates[0]))
             } else {
                 val popupActions = storesWithoutDuplicates.map { task(it) }
                 val group = DefaultActionGroup(popupActions)

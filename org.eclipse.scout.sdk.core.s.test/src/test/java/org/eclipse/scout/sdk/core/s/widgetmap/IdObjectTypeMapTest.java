@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -392,7 +392,7 @@ public class IdObjectTypeMapTest {
 
     assertEquals(1, widgetMap.idObjectTypeMapReferences().size());
     var idObjectTypeMapReferences = widgetMap.idObjectTypeMapReferences().stream().toList();
-    assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(findClassByObjectType("SomeSuperClass2WidgetMap", module)).orElseThrow(), idObjectTypeMapReferences.get(0));
+    assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(findClassByObjectType("SomeSuperClass2WidgetMap", module)).orElseThrow(), idObjectTypeMapReferences.getFirst());
 
     var mainBox = widgetMap.elements().get("MainBox");
     assertNotNull(mainBox);
@@ -427,7 +427,7 @@ public class IdObjectTypeMapTest {
 
     assertEquals(1, widgetMap.idObjectTypeMapReferences().size());
     var idObjectTypeMapReferences = widgetMap.idObjectTypeMapReferences().stream().toList();
-    assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(findClassByObjectType("SomeSuperClass2WidgetMap", module)).orElseThrow(), idObjectTypeMapReferences.get(0));
+    assertIdObjectTypeMapReference(IdObjectTypeMapReference.create(findClassByObjectType("SomeSuperClass2WidgetMap", module)).orElseThrow(), idObjectTypeMapReferences.getFirst());
   }
 
   @Test

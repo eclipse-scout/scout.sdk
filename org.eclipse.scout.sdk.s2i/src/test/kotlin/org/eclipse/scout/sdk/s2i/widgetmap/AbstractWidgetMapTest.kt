@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -56,6 +56,11 @@ abstract class AbstractWidgetMapTest(val modelPath: String, fixturePath: String 
         })
 
         myModelFile = myFixture.copyFileToProject("$modelPath/${modelFileName()}", "${modelTargetPath()}/${modelFileName()}")
+    }
+
+    override fun tearDown() {
+        NodeModulesProvider.removeProvider(myFixture.project)
+        super.tearDown()
     }
 
     fun testWidgetMap() {

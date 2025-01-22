@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -196,7 +196,7 @@ class TransactionManager(val project: Project, val transactionName: String? = nu
 
     /**
      * Tries to commit all [TransactionMember]s registered so far. This [TransactionManager] may be used to
-     * register more [TransactionMember]s afterwards.
+     * register more [TransactionMember]s afterward.
      *
      * @param progress The [IdeaProgress] for progress indication
      * @return true if all [TransactionMember]s have been committed successfully

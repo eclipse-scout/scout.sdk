@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,7 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.IndexNotReadyException
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.ui.popup.Balloon
 import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.ui.components.JBScrollPane
@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import java.util.logging.Level
 import javax.swing.ScrollPaneConstants
 
-open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
+open class IdeaLogger : ISdkConsoleSpi, ProjectActivity, DumbAware {
 
     private val m_textLog = Logger.getInstance(IdeaLogger::class.java)
     private val m_balloonLog = NotificationGroupManager.getInstance().getNotificationGroup("scout.notification")
@@ -42,7 +42,7 @@ open class IdeaLogger : ISdkConsoleSpi, StartupActivity, DumbAware {
     /**
      * Executed on [Project] open
      */
-    override fun runActivity(project: Project) {
+    override suspend fun execute(project: Project) {
         SdkConsole.setConsoleSpi(this)
         if (EclipseScoutBundle.isRunningInSandbox()) {
             // set log level to DEBUG for plugin development

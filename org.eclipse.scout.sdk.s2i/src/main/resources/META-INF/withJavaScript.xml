@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2025 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -10,9 +10,6 @@
 <idea-plugin allow-bundled-update="true">
   <extensions defaultExtensionNs="com.intellij">
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.model.js.JsModelCacheStartup"/>
-    <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.model.js.JsModelManager"/>
-    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.model.js.PnpmLibraryRootUpdaterStartup"/>
-    <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.model.js.PnpmLibraryRootUpdater"/>
     <lang.foldingBuilder language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.nls.folding.NlsFoldingBuilderForJs"/>
     <lang.foldingBuilder language="TypeScript" implementationClass="org.eclipse.scout.sdk.s2i.nls.folding.NlsFoldingBuilderForJs"/>
     <completion.contributor language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJs" id="scoutNlsCompletionJs" order="first"/>
@@ -26,10 +23,8 @@
     <group id="org.eclipse.scout.sdk.s2i.ScoutJsMenu">
       <add-to-group group-id="org.eclipse.scout.sdk.s2i.ScoutMenu" relative-to-action="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInFileMenu" anchor="after"/>
       <separator></separator>
-      <action id="org.eclipse.scout.sdk.s2i.UpdateWidgetMapInScopeMenu"
-              class="org.eclipse.scout.sdk.s2i.widgetmap.UpdateWidgetMapInScopeMenu"/>
-      <action id="org.eclipse.scout.sdk.s2i.UpdateWidgetMapInFileMenu"
-              class="org.eclipse.scout.sdk.s2i.widgetmap.UpdateWidgetMapInFileMenu">
+      <action id="org.eclipse.scout.sdk.s2i.UpdateWidgetMapInScopeMenu" class="org.eclipse.scout.sdk.s2i.widgetmap.UpdateWidgetMapInScopeMenu"/>
+      <action id="org.eclipse.scout.sdk.s2i.UpdateWidgetMapInFileMenu" class="org.eclipse.scout.sdk.s2i.widgetmap.UpdateWidgetMapInFileMenu">
         <keyboard-shortcut keymap="$default" first-keystroke="control alt shift W"/>
       </action>
     </group>

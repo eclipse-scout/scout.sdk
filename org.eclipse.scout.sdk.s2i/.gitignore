@@ -3,3 +3,5 @@
 /out
 !/gradle/wrapper/gradle-wrapper.jar
 !/src/test/resources/model/dependencies/**/node_modules
+.intellijPlatform
+.kotlin

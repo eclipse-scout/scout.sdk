@@ -16,7 +16,7 @@ import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiManager
 import com.maddyhome.idea.copyright.pattern.EntityUtil
@@ -38,12 +38,12 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInRe
 import java.nio.file.Path
 import java.util.*
 
-open class IdeaSettingsCommentGenerator : IDefaultElementCommentGeneratorSpi, StartupActivity, DumbAware {
+open class IdeaSettingsCommentGenerator : IDefaultElementCommentGeneratorSpi, ProjectActivity, DumbAware {
 
     /**
      * Executed on [Project] open
      */
-    override fun runActivity(project: Project) {
+    override suspend fun execute(project: Project) {
         JavaElementCommentBuilder.setCommentGeneratorSpi(this)
     }
 

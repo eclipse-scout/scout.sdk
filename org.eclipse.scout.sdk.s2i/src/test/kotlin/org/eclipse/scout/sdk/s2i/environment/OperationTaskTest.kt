@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -78,11 +78,11 @@ class OperationTaskTest : BasePlatformTestCase() {
         assertTrue(result)
     }
 
-    private inner class CancelThread(private val waitUntilTaskReady: CountDownLatch, private val canceled: CountDownLatch, private val task: OperationTask) : Thread("cancel thread") {
+    private inner class CancelThread(private val m_waitUntilTaskReady: CountDownLatch, private val m_canceled: CountDownLatch, private val m_task: OperationTask) : Thread("cancel thread") {
         override fun run() {
-            waitUntilTaskReady.await(1, TimeUnit.MINUTES)
-            assertTrue(task.cancel())
-            canceled.countDown()
+            m_waitUntilTaskReady.await(1, TimeUnit.MINUTES)
+            assertTrue(m_task.cancel())
+            m_canceled.countDown()
         }
     }
 }

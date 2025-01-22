@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -444,7 +444,7 @@ public class MethodGenerator<TYPE extends IMethodGenerator<TYPE, BODY>, BODY ext
     // parameters
     if (isVarargs && !m_parameters.isEmpty()) {
       // if method is varargs the last parameter must be the varargs
-      m_parameters.get(m_parameters.size() - 1).asVarargs();
+      m_parameters.getLast().asVarargs();
     }
     builder.parenthesisOpen();
     builder.append(parameters(), null, ", ", null);

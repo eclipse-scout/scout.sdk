@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationSpec
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader.createManager
 import org.eclipse.scout.sdk.s2i.nls.inspection.AddMissingTranslationQuickFix
-import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
+import org.eclipse.scout.sdk.s2i.settings.ScoutSettingsHelper
 import java.util.stream.Collectors.toList
 
 object NlsCompletionHelper {
@@ -105,7 +105,7 @@ object NlsCompletionHelper {
     private fun renderLookupElement(element: LookupElement, presentation: LookupElementPresentation) {
         val lookupObj = element.getObject() as TranslationLookupObject
         val translation = lookupObj.translation
-        val language = ScoutSettings.getTranslationLanguage(lookupObj.module.project)
+        val language = ScoutSettingsHelper.getTranslationLanguage(lookupObj.module.project)
         val isInProject = translation.hasEditableStores()
         val primaryStoreName = translation.stores()
             .min(TranslationStoreComparator.INSTANCE).orElse(null)

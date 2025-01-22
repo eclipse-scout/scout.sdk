@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,7 +39,7 @@ public class PropertyBeanTest {
 
     assertEquals(5, propertyBeans.size());
 
-    var aloneProp = propertyBeans.get(0);
+    var aloneProp = propertyBeans.getFirst();
     assertEquals("Alone", aloneProp.name());
     assertEquals(String.class.getName(), aloneProp.type().name());
     assertEquals(propTestClass, aloneProp.declaringType());

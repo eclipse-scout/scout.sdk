@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.core.util.visitor;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.SequencedCollection;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -59,7 +60,7 @@ public class BreadthFirstTraversal<T> implements ITreeTraversal<T> {
     return TreeVisitResult.CONTINUE;
   }
 
-  protected void enqueueChildren(Deque<P_BreadthFirstNode<T>> dek, P_BreadthFirstNode<T> node) {
+  protected void enqueueChildren(SequencedCollection<P_BreadthFirstNode<T>> dek, P_BreadthFirstNode<T> node) {
     var children = m_childrenSupplier.apply(node.m_element);
     if (children == null) {
       return;
@@ -69,14 +70,14 @@ public class BreadthFirstTraversal<T> implements ITreeTraversal<T> {
     children.forEach(child -> enqueueChild(child, dek, node, index.getAndIncrement()));
   }
 
-  protected void enqueueChild(T child, Deque<P_BreadthFirstNode<T>> dek, P_BreadthFirstNode<T> node, int index) {
+  protected void enqueueChild(T child, SequencedCollection<P_BreadthFirstNode<T>> dek, P_BreadthFirstNode<T> node, int index) {
     if (child == null) {
       return;
     }
     enqueue(dek, child, node.m_level + 1, index);
   }
 
-  protected void enqueue(Deque<P_BreadthFirstNode<T>> dek, T element, int level, int index) {
+  protected void enqueue(SequencedCollection<P_BreadthFirstNode<T>> dek, T element, int level, int index) {
     var e = new P_BreadthFirstNode<>(element, level, index);
     dek.addLast(e);
   }

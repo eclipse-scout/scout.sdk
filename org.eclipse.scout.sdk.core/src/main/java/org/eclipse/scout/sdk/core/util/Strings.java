@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -433,7 +433,6 @@ public final class Strings {
     if (toBeFoundLength == 0) {
       return 0;
     }
-    //noinspection IfStatementWithIdenticalBranches
     if (isCaseSensitive) {
       arrayLoop: for (int i = start, max = end - toBeFoundLength + 1; i < max; i++) {
         if (searchIn[i] == toBeFound[0]) {
@@ -1163,7 +1162,7 @@ public final class Strings {
   /**
    * Removes leading and trailing invisible characters from the {@link CharSequence} given.
    * <p>
-   * Please note: While {@link String#trim()} does not correctly handle unicode whitespace characters and
+   * Please note: While {@link String#trim()} does not correctly handle Unicode whitespace characters and
    * {@link String#strip()} does not remove invisible control characters ({@code '\0'} - {@code '\8'}), this method
    * removes both types of invisible characters.
    * 

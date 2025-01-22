@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,7 +36,7 @@ public class ClasspathEntryTest {
     var path = env.classpath().toList();
     var first = path.get(0);
     var second = path.get(1);
-    var last = path.get(path.size() - 1);
+    var last = path.getLast();
     assertEquals(StandardCharsets.UTF_8.name(), first.encoding());
     assertTrue(first.isDirectory());
     assertTrue(first.isSourceFolder());
@@ -51,6 +51,7 @@ public class ClasspathEntryTest {
     assertTrue(first.unwrap().toString().replace('\\', '/').endsWith("/src/test/fixture, mode=SOURCE]"));
     assertNotEquals(second.unwrap().hashCode(), first.unwrap().hashCode());
     new CoreJavaEnvironmentWithSourceFactory().accept(newEnv -> assertNotEquals(newEnv.classpath().findAny().orElseThrow(), first));
+    //noinspection EqualsWithItself
     assertEquals(first, first);
     assertEquals(first.unwrap(), first.unwrap());
     assertNotEquals(second.unwrap(), first.unwrap());

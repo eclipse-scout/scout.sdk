@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -151,7 +151,7 @@ class ScoutModuleBuilder : ModuleBuilder() {
 
     override fun getNodeIcon() = scoutIcon(15)
 
-    override fun isSuitableSdkType(sdkType: SdkTypeId?) = sdkType === JavaSdk.getInstance()
+    override fun isSuitableSdkType(sdkType: SdkTypeId) = sdkType === JavaSdk.getInstance()
 
-    override fun createProject(name: String?, path: String?) = ExternalProjectsManagerImpl.setupCreatedProject(super.createProject(name, path))
+    override fun createProject(name: String, path: String) = ExternalProjectsManagerImpl.setupCreatedProject(super.createProject(name, path))
 }

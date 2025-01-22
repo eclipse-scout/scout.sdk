@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -80,11 +81,11 @@ public class TranslationsTest {
     var s7 = createStore("test.Class7", 200, "a", "c");
     var s8 = createStore("test.Class8", 200, "v", "z");
 
-    var implicitOverrides = Translations.storesHavingImplicitOverrides(Stream.of(s1, s2, s3, s4, s5, s6, s7, s8));
+    var implicitOverrides = Translations.storesHavingImplicitOverrides(List.of(s1, s2, s3, s4, s5, s6, s7, s8));
     var implicitOverrideNames = getImplicitOverrideNames(implicitOverrides);
     assertEquals(Set.of("test.Class1,test.Class2,test.Class4", "test.Class5,test.Class7"), implicitOverrideNames);
 
-    assertEquals(0, Translations.storesHavingImplicitOverrides(Stream.of(s1, s3)).count());
+    assertEquals(0, Translations.storesHavingImplicitOverrides(List.of(s1, s3)).count());
   }
 
   private static Set<String> getImplicitOverrideNames(Stream<Set<ITranslationStore>> implicitOverrides) {

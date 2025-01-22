@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import javax.swing.Icon
 
 class NlsFileType private constructor() : FileType {
 
+    @Suppress("CompanionObjectInExtension") // seems to be ok. E.g. DiffFileType seems to do the same
     companion object {
         @JvmField
         val INSTANCE: NlsFileType = NlsFileType()
@@ -29,7 +30,7 @@ class NlsFileType private constructor() : FileType {
 
     override fun getCharset(file: VirtualFile, content: ByteArray): String = StandardCharsets.UTF_8.name()
 
-    override fun getName() = message("nls.file.desc")
+    override fun getName() = "ScoutNls"
 
     override fun getDescription() = message("nls.file.desc")
 

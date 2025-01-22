@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,12 +16,12 @@ import com.intellij.codeInsight.template.postfix.templates.editable.JavaEditable
 import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.pom.java.LanguageLevel
 import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
 
-class PostfixCompletionInstaller : StartupActivity, DumbAware {
-    override fun runActivity(project: Project) {
+class PostfixCompletionInstaller : ProjectActivity, DumbAware {
+    override suspend fun execute(project: Project) {
         val beansGetPostfixId = "org.eclipse.scout.sdk.s2i.beans"
         val storage = PostfixTemplateStorage.getInstance() // already get instance here so that the storage is initialized
         val javaPostfixTemplateProvider = LanguagePostfixTemplate.EP_NAME.extensionList

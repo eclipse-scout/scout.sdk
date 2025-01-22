@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 /**
  * <h3>{@link ITranslation}</h3>
  * <p>
- * Represents a single translation. A translation consists of an unique identifier (key) and a text for each supported
+ * Represents a single translation. A translation consists of a unique identifier (key) and a text for each supported
  * {@link Language}.
  *
  * @since 7.0.0
@@ -41,7 +41,7 @@ public interface ITranslation extends Comparable<ITranslation> {
    * finally by all other texts.
    */
   Comparator<ITranslation> TRANSLATION_COMPARATOR = Comparator.comparing(ITranslation::key)
-      .thenComparing(t -> t.text(Language.LANGUAGE_DEFAULT).orElse(null))
+      .thenComparing(t -> t.text(Language.LANGUAGE_DEFAULT).orElse(""))
       .thenComparing(t -> String.join("", t.texts().values()));
 
   /**
@@ -56,7 +56,7 @@ public interface ITranslation extends Comparable<ITranslation> {
    * This instance remains untouched.
    *
    * @param translation
-   *          The {@link ITranslation} whose texts should be merged with this one.
+   *     The {@link ITranslation} whose texts should be merged with this one.
    */
   ITranslation merged(ITranslation translation);
 
@@ -64,9 +64,9 @@ public interface ITranslation extends Comparable<ITranslation> {
    * Gets the translation text for the specified {@link Language}.
    *
    * @param language
-   *          The {@link Language} for which the text should be returned. The language must match exactly (including
-   *          country and variant of the {@link Language#locale()}). As alternative use {@link #bestText(Language)}.
-   *          Must not be {@code null}.
+   *     The {@link Language} for which the text should be returned. The language must match exactly (including
+   *     country and variant of the {@link Language#locale()}). As alternative use {@link #bestText(Language)}.
+   *     Must not be {@code null}.
    * @return The translation text or an empty {@link Optional}.
    * @see #bestText(Language)
    */
@@ -74,10 +74,10 @@ public interface ITranslation extends Comparable<ITranslation> {
 
   /**
    * Gets the translation text that best suites the given {@link Language}.
-   * 
+   *
    * @param language
-   *          The {@link Language} for which the best matching text should be returned. May be {@code null}. In that
-   *          case the text for the {@link Language#LANGUAGE_DEFAULT} is returned.
+   *     The {@link Language} for which the best matching text should be returned. May be {@code null}. In that
+   *     case the text for the {@link Language#LANGUAGE_DEFAULT} is returned.
    * @return The best text of this translation that matches the given {@link Language}.
    * @see #text(Language)
    */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.SequencedCollection;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -407,7 +408,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     setAvailableVersions(singletonList(IMavenConstants.LATEST));
   }
 
-  private void setAvailableVersions(List<String> versions) {
+  private void setAvailableVersions(SequencedCollection<String> versions) {
     m_scoutVersions.clear();
     m_scoutVersions.addAll(versions);
 
@@ -420,7 +421,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
    * @param versions
    *          The new versions list. Is never {@code null} or empty.
    */
-  protected void updateVersionsFieldContent(List<String> versions) {
+  protected void updateVersionsFieldContent(SequencedCollection<String> versions) {
     var versionsField = m_scoutVersionField;
     if (versionsField == null || versionsField.isDisposed()) { // do not use isContentCreated here as createContent() might not have finished yet
       return;
@@ -429,7 +430,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     var contentProvider = (P_ScoutVersionsContentProvider) versionsField.getContentProvider();
     contentProvider.clearCache();
     if (!versions.contains(selected)) {
-      versionsField.acceptProposal(versions.get(0));
+      versionsField.acceptProposal(versions.getFirst());
     }
     versionsField.setSelection(0);
   }

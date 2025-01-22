@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.core.s.nls.ITranslationStore
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.containingModule
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.callInIdeaEnvironment
 import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager
@@ -101,14 +102,14 @@ class AddMissingTranslationQuickFix(val key: String) : LocalQuickFix {
 
         callInIdeaEnvironment(project, message("store.new.translation")) { env, progress ->
             manager.flush(env, progress)
-            updateTranslationKey(key, created, spec)
+            updateTranslationKey(project, key, created, spec)
         }
     }
 
-    private fun updateTranslationKey(existingKey: String, createdNlsEntry: ITranslation, translationSpec: TranslationLanguageSpec) {
+    private fun updateTranslationKey(project: Project, existingKey: String, createdNlsEntry: ITranslation, translationSpec: TranslationLanguageSpec) {
         val createdKey = createdNlsEntry.key()
         if (createdKey == existingKey) return
-        val path = translationSpec.element.containingFile.virtualFile.resolveLocalPath() ?: return
+        val path = IdeaEnvironment.computeInReadAction(project) { translationSpec.element.containingFile.virtualFile.resolveLocalPath() } ?: return
         TransactionManager.current().register(UpdateTranslationKeyMember(path, createdKey, translationSpec))
     }
 

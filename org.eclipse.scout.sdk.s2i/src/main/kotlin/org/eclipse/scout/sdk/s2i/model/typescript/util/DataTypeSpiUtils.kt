@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -126,7 +126,7 @@ object DataTypeSpiUtils {
         return module.nodeElementFactory().createObjectLiteralDataType(name, objectLiteral)
     }
 
-    private val ILLEGAL_DATA_TYPE_CHARS = "[|&\\(\\)\\[\\]]".toRegex()
+    private val ILLEGAL_DATA_TYPE_CHARS = "[|&()\\[\\]]".toRegex()
 
     fun createDataType(dataType: String, scope: JSElement, module: IdeaNodeModule): DataTypeSpi? {
         if (dataType.isEmpty() || dataType.contains(ILLEGAL_DATA_TYPE_CHARS)) return null

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,7 +35,7 @@ public class AnnotationTest {
     // type annotation
     var annotations = childClassType.annotations().stream().toList();
     assertEquals(1, annotations.size());
-    var annotation = annotations.get(0);
+    var annotation = annotations.getFirst();
     var nreal = 0;
     var nsynth = 0;
     for (var v : annotation.elements().values()) {
@@ -82,7 +82,7 @@ public class AnnotationTest {
     var testAnnot = wildcardBaseClass.annotations().first().orElseThrow();
     var value = testAnnot.element("inner").orElseThrow();
     assertNotNull(value);
-    assertSame(value.value().type(), MetaValueType.Array);
+    assertSame(MetaValueType.Array, value.value().type());
 
     var arr = ((IArrayMetaValue) value.value()).metaValueArray();
     assertEquals(2, arr.length);
@@ -114,7 +114,7 @@ public class AnnotationTest {
     // type annotation
     var annotations = baseClassType.annotations().stream().toList();
     assertEquals(1, annotations.size());
-    var annotation = annotations.get(0);
+    var annotation = annotations.getFirst();
     var nreal = 0;
     var nsynth = 0;
     for (var v : annotation.elements().values()) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -99,10 +99,10 @@ public class TranslationPropertiesFileTest {
   @Test
   public void testParse() {
     assertSame(Language.LANGUAGE_DEFAULT, parseLanguageFromFileName("prefix.properties", "prefix").orElseThrow());
-    assertEquals(new Language(new Locale("test")), parseLanguageFromFileName("prefix_test.properties", "prefix").orElseThrow());
-    assertEquals(new Language(new Locale("de", "FR", "xx")), parseLanguageFromFileName("prefix_de_FR_xx.properties", "prefix").orElseThrow());
-    assertEquals(new Language(new Locale("de", "FR")), parseLanguageFromFileName("prefix_de_FR.properties", "prefix").orElseThrow());
-    assertEquals(new Language(new Locale("de")), parseLanguageFromFileName("prefix_de.properties", "prefix").orElseThrow());
+    assertEquals(new Language(Locale.of("test")), parseLanguageFromFileName("prefix_test.properties", "prefix").orElseThrow());
+    assertEquals(new Language(Locale.of("de", "FR", "xx")), parseLanguageFromFileName("prefix_de_FR_xx.properties", "prefix").orElseThrow());
+    assertEquals(new Language(Locale.of("de", "FR")), parseLanguageFromFileName("prefix_de_FR.properties", "prefix").orElseThrow());
+    assertEquals(new Language(Locale.of("de")), parseLanguageFromFileName("prefix_de.properties", "prefix").orElseThrow());
     assertFalse(parseLanguageFromFileName("abc", "abc").isPresent());
     assertFalse(parseLanguageFromFileName(null, "").isPresent());
     assertFalse(parseLanguageFromFileName("prefix_test.properties", "text").isPresent());

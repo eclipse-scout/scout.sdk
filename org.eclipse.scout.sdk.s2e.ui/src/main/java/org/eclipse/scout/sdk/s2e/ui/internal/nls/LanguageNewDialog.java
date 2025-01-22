@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -133,7 +133,7 @@ public class LanguageNewDialog extends TitleAreaDialog {
     }
 
     // check if language already exists
-    var lang = new Language(new Locale(getLanguageIso(), Strings.notBlank(getCountryIso()).orElse("")));
+    var lang = new Language(Locale.of(getLanguageIso(), Strings.notBlank(getCountryIso()).orElse("")));
     if (getStore().languages().anyMatch(isEqual(lang))) {
       setMessage("This language already exists.", IMessageProvider.WARNING);
       return;
@@ -215,7 +215,7 @@ public class LanguageNewDialog extends TitleAreaDialog {
     protected Collection<?> loadProposals(IProgressMonitor monitor) {
       var isoLanguages = Locale.getISOLanguages();
       return Arrays.stream(isoLanguages)
-          .map(Locale::new)
+          .map(Locale::of)
           .collect(toList());
     }
   }
@@ -250,7 +250,7 @@ public class LanguageNewDialog extends TitleAreaDialog {
     protected Collection<?> loadProposals(IProgressMonitor monitor) {
       var isoCountries = Locale.getISOCountries();
       return Arrays.stream(isoCountries)
-          .map(isoCountry -> new Locale("", isoCountry))
+          .map(isoCountry -> Locale.of("", isoCountry))
           .collect(toList());
     }
   }

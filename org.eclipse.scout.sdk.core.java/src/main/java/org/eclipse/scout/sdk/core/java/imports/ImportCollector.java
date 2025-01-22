@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -187,7 +187,7 @@ public class ImportCollector implements IImportCollector {
     return organizeImports(m_staticImports.values(), m_imports.values(), includeExisting);
   }
 
-  private static final class ImportElement {
+  protected static final class ImportElement {
     private final boolean m_static;
     private final String m_packageName;
     private final String m_simpleName;

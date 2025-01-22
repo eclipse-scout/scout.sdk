@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.chooseAnalysisScope
 
-class UpdateAllDerivedResourcesMenu : AnAction(message("update.derived.resources") + "...", message("update.derived.resources.desc"), null) {
+class UpdateAllDerivedResourcesMenu : AnAction() {
 
     override fun actionPerformed(event: AnActionEvent) {
         val scopeToTrigger = event.chooseAnalysisScope(message("update.derived.resources"), message("select.scope.to.update")) ?: return

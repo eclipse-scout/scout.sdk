@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -429,7 +429,7 @@ public class ProposalTextField extends TextField {
 
   private class P_ProposalFieldListener implements Listener {
 
-    private boolean equalsIgnoreCase(String a, String b) {
+    private static boolean equalsIgnoreCase(String a, String b) {
       return (a == null && b == null) || a != null && a.equalsIgnoreCase(b);
     }
 

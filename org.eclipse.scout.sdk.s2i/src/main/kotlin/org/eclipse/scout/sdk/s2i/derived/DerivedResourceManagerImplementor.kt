@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,8 +35,8 @@ import org.eclipse.scout.sdk.s2i.environment.IdeaProgress
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager
 import org.eclipse.scout.sdk.s2i.environment.TransactionManager.Companion.callInExistingTransaction
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
+import org.eclipse.scout.sdk.s2i.settings.ScoutSettingsHelper
 import org.eclipse.scout.sdk.s2i.settings.SettingsChangedListener
-import org.eclipse.scout.sdk.s2i.util.compat.AppTopics
 import java.util.Collections.emptyList
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.TimeUnit
@@ -55,13 +55,13 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
 
     override fun start() {
         addDerivedResourceHandlerFactory(DtoUpdateHandlerFactory())
-        ScoutSettings.addListener(this)
+        ScoutSettingsHelper.addListener(this)
         updateSubscription()
     }
 
     override fun dispose() {
         unsubscribe()
-        ScoutSettings.removeListener(this)
+        ScoutSettingsHelper.removeListener(this)
         m_updateHandlerFactories.clear()
     }
 
@@ -76,7 +76,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
             return@synchronized
         }
         m_busConnection = project.messageBus.connect()
-        m_busConnection?.subscribe(AppTopics.fileDocumentSync(), DocumentSyncListener())
+        m_busConnection?.subscribe(FileDocumentManagerListener.TOPIC, DocumentSyncListener())
     }
 
     private fun unsubscribe() = synchronized(this) {
@@ -92,7 +92,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         }
     }
 
-    override fun isAutoUpdateDerivedResources(): Boolean = ScoutSettings.isAutoUpdateDerivedResources(project)
+    override fun isAutoUpdateDerivedResources(): Boolean = ScoutSettingsHelper.isAutoUpdateDerivedResources(project)
 
     override fun trigger(scope: SearchScope) {
         SdkLog.debug("Derived resource update event for scope $scope")

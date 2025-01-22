@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,7 @@ import com.intellij.lang.javascript.JavascriptLanguage
 import com.intellij.lang.javascript.library.JSLibraryManager
 import com.intellij.lang.javascript.library.JSLibraryManager.JSLibraryManagerChangeListener
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessModuleDir
@@ -35,6 +36,7 @@ import java.nio.file.Path
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+@Service(Service.Level.PROJECT)
 class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable {
 
     private val m_nodeModuleInventory = IdeaNodeModules(project)
@@ -117,6 +119,7 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
                     .asSequence()
                     .filter { it.isPhysical && !it.isDirectory && it.isValid }
                     .map { it.virtualFile }
+                    .filter { it.isValid && it.isInLocalFileSystem }
                     .distinct() // events for the same file: only process once
                     .mapNotNull { it.resolveLocalPath() }
                     .toList()

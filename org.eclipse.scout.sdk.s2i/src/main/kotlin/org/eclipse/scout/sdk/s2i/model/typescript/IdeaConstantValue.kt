@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.NodeElementSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.s2i.model.typescript.util.DataTypeSpiUtils
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
-import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.nio.file.Path
@@ -39,34 +38,23 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
     private val m_type = FinalValue<IConstantValue.ConstantValueType>()
     private val m_dataType = FinalValue<IDataType?>()
 
-    fun unwrappedElement() = m_unwrappedElement.computeIfAbsentAndGet {
-        var unwrappedElement = unwrapJSParenthesizedExpression(element)
-        unwrappedElement = unwrapTypeScriptAsExpression(unwrappedElement)
-        unwrappedElement = unwrapTypeScriptExpressionWithTypeArguments(unwrappedElement)
-        unwrapJSNewExpression(unwrappedElement)
-    }
-
     override fun containingFile(): Optional<Path> = m_containingFile.computeIfAbsentAndGet { Optional.ofNullable(element?.containingFile?.virtualFile?.resolveLocalPath()) }
 
-    protected fun unwrapJSParenthesizedExpression(element: JSElement?) = if (element is JSParenthesizedExpression) element.innerExpression else element
-
-    protected fun unwrapTypeScriptAsExpression(element: JSElement?) = if (element is TypeScriptAsExpression) element.expression else element
-
-    protected fun unwrapTypeScriptExpressionWithTypeArguments(element: JSElement?) = CompatibilityMethodCaller<JSElement?>()
-        .withCandidate("com.intellij.lang.javascript.psi.TypeScriptExpressionWithTypeArguments", "getExpression") {
-            // for IJ >= 2023.2 a JSReferenceExpression and its TypeScriptTypeArgumentList is wrapped in a TypeScriptExpressionWithTypeArguments => unwrap it and return its expression
-            if (it.descriptor.resolvedClass().isInstance(element)) {
-                return@withCandidate it.invoke(element)
+    fun unwrappedElement() = m_unwrappedElement.computeIfAbsentAndGet {
+        var unwrapped = element
+        // unwraps until no longer possible or for max. 10 levels
+        // necessary as the wrapper elements may be nested in different combinations
+        for (level in 0..9) {
+            unwrapped = when (unwrapped) {
+                is JSParenthesizedExpression -> unwrapped.innerExpression
+                is TypeScriptAsExpression -> unwrapped.expression
+                is JSNewExpression -> unwrapped.methodExpression
+                is TypeScriptExpressionWithTypeArguments -> unwrapped.expression
+                else -> return@computeIfAbsentAndGet unwrapped
             }
-            element
         }
-        .withCandidate("java.lang.Object", "toString") {
-            // for IJ < 2023.2 TypeScriptExpressionWithTypeArguments does not exists => no need to unwrap anything
-            element
-        }
-        .invoke() ?: element
-
-    protected fun unwrapJSNewExpression(element: JSElement?) = if (element is JSNewExpression) element.methodExpression else element
+        return@computeIfAbsentAndGet unwrapped
+    }
 
     fun referencedElement() = m_referencedElement.computeIfAbsentAndGet {
         (unwrappedElement() as? JSReferenceExpression)?.let { ideaModule.resolveReferencedElement(it) }

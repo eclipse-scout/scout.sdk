@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -137,7 +137,7 @@ public class JaxWsModuleNewOperation implements BiConsumer<EclipseEnvironment, E
     if (importedProjects == null || importedProjects.isEmpty()) {
       throw newFail("Unable to import newly created project into workspace.");
     }
-    return importedProjects.iterator().next().getProject();
+    return importedProjects.getFirst().getProject();
   }
 
   public IJavaProject getServerModule() {

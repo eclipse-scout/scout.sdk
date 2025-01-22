@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -53,27 +53,16 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
 
   public AnnotationQuery(IType containerType, JavaElementSpi owner) {
     m_containerType = containerType;
-
-    if (owner instanceof TypeSpi) {
-      m_ownerInLevelFinder = Optional::of;
-    }
-    else if (owner instanceof MethodSpi) {
-      m_ownerInLevelFinder = getMethodLookup((MethodSpi) owner);
-    }
-    else if (owner instanceof FieldSpi) {
-      m_ownerInLevelFinder = level -> level.fields().withName(owner.getElementName()).first();
-    }
-    else if (owner instanceof MethodParameterSpi param) {
-      m_ownerInLevelFinder = getMethodLookup(param.getDeclaringMethod())
+    m_ownerInLevelFinder = switch (owner) {
+      case TypeSpi ignored -> Optional::of;
+      case MethodSpi methodSpi -> getMethodLookup(methodSpi);
+      case FieldSpi ignored -> level -> level.fields().withName(owner.getElementName()).first();
+      case MethodParameterSpi param -> getMethodLookup(param.getDeclaringMethod())
           .andThen(method -> method
               .flatMap(m -> ((IMethod) m).parameters().item(param.getIndex())));
-    }
-    else if (owner instanceof PackageSpi) {
-      m_ownerInLevelFinder = Optional::of;
-    }
-    else {
-      throw new IllegalArgumentException("Unsupported annotation container: " + owner.getClass().getName());
-    }
+      case PackageSpi ignored -> Optional::of;
+      case null, default -> throw new IllegalArgumentException("Unsupported annotation container: " + (owner == null ? "null" : owner.getClass().getName()));
+    };
   }
 
   @SuppressWarnings("TypeMayBeWeakened")
@@ -101,8 +90,8 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
    * Include or exclude super types visiting when searching for annotations.
    *
    * @param b
-   *          {@code true} if all super classes and super interfaces should be checked for annotations. Default is
-   *          {@code false}.
+   *     {@code true} if all super classes and super interfaces should be checked for annotations. Default is
+   *     {@code false}.
    * @return this
    */
   public AnnotationQuery<T> withSuperTypes(boolean b) {
@@ -115,7 +104,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
    * Include or exclude super class visiting when searching for annotations.
    *
    * @param b
-   *          {@code true} if all super classes should be checked for annotations. Default is {@code false}.
+   *     {@code true} if all super classes should be checked for annotations. Default is {@code false}.
    * @return this
    */
   public AnnotationQuery<T> withSuperClasses(boolean b) {
@@ -131,7 +120,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
    * Include or exclude super interface visiting when searching for annotations.
    *
    * @param b
-   *          {@code true} if all super interfaces should be checked for annotations. Default is {@code false} .
+   *     {@code true} if all super interfaces should be checked for annotations. Default is {@code false} .
    * @return this
    */
   public AnnotationQuery<T> withSuperInterfaces(boolean b) {
@@ -147,7 +136,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
    * Limit the annotations to the given fully qualified annotation type name (see {@link IAnnotation#type()}).
    *
    * @param fullyQualifiedName
-   *          The fully qualified name. Default is no filtering.
+   *     The fully qualified name. Default is no filtering.
    * @return this
    */
   public AnnotationQuery<T> withName(CharSequence fullyQualifiedName) {
@@ -159,12 +148,12 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
    * <b>Example:</b> {@code type.annotations().withNameFrom(IJavaApi.class, IJavaApi::Override)}.
    *
    * @param api
-   *          The api type that defines the type. An instance of this API is passed to the nameFunction. May be
-   *          {@code null} in case the given nameFunction can handle a {@code null} input.
+   *     The api type that defines the type. An instance of this API is passed to the nameFunction. May be
+   *     {@code null} in case the given nameFunction can handle a {@code null} input.
    * @param nameFunction
-   *          A {@link Function} to be called to obtain the fully qualified type name to search.
+   *     A {@link Function} to be called to obtain the fully qualified type name to search.
    * @param <API>
-   *          The API type that contains the class name
+   *     The API type that contains the class name
    * @return this
    */
   public <API extends IApiSpecification> AnnotationQuery<T> withNameFrom(Class<API> api, Function<API, ITypeNameSupplier> nameFunction) {
@@ -185,7 +174,7 @@ public class AnnotationQuery<T> extends AbstractQuery<T> implements Predicate<IA
    * Limit the annotations to the given managed annotation type and convert the result into the narrowed managed type.
    *
    * @param managedWrapperType
-   *          The managed annotation type class. Default no filtering.
+   *     The managed annotation type class. Default no filtering.
    * @return this
    */
   @SuppressWarnings("unchecked")

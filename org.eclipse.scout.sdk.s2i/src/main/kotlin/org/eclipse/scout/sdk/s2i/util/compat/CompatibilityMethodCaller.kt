@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,12 +37,12 @@ class CompatibilityMethodCaller<T> {
     fun withCandidate(declaringClassFqn: String, methodName: String, vararg parameterTypesFqn: String, handler: (ResolvedMethod<T>) -> T) =
             withCandidate(MethodDescriptor(declaringClassFqn, methodName, parameterTypesFqn, handler))
 
-    fun invoke(): T {
+    fun invoke(vararg parameters: Any?): T {
         val (selectedDescriptor, methodCallable) = m_selectedDescriptorWithCallable
-        return selectedDescriptor.handler(ResolvedMethod(selectedDescriptor, methodCallable))
+        return selectedDescriptor.handler(ResolvedMethod(selectedDescriptor, methodCallable, parameters))
     }
 
-    class ResolvedMethod<R>(val descriptor: MethodDescriptor<R>, private val m_callable: (Any?, Array<out Any?>) -> R) {
+    class ResolvedMethod<R>(val descriptor: MethodDescriptor<R>, private val m_callable: (Any?, Array<out Any?>) -> R, val parameters: Array<out Any?>) {
 
         fun invoke(obj: Any?, vararg parameters: Any?) = try {
             m_callable(obj, parameters)

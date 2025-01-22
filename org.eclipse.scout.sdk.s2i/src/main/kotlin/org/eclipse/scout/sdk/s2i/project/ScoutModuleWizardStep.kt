@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,7 +32,6 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.ui.TextFieldWithMaxLen
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
-import java.util.function.Supplier
 import javax.swing.BorderFactory
 import javax.swing.ButtonGroup
 import javax.swing.DefaultComboBoxModel
@@ -70,19 +69,19 @@ class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: Scout
         val namePanel = JPanel(GridBagLayout())
 
         ComponentValidator(wizardContext.disposable)
-            .withValidator(Supplier { validateGroupId() })
+            .withValidator { validateGroupId() }
             .andRegisterOnDocumentListener(m_groupIdTextField)
             .andStartOnFocusLost()
             .installOn(m_groupIdTextField)
 
         ComponentValidator(wizardContext.disposable)
-            .withValidator(Supplier { validateArtifactId() })
+            .withValidator { validateArtifactId() }
             .andRegisterOnDocumentListener(m_artifactIdTextField)
             .andStartOnFocusLost()
             .installOn(m_artifactIdTextField)
 
         ComponentValidator(wizardContext.disposable)
-            .withValidator(Supplier { validateDisplayName() })
+            .withValidator { validateDisplayName() }
             .andRegisterOnDocumentListener(m_displayNameTextField)
             .andStartOnFocusLost()
             .installOn(m_displayNameTextField)
@@ -125,7 +124,7 @@ class ScoutModuleWizardStep(val wizardContext: WizardContext, val builder: Scout
         val settingsPanel = JPanel(GridBagLayout())
 
         val versionValidator = ComponentValidator(wizardContext.disposable)
-            .withValidator(Supplier { validateVersion() })
+            .withValidator { validateVersion() }
             .installOn(m_versionsComboBox)
         m_versionsComboBox.isEditable = true
         m_versionsComboBox.putClientProperty("html.disable", true)

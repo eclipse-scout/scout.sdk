@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -41,7 +41,7 @@ public class LanguageNewAction extends Action {
   public void run() {
     var dialog = new LanguageNewDialog(m_shell, m_project);
     if (dialog.open() == Window.OK) {
-      var newLanguage = new Language(new Locale(dialog.getLanguageIso(), Optional.ofNullable(dialog.getCountryIso()).orElse("")));
+      var newLanguage = new Language(Locale.of(dialog.getLanguageIso(), Optional.ofNullable(dialog.getCountryIso()).orElse("")));
       m_project.addNewLanguage(newLanguage, dialog.getStore());
     }
   }

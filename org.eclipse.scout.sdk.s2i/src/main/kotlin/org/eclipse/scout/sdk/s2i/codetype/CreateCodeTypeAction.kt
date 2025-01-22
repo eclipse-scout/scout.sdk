@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,12 +13,11 @@ import com.intellij.psi.PsiClass
 import org.eclipse.scout.sdk.core.s.codetype.CodeTypeNewOperation
 import org.eclipse.scout.sdk.core.s.util.ITier
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.element.CreateElementAction
 import org.eclipse.scout.sdk.s2i.findTypeByName
 import org.eclipse.scout.sdk.s2i.toIdea
 
-class CreateCodeTypeAction : CreateElementAction<CodeTypeNewOperation>(EclipseScoutBundle.message("create.codetype"), EclipseScoutBundle.message("create.codetype.desc")) {
+class CreateCodeTypeAction : CreateElementAction<CodeTypeNewOperation>() {
 
     override fun startTiers(): Collection<ITier<*>> = listOf(ScoutTier.Shared)
 

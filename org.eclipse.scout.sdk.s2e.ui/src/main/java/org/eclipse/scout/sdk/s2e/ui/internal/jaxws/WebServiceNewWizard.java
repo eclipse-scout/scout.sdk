@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,8 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.jaxws;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Locale;
 
 import org.eclipse.core.resources.IFile;
@@ -81,13 +82,13 @@ public class WebServiceNewWizard extends AbstractWizard implements INewWizard {
     else {
       try {
         if (createConsumer) {
-          op.setWsdlUrl(new URL(getWebServiceNewWizardPage().getConsumerWsdlUrl()));
+          op.setWsdlUrl(new URI(getWebServiceNewWizardPage().getConsumerWsdlUrl()).toURL());
         }
         else {
-          op.setWsdlUrl(new URL(getWebServiceNewWizardPage().getProviderWsdlUrl()));
+          op.setWsdlUrl(new URI(getWebServiceNewWizardPage().getProviderWsdlUrl()).toURL());
         }
       }
-      catch (MalformedURLException e) {
+      catch (URISyntaxException | MalformedURLException e) {
         SdkLog.error("Invalid URL.", e);
       }
     }

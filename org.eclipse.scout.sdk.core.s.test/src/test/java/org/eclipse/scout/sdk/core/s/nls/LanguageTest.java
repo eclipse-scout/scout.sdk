@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -29,16 +29,16 @@ public class LanguageTest {
   @Test
   public void testParse() {
     assertSame(Language.LANGUAGE_DEFAULT, Language.parse("default").orElseThrow());
-    assertEquals(new Language(new Locale("test")), Language.parse("test").orElseThrow());
-    assertEquals(new Language(new Locale("de", "FR", "xx")), Language.parse("de_FR_xx").orElseThrow());
-    assertEquals(new Language(new Locale("de", "FR")), Language.parse("de_FR").orElseThrow());
-    assertEquals(new Language(new Locale("de")), Language.parse("de").orElseThrow());
+    assertEquals(new Language(Locale.of("test")), Language.parse("test").orElseThrow());
+    assertEquals(new Language(Locale.of("de", "FR", "xx")), Language.parse("de_FR_xx").orElseThrow());
+    assertEquals(new Language(Locale.of("de", "FR")), Language.parse("de_FR").orElseThrow());
+    assertEquals(new Language(Locale.of("de")), Language.parse("de").orElseThrow());
     assertFalse(Language.parse("").isPresent());
   }
 
   @Test
   public void testParseOrThrow() {
-    assertEquals(new Language(new Locale("test")), Language.parseThrowingOnError("test"));
+    assertEquals(new Language(Locale.of("test")), Language.parseThrowingOnError("test"));
     assertThrows(IllegalArgumentException.class, () -> Language.parseThrowingOnError("_blub"));
   }
 
@@ -60,7 +60,7 @@ public class LanguageTest {
   @Test
   @SuppressWarnings({"unlikely-arg-type", "EqualsBetweenInconvertibleTypes", "ConstantConditions", "SimplifiableJUnitAssertion", "EqualsWithItself"})
   public void testLanguage() {
-    var locale = new Locale("test");
+    var locale = Locale.of("test");
     var lang = new Language(locale);
     assertSame(locale, lang.locale());
     assertEquals("test", lang.displayName());

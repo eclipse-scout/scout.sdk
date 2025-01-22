@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -191,7 +191,7 @@ public class DataObjectGenerator<TYPE extends DataObjectGenerator<TYPE>> extends
     return thisInstance();
   }
 
-  private static final class NodeEntry {
+  protected static final class NodeEntry {
     private final String m_name;
     private final DataObjectNodeKind m_kind;
     private final JavaBuilderContextFunction<String> m_dataType;

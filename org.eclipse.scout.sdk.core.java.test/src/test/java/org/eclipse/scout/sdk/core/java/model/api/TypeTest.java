@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -145,12 +145,12 @@ public class TypeTest {
   public void testResolveTypeParamValue(IJavaEnvironment env) {
     var resolvedTypeParamValueSignature = env.requireType(ChildClass.class.getName()).resolveTypeParamValue(0, InterfaceLevel1.class.getName()).orElseThrow().collect(toList());
     assertEquals(1, resolvedTypeParamValueSignature.size());
-    assertEquals(org.eclipse.scout.sdk.core.java.fixture.Long.class.getName(), resolvedTypeParamValueSignature.get(0).name());
+    assertEquals(org.eclipse.scout.sdk.core.java.fixture.Long.class.getName(), resolvedTypeParamValueSignature.getFirst().name());
 
     resolvedTypeParamValueSignature = env.requireType(ChildClass.class.getName())
         .resolveTypeParamValue(0, BaseClass.class.getName())
         .orElseThrow()
-        .collect(toList());
+        .toList();
     assertEquals(3, resolvedTypeParamValueSignature.size());
     assertEquals(AbstractList.class.getName() + JavaTypes.C_GENERIC_START + String.class.getName() + JavaTypes.C_GENERIC_END, resolvedTypeParamValueSignature.get(0).reference());
     assertEquals(AbstractList.class.getName(), resolvedTypeParamValueSignature.get(0).reference(true));
@@ -221,7 +221,7 @@ public class TypeTest {
     // type arguments
     var typeArguments = baseClassType.typeArguments().toList();
     assertEquals(2, typeArguments.size());
-    var firstTypeArg = typeArguments.get(0);
+    var firstTypeArg = typeArguments.getFirst();
     assertTrue(firstTypeArg.isParameterType());
     assertEquals(AbstractList.class.getName(), firstTypeArg.requireSuperClass().name());
     assertEquals(2, firstTypeArg.superInterfaces().count());
@@ -343,7 +343,7 @@ public class TypeTest {
     // super type arguments
     var superTypeArguments = innerClass2.requireSuperClass().typeArguments().toList();
     assertEquals(1, superTypeArguments.size());
-    var firstTypeArg = superTypeArguments.get(0);
+    var firstTypeArg = superTypeArguments.getFirst();
     assertFalse(firstTypeArg.isParameterType());
     assertTrue(firstTypeArg.isArray());
     assertEquals(1, firstTypeArg.arrayDimension());

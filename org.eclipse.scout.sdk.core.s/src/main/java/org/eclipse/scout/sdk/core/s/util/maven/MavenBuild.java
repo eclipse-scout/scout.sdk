@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -60,6 +60,7 @@ public class MavenBuild {
     withProperty("master_coverage_skip", "true")
         .withProperty("master_test_forkCount", "1")
         .withProperty("master_test_runOrder", "filesystem")
+        .withProperty("master_cyclonedx_skip", "true")
         .withProperty("master_git-id_skip", "true");
   }
 

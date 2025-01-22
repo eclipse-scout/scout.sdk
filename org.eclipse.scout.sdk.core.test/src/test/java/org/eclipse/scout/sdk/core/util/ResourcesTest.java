@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
@@ -29,15 +28,15 @@ import org.junit.jupiter.api.Test;
 @Tag("IntegrationTest")
 public class ResourcesTest {
   @Test
-  public void testHttpGet() throws IOException {
-    var uri = "https://eclipse.dev/scout/";
-    try (var in = Resources.httpGet(uri)) {
+  public void testHttpGet() throws IOException, URISyntaxException {
+    var address = "https://eclipse.dev/scout/";
+    try (var in = Resources.httpGet(address)) {
       assertTrue(in.read() >= 0);
     }
-    try (var in = Resources.openStream(uri)) {
+    try (var in = Resources.openStream(address)) {
       assertTrue(in.read() >= 0);
     }
-    var url = new URL(uri);
+    var url = new URI(address).toURL();
     try (var in = Resources.openStream(url)) {
       assertTrue(in.read() >= 0);
     }

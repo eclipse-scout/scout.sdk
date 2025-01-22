@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,14 +18,14 @@ import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.project.DumbService
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.PackageIndex
-import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.openapi.roots.SourceFolder
 import com.intellij.openapi.ui.popup.JBPopup
 import com.intellij.openapi.util.text.StringUtil
-import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiDirectory
 import com.intellij.psi.PsiNameHelper
+import com.intellij.psi.util.PsiTypesUtil
 import com.intellij.psi.util.PsiUtil
 import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
@@ -44,7 +44,23 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.function.BiConsumer
 
-abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val text: String, val description: String) : AnAction(text, description, null) {
+abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>> : AnAction() {
+
+    companion object {
+        /**
+         * isRestrictedIdentifier was moved from HighlightClassUtil to PsiTypesUtil in IJ 2025.1
+         * Can be removed as soon as IJ 2025.1 is the newest supported version.
+         */
+        private val m_isRestrictedIdentifier = CompatibilityMethodCaller<Boolean>()
+            .withCandidate(PsiTypesUtil::class.java, "isRestrictedIdentifier", String::class.java, LanguageLevel::class.java) {
+                // IJ >= 2025.1
+                it.invokeStatic(*it.parameters)
+            }
+            .withCandidate(HighlightClassUtil::class.java, "isRestrictedIdentifier", String::class.java, LanguageLevel::class.java) {
+                // IJ <= 2024.3
+                it.invokeStatic(*it.parameters)
+            }
+    }
 
     override fun actionPerformed(e: AnActionEvent) {
         val dataContext = e.dataContext
@@ -86,7 +102,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
     protected fun createPopup(dir: PsiDirectory): JBPopup {
         val contentPanel = NewItemSimplePopupPanel()
         val nameField = contentPanel.textField
-        val popup = NewItemPopupUtil.createNewItemPopup(text, contentPanel, nameField)
+        val popup = NewItemPopupUtil.createNewItemPopup(this.templatePresentation.text, contentPanel, nameField)
         contentPanel.setApplyAction {
             val name = nameField.text
             val errorMessage = validateInput(dir, name)
@@ -108,14 +124,14 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
             errorMessage = EclipseScoutBundle.message("invalid.java.qualified.name")
         }
         val shortName = StringUtil.getShortName(name)
-        if (HighlightClassUtil.isRestrictedIdentifier(shortName, level)) {
+        if (m_isRestrictedIdentifier.invoke(shortName, level)) {
             errorMessage = JavaErrorBundle.message("restricted.identifier", shortName)
         }
         return errorMessage
     }
 
     protected fun createElement(dir: PsiDirectory, name: String) {
-        IdeaEnvironment.callInIdeaEnvironment(dir.project, description) { env, progress ->
+        IdeaEnvironment.callInIdeaEnvironment(dir.project, this.templatePresentation.description) { env, progress ->
             val project = env.project
             val sourceFolder = dir.virtualFile.containingSourceFolder(project)
             if (sourceFolder == null || !isValidSourceFolder(sourceFolder)) {
@@ -129,7 +145,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
                 return@callInIdeaEnvironment null
             }
 
-            var pkg = IdeaEnvironment.computeInReadAction(dir.project) { getPackageNameByDirectory(dir.virtualFile, project) }
+            var pkg = IdeaEnvironment.computeInReadAction(dir.project) { PackageIndex.getInstance(project).getPackageNameByDirectory(dir.virtualFile) }
             val lastIndexOf = name.lastIndexOf(".")
             if (lastIndexOf > 0) pkg += "." + name.substring(0, lastIndexOf)
             val elementName = capitalize(name.substring(lastIndexOf + 1, name.length)).toString()
@@ -148,22 +164,9 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>>(val
         }.thenAccept {
             it.get()?.let { psiSupplier -> openPsiInEditorLater(dir.project, psiSupplier) }
         }.exceptionally {
-            SdkLog.error("Error creating {}.", text, it)
+            SdkLog.error("Error creating {}.", this.templatePresentation.text, it)
             null
         }
-    }
-
-    protected fun getPackageNameByDirectory(dir: VirtualFile, project: Project): String? {
-        // can be removed as soon as IJ 2022.3 is the latest supported version
-        return CompatibilityMethodCaller<String?>()
-            .withCandidate(PackageIndex::class.java.name, "getPackageNameByDirectory", VirtualFile::class.java.name) {
-                // for IJ >= 2022.3: use PackageIndex
-                it.invoke(PackageIndex.getInstance(project), dir)
-            }
-            .withCandidate(ProjectFileIndex::class.java.name, "getPackageNameByDirectory", VirtualFile::class.java.name) {
-                // for IJ <= 2022.2 use ProjectFileIndex
-                it.invoke(ProjectFileIndex.getInstance(project), dir)
-            }.invoke()
     }
 
     protected open fun openPsiInEditorLater(project: Project, psiSupplier: () -> PsiClass?) {

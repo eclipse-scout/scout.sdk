@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -899,7 +899,7 @@ public class WebServiceFormPage extends FormPage {
     m_package = pck;
   }
 
-  private static final class P_ImageArea {
+  protected static final class P_ImageArea {
     private final Rectangle m_area;
     private final Object m_elementToShow;
 

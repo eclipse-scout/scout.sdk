@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,7 +26,6 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.Conditions.alwaysTrue
 import com.intellij.psi.*
-import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager
 import com.intellij.psi.codeStyle.JavaCodeStyleManager
 import com.intellij.psi.codeStyle.JavaCodeStyleSettings
@@ -46,7 +45,6 @@ import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 /**
  * Handler that inserts a selected [TemplateDescriptor].
  */
-@Suppress("TestOnlyProblems")
 class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scoutApi: IScoutApi, val prefix: CharSequence) : InsertHandler<LookupElement> {
 
     private lateinit var m_engine: TemplateEngine
@@ -63,25 +61,22 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
 
     /**
      * The templates do not work if the setting "InsertInnerClassImports" is active.
-     * Therefore, execute the template with temporary settings (see [CodeStyleSettingsManager.setTemporarySettings]).
+     * Therefore, execute the template with temporary settings.
      * The temporary settings will be removed again in the [TemplateListener].
      */
     private fun startTemplateWithTempSettings(template: TemplateImpl, editor: Editor) {
-        val project = editor.project
+        val project = editor.project ?: return
 
         writeCommandAction(project).run(ThrowableRunnable<RuntimeException> {
-            val settingsManager = CodeStyleSettingsManager.getInstance(project)
-            val origTempSettings = settingsManager.temporarySettings
             val origProjectSettings = CodeStyle.getSettings(editor) // must be obtained before creating temp settings!
-            val tempSettings = CodeStyleSettingsManager.getInstance(project).createTemporarySettings()
-            tempSettings.copyFrom(origProjectSettings)
+            val templateListener = TemplateListener(templateDescriptor, editor) { m_insertPos }
+            val tempSettings = CodeStyleSettingsManager.getInstance(project).cloneSettings(origProjectSettings)
             tempSettings.getCustomSettings(JavaCodeStyleSettings::class.java).isInsertInnerClassImports = false
 
-            val templateListener = TemplateListener(templateDescriptor, editor, settingsManager, origTempSettings) {
-                m_insertPos
-            }
             TemplateHelper.removePrefix(editor, prefix)
-            TemplateManager.getInstance(project).startTemplate(editor, template, templateListener)
+            CodeStyle.runWithLocalSettings(project, tempSettings) { _ ->
+                TemplateManager.getInstance(project).startTemplate(editor, template, templateListener)
+            }
 
             m_insertPos = TemplateManagerImpl.getTemplateState(editor)
                 ?.getVariableRange(TemplateDescriptor.VARIABLE_NAME)
@@ -100,7 +95,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
         template.isToIndent = true
         template.setValue(Template.Property.USE_STATIC_IMPORT_IF_POSSIBLE, false)
         TemplateImplUtil.parseVariableNames(source).forEach { addVariable(it, template) }
-        SdkLog.debug("Template with {} segments created.", template.segmentsCount) // calls parseSegments internally which is no public API
+        SdkLog.debug("Template '{}' created.", (template as Template).string) // getString() calls parseSegments internally which is no public API but required here
         return template
     }
 
@@ -118,8 +113,6 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
     private class TemplateListener(
         private val m_templateDescriptor: TemplateDescriptor,
         private val m_editor: Editor,
-        private val m_settingsManager: CodeStyleSettingsManager,
-        private val m_origSettings: CodeStyleSettings?,
         private val m_positionSupplier: () -> Int
     ) : TemplateEditingAdapter() {
 
@@ -132,11 +125,7 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
         }
 
         private fun onTemplateCompletedOrCancelled(state: TemplateState?) {
-            try {
-                insertInnerTypeGetter(computeCompletionPosition(state))
-            } finally {
-                resetTemporarySettings()
-            }
+            insertInnerTypeGetter(computeCompletionPosition(state))
         }
 
         private fun computeCompletionPosition(state: TemplateState?): Int {
@@ -147,14 +136,6 @@ class TemplateInsertHandler(val templateDescriptor: TemplateDescriptor, val scou
                 }
             }
             return m_positionSupplier()
-        }
-
-        private fun resetTemporarySettings() {
-            if (m_origSettings != null) {
-                m_settingsManager.setTemporarySettings(m_origSettings)
-            } else {
-                m_settingsManager.dropTemporarySettings()
-            }
         }
 
         private fun resolveInnerTypeGetterContainer(createdClass: PsiClass): Pair<PsiClass, String>? {

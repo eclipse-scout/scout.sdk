@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,10 +13,10 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toMap;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.SequencedCollection;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -34,8 +34,8 @@ public class StackedTranslation extends Translation implements IStackedTranslati
   private Map<Language, String> m_mergedTexts; // created on first use
   private Map<Language, ITranslationEntry> m_entriesByLanguage; // created on first use
 
-  protected StackedTranslation(List<ITranslationEntry> entries) {
-    super(entries.get(0).key()); // element must exist
+  protected StackedTranslation(SequencedCollection<ITranslationEntry> entries) {
+    super(entries.getFirst().key()); // element must exist
     m_entries = entries.stream()
         .collect(toMap(ITranslationEntry::store, Function.identity(), Ensure::failOnDuplicates));
   }

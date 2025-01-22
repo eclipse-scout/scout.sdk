@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -216,8 +216,8 @@ public final class Translations {
    * @return A {@link Stream} returning {@link Set sets} of {@link ITranslationStore Translations} that share the same
    *         {@code @Order} annotation value and have common translation keys.
    */
-  public static Stream<Set<ITranslationStore>> storesHavingImplicitOverrides(Stream<ITranslationStore> allStores) {
-    return allStores
+  public static Stream<Set<ITranslationStore>> storesHavingImplicitOverrides(Collection<ITranslationStore> allStores) {
+    return allStores.stream()
         .distinct()
         .collect(groupingBy(s -> s.service().order(), toList()))
         .values().stream()

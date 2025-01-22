@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -233,7 +233,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implemen
     var typeArgs = type.typeArguments().toList();
     if (!typeArgs.isEmpty()) {
       builder.append(JavaTypes.C_GENERIC_START);
-      buildReferenceRec(typeArgs.get(0), false, builder);
+      buildReferenceRec(typeArgs.getFirst(), false, builder);
       for (var i = 1; i < typeArgs.size(); i++) {
         builder.append(JavaTypes.C_COMMA);
         buildReferenceRec(typeArgs.get(i), false, builder);

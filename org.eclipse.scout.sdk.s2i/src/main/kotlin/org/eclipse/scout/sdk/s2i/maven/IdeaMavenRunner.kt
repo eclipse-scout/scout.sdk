@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,10 +12,9 @@ package org.eclipse.scout.sdk.s2i.maven
 import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
 import com.intellij.execution.ui.RunContentDescriptor
-import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.util.ui.EDT
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment
@@ -34,12 +33,12 @@ import org.jetbrains.idea.maven.project.MavenProjectsManager
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-open class IdeaMavenRunner : IMavenRunnerSpi, StartupActivity, DumbAware {
+open class IdeaMavenRunner : IMavenRunnerSpi, ProjectActivity, DumbAware {
 
     /**
      * Executed on [Project] open
      */
-    override fun runActivity(project: Project) {
+    override suspend fun execute(project: Project) {
         MavenRunner.set(this)
     }
 
@@ -85,10 +84,8 @@ open class IdeaMavenRunner : IMavenRunnerSpi, StartupActivity, DumbAware {
         val processStarted = CountDownLatch(1)
         val processTerminated = CountDownLatch(1)
 
-        Ensure.isFalse(EDT.isCurrentThreadEdt(), "Not allowed to execute Maven runner in UI thread.") // as this thread will be blocked (freeze) until the maven call completed.
-        ApplicationManager.getApplication().invokeLater {
-            MavenRunConfigurationType.runConfiguration(project, parameters, generalSettings, settings) { onMavenProcessStarted(it, processStarted, processTerminated) }
-        }
+        Ensure.isFalse(EDT.isCurrentThreadEdt(), "Not allowed to execute Maven runner in UI thread.")
+        MavenRunConfigurationType.runConfiguration(project, parameters, generalSettings, settings) { onMavenProcessStarted(it, processStarted, processTerminated) }
 
         val processCreated = processStarted.await(10, TimeUnit.SECONDS)
         if (processCreated) {

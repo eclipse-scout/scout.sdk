@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2025 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 <idea-plugin allow-bundled-update="true" require-restart="true">
   <id>org.eclipse.scout.sdk.s2i</id>
   <name>Eclipse Scout</name>
-  <version>13.0.0.9999999999</version>
+  <version>14.0.0.9999999999</version>
 
   <vendor url="https://eclipse.dev/scout/">Eclipse Scout Project</vendor>
 
@@ -83,8 +83,8 @@
         ...
   ]]></change-notes>
 
-  <!-- please see https://jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-  <idea-version since-build="222.4345.14" until-build="243.*"/>
+  <!-- please see https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html for description -->
+  <idea-version since-build="243.23654"/>
 
   <depends>com.intellij.modules.platform</depends>
   <depends>com.intellij.modules.lang</depends>
@@ -106,7 +106,6 @@
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManagerStartup"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.PostfixCompletionInstaller"/>
 
-    <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.classid.AutoCreateClassIdListener"/>
     <projectService serviceInterface="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager"
                     serviceImplementation="org.eclipse.scout.sdk.s2i.derived.DerivedResourceManagerImplementor"/>
     <projectService serviceInterface="org.eclipse.scout.sdk.s2i.dataobject.DataObjectManager"
@@ -115,7 +114,6 @@
                     serviceImplementation="org.eclipse.scout.sdk.s2i.classid.ClassIdCacheImplementor"/>
     <applicationService serviceInterface="org.eclipse.scout.sdk.s2i.element.ElementCreationManager"
                         serviceImplementation="org.eclipse.scout.sdk.s2i.element.ElementCreationManagerImplementor"/>
-    <projectService serviceImplementation="org.eclipse.scout.sdk.s2i.nls.TranslationManagerCache"/>
     <applicationService serviceImplementation="org.eclipse.scout.sdk.s2i.settings.ScoutCodeFoldingSettings"/>
     <projectConfigurable groupId="language" displayName="Scout" id="preferences.ScoutSettings"
                          instance="org.eclipse.scout.sdk.s2i.settings.ScoutSettings"/>
@@ -125,11 +123,11 @@
                      implementationClass="org.eclipse.scout.sdk.s2i.classid.MissingClassIdInspection"/>
     <localInspection language="JAVA" shortName="DuplicateClassId" groupName="Scout" enabledByDefault="false" level="ERROR" key="duplicate.classid.inspection.displayName"
                      implementationClass="org.eclipse.scout.sdk.s2i.classid.DuplicateClassIdInspection"/>
-    <localInspection shortName="MissingTranslation" groupName="Scout" enabledByDefault="true" level="WARNING" key="missing.translation.inspection.displayName"
+    <localInspection language="" shortName="MissingTranslation" groupName="Scout" enabledByDefault="true" level="WARNING" key="missing.translation.inspection.displayName"
                      implementationClass="org.eclipse.scout.sdk.s2i.nls.inspection.MissingTranslationInspection"/>
-    <globalInspection shortName="UnusedTranslation" groupName="Scout" enabledByDefault="false" level="WARNING" key="unused.translation.inspection.displayName"
+    <globalInspection language="" shortName="UnusedTranslation" groupName="Scout" enabledByDefault="false" level="WARNING" key="unused.translation.inspection.displayName"
                       implementationClass="org.eclipse.scout.sdk.s2i.nls.inspection.UnusedTranslationInspection"/>
-    <fileType name="Scout National Language Support" extensions="nls" fieldName="INSTANCE" implementationClass="org.eclipse.scout.sdk.s2i.nls.NlsFileType"/>
+    <fileType name="ScoutNls" extensions="nls" fieldName="INSTANCE" implementationClass="org.eclipse.scout.sdk.s2i.nls.NlsFileType"/>
     <fileEditorProvider implementation="org.eclipse.scout.sdk.s2i.nls.editor.NlsFileEditorProvider"/>
     <completion.contributor language="JAVA" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForJava" id="scoutNlsCompletionJava" order="before propertiesCompletion"/>
     <completion.contributor language="HTML" implementationClass="org.eclipse.scout.sdk.s2i.nls.completion.NlsCompletionContributorForHtml" id="scoutNlsCompletionHtml" order="before html"/>
@@ -144,6 +142,7 @@
     <liveTemplateMacro implementation="org.eclipse.scout.sdk.s2i.template.java.PsiExpressionEnumMacro"/>
     <moduleBuilder builderClass="org.eclipse.scout.sdk.s2i.project.ScoutModuleBuilder"/>
     <intentionAction order="first">
+      <language></language>
       <className>org.eclipse.scout.sdk.s2i.nls.intention.TranslationEditIntention</className>
       <bundleName>messages.EclipseScoutBundle</bundleName>
       <category>Scout</category>
@@ -158,13 +157,10 @@
   <actions>
     <group id="org.eclipse.scout.sdk.s2i.ScoutMenu" popup="true" text="Scout">
       <add-to-group group-id="MainMenu" relative-to-action="ToolsMenu" anchor="after"/>
-      <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu"
-              class="org.eclipse.scout.sdk.s2i.derived.UpdateAllDerivedResourcesMenu"/>
+      <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu" class="org.eclipse.scout.sdk.s2i.derived.UpdateAllDerivedResourcesMenu"/>
       <separator></separator>
-      <action id="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInScopeMenu"
-              class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInScopeMenu"/>
-      <action id="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInFileMenu"
-              class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInFileMenu">
+      <action id="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInScopeMenu" class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInScopeMenu"/>
+      <action id="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInFileMenu" class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInFileMenu">
         <keyboard-shortcut keymap="$default" first-keystroke="control alt shift O"/>
       </action>
     </group>
@@ -173,16 +169,11 @@
            class="org.eclipse.scout.sdk.s2i.element.ScoutElementActionGroup"
            popup="true">
       <add-to-group group-id="NewGroup" anchor="last"/>
-      <action id="org.eclipse.scout.sdk.s2i.CreateEntityAction"
-              class="org.eclipse.scout.sdk.s2i.entity.CreateEntityAction"/>
-      <action id="org.eclipse.scout.sdk.s2i.CreateFormAction"
-              class="org.eclipse.scout.sdk.s2i.form.CreateFormAction"/>
-      <action id="org.eclipse.scout.sdk.s2i.CreatePageAction"
-              class="org.eclipse.scout.sdk.s2i.page.CreatePageAction"/>
-      <action id="org.eclipse.scout.sdk.s2i.CreateLookupCallAction"
-              class="org.eclipse.scout.sdk.s2i.lookupcall.CreateLookupCallAction"/>
-      <action id="org.eclipse.scout.sdk.s2i.CreateCodeTypeAction"
-              class="org.eclipse.scout.sdk.s2i.codetype.CreateCodeTypeAction"/>
+      <action id="org.eclipse.scout.sdk.s2i.CreateEntityAction" class="org.eclipse.scout.sdk.s2i.entity.CreateEntityAction"/>
+      <action id="org.eclipse.scout.sdk.s2i.CreateFormAction" class="org.eclipse.scout.sdk.s2i.form.CreateFormAction"/>
+      <action id="org.eclipse.scout.sdk.s2i.CreatePageAction" class="org.eclipse.scout.sdk.s2i.page.CreatePageAction"/>
+      <action id="org.eclipse.scout.sdk.s2i.CreateLookupCallAction" class="org.eclipse.scout.sdk.s2i.lookupcall.CreateLookupCallAction"/>
+      <action id="org.eclipse.scout.sdk.s2i.CreateCodeTypeAction" class="org.eclipse.scout.sdk.s2i.codetype.CreateCodeTypeAction"/>
     </group>
   </actions>
 

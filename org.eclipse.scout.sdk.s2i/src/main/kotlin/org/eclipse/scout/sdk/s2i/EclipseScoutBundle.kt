@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,18 +22,16 @@ import org.eclipse.scout.sdk.s2i.dataobject.DataObjectManager
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.eclipse.scout.sdk.s2i.element.ElementCreationManager
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerCache
-import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller
 import org.jetbrains.annotations.Nls
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
-import javax.swing.Icon
 
 @NonNls
 private const val RESOURCE_BUNDLE = "messages.EclipseScoutBundle"
 
 object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
 
-    val ScoutIcon = load("META-INF/pluginIcon.svg")
+    val ScoutIcon = IconManager.getInstance().getIcon("META-INF/pluginIcon.svg", javaClass.classLoader)
 
     @Nls
     fun message(@PropertyKey(resourceBundle = RESOURCE_BUNDLE) key: String, vararg params: Any): String =
@@ -65,16 +63,4 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
                 || Strings.countMatches(PathManager.getConfigPath(), sandbox) > 0
                 || Strings.countMatches(PathManager.getSystemPath(), sandbox) > 0
     }
-
-    /**
-     * can be removed as soon as IJ 2023.2 is the latest supported version
-     */
-    private fun load(path: String) = CompatibilityMethodCaller<Icon>()
-        .withCandidate(IconManager::class.java, "getIcon", String::class.java, ClassLoader::class.java) {
-            // for IJ >= 2023.2 use ClassLoader as second argument
-            it.invoke(IconManager.getInstance(), path, javaClass.classLoader)
-        }.withCandidate(IconManager::class.java, "getIcon", String::class.java, Class::class.java) {
-            // for IJ <= 2023.1: use Class as second argument
-            it.invoke(IconManager.getInstance(), path, javaClass)
-        }.invoke()
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,7 +36,7 @@ class DataObjectManagerImpl(val project: Project) : DataObjectManager {
 
     override fun createDataObjectModel(type: IType): DataObjectModel? = DataObjectModel.wrap(type).orElse(null)
 
-    override fun scheduleConvenienceMethodsUpdate(scope: SearchScope) = callInIdeaEnvironment(project, message("update.dataobject.in.scope")) { e, p ->
+    override fun scheduleConvenienceMethodsUpdate(scope: SearchScope) = callInIdeaEnvironment(project, message("action.org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInScopeMenu.text")) { e, p ->
         try {
             updateConvenienceMethods(scope, e, p)
         } catch (t: Throwable) {
@@ -47,7 +47,7 @@ class DataObjectManagerImpl(val project: Project) : DataObjectManager {
     private fun updateConvenienceMethods(scope: SearchScope, env: IdeaEnvironment, progress: IdeaProgress) {
         val totalWork = 200
         val workForDiscovery = 10
-        progress.init(totalWork, message("update.dataobject.in.scope"))
+        progress.init(totalWork, message("action.org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInScopeMenu.text"))
         val doEntities = computeInReadAction(project, true, progress.newChild(workForDiscovery).indicator) {
             ScoutApi.allKnown().asSequence()
                     .map { it.IDoEntity().fqn() }

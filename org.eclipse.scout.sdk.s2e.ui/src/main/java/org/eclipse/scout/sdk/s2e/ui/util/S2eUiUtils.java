@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -99,7 +99,7 @@ public final class S2eUiUtils {
         return o1.toString().compareTo(o2.toString());
       }
 
-      private int getRanking(IJavaElement element) {
+      private static int getRanking(IJavaElement element) {
         var tierOptional = S2eTier.of(element);
         if (tierOptional.isEmpty()) {
           return 100;
@@ -323,7 +323,7 @@ public final class S2eUiUtils {
     }
 
     candidates.sort(javaElementComparator);
-    var element = candidates.get(0);
+    var element = candidates.getFirst();
 
     // package
     result.setPackage((IPackageFragment) element.getAncestor(IJavaElement.PACKAGE_FRAGMENT));

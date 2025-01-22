@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,11 +13,8 @@ import com.intellij.application.options.editor.CodeFoldingOptionsProvider
 import com.intellij.openapi.options.BeanConfigurable
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 
-class ScoutCodeFoldingOptionsProvider : BeanConfigurable<ScoutCodeFoldingSettings>(ScoutSettings.getCodeFoldingSettings(), "Scout"), CodeFoldingOptionsProvider {
+class ScoutCodeFoldingOptionsProvider : BeanConfigurable<ScoutCodeFoldingSettings>(ScoutSettingsHelper.getCodeFoldingSettings(), "Scout"), CodeFoldingOptionsProvider {
     init {
-        val settings = instance
-        if (settings != null) {
-            checkBox(message("nls.folding.name"), settings::isCollapseTranslations, settings::setCollapseTranslations)
-        }
+        checkBox(message("nls.folding.name"), instance::isCollapseTranslations, instance::setCollapseTranslations)
     }
 }

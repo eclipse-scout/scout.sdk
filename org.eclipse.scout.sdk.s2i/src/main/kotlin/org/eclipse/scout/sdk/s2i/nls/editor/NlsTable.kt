@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -122,8 +122,8 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
         m_tableSorterFilter.sortKeys = listOf(RowSorter.SortKey(0, SortOrder.ASCENDING), RowSorter.SortKey(1, SortOrder.ASCENDING))
         border = null
 
-        setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS)
-        setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS)
+        setVerticalScrollBarPolicy(VERTICAL_SCROLLBAR_ALWAYS)
+        setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_ALWAYS)
         setViewportView(m_table)
     }
 
@@ -231,7 +231,7 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
     fun setFilter(rowFilter: ((IStackedTranslation) -> Boolean)?, columnFilter: ((Language) -> Boolean)?) {
         val filter = object : RowFilter<NlsTableModel, Int>() {
             override fun include(entry: Entry<out NlsTableModel, out Int>): Boolean {
-                return rowFilter?.invoke(m_model.translationForRow(entry.identifier)) ?: true
+                return rowFilter?.invoke(m_model.translationForRow(entry.identifier)) != false
             }
         }
         m_tableSorterFilter.rowFilter = filter
@@ -345,7 +345,7 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
 
         private val m_cellContentPanel = JBPanel<JBPanel<*>>()
         private val m_txt = TextAreaWithContentSize(m_table.font)
-        private val m_scrollPane = JBScrollPane(m_txt, ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED)
+        private val m_scrollPane = JBScrollPane(m_txt, VERTICAL_SCROLLBAR_NEVER, HORIZONTAL_SCROLLBAR_AS_NEEDED)
 
         init {
             val borderWidth = 1
@@ -467,7 +467,7 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
         }
 
         private fun createButton(action: AnAction): ActionButton {
-            val presentation = action.templatePresentation
+            val presentation = action.templatePresentation.clone()
             val d = JBDimension(16, 16)
             val button = object : ActionButton(action, presentation, ActionPlaces.UNKNOWN, d) {
                 override fun getDataContext(): DataContext {

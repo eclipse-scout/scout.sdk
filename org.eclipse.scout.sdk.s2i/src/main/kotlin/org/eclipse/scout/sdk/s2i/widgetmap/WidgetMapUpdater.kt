@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -108,8 +108,14 @@ object WidgetMapUpdater {
     private fun updateScope(scope: SearchScope, project: Project, progress: IdeaProgress) {
         progress.init(100, message("update.widgetMap.in.scope"))
         progress.indicator.text2 = message("search.for.models")
+
+        // Access TypeScriptFileType instance by reflection.
+        // TypeScriptFileType is migrated to a Kotlin object in IJ 2025.1, while it is a Java singleton having a public INSTANCE field before.
+        // Can be removed and migrated to 'TypeScriptFileType' only as soon as IJ 2025.1 is the newest supported version.
+        val tsFileType = TypeScriptFileType::class.java.fields.first { "INSTANCE" == it.name }.get(null) as TypeScriptFileType
+
         val updateInfos = IdeaEnvironment.computeInReadAction(project) {
-            FileTypeIndex.getFiles(TypeScriptFileType.INSTANCE, GlobalSearchScope.EMPTY_SCOPE.union(scope))
+            FileTypeIndex.getFiles(tsFileType, GlobalSearchScope.EMPTY_SCOPE.union(scope))
                 .filter { it.isValid && it.isInLocalFileSystem }
                 .mapNotNull { findFilePair(it, project) }
                 .groupBy { it.first.containingModule(false) }.entries

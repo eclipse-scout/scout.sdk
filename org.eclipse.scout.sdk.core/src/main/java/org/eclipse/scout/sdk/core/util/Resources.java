@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
 import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.ProxySelector;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -36,8 +37,6 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
  */
 public final class Resources {
 
-  private static final int BUFFER_SIZE = 8192;
-
   public static final String PROTOCOL_HTTP = "http";
   public static final String PROTOCOL_HTTPS = "https";
 
@@ -48,6 +47,10 @@ public final class Resources {
 
   public static final String ENCODING_GZIP = "gzip";
 
+  public static final FinalValue<HttpClient> SHARED_HTTP_CLIENT = new FinalValue<>();
+
+  private static final int BUFFER_SIZE = 8192;
+
   private Resources() {
   }
 
@@ -55,12 +58,12 @@ public final class Resources {
    * Opens a connection to the given {@link URL} and returns the content as {@link InputStream}.
    *
    * @param url
-   *          The {@link URL} to connect to. Must not be {@code null}.
+   *     The {@link URL} to connect to. Must not be {@code null}.
    * @return An {@link InputStream} returning the content of the target {@link URL}.
    * @throws IOException
-   *           if the connection fails.
+   *     if the connection fails.
    * @throws SdkException
-   *           if the url is not valid or the thread is interrupted while waiting for the response.
+   *     if the url is not valid or the thread is interrupted while waiting for the response.
    */
   public static InputStream openStream(URL url) throws IOException {
     return openStream(toURI(url));
@@ -70,12 +73,12 @@ public final class Resources {
    * Opens a connection to the given uri and returns the content as {@link InputStream}.
    *
    * @param uri
-   *          The uri to connect to. Must be a valid {@link URI} and must not be {@code null}.
+   *     The uri to connect to. Must be a valid {@link URI} and must not be {@code null}.
    * @return An {@link InputStream} returning the content of the target {@link URI}.
    * @throws IOException
-   *           if the connection fails.
+   *     if the connection fails.
    * @throws SdkException
-   *           if the uri is not valid or the thread is interrupted while waiting for the response.
+   *     if the uri is not valid or the thread is interrupted while waiting for the response.
    */
   public static InputStream openStream(String uri) throws IOException {
     try {
@@ -88,14 +91,14 @@ public final class Resources {
 
   /**
    * Opens a connection to the given {@link URI} and returns the content as {@link InputStream}.
-   * 
+   *
    * @param uri
-   *          The {@link URI} to connect to. Must not be {@code null}.
+   *     The {@link URI} to connect to. Must not be {@code null}.
    * @return An {@link InputStream} returning the content of the target {@link URI}.
    * @throws IOException
-   *           if the connection fails.
+   *     if the connection fails.
    * @throws SdkException
-   *           if the thread is interrupted while waiting for the response.
+   *     if the thread is interrupted while waiting for the response.
    */
   public static InputStream openStream(URI uri) throws IOException {
     var scheme = uri.getScheme();
@@ -113,12 +116,12 @@ public final class Resources {
    * Performs an HTTP GET request to the given {@link URL}.
    *
    * @param url
-   *          The {@link URL} to get. Must not be {@code null}.
+   *     The {@link URL} to get. Must not be {@code null}.
    * @return An {@link InputStream} returning the content of the body of the HTTP response.
    * @throws IOException
-   *           if the connections fails or an error status code is returned by the server.
+   *     if the connections fails or an error status code is returned by the server.
    * @throws SdkException
-   *           if the thread is interrupted while waiting for the response.
+   *     if the thread is interrupted while waiting for the response.
    */
   public static InputStream httpGet(URL url) throws IOException {
     return httpGet(toURI(url));
@@ -128,12 +131,12 @@ public final class Resources {
    * Performs an HTTP GET request to the given uri {@link String}.
    *
    * @param uri
-   *          The uri to get. Must be a valid {@link URI} and must not be {@code null}.
+   *     The uri to get. Must be a valid {@link URI} and must not be {@code null}.
    * @return An {@link InputStream} returning the content of the body of the HTTP response.
    * @throws IOException
-   *           if the connections fails or an error status code is returned by the server.
+   *     if the connections fails or an error status code is returned by the server.
    * @throws SdkException
-   *           if the uri is invalid or the thread is interrupted while waiting for the response.
+   *     if the uri is invalid or the thread is interrupted while waiting for the response.
    */
   public static InputStream httpGet(String uri) throws IOException {
     try {
@@ -146,14 +149,14 @@ public final class Resources {
 
   /**
    * Performs an HTTP GET request to the given {@link URI}.
-   * 
+   *
    * @param uri
-   *          The {@link URI} to get. Must not be {@code null}.
+   *     The {@link URI} to get. Must not be {@code null}.
    * @return An {@link InputStream} returning the content of the body of the HTTP response.
    * @throws IOException
-   *           if the connections fails or an error status code is returned by the server.
+   *     if the connections fails or an error status code is returned by the server.
    * @throws SdkException
-   *           if the thread is interrupted while waiting for the response.
+   *     if the thread is interrupted while waiting for the response.
    */
   public static InputStream httpGet(URI uri) throws IOException {
     try {
@@ -166,7 +169,7 @@ public final class Resources {
 
   static InputStream doHttpGetWithRetry(URI uri) throws IOException, InterruptedException {
     IOException exception = null;
-    var numRetries = 5; // retry 5 times as some resources might be temporary unavailable
+    var numRetries = 7; // retry 5 times as some resources might be temporary unavailable
     for (var attempt = 1; attempt <= numRetries; attempt++) {
       try {
         return doHttpGet(uri);
@@ -194,31 +197,19 @@ public final class Resources {
   }
 
   static InputStream doHttpGet(URI uri) throws IOException, InterruptedException {
-    var timeout = Duration.ofSeconds(10);
     var request = HttpRequest.newBuilder()
         .uri(uri)
         .version(Version.HTTP_2)
-        .timeout(timeout)
+        .timeout(Duration.ofSeconds(58)) // currently no longer requests are supported
         .setHeader(HEADER_PRAGMA, "no-cache")
         .setHeader(HEADER_CACHE_CONTROL, "no-cache, max-age=0, must-revalidate")
         .setHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP) // support gzip compression
         .GET()
         .build();
     var handler = buffering(ofInputStream(), BUFFER_SIZE);
-    var proxySelector = ProxySelector.getDefault();
-    var authenticator = Authenticator.getDefault();
-    var clientBuilder = HttpClient.newBuilder()
-        .followRedirects(Redirect.NORMAL)
-        .cookieHandler(new CookieManager(null, null))
-        .connectTimeout(timeout);
-    if (proxySelector != null) {
-      clientBuilder.proxy(proxySelector);
-    }
-    if (authenticator != null) {
-      clientBuilder.authenticator(authenticator);
-    }
 
-    var response = clientBuilder.build().send(request, handler);
+    var httpClient = getSharedHttpClient();
+    var response = httpClient.send(request, handler);
     var statusCode = response.statusCode();
     if (statusCode < 200 || statusCode > 299) {
       throw new IOException("HTTP status code " + statusCode + " received from " + toSimple(uri));
@@ -232,6 +223,27 @@ public final class Resources {
       return new GZIPInputStream(response.body());
     }
     return response.body();
+  }
+
+  public static HttpClient getSharedHttpClient() {
+    return SHARED_HTTP_CLIENT.computeIfAbsentAndGet(Resources::createHttpClient);
+  }
+
+  static HttpClient createHttpClient() {
+    var clientBuilder = HttpClient.newBuilder()
+        .followRedirects(Redirect.NORMAL)
+        .version(Version.HTTP_2)
+        .cookieHandler(new CookieManager(null, CookiePolicy.ACCEPT_ORIGINAL_SERVER))
+        .connectTimeout(Duration.ofSeconds(10));
+    var proxySelector = ProxySelector.getDefault();
+    var authenticator = Authenticator.getDefault();
+    if (proxySelector != null) {
+      clientBuilder.proxy(proxySelector);
+    }
+    if (authenticator != null) {
+      clientBuilder.authenticator(authenticator);
+    }
+    return clientBuilder.build();
   }
 
   static String toSimple(URI uri) {

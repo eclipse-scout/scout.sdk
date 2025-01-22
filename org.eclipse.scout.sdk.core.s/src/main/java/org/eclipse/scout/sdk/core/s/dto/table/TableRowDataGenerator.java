@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -236,7 +236,6 @@ public class TableRowDataGenerator<TYPE extends TableRowDataGenerator<TYPE>> ext
    * @return IPageWithTable, ITableField, ITableExtension
    */
   @Override
-  @SuppressWarnings({"squid:S1185", "RedundantMethodOverride"}) // method is overridden for javadoc
   public IType modelType() {
     return super.modelType();
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,7 +33,7 @@ public class MethodParameterTest {
     var methodInChildClassParams = method.parameters().stream().toList();
     assertEquals(2, methodInChildClassParams.size());
 
-    var firstParam = methodInChildClassParams.get(0);
+    var firstParam = methodInChildClassParams.getFirst();
     assertEquals("firstParam", firstParam.elementName());
     assertEquals(Flags.AccFinal, firstParam.flags());
     assertEquals(method, firstParam.declaringMethod());
@@ -64,7 +64,7 @@ public class MethodParameterTest {
     var methodInBaseClassParams = method.parameters().stream().toList();
     assertEquals(1, methodInBaseClassParams.size());
 
-    var runnableParam = methodInBaseClassParams.get(0);
+    var runnableParam = methodInBaseClassParams.getFirst();
     assertEquals("runnableParam", runnableParam.elementName());
     assertEquals(Flags.AccFinal, runnableParam.flags());
     assertEquals(method, runnableParam.declaringMethod());

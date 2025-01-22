@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -92,7 +92,7 @@ public class AnnotationElementTest {
   @Test
   public void testToString(IJavaEnvironment env) {
     List<IAnnotationElement> values = new ArrayList<>(env.requireType(ChildClass.class.getName()).methods().item(1).orElseThrow().annotations().first().orElseThrow().elements().values());
-    var methodInChildClassValue1 = values.get(0);
+    var methodInChildClassValue1 = values.getFirst();
     assertFalse(Strings.isBlank(methodInChildClassValue1.toString()));
 
     var testAnnotValues = env.requireType(ChildClass.class.getName()).requireSuperClass().annotations().first().orElseThrow().element("values").orElseThrow();

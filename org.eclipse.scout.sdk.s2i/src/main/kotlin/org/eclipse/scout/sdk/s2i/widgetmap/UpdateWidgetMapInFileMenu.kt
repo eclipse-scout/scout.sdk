@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,9 +16,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.psi.PsiDocumentManager
 import org.eclipse.scout.sdk.s2i.DataContextHelper
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 
-class UpdateWidgetMapInFileMenu : AnAction(message("update.widgetMap.in.file"), message("update.widgetMap.in.file.desc"), null) {
+class UpdateWidgetMapInFileMenu : AnAction() {
 
     override fun update(event: AnActionEvent) {
         event.presentation.isEnabled = getActiveFile(event) != null

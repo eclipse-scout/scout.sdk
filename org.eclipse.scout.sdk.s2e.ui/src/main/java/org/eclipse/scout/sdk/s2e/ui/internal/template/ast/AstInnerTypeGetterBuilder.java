@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -158,7 +158,7 @@ public class AstInnerTypeGetterBuilder extends AstMethodBuilder<AstInnerTypeGett
         rewrite.insertFirst(get(), null);
       }
       else {
-        rewrite.insertAfter(get(), (ASTNode) originalList.get(originalList.size() - 1), null);
+        rewrite.insertAfter(get(), (ASTNode) originalList.getLast(), null);
       }
     }
     else {
@@ -168,10 +168,10 @@ public class AstInnerTypeGetterBuilder extends AstMethodBuilder<AstInnerTypeGett
 
   protected static ASTNode getSiblingForGetter(String getterName, TypeDeclaration declaringType, EclipseEnvironment scoutElementProvider) {
     var t = Ensure.notNull(AstUtils.getTypeBinding(declaringType));
-
     var jdtTypeToScoutType = scoutElementProvider.toScoutType(t);
     var structuredForm = StructuredType.of(jdtTypeToScoutType);
     var methodSibling = structuredForm.getSiblingMethodFieldGetter(getterName);
+    //noinspection IfCanBeSwitch
     if (methodSibling == null) {
       return null;
     }

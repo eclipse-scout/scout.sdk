@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,9 +18,8 @@ import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.search.GlobalSearchScope.fileScope
 import org.eclipse.scout.sdk.s2i.DataContextHelper
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 
-class UpdateDoConvenienceMethodsInFileMenu : AnAction(message("update.dataobject.in.file"), message("update.dataobject.in.file.desc"), null) {
+class UpdateDoConvenienceMethodsInFileMenu : AnAction() {
 
     override fun update(event: AnActionEvent) {
         event.presentation.isEnabled = getActiveFile(event) != null

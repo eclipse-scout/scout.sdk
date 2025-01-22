@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,7 +30,7 @@ public class TypeParameterTest {
     var typeParameters = childClassType.typeParameters().toList();
     assertEquals(1, typeParameters.size());
 
-    var param = typeParameters.get(0);
+    var param = typeParameters.getFirst();
     assertEquals("X", param.elementName());
     assertEquals(childClassType, param.declaringMember());
 
@@ -43,7 +43,7 @@ public class TypeParameterTest {
     assertEquals(expectedParamSrc, param.toWorkingCopy().toJavaSource().toString());
     assertEquals(expectedParamSrc, param.source().orElseThrow().asCharSequence().toString());
 
-    var abstractListBound = bounds.get(0);
+    var abstractListBound = bounds.getFirst();
     assertEquals(String.class.getName(), abstractListBound.typeArguments().findAny().orElseThrow().name());
 
     new CoreJavaEnvironmentBinaryOnlyFactory().accept(binEnv -> {
@@ -69,7 +69,7 @@ public class TypeParameterTest {
     var typeParameters = baseClassType.typeParameters().toList();
     assertEquals(2, typeParameters.size());
 
-    var param = typeParameters.get(0);
+    var param = typeParameters.getFirst();
     assertEquals("T", param.elementName());
     assertEquals(baseClassType, param.declaringMember());
     assertEquals(0, param.bounds().count());

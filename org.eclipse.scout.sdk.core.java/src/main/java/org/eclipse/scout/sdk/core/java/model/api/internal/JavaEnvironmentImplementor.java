@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -200,7 +200,7 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
     if (sourceFoldersSorted.isEmpty()) {
       return Optional.empty();
     }
-    return Optional.of(sourceFoldersSorted.get(0));
+    return Optional.of(sourceFoldersSorted.getFirst());
   }
 
   protected List<IClasspathEntry> sourceFoldersSorted() {

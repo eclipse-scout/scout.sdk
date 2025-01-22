@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,7 @@ import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.rootManager
-import com.intellij.openapi.startup.StartupActivity
+import com.intellij.openapi.startup.ProjectActivity
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiModifier
@@ -39,7 +39,7 @@ import java.util.*
 import java.util.stream.Stream
 import kotlin.streams.asStream
 
-open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActivity, DumbAware {
+open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, ProjectActivity, DumbAware {
 
     override fun visibleStoresForJavaModule(modulePath: Path, env: IEnvironment, progress: IProgress): Stream<ITranslationStore> = modulePath
         .toVirtualFile()
@@ -56,7 +56,7 @@ open class IdeaTranslationStoreSupplier : ITranslationStoreSupplier, StartupActi
     /**
      * Executed on [Project] open
      */
-    override fun runActivity(project: Project) {
+    override suspend fun execute(project: Project) {
         Translations.registerStoreSupplier(this)
     }
 

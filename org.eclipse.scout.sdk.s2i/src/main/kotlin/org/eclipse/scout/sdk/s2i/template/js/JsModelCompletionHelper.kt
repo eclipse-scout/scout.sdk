@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,6 +33,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.elementType
 import com.intellij.util.ThrowableRunnable
+import icons.JavaScriptPsiIcons
 import org.eclipse.scout.sdk.core.java.JavaUtils
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
@@ -44,7 +45,6 @@ import org.eclipse.scout.sdk.s2i.model.js.JsModelManager
 import org.eclipse.scout.sdk.s2i.template.BoolVariableAdapter
 import org.eclipse.scout.sdk.s2i.template.TemplateHelper
 import org.eclipse.scout.sdk.s2i.template.VariableDescriptor
-import java.util.concurrent.ConcurrentHashMap
 import javax.swing.Icon
 
 object JsModelCompletionHelper {
@@ -58,7 +58,6 @@ object JsModelCompletionHelper {
     val COMPLETE_VARIABLE = VariableDescriptor("COMP", "complete()")
     val ALL_VARIABLES = listOf(BOOL_VARIABLE, TEXT_VARIABLE, COMPLETE_VARIABLE)
         .associateBy { it.name }
-    private val JS_ICONS = ConcurrentHashMap<String, Icon>()
 
     const val END_VARIABLE_SRC = "\$${TemplateImpl.END}$"
     val BOOL_VARIABLE_SRC = "\$${BOOL_VARIABLE.name}$"
@@ -119,16 +118,6 @@ object JsModelCompletionHelper {
             else -> JsValueLookupElement(propertyValue)
         }
         return createLookupElement(element, completionInfo)
-    }
-
-    /**
-     * Workaround for Plugin compatibility check as 'JavaScriptPsiIcons.Classes' seems to be marked internal since IJ 2024.2
-     * But according to https://intellij-icons.jetbrains.design/ this seems to be the correct Icon and the correct way to access them.
-     * Can be removed as soon as the icons are accessible again or other API access is provided.
-     */
-    private fun loadJavaScriptIcon(name: String) = JS_ICONS.computeIfAbsent(name) { n ->
-        val classesIconsClass = Class.forName("icons.JavaScriptPsiIcons\$Classes", true, JsModelCompletionHelper::class.java.classLoader)
-        return@computeIfAbsent classesIconsClass.getField(n).get(null) as Icon
     }
 
     private fun createLookupElement(modelElement: ScoutJsModelLookupElement, completionInfo: JsModelCompletionInfo): LookupElementBuilder {
@@ -285,7 +274,7 @@ object JsModelCompletionHelper {
         TemplateImplUtil.parseVariableNames(source)
             .mapNotNull { ALL_VARIABLES[it] }
             .forEach { addVariable(it, template, defaultValueProvider) }
-        SdkLog.debug("Template with {} segments created.", template.segmentsCount) // calls parseSegments internally which is no public API
+        SdkLog.debug("Template '{}' created.", (template as Template).string) // getString() calls parseSegments internally which is no public API but required here
         return template
     }
 
@@ -332,14 +321,14 @@ object JsModelCompletionHelper {
             val property = property()
             if (property.type().isChildModelSupported) {
                 if (property.scoutJsObject().declaringClass().isTypeScript) {
-                    return loadJavaScriptIcon("TypeScriptClass")
+                    return JavaScriptPsiIcons.Classes.TypeScriptClass
                 }
-                return loadJavaScriptIcon("JavaScriptClass")
+                return JavaScriptPsiIcons.Classes.JavaScriptClass
             }
             if (property.type().isEnumLike) {
                 return AllIcons.Nodes.Enum
             }
-            return loadJavaScriptIcon("Alias")
+            return JavaScriptPsiIcons.Classes.Alias
         }
 
         override fun tailText(): String = " (from " + property().scoutJsObject().declaringClass().name() + ")"
@@ -351,9 +340,9 @@ object JsModelCompletionHelper {
         override fun property(): ScoutJsProperty = propertyValue.property()
         override fun icon(): Icon {
             if (propertyValue.scoutJsObject.declaringClass().isTypeScript) {
-                return loadJavaScriptIcon("TypeScriptClass")
+                return JavaScriptPsiIcons.Classes.TypeScriptClass
             }
-            return loadJavaScriptIcon("JavaScriptClass")
+            return JavaScriptPsiIcons.Classes.JavaScriptClass
         }
 
         override fun typeText(): String = propertyValue.scoutJsObject.declaringClass().containingModule().name()

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,6 +47,7 @@ import org.eclipse.scout.sdk.s2i.environment.model.JavaEnvironmentWithIdea
 import org.jetbrains.concurrency.CancellablePromise
 import java.nio.file.Path
 import java.util.*
+import java.util.concurrent.Callable
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.streams.asStream
 
@@ -81,11 +82,11 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
         /**
          * Like [computeInReadActionAsync] but the calling thread is blocked until the result is available.
          */
-        fun <T> computeInReadAction(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: () -> T): T {
+        fun <T> computeInReadAction(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: Callable<T>): T {
             if (ApplicationManager.getApplication().isReadAccessAllowed) {
-                // already in read action: don't submit non-blocking read-action (could end up in a dead-lock). Instead, directly execute
+                // already in read action: don't submit non-blocking read-action (could end up in a deadlock). Instead, directly execute
                 // also don't repeat until indexes are ready. If here the read-lock is already held, it must be released so that the dump mode can end
-                return callable()
+                return callable.call()
             }
             return createReadAction(project, requireSmartMode, progress, callable).executeSynchronously()
         }
@@ -98,14 +99,14 @@ open class IdeaEnvironment private constructor(val project: Project) : AbstractE
          * @param progress An optional [ProgressIndicator] to use if executed asynchronously.
          * @return A [CancellablePromise] representing the asynchronous computation.
          */
-        fun <T> computeInReadActionAsync(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: () -> T): CancellablePromise<T> {
+        fun <T> computeInReadActionAsync(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: Callable<T>): CancellablePromise<T> {
             val action = createReadAction(project, requireSmartMode, progress, callable)
             // use WrappingCancellablePromise to unwrap ExecutionExceptions.
             // this is required so that ControlFlowExceptions are correctly rethrown.
             return WrappingCancellablePromise(action.submit(AppExecutorUtil.getAppExecutorService()))
         }
 
-        private fun <T> createReadAction(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: () -> T): NonBlockingReadAction<T> {
+        private fun <T> createReadAction(project: Project, requireSmartMode: Boolean = true, progress: ProgressIndicator? = null, callable: Callable<T>): NonBlockingReadAction<T> {
             val disposable = EclipseScoutBundle.derivedResourceManager(project)
             var action = ReadAction.nonBlocking(callable).expireWith(disposable)
             if (progress != null) {

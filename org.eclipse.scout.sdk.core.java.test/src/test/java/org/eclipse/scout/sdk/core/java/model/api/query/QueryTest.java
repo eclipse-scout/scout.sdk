@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -125,7 +125,7 @@ public class QueryTest {
 
     var list = childClassType.methods().stream().filter((element) -> !element.parameters().existsAny()).toList();
     assertEquals(2, list.size());
-    assertTrue(list.get(0).isConstructor());
+    assertTrue(list.getFirst().isConstructor());
 
     assertEquals(1, childClassType.methods().withFlags(Flags.AccProtected | Flags.AccSynchronized).stream().count());
     assertEquals(1, childClassType.methods().withFlags(Flags.AccPrivate).stream().count());
@@ -166,7 +166,7 @@ public class QueryTest {
 
     var secondParamAnnotations = secondParam.annotations().withSuperTypes(true).stream().toList();
     assertEquals(1, secondParamAnnotations.size());
-    assertEquals(ParamMarkerAnnotation.class.getName(), secondParamAnnotations.get(0).type().name());
+    assertEquals(ParamMarkerAnnotation.class.getName(), secondParamAnnotations.getFirst().type().name());
 
   }
 }

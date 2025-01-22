@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.chooseAnalysisScope
 
-class UpdateDoConvenienceMethodsInScopeMenu : AnAction(message("update.dataobject.in.scope") + "...", message("update.dataobject.in.scope.desc"), null) {
+class UpdateDoConvenienceMethodsInScopeMenu : AnAction() {
 
     override fun actionPerformed(event: AnActionEvent) {
         val scopeToTrigger = event.chooseAnalysisScope(message("update.dataobject.in.scope"), message("select.scope.to.update")) ?: return

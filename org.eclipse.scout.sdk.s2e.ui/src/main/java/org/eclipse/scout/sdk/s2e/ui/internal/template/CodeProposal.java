@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -41,6 +41,6 @@ public class CodeProposal extends AbstractTypeProposal {
         .get();
 
     List<BodyDeclaration> bodyDeclarations = createdCode.bodyDeclarations();
-    setEndPosition(getRewrite().track(bodyDeclarations.get(bodyDeclarations.size() - 1)));
+    setEndPosition(getRewrite().track(bodyDeclarations.getLast()));
   }
 }

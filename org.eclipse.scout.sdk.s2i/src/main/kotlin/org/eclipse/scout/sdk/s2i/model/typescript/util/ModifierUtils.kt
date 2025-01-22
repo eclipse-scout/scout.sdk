@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,8 +17,8 @@ import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement.ExportType
 import org.eclipse.scout.sdk.core.typescript.model.api.Modifier
 import org.eclipse.scout.sdk.core.util.SdkException
 
-val MODIFIER_MAPPING = Modifier.values()
-    .associateWith { ModifierType.values().first { mt -> it.keyword == mt.keyword } }
+val MODIFIER_MAPPING = Modifier.entries
+    .associateWith { ModifierType.entries.first { mt -> it.keyword == mt.keyword } }
 
 fun Modifier.toModifierType(): ModifierType {
     return MODIFIER_MAPPING[this] ?: throw SdkException("No PSI mapping for Modifier '{}' (keyword={}).", name, keyword)

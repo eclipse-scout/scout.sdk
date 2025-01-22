@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -238,13 +238,13 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
       var typeParamAvailable = !typeParameters.isEmpty();
       m_keyTypeField.setEnabled(typeParamAvailable);
       if (typeParamAvailable) {
-        var bounds = typeParameters.get(0).bounds().toList();
+        var bounds = typeParameters.getFirst().bounds().toList();
         var typeContentProvider = (StrictHierarchyTypeContentProvider) m_keyTypeField.getContentProvider();
         if (bounds.isEmpty()) {
           typeContentProvider.setBaseClassFqn(null);
         }
         else {
-          typeContentProvider.setBaseClassFqn(bounds.get(0).name());
+          typeContentProvider.setBaseClassFqn(bounds.getFirst().name());
         }
       }
     }

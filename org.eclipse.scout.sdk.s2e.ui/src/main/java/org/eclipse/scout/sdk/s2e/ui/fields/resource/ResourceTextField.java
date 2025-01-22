@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.s2e.ui.fields.resource;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
@@ -107,6 +108,7 @@ public class ResourceTextField extends TextField {
       }
     });
 
+    //noinspection ExtractMethodRecommender
     StyledText text = getTextComponent();
     text.addFocusListener(new FocusListener() {
       @Override
@@ -126,7 +128,7 @@ public class ResourceTextField extends TextField {
         // nop
       }
 
-      @SuppressWarnings("squid:S1166")
+      @SuppressWarnings("MethodMayBeStatic")
       private URL toUrl(String path) {
         if (Strings.isBlank(path)) {
           return null;
@@ -139,9 +141,9 @@ public class ResourceTextField extends TextField {
         catch (Exception ex) {
           // the supplied string is no valid path for this OS. Try as URL
           try {
-            return new URL(path);
+            return new URI(path).toURL();
           }
-          catch (MalformedURLException e1) {
+          catch (MalformedURLException | URISyntaxException e1) {
             SdkLog.debug(e1);
             return null;
           }

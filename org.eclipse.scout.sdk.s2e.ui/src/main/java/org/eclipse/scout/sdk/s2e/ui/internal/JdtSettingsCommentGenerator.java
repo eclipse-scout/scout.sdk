@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -207,7 +207,7 @@ public class JdtSettingsCommentGenerator implements IDefaultElementCommentGenera
       context.setVariable(CodeTemplateContextType.FIELD_TYPE, fieldTypeSimpleName);
       context.setVariable(CodeTemplateContextType.BARE_FIELD_NAME, getterSetterName);
       if (!paramNames.isEmpty()) {
-        context.setVariable(CodeTemplateContextType.PARAM, paramNames.get(0));
+        context.setVariable(CodeTemplateContextType.PARAM, paramNames.getFirst());
       }
       else {
         context.setVariable(CodeTemplateContextType.PARAM, UNDEFINED_VAR_VALUE);

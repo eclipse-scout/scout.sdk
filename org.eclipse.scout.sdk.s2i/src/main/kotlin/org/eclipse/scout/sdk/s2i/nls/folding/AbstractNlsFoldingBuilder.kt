@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.s2i.containingModule
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationDependencyScope
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader
-import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
+import org.eclipse.scout.sdk.s2i.settings.ScoutSettingsHelper
 import java.util.regex.Pattern
 
 abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
@@ -57,7 +57,7 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
         val project = root.project
         val manager = TranslationManagerLoader.createManager(module, scope, true) ?: return emptyArray()
         m_javaLangStringType = PsiType.getTypeByName(CommonClassNames.JAVA_LANG_STRING, project, allScope(project))
-        m_requestedLanguage = ScoutSettings.getTranslationLanguage(project)
+        m_requestedLanguage = ScoutSettingsHelper.getTranslationLanguage(project)
         val result = buildFoldRegions(root, manager).toTypedArray()
         SdkLog.debug("Folding region creation took {}ms.", System.currentTimeMillis() - start)
         return result
@@ -104,5 +104,5 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
         return text.take(maxLen - suffix.length) + suffix
     }
 
-    protected open fun isFoldingOn() = ScoutSettings.getCodeFoldingSettings().isCollapseTranslations()
+    protected open fun isFoldingOn() = ScoutSettingsHelper.getCodeFoldingSettings().isCollapseTranslations()
 }

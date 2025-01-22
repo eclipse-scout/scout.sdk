@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.core.s.IScoutSourceFolders
 import org.eclipse.scout.sdk.core.s.util.ITier
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
 import org.jetbrains.jps.model.java.JavaSourceRootType
-import org.mockito.ArgumentMatchers.same
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import java.nio.file.Path
@@ -159,8 +159,15 @@ class SourceFolderHelperTest : TestCase() {
         initDependencies()
     }
 
+    /**
+     * Kotlin capable same function which does not return null to fulfill the Kotlin not-nullable type checks
+     */
+    private fun <T> same(value: T): T {
+        return ArgumentMatchers.same(value) ?: value
+    }
+
     private fun initProject() {
-        `when`(m_project.getComponent(same(ModuleManager::class.java))).thenAnswer { m_moduleManager }
+        `when`(m_project.getService(same(ModuleManager::class.java))).thenAnswer { m_moduleManager }
     }
 
     private fun initModules() {
@@ -380,6 +387,7 @@ class SourceFolderHelperTest : TestCase() {
         `when`(rm.module).thenAnswer { m }
 
         val mrm: ModuleRootManager = mock(ModuleRootManager::class.java, "$m - ModuleRootManager")
+        @Suppress("UnstableApiUsage", "DEPRECATION")
         `when`(m.getComponent(same(ModuleRootManager::class.java))).thenAnswer { mrm }
         `when`(mrm.contentEntries).thenAnswer { arrayOf(ce) }
 

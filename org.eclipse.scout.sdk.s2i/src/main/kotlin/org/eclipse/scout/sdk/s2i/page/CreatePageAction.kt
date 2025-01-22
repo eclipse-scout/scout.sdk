@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,12 +11,11 @@ package org.eclipse.scout.sdk.s2i.page
 
 import com.intellij.psi.PsiClass
 import org.eclipse.scout.sdk.core.s.page.PageNewOperation
-import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.element.CreateElementAction
 import org.eclipse.scout.sdk.s2i.findTypeByName
 import org.eclipse.scout.sdk.s2i.toIdea
 
-class CreatePageAction : CreateElementAction<PageNewOperation>(EclipseScoutBundle.message("create.page"), EclipseScoutBundle.message("create.page.desc")) {
+class CreatePageAction : CreateElementAction<PageNewOperation>() {
 
     override fun operationClass(): Class<PageNewOperation> = PageNewOperation::class.java
 
