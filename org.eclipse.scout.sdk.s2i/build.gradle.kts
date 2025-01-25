@@ -53,7 +53,7 @@ dependencies {
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.typescript.test", scoutSdkVersion)
 
     intellijPlatform {
-        intellijIdeaUltimate("2024.3.2")
+        intellijIdeaUltimate("2024.3.2.1")
         bundledPlugins(listOf("com.intellij.java", "org.jetbrains.idea.maven", "com.intellij.copyright", "com.intellij.properties", "JavaScript"))
         pluginVerifier()
         testFramework(TestFrameworkType.Platform)
@@ -76,7 +76,7 @@ intellijPlatform {
     pluginConfiguration {
         version = scoutSdkPluginVersion
         ideaVersion {
-            sinceBuild = "243.23654"
+            sinceBuild = "243"
             untilBuild = provider { null }
         }
     }
