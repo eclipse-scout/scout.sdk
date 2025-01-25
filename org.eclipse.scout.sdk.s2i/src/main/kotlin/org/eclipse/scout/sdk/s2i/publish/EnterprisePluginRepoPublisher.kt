@@ -78,8 +78,8 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
             val pathSep = File.pathSeparator
             println("usage:")
             println(
-                "java -cp blockmap-1.0.5.jar${pathSep}jackson-annotations-2.13.4.jar${pathSep}jackson-core-2.13.4.jar${pathSep}jackson-databind-2.13.4.2.jar${pathSep}" + // Blockmap Libs
-                        "kotlin-stdlib-2.1.0.jar${pathSep}kotlin-stdlib-common-2.1.0.jar${pathSep}kotlin-stdlib-jdk8-2.1.0.jar${pathSep}" + // Kotlin libs
+                "java -cp blockmap-1.0.7.jar${pathSep}jackson-annotations-2.18.2.jar${pathSep}jackson-core-2.18.2.jar${pathSep}jackson-databind-2.18.2.jar${pathSep}" + // Blockmap Libs
+                        "kotlin-stdlib-2.1.0.jar${pathSep}" + // Kotlin libs
                         "org.eclipse.scout.sdk.core-14.0.0-SNAPSHOT.jar${pathSep}org.eclipse.scout.sdk.s2i-14.0.0-SNAPSHOT.jar" + // Scout SDK libs
                         " org.eclipse.scout.sdk.s2i.publish.EnterprisePluginRepoPublisher /path/to/plugin.zip /path/to/enterprise/repoDir [https://host/path-to-repo]"
             )
