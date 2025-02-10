@@ -66,28 +66,6 @@
     <master_test_forkCount>1</master_test_forkCount>
     <eclipse_gerrit_username/>
 
-    <!-- Sonar properties -->
-    <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
-
-    <!-- exclude fixtures -->
-    <sonar.exclusions>
-      **/src/test/fixture/**/*,
-      **/src/test/client/**/*,
-      **/src/test/shared/**/*
-    </sonar.exclusions>
-
-    <!-- exclude fixtures, archetypes, UI -->
-    <sonar.coverage.exclusions>
-      **/src/test/fixture/**/*,
-      **/src/test/client/**/*,
-      **/src/test/shared/**/*,
-      **/src/main/java/org/eclipse/scout/sdk/s2e/ui/**/*,
-      **/src/main/java/org/eclipse/scout/sdk/s2e/doc/**/*,
-      **/src/main/java/org/eclipse/scout/sdk/doc/**/*,
-      **/org/eclipse/scout/maven/plugins/updatesite/**/*,
-      **/Ensure*
-    </sonar.coverage.exclusions>
-
     <!-- dependencies to Eclipse artifacts -->
     <org.eclipse.compare.core>3.8.600</org.eclipse.compare.core>
     <org.eclipse.compare>3.11.200</org.eclipse.compare>
