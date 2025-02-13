@@ -28,7 +28,7 @@ plugins {
     id("java")
     id("maven-publish")
     id("org.jetbrains.intellij.platform") version "2.2.1" // See https://github.com/JetBrains/intellij-platform-gradle-plugin
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "2.1.10"
     id("io.github.rmanibus.maven-settings") version "0.8" // for maven settings
 }
 
@@ -54,7 +54,7 @@ dependencies {
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.typescript.test", scoutSdkVersion)
 
     intellijPlatform {
-        intellijIdeaUltimate("2024.3.2.1")
+        intellijIdeaUltimate("2024.3.3")
         bundledPlugins(listOf("com.intellij.java", "org.jetbrains.idea.maven", "com.intellij.copyright", "com.intellij.properties", "JavaScript"))
         pluginVerifier()
         testFramework(TestFrameworkType.Platform)
