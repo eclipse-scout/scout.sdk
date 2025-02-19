@@ -10,7 +10,6 @@
 package org.eclipse.scout.sdk.s2i.element
 
 import com.intellij.codeInsight.daemon.JavaErrorBundle
-import com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil
 import com.intellij.ide.ui.newItemPopup.NewItemPopupUtil
 import com.intellij.ide.ui.newItemPopup.NewItemSimplePopupPanel
 import com.intellij.ide.util.EditorHelper
@@ -56,7 +55,7 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>> : A
                 // IJ >= 2025.1
                 it.invokeStatic(*it.parameters)
             }
-            .withCandidate(HighlightClassUtil::class.java, "isRestrictedIdentifier", String::class.java, LanguageLevel::class.java) {
+            .withCandidate("com.intellij.codeInsight.daemon.impl.analysis.HighlightClassUtil", "isRestrictedIdentifier", String::class.java.name, LanguageLevel::class.java.name) {
                 // IJ <= 2024.3
                 it.invokeStatic(*it.parameters)
             }
