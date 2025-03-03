@@ -58,6 +58,11 @@ public final class ScoutProjectNewHelper {
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\\\\<>=/:\"]+");
   public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z][a-z\\d_]{0,32}(?:\\.[a-z][a-z\\d_]{0,32}){0,16}$");
 
+  /**
+   * Marker property to identify maven builds creating new projects
+   */
+  public static final String PROPERTY_SDK_PROJECT_NEW = "scoutSdkProjectNew";
+
   private ScoutProjectNewHelper() {
   }
 
@@ -78,7 +83,7 @@ public final class ScoutProjectNewHelper {
 
   @SuppressWarnings("squid:S00107")
   public static void createProject(Path workingDir, String groupId, String artifactId, String displayName, String javaVersion,
-      String archetypeGroupId, String archetypeArtifactId, String archetypeVersion, IEnvironment env, IProgress progress) throws IOException {
+                                   String archetypeGroupId, String archetypeArtifactId, String archetypeVersion, IEnvironment env, IProgress progress) throws IOException {
 
     // validate input
     Ensure.notNull(workingDir);
@@ -128,7 +133,8 @@ public final class ScoutProjectNewHelper {
         .withProperty("displayName", displayName)
         .withProperty("javaVersion", javaVersion)
         .withProperty("simpleArtifactName", artifactName)
-        .withProperty("userName", CoreUtils.getUsername());
+        .withProperty("userName", CoreUtils.getUsername())
+        .withProperty(PROPERTY_SDK_PROJECT_NEW);
     if (SdkLog.isDebugEnabled()) {
       // enables Groovy debug log file
       archetypeBuild.withProperty("debug", "true");
@@ -242,11 +248,11 @@ public final class ScoutProjectNewHelper {
 
   /**
    * Gets all major Java versions (e.g. 8 or 11 or 17) that are officially supported by the Scout version given.
-   * 
+   *
    * @param scoutVersion
-   *          The Scout version (e.g. 11.0.14 or 22.0-SNAPSHOT or LATEST).
+   *     The Scout version (e.g. 11.0.14 or 22.0-SNAPSHOT or LATEST).
    * @return The supported major Java versions (e.g. 8 or 11 or 17) for the Scout version given. If the given Scout
-   *         version is invalid, the supported Java version of the newest Scout version is returned.
+   * version is invalid, the supported Java version of the newest Scout version is returned.
    */
   public static int[] getSupportedJavaVersions(CharSequence scoutVersion) {
     return ScoutApi.create(scoutVersion).supportedJavaVersions();
@@ -254,16 +260,16 @@ public final class ScoutProjectNewHelper {
 
   /**
    * Gets all Scout versions available on Maven central which are supported by this SDK.
-   * 
+   *
    * @param useJavaClient
-   *          {@code true} if the versions for the archetype with the Java UI should be returned, {@code false} for the
-   *          versions of the archetype with the JavaScript UI.
+   *     {@code true} if the versions for the archetype with the Java UI should be returned, {@code false} for the
+   *     versions of the archetype with the JavaScript UI.
    * @param includePreviewVersions
-   *          {@code true} if preview releases should be included in the result list.
+   *     {@code true} if preview releases should be included in the result list.
    * @return A {@link List} holding the versions available on Maven central sorted descending (the newest version
-   *         first).
+   * first).
    * @throws IOException
-   *           if there is an error reading the versions from Maven central
+   *     if there is an error reading the versions from Maven central
    */
   public static List<String> getSupportedArchetypeVersions(boolean useJavaClient, boolean includePreviewVersions) throws IOException {
     var artifactId = useJavaClient ? SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID : SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID;
