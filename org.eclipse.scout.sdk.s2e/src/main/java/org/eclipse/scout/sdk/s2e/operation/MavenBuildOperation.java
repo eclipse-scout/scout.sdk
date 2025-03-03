@@ -53,6 +53,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
+import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenRunnerSpi;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
@@ -247,7 +248,8 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
     workingCopy.setAttribute(M2_OFFLINE, build.hasOption(MavenBuild.OPTION_OFFLINE));
     workingCopy.setAttribute(M2_SKIP_TESTS, properties.containsKey(MavenBuild.PROPERTY_SKIP_TESTS) || properties.containsKey(MavenBuild.PROPERTY_SKIP_TEST_CREATION));
     workingCopy.setAttribute(M2_NON_RECURSIVE, build.hasOption(MavenBuild.OPTION_NON_RECURSIVE));
-    workingCopy.setAttribute(M2_WORKSPACE_RESOLUTION, true);
+    // do not use workspace resolution when creating a new project
+    workingCopy.setAttribute(M2_WORKSPACE_RESOLUTION, !properties.containsKey(ScoutProjectNewHelper.PROPERTY_SDK_PROJECT_NEW));
     workingCopy.setAttribute(M2_DEBUG_OUTPUT, SdkLog.isDebugEnabled() || build.hasOption(MavenBuild.OPTION_DEBUG));
     workingCopy.setAttribute(M2_THREADS, 1);
     // not supported yet: "M2_PROFILES" and "M2_USER_SETTINGS"
