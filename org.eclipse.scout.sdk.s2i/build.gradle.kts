@@ -110,6 +110,11 @@ tasks {
         targetCompatibility = JavaVersion.VERSION_21.toString()
     }
 
+    withType<VerifyPluginTask> {
+        // increase memory for plugin verifier fork as the default value is no longer enough
+        maxHeapSize = "3g"
+    }
+
     withType<RunIdeTask> {
         maxHeapSize = "5g"
     }
