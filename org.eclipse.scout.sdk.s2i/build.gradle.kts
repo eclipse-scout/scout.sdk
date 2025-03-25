@@ -22,13 +22,13 @@ import java.util.*
 
 val scoutSdkVersion = "14.0.0-SNAPSHOT"
 val scoutSdkPluginVersion = "14.0.0.".plus(timestamp())
-val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "25.1-SNAPSHOT")
+val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "25.2-SNAPSHOT")
 
 plugins {
     id("java")
     id("maven-publish")
-    id("org.jetbrains.intellij.platform") version "2.2.1" // See https://github.com/JetBrains/intellij-platform-gradle-plugin
-    kotlin("jvm") version "2.1.10"
+    id("org.jetbrains.intellij.platform") version "2.4.0" // See https://github.com/JetBrains/intellij-platform-gradle-plugin
+    kotlin("jvm") version "2.1.20"
     id("io.github.rmanibus.maven-settings") version "0.8" // for maven settings
 }
 
@@ -47,7 +47,7 @@ dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", scoutSdkVersion)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.ecj", scoutSdkVersion)
     implementation("org.apache.poi", "poi-ooxml", "5.4.0")
-    testImplementation("org.mockito", "mockito-core", "5.15.2")
+    testImplementation("org.mockito", "mockito-core", "5.16.1")
     testImplementation("junit", "junit", "4.13.2")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.test", scoutSdkVersion)

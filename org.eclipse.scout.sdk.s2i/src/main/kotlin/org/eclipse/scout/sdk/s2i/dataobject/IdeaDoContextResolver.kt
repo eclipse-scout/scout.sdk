@@ -35,7 +35,7 @@ open class IdeaDoContextResolver : DoContextResolvers.IDoContextResolver, Projec
 
     override fun resolveNamespaceCandidates(environment: IJavaEnvironment) = resolveNamespaceCandidates(environment.toIdea().module, environment)
 
-    fun resolveNamespaceCandidates(module: Module, environment: IJavaEnvironment) = computeInReadAction(module.project) {
+    fun resolveNamespaceCandidates(module: Module, environment: IJavaEnvironment): Stream<IType> = computeInReadAction(module.project) {
         val moduleScope = module.getModuleWithDependenciesAndLibrariesScope(false)
         return@computeInReadAction ScoutApi.allKnown().asSequence()
                 .mapNotNull { it.api(IScout22DoApi::class.java).orElse(null) }

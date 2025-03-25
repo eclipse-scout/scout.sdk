@@ -14,7 +14,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_p2_plugin_config-master</artifactId>
-    <version>25.1-SNAPSHOT</version>
+    <version>25.1.1</version>
     <relativePath/>
   </parent>
 
@@ -35,7 +35,7 @@
     <eclipse_gerrit_username/>
     <scout.base.version>14.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
-    <org.eclipse.scout.rt_version>25.1-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>25.2-SNAPSHOT</org.eclipse.scout.rt_version>
   </properties>
 
   <dependencyManagement>
