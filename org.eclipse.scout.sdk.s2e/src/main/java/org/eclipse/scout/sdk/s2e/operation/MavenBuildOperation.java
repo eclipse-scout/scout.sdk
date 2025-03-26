@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -53,7 +53,6 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
-import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenRunnerSpi;
 import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
@@ -241,6 +240,7 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
     var workingCopy = launchConfigurationType.newInstance(null, "-mavenBuild" + BUILD_NAME_NUM.getAndIncrement());
     var build = getBuild();
     var properties = build.getProperties();
+    var isArchetypeBuild = build.getGoals().stream().anyMatch(MavenBuild.GOAL_ARCHETYPE_GENERATE::equals);
 
     workingCopy.setAttribute(WORKING_DIRECTORY, build.getWorkingDirectory().toAbsolutePath().toString());
     workingCopy.setAttribute(ILaunchManager.ATTR_PRIVATE, true);
@@ -249,13 +249,13 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
     workingCopy.setAttribute(M2_SKIP_TESTS, properties.containsKey(MavenBuild.PROPERTY_SKIP_TESTS) || properties.containsKey(MavenBuild.PROPERTY_SKIP_TEST_CREATION));
     workingCopy.setAttribute(M2_NON_RECURSIVE, build.hasOption(MavenBuild.OPTION_NON_RECURSIVE));
     // do not use workspace resolution when creating a new project
-    workingCopy.setAttribute(M2_WORKSPACE_RESOLUTION, !properties.containsKey(ScoutProjectNewHelper.PROPERTY_SDK_PROJECT_NEW));
+    workingCopy.setAttribute(M2_WORKSPACE_RESOLUTION, !isArchetypeBuild);
     workingCopy.setAttribute(M2_DEBUG_OUTPUT, SdkLog.isDebugEnabled() || build.hasOption(MavenBuild.OPTION_DEBUG));
     workingCopy.setAttribute(M2_THREADS, 1);
     // not supported yet: "M2_PROFILES" and "M2_USER_SETTINGS"
     workingCopy.setAttribute(M2_PROPERTIES, build.getPropertiesAsList());
 
-    if (build.getGoals().stream().anyMatch(MavenBuild.GOAL_ARCHETYPE_GENERATE::equals)) {
+    if (isArchetypeBuild) {
       var vm = getDefaultJvm();
       if (vm != null) {
         var path = Path.fromOSString(vm.getInstallLocation().toString()).toPortableString();

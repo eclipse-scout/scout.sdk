@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -57,11 +57,6 @@ public final class ScoutProjectNewHelper {
 
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\\\\<>=/:\"]+");
   public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z][a-z\\d_]{0,32}(?:\\.[a-z][a-z\\d_]{0,32}){0,16}$");
-
-  /**
-   * Marker property to identify maven builds creating new projects
-   */
-  public static final String PROPERTY_SDK_PROJECT_NEW = "scoutSdkProjectNew";
 
   private ScoutProjectNewHelper() {
   }
@@ -133,8 +128,7 @@ public final class ScoutProjectNewHelper {
         .withProperty("displayName", displayName)
         .withProperty("javaVersion", javaVersion)
         .withProperty("simpleArtifactName", artifactName)
-        .withProperty("userName", CoreUtils.getUsername())
-        .withProperty(PROPERTY_SDK_PROJECT_NEW);
+        .withProperty("userName", CoreUtils.getUsername());
     if (SdkLog.isDebugEnabled()) {
       // enables Groovy debug log file
       archetypeBuild.withProperty("debug", "true");
