@@ -149,7 +149,7 @@ class ScoutModuleBuilder : ModuleBuilder() {
 
     override fun getDescription() = message("module.builder.desc")
 
-    override fun getNodeIcon() = scoutIcon(15)
+    override fun getNodeIcon() = scoutIcon(16)
 
     override fun isSuitableSdkType(sdkType: SdkTypeId) = sdkType === JavaSdk.getInstance()
 
