@@ -17,6 +17,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessModuleDir
+import com.intellij.openapi.vfs.InvalidVirtualFileAccessException
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
@@ -46,13 +47,16 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
         fun getOrCreateScoutJsModel(module: Module) = moduleDir(module)?.let {
             try {
                 ScoutJsModels.create(it, module.project).orElse(null)
+            } catch (e: InvalidVirtualFileAccessException) {
+                SdkLog.info("Error creating Scout JS model for module '{}'.", module.name, e)
+                null
             } catch (e: Exception) {
                 SdkLog.warning("Error creating Scout JS model for module '{}'.", module.name, e)
                 null
             } catch (e: AssertionError) {
                 // Might be thrown if a VCS update is changing files while creating the ScoutJsModel
                 // E.g. thrown from ResolveScopeManagerImpl.getDefaultResolveScope when the old file gets invalid.
-                SdkLog.warning("Error creating Scout JS model for module '{}'.", module.name, e)
+                SdkLog.info("Error creating Scout JS model for module '{}'.", module.name, e)
                 null
             }
         }
