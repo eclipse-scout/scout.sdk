@@ -46,7 +46,6 @@
     <!-- Eclipse integration -->
     <module>../org.eclipse.scout.sdk.s2e</module>
     <module>../org.eclipse.scout.sdk.s2e.test</module>
-    <module>../org.eclipse.scout.sdk.s2e.doc</module>
     <module>../org.eclipse.scout.sdk.s2e.ui</module>
 
     <!-- documentation -->
@@ -231,18 +230,6 @@
       <dependency>
         <groupId>org.eclipse.scout.sdk.s2e</groupId>
         <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>${project.version}</version>
-        <classifier>sources</classifier>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e.doc</artifactId>
         <version>${project.version}</version>
         <classifier>sources</classifier>
       </dependency>

@@ -57,7 +57,6 @@ public class WebServiceNewWizard extends AbstractWizard implements INewWizard {
         .withUiAction(WebServiceNewWizard::afterOperation);
 
     setWindowTitle(getWebServiceNewWizardPage().getTitle());
-    setHelpAvailable(true);
     setDefaultPageImageDescriptor(S2ESdkUiActivator.getImageDescriptor(ISdkIcons.ScoutProjectNewWizBanner));
   }
 

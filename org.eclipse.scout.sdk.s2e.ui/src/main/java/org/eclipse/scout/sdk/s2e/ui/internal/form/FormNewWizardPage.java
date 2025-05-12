@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
-import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
@@ -35,7 +34,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3>{@link FormNewWizardPage}</h3>
@@ -80,12 +78,8 @@ public class FormNewWizardPage extends AbstractCompilationUnitNewWizardPage {
   @Override
   protected void createContent(Composite parent) {
     super.createContent(parent);
-
     initDefaults();
-
     createFormPropertiesGroup(parent);
-
-    PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_FORM_NEW_WIZARD_PAGE);
   }
 
   protected void initDefaults() {
@@ -173,7 +167,7 @@ public class FormNewWizardPage extends AbstractCompilationUnitNewWizardPage {
 
   @Override
   protected int getLabelWidth() {
-    return 130;
+    return 150;
   }
 
   protected void createFormPropertiesGroup(Composite p) {

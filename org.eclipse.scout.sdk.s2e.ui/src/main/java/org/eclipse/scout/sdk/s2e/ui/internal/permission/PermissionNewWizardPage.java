@@ -16,11 +16,8 @@ import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
-import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.util.PackageContainer;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractCompilationUnitNewWizardPage;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3>{@link PermissionNewWizardPage}</h3>
@@ -48,12 +45,5 @@ public class PermissionNewWizardPage extends AbstractCompilationUnitNewWizardPag
   @Override
   public PermissionNewWizard getWizard() {
     return (PermissionNewWizard) super.getWizard();
-  }
-
-  @Override
-  protected void createContent(Composite parent) {
-    super.createContent(parent);
-
-    PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PERMISSION_NEW_WIZARD_PAGE);
   }
 }

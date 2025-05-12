@@ -94,7 +94,6 @@ public abstract class AbstractWizard extends Wizard {
     var page = createWizardPage(pageClass, packageContainer);
     addPage(page);
     setWindowTitle(page.getTitle());
-    setHelpAvailable(true);
     setDefaultPageImageDescriptor(JavaPluginImages.DESC_WIZBAN_NEWCLASS);
     return page;
   }

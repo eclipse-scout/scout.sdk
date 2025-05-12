@@ -43,7 +43,6 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     setWindowTitle("New Scout Project");
-    setHelpAvailable(true);
     setDefaultPageImageDescriptor(S2ESdkUiActivator.getImageDescriptor(ISdkIcons.ScoutProjectNewWizBanner));
 
     m_page1 = new ScoutProjectNewWizardPage();
@@ -81,9 +80,9 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
    * Fills the operation with the values from the UI. This method is called in a worker thread.
    *
    * @param input
-   *          The mapping input.
+   *     The mapping input.
    * @param op
-   *          The operation to fill
+   *     The operation to fill
    */
   protected void mapPageToOperation(PageToOperationMappingInput input, ScoutProjectNewOperation op) {
     op.setDisplayName(m_page1.getDisplayName());

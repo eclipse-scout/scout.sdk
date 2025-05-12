@@ -31,7 +31,6 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.s2e.environment.AbstractJob;
-import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.AbstractContentProviderAdapter;
@@ -123,15 +122,13 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
         .swtDefaults()
         .applyTo(parent);
 
-    var labelWidth = 100;
+    var labelWidth = 120;
     createProjectNameGroup(parent, labelWidth);
     createClientLanguageGroup(parent);
     createScoutVersionGroup(parent, labelWidth);
     createProjectLocationGroup(parent, labelWidth);
 
     updateVersionsAsync(); // schedule remote version fetch
-
-    PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PROJECT_NEW_WIZARD_PAGE);
   }
 
   protected void createProjectNameGroup(Composite parent, int labelWidth) {
@@ -230,11 +227,11 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
         .applyTo(uiLangBox);
     GridDataFactory
         .defaultsFor(m_javaButton)
-        .indent(13, 2)
+        .indent(23, 2)
         .applyTo(m_javaButton);
     GridDataFactory
         .defaultsFor(m_javaScriptButton)
-        .indent(13, 5)
+        .indent(23, 5)
         .applyTo(m_javaScriptButton);
   }
 
@@ -417,9 +414,9 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   /**
    * Executed in UI thread
-   * 
+   *
    * @param versions
-   *          The new versions list. Is never {@code null} or empty.
+   *     The new versions list. Is never {@code null} or empty.
    */
   protected void updateVersionsFieldContent(SequencedCollection<String> versions) {
     var versionsField = m_scoutVersionField;
@@ -437,9 +434,9 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   /**
    * Executed in UI thread
-   * 
+   *
    * @param loading
-   *          The new value
+   *     The new value
    */
   protected void setVersionLoading(boolean loading) {
     m_versionsLoading = loading;

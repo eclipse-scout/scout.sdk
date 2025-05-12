@@ -11,6 +11,7 @@
 *.dll binary
 *.doc binary
 *.docx binary
+*.vsdx binary
 *.eml binary
 *.eot binary
 *.ER1 binary

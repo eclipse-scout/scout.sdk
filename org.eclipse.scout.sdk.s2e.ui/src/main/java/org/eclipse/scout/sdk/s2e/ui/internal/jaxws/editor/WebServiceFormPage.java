@@ -45,7 +45,6 @@ import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
 import org.eclipse.scout.sdk.s2e.operation.jaxws.WebServiceNewOperation;
-import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
@@ -64,7 +63,6 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.FormPage;
@@ -141,7 +139,6 @@ public class WebServiceFormPage extends FormPage {
       // if it is a provider: validate annotation processing settings
       validateAnnotationProcessingSettings();
     }
-    PlatformUI.getWorkbench().getHelpSystem().setHelp(body, IScoutHelpContextIds.SCOUT_WEB_SERVICE_EDITOR_PAGE);
   }
 
   protected void createOverviewImage(Composite parent, String imgName, Iterable<P_ImageArea> areas, int horizontalSpan) {
@@ -576,7 +573,7 @@ public class WebServiceFormPage extends FormPage {
   }
 
   public boolean isEntryPointPackageChanged() {
-    return m_entryPointPackageFields.stream()        .anyMatch(this::isEntryPointPackageChanged);
+    return m_entryPointPackageFields.stream().anyMatch(this::isEntryPointPackageChanged);
   }
 
   protected boolean isEntryPointNameChanged(TextField field) {

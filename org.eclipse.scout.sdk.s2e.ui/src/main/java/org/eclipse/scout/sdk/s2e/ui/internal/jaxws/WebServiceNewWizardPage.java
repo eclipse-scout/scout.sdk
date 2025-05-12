@@ -47,7 +47,6 @@ import org.eclipse.scout.sdk.core.util.Strings;
 import org.eclipse.scout.sdk.core.util.Xml;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.environment.AbstractJob;
-import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.PackageContentProvider;
@@ -65,7 +64,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PlatformUI;
 import org.w3c.dom.Document;
 
 /**
@@ -135,8 +133,6 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     setViewState();
 
     m_consumerWsdlUrlField.setFocus();
-
-    PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_WEB_SERVICE_NEW_WIZARD_PAGE);
   }
 
   protected void createTypeGroup(Composite parent, int labelWidth) {

@@ -28,7 +28,6 @@ import org.eclipse.scout.sdk.core.s.nls.Language;
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.AbstractContentProviderAdapter;
@@ -39,7 +38,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 
 public class LanguageNewDialog extends TitleAreaDialog {
 
@@ -70,8 +68,6 @@ public class LanguageNewDialog extends TitleAreaDialog {
     revalidate();
 
     setTitleImage(S2ESdkUiActivator.getImage(ISdkIcons.ScoutProjectNewWizBanner));
-    setHelpAvailable(true);
-    PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_LANGUAGE_NEW_WIZARD_PAGE);
     return contents;
   }
 

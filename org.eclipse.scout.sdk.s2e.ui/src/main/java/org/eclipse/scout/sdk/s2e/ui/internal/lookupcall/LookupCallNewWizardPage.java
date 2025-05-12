@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment;
-import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.StrictHierarchyTypeContentProvider;
@@ -36,7 +35,6 @@ import org.eclipse.scout.sdk.s2e.util.JdtUtils.PublicAbstractPrimaryTypeFilter;
 import org.eclipse.scout.sdk.s2e.util.S2eTier;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3>{@link LookupCallNewWizardPage}</h3>
@@ -96,8 +94,6 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
 
     guessServerFolders();
     createLookupCallPropertiesGroup(parent);
-
-    PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_LOOKUPCALL_NEW_WIZARD_PAGE);
   }
 
   protected IType calcServiceImplSuperTypeDefault() {
@@ -170,7 +166,7 @@ public class LookupCallNewWizardPage extends AbstractCompilationUnitNewWizardPag
 
   @Override
   protected int getLabelWidth() {
-    return 120;
+    return 150;
   }
 
   @Override

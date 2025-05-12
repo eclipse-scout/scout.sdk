@@ -34,7 +34,6 @@ import org.eclipse.scout.sdk.core.s.nls.Translation;
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
-import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
@@ -55,7 +54,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import org.eclipse.ui.PlatformUI;
 
 public abstract class AbstractTranslationDialog extends TitleAreaDialog {
 
@@ -133,8 +131,6 @@ public abstract class AbstractTranslationDialog extends TitleAreaDialog {
     contents.setEnabled(getNlsProject().isEditable());
 
     setTitleImage(S2ESdkUiActivator.getImage(ISdkIcons.ScoutProjectNewWizBanner));
-    PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_ENTRY_WIZARD_PAGE);
-    setHelpAvailable(true);
     return contents;
   }
 

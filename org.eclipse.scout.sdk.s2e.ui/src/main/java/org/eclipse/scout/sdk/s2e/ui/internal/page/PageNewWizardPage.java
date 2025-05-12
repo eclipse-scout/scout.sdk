@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.s2e.S2ESdkActivator;
-import org.eclipse.scout.sdk.s2e.ui.IScoutHelpContextIds;
 import org.eclipse.scout.sdk.s2e.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.s2e.ui.fields.proposal.content.StrictHierarchyTypeContentProvider;
@@ -37,7 +36,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3>{@link PageNewWizardPage}</h3>
@@ -90,8 +88,6 @@ public class PageNewWizardPage extends AbstractCompilationUnitNewWizardPage {
     var superTypeContentProvider = (StrictHierarchyTypeContentProvider) getSuperTypeField().getContentProvider();
     superTypeContentProvider.setTypeProposalFilter(superTypeContentProvider.getTypeProposalFilter()
         .and(element -> !scoutApi().orElseThrow().AbstractPage().fqn().equals(element.getFullyQualifiedName())));
-
-    PlatformUI.getWorkbench().getHelpSystem().setHelp(parent, IScoutHelpContextIds.SCOUT_PAGE_NEW_WIZARD_PAGE);
   }
 
   protected void createOptionsGroup(Composite p) {
@@ -176,7 +172,7 @@ public class PageNewWizardPage extends AbstractCompilationUnitNewWizardPage {
 
   @Override
   protected int getLabelWidth() {
-    return 120;
+    return 150;
   }
 
   protected void createPageServiceGroup(Composite p) {
