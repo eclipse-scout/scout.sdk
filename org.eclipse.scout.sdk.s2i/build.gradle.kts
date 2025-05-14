@@ -86,12 +86,11 @@ intellijPlatform {
         verificationReportsFormats = VerifyPluginTask.VerificationReportsFormats.ALL
         subsystemsToCheck = VerifyPluginTask.Subsystems.WITHOUT_ANDROID
         ides {
-            // for releases:
-            // ide(IntelliJPlatformType.IntellijIdeaUltimate, "2025.1")
+            ide(IntelliJPlatformType.IntellijIdeaUltimate, "2025.1.1.1")
             select {
                 types = listOf(IntelliJPlatformType.IntellijIdeaUltimate)
                 channels = listOf(ProductRelease.Channel.EAP)
-                sinceBuild = "251"
+                sinceBuild = "252"
             }
         }
     }
