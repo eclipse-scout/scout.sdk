@@ -9,8 +9,8 @@
  */
 package org.eclipse.scout.sdk.s2i.maven
 
-import com.intellij.execution.process.ProcessAdapter
 import com.intellij.execution.process.ProcessEvent
+import com.intellij.execution.process.ProcessListener
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -120,7 +120,7 @@ open class IdeaMavenRunner : IMavenRunnerSpi, ProjectActivity, DumbAware {
         }
     }
 
-    private inner class ProcessTerminatedListener(val processTerminatedLatch: CountDownLatch) : ProcessAdapter() {
+    private inner class ProcessTerminatedListener(val processTerminatedLatch: CountDownLatch) : ProcessListener {
         override fun processTerminated(event: ProcessEvent) = onMavenProcessTerminated(processTerminatedLatch, event.exitCode, event.text)
     }
 }
