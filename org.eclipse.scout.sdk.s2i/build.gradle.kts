@@ -27,8 +27,8 @@ val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "25.2-SNA
 plugins {
     id("java")
     id("maven-publish")
-    id("org.jetbrains.intellij.platform") version "2.4.0" // See https://github.com/JetBrains/intellij-platform-gradle-plugin
-    kotlin("jvm") version "2.1.20"
+    id("org.jetbrains.intellij.platform") version "2.6.0" // See https://github.com/JetBrains/intellij-platform-gradle-plugin
+    kotlin("jvm") version "2.1.21"
     id("io.github.rmanibus.maven-settings") version "0.8" // for maven settings
 }
 
@@ -46,8 +46,8 @@ repositories {
 dependencies {
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", scoutSdkVersion)
     api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.ecj", scoutSdkVersion)
-    implementation("org.apache.poi", "poi-ooxml", "5.4.0")
-    testImplementation("org.mockito", "mockito-core", "5.16.1")
+    implementation("org.apache.poi", "poi-ooxml", "5.4.1")
+    testImplementation("org.mockito", "mockito-core", "5.18.0")
     testImplementation("junit", "junit", "4.13.2")
     testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
     testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.test", scoutSdkVersion)
@@ -86,7 +86,7 @@ intellijPlatform {
         verificationReportsFormats = VerifyPluginTask.VerificationReportsFormats.ALL
         subsystemsToCheck = VerifyPluginTask.Subsystems.WITHOUT_ANDROID
         ides {
-            ide(IntelliJPlatformType.IntellijIdeaUltimate, "2025.1.1.1")
+            ide(IntelliJPlatformType.IntellijIdeaUltimate, "2025.1.3")
             select {
                 types = listOf(IntelliJPlatformType.IntellijIdeaUltimate)
                 channels = listOf(ProductRelease.Channel.EAP)

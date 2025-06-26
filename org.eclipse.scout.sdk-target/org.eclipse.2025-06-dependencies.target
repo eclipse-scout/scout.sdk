@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="Scout SDK Eclipse 2024-12 Dependencies" sequenceNumber="61">
+<?pde version="3.8"?><target name="Scout SDK Eclipse 2025-06 Dependencies" sequenceNumber="62">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.e4.rcp.feature.group" version="0.0.0"/>
@@ -29,7 +29,6 @@
 <unit id="org.apache.lucene.core" version="0.0.0"/>
 <unit id="org.apache.lucene.analysis-smartcn" version="0.0.0"/>
 <unit id="com.sun.jna" version="0.0.0"/>
-<unit id="org.apache.commons.jxpath" version="0.0.0"/>
 <unit id="org.apache.commons.io" version="0.0.0"/>
 <unit id="org.apache.commons.cli" version="0.0.0"/>
 <unit id="org.apache.commons.codec" version="0.0.0"/>
@@ -72,7 +71,7 @@
 <unit id="org.objectweb.asm.tree.analysis" version="0.0.0"/>
 <unit id="org.eclipse.equinox.http.service.api" version="0.0.0"/>
 <unit id="org.osgi.service.http.whiteboard" version="0.0.0"/>
-<unit id="org.apache.commons.commons-beanutils" version="0.0.0"/>
+<unit id="com.github.weisj.jsvg" version="0.0.0"/>
 <unit id="org.apache.commons.collections" version="0.0.0"/>
 <unit id="org.jdom" version="0.0.0"/>
 <unit id="org.apache.xmlgraphics" version="0.0.0"/>
@@ -95,7 +94,7 @@
 <unit id="junit-platform-suite-engine" version="0.0.0"/>
 <unit id="org.apiguardian.api" version="0.0.0"/>
 <unit id="org.tukaani.xz" version="0.0.0"/>
-<repository location="https://download.eclipse.org/releases/2024-12/"/>
+<repository location="https://download.eclipse.org/releases/2025-06/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="slicer" includeSource="true" type="InstallableUnit">
 <unit id="com.google.guava" version="27.1.0.v20221112-0806"/>

@@ -32,7 +32,7 @@
           mvn clean deploy
     3b. For deploying releases (to be used by Tycho releases):
         - Prerequisite: 1. you need to have GPG properly set up, see https://central.sonatype.org/publish/requirements/gpg/
-                        2. if not already present: you need to add the server with id 'ossrh' into your settings.xml including the corresponding credentials (e.g. oss sonatype username/password)
+                        2. if not already present: you need to add the server with id 'central' into your settings.xml including the corresponding credentials (e.g. oss sonatype username/password)
         - Make sure that ${org.eclipse.m2e.core}, ${org.eclipse.m2e.core.ui},... in the parent POM don't have a '-SNAPSHOT' suffix
         3b.1 For full deploy: In org.eclipse.scout.sdk.s2e.releng/, execute
              mvn clean deploy -P deploy-releases
@@ -46,8 +46,8 @@
     <maven.deploy.skip>true</maven.deploy.skip>
     <forgeSnapshotId>bsi-tools-snapshot</forgeSnapshotId>
     <forgeSnapshotUrl>https://scout.bsiag.com/repository/org.eclipse.scout-snapshot-local</forgeSnapshotUrl>
-    <forgeReleaseId>ossrh</forgeReleaseId>
-    <forgeReleaseUrl>https://oss.sonatype.org/service/local/staging/deploy/maven2/</forgeReleaseUrl>
+    <forgeReleaseId>central</forgeReleaseId>
+    <forgeReleaseUrl>https://central.sonatype.com</forgeReleaseUrl>
   </properties>
 
   <build>
@@ -106,8 +106,8 @@
           <includeOptional>false</includeOptional>
           <source>
             <repository>
-              <id>eclipse_2024_12</id>
-              <url>https://download.eclipse.org/releases/2024-12/</url>
+              <id>eclipse_2025_06</id>
+              <url>https://download.eclipse.org/releases/2025-06/</url>
               <layout>p2</layout>
             </repository>
           </source>
@@ -142,23 +142,6 @@
       </plugin>
     </plugins>
   </build>
-
-  <distributionManagement>
-    <repository>
-      <id>${forgeReleaseId}</id>
-      <url>${forgeReleaseUrl}</url>
-    </repository>
-    <snapshotRepository>
-      <id>${forgeSnapshotId}</id>
-      <url>${forgeSnapshotUrl}</url>
-    </snapshotRepository>
-    <site>
-      <id>eclipse.scout.sdk.site</id>
-      <name>Eclipse Scout SDK Site</name>
-      <!-- >workaround for https://issues.apache.org/jira/browse/MSITE-671 -->
-      <url>http://staging</url>
-    </site>
-  </distributionManagement>
 
   <pluginRepositories>
     <pluginRepository>
