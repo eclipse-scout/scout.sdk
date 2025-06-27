@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+  ~
+  ~ This program and the accompanying materials are made
+  ~ available under the terms of the Eclipse Public License 2.0
+  ~ which is available at https://www.eclipse.org/legal/epl-2.0/
+  ~
+  ~ SPDX-License-Identifier: EPL-2.0
+  -->
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.scout</groupId>
+    <artifactId>maven_sdk_plugin_config-master</artifactId>
+    <version>25.1.4</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>org.eclipse.scout.sdk.deps</groupId>
+  <artifactId>org.eclipse.m2e.core</artifactId>
+  <version>2.7.2.20250318-1458</version>
+  <packaging>pom</packaging>
+
+  <name>Scout SDK org.eclipse.m2e.core dependency</name>
+  <description>This is org.eclipse.m2e.core jar used by Scout SDK</description>
+  <url>https://eclipse.dev/scout/</url>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License 2.0</name>
+      <url>https://www.eclipse.org/legal/epl-2.0/</url>
+      <comments>
+        This program and the accompanying materials are made
+        available under the terms of the Eclipse Public License 2.0
+        which is available at https://www.eclipse.org/legal/epl-2.0/
+      </comments>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>https://github.com/eclipse-scout/scout.sdk</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>scout-dev@eclipse.org</id>
+      <name>Scout Development Team</name>
+    </developer>
+  </developers>
+
+  <properties>
+    <downloaded>${project.build.directory}/repository/plugins</downloaded>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.runtime</artifactId>
+      <version>3.33.100</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.resources</artifactId>
+      <version>3.22.200</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.filesystem</artifactId>
+      <version>1.11.200</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.variables</artifactId>
+      <version>3.6.500</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>[1.7.0,3.0.0)</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>[30.0,40)</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho.extras</groupId>
+        <artifactId>tycho-p2-extras-plugin</artifactId>
+        <version>${master_plugin_tycho-extras_version}</version>
+        <configuration>
+          <includeOptional>false</includeOptional>
+          <source>
+            <repository>
+              <id>eclipse_2025_06</id>
+              <url>https://download.eclipse.org/releases/2025-06/</url>
+              <layout>p2</layout>
+            </repository>
+          </source>
+          <ius>
+            <iu>
+              <id>org.eclipse.m2e.core</id>
+              <version>${project.version}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.m2e.core.source</id>
+              <version>${project.version}</version>
+            </iu>
+          </ius>
+          <followStrictOnly>true</followStrictOnly>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>mirror</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-jar-from-p2</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${downloaded}/org.eclipse.m2e.core_${project.version}.jar</file>
+                  <type>jar</type>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+          <execution>
+            <id>attach-source-from-p2</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>${downloaded}/org.eclipse.m2e.core.source_${project.version}.jar</file>
+                  <type>java-source</type>
+                  <classifier>sources</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+          <execution>
+            <id>attach-javadoc-dummy</id>
+            <phase>package</phase>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>./javadoc.jar</file>
+                  <type>javadoc</type>
+                  <classifier>javadoc</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

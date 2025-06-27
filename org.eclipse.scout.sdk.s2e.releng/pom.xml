@@ -11,257 +11,58 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.eclipse.scout.sdk</groupId>
-    <artifactId>org.eclipse.scout.sdk</artifactId>
-    <version>14.0.0-SNAPSHOT</version>
-    <relativePath>../org.eclipse.scout.sdk</relativePath>
-  </parent>
-
-  <artifactId>org.eclipse.scout.sdk.s2e.releng</artifactId>
-  <packaging>pom</packaging>
-  <name>${project.groupId}:${project.artifactId}</name>
+  <!-- NO PARENT HERE BY DESIGN -->
+  <!-- So that this helper pom is not published to central -->
 
   <!--
-    To update the Eclipse artifacts needed by the Maven class-loader side of Eclipse Scout SDK:
+  New Eclipse platform instructions:
+   1. Adapt the Eclipse P2 target file in org.eclipse.scout.sdk-target/org.eclipse.YEAR-MONTH-dependencies.target to the new release:
+      1. Change the name of this .target file according to the new Eclipse release.
+      2. In the file change "name", "sequenceNumber" and "repository location".
+      3. Sometimes some artifacts needs to be removed/added so that the new target platform resolves successfully (will be verified later in step 5).
+   2. In org.eclipse.scout.sdk-target/pom.xml adjust the file name and classifier for the artifact attached with "build-helper-maven-plugin".
+   3. In org.eclipse.scout.sdk.p2/pom.xml adjust the dependency classifier for the "org.eclipse.scout.sdk-target" artifact in the "target-platform-configuration" to the one used in the previous step.
+   4. In org.eclipse.scout.sdk-feature: Update the P2 update site in *.properties and feature.xml.
+   5. Verify using local Maven build on org.eclipse.scout.sdk.p2/pom.xml using "mvn clean install" and fix issues.
 
-    1.  If needed, update the source p2 repository below
-    2.  Update versions in the parent POM: ${org.eclipse.m2e.core}, ${org.eclipse.m2e.core.ui}, ...
-    3a. For deploying snapshots (to be used by Eclipse Scout SDK snapshots)
-        - In org.eclipse.scout.sdk.s2e.releng/, execute
-          mvn clean deploy
-    3b. For deploying releases (to be used by Tycho releases):
-        - Prerequisite: 1. you need to have GPG properly set up, see https://central.sonatype.org/publish/requirements/gpg/
-                        2. if not already present: you need to add the server with id 'central' into your settings.xml including the corresponding credentials (e.g. oss sonatype username/password)
-        - Make sure that ${org.eclipse.m2e.core}, ${org.eclipse.m2e.core.ui},... in the parent POM don't have a '-SNAPSHOT' suffix
-        3b.1 For full deploy: In org.eclipse.scout.sdk.s2e.releng/, execute
-             mvn clean deploy -P deploy-releases
-        3b.2 For single additional deps: In org.eclipse.scout.sdk.s2e.releng/, execute
-             mvn clean deploy -P deploy-releases-addNewDeps
-        - Login to https://oss.sonatype.org: Close and release staged artifacts into repository 'Releases'
+   6. In org.eclipse.scout.sdk/pom.xml adjust dependency versions in the section titled "dependencies to Eclipse artifacts". The version should match the one of the corresponding Eclipse release.
+   7. In org.eclipse.scout.sdk/pom.xml adjust dependency versions in the section titled "versions to dependencies uploaded by scout". The version should match the one of the corresponding Eclipse release.
+   8. In the child modules of this pom adjust the source P2 repository (id and url) in the "tycho-p2-extras-plugin" configuration.
+   9. In the child modules of this pom adjust the version of the pom to the ones used in step 7.
+  10. In the child modules of this pom adjust all the dependency versions to match the versions used in step 6.
+  11. Verify using local Maven build on this pom: "mvn clean install -Dmaster_sanityCheck_skip=true -Dmaster_flatten_skip=true -Prelease -Pcentral-portal"
+  12. Verify using local Maven build on org.eclipse.scout.sdk/pom.xml using "mvn clean install -DskipTests".
+  13. If successful: Commit and push as feature branch to GitHub.
+
+  14. Run job https://ci.eclipse.org/scout/job/org.eclipse.scout.sdk.deps_deploy/ on your branch.
+  15. After successful Job completion publish the artifact to Maven Central by doing ONE of the following:
+      1. Using Web-UI: a) Visit https://central.sonatype.com/publishing/deployments (requires login).
+                       b) Wait until the deployment appears. This may take several hours up to several days to appear!
+                       c) Check if Maven Central validation passed.
+                       d) Manually check the content.
+                       e) Publish the artifacts if all ok.
+      2. Using Rest-API (this can be done immediately after deployment, there is no need to wait for the deployment to appear in the web UI)
+         See https://central.sonatype.org/publish/publish-portal-api/ for authentication instructions and commands to check status, publish or drop the deployment.
+         The deploymentId required in the rest calls can be copied from the console output at the end of the Jenkins job "org.eclipse.scout.sdk.deps_deploy".
+         To validate the uploaded content check the zip in the build artifacts of the Jenkins job: https://ci.eclipse.org/scout/job/org.eclipse.scout.sdk.deps_deploy/lastSuccessfulBuild/artifact/org.eclipse.scout.sdk.s2e.releng/
+  16. After publishing on Maven Central run job https://ci.eclipse.org/scout/job/org.eclipse.scout.sdk.branch-14.0_continuous/ on your branch.
+  17. If successful: Merge your branch.
   -->
+  <groupId>org.eclipse.scout.sdk</groupId>
+  <artifactId>org.eclipse.scout.sdk.s2e.releng</artifactId>
+  <version>14.0.0-SNAPSHOT</version>
+
+  <packaging>pom</packaging>
+  <name>${project.artifactId}</name>
+
   <properties>
-    <downloaded>${project.build.directory}/repository/plugins/</downloaded>
     <!-- don't deploy this helper pom -->
     <maven.deploy.skip>true</maven.deploy.skip>
-    <forgeSnapshotId>bsi-tools-snapshot</forgeSnapshotId>
-    <forgeSnapshotUrl>https://scout.bsiag.com/repository/org.eclipse.scout-snapshot-local</forgeSnapshotUrl>
-    <forgeReleaseId>central</forgeReleaseId>
-    <forgeReleaseUrl>https://central.sonatype.com</forgeReleaseUrl>
   </properties>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.eclipse.tycho.extras</groupId>
-          <artifactId>tycho-p2-extras-plugin</artifactId>
-          <version>${master_plugin_tycho-extras_version}</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <configuration>
-            <url>${forgeSnapshotUrl}</url>
-            <repositoryId>${forgeSnapshotId}</repositoryId>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+  <modules>
+    <module>org.eclipse.m2e.core</module>
+    <module>org.eclipse.m2e.core.ui</module>
+  </modules>
 
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>*.pom</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>false</filtering>
-        <excludes>
-          <exclude>*.pom</exclude>
-        </excludes>
-      </resource>
-    </resources>
-
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>filter-resources</id>
-            <goals>
-              <goal>resources</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.eclipse.tycho.extras</groupId>
-        <artifactId>tycho-p2-extras-plugin</artifactId>
-        <configuration>
-          <includeOptional>false</includeOptional>
-          <source>
-            <repository>
-              <id>eclipse_2025_06</id>
-              <url>https://download.eclipse.org/releases/2025-06/</url>
-              <layout>p2</layout>
-            </repository>
-          </source>
-          <ius>
-            <iu>
-              <id>org.eclipse.m2e.core</id>
-              <version>${org.eclipse.m2e.core}</version>
-            </iu>
-            <iu>
-              <id>org.eclipse.m2e.core.source</id>
-              <version>${org.eclipse.m2e.core}</version>
-            </iu>
-            <iu>
-              <id>org.eclipse.m2e.core.ui</id>
-              <version>${org.eclipse.m2e.core.ui}</version>
-            </iu>
-            <iu>
-              <id>org.eclipse.m2e.core.ui.source</id>
-              <version>${org.eclipse.m2e.core.ui}</version>
-            </iu>
-          </ius>
-          <followStrictOnly>true</followStrictOnly>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>mirror</goal>
-            </goals>
-            <phase>validate</phase>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>apache.snapshots</id>
-      <name>Apache Snapshot Repository</name>
-      <url>https://repository.apache.org/content/groups/snapshots/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories>
-
-  <profiles>
-    <profile>
-      <id>deploy-m2e-snapshots</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-deploy-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>deploy-m2e-core</id>
-                <goals>
-                  <goal>deploy-file</goal>
-                </goals>
-                <phase>deploy</phase>
-                <configuration>
-                  <file>${downloaded}/org.eclipse.m2e.core_${org.eclipse.m2e.core}.jar</file>
-                  <sources>${downloaded}/org.eclipse.m2e.core.source_${org.eclipse.m2e.core}.jar</sources>
-                  <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.pom</pomFile>
-                </configuration>
-              </execution>
-              <execution>
-                <id>deploy-m2e-ui</id>
-                <goals>
-                  <goal>deploy-file</goal>
-                </goals>
-                <phase>deploy</phase>
-                <configuration>
-                  <file>${downloaded}/org.eclipse.m2e.core.ui_${org.eclipse.m2e.core.ui}.jar</file>
-                  <sources>${downloaded}/org.eclipse.m2e.core.ui.source_${org.eclipse.m2e.core.ui}.jar</sources>
-                  <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.ui.pom</pomFile>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>deploy-releases</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <configuration>
-              <repositoryId>${forgeReleaseId}</repositoryId>
-              <url>${forgeReleaseUrl}</url>
-            </configuration>
-            <executions>
-              <execution>
-                <id>deploy-m2e-core</id>
-                <goals>
-                  <goal>sign-and-deploy-file</goal>
-                </goals>
-                <phase>deploy</phase>
-                <configuration>
-                  <file>${downloaded}/org.eclipse.m2e.core_${org.eclipse.m2e.core}.jar</file>
-                  <sources>${downloaded}/org.eclipse.m2e.core.source_${org.eclipse.m2e.core}.jar</sources>
-                  <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.pom</pomFile>
-                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
-                  <gpgArguments>
-                    <arg>--pinentry-mode</arg>
-                    <arg>loopback</arg>
-                  </gpgArguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>deploy-m2e-ui</id>
-                <goals>
-                  <goal>sign-and-deploy-file</goal>
-                </goals>
-                <phase>deploy</phase>
-                <configuration>
-                  <file>${downloaded}/org.eclipse.m2e.core.ui_${org.eclipse.m2e.core.ui}.jar</file>
-                  <sources>${downloaded}/org.eclipse.m2e.core.ui.source_${org.eclipse.m2e.core.ui}.jar</sources>
-                  <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.ui.pom</pomFile>
-                  <javadoc>${project.build.outputDirectory}/javadoc.jar</javadoc>
-                  <gpgArguments>
-                    <arg>--pinentry-mode</arg>
-                    <arg>loopback</arg>
-                  </gpgArguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>deploy-releases-addNewDeps</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <configuration>
-              <repositoryId>${forgeReleaseId}</repositoryId>
-              <url>${forgeReleaseUrl}</url>
-            </configuration>
-            <executions>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
