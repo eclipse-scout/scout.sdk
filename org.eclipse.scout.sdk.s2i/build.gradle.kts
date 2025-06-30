@@ -97,7 +97,6 @@ intellijPlatform {
 }
 
 kotlin {
-    jvmToolchain(24)
     compilerOptions {
         jvmTarget = JvmTarget.JVM_21
     }
