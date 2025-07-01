@@ -27,7 +27,10 @@ val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "25.2-SNA
 plugins {
     id("java")
     id("maven-publish")
-    id("org.jetbrains.intellij.platform") version "2.6.0" // See https://github.com/JetBrains/intellij-platform-gradle-plugin
+
+    // See https://github.com/JetBrains/intellij-platform-gradle-plugin
+    id("org.jetbrains.intellij.platform") version "2.5.0" // do not use 2.6.0. It is not compatible with IJ 2024.3
+
     kotlin("jvm") version "2.1.21"
     id("io.github.rmanibus.maven-settings") version "0.8" // for maven settings
 }
