@@ -20,7 +20,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk</artifactId>
-  <version>14.0.0-SNAPSHOT</version>
+  <version>14.0.12</version>
   <packaging>pom</packaging>
   <name>Eclipse Scout SDK</name>
   <description>Eclipse Scout SDK</description>
@@ -54,7 +54,7 @@
 
   <properties>
     <scout.osgi.version>14.0.0</scout.osgi.version>
-    <org.eclipse.scout.rt_version>25.2-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>25.2.0-beta.2</org.eclipse.scout.rt_version>
 
     <jdk.source.version>21</jdk.source.version>
     <jdk.min.version>${jdk.source.version}</jdk.min.version>
