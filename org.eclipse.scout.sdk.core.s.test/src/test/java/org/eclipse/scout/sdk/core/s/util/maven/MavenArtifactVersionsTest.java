@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -44,6 +44,8 @@ public class MavenArtifactVersionsTest {
   @Test
   @Tag("IntegrationTest")
   public void testAllOnCentral() throws IOException {
+    assertTrue(MavenArtifactVersions.allOnCentral(ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID)
+        .anyMatch(s -> s.startsWith("25.2.0")));
     assertTrue(MavenArtifactVersions.allOnCentral(ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, ScoutProjectNewHelper.SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID).findAny().isPresent());
     assertFalse(MavenArtifactVersions.allOnCentral(ScoutProjectNewHelper.SCOUT_ARCHETYPES_GROUP_ID, "not-existing").findAny().isPresent());
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.core.s.project;
 
 import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
@@ -242,7 +243,7 @@ public final class ScoutProjectNewHelper {
 
   /**
    * Gets all major Java versions (e.g. 8 or 11 or 17) that are officially supported by the Scout version given.
-   * 
+   *
    * @param scoutVersion
    *          The Scout version (e.g. 11.0.14 or 22.0-SNAPSHOT or LATEST).
    * @return The supported major Java versions (e.g. 8 or 11 or 17) for the Scout version given. If the given Scout
@@ -254,14 +255,13 @@ public final class ScoutProjectNewHelper {
 
   /**
    * Gets all Scout versions available on Maven central which are supported by this SDK.
-   * 
+   *
    * @param useJavaClient
    *          {@code true} if the versions for the archetype with the Java UI should be returned, {@code false} for the
    *          versions of the archetype with the JavaScript UI.
    * @param includePreviewVersions
-   *          {@code true} if preview releases should be included in the result list.
-   * @return A {@link List} holding the versions available on Maven central sorted descending (the newest version
-   *         first).
+   *     {@code true} if preview releases should be included in the result list.
+   * @return A {@link List} holding the versions available on Maven central sorted descending (the newest version first).
    * @throws IOException
    *           if there is an error reading the versions from Maven central
    */
@@ -276,6 +276,7 @@ public final class ScoutProjectNewHelper {
         .flatMap(Optional::stream)
         .filter(v -> v.compareCommonSegmentsTo(min) >= 0) // only supported versions
         .filter(v -> includePreviewVersions || Strings.isEmpty(v.suffix())) // include preview versions?
+        .sorted(reverseOrder()) // newest first
         .map(ApiVersion::asString)
         .collect(toList());
   }
