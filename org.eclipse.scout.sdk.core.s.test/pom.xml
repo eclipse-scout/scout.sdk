@@ -483,6 +483,20 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <configuration>
+          <rules>
+            <dependencyConvergence>
+              <excludes>
+                <exclude>jakarta.inject:jakarta.inject-api</exclude><!-- see below: we require a fixed old version for maven-embedder, however runtime does include a newer version -->
+              </excludes>
+            </dependencyConvergence>
+          </rules>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
