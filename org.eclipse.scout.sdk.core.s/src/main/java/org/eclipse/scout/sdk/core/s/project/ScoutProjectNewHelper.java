@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.core.s.project;
 
 import static java.util.Comparator.naturalOrder;
+import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
@@ -260,8 +261,7 @@ public final class ScoutProjectNewHelper {
    *     versions of the archetype with the JavaScript UI.
    * @param includePreviewVersions
    *     {@code true} if preview releases should be included in the result list.
-   * @return A {@link List} holding the versions available on Maven central sorted descending (the newest version
-   * first).
+   * @return A {@link List} holding the versions available on Maven central sorted descending (the newest version first).
    * @throws IOException
    *     if there is an error reading the versions from Maven central
    */
@@ -276,6 +276,7 @@ public final class ScoutProjectNewHelper {
         .flatMap(Optional::stream)
         .filter(v -> v.compareCommonSegmentsTo(min) >= 0) // only supported versions
         .filter(v -> includePreviewVersions || Strings.isEmpty(v.suffix())) // include preview versions?
+        .sorted(reverseOrder()) // newest first
         .map(ApiVersion::asString)
         .collect(toList());
   }

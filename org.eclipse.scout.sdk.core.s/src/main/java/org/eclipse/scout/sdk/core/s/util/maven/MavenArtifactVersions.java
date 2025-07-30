@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -53,39 +53,39 @@ public final class MavenArtifactVersions {
    * For source folders it is taken from the parent pom.xml<br>
    * Source or javadoc jar files are not supported.
    * </p>
-   * 
+   *
    * @param artifactId
-   *          The name of the Maven module. This is the name of the jar file (without any suffixes) and the name of the
-   *          directory that contains the source folders. Typically, this is equal to the artifactId of the module. May
-   *          be {@code null} but then the resulting {@link Optional} will always be empty.
+   *     The name of the Maven module. This is the name of the jar file (without any suffixes) and the name of the
+   *     directory that contains the source folders. Typically, this is equal to the artifactId of the module. May
+   *     be {@code null} but then the resulting {@link Optional} will always be empty.
    * @param context
-   *          The {@link IJavaEnvironment} in which the module should be searched. May be {@code null} but then the
-   *          resulting {@link Optional} will always be empty.
+   *     The {@link IJavaEnvironment} in which the module should be searched. May be {@code null} but then the
+   *     resulting {@link Optional} will always be empty.
    * @return An {@link Optional} holding the Maven version of the given module or an empty {@link Optional} if the
-   *         module could not be found, the version cannot be parsed or one of the parameters is {@code null}.
+   * module could not be found, the version cannot be parsed or one of the parameters is {@code null}.
    */
   public static Optional<ApiVersion> usedIn(String artifactId, IJavaEnvironment context) {
     return modulePathIn(artifactId, context).flatMap(MavenArtifactVersions::version);
   }
 
   /**
-   * Gets the newest 200 (limitation by Maven central) versions of given artifact that can be found on Maven-central.
-   * 
+   * Gets the newest 100 versions of given artifact that can be found on Maven-central.
+   *
    * @param groupId
-   *          The groupId of the artifact. Must not be {@code null}.
+   *     The groupId of the artifact. Must not be {@code null}.
    * @param artifactId
-   *          The artifactId of the artifact. Must not be {@code null}.
+   *     The artifactId of the artifact. Must not be {@code null}.
    * @return A {@link Stream} with all versions found on Maven-central.
    * @throws IOException
-   *           if there is an error reading the value from Maven-central.
+   *     if there is an error reading the value from Maven-central.
    */
   public static Stream<String> allOnCentral(String groupId, String artifactId) throws IOException {
     try {
       var g = URLEncoder.encode(groupId, StandardCharsets.UTF_8);
       var a = URLEncoder.encode(artifactId, StandardCharsets.UTF_8);
-      var uri = new URI("https://search.maven.org/solrsearch/select?q=g:" + g + "+AND+a:" + a + "&core=gav&rows=100&wt=xml");
+      var uri = new URI("https://central.sonatype.com/solrsearch/select?q=g:" + g + "+AND+a:" + a + "&core=gav&rows=100&wt=xml&sort=version+desc");
       var dom = Xml.get(uri);
-      return Xml.evaluateXPath("result/doc/str[@name='v']", dom.getDocumentElement()).stream()
+      return Xml.evaluateXPath("response/docs/docs/v", dom.getDocumentElement()).stream()
           .map(Node::getTextContent)
           .filter(Strings::hasText);
     }
