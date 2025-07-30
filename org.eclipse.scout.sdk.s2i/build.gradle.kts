@@ -29,7 +29,7 @@ plugins {
     id("maven-publish")
 
     // See https://github.com/JetBrains/intellij-platform-gradle-plugin
-    id("org.jetbrains.intellij.platform") version "2.5.0" // do not use 2.6.0. It is not compatible with IJ 2024.3
+    id("org.jetbrains.intellij.platform") version "2.5.0" // do not use 2.6.0 or 2.7.0. It is not compatible with IJ 2024.3
 
     kotlin("jvm") version "2.1.21"
     id("io.github.rmanibus.maven-settings") version "0.8" // for maven settings
@@ -89,7 +89,11 @@ intellijPlatform {
         verificationReportsFormats = VerifyPluginTask.VerificationReportsFormats.ALL
         subsystemsToCheck = VerifyPluginTask.Subsystems.WITHOUT_ANDROID
         ides {
-            ide(IntelliJPlatformType.IntellijIdeaUltimate, "2025.1.3")
+            select {
+                types = listOf(IntelliJPlatformType.IntellijIdeaUltimate)
+                channels = listOf(ProductRelease.Channel.RELEASE)
+                sinceBuild = "2025.1.4.1"
+            }
             select {
                 types = listOf(IntelliJPlatformType.IntellijIdeaUltimate)
                 channels = listOf(ProductRelease.Channel.EAP)
