@@ -19,8 +19,8 @@ import com.intellij.codeInsight.template.TemplateManager
 import com.intellij.codeInsight.template.impl.TemplateImpl
 import com.intellij.codeInsight.template.impl.TemplateImplUtil
 import com.intellij.icons.AllIcons
-import com.intellij.lang.javascript.JSStubElementTypes
 import com.intellij.lang.javascript.patterns.JSPatterns.jsProperty
+import com.intellij.lang.javascript.psi.JSArrayLiteralExpression
 import com.intellij.lang.javascript.psi.JSLiteralExpression
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
 import com.intellij.lang.javascript.psi.JSProperty
@@ -31,7 +31,6 @@ import com.intellij.patterns.PlatformPatterns.psiElement
 import com.intellij.patterns.StandardPatterns.or
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import com.intellij.psi.util.elementType
 import com.intellij.util.ThrowableRunnable
 import icons.JavaScriptPsiIcons
 import org.eclipse.scout.sdk.core.java.JavaUtils
@@ -96,7 +95,7 @@ object JsModelCompletionHelper {
         val usedPropertyNames = objectLiteral.properties.mapNotNull { it.name }.filter { it != CompletionInitializationContext.DUMMY_IDENTIFIER_TRIMMED }.toSet()
         val contextElement = if (isNameCompletion) element.parent else element // on property completion there is one more element (a jsProperty with DUMMY_IDENTIFIER name)
         val contextParent = contextElement.parent
-        val isInArray = contextParent.elementType == JSStubElementTypes.ARRAY_LITERAL_EXPRESSION
+        val isInArray = contextParent is JSArrayLiteralExpression
         val siblings = contextParent.children
         val isLast = siblings.indexOf(contextElement) == siblings.size - 1
         val isInLiteral = contextElement is JSLiteralExpression

@@ -7,7 +7,7 @@
   ~
   ~ SPDX-License-Identifier: EPL-2.0
   -->
-<idea-plugin allow-bundled-update="true">
+<idea-plugin>
   <extensions defaultExtensionNs="com.intellij">
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.model.js.JsModelCacheStartup"/>
     <lang.foldingBuilder language="JavaScript" implementationClass="org.eclipse.scout.sdk.s2i.nls.folding.NlsFoldingBuilderForJs"/>
