@@ -99,7 +99,7 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
                 Boolean::class.java,
                 java.lang.Boolean::class.java -> tryConvertToBoolean()
 
-                java.lang.Integer::class.java,
+                Integer::class.java,
                 Int::class.java,
                 java.lang.Float::class.java,
                 Float::class.java,
@@ -107,8 +107,8 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
                 Long::class.java,
                 java.lang.Double::class.java,
                 Double::class.java,
-                java.math.BigDecimal::class.java,
-                java.math.BigInteger::class.java -> tryConvertToNumber(expectedType)
+                BigDecimal::class.java,
+                BigInteger::class.java -> tryConvertToNumber(expectedType)
 
                 else -> null // unknown type conversion
             }
@@ -176,7 +176,7 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
         when (value) {
             is BigInteger -> {
                 when (requestedNumberType) {
-                    Int::class.java, java.lang.Integer::class.java -> value.intValueExact()
+                    Int::class.java, Integer::class.java -> value.intValueExact()
                     Long::class.java, java.lang.Long::class.java -> value.longValueExact()
                     else -> null
                 }?.let { return it }
@@ -184,7 +184,7 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
 
             is BigDecimal -> {
                 when (requestedNumberType) {
-                    Int::class.java, java.lang.Integer::class.java -> value.intValueExact()
+                    Int::class.java, Integer::class.java -> value.intValueExact()
                     Long::class.java, java.lang.Long::class.java -> value.longValueExact()
                     else -> null
                 }?.let { return it }
@@ -192,7 +192,7 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
 
             else -> {
                 when (requestedNumberType) {
-                    Int::class.java, java.lang.Integer::class.java -> value.toInt()
+                    Int::class.java, Integer::class.java -> value.toInt()
                     Long::class.java, java.lang.Long::class.java -> value.toLong()
                     else -> null
                 }?.let { return it }
@@ -200,7 +200,7 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
         }
 
         return when (requestedNumberType) {
-            java.math.BigInteger::class.java -> when (value) {
+            BigInteger::class.java -> when (value) {
                 is Int -> value.toBigInteger()
                 is Float -> value.toBigDecimal().toBigInteger()
                 is Long -> value.toBigInteger()
@@ -210,7 +210,7 @@ open class IdeaConstantValue(val ideaModule: IdeaNodeModule, internal val elemen
                 else -> null
             }
 
-            java.math.BigDecimal::class.java -> when (value) {
+            BigDecimal::class.java -> when (value) {
                 is Int -> value.toBigDecimal()
                 is Float -> value.toBigDecimal()
                 is Long -> value.toBigDecimal()

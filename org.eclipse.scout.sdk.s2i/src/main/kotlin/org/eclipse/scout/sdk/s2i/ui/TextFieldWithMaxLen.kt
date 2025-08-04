@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -66,7 +66,7 @@ class TextFieldWithMaxLen(text: String = "", columns: Int = 0, maxLength: Int = 
             val overLimit = currentLength - lengthOfTextToDelete + textToInsert.length - maxLength
             var limitedTextToInsert = textToInsert
             if (overLimit > 0) {
-                limitedTextToInsert = textToInsert.substring(0, textToInsert.length - overLimit)
+                limitedTextToInsert = textToInsert.dropLast(overLimit)
             }
             super.replace(fb, offset, lengthOfTextToDelete, limitedTextToInsert, attrs)
         }

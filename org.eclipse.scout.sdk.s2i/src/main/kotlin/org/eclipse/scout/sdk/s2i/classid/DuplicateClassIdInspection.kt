@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,7 +26,7 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
 
     override fun checkFile(file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor> {
         return try {
-            val javaFile = if (file is PsiJavaFile) file else null ?: return ProblemDescriptor.EMPTY_ARRAY
+            val javaFile = (file as? PsiJavaFile) ?: return ProblemDescriptor.EMPTY_ARRAY
             val classIdCache = EclipseScoutBundle.classIdCache(javaFile.project)
             if (!classIdCache.isCacheReady()) {
                 classIdCache.scheduleSetup() // does nothing if already scheduled or already set up

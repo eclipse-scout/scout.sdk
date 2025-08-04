@@ -35,7 +35,7 @@ class PostfixCompletionInstaller : ProjectActivity, DumbAware {
         val latestBeansFqn = beansApi.fqn()
         val beansGetMethodName = beansApi.methodName
         val template = JavaEditablePostfixTemplate(
-            beansGetPostfixId, "beans", "$latestBeansFqn.$beansGetMethodName(\$EXPR\$.class)", "",
+            beansGetPostfixId, "beans", "$latestBeansFqn.$beansGetMethodName(\$EXPR$.class)", "",
             emptySet(), LanguageLevel.JDK_1_8, true, javaPostfixTemplateProvider
         )
         existingTemplates.add(template)

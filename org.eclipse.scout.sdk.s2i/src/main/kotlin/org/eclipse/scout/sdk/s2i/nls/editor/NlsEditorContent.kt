@@ -323,11 +323,11 @@ class NlsEditorContent(val project: Project, val translationManager: Translation
         }
     }
 
-    private inner class TranslationServicesLocateAction(stores: List<ITranslationStore>) : AbstractStoresAction(
+    private class TranslationServicesLocateAction(stores: List<ITranslationStore>) : AbstractStoresAction(
         message("jump.to.text.service"), message("choose.text.service"),
         AllIcons.Nodes.Services, stores, { TranslationServiceLocateAction(it) })
 
-    private inner class TranslationServiceLocateAction(private val m_store: ITranslationStore) : DumbAwareAction(m_store.service().type().elementName(), null, AllIcons.Nodes.Services) {
+    private class TranslationServiceLocateAction(private val m_store: ITranslationStore) : DumbAwareAction(m_store.service().type().elementName(), null, AllIcons.Nodes.Services) {
         override fun actionPerformed(e: AnActionEvent) {
             m_store.service().type().resolvePsi()?.navigate(true)
         }

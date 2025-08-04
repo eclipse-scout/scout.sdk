@@ -326,7 +326,7 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
         }
     }
 
-    private inner class NewLineAction(private val m_txt: JBTextArea) : DumbAwareAction(
+    private class NewLineAction(private val m_txt: JBTextArea) : DumbAwareAction(
         null, message(
             "insert.new.line.x",
             getKeystrokeText(getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK))

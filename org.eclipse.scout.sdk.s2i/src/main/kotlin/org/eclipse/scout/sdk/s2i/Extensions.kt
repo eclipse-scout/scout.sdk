@@ -221,7 +221,7 @@ fun PsiElement.containingModule(returnReferencingModuleIfNotInFilesystem: Boolea
         return null
     }
 
-    val searchElement = if (isInProject) this else psiFile ?: this
+    val searchElement = if (isInProject) this else psiFile
     return computeInReadAction(project) {
         this
             .takeIf { it.isValid }
@@ -280,7 +280,7 @@ fun Project.findAllTypesAnnotatedWith(annotation: String, scope: SearchScope, in
     options.isCaseSensitiveMatch = true
     options.isRecursiveSearch = true
     options.scope = scope
-    options.searchPattern = "@$annotation( )\nclass \$Class\$ {}"
+    options.searchPattern = "@$annotation( )\nclass \$Class$ {}"
     options.setFileType(JavaFileType.INSTANCE)
 
     val constraint = MatchVariableConstraint()

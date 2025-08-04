@@ -16,7 +16,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.MessageDigest;
@@ -233,7 +234,7 @@ public class StagingMojo extends AbstractStagingMojo {
   private File downloadJar(String url, String jarName, String outputDir) throws MojoExecutionException {
     var path = url + "/" + jarName;
     try {
-      var u = new URL(path);
+      var u = new URI(path).toURL();
       var conn = u.openConnection();
       var outFile = new File(outputDir, jarName);
       getLog().info("Downloading " + path + " to " + outFile);
@@ -243,7 +244,7 @@ public class StagingMojo extends AbstractStagingMojo {
       }
       return outFile;
     }
-    catch (IOException e) {
+    catch (IOException | URISyntaxException e) {
       throw new MojoExecutionException("Could not download '" + path + "'." + e);
     }
   }

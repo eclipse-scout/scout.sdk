@@ -145,8 +145,9 @@ abstract class CreateElementAction<OP : BiConsumer<IEnvironment, IProgress>> : A
             }
 
             var pkg = IdeaEnvironment.computeInReadAction(dir.project) { PackageIndex.getInstance(project).getPackageNameByDirectory(dir.virtualFile) }
-            val lastIndexOf = name.lastIndexOf(".")
-            if (lastIndexOf > 0) pkg += "." + name.substring(0, lastIndexOf)
+            val delim = '.'
+            val lastIndexOf = name.lastIndexOf(delim)
+            if (lastIndexOf > 0) pkg += delim + name.take(lastIndexOf)
             val elementName = capitalize(name.substring(lastIndexOf + 1, name.length)).toString()
 
             if (pkg.isNullOrEmpty()) {

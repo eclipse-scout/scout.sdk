@@ -328,7 +328,8 @@ class TransactionManager(val project: Project, val transactionName: String? = nu
         } catch (indexException: IndexNotReadyException) {
             throw indexException // will be handled by the retry
         } catch (cancelException: ProcessCanceledException) {
-            SdkLog.debug("Transaction member '{}' was cancelled.", member)
+            SdkLog.debug("Transaction member '{}' was cancelled.", member, cancelException)
+            throw cancelException // actually not necessary as SdkLog.debug will already throw it. But still write here to be sure in case the logger changes (and to make the inspection happy)
         } catch (e: Exception) {
             SdkLog.warning("Error committing transaction member '$member'.", e)
         }

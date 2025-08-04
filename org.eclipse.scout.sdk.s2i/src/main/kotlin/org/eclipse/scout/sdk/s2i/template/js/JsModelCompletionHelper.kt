@@ -58,10 +58,10 @@ object JsModelCompletionHelper {
     val ALL_VARIABLES = listOf(BOOL_VARIABLE, TEXT_VARIABLE, COMPLETE_VARIABLE)
         .associateBy { it.name }
 
-    const val END_VARIABLE_SRC = "\$${TemplateImpl.END}$"
-    val BOOL_VARIABLE_SRC = "\$${BOOL_VARIABLE.name}$"
-    val TEXT_VARIABLE_SRC = "\$${TEXT_VARIABLE.name}$"
-    val COMPLETE_VARIABLE_SRC = "\$${COMPLETE_VARIABLE.name}$"
+    const val END_VARIABLE_SRC = "$${TemplateImpl.END}$"
+    val BOOL_VARIABLE_SRC = "$${BOOL_VARIABLE.name}$"
+    val TEXT_VARIABLE_SRC = "$${TEXT_VARIABLE.name}$"
+    val COMPLETE_VARIABLE_SRC = "$${COMPLETE_VARIABLE.name}$"
 
     fun propertyElementPattern() = or(
         psiElement().withSuperParent(2, jsProperty()),

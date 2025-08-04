@@ -17,14 +17,10 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.chooseAnalysisScope
 
 class UpdateWidgetMapInScopeMenu : AnAction() {
-
-    companion object {
-        private val UNSUPPORTED_SCOPE_TYPES: List<Int> = listOf(AnalysisScope.MODULE, AnalysisScope.MODULES)
-    }
-
     override fun actionPerformed(event: AnActionEvent) {
+        val unsupportedScopeTypes: List<Int> = listOf(AnalysisScope.MODULE, AnalysisScope.MODULES)
         val scopeToTrigger = event.chooseAnalysisScope(message("select.scope.to.update"), message("select.scope.to.update")) {
-            it.scope?.scopeType !in UNSUPPORTED_SCOPE_TYPES
+            it.scope?.scopeType !in unsupportedScopeTypes
         } ?: return
         FileDocumentManager.getInstance().saveAllDocuments() // save all documents so that the update can see the latest changes
         WidgetMapUpdater.updateAsync(scopeToTrigger.toSearchScope(), scopeToTrigger.project)

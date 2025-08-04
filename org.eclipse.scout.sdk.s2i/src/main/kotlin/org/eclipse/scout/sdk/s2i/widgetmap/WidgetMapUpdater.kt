@@ -24,6 +24,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.WriteAction
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.module.Module
+import com.intellij.openapi.progress.ProcessCanceledException
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
@@ -172,6 +173,9 @@ object WidgetMapUpdater {
                         progress.worked(1)
                     }
                 }
+            } catch (e: ProcessCanceledException) {
+                SdkLog.debug("Canceled while writing WidgetMaps for file '{}'.", it.modelFunction.containingFile?.virtualFile?.resolveLocalPath(), e)
+                throw e // actually not necessary as SdkLog.debug will already throw it. But still write here to be sure in case the logger changes (and to make the inspection happy)
             } catch (e: RuntimeException) {
                 val realEx = if (e.cause == null || e.cause == e) e else e.cause
                 SdkLog.warning("Error updating WidgetMaps for file '{}'.", it.modelFunction.containingFile?.virtualFile?.resolveLocalPath(), realEx)

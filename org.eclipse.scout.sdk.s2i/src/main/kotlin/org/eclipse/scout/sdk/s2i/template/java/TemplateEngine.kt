@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -34,10 +34,10 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
         const val VALUE_OPTION_DEFAULT_VAL = "default"
         const val VALUE_OPTION_UNCHANGED = "unchanged"
 
-        private val DECLARING_TYPE_ARG_REGEX = Pattern.compile("\\\$declaringTypeArg\\(([\\w.]+),\\s*(\\d+),\\s*($VALUE_OPTION_BOX|$VALUE_OPTION_UNBOX|$VALUE_OPTION_DEFAULT_VAL|$VALUE_OPTION_UNCHANGED)\\)\\\$")
-        private val ENCLOSING_INSTANCE_FQN_REGEX = Pattern.compile("\\\$enclosingInstanceInScopeFqn\\((.*)\\)\\\$")
-        private val CLASS_ID_REGEX = Pattern.compile("\\\$newClassId\\(\\)\\\$")
-        private val UNIQUE_ID_REGEX = Pattern.compile("\\\$newUniqueId\\((.+)\\)\\\$")
+        private val DECLARING_TYPE_ARG_REGEX = Pattern.compile("\\\$declaringTypeArg\\(([\\w.]+),\\s*(\\d+),\\s*($VALUE_OPTION_BOX|$VALUE_OPTION_UNBOX|$VALUE_OPTION_DEFAULT_VAL|$VALUE_OPTION_UNCHANGED)\\)\\$")
+        private val ENCLOSING_INSTANCE_FQN_REGEX = Pattern.compile("\\\$enclosingInstanceInScopeFqn\\((.*)\\)\\$")
+        private val CLASS_ID_REGEX = Pattern.compile("\\\$newClassId\\(\\)\\$")
+        private val UNIQUE_ID_REGEX = Pattern.compile("\\\$newUniqueId\\((.+)\\)\\$")
     }
 
     private val m_resolvedTypeArgs = HashMap<Pair<String, Int>, String>()
