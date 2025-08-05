@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -90,7 +90,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   }
 
   /**
-   * Shutdown the manager. Afterwards no auto updates are performed. All listeners are removed. Waits until all derived
+   * Shutdown the manager. Afterward, no auto updates are performed. All listeners are removed. Waits until all derived
    * resources have finished updating.
    */
   public void dispose() {
@@ -137,7 +137,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
     var cleanResources = cleanCopy(resources); // remove non-accessible, containing and null resources
     if (enqueueFiles(cleanResources)) {
       m_runQueuedTriggerHandlersJob.abort();
-      m_runQueuedTriggerHandlersJob.schedule(1000); // wait a little to give other follow-up events time so that they don't trigger another re-calculation job
+      m_runQueuedTriggerHandlersJob.schedule(2000); // wait a little to give other follow-up events time so that they don't trigger another re-calculation job
     }
   }
 
@@ -334,7 +334,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   }
 
   /**
-   * Job that iterates over all java change events and checks if they require a update.
+   * Job that iterates over all java change events and checks if they require an update.
    */
   private static final class P_ResourceChangeEventCheckJob extends AbstractJob {
 
@@ -397,7 +397,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
   }
 
   /**
-   * Job that executes all trigger operations that have been enqueued, with lowest priority.
+   * Job that executes all trigger operations that have been enqueued, with the lowest priority.
    */
   private static final class P_RunQueuedTriggerHandlersJob extends AbstractJob {
 

@@ -17,19 +17,19 @@ import static org.eclipse.scout.sdk.s2e.environment.EclipseEnvironment.toScoutPr
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
+import java.util.stream.IntStream;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugEvent;
@@ -42,12 +42,8 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchListener;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IProcess;
-import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.internal.launching.StandardVMType;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
-import org.eclipse.jdt.launching.IVMInstall;
-import org.eclipse.jdt.launching.IVMInstall2;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.scout.sdk.core.log.SdkLog;
@@ -59,8 +55,8 @@ import org.eclipse.scout.sdk.core.s.util.maven.MavenBuild;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.Strings;
+import org.eclipse.scout.sdk.s2e.util.ApiHelper;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
-import org.osgi.framework.Version;
 
 /**
  * <h3>{@link MavenBuildOperation}</h3>
@@ -77,7 +73,6 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
    * see org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants
    */
   public static final String WORKING_DIRECTORY = "org.eclipse.jdt.launching.WORKING_DIRECTORY";
-  public static final String JRE_CONTAINER = "org.eclipse.jdt.launching.JRE_CONTAINER";
 
   public static final String M2_PROFILES = "M2_PROFILES";
   public static final String M2_GOALS = "M2_GOALS";
@@ -255,43 +250,26 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
     // not supported yet: "M2_PROFILES" and "M2_USER_SETTINGS"
     workingCopy.setAttribute(M2_PROPERTIES, build.getPropertiesAsList());
 
-    if (isArchetypeBuild) {
-      var vm = getDefaultJvm();
-      if (vm != null) {
-        var path = Path.fromOSString(vm.getInstallLocation().toString()).toPortableString();
-        workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_JRE_CONTAINER_PATH, path);
-      }
-    }
-
     setGoals(workingCopy, build.getGoals());
 
     var container = getWorkspaceContainer();
     setProjectConfiguration(workingCopy, container, monitor);
-    setJreContainerPath(workingCopy, container);
+    setJreContainerPath(workingCopy, isArchetypeBuild, container);
 
     return workingCopy;
   }
 
-  protected static IVMInstall getDefaultJvm() {
-    var defaultVm = JavaRuntime.getDefaultVMInstall();
-    if (defaultVm != null && defaultVm.getVMInstallType() instanceof StandardVMType) {
-      return defaultVm;
+  protected static void setJreContainerPath(ILaunchConfigurationWorkingCopy workingCopy, boolean isArchetypeBuild, IResource container) throws CoreException {
+    if (container == null || isArchetypeBuild) {
+      return; // use default VM
     }
-
-    return (IVMInstall) Arrays.stream(JavaRuntime.getVMInstallTypes())
-        .filter(StandardVMType.class::isInstance)
-        .flatMap(t -> Arrays.stream(t.getVMInstalls()))
-        .filter(IVMInstall2.class::isInstance)
-        .map(IVMInstall2.class::cast)
-        .max(Comparator.comparing(vm -> new Version(vm.getJavaVersion()), naturalOrder()))
-        .orElse(null);
-  }
-
-  protected static void setJreContainerPath(ILaunchConfigurationWorkingCopy workingCopy, IResource container) throws CoreException {
-    var path = getJreContainerPath(container);
-    if (path != null) {
-      workingCopy.setAttribute(JRE_CONTAINER, path.toPortableString());
-    }
+    // try to find a JRE matching the ScoutApi of the container
+    // path in the following form: org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-24/
+    Optional.ofNullable(getMinJavaVersionFor(container))
+        .map(javaVersion -> JavaRuntime.getExecutionEnvironmentsManager().getEnvironment("JavaSE-" + javaVersion))
+        .map(JavaRuntime::newJREContainerPath)
+        .map(path -> path.addTrailingSeparator().toPortableString())
+        .ifPresent(path -> workingCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_JRE_CONTAINER_PATH, path));
   }
 
   protected static void setGoals(ILaunchConfigurationWorkingCopy workingCopy, Iterable<String> goals) {
@@ -331,8 +309,8 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
     }
   }
 
-  protected static IPath getJreContainerPath(IResource basedir) throws CoreException {
-    if (basedir == null || !basedir.exists()) {
+  protected static Integer getMinJavaVersionFor(IResource basedir) throws CoreException {
+    if (!basedir.exists()) {
       return null;
     }
 
@@ -346,11 +324,11 @@ public class MavenBuildOperation implements BiConsumer<IEnvironment, IProgress> 
       return null;
     }
 
-    var entries = javaProject.getRawClasspath();
-    return Arrays.stream(entries)
-        .filter(entry -> JRE_CONTAINER.equals(entry.getPath().segment(0)))
-        .findFirst()
-        .map(IClasspathEntry::getPath)
+    return ApiHelper.scoutApiFor(javaProject)
+        .map(api -> Arrays.stream(api.supportedJavaVersions()))
+        .orElseGet(IntStream::empty)
+        .boxed()
+        .min(naturalOrder())
         .orElse(null);
   }
 
