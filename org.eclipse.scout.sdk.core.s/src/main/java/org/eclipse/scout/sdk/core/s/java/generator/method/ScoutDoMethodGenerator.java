@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,9 +39,9 @@ import org.eclipse.scout.sdk.core.java.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.model.query.AbstractQuery;
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode;
 import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode.DataObjectNodeKind;
-import org.eclipse.scout.sdk.core.s.java.apidef.IScout22DoApi;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.java.builder.body.IScoutMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * Provides data object related method factory functions.
@@ -130,8 +130,8 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
     return switch (kind) {
       case VALUE -> scoutApi.DoEntity().doValueMethodName();
       case LIST -> scoutApi.DoEntity().doListMethodName();
-      case COLLECTION -> scoutApi.requireApi(IScout22DoApi.class).DoEntity().doCollectionMethodName();
-      case SET -> scoutApi.requireApi(IScout22DoApi.class).DoEntity().doSetMethodName();
+      case COLLECTION -> scoutApi.DoEntity().doCollectionMethodName();
+      case SET -> scoutApi.DoEntity().doSetMethodName();
     };
   }
 
@@ -140,8 +140,8 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
     var type = switch (kind) {
       case VALUE -> scoutApi.DoValue();
       case LIST -> scoutApi.DoList();
-      case COLLECTION -> scoutApi.requireApi(IScout22DoApi.class).DoCollection();
-      case SET -> scoutApi.requireApi(IScout22DoApi.class).DoSet();
+      case COLLECTION -> scoutApi.DoCollection();
+      case SET -> scoutApi.DoSet();
     };
     return type.fqn() + JavaTypes.C_GENERIC_START + dataType.apply(ctx) + JavaTypes.C_GENERIC_END;
   }
@@ -397,18 +397,16 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
   }
 
   static String computeDoNodeGetterName(IJavaBuilderContext c, CharSequence doNodeName, CharSequence doNodeType) {
-    return c.requireApi(IScoutApi.class).IDoEntity().computeGetterPrefixFor(doNodeType) + capitalize(doNodeName);
+    return PropertyBean.getterPrefixFor(doNodeType) + capitalize(doNodeName);
   }
 
   static void computeDoNodeGetterBody(CharSequence name, String returnTypeReference, IScoutMethodBodyBuilder<?> builder) {
     if (JavaTypes._boolean.equals(returnTypeReference)) {
       // special body for primitive boolean getters (Scout >= 22 only)
-      var scout22DoApi = builder.context()
-          .api(IScoutApi.class)
-          .flatMap(scoutApi -> scoutApi.api(IScout22DoApi.class));
-      if (scout22DoApi.isPresent()) {
+      var scoutApi = builder.context().api(IScoutApi.class);
+      if (scoutApi.isPresent()) {
         builder.returnClause()
-            .append(scout22DoApi.orElseThrow().DoEntity().nvlMethodName())
+            .append(scoutApi.orElseThrow().DoEntity().nvlMethodName())
             .parenthesisOpen()
             .appendFunc(c -> computeDoNodeGetterName(c, name, JavaTypes.Boolean)).parenthesisOpen().parenthesisClose()
             .parenthesisClose().semicolon();
@@ -494,11 +492,17 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
     }
 
     var valueGetter = createDoNodeGetter(name, dataTypeRef, owner);
-    var additionalGetters = owner.javaEnvironment().requireApi(IScoutApi.class)
-        .IDoEntity().getAdditionalDoNodeGetters(name, dataTypeRef, owner);
+    var additionalGetters = getAdditionalDoNodeGetters(name, dataTypeRef, owner);
     var allMissingGetters = Stream.concat(Stream.of(valueGetter), additionalGetters)
         .filter(gen -> !implementedInSuperClass(gen, owner)); // skip getters already existing in the super class. no need to override
     return Stream.concat(Stream.of(chainedSetter), allMissingGetters);
+  }
+
+  static Stream<IScoutMethodGenerator<?, ?>> getAdditionalDoNodeGetters(CharSequence name, CharSequence dataTypeRef, IType ownerType) {
+    if (!Strings.equals(JavaTypes.Boolean, dataTypeRef)) {
+      return Stream.empty();
+    }
+    return Stream.of(ScoutDoMethodGenerator.createDoNodeGetter(name, JavaTypes._boolean, ownerType));
   }
 
   static Stream<IScoutMethodGenerator<?, ?>> buildMethodGeneratorsForCollection(String name, DataObjectNodeKind kind, String dataTypeRef, boolean isInherited, IType owner) {

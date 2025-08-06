@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
-import org.eclipse.scout.sdk.core.s.java.apidef.IScout22DoApi;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 
@@ -58,8 +57,8 @@ public final class DoContextResolvers {
     var namespace = selectNamespace(targetPackage, namespaceCandidates);
 
     var typeVersionCandidates = Optional.ofNullable(namespace)
-        .flatMap(n -> n.javaEnvironment().requireApi(IScoutApi.class).api(IScout22DoApi.class))
-        .map(doApi -> doApi.ITypeVersion().fqn())
+        .map(n -> n.javaEnvironment().requireApi(IScoutApi.class))
+        .map(scoutApi -> scoutApi.ITypeVersion().fqn())
         .map(iTypeVersionFqn -> res.resolvePrimaryTypesInPackageOf(namespace)
             .flatMap(sibling -> resolveTypeVersionCandidates(iTypeVersionFqn, sibling))
             .collect(toList()))

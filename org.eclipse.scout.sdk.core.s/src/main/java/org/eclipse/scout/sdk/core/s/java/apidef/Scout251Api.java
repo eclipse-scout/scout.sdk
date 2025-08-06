@@ -13,7 +13,7 @@ import org.eclipse.scout.sdk.core.java.apidef.MaxApiLevel;
 
 @MaxApiLevel({25, 1})
 @SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
-public interface Scout251Api extends IScoutApi, IScout242Api, IScoutChartApi, IScout22DoApi {
+public interface Scout251Api extends IScoutApi, IScout242Api {
 
   @Override
   default int[] supportedJavaVersions() {
@@ -27,7 +27,7 @@ public interface Scout251Api extends IScoutApi, IScout242Api, IScoutChartApi, IS
     return JAX_WS_CONSTANTS;
   }
 
-  class JaxWsConstants extends Scout11Api.JaxWsConstants {
+  class JaxWsConstants extends Scout22010Api.JaxWsConstants {
 
     @Override
     public String codeModelFactoryPath() {

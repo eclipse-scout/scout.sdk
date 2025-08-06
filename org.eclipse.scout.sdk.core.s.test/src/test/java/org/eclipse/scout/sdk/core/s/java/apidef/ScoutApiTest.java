@@ -57,9 +57,11 @@ public class ScoutApiTest {
 
   @Test
   public void testSupportedJavaVersions() {
-    assertArrayEquals(new int[]{8, 11}, ScoutApi.create("10.0").supportedJavaVersions());
-    assertArrayEquals(new int[]{8, 11}, ScoutApi.create("11.0-SNAPSHOT").supportedJavaVersions());
-    assertArrayEquals(new int[]{8, 11}, ScoutApi.create("11.0.15").supportedJavaVersions());
+    // the next three use the "oldest" api definition which currently is 22.0.10
+    assertArrayEquals(new int[]{11}, ScoutApi.create("10.0").supportedJavaVersions());
+    assertArrayEquals(new int[]{11}, ScoutApi.create("11.0-SNAPSHOT").supportedJavaVersions());
+    assertArrayEquals(new int[]{11}, ScoutApi.create("11.0.15").supportedJavaVersions());
+
     assertArrayEquals(new int[]{11}, ScoutApi.create("22.0.1").supportedJavaVersions());
     assertArrayEquals(new int[]{11}, ScoutApi.create("22.0.9").supportedJavaVersions());
     assertArrayEquals(new int[]{11}, ScoutApi.create("22.0.10").supportedJavaVersions());
@@ -92,6 +94,6 @@ public class ScoutApiTest {
 
   private static void assertApiContainsData(IScoutApi api) {
     assertTrue(api.maxLevel().segments().length > 0);
-    assertEquals(Scout11Api.DATA_ANNOTATION.fqn(), api.Data().fqn());
+    assertEquals(Scout22010Api.DATA_ANNOTATION.fqn(), api.Data().fqn());
   }
 }

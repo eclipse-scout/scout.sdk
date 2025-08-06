@@ -94,23 +94,7 @@ public final class CoreScoutTestingUtils {
   static String archetypeVersion() {
     // do not compute sdk version based on maven module. This version would always be the same.
     // instead derive it from the Scout RT version which might be modified using parameters.
-    return rtToArchetypeVersion(currentScoutVersion());
-  }
-
-  static String rtToArchetypeVersion(String rtVersion) {
-    var version = ApiVersion.parse(rtVersion).orElseThrow(() -> newFail("Invalid Scout RT version '{}'.", rtVersion));
-    var numberSegments = version.segments();
-    if (numberSegments[0] > 11) { // e.g. Scout RT 22.0-SNAPSHOT
-      // For Scout RT version > 11 the archetype version uses the same version schema as the RT
-      return rtVersion;
-    }
-    if (numberSegments.length < 2) {
-      numberSegments = new int[]{numberSegments[0], 0};
-    }
-    if (numberSegments.length < 3) {
-      numberSegments = new int[]{numberSegments[0], numberSegments[1], 0};
-    }
-    return new ApiVersion(numberSegments, version.suffix()).asString();
+    return currentScoutVersion();
   }
 
   static String javaVersionForArchetypes() {

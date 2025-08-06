@@ -133,6 +133,22 @@
       <artifactId>org.eclipse.scout.rt.ui.html.test</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.server.test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.server.jaxws</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.dataobject</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.rt</groupId>
+      <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
+    </dependency>
+    <dependency>
       <!-- NLS tests need sources of org.eclipse.scout.rt.ui.html.UiTextContributor -->
       <groupId>org.eclipse.scout.rt</groupId>
       <artifactId>org.eclipse.scout.rt.ui.html</artifactId>
@@ -153,132 +169,9 @@
       <scope>test</scope>
       <classifier>sources</classifier>
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.server.test</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.server.jaxws</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.rt</groupId>
-      <artifactId>org.eclipse.scout.rt.dataobject</artifactId>
-    </dependency>
   </dependencies>
 
   <profiles>
-    <profile>
-      <id>add-datamodel.client-dependency-for-22.0-build</id>
-      <activation>
-        <property>
-          <!-- add dependency for the scout version 22.0 -->
-          <name>org.eclipse.scout.rt_version</name>
-          <value>22.0-SNAPSHOT</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.eclipse.scout.rt</groupId>
-          <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>add-datamodel.client-dependency-for-23.1-build</id>
-      <activation>
-        <property>
-          <!-- add dependency for the scout version 23.1 -->
-          <name>org.eclipse.scout.rt_version</name>
-          <value>23.1-SNAPSHOT</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.eclipse.scout.rt</groupId>
-          <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>add-datamodel.client-dependency-for-23.2-build</id>
-      <activation>
-        <property>
-          <!-- add dependency for the scout version 23.2 -->
-          <name>org.eclipse.scout.rt_version</name>
-          <value>23.2-SNAPSHOT</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.eclipse.scout.rt</groupId>
-          <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>add-datamodel.client-dependency-for-24.1-build</id>
-      <activation>
-        <property>
-          <!-- add dependency for the scout version 24.1 -->
-          <name>org.eclipse.scout.rt_version</name>
-          <value>24.1-SNAPSHOT</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.eclipse.scout.rt</groupId>
-          <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>add-datamodel.client-dependency-for-24.2-build</id>
-      <activation>
-        <property>
-          <!-- add dependency for the scout version 24.2 -->
-          <name>org.eclipse.scout.rt_version</name>
-          <value>24.2-SNAPSHOT</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.eclipse.scout.rt</groupId>
-          <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>add-datamodel.client-dependency-for-25.1-build</id>
-      <activation>
-        <property>
-          <!-- add dependency for the scout version 25.1 -->
-          <name>org.eclipse.scout.rt_version</name>
-          <value>25.1-SNAPSHOT</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.eclipse.scout.rt</groupId>
-          <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
-      <id>add-datamodel.client-dependency-for-default-build</id>
-      <activation>
-        <property>
-          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (25.2) -->
-          <name>!org.eclipse.scout.rt_version</name>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.eclipse.scout.rt</groupId>
-          <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
 
     <profile>
       <id>add-nls.source-dependency-for-23.2-build</id>

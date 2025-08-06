@@ -33,8 +33,8 @@ public class ScoutProjectNewHelperTest {
     assertArrayEquals(latest, getSupportedJavaVersions("latest"));
     assertArrayEquals(latest, getSupportedJavaVersions(""));
     assertArrayEquals(latest, getSupportedJavaVersions("--invalid--version--"));
-    assertArrayEquals(new int[]{8, 11}, getSupportedJavaVersions("10"));
-    assertArrayEquals(new int[]{8, 11}, getSupportedJavaVersions("11.4.5"));
+    assertArrayEquals(new int[]{11}, getSupportedJavaVersions("10"));
+    assertArrayEquals(new int[]{11}, getSupportedJavaVersions("11.4.5"));
     assertArrayEquals(new int[]{11}, getSupportedJavaVersions("22.0.2"));
     assertArrayEquals(new int[]{11}, getSupportedJavaVersions("22.0.10"));
     assertArrayEquals(new int[]{11, 17}, getSupportedJavaVersions("22.0.11"));

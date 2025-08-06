@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,12 +9,7 @@
  */
 package org.eclipse.scout.sdk.core.s.java.apidef;
 
-import java.util.stream.Stream;
-
 import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
-import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator;
-import org.eclipse.scout.sdk.core.java.model.api.IType;
-import org.eclipse.scout.sdk.core.s.java.generator.method.IScoutMethodGenerator;
 
 @SuppressWarnings({"squid:S00100", "squid:S2166", "squid:S2176", "squid:S00118", "findbugs:NM_METHOD_NAMING_CONVENTION"}) // method naming conventions
 public interface IScoutInterfaceApi {
@@ -157,28 +152,6 @@ public interface IScoutInterfaceApi {
   IDoEntity IDoEntity();
 
   interface IDoEntity extends ITypeNameSupplier {
-    /**
-     * Computes the getter prefix for a DoNode attribute. This is "get" for most objects and (depending on Scout
-     * version) "is" for boolean types.
-     * 
-     * @param dataTypeRef
-     *          The datatype reference of the attribute. This is the type parameter value of the DoNode.
-     * @return The prefix to use for this type.
-     */
-    String computeGetterPrefixFor(CharSequence dataTypeRef);
-
-    /**
-     * Gets some additional getter {@link IMethodGenerator IMethodGenerators} for the given data object attribute.
-     * 
-     * @param name
-     *          The name of attribute. This is the name of the method returning the DoNode.
-     * @param dataTypeRef
-     *          The datatype reference of the attribute. This is the type parameter value of the DoNode.
-     * @param ownerType
-     *          The {@link IType} that contains the attribute and will hold the created getters
-     * @return A {@link Stream} returning any additional getters.
-     */
-    Stream<IScoutMethodGenerator<?, ?>> getAdditionalDoNodeGetters(CharSequence name, CharSequence dataTypeRef, IType ownerType);
   }
 
   IDateField IDateField();
@@ -545,8 +518,34 @@ public interface IScoutInterfaceApi {
   DoEntity DoEntity();
 
   interface DoEntity extends ITypeNameSupplier {
+    String nvlMethodName();
+
+    String doSetMethodName();
+
+    String doCollectionMethodName();
+
     String doValueMethodName();
 
     String doListMethodName();
+  }
+
+  DoSet DoSet();
+
+  interface DoSet extends ITypeNameSupplier {
+  }
+
+  DoCollection DoCollection();
+
+  interface DoCollection extends ITypeNameSupplier {
+  }
+
+  ITypeVersion ITypeVersion();
+
+  interface ITypeVersion extends ITypeNameSupplier {
+  }
+
+  INamespace INamespace();
+
+  interface INamespace extends ITypeNameSupplier {
   }
 }

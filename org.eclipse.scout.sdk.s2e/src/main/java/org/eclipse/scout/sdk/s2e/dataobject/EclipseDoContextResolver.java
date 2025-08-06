@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,6 @@ import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.dataobject.DoContextResolvers;
-import org.eclipse.scout.sdk.core.s.java.apidef.IScout22DoApi;
 import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi;
 import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.environment.model.JavaEnvironmentWithJdt;
@@ -41,9 +40,6 @@ public class EclipseDoContextResolver implements DoContextResolvers.IDoContextRe
     var project = ((JavaEnvironmentWithJdt) environment.unwrap()).javaProject();
     var filter = new PublicPrimaryNonAbstractSourceTypeFilter().and(EclipseDoContextResolver::isInteresting);
     return ScoutApi.allKnown()
-        .map(a -> a.api(IScout22DoApi.class))
-        .filter(Optional::isPresent)
-        .flatMap(Optional::stream)
         .map(a -> a.INamespace().fqn())
         .distinct()
         .flatMap(iNamespace -> JdtUtils.findTypesInStrictHierarchy(project, iNamespace, null, filter).stream())

@@ -19,7 +19,6 @@ import com.intellij.psi.PsiModifier
 import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment
 import org.eclipse.scout.sdk.core.java.model.api.IType
 import org.eclipse.scout.sdk.core.s.dataobject.DoContextResolvers
-import org.eclipse.scout.sdk.core.s.java.apidef.IScout22DoApi
 import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
 import org.eclipse.scout.sdk.s2i.*
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
@@ -38,7 +37,6 @@ open class IdeaDoContextResolver : DoContextResolvers.IDoContextResolver, Projec
     fun resolveNamespaceCandidates(module: Module, environment: IJavaEnvironment): Stream<IType> = computeInReadAction(module.project) {
         val moduleScope = module.getModuleWithDependenciesAndLibrariesScope(false)
         return@computeInReadAction ScoutApi.allKnown().asSequence()
-                .mapNotNull { it.api(IScout22DoApi::class.java).orElse(null) }
                 .map { it.INamespace().fqn() }
                 .distinct()
                 .flatMap { module.project.findTypesByName(it) }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,6 @@ import java.util.StringJoiner;
 
 import org.eclipse.scout.sdk.core.java.model.api.IMethod;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
-import org.eclipse.scout.sdk.core.s.java.apidef.IScout22DoApi;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 
@@ -66,15 +65,10 @@ public class DataObjectNode {
       if (scoutApi.DoList().fqn().equals(name)) {
         return Optional.of(LIST);
       }
-      return scoutApi.api(IScout22DoApi.class)
-          .flatMap(a -> detectDoCollection(a, name));
-    }
-
-    static Optional<DataObjectNodeKind> detectDoCollection(IScout22DoApi extendedApi, String name) {
-      if (extendedApi.DoSet().fqn().equals(name)) {
+      if (scoutApi.DoSet().fqn().equals(name)) {
         return Optional.of(SET);
       }
-      if (extendedApi.DoCollection().fqn().equals(name)) {
+      if (scoutApi.DoCollection().fqn().equals(name)) {
         return Optional.of(COLLECTION);
       }
       return Optional.empty();

@@ -245,7 +245,7 @@ public final class ScoutProjectNewHelper {
    * Gets all major Java versions (e.g. 8 or 11 or 17) that are officially supported by the Scout version given.
    *
    * @param scoutVersion
-   *     The Scout version (e.g. 11.0.14 or 22.0-SNAPSHOT or LATEST).
+   *     The Scout version (e.g. 12.0.14 or 22.0-SNAPSHOT or LATEST).
    * @return The supported major Java versions (e.g. 8 or 11 or 17) for the Scout version given. If the given Scout
    * version is invalid, the supported Java version of the newest Scout version is returned.
    */

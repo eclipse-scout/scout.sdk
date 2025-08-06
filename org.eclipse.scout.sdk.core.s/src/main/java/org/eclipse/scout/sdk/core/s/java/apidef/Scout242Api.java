@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,7 +14,7 @@ import org.eclipse.scout.sdk.core.java.builder.expression.IExpressionBuilder;
 
 @MaxApiLevel({24, 2})
 @SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
-public interface Scout242Api extends IScoutApi, IScout242Api, IScoutChartApi, IScout22DoApi {
+public interface Scout242Api extends IScoutApi, IScout242Api {
 
   PermissionId PERMISSION_ID = new PermissionId();
 

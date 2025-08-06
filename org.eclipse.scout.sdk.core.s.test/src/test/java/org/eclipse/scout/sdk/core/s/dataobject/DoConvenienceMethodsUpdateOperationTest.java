@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,12 +22,10 @@ import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertEqua
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.eclipse.scout.sdk.core.java.apidef.ApiVersion;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.environment.NullProgress;
-import org.eclipse.scout.sdk.core.s.java.apidef.IScout22DoApi;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.context.ClassIdAutoCreationExtension;
@@ -64,7 +62,7 @@ public class DoConvenienceMethodsUpdateOperationTest {
     testApiOfSampleDo(generatedSampleDo);
     if (scoutApi.maxLevel().major() >= 22) {
       // check that the primitive boolean getter uses the nvl method
-      var nvlMethodName = scoutApi.requireApi(IScout22DoApi.class).DoEntity().nvlMethodName();
+      var nvlMethodName = scoutApi.DoEntity().nvlMethodName();
       var isEnabledBodySource = generatedSampleDo.methods().withName("isEnabled").first().orElseThrow().sourceOfBody().orElseThrow().asCharSequence().toString();
       assertTrue(isEnabledBodySource.indexOf(nvlMethodName + "(getEnabled())") > 0);
     }
@@ -155,8 +153,6 @@ public class DoConvenienceMethodsUpdateOperationTest {
   private static void testApiOfSampleDo(IType sampleDo) {
     var scoutApi = sampleDo.javaEnvironment().requireApi(IScoutApi.class);
 
-    var scoutApiVersionMin22 = scoutApi.maxLevel().compareTo(new ApiVersion(22)) >= 0;
-
     assertHasFlags(sampleDo, Flags.AccPublic);
     assertHasSuperClass(sampleDo, scoutApi.DoEntity());
     assertHasSuperInterfaces(sampleDo, new String[]{"dataobject.DataObjectTestInterface"});
@@ -165,9 +161,7 @@ public class DoConvenienceMethodsUpdateOperationTest {
     // fields of SampleDo
     assertEquals(0, sampleDo.fields().stream().count(), "field count of 'dataobject.SampleDo'");
 
-    // --> manual modification
-    assertEquals(scoutApiVersionMin22 ? 12 : 11, sampleDo.methods().stream().count(), "method count of 'dataobject.SampleDo'");
-    // <-- manual modification
+    assertEquals(12, sampleDo.methods().stream().count(), "method count of 'dataobject.SampleDo'");
     var enabled = assertMethodExist(sampleDo, "enabled");
     assertMethodReturnType(enabled, "org.eclipse.scout.rt.dataobject.DoValue<java.lang.Boolean>");
     assertEquals(4, enabled.annotations().stream().count(), "annotation count");
@@ -190,19 +184,13 @@ public class DoConvenienceMethodsUpdateOperationTest {
     assertEquals(2, withEnabled.annotations().stream().count(), "annotation count");
     assertAnnotation(withEnabled, "java.lang.Deprecated");
     assertAnnotation(withEnabled, scoutApi.Generated());
-    // --> manual modification
-    if (scoutApiVersionMin22) {
       var getEnabled = assertMethodExist(sampleDo, "getEnabled");
       assertMethodReturnType(getEnabled, "java.lang.Boolean");
       assertEquals(2, getEnabled.annotations().stream().count(), "annotation count");
       assertAnnotation(getEnabled, "java.lang.Deprecated");
       assertAnnotation(getEnabled, scoutApi.Generated());
-    }
-    // <-- manual modification
     var isEnabled = assertMethodExist(sampleDo, "isEnabled");
-    // --> manual modification
-    assertMethodReturnType(isEnabled, scoutApiVersionMin22 ? "boolean" : "java.lang.Boolean");
-    // <-- manual modification
+    assertMethodReturnType(isEnabled, "boolean");
     assertEquals(2, isEnabled.annotations().stream().count(), "annotation count");
     assertAnnotation(isEnabled, "java.lang.Deprecated");
     assertAnnotation(isEnabled, scoutApi.Generated());

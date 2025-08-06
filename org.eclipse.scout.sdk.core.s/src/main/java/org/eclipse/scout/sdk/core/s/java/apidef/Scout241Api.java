@@ -13,7 +13,7 @@ import org.eclipse.scout.sdk.core.java.apidef.MaxApiLevel;
 
 @MaxApiLevel({24, 1})
 @SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
-public interface Scout241Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
+public interface Scout241Api extends IScoutApi {
 
   @Override
   default int[] supportedJavaVersions() {
@@ -27,7 +27,7 @@ public interface Scout241Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     return GENERATED;
   }
 
-  class Generated extends Scout11Api.Generated {
+  class Generated extends Scout22010Api.Generated {
     @Override
     public String fqn() {
       return "jakarta.annotation.Generated";
@@ -41,7 +41,7 @@ public interface Scout241Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     return WEB_SERVICE_CLIENT;
   }
 
-  class WebServiceClient extends Scout11Api.WebServiceClient {
+  class WebServiceClient extends Scout22010Api.WebServiceClient {
     @Override
     public String fqn() {
       return "jakarta.xml.ws.WebServiceClient";
@@ -55,7 +55,7 @@ public interface Scout241Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     return WEB_SERVICE;
   }
 
-  class WebService extends Scout11Api.WebService {
+  class WebService extends Scout22010Api.WebService {
     @Override
     public String fqn() {
       return "jakarta.jws.WebService";
@@ -84,7 +84,7 @@ public interface Scout241Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     return UI_TEXT_CONTRIBUTOR;
   }
 
-  class UiTextContributor extends Scout11Api.UiTextContributor {
+  class UiTextContributor extends Scout22010Api.UiTextContributor {
 
     @Override
     public String contributeUiTextKeysMethodName() {

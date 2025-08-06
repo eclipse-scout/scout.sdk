@@ -218,6 +218,11 @@ public interface IScoutVariousApi {
     String contributeUiTextKeysMethodName();
   }
 
+  ChartUiTextContributor ChartUiTextContributor();
+
+  interface ChartUiTextContributor extends ITypeNameSupplier {
+  }
+
   VetoException VetoException();
 
   interface VetoException extends ITypeNameSupplier {
