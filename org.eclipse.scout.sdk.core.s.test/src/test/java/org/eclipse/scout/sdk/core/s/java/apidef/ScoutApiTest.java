@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -92,6 +92,6 @@ public class ScoutApiTest {
 
   private static void assertApiContainsData(IScoutApi api) {
     assertTrue(api.maxLevel().segments().length > 0);
-    assertEquals(Scout10Api.DATA_ANNOTATION.fqn(), api.Data().fqn());
+    assertEquals(Scout11Api.DATA_ANNOTATION.fqn(), api.Data().fqn());
   }
 }

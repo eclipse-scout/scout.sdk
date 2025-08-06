@@ -169,22 +169,6 @@
 
   <profiles>
     <profile>
-      <id>add-chart-dependency-if-available</id>
-      <activation>
-        <property>
-          <name>org.eclipse.scout.rt_version</name>
-          <value>!10.0.0-SNAPSHOT</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.eclipse.scout.rt</groupId>
-          <artifactId>org.eclipse.scout.rt.chart.ui.html</artifactId>
-        </dependency>
-      </dependencies>
-    </profile>
-
-    <profile>
       <id>add-datamodel.client-dependency-for-22.0-build</id>
       <activation>
         <property>

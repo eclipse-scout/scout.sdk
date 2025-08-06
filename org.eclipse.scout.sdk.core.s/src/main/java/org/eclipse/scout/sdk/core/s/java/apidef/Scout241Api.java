@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,7 @@ public interface Scout241Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     return GENERATED;
   }
 
-  class Generated extends Scout10Api.Generated {
+  class Generated extends Scout11Api.Generated {
     @Override
     public String fqn() {
       return "jakarta.annotation.Generated";
@@ -41,7 +41,7 @@ public interface Scout241Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     return WEB_SERVICE_CLIENT;
   }
 
-  class WebServiceClient extends Scout10Api.WebServiceClient {
+  class WebServiceClient extends Scout11Api.WebServiceClient {
     @Override
     public String fqn() {
       return "jakarta.xml.ws.WebServiceClient";
@@ -55,7 +55,7 @@ public interface Scout241Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     return WEB_SERVICE;
   }
 
-  class WebService extends Scout10Api.WebService {
+  class WebService extends Scout11Api.WebService {
     @Override
     public String fqn() {
       return "jakarta.jws.WebService";
@@ -84,7 +84,7 @@ public interface Scout241Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     return UI_TEXT_CONTRIBUTOR;
   }
 
-  class UiTextContributor extends Scout10Api.UiTextContributor {
+  class UiTextContributor extends Scout11Api.UiTextContributor {
 
     @Override
     public String contributeUiTextKeysMethodName() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,7 +25,7 @@ public interface Scout232Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
     return SCOUT_TEXT_PROVIDER_SERVICE;
   }
 
-  class ScoutTextProviderService extends Scout10Api.ScoutTextProviderService {
+  class ScoutTextProviderService extends Scout11Api.ScoutTextProviderService {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.nls.text.ScoutTextProviderService";

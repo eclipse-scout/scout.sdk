@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -63,7 +63,7 @@ public interface Scout22010Api extends IScoutApi, IScoutChartApi, IScout22DoApi 
     return DO_ENTITY;
   }
 
-  class DoEntity extends Scout10Api.DoEntity implements IScout22DoApi.DoEntity {
+  class DoEntity extends Scout11Api.DoEntity implements IScout22DoApi.DoEntity {
     @Override
     public String nvlMethodName() {
       return "nvl";
@@ -87,7 +87,7 @@ public interface Scout22010Api extends IScoutApi, IScoutChartApi, IScout22DoApi 
     return I_DO_ENTITY;
   }
 
-  class IDoEntity extends Scout10Api.IDoEntity {
+  class IDoEntity extends Scout11Api.IDoEntity {
     @Override
     public String computeGetterPrefixFor(CharSequence dataTypeRef) {
       // since Scout 22 standard bean specification is used
@@ -143,7 +143,7 @@ public interface Scout22010Api extends IScoutApi, IScoutChartApi, IScout22DoApi 
     return TYPE_VERSION;
   }
 
-  class TypeVersion extends Scout10Api.TypeVersion {
+  class TypeVersion extends Scout11Api.TypeVersion {
     @Override
     public void buildValue(IExpressionBuilder<?> builder, String typeVersion) {
       builder.classLiteral(typeVersion);

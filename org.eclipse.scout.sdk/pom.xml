@@ -921,12 +921,6 @@
         <version>${org.eclipse.scout.rt_version}</version>
         <classifier>sources</classifier>
       </dependency>
-      <dependency>
-        <!-- explicitly set version here because the imported scout.rt parent has no version for this dependency in 10.0.0 -->
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>org.eclipse.scout.rt.chart.ui.html</artifactId>
-        <version>${org.eclipse.scout.rt_version}</version>
-      </dependency>
 
       <!-- dependency convergence -->
       <!-- may be deleted and re-created as needed on other version updates -->
@@ -1279,26 +1273,6 @@
         <property>
           <name>org.eclipse.scout.rt_version</name>
           <value>11.0-SNAPSHOT</value>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <configuration>
-              <rulesToSkip>dependencyConvergence</rulesToSkip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>disable-convergence-for-10.0-build</id>
-      <activation>
-        <property>
-          <name>org.eclipse.scout.rt_version</name>
-          <value>10.0.0-SNAPSHOT</value>
         </property>
       </activation>
       <build>
