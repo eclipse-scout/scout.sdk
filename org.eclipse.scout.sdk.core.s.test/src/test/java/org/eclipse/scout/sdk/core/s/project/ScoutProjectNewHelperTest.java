@@ -11,11 +11,14 @@ package org.eclipse.scout.sdk.core.s.project;
 
 import static org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper.getSupportedArchetypeVersions;
 import static org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper.getSupportedJavaVersions;
+import static org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper.limitToLtsOrNewest;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.eclipse.scout.sdk.core.java.apidef.ApiVersion;
 import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi;
@@ -52,10 +55,28 @@ public class ScoutProjectNewHelperTest {
     assertFalse(javaScriptPreview.isEmpty());
     assertTrue(javaRelease.size() <= javaPreview.size());
     assertTrue(javaScriptRelease.size() <= javaScriptPreview.size());
-    assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("22.")));
     assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("23.")));
     assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("24.")));
     assertTrue(javaPreview.stream().anyMatch(v -> v.startsWith("25.")));
     assertTrue(javaScriptPreview.stream().anyMatch(v -> v.startsWith("25.")));
+  }
+
+  @Test
+  public void testLimitToLtsOrNewest() {
+    assertEquals(List.of(ApiVersion.parse("25.2.0-beta.1").orElseThrow(),
+        ApiVersion.parse("25.2.0-beta.0").orElseThrow(),  // X.2 are LTS and therefore always preserved
+        ApiVersion.parse("25.1.15").orElseThrow(), // newest stable is always preserved (even if X.1)
+        ApiVersion.parse("25.1.12").orElseThrow(), // newest stable is always preserved (even if X.1)
+        ApiVersion.parse("24.2.16").orElseThrow(), // X.2 are LTS and therefore always preserved
+        ApiVersion.parse("24.2.2").orElseThrow()  // X.2 are LTS and therefore always preserved
+    ), limitToLtsOrNewest(List.of(ApiVersion.parse("25.2.0-beta.1").orElseThrow(),
+        ApiVersion.parse("25.2.0-beta.0").orElseThrow(),
+        ApiVersion.parse("25.1.15").orElseThrow(),
+        ApiVersion.parse("25.1.12").orElseThrow(),
+        ApiVersion.parse("24.2.16").orElseThrow(),
+        ApiVersion.parse("24.2.2").orElseThrow(),
+        ApiVersion.parse("24.1.4").orElseThrow(),
+        ApiVersion.parse("24.1.0-beta.1").orElseThrow()
+    )).toList());
   }
 }

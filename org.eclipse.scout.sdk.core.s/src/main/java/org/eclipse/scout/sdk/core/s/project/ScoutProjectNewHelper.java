@@ -9,24 +9,24 @@
  */
 package org.eclipse.scout.sdk.core.s.project;
 
-import static java.util.Comparator.naturalOrder;
+import static java.util.Collections.emptyList;
 import static java.util.Comparator.reverseOrder;
-import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import javax.xml.transform.TransformerException;
 
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.apidef.ApiVersion;
-import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
@@ -254,7 +254,7 @@ public final class ScoutProjectNewHelper {
   }
 
   /**
-   * Gets all Scout versions available on Maven central which are supported by this SDK.
+   * Gets all Scout versions >= 23 (older projects should no longer be created) available on Maven central.
    *
    * @param useJavaClient
    *     {@code true} if the versions for the archetype with the Java UI should be returned, {@code false} for the
@@ -266,18 +266,45 @@ public final class ScoutProjectNewHelper {
    *     if there is an error reading the versions from Maven central
    */
   public static List<String> getSupportedArchetypeVersions(boolean useJavaClient, boolean includePreviewVersions) throws IOException {
+    // versions older than 23 should no longer be created as the support for them is reduced. For new project more up-to-date version should be chosen.
+    // Furthermore, e.g. Eclipse can no longer run such old versions.
+    // Can be removed as soon as support for Scout versions < 23 is dropped in the ScoutApi.
+    var min = ApiVersion.parse("23.0.0").orElseThrow();
     var artifactId = useJavaClient ? SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID : SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID;
-    var min = ScoutApi.allKnown()
-        .map(IApiSpecification::maxLevel)
-        .min(naturalOrder())
-        .orElseThrow();
-    return MavenArtifactVersions.allOnCentral(SCOUT_ARCHETYPES_GROUP_ID, artifactId)
+    var availableVersions = MavenArtifactVersions.allOnCentral(SCOUT_ARCHETYPES_GROUP_ID, artifactId)
         .map(ApiVersion::parse)
         .flatMap(Optional::stream)
         .filter(v -> v.compareCommonSegmentsTo(min) >= 0) // only supported versions
-        .filter(v -> includePreviewVersions || Strings.isEmpty(v.suffix())) // include preview versions?
         .sorted(reverseOrder()) // newest first
+        .toList();
+    if (availableVersions.isEmpty()) {
+      return emptyList();
+    }
+    return limitToLtsOrNewest(availableVersions) // only newest X.1 release
+        .filter(v -> includePreviewVersions || Strings.isEmpty(v.suffix())) // include preview versions?
         .map(ApiVersion::asString)
-        .collect(toList());
+        .toList();
+  }
+
+  static Stream<ApiVersion> limitToLtsOrNewest(Collection<ApiVersion> availableVersions) {
+    // The X.1 versions are only still supported, if they are the newest version available.
+    // As soon as the next X.2 release is available, the X.1 release is no longer maintained.
+    // Therefore, creating new projects on X.1 releases should only be allowed if it is the newest.
+    var newestStableMajorMinor = availableVersions.stream()
+        .filter(version -> Strings.isEmpty(version.suffix())) // stable only
+        .findFirst() // first must be newest
+        .orElseThrow()
+        .segments(2);
+    return availableVersions.stream()
+        .filter(v -> isLtsOrNewest(v, newestStableMajorMinor));
+  }
+
+  static boolean isLtsOrNewest(ApiVersion version, int[] newestStableMajorMinor) {
+    var candidate = version.segments();
+    if (candidate.length < 2 || newestStableMajorMinor.length < 2) {
+      return true; // accept versions with only one number (should not exist)
+    }
+    return candidate[1] != 1 // it's an X.2 release (LTS) -> always accept
+        || (candidate[0] == newestStableMajorMinor[0] && candidate[1] == newestStableMajorMinor[1]); // it's the newest release (which might be an X.1) -> always accept
   }
 }

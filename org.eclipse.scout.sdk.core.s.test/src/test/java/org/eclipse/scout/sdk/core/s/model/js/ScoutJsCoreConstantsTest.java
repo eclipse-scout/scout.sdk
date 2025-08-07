@@ -246,8 +246,8 @@ public class ScoutJsCoreConstantsTest {
   }
 
   private static String getNewestModuleUrl(String name) throws IOException {
-    var versionSuffix = getCurrentVersionSuffix();
-    if (versionSuffix == null) {
+    var versionPrefix = getCurrentVersionPrefix();
+    if (versionPrefix == null) {
       SdkLog.warning("{} skipped for current Scout version '{}'.", ScoutJsCoreConstantsTest.class.getSimpleName(), CoreScoutTestingUtils.currentScoutVersion());
       return null;
     }
@@ -256,20 +256,20 @@ public class ScoutJsCoreConstantsTest {
       var obj = parser.readObject();
       var newest = obj.getJsonObject("versions")
           .entrySet().stream()
-          .filter(entry -> entry.getKey().startsWith(versionSuffix))
+          .filter(entry -> entry.getKey().startsWith(versionPrefix))
           .collect(Collectors.toMap(entry -> ApiVersion.parse(entry.getKey()).orElseThrow(), entry -> (JsonObject) entry.getValue(), Ensure::failOnDuplicates, TreeMap::new))
           .lastEntry();
       if (newest == null) {
-        SdkLog.warning("Could not find any version for Node package '{}' starting with '{}' on '{}'.", name, versionSuffix, npmJsUrl);
+        SdkLog.warning("Could not find any version for Node package '{}' starting with '{}' on '{}'.", name, versionPrefix, npmJsUrl);
         return null; // no version found
       }
       return newest.getValue().getJsonObject("dist").getString("tarball");
     }
   }
 
-  private static String getCurrentVersionSuffix() {
+  private static String getCurrentVersionPrefix() {
     var version = CoreScoutTestingUtils.currentScoutVersion(); // e.g. 24.1-SNAPSHOT
-    var segments = ApiVersion.parse(version).orElseThrow().segments();
+    var segments = ApiVersion.parse(version).orElseThrow().segments(2);
     if (segments[0] <= 22) {
       return null; // this test only supports versions >= 23.1 (TypeScript)
     }

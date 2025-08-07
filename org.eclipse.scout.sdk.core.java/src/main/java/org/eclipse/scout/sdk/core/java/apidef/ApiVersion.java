@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -57,9 +57,9 @@ public class ApiVersion implements Comparable<ApiVersion> {
    * Parses the value of an {@link MaxApiLevel} annotation on the given class.
    *
    * @param clazz
-   *          The class whose {@link MaxApiLevel} annotation should be parsed.
+   *     The class whose {@link MaxApiLevel} annotation should be parsed.
    * @return An {@link Optional} with the {@link ApiVersion} of the given class or an empty {@link Optional} if the
-   *         given class is {@code null} or the annotation does not exist.
+   * given class is {@code null} or the annotation does not exist.
    * @see #requireMaxApiLevelOf(Class)
    */
   public static Optional<ApiVersion> maxApiLevelOf(Class<?> clazz) {
@@ -74,10 +74,10 @@ public class ApiVersion implements Comparable<ApiVersion> {
    * not have an {@link MaxApiLevel} annotation.
    *
    * @param clazz
-   *          The class whose {@link MaxApiLevel} annotation should be parsed.
+   *     The class whose {@link MaxApiLevel} annotation should be parsed.
    * @return The {@link ApiVersion} value of the annotation.
    * @throws IllegalArgumentException
-   *           if the clazz is {@code null} or the clazz does not have the {@link MaxApiLevel} annotation.
+   *     if the clazz is {@code null} or the clazz does not have the {@link MaxApiLevel} annotation.
    * @see #maxApiLevelOf(Class)
    */
   public static ApiVersion requireMaxApiLevelOf(Class<?> clazz) {
@@ -89,7 +89,7 @@ public class ApiVersion implements Comparable<ApiVersion> {
    * Parses the given {@link CharSequence} into an {@link ApiVersion}.
    *
    * @param version
-   *          The {@link CharSequence} to parse. It must fulfill {@link #VERSION_PATTERN} to be successfully parsed.
+   *     The {@link CharSequence} to parse. It must fulfill {@link #VERSION_PATTERN} to be successfully parsed.
    * @return The {@link ApiVersion} or an empty {@link Optional} if the given {@link CharSequence} cannot be parsed.
    */
   public static Optional<ApiVersion> parse(CharSequence version) {
@@ -113,8 +113,8 @@ public class ApiVersion implements Comparable<ApiVersion> {
 
   /**
    * @return The suffix {@link String} or {@code null} if this {@link ApiVersion} has no suffix. The suffix is the whole
-   *         part after the maximal three number sections including the delimiter (e.g. {@code "-SNAPSHOT"} or
-   *         {@code ".SUFFIX"}).
+   * part after the maximal three number sections including the delimiter (e.g. {@code "-SNAPSHOT"} or
+   * {@code ".SUFFIX"}).
    */
   public String suffix() {
     return m_suffix;
@@ -124,7 +124,16 @@ public class ApiVersion implements Comparable<ApiVersion> {
    * @return A copy of all number segments of the version. Never returns {@code null}.
    */
   public int[] segments() {
-    return Arrays.copyOf(m_segments, m_segments.length);
+    return segments(m_segments.length);
+  }
+
+  /**
+   * @param n
+   *     The number of segments to copy. Must be in the range {@code [0, segments.length]}.
+   * @return A copy of the first n segments of the version. Never returns {@code null}.
+   */
+  public int[] segments(int n) {
+    return Arrays.copyOf(m_segments, Math.max(0, Math.min(n, m_segments.length)));
   }
 
   /**
@@ -176,9 +185,9 @@ public class ApiVersion implements Comparable<ApiVersion> {
   /**
    * Compares all segments which exist in this {@link ApiVersion} and the given one. Therefore, the compare aborts on
    * the first segments that has a different value or after the last segment that exists for both instances.
-   * 
+   *
    * @param o
-   *          The {@link ApiVersion} to compare against.
+   *     The {@link ApiVersion} to compare against.
    * @return The difference of the first segments that exists in both instances and have a different value.
    */
   public int compareCommonSegmentsTo(ApiVersion o) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -50,6 +50,14 @@ public class ApiVersionTest {
     assertArrayEquals(segments, v.segments());
     assertNotSame(segments, v.segments());
     assertEquals(12, v.major());
+
+    assertArrayEquals(new int[0], v.segments(-1));
+    assertArrayEquals(new int[0], v.segments(0));
+    assertArrayEquals(new int[]{12}, v.segments(1));
+    assertArrayEquals(segments, v.segments(2));
+    assertArrayEquals(segments, v.segments(3));
+    assertArrayEquals(segments, v.segments(4));
+
   }
 
   @Test
