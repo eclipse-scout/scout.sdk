@@ -16,7 +16,6 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.externalSystem.service.project.manage.ExternalProjectsManagerImpl
 import com.intellij.openapi.module.JavaModuleType
 import com.intellij.openapi.module.ModuleType
-import com.intellij.openapi.module.StdModuleTypes
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.projectRoots.SdkTypeId
@@ -51,7 +50,7 @@ class ScoutModuleBuilder : ModuleBuilder() {
     var javaVersion: Int? = null
     var scoutVersion: String? = null /* use latest */
 
-    override fun getModuleType(): ModuleType<*> = StdModuleTypes.JAVA
+    override fun getModuleType(): ModuleType<*> = JavaModuleType.getModuleType()
 
     override fun createWizardSteps(wizardContext: WizardContext, modulesProvider: ModulesProvider): Array<ModuleWizardStep> = ModuleWizardStep.EMPTY_ARRAY
 
