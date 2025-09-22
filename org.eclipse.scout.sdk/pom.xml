@@ -860,12 +860,12 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <scope>test</scope>
-        <version>33.4.8-jre</version>
+        <version>33.5.0-jre</version>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>5.18.0</version>
+        <version>5.20.0</version>
       </dependency>
       <dependency>
         <groupId>xml-apis</groupId>
@@ -955,7 +955,7 @@
           <!-- use the javac compiler for the SDK because of bugs in ECJ concerning type arguments with Java 11 -->
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.14.0</version>
+          <version>3.14.1</version>
           <configuration combine.self="override">
             <source>${jdk.source.version}</source>
             <target>${jdk.source.version}</target>

@@ -29,7 +29,7 @@ plugins {
     id("maven-publish")
 
     // See https://github.com/JetBrains/intellij-platform-gradle-plugin
-    id("org.jetbrains.intellij.platform") version "2.5.0" // do not use 2.6.0 or 2.7.0. It is not compatible with IJ 2024.3
+    id("org.jetbrains.intellij.platform") version "2.9.0"
 
     kotlin("jvm") version "2.1.21"
     id("io.github.rmanibus.maven-settings") version "0.8" // for maven settings
@@ -47,14 +47,17 @@ repositories {
 }
 
 dependencies {
-    api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.s", scoutSdkVersion)
-    api("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.ecj", scoutSdkVersion)
-    implementation("org.apache.poi", "poi-ooxml", "5.4.1")
-    testImplementation("org.mockito", "mockito-core", "5.18.0")
-    testImplementation("junit", "junit", "4.13.2")
-    testImplementation("org.eclipse.scout.rt", "org.eclipse.scout.rt.client", scoutRtVersion)
-    testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.java.test", scoutSdkVersion)
-    testImplementation("org.eclipse.scout.sdk", "org.eclipse.scout.sdk.core.typescript.test", scoutSdkVersion)
+    api("org.eclipse.scout.sdk:org.eclipse.scout.sdk.core.s:$scoutSdkVersion")
+    api("org.eclipse.scout.sdk:org.eclipse.scout.sdk.core.java.ecj:$scoutSdkVersion")
+    implementation("org.apache.poi:poi-ooxml:5.4.1")
+    testImplementation("org.mockito:mockito-core:5.20.0")
+    testImplementation("junit:junit:4.13.2")
+    testRuntimeOnly("org.eclipse.scout.rt:org.eclipse.scout.rt.client:$scoutRtVersion") {
+        // conflicts with the newer version shipped with IJ. Therefore, exclude older Scout version.
+        exclude(group = "io.opentelemetry.semconv", module = "opentelemetry-semconv")
+    }
+    testImplementation("org.eclipse.scout.sdk:org.eclipse.scout.sdk.core.java.test:$scoutSdkVersion")
+    testImplementation("org.eclipse.scout.sdk:org.eclipse.scout.sdk.core.typescript.test:$scoutSdkVersion")
 
     intellijPlatform {
         intellijIdeaUltimate("2024.3.3")
@@ -90,14 +93,14 @@ intellijPlatform {
         subsystemsToCheck = VerifyPluginTask.Subsystems.WITHOUT_ANDROID
         ides {
             select {
-                types = listOf(IntelliJPlatformType.IntellijIdeaUltimate)
+                types = listOf(IntelliJPlatformType.IntellijIdea)
                 channels = listOf(ProductRelease.Channel.RELEASE)
-                sinceBuild = "2025.1.4.1"
+                sinceBuild = "2025.1"
             }
             select {
-                types = listOf(IntelliJPlatformType.IntellijIdeaUltimate)
+                types = listOf(IntelliJPlatformType.IntellijIdea)
                 channels = listOf(ProductRelease.Channel.EAP)
-                sinceBuild = "252"
+                sinceBuild = "253"
             }
         }
     }

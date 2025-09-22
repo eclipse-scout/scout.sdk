@@ -194,6 +194,8 @@ class TemplateTest : AbstractTestCaseWithRunningClasspathModule() {
             .excludeIfContains("/com.jetbrains.intellij.idea/")
             .excludeIfContains("/org.jetbrains.kotlin/")
             .excludeIfContains("/xml-apis/xml-apis/") // because also present in the JRE
+            .excludeIfContains("/org.eclipse.scout.sdk/org.eclipse.scout.sdk.s2i/") // exclude s2i
+            .excludeIfContains("/.gradle/caches/") // exclude IJ
             .accept {
                 SdkJavaAssertions.assertNoCompileErrors(it, source, null, simpleName)
             }
