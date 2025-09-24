@@ -54,7 +54,7 @@
 
   <properties>
     <scout.osgi.version>14.0.0</scout.osgi.version>
-    <org.eclipse.scout.rt_version>25.2-SNAPSHOT</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>26.1-SNAPSHOT</org.eclipse.scout.rt_version>
 
     <jdk.source.version>21</jdk.source.version>
     <jdk.min.version>${jdk.source.version}</jdk.min.version>

@@ -18,7 +18,7 @@
       <p>
       Eclipse Scout integration for IntelliJ IDEA
       </p>
-      <p>Supports Scout runtime versions 10, 11, 22, 23, 24 and 25.</p>
+      <p>Supports Scout runtime versions 10, 11, 22, 23, 24, 25 and 26.</p>
       <p>
       Features:
         <br>
@@ -45,10 +45,14 @@
   ]]></description>
 
   <change-notes><![CDATA[
+        <b>September 24, 2025</b><br>
+        Adds support for Scout 26.1<br>
         <b>March 25, 2025</b><br>
         Adds support for Scout 25.2<br>
         <b>September 30, 2024</b><br>
         Adds support for Scout 25.1<br>
+        <b>February 2, 2024</b><br>
+        Adds support for Scout 24.2<br>
         <b>November 10, 2023</b><br>
         Adds support for Scout 24.1<br>
         <b>May 10, 2023</b><br>
