@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -138,7 +138,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     internal fun trySetupCache() {
         SdkLog.debug("Start building @ClassId value cache.")
         val start = System.currentTimeMillis()
-        findAllClassIds(GlobalSearchScope.projectScope(project))
+        findAllClassIds(GlobalSearchScope.allScope(project)) // include libraries in case classId values are copied e.g. from Scout rt
             .filter { !ignoreClassId(it) }
             .forEach {
                 val fqn = it.ownerFqn() ?: return@forEach
