@@ -163,7 +163,7 @@
 
     <icu4j>77.1</icu4j>
     <ecj>3.42.0</ecj>
-    <junit.version>5.13.4</junit.version>
+    <junit.version>5.14.0</junit.version>
 
     <!-- versions to dependencies uploaded by scout -->
     <org.eclipse.m2e.core>2.7.2.20250318-1458</org.eclipse.m2e.core>
@@ -794,7 +794,7 @@
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.5.18</version>
+        <version>1.5.20</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
