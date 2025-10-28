@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,12 @@ import org.eclipse.scout.sdk.core.util.Strings;
 @MaxApiLevel({22, 0, 10})
 @SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
 public interface Scout22010Api extends IScoutApi, IScoutChartApi, IScout22DoApi {
+
+  @Override
+  default String ecjVersion() {
+    return "3.29.0";
+  }
+
   @Override
   default int[] supportedJavaVersions() {
     return new int[]{11};

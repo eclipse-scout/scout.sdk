@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -53,6 +53,21 @@ public class ScoutApiTest {
   @Test
   public void testScoutApiMatches(IJavaEnvironment env) {
     assertApiValid(IScoutApi.class, env, ScoutApiTest::onlyInvalid);
+  }
+
+  @Test
+  public void testEcjVersion() {
+    assertEquals("3.19.0", ScoutApi.create("10.0").ecjVersion());
+    assertEquals("3.21.0", ScoutApi.create("11.0").ecjVersion());
+    assertEquals("3.29.0", ScoutApi.create("22.0").ecjVersion());
+    assertEquals("3.29.0", ScoutApi.create("22.0.11").ecjVersion());
+    assertEquals("3.29.0", ScoutApi.create("23.1").ecjVersion());
+    assertEquals("3.29.0", ScoutApi.create("23.2").ecjVersion());
+    assertEquals("3.31.0", ScoutApi.create("24.1").ecjVersion());
+    assertEquals("3.31.0", ScoutApi.create("24.2").ecjVersion());
+    assertEquals("3.40.0", ScoutApi.create("25.1").ecjVersion());
+    assertEquals("3.40.0", ScoutApi.create("25.2").ecjVersion());
+    assertEquals("3.43.0", ScoutApi.create("26.1").ecjVersion());
   }
 
   @Test

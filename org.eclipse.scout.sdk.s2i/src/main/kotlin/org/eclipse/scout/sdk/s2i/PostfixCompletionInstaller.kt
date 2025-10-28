@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.core.s.java.apidef.ScoutApi
 
 class PostfixCompletionInstaller : ProjectActivity, DumbAware {
     override suspend fun execute(project: Project) {
-        val beansGetPostfixId = "org.eclipse.scout.sdk.s2i.beans"
+        val beansGetPostfixId = "${EclipseScoutBundle.ID}.beans"
         val storage = PostfixTemplateStorage.getInstance() // already get instance here so that the storage is initialized
         val javaPostfixTemplateProvider = LanguagePostfixTemplate.EP_NAME.extensionList
             .firstOrNull { it.language == JavaLanguage.INSTANCE.id }

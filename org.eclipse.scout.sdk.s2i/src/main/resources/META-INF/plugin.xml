@@ -45,6 +45,8 @@
   ]]></description>
 
   <change-notes><![CDATA[
+        <b>October 28, 2025</b><br>
+        Automatic configuration of Eclipse Compiler for Java (ecj) and encodings settings.<br>
         <b>September 24, 2025</b><br>
         Adds support for Scout 26.1<br>
         <b>March 25, 2025</b><br>
@@ -103,6 +105,7 @@
   <extensions defaultExtensionNs="com.intellij">
     <notificationGroup displayType="BALLOON" id="scout.notification" key="notification.group.name"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.maven.MavenSourcesAutoDownloader"/>
+    <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.settings.ide.AutoUpdateIdeSettingsStartup"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaLogger"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.nls.IdeaTranslationStoreSupplier"/>
     <postStartupActivity implementation="org.eclipse.scout.sdk.s2i.IdeaSettingsCommentGenerator"/>

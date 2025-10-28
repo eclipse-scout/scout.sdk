@@ -19,7 +19,6 @@ import java.util.*
 
 object ScoutSettingsHelper {
 
-
     private val listeners = EventListenerList()
 
     fun getCodeFoldingSettings() = ScoutCodeFoldingSettings.getInstance()
@@ -35,6 +34,12 @@ object ScoutSettingsHelper {
 
     fun setAutoCreateClassIdAnnotations(project: Project, newValue: Boolean) =
         changeProperty(projectSettings(project), ScoutSettings.KEY_AUTO_CREATE_CLASS_ID, isAutoCreateClassIdAnnotations(project).toString(), newValue.toString())
+
+    fun isAutoUpdateIdeSettings(project: Project) =
+        projectSettings(project).getBoolean(ScoutSettings.KEY_AUTO_UPDATE_IDE_SETTINGS, true)
+
+    fun setAutoUpdateIdeSettings(project: Project, newValue: Boolean) =
+        changeProperty(projectSettings(project), ScoutSettings.KEY_AUTO_UPDATE_IDE_SETTINGS, isAutoUpdateIdeSettings(project).toString(), newValue.toString())
 
     fun getTranslationLanguage(project: Project): Language {
         val raw = projectSettings(project).getValue(ScoutSettings.KEY_TRANSLATION_DEFAULT_LANG)

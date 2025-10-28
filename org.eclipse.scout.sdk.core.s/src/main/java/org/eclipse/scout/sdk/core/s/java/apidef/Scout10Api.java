@@ -26,6 +26,11 @@ import org.eclipse.scout.sdk.core.util.Strings;
 public interface Scout10Api extends IScoutApi {
 
   @Override
+  default String ecjVersion() {
+    return "3.19.0";
+  }
+
+  @Override
   default int[] supportedJavaVersions() {
     return new int[]{8, 11};
   }

@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.s2i.dataobject.DataObjectManager
 import org.eclipse.scout.sdk.s2i.derived.DerivedResourceManager
 import org.eclipse.scout.sdk.s2i.element.ElementCreationManager
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerCache
+import org.eclipse.scout.sdk.s2i.settings.ide.AutoUpdateIdeSettingsListener
 import org.jetbrains.annotations.Nls
 import org.jetbrains.annotations.NonNls
 import org.jetbrains.annotations.PropertyKey
@@ -31,6 +32,7 @@ private const val RESOURCE_BUNDLE = "messages.EclipseScoutBundle"
 
 object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
 
+    const val ID = "org.eclipse.scout.sdk.s2i"
     val ScoutIcon = IconManager.getInstance().getIcon("META-INF/pluginIcon.svg", javaClass.classLoader)
 
     @Nls
@@ -45,6 +47,9 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
 
     fun autoCreateClassIdListener(project: Project): AutoCreateClassIdListener =
         project.getService(AutoCreateClassIdListener::class.java)
+
+    fun autoUpdateIdeSettingsListener(project: Project): AutoUpdateIdeSettingsListener =
+        project.getService(AutoUpdateIdeSettingsListener::class.java)
 
     fun classIdCache(project: Project): ClassIdCache =
         project.getService(ClassIdCache::class.java)

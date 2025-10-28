@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,4 +31,6 @@ public interface IScoutApi extends IApiSpecification, IScoutAnnotationApi, IScou
    * @return The {@link Charset} to use for reading and writing .properties files.
    */
   Charset propertiesEncoding();
+
+  String ecjVersion();
 }

@@ -16,6 +16,11 @@ import org.eclipse.scout.sdk.core.java.apidef.MaxApiLevel;
 public interface Scout251Api extends IScoutApi, IScout242Api, IScoutChartApi, IScout22DoApi {
 
   @Override
+  default String ecjVersion() {
+    return "3.40.0";
+  }
+
+  @Override
   default int[] supportedJavaVersions() {
     return new int[]{21};
   }

@@ -14,6 +14,12 @@ import org.eclipse.scout.sdk.core.java.apidef.MaxApiLevel;
 @MaxApiLevel(11)
 @SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
 public interface Scout11Api extends IScoutApi, IScoutChartApi {
+
+  @Override
+  default String ecjVersion() {
+    return "3.21.0";
+  }
+
   IScoutChartApi.ChartUiTextContributor CHART_UI_TEXT_CONTRIBUTOR = new ChartUiTextContributor();
 
   @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -56,9 +56,9 @@ public final class ScoutApi {
 
   /**
    * Creates the {@link IScoutApi} for the given {@link ApiVersion}.
-   * 
+   *
    * @param version
-   *          The {@link ApiVersion}. Must not be {@code null}.
+   *     The {@link ApiVersion}. Must not be {@code null}.
    * @return The {@link IScoutApi} matching the given version.
    */
   public static IScoutApi create(ApiVersion version) {
@@ -69,8 +69,8 @@ public final class ScoutApi {
    * Creates the {@link IScoutApi} for the given version.
    *
    * @param scoutVersion
-   *          The version to use. Must be a parsable {@link ApiVersion} (see {@link ApiVersion#parse(CharSequence)}). If
-   *          it cannot be parsed, the newest {@link IScoutApi} is returned.
+   *     The version to use. Must be a parsable {@link ApiVersion} (see {@link ApiVersion#parse(CharSequence)}). If
+   *     it cannot be parsed, the newest {@link IScoutApi} is returned.
    * @return The {@link IScoutApi} matching the given version.
    */
   public static IScoutApi create(CharSequence scoutVersion) {
@@ -100,11 +100,11 @@ public final class ScoutApi {
 
   /**
    * Gets the Scout version used in the module at the given {@link Path}.
-   * 
+   *
    * @param moduleDir
-   *          The root {@link Path} of the module. Must not be {@code null}.
+   *     The root {@link Path} of the module. Must not be {@code null}.
    * @param env
-   *          The {@link IEnvironment} to find the module with the given path. Must not be {@code null}.
+   *     The {@link IEnvironment} to find the module with the given path. Must not be {@code null}.
    * @return The Scout version or an empty {@link Optional} if the module could not be found, or it is no Scout module.
    */
   public static Optional<ApiVersion> version(Path moduleDir, IEnvironment env) {
@@ -127,7 +127,8 @@ public final class ScoutApi {
 
     @Override
     public Collection<Class<? extends IApiSpecification>> knownApis() {
-      return Arrays.asList(Scout10Api.class, Scout11Api.class, Scout22010Api.class, Scout22Api.class, Scout231Api.class, Scout232Api.class, Scout241Api.class, Scout242Api.class, Scout251Api.class, Scout252Api.class);
+      return Arrays.asList(Scout10Api.class, Scout11Api.class, Scout22010Api.class, Scout22Api.class, Scout231Api.class, Scout232Api.class, Scout241Api.class, Scout242Api.class,
+          Scout251Api.class, Scout252Api.class, Scout261Api.class);
     }
 
     @Override

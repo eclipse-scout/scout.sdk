@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,13 +30,14 @@ class ScoutSettingsForm : JBPanel<ScoutSettingsForm>() {
     private val m_htmlDisable = "html.disable"
     private val m_autoUpdateDerivedResources: JBCheckBox
     private val m_autoCreateClassIdAnnotations: JBCheckBox
+    private val m_autoUpdateIdeSettings: JBCheckBox
     private val m_translationLanguageComboBox: JComboBox<Language>
     private val m_translationLanguageLabel: JBLabel
 
     init {
         putClientProperty(m_htmlDisable, true)
 
-        layout = GridLayoutManager(4, 2, JBUI.emptyInsets(), -1, -1)
+        layout = GridLayoutManager(5, 2, JBUI.emptyInsets(), -1, -1)
 
         m_autoUpdateDerivedResources = JBCheckBox()
         m_autoUpdateDerivedResources.text = EclipseScoutBundle.message("automatically.update.generated.classes")
@@ -46,8 +47,12 @@ class ScoutSettingsForm : JBPanel<ScoutSettingsForm>() {
         m_autoCreateClassIdAnnotations.text = EclipseScoutBundle.message("automatically.create.classid.annotation")
         m_autoCreateClassIdAnnotations.putClientProperty(m_htmlDisable, true)
 
+        m_autoUpdateIdeSettings = JBCheckBox()
+        m_autoUpdateIdeSettings.text = EclipseScoutBundle.message("auto.update.ide.settings")
+        m_autoUpdateIdeSettings.putClientProperty(m_htmlDisable, true)
+
         m_translationLanguageLabel = JBLabel()
-        m_translationLanguageLabel.text = EclipseScoutBundle.message("translation.display.language")
+        m_translationLanguageLabel.text = EclipseScoutBundle.message("translation.preview.language")
         m_translationLanguageLabel.putClientProperty(m_htmlDisable, true)
 
         m_translationLanguageComboBox = ComboBox()
@@ -55,46 +60,55 @@ class ScoutSettingsForm : JBPanel<ScoutSettingsForm>() {
         m_translationLanguageComboBox.putClientProperty(m_htmlDisable, true)
 
         add(
-                m_autoUpdateDerivedResources,
-                GridConstraints(
-                        0, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
-                        GridConstraints.SIZEPOLICY_CAN_SHRINK or GridConstraints.SIZEPOLICY_CAN_GROW,
-                        GridConstraints.SIZEPOLICY_FIXED,
-                        null, null, null, 0, false
-                )
+            m_autoUpdateDerivedResources,
+            GridConstraints(
+                0, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
+                GridConstraints.SIZEPOLICY_CAN_SHRINK or GridConstraints.SIZEPOLICY_CAN_GROW,
+                GridConstraints.SIZEPOLICY_FIXED,
+                null, null, null, 0, false
+            )
         )
         add(
-                m_autoCreateClassIdAnnotations,
-                GridConstraints(
-                        1, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
-                        GridConstraints.SIZEPOLICY_CAN_SHRINK or GridConstraints.SIZEPOLICY_CAN_GROW,
-                        GridConstraints.SIZEPOLICY_FIXED,
-                        null, null, null, 0, false
-                )
+            m_autoCreateClassIdAnnotations,
+            GridConstraints(
+                1, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
+                GridConstraints.SIZEPOLICY_CAN_SHRINK or GridConstraints.SIZEPOLICY_CAN_GROW,
+                GridConstraints.SIZEPOLICY_FIXED,
+                null, null, null, 0, false
+            )
         )
         add(
-                m_translationLanguageLabel,
-                GridConstraints(
-                        2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
-                        GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED,
-                        null, Dimension(82, 16), null, 0, false
-                )
+            m_autoUpdateIdeSettings,
+            GridConstraints(
+                2, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
+                GridConstraints.SIZEPOLICY_CAN_SHRINK or GridConstraints.SIZEPOLICY_CAN_GROW,
+                GridConstraints.SIZEPOLICY_FIXED,
+                null, null, null, 0, false
+            )
         )
         add(
-                m_translationLanguageComboBox,
-                GridConstraints(
-                        2, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL,
-                        GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED,
-                        null, null, null, 0, false
-                )
+            m_translationLanguageLabel,
+            GridConstraints(
+                3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE,
+                GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED,
+                null, Dimension(82, 16), null, 0, false
+            )
         )
         add(
-                Spacer(),
-                GridConstraints(
-                        3, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL,
-                        GridConstraints.SIZEPOLICY_CAN_SHRINK, GridConstraints.SIZEPOLICY_WANT_GROW,
-                        null, null, null, 0, false
-                )
+            m_translationLanguageComboBox,
+            GridConstraints(
+                3, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL,
+                GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED,
+                null, null, null, 0, false
+            )
+        )
+        add(
+            Spacer(),
+            GridConstraints(
+                4, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL,
+                GridConstraints.SIZEPOLICY_CAN_SHRINK, GridConstraints.SIZEPOLICY_WANT_GROW,
+                null, null, null, 0, false
+            )
         )
     }
 
@@ -102,10 +116,10 @@ class ScoutSettingsForm : JBPanel<ScoutSettingsForm>() {
         val model = DefaultComboBoxModel<Language>()
         model.addElement(Language.LANGUAGE_DEFAULT)
         Locale.getAvailableLocales()
-                .map { Language(it) }
-                .filter { Strings.hasText(it.toString()) }
-                .sorted()
-                .forEach { model.addElement(it) }
+            .map { Language(it) }
+            .filter { Strings.hasText(it.toString()) }
+            .sorted()
+            .forEach { model.addElement(it) }
         return model
     }
 
@@ -120,6 +134,13 @@ class ScoutSettingsForm : JBPanel<ScoutSettingsForm>() {
         set(value) {
             m_autoCreateClassIdAnnotations.isSelected = value
         }
+
+    var isAutoUpdateIdeSettings
+        get() = m_autoUpdateIdeSettings.isSelected
+        set(value) {
+            m_autoUpdateIdeSettings.isSelected = value
+        }
+
     var translationLanguage
         get() = m_translationLanguageComboBox.selectedItem as Language
         set(value) {
