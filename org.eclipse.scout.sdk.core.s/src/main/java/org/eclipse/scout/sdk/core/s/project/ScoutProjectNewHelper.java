@@ -254,7 +254,7 @@ public final class ScoutProjectNewHelper {
   }
 
   /**
-   * Gets all Scout versions >= 23 (older projects should no longer be created) available on Maven central.
+   * Gets all Scout versions >= 24 (older projects should no longer be created) available on Maven central.
    *
    * @param useJavaClient
    *     {@code true} if the versions for the archetype with the Java UI should be returned, {@code false} for the
@@ -266,10 +266,10 @@ public final class ScoutProjectNewHelper {
    *     if there is an error reading the versions from Maven central
    */
   public static List<String> getSupportedArchetypeVersions(boolean useJavaClient, boolean includePreviewVersions) throws IOException {
-    // versions older than 23 should no longer be created as the support for them is reduced. For new project more up-to-date version should be chosen.
+    // versions older than 24 should no longer be created as the support for them is reduced. For new project more up-to-date version should be chosen.
     // Furthermore, e.g. Eclipse can no longer run such old versions.
-    // Can be removed as soon as support for Scout versions < 23 is dropped in the ScoutApi.
-    var min = ApiVersion.parse("23.0.0").orElseThrow();
+    // Can be removed as soon as support for Scout versions < 24 is dropped in the ScoutApi.
+    var min = ApiVersion.parse("24.0.0").orElseThrow();
     var artifactId = useJavaClient ? SCOUT_ARCHETYPES_HELLOWORLD_ARTIFACT_ID : SCOUT_ARCHETYPES_HELLOJS_ARTIFACT_ID;
     var availableVersions = MavenArtifactVersions.allOnCentral(SCOUT_ARCHETYPES_GROUP_ID, artifactId)
         .map(ApiVersion::parse)
