@@ -17,6 +17,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessModuleDir
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.InvalidVirtualFileAccessException
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.PsiFile
@@ -101,6 +102,7 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
     }
 
     override fun dispose() {
+        Disposer.dispose(this)
         m_busConnection.disconnect()
         NodeModulesProvider.clearNodeModules()
         NodeModulesProvider.removeProvider(project)

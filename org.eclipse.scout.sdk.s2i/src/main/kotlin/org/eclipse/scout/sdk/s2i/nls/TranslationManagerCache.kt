@@ -15,6 +15,7 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.util.concurrency.AppExecutorUtil
 import com.intellij.util.messages.MessageBusConnection
@@ -72,6 +73,7 @@ class TranslationManagerCache(val project: Project) : Disposable {
     fun clear() = m_cache.clear()
 
     override fun dispose() {
+        Disposer.dispose(this)
         m_busConnection?.disconnect()
         m_busConnection = null
         clear()

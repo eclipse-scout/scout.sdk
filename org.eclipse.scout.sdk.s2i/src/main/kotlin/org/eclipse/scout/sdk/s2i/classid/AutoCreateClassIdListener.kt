@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2i.classid
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import org.eclipse.scout.sdk.core.s.classid.ClassIds
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettings
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettingsHelper
@@ -31,6 +32,7 @@ class AutoCreateClassIdListener(val project: Project) : SettingsChangedListener,
     }
 
     override fun dispose() {
+        Disposer.dispose(this)
         ScoutSettingsHelper.removeListener(this)
     }
 

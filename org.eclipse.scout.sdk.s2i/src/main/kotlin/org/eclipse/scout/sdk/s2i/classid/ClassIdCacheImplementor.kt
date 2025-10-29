@@ -13,6 +13,7 @@ import com.intellij.lang.java.JavaLanguage
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.AsyncFileListener
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -99,6 +100,7 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     }
 
     override fun dispose() {
+        Disposer.dispose(this)
         m_fileCache.clear()
     }
 

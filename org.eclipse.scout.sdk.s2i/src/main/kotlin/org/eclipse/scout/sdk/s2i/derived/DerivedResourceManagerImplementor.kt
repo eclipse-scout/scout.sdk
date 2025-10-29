@@ -14,6 +14,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.search.GlobalSearchScope.fileScope
@@ -60,6 +61,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
     }
 
     override fun dispose() {
+        Disposer.dispose(this)
         unsubscribe()
         ScoutSettingsHelper.removeListener(this)
         m_updateHandlerFactories.clear()
