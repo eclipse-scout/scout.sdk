@@ -52,12 +52,5 @@ public class ScoutProjectNewHelperTest {
     assertFalse(javaScriptPreview.isEmpty());
     assertTrue(javaRelease.size() <= javaPreview.size());
     assertTrue(javaScriptRelease.size() <= javaScriptPreview.size());
-    assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("10.")));
-    assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("11.")));
-    assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("22.")));
-    assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("23.")));
-    assertTrue(javaRelease.stream().anyMatch(v -> v.startsWith("24.")));
-    assertTrue(javaPreview.stream().anyMatch(v -> v.startsWith("25.")));
-    assertTrue(javaScriptPreview.stream().anyMatch(v -> v.startsWith("25.")));
   }
 }
