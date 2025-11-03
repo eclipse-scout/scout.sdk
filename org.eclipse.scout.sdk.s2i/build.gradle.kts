@@ -61,6 +61,7 @@ dependencies {
 
     intellijPlatform {
         intellijIdeaUltimate("2024.3.3")
+//        intellijIdeaUltimate("253-EAP-SNAPSHOT") { this.useInstaller = false } // EAP
         bundledPlugins(listOf("com.intellij.java", "org.jetbrains.idea.maven", "com.intellij.copyright", "com.intellij.properties", "JavaScript"))
         pluginVerifier()
         testFramework(TestFrameworkType.Platform)
