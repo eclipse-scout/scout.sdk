@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,10 +9,11 @@
  */
 package org.eclipse.scout.sdk.s2i.derived
 
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.SearchScope
 import org.eclipse.scout.sdk.core.s.derived.IDerivedResourceHandler
 
 interface DerivedResourceHandlerFactory {
-    fun createHandlersFor(scope: SearchScope, project: Project): Sequence<IDerivedResourceHandler>
+    fun createHandlersFor(scope: SearchScope, project: Project, indicator: ProgressIndicator): Sequence<IDerivedResourceHandler>
 }

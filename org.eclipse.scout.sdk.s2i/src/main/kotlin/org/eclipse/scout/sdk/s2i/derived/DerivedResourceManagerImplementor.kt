@@ -49,8 +49,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
     private val m_delayedProcessor = DelayedBuffer(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true) { events ->
         if (!project.isInitialized || events.isEmpty()) return@DelayedBuffer
         val unionScope = union(events)
-        if (SearchScope.isEmptyScope(unionScope)) return@DelayedBuffer
-        scheduleUpdate(unionScope)
+        trigger(unionScope)
     }
     private var m_busConnection: MessageBusConnection? = null
 
@@ -98,7 +97,9 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
 
     override fun trigger(scope: SearchScope) {
         SdkLog.debug("Derived resource update event for scope $scope")
-        m_delayedProcessor.submit(scope)
+        if (!project.isInitialized) return
+        if (SearchScope.isEmptyScope(scope)) return
+        scheduleUpdate(scope)
     }
 
     private fun union(events: List<SearchScope>): SearchScope {
@@ -122,7 +123,7 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         val start = System.currentTimeMillis()
         val handlers = m_updateHandlerFactories.values
             .parallelStream()
-            .flatMap { executeDerivedResourceHandlerFactory(it, scope) }
+            .flatMap { executeDerivedResourceHandlerFactory(it, scope, progress.indicator) }
             .collect(toList())
         SdkLog.debug("Derived resource handler creation took {}ms. Number of created handlers: {}", System.currentTimeMillis() - start, handlers.size)
         if (handlers.isNotEmpty() && !progress.indicator.isCanceled) {
@@ -130,8 +131,8 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
         }
     }
 
-    private fun executeDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory, scope: SearchScope) = computeInReadAction(project) {
-        factory.createHandlersFor(scope, project).toList().stream() // create a list first (terminal operation) so that the factory is executed here!
+    private fun executeDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory, scope: SearchScope, indicator: ProgressIndicator) = computeInReadAction(project) {
+        factory.createHandlersFor(scope, project, indicator).toList().stream() // create a list first (terminal operation) so that the factory is executed here!
     }
 
     override fun addDerivedResourceHandlerFactory(factory: DerivedResourceHandlerFactory) = synchronized(m_updateHandlerFactories) {
@@ -213,7 +214,8 @@ class DerivedResourceManagerImplementor(val project: Project) : DerivedResourceM
     private inner class DocumentSyncListener : FileDocumentManagerListener {
         override fun fileContentReloaded(file: VirtualFile, document: Document) {
             if (JavaTypes.JAVA_FILE_EXTENSION == file.extension) {
-                trigger(fileScope(project, file))
+                // batch process consecutive file events
+                m_delayedProcessor.submit(fileScope(project, file))
             }
         }
 

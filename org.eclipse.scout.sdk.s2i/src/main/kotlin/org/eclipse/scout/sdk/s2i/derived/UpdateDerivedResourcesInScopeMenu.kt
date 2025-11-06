@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.message
 import org.eclipse.scout.sdk.s2i.chooseAnalysisScope
 
-class UpdateAllDerivedResourcesMenu : AnAction() {
+class UpdateDerivedResourcesInScopeMenu : AnAction() {
 
     override fun actionPerformed(event: AnActionEvent) {
         val scopeToTrigger = event.chooseAnalysisScope(message("update.derived.resources"), message("select.scope.to.update")) ?: return

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2i.derived
 
+import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiJavaFile
@@ -23,11 +24,11 @@ import kotlin.streams.asSequence
 
 
 open class DtoUpdateHandlerFactory : DerivedResourceHandlerFactory {
-    override fun createHandlersFor(scope: SearchScope, project: Project) =
+    override fun createHandlersFor(scope: SearchScope, project: Project, indicator: ProgressIndicator) =
             ScoutApi.allKnown().asSequence()
                     .flatMap { dtoMarkerAnnotationNames(it) }
                     .distinct()
-                    .flatMap { project.findAllTypesAnnotatedWith(it, scope) }
+                .flatMap { project.findAllTypesAnnotatedWith(it, scope, indicator) }
                     .filter(this::acceptClass)
                     .flatMap(this::typeToHandlers)
 

@@ -166,7 +166,10 @@
   <actions>
     <group id="org.eclipse.scout.sdk.s2i.ScoutMenu" popup="true" text="Scout">
       <add-to-group group-id="MainMenu" relative-to-action="ToolsMenu" anchor="after"/>
-      <action id="org.eclipse.scout.sdk.s2i.UpdateAllDerivedResourcesMenu" class="org.eclipse.scout.sdk.s2i.derived.UpdateAllDerivedResourcesMenu"/>
+      <action id="org.eclipse.scout.sdk.s2i.UpdateDerivedResourcesInScopeMenu" class="org.eclipse.scout.sdk.s2i.derived.UpdateDerivedResourcesInScopeMenu"/>
+      <action id="org.eclipse.scout.sdk.s2i.UpdateDerivedResourcesInFileMenu" class="org.eclipse.scout.sdk.s2i.derived.UpdateDerivedResourcesInFileMenu">
+        <keyboard-shortcut keymap="$default" first-keystroke="control alt shift F"/>
+      </action>
       <separator></separator>
       <action id="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInScopeMenu" class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInScopeMenu"/>
       <action id="org.eclipse.scout.sdk.s2i.UpdateDoConvenienceMethodsInFileMenu" class="org.eclipse.scout.sdk.s2i.dataobject.UpdateDoConvenienceMethodsInFileMenu">
