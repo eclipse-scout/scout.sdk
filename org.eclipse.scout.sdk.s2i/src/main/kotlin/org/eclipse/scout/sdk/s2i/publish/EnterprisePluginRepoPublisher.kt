@@ -97,15 +97,14 @@ open class EnterprisePluginRepoPublisher(val pluginToDeploy: Path, val repoDir: 
         writeBlockMapFiles(deployedPlugin)
 
         val newZip = repoDir.relativize(deployedPlugin).joinToString("/")
-        val oldZip = modifyUpdatePluginsXml(pluginXml)
-        if (!Objects.equals(newZip, oldZip)) {
-            deleteOldPluginFromRepo(oldZip)
-            removeOldBlockMapFilesFromRepo(deployedPlugin, pluginXml.id)
-        }
-
+        val oldZip = modifyUpdatePluginsXml(pluginXml) // may be an absolute URL, a relative URL or null if there was no old plugin
         if (oldZip == null) {
             println("New plugin '${pluginXml.id}' (version '${pluginXml.version}') successfully published to enterprise plugin repository '$repoDir'.")
         } else {
+            if (!oldZip.endsWith(newZip)) { // only delete if the new file is different then the old. Otherwise, the just staged file is deleted again.
+                deleteOldPluginFromRepo(oldZip)
+                removeOldBlockMapFilesFromRepo(deployedPlugin, pluginXml.id)
+            }
             println("Plugin '${pluginXml.id}' (version '${pluginXml.version}') successfully published to enterprise plugin repository '$repoDir' replacing old version '$oldZip'.")
         }
     }
