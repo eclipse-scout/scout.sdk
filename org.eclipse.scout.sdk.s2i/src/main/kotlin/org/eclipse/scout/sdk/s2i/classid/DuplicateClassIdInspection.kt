@@ -18,7 +18,9 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiJavaFile
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
 import org.eclipse.scout.sdk.s2i.EclipseScoutBundle
+import org.eclipse.scout.sdk.s2i.classid.ClassIdCache.ClassIdOccurrence
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.util.ApiHelper
 
@@ -34,9 +36,13 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
                 // as soon as the cache is ready, this inspection will start its work
                 return ProblemDescriptor.EMPTY_ARRAY
             }
+            val currentFile = javaFile.virtualFile.path
+            val duplicates = classIdCache.duplicates(currentFile)
+            if (duplicates.isEmpty()) return ProblemDescriptor.EMPTY_ARRAY
 
-            classIdCache.duplicates(javaFile.virtualFile.path)
-                .mapNotNull { createProblemFor(it.value, javaFile, manager, isOnTheFly) }
+            val scoutApi = ApiHelper.scoutApiFor(javaFile) ?: return ProblemDescriptor.EMPTY_ARRAY
+            duplicates
+                .mapNotNull { createProblemFor(it.value, javaFile, currentFile, manager, isOnTheFly, scoutApi) }
                 .flatten()
                 .toTypedArray()
         } catch (e: Exception) {
@@ -45,28 +51,30 @@ open class DuplicateClassIdInspection : LocalInspectionTool() {
         }
     }
 
-    protected fun createProblemFor(duplicates: Collection<String>, file: PsiJavaFile, manager: InspectionManager, isOnTheFly: Boolean) =
-        resolvePsi(duplicates, file)
-            .mapNotNull { createProblemFor(duplicates, it, manager, isOnTheFly) }
+    protected fun createProblemFor(duplicatesWithSameClassId: Collection<ClassIdOccurrence>, file: PsiJavaFile, currentFile: String, manager: InspectionManager, isOnTheFly: Boolean, scoutApi: IScoutApi) =
+        resolveAnnotations(duplicatesWithSameClassId, file, currentFile, scoutApi)
+            .mapNotNull { createProblemFor(duplicatesWithSameClassId, it.key, currentFile, it.value, manager, isOnTheFly) }
 
-    protected fun createProblemFor(duplicates: Collection<String>, clazz: PsiClass, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {
-        val scoutApi = ApiHelper.scoutApiFor(clazz) ?: return null
-        val project = clazz.project
-        val annotation = ClassIdAnnotation.of(clazz, project, scoutApi) ?: return null
-        val myName = computeInReadAction(project) { clazz.qualifiedName }
-        val othersWithSameValue = duplicates
-            .filter { d -> d != myName }
-            .joinToString()
-        val message = EclipseScoutBundle.message("duplicate.classid.value", othersWithSameValue)
+    protected fun createProblemFor(duplicatesWithSameClassId: Collection<ClassIdOccurrence>, myFqn: String, myFilePath: String, myAnnotation: ClassIdAnnotation, manager: InspectionManager, isOnTheFly: Boolean): ProblemDescriptor? {
+        val othersWithSameValue = duplicatesWithSameClassId.filter { d -> d.fqn != myFqn || d.path != myFilePath }
+        if (othersWithSameValue.isEmpty()) return null
+
+        val others = othersWithSameValue.joinToString { "${it.fqn} in ${it.path}" }
+        val message = EclipseScoutBundle.message("duplicate.classid.value", others)
         val quickFix = ChangeClassIdValueQuickFix()
-        return manager.createProblemDescriptor(annotation.psiAnnotation, message, isOnTheFly, arrayOf(quickFix), ProblemHighlightType.ERROR)
+        return manager.createProblemDescriptor(myAnnotation.psiAnnotation, message, isOnTheFly, arrayOf(quickFix), ProblemHighlightType.ERROR)
     }
 
-    protected fun resolvePsi(duplicates: Collection<String>, file: PsiJavaFile): List<PsiClass> = computeInReadAction(file.project) {
-        PsiTreeUtil.findChildrenOfType(file, PsiClass::class.java)
-            .associateBy { it.qualifiedName }
-            .filter { it.key != null }
-            .filter { duplicates.contains(it.key) }
-            .map { it.value }
+    protected fun resolveAnnotations(duplicatesWithSameClassId: Collection<ClassIdOccurrence>, file: PsiJavaFile, filePath: String, scoutApi: IScoutApi): Map<String /* fqn */, ClassIdAnnotation> = computeInReadAction(file.project) {
+        val localClassFqnWithSameClassId = duplicatesWithSameClassId
+            .filter { it.path == filePath }
+            .map { it.fqn }
+            .toSet()
+        val project = file.project
+        PsiTreeUtil.findChildrenOfType(file, PsiClass::class.java).asSequence()
+            .mapNotNull { it.qualifiedName?.let { fqn -> fqn to it } }
+            .filter { localClassFqnWithSameClassId.contains(it.first) }
+            .mapNotNull { ClassIdAnnotation.of(it.second, project, scoutApi)?.let { a -> it.first to a } }
+            .toMap()
     }
 }

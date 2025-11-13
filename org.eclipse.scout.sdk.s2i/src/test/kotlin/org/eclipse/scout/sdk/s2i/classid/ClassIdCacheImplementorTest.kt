@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,17 +22,39 @@ class ClassIdCacheImplementorTest : TestCase() {
         ))
         val usage = cache.usageByClassId()
         assertEquals(5, usage.size)
-        assertEquals(listOf("a"), usage["1"])
+        assertEquals(listOf(ClassIdCache.ClassIdOccurrence("A.java", "a", "1")), usage["1"])
         assertEquals(2, usage["2"]?.size)
-        assertEquals(listOf("c"), usage["3"])
-        assertEquals(listOf("d"), usage["4"])
+        assertEquals(listOf(ClassIdCache.ClassIdOccurrence("A.java", "c", "3")), usage["3"])
+        assertEquals(listOf(ClassIdCache.ClassIdOccurrence("B.java", "d", "4")), usage["4"])
 
-        assertTrue(usage["1"]?.contains("a") ?: false)
-        assertTrue(usage["2"]?.contains("e") ?: false)
-        assertTrue(usage["2"]?.contains("b") ?: false)
+        assertTrue(usage["1"]?.any { it.fqn == "a" } ?: false)
+        assertTrue(usage["2"]?.any { it.fqn == "e" } ?: false)
+        assertTrue(usage["2"]?.any { it.fqn == "b" } ?: false)
 
         assertEquals(1, cache.duplicates().size)
         assertEquals(1, cache.duplicates("A.java").size)
+    }
+
+    fun testWithSameFqn() {
+        val cache = createCache(
+            mutableMapOf(
+                "A.java" to mutableMapOf("a" to "1"),
+                "B.java" to mutableMapOf("a" to "1", "b" to "2", "c" to "3")
+            )
+        )
+        val usage = cache.usageByClassId()
+        assertEquals(3, usage.size)
+        assertEquals(2, usage["1"]?.size)
+
+        val duplicates = cache.duplicates("A.java")
+        assertEquals(1, duplicates.size)
+        val occurrence = duplicates["1"]
+        assertEquals(2, occurrence?.size)
+        assertEquals("a", occurrence?.get(0)?.fqn)
+        assertEquals("a", occurrence?.get(1)?.fqn)
+        val files = occurrence?.map { it.path }?.toList()
+        assertTrue(files?.contains("A.java") ?: false)
+        assertTrue(files?.contains("B.java") ?: false)
     }
 
     private fun createCache(initialMap: MutableMap<String /* file name */, MutableMap<String /* fqn */, String /* classid */>>): ClassIdCacheImplementor {

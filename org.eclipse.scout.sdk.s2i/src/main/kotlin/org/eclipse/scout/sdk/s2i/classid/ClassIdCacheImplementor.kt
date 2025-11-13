@@ -116,25 +116,21 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
             .mapNotNull { ClassIdAnnotation.of(null, it, project, scoutApi) }
             .filter { it.hasValue() }
 
-    override fun typesWithClassId(classId: String): List<String> = usageByClassId()[classId] ?: emptyList()
+    override fun duplicates(): Map<String, List<ClassIdCache.ClassIdOccurrence>> = duplicates(null)
 
-    override fun duplicates(): Map<String, List<String>> = duplicates(null)
-
-    override fun duplicates(absoluteFilePath: String): Map<String, List<String>> {
+    override fun duplicates(absoluteFilePath: String): Map<String, List<ClassIdCache.ClassIdOccurrence>> {
         val classIdsInFile = m_fileCache[absoluteFilePath]?.map { it.value }?.toSet() ?: return emptyMap()
-        return duplicates { classIdsInFile.contains(it.value) } // only duplicates of the current file
+        return duplicates { classIdsInFile.contains(it.classId) } // only duplicates of the current file
     }
 
-    internal fun duplicates(filter: ((Map.Entry<String, String>) -> Boolean)?) = usageByClassId(filter).filter { it.value.size > 1 }
+    internal fun duplicates(filter: ((ClassIdCache.ClassIdOccurrence) -> Boolean)?) = usageByClassId(filter).filter { it.value.size > 1 }
 
-    internal fun usageByClassId(filter: ((Map.Entry<String, String>) -> Boolean)? = null): Map<String /* classId */, List<String /* fqn */>> {
-        val nullSafeFilter = filter ?: { true }
-        return m_fileCache.values
-            .asSequence()
-            .map { it.entries }
+    internal fun usageByClassId(filter: ((ClassIdCache.ClassIdOccurrence) -> Boolean)? = null): Map<String /* classId */, List<ClassIdCache.ClassIdOccurrence>> {
+        var allClassIds = m_fileCache.asSequence()
+            .map { it.value.asSequence().map { entry -> ClassIdCache.ClassIdOccurrence(it.key, entry.key, entry.value) } }
             .flatten()
-            .filter { nullSafeFilter(it) }
-            .groupBy({ it.value }, { it.key })
+        if (filter != null) allClassIds = allClassIds.filter(filter)
+        return allClassIds.groupBy { it.classId }
     }
 
     internal fun trySetupCache() {

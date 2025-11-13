@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -47,27 +47,23 @@ interface ClassIdCache : Disposable {
     fun isCacheReady(): Boolean
 
     /**
-     * @param classId The @ClassId value to search
-     * @return A [List] holding all fully qualified class names in the project having the id specified.
-     */
-    fun typesWithClassId(classId: String): List<String>
-
-    /**
      * @return A [Map] holding all @ClassId values that exist more than once in the cache.
-     * The key of the map is the @ClassId value, the value of the Map is a [List] of fully qualified class names that have the corresponding @ClassId value.
+     * The key of the map is the @ClassId value, the value of the Map are all [ClassIdOccurrence] having corresponding @ClassId value.
      *
      * This method only returns a result if the cache has been created (see [isCacheReady] and [setup])
      */
-    fun duplicates(): Map<String, List<String>>
+    fun duplicates(): Map<String, List<ClassIdOccurrence>>
 
     /**
      * @param absoluteFilePath A [String] holding an absolute path on the local file system pointing to the file for which the duplicates should be returned.
      * The cache only contains entries of the current project. This means the file must be within the project to return a result.
      * @return A [Map] holding all duplicate @ClassId values for the given file path.
-     * The key of the map is the @ClassId value, the value of the Map is a [List] of fully qualified class names that have the corresponding @ClassId value.
-     * This means at least one class in the set of each entry must be within the file specified.
+     * The key of the map is the @ClassId value, the value of the Map are all [ClassIdOccurrence] that have the corresponding @ClassId value.
+     * This means at least one class in the list of each entry will be within the file specified.
      *
      * This method only returns a result if the cache has been created (see [isCacheReady] and [setup])
      */
-    fun duplicates(absoluteFilePath: String): Map<String, List<String>>
+    fun duplicates(absoluteFilePath: String): Map<String, List<ClassIdOccurrence>>
+
+    data class ClassIdOccurrence(val path: String, val fqn: String, val classId: String)
 }
