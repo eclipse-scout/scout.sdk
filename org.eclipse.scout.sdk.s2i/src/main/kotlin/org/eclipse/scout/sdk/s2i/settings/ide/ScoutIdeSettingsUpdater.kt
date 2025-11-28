@@ -125,7 +125,7 @@ class ScoutIdeSettingsUpdater(val mavenManager: MavenProjectsManager) : MavenPro
                 }
             }
         }
-        return dest.toString()
+        return dest.toString().replace('\\', '/') // replace windows path separator as IJ path substitution only works on unix file separators.
     }
 
     private fun getEcjDir(project: Project): Path {
