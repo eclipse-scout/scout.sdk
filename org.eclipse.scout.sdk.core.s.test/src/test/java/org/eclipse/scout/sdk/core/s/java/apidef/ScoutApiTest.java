@@ -91,10 +91,17 @@ public class ScoutApiTest {
     assertArrayEquals(new int[]{21}, ScoutApi.create("25.1-SNAPSHOT").supportedJavaVersions());
     assertArrayEquals(new int[]{21}, ScoutApi.create("25.1.0").supportedJavaVersions());
     assertArrayEquals(new int[]{21}, ScoutApi.create("25.1.1234").supportedJavaVersions());
-    assertArrayEquals(new int[]{24}, ScoutApi.create("25.2").supportedJavaVersions());
-    assertArrayEquals(new int[]{24}, ScoutApi.create("25.2-SNAPSHOT").supportedJavaVersions());
     assertArrayEquals(new int[]{24}, ScoutApi.create("25.2.0").supportedJavaVersions());
-    assertArrayEquals(new int[]{24}, ScoutApi.create("25.2.1234").supportedJavaVersions());
+    assertArrayEquals(new int[]{24}, ScoutApi.create("25.2.16").supportedJavaVersions());
+    assertArrayEquals(new int[]{25}, ScoutApi.create("25.2.17").supportedJavaVersions());
+    assertArrayEquals(new int[]{25}, ScoutApi.create("25.2.20").supportedJavaVersions());
+    assertArrayEquals(new int[]{25}, ScoutApi.create("25.2").supportedJavaVersions());
+    assertArrayEquals(new int[]{25}, ScoutApi.create("25.2-SNAPSHOT").supportedJavaVersions());
+    assertArrayEquals(new int[]{25}, ScoutApi.create("25.2.1234").supportedJavaVersions());
+    assertArrayEquals(new int[]{25}, ScoutApi.create("26.1").supportedJavaVersions());
+    assertArrayEquals(new int[]{25}, ScoutApi.create("26.1-SNAPSHOT").supportedJavaVersions());
+    assertArrayEquals(new int[]{25}, ScoutApi.create("26.1.0").supportedJavaVersions());
+    assertArrayEquals(new int[]{25}, ScoutApi.create("26.1.1234").supportedJavaVersions());
   }
 
   private static Map<String, String> onlyInvalid(Map<String, String> candidates, IType type, IScoutApi api) {

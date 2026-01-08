@@ -11,12 +11,12 @@ package org.eclipse.scout.sdk.core.s.java.apidef;
 
 import org.eclipse.scout.sdk.core.java.apidef.MaxApiLevel;
 
-@MaxApiLevel({25, 2})
+@MaxApiLevel({25, 2, 16})
 @SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
-public interface Scout252Api extends IScoutApi, IScout242Api, IScoutChartApi, IScout22DoApi {
+public interface Scout25216Api extends IScoutApi, IScout242Api, IScoutChartApi, IScout22DoApi {
 
   @Override
   default int[] supportedJavaVersions() {
-    return new int[]{25};
+    return new int[]{24};
   }
 }
