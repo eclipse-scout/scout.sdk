@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,7 +36,7 @@ public class ApiTest {
 
   @Test
   public void testVersion(IJavaEnvironment env) {
-    assertEquals(12, Api.version(IJavaApi.class, env.requireType(Long.class.getName())).orElseThrow().major());
+    assertEquals(11, Api.version(IJavaApi.class, env.requireType(Long.class.getName())).orElseThrow().major());
   }
 
   @Test
