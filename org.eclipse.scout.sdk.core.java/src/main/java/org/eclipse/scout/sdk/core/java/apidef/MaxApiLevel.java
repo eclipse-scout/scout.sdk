@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,8 +16,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specifies the maximum API level for an {@link IApiSpecification}
- * 
+ * Specifies the maximum API level for an {@link IApiSpecification}.<p>
+ * This means the API spec is valid up to the specified version. Missing segments in the given value are considered to be {@link Integer#MAX_VALUE} and are therefore always included.
+ * <p>
+ * Example:<br>
+ * Specifying a version as {@code @MaxApiLevel(9)} therefore means it is valid up to e.g. {@code 9.2147483647.2147483647}. This includes version 7.x, 8.x and e.g. 9.4.4 which are all smaller.
+ *
  * @see IApiSpecification#maxLevel()
  */
 @Documented

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,7 @@ package org.eclipse.scout.sdk.core.java.fixture.apidef;
 
 import org.eclipse.scout.sdk.core.java.apidef.MaxApiLevel;
 
-@MaxApiLevel(10)
+@MaxApiLevel(8)
 public interface Java8Api extends IJavaApi {
 
   String VALUE = "8";

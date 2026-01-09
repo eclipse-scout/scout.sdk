@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,7 @@ package org.eclipse.scout.sdk.core.java.fixture.apidef;
 
 import org.eclipse.scout.sdk.core.java.apidef.MaxApiLevel;
 
-@MaxApiLevel(12)
+@MaxApiLevel(11)
 public interface Java11Api extends IJavaApi, ICustomApi {
   String VALUE = "11";
   int INT = 11;

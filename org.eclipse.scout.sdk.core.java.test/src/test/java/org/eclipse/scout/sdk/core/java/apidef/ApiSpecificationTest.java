@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,6 +30,9 @@ public class ApiSpecificationTest {
   public void testApiComposition() {
     assertEquals("8", createFixtureApiDefinition(8).method());
     assertEquals("8", createFixtureApiDefinition(8, 4).method());
+    assertEquals("8", createFixtureApiDefinition(8, 4, 5).method());
+    assertEquals("11", createFixtureApiDefinition(9).method());
+    assertEquals("11", createFixtureApiDefinition(10).method());
     assertEquals("13", createFixtureApiDefinition(13).maxLevel().asString());
     assertEquals("11", createFixtureApiDefinition(11, 2, 14).method());
     assertEquals("11", createFixtureApiDefinition(11, 0, 12).method());
@@ -46,15 +49,15 @@ public class ApiSpecificationTest {
     assertEquals("3", createTestApiDefinition(new ApiVersion(snapshotSuffix, 3, 1)).myVersion());
 
     assertEquals("4", createTestApiDefinition(new ApiVersion(null, 4, 4)).myVersion());
-    assertEquals("401", createTestApiDefinition(new ApiVersion(null, 4, 3)).myVersion());
-    assertEquals("401", createTestApiDefinition(new ApiVersion(null, 4, 2)).myVersion());
+    assertEquals("43", createTestApiDefinition(new ApiVersion(null, 4, 3)).myVersion());
+    assertEquals("43", createTestApiDefinition(new ApiVersion(null, 4, 2)).myVersion());
     assertEquals("4", createTestApiDefinition(new ApiVersion(snapshotSuffix, 4, 4)).myVersion());
-    assertEquals("401", createTestApiDefinition(new ApiVersion(snapshotSuffix, 4, 3)).myVersion()); // important so that for an RT 4.3-SNAPSHOT the 4.3 API is used
-    assertEquals("401", createTestApiDefinition(new ApiVersion(snapshotSuffix, 4, 2)).myVersion());
+    assertEquals("43", createTestApiDefinition(new ApiVersion(snapshotSuffix, 4, 3)).myVersion()); // important so that for an RT 4.3-SNAPSHOT the 4.3 API is used
+    assertEquals("43", createTestApiDefinition(new ApiVersion(snapshotSuffix, 4, 2)).myVersion());
 
     assertEquals("4", createTestApiDefinition(new ApiVersion(null, 4)).myVersion());
-    assertEquals("401", createTestApiDefinition(new ApiVersion(null, 4, 1)).myVersion());
-    assertEquals("401", createTestApiDefinition(new ApiVersion(snapshotSuffix, 4, 1)).myVersion());
+    assertEquals("43", createTestApiDefinition(new ApiVersion(null, 4, 1)).myVersion());
+    assertEquals("43", createTestApiDefinition(new ApiVersion(snapshotSuffix, 4, 1)).myVersion());
   }
 
   @Test
@@ -62,7 +65,7 @@ public class ApiSpecificationTest {
   public void testHashCodeEqualsToString() {
     var apiDefinition1 = createFixtureApiDefinition(11, 4, 44);
     var apiDefinition2 = createFixtureApiDefinition(11, 4, 44);
-    assertEquals(ApiSpecification.class.getSimpleName() + " [maxLevel=12, class=" + Java11Api.class.getName() + "]", apiDefinition1.toString());
+    assertEquals(ApiSpecification.class.getSimpleName() + " [maxLevel=11, class=" + Java11Api.class.getName() + "]", apiDefinition1.toString());
     assertNotEquals(apiDefinition1.hashCode(), apiDefinition2.hashCode());
     assertTrue(apiDefinition1.equals(apiDefinition1));
     assertFalse(apiDefinition1.equals(apiDefinition2));
@@ -76,7 +79,7 @@ public class ApiSpecificationTest {
 
   @Test
   public void testOptionalApi() {
-    var api8 = createFixtureApiDefinition(10);
+    var api8 = createFixtureApiDefinition(7);
     assertEquals("8", api8.method());
     assertFalse(api8.api(ICustomApi.class).isPresent());
 
@@ -109,8 +112,8 @@ public class ApiSpecificationTest {
     assertEquals("someFunction4", testApi.someFunction());
     assertEquals("someOtherFunction4", testApi.someOtherFunction());
 
-    assertEquals("someFunction3", testApi.requireApi(TestApi401.class).someFunction());
-    assertEquals("someOtherFunction4", testApi.requireApi(TestApi401.class).someOtherFunction());
+    assertEquals("someFunction3", testApi.requireApi(TestApi43.class).someFunction());
+    assertEquals("someOtherFunction4", testApi.requireApi(TestApi43.class).someOtherFunction());
 
     assertEquals("someFunction3", testApi.requireApi(TestApi3.class).someFunction());
     assertThrows(IllegalArgumentException.class, () -> testApi.requireApi(TestApi3.class).someOtherFunction());
@@ -123,7 +126,7 @@ public class ApiSpecificationTest {
   }
 
   protected static ITestApi createTestApiDefinition(ApiVersion v) {
-    var spec = ApiSpecification.create(asList(TestApi3.class, TestApi401.class, TestApi4.class), v);
+    var spec = ApiSpecification.create(asList(TestApi3.class, TestApi43.class, TestApi4.class), v);
     assertNotNull(spec);
     return spec.requireApi(ITestApi.class);
   }
@@ -150,10 +153,10 @@ public class ApiSpecificationTest {
   }
 
   @MaxApiLevel({4, 3})
-  public interface TestApi401 extends ITestApi {
+  public interface TestApi43 extends ITestApi {
     @Override
     default String myVersion() {
-      return "401";
+      return "43";
     }
 
     @Override
