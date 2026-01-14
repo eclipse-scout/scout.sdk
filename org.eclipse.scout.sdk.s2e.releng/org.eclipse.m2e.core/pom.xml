@@ -14,13 +14,13 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_plugin_config-master</artifactId>
-    <version>25.2.1</version>
+    <version>26.1.0</version>
     <relativePath/>
   </parent>
 
   <groupId>org.eclipse.scout.sdk.deps</groupId>
   <artifactId>org.eclipse.m2e.core</artifactId>
-  <version>2.7.2.20250318-1458</version>
+  <version>2.7.600.20251121-1832</version>
   <packaging>pom</packaging>
 
   <name>Scout SDK org.eclipse.m2e.core dependency</name>
@@ -58,22 +58,22 @@
     <dependency>
       <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
-      <version>3.33.100</version>
+      <version>3.34.100</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.core.resources</artifactId>
-      <version>3.22.200</version>
+      <version>3.23.100</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.core.filesystem</artifactId>
-      <version>1.11.200</version>
+      <version>1.11.400</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.core.variables</artifactId>
-      <version>3.6.500</version>
+      <version>3.6.700</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -97,8 +97,8 @@
           <includeOptional>false</includeOptional>
           <source>
             <repository>
-              <id>eclipse_2025_06</id>
-              <url>https://download.eclipse.org/releases/2025-06/</url>
+              <id>eclipse_2025_12</id>
+              <url>https://download.eclipse.org/releases/2025-12/</url>
               <layout>p2</layout>
             </repository>
           </source>

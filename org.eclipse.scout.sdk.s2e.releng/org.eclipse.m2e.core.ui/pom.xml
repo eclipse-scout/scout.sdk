@@ -14,13 +14,13 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_plugin_config-master</artifactId>
-    <version>25.2.1</version>
+    <version>26.1.0</version>
     <relativePath/>
   </parent>
 
   <groupId>org.eclipse.scout.sdk.deps</groupId>
   <artifactId>org.eclipse.m2e.core.ui</artifactId>
-  <version>2.4.0.20250224-0720</version>
+  <version>2.4.101.20251127-1007</version>
   <packaging>pom</packaging>
 
   <name>Scout SDK org.eclipse.m2e.core.ui dependency</name>
@@ -58,77 +58,77 @@
     <dependency>
       <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
-      <version>3.33.100</version>
+      <version>3.34.100</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.core.resources</artifactId>
-      <version>3.22.200</version>
+      <version>3.23.100</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.m2e.core</artifactId>
-      <version>2.7.2.20250318-1458</version>
+      <version>2.7.600.20251121-1832</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.ui.console</artifactId>
-      <version>3.14.300</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.ui.ide</artifactId>
-      <version>3.22.600</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.core.filesystem</artifactId>
-      <version>1.11.200</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.core.expressions</artifactId>
-      <version>3.9.400</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.ui.forms</artifactId>
-      <version>3.13.500</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.jface.text</artifactId>
-      <version>3.28.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.core.filebuffers</artifactId>
-      <version>3.8.400</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.ui</artifactId>
-      <version>3.207.200</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.ui.navigator</artifactId>
-      <version>3.13.100</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.debug.ui</artifactId>
-      <version>3.18.800</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.platform</groupId>
-      <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
       <version>3.15.0</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.ui.ide</artifactId>
+      <version>3.22.800</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.filesystem</artifactId>
+      <version>1.11.400</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.expressions</artifactId>
+      <version>3.9.500</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.ui.forms</artifactId>
+      <version>3.13.700</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.jface.text</artifactId>
+      <version>3.29.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.core.filebuffers</artifactId>
+      <version>3.8.500</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.ui</artifactId>
+      <version>3.207.400</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.ui.navigator</artifactId>
+      <version>3.13.300</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.debug.ui</artifactId>
+      <version>3.19.100</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
+      <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
+      <version>3.15.100</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.platform</groupId>
       <artifactId>org.eclipse.compare.core</artifactId>
-      <version>3.8.700</version>
+      <version>3.8.800</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -147,8 +147,8 @@
           <includeOptional>false</includeOptional>
           <source>
             <repository>
-              <id>eclipse_2025_06</id>
-              <url>https://download.eclipse.org/releases/2025-06/</url>
+              <id>eclipse_2025_12</id>
+              <url>https://download.eclipse.org/releases/2025-12/</url>
               <layout>p2</layout>
             </repository>
           </source>
