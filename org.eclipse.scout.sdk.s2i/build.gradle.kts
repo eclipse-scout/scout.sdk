@@ -29,7 +29,7 @@ plugins {
     id("maven-publish")
 
     // See https://github.com/JetBrains/intellij-platform-gradle-plugin
-    id("org.jetbrains.intellij.platform") version "2.10.1"
+    id("org.jetbrains.intellij.platform") version "2.10.5"
 
     kotlin("jvm") version "2.1.21"
     id("io.github.rmanibus.maven-settings") version "0.8" // for maven settings
@@ -49,8 +49,8 @@ repositories {
 dependencies {
     api("org.eclipse.scout.sdk:org.eclipse.scout.sdk.core.s:$scoutSdkVersion")
     api("org.eclipse.scout.sdk:org.eclipse.scout.sdk.core.java.ecj:$scoutSdkVersion")
-    implementation("org.apache.poi:poi-ooxml:5.4.1")
-    testImplementation("org.mockito:mockito-core:5.20.0")
+    implementation("org.apache.poi:poi-ooxml:5.5.1")
+    testImplementation("org.mockito:mockito-core:5.21.0")
     testImplementation("junit:junit:4.13.2")
     testRuntimeOnly("org.eclipse.scout.rt:org.eclipse.scout.rt.client:$scoutRtVersion") {
         // conflicts with the older version shipped with IJ. Exclude the Scout version to ensure the version is compatible with IJ.
@@ -98,11 +98,11 @@ intellijPlatform {
                 channels = listOf(ProductRelease.Channel.RELEASE)
                 sinceBuild = "2025.1"
             }
-            select {
-                types = listOf(IntelliJPlatformType.IntellijIdea)
-                channels = listOf(ProductRelease.Channel.EAP)
-                sinceBuild = "253"
-            }
+//            select {
+//                types = listOf(IntelliJPlatformType.IntellijIdea)
+//                channels = listOf(ProductRelease.Channel.EAP)
+//                sinceBuild = "253"
+//            }
         }
     }
 }
