@@ -80,7 +80,7 @@ public class ResourcesTest {
 
     // there is a response (eclipse 404 page), but error status code
     assertThrows(IOException.class, () -> {
-      try (var in = Resources.httpGet("https://www.eclipse.org/scout-not-existing-xyzabc/")) {
+      try (var in = Resources.httpGet("https://eclipsescout.github.io/scout-docs/25.2/whateverxxx-does-not-exist-url")) {
         fail("Should not come here. GET should throw directly because given URL must return a 404 HTTP status code. " + in);
       }
     });
