@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -57,7 +57,6 @@ public final class MavenSandboxClassLoaderFactory {
         "com.google.inject.Guice", // guice
         "org.apache.http.client.HttpClient", // httpclient
         "org.apache.http.HttpHost", // httpcore
-        "org.apache.commons.logging.Log", // jcl-over-slf4j
         "org.apache.maven.artifact.Artifact", // maven-artifact
         "org.apache.maven.building.ProblemCollector", // maven-builder-support
         "org.apache.maven.artifact.ArtifactStatus", // maven-compat
@@ -95,16 +94,16 @@ public final class MavenSandboxClassLoaderFactory {
         "org.objectweb.asm.ClassVisitor", // asm
 
         // logging:
-        "org.slf4j.simple.SimpleLogger",
+        "org.slf4j.simple.SimpleLogger", // maven-slf4j-provider
+        "org.apache.commons.logging.Log", // jcl-over-slf4j
+        "org.slf4j.ILoggerFactory", // slf4j-api
 
-        // Maven dependencies:
+        // Other dependencies:
         "org.apache.commons.cli.CommandLineParser", // commons-cli
         "org.apache.commons.codec.BinaryDecoder", // commons-codec
         "javax.inject.Inject", // javax.inject
         "com.google.common.base.Predicate", // guava
-        "com.google.common.util.concurrent.internal.InternalFutureFailureAccess", // guava failureAccess
-        "org.slf4j.ILoggerFactory", // slf4j-api
-        "javax.annotation.PostConstruct" // javax.annotations-api
+        "com.google.common.util.concurrent.internal.InternalFutureFailureAccess" // guava failureAccess
     );
     return getJarsUrls(baseClasses);
   }
@@ -113,7 +112,7 @@ public final class MavenSandboxClassLoaderFactory {
    * Gets the locations of the jars containing the given classes
    *
    * @param baseClasses
-   *          The fqn of the classes
+   *     The fqn of the classes
    * @return the {@link URL}s of the jars that contain the given class names.
    */
   static URL[] getJarsUrls(Collection<String> baseClasses) {
@@ -127,7 +126,7 @@ public final class MavenSandboxClassLoaderFactory {
    * Gets the location of the jar containing the given class name.
    *
    * @param className
-   *          the fully qualified class name.
+   *     the fully qualified class name.
    * @return The {@link URL} of the jar that contains the given class.
    */
   static URL getJarContaining(String className) {
