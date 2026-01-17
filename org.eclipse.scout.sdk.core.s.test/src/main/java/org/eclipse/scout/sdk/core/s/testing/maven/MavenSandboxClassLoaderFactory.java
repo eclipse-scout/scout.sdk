@@ -92,6 +92,7 @@ public final class MavenSandboxClassLoaderFactory {
         "org.apache.maven.wagon.providers.http.HttpWagon", // wagon-http
         "org.apache.maven.wagon.shared.http.AbstractHttpClientWagon", // wagon-http-shared
         "org.apache.maven.wagon.AbstractWagon", // wagon-provider-api
+        "org.objectweb.asm.ClassVisitor", // asm
 
         // logging:
         "org.slf4j.simple.SimpleLogger",
