@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -114,16 +113,19 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
             var t = (IType) javaElement;
             try {
               if (!t.isBinary() && !t.isAnonymous()) {
-                var superTypeHierarchy = t.newSupertypeHierarchy(null);
-                var scoutApi = ApiHelper.requireScoutApiFor(t);
-                var classIdFqn = scoutApi.ClassId().fqn();
-                if (JdtUtils.hierarchyContains(superTypeHierarchy, scoutApi.ITypeWithClassId().fqn())) {
-                  var annotation = JdtUtils.getAnnotation(t, classIdFqn);
-                  return new ClassIdTarget(typeDecl, t, annotation, scoutApi);
+                var optScoutApi = ApiHelper.scoutApiFor(t.getJavaProject());
+                if (optScoutApi.isPresent()) {
+                  var scoutApi = optScoutApi.orElseThrow();
+                  var classIdFqn = scoutApi.ClassId().fqn();
+                  var superTypeHierarchy = t.newSupertypeHierarchy(null);
+                  if (JdtUtils.hierarchyContains(superTypeHierarchy, scoutApi.ITypeWithClassId().fqn())) {
+                    var annotation = JdtUtils.getAnnotation(t, classIdFqn);
+                    return new ClassIdTarget(typeDecl, t, annotation, scoutApi);
+                  }
                 }
               }
             }
-            catch (JavaModelException e) {
+            catch (Exception e) {
               SdkLog.error("Unable to check if type '{}' is anonymous.", t.getFullyQualifiedName(), e);
             }
           }
@@ -140,6 +142,11 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     private ClassIdAddProposal(CompilationUnitRewrite cur) {
       super("Add @ClassId annotation", cur.getCu(), 1000, JavaPluginImages.get(JavaPluginImages.IMG_CORRECTION_CHANGE));
       m_rewrite = cur;
+    }
+
+    @Override
+    protected boolean useDelegateToCreateTextChange() {
+      return false;
     }
 
     @Override

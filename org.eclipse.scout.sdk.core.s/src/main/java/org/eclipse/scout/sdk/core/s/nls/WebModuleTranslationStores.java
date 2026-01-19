@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -149,7 +149,7 @@ public final class WebModuleTranslationStores {
       SdkLog.debug("loading ui text contributor '{}'.", contributorType.name());
       contributor.load(progress);
     }
-    catch (SdkException e) {
+    catch (Exception e) {
       SdkLog.warning("Cannot calculate available text keys for ui text contributor '{}'.", contributorType.name(), e);
     }
     return contributor;
