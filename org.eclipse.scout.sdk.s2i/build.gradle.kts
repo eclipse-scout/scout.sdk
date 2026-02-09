@@ -29,7 +29,7 @@ plugins {
     id("maven-publish")
 
     // See https://github.com/JetBrains/intellij-platform-gradle-plugin
-    id("org.jetbrains.intellij.platform") version "2.10.5"
+    id("org.jetbrains.intellij.platform") version "2.11.0"
 
     kotlin("jvm") version "2.1.21"
     id("io.github.rmanibus.maven-settings") version "0.8" // for maven settings
