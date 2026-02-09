@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -70,32 +70,34 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
         return AppExecutorUtil.getAppExecutorService().submit { setup() }
     }
 
-    override fun setup() = synchronized(m_fileCache) {
-        // synchronized so that only one is creating the cache at a time
-        if (isCacheReady()) {
-            return
-        }
-
-        try {
-            m_cacheSetupRunning = true
-            computeInReadAction(project) {
-                trySetupCache()
+    override fun setup() {
+        synchronized(m_fileCache) {
+            // synchronized so that only one is creating the cache at a time
+            if (isCacheReady()) {
+                return
             }
 
-            // initial cache is ready, register listeners to keep it up to date
-            PsiManager.getInstance(project).addPsiTreeChangeListener(PsiListener(), this)
-            VirtualFileManager.getInstance().addAsyncFileListener(VfsListener(), this)
+            try {
+                m_cacheSetupRunning = true
+                computeInReadAction(project) {
+                    trySetupCache()
+                }
 
-            m_cacheReady = true
+                // initial cache is ready, register listeners to keep it up to date
+                PsiManager.getInstance(project).addPsiTreeChangeListener(PsiListener(), this)
+                VirtualFileManager.getInstance().addAsyncFileListener(VfsListener(), this)
 
-            duplicates().forEach { SdkLog.debug("Duplicate @ClassId value '{}' found for types {}.", it.key, it.value) }
-        } catch (t: Exception) {
-            SdkLog.warning("Error building @ClassId value cache.", t)
-        } catch (t: AssertionError) {
-            // assertion error might be thrown by PsiFile (e.g. "Stub count doesn't match stubbed node length" in FileTrees.reconcilePsi
-            SdkLog.warning("Error building @ClassId value cache.", t)
-        } finally {
-            m_cacheSetupRunning = false
+                m_cacheReady = true
+
+                duplicates().forEach { SdkLog.debug("Duplicate @ClassId value '{}' found for types {}.", it.key, it.value) }
+            } catch (t: Exception) {
+                SdkLog.warning("Error building @ClassId value cache.", t)
+            } catch (t: AssertionError) {
+                // assertion error might be thrown by PsiFile (e.g. "Stub count doesn't match stubbed node length" in FileTrees.reconcilePsi
+                SdkLog.warning("Error building @ClassId value cache.", t)
+            } finally {
+                m_cacheSetupRunning = false
+            }
         }
     }
 
@@ -126,9 +128,9 @@ class ClassIdCacheImplementor(val project: Project) : ClassIdCache {
     internal fun duplicates(filter: ((ClassIdCache.ClassIdOccurrence) -> Boolean)?) = usageByClassId(filter).filter { it.value.size > 1 }
 
     internal fun usageByClassId(filter: ((ClassIdCache.ClassIdOccurrence) -> Boolean)? = null): Map<String /* classId */, List<ClassIdCache.ClassIdOccurrence>> {
-        var allClassIds = m_fileCache.asSequence()
-            .map { it.value.asSequence().map { entry -> ClassIdCache.ClassIdOccurrence(it.key, entry.key, entry.value) } }
-            .flatten()
+        var allClassIds = m_fileCache.asSequence().flatMap {
+            it.value.asSequence().map { entry -> ClassIdCache.ClassIdOccurrence(it.key, entry.key, entry.value) }
+        }
         if (filter != null) allClassIds = allClassIds.filter(filter)
         return allClassIds.groupBy { it.classId }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,8 +31,7 @@ open class MissingClassIdInspection : AbstractBaseJavaLocalInspectionTool() {
     private val m_template = EclipseScoutBundle.message("missing.classid.annotation")
 
     private val m_scoutApiByiTypeWithClassId = ScoutApi.allKnown().asSequence()
-            .map { Pair<String, String>(it.ITypeWithClassId().fqn(), it.ClassId().fqn()) to it }
-            .toMap()
+        .associateBy { Pair<String, String>(it.ITypeWithClassId().fqn(), it.ClassId().fqn()) }
 
     override fun checkClass(aClass: PsiClass, manager: InspectionManager, isOnTheFly: Boolean): Array<ProblemDescriptor>? {
         if (aClass.resolveSourceRoot() == null) {

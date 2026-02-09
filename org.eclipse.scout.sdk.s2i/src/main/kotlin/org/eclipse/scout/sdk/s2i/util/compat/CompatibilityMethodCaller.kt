@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,9 +24,7 @@ class CompatibilityMethodCaller<T> {
 
     private val m_descriptors = ArrayList<MethodDescriptor<T>>()
     private val m_selectedDescriptorWithCallable: Pair<MethodDescriptor<T>, (Any?, Array<out Any?>) -> T> by lazy {
-        m_descriptors.asSequence()
-                .mapNotNull { d -> d.resolvedCallable?.let { d to it } }
-                .firstOrNull() ?: throw SdkException("No compatible API function found.")
+        m_descriptors.firstNotNullOfOrNull { d -> d.resolvedCallable?.let { d to it } } ?: throw SdkException("No compatible API function found.")
     }
 
     fun withCandidate(d: MethodDescriptor<T>) = apply { m_descriptors.add(d) }

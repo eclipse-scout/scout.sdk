@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -260,7 +260,7 @@ class TransactionManager(val project: Project, val transactionName: String? = nu
         if (m_members.isEmpty()) return true
         try {
             if (!save || progress.indicator.isCanceled) return false
-            return computeInWriteAction(project, transactionName) { commitAllInUiThread(progress) } ?: return false
+            return computeInWriteAction(project, transactionName) { commitAllInUiThread(progress) } ?: false
         } finally {
             m_members.clear()
             m_size = 0

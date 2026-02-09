@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -176,8 +176,7 @@ class NlsTable(manager: TranslationManager, project: Project) : JBScrollPane() {
         val entry = m_model.translationForRow(m_table.convertRowIndexToModel(rowIndex))
         val add = additionalText ?: ""
         return (sequenceOf(add) + entry.texts().values.asSequence())
-                .map { Strings.countMatches(it, "\n") + 1 }
-                .maxOrNull() ?: 1
+            .maxOfOrNull { Strings.countMatches(it, "\n") + 1 } ?: 1
     }
 
     fun selectedLanguages() = m_table.selectedColumns

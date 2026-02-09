@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -51,10 +51,10 @@ internal class WrappingCancellablePromise<T>(private val m_inner: CancellablePro
         return executionException?.cause ?: e
     }
 
-    override fun <SUB_RESULT : Any?> then(done: Function<in T, out SUB_RESULT>): CancellablePromise<SUB_RESULT> =
+    override fun <SUB_RESULT> then(done: Function<in T, out SUB_RESULT>): CancellablePromise<SUB_RESULT> =
         WrappingCancellablePromise(m_inner.then(done) as CancellablePromise<SUB_RESULT>)
 
-    override fun <SUB_RESULT : Any?> thenAsync(doneF: Function<in T, out Promise<SUB_RESULT>>): CancellablePromise<SUB_RESULT> =
+    override fun <SUB_RESULT> thenAsync(doneF: Function<in T, out Promise<SUB_RESULT>>): CancellablePromise<SUB_RESULT> =
         WrappingCancellablePromise(m_inner.thenAsync(doneF) as CancellablePromise<SUB_RESULT>)
 
     override fun onSuccess(handler: Consumer<in T>): AsyncPromise<T> =

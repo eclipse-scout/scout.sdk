@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -583,22 +583,20 @@ public final class Strings {
    *           if the {@link CharSequence} is {@code null}.
    */
   public static char[] toCharArray(CharSequence s) {
-    if (s instanceof StringBuilder) {
+    if (s instanceof StringBuilder sb) {
       var buf = new char[s.length()];
-      //noinspection OverlyStrongTypeCast
-      ((StringBuilder) s).getChars(0, buf.length, buf, 0);
+      sb.getChars(0, buf.length, buf, 0);
       return buf;
     }
-    if (s instanceof String) {
-      return ((String) s).toCharArray();
+    if (s instanceof String str) {
+      return str.toCharArray();
     }
-    if (s instanceof CharBuffer) {
-      return ((CharBuffer) s).array();
+    if (s instanceof CharBuffer cb) {
+      return cb.array();
     }
-    if (s instanceof StringBuffer) {
+    if (s instanceof StringBuffer sb) {
       var buf = new char[s.length()];
-      //noinspection OverlyStrongTypeCast
-      ((StringBuffer) s).getChars(0, buf.length, buf, 0);
+      sb.getChars(0, buf.length, buf, 0);
       return buf;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -38,6 +38,7 @@ import org.eclipse.jdt.internal.compiler.ast.FalseLiteral;
 import org.eclipse.jdt.internal.compiler.ast.FloatLiteral;
 import org.eclipse.jdt.internal.compiler.ast.IntLiteral;
 import org.eclipse.jdt.internal.compiler.ast.Literal;
+import org.eclipse.jdt.internal.compiler.ast.Location;
 import org.eclipse.jdt.internal.compiler.ast.LongLiteral;
 import org.eclipse.jdt.internal.compiler.ast.MarkerAnnotation;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
@@ -159,7 +160,7 @@ public final class SpiWithEcjUtils {
         .collect(toList());
   }
 
-  static SourceRange createSourceRange(ASTNode node, CompilationUnitSpi cu, JavaEnvironmentWithEcj env) {
+  static SourceRange createSourceRange(Location node, CompilationUnitSpi cu, JavaEnvironmentWithEcj env) {
     if (node == null) {
       return null;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -78,7 +78,7 @@ class NlsTableModel(val translationManager: TranslationManager, val project: Pro
 
     fun rowForTranslationWithKey(key: String): Int {
         val translations = translations()
-        for (i in 0 until translations.size) {
+        for (i in translations.indices) {
             if (translations[i].key() == key) {
                 return i
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,7 +28,9 @@ open class TablePreservingSelection(model: TableModel, private val m_indexToRowM
     var columnWidthSupplier: ((TableColumn) -> Int)? = null
         set(value) {
             if (value != null) {
-                (0 until columnModel.columnCount).map { columnModel.getColumn(it) }.map { it.preferredWidth = value(it) }
+                (0 until columnModel.columnCount)
+                    .map { columnModel.getColumn(it) }
+                    .forEach { it.preferredWidth = value(it) }
             }
             field = value
         }

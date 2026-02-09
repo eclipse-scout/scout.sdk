@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -38,17 +38,16 @@ open class IdeaDoContextResolver : DoContextResolvers.IDoContextResolver, Projec
     fun resolveNamespaceCandidates(module: Module, environment: IJavaEnvironment): Stream<IType> = computeInReadAction(module.project) {
         val moduleScope = module.getModuleWithDependenciesAndLibrariesScope(false)
         return@computeInReadAction ScoutApi.allKnown().asSequence()
-                .mapNotNull { it.api(IScout22DoApi::class.java).orElse(null) }
-                .map { it.INamespace().fqn() }
-                .distinct()
-                .flatMap { module.project.findTypesByName(it) }
-                .flatMap { it.newSubTypeHierarchy(moduleScope, checkDeep = true, includeAnonymous = false, includeRoot = false).asSequence() }
-                .filter { it.isValid && it.isPhysical && it.isWritable }
-                .filter { !it.isEnum && !it.isInterface && !it.isAnnotationType }
-                .filter { !it.hasModifierProperty(PsiModifier.ABSTRACT) }
-                .map { it.toScoutType(environment) }
-                .filterNotNull()
-                .asStream()
+            .mapNotNull { it.api(IScout22DoApi::class.java).orElse(null) }
+            .map { it.INamespace().fqn() }
+            .distinct()
+            .flatMap { module.project.findTypesByName(it) }
+            .flatMap { it.newSubTypeHierarchy(moduleScope, checkDeep = true, includeAnonymous = false, includeRoot = false).asSequence() }
+            .filter { it.isValid && it.isPhysical && it.isWritable }
+            .filter { !it.isEnum && !it.isInterface && !it.isAnnotationType }
+            .filter { !it.hasModifierProperty(PsiModifier.ABSTRACT) }
+            .mapNotNull { it.toScoutType(environment) }
+            .asStream()
     }
 
     override fun resolvePrimaryTypesInPackageOf(ref: IType?): Stream<IType> {
@@ -59,8 +58,8 @@ open class IdeaDoContextResolver : DoContextResolvers.IDoContextResolver, Projec
             val javaFile = psi.containingFile as? PsiJavaFile ?: return@computeInReadAction Stream.empty()
             val psiPackage = JavaPsiFacade.getInstance(project).findPackage(javaFile.packageName) ?: return@computeInReadAction Stream.empty()
             return@computeInReadAction psiPackage.classes.asSequence()
-                    .mapNotNull { it.toScoutType(javaEnvironment) }
-                    .asStream()
+                .mapNotNull { it.toScoutType(javaEnvironment) }
+                .asStream()
         }
     }
 }

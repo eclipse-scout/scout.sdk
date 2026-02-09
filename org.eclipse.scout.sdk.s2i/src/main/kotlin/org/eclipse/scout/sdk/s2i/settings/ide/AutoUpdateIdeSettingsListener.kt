@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -50,14 +50,16 @@ class AutoUpdateIdeSettingsListener(val project: Project) : SettingsChangedListe
         }
     }
 
-    fun enable() = synchronized(this) {
-        val currentListener = this.m_listener
-        if (currentListener != null) return // already enabled
+    fun enable() {
+        synchronized(this) {
+            val currentListener = this.m_listener
+            if (currentListener != null) return // already enabled
 
-        val mavenManager = MavenProjectsManager.getInstance(project)
-        val newListener = ScoutIdeSettingsUpdater(mavenManager)
-        mavenManager.addManagerListener(newListener, newListener)
-        m_listener = newListener
+            val mavenManager = MavenProjectsManager.getInstance(project)
+            val newListener = ScoutIdeSettingsUpdater(mavenManager)
+            mavenManager.addManagerListener(newListener, newListener)
+            m_listener = newListener
+        }
     }
 
     fun disable() = synchronized(this) {
