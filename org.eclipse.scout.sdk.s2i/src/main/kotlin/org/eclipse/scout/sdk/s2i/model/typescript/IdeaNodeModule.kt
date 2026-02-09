@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,10 +17,7 @@ import com.intellij.lang.javascript.psi.ecmal4.JSAttributeList
 import com.intellij.lang.javascript.psi.ecmal4.JSClass
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.psi.PsiDocumentManager
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiReference
+import com.intellij.psi.*
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.typescript.IWebConstants
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement
@@ -30,6 +27,7 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.*
 import org.eclipse.scout.sdk.core.util.FinalValue
 import org.eclipse.scout.sdk.core.util.SourceRange
 import org.eclipse.scout.sdk.s2i.model.typescript.factory.IdeaNodeElementFactory
+import org.eclipse.scout.sdk.s2i.util.compat.CompatibilityMethodCaller
 import java.nio.CharBuffer
 import java.nio.file.Path
 import java.util.*
@@ -38,6 +36,22 @@ import java.util.Collections.unmodifiableMap
 import java.util.stream.Collectors.toMap
 
 class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModuleDir: VirtualFile) : AbstractNodeElementSpi<INodeModule>(null), NodeModuleSpi {
+
+    private companion object {
+        /**
+         * Compatibility for resolveOverAliases.
+         * Can be removed as soon as IJ 2026.1 is the oldest supported version.
+         */
+        private val RESOLVE_OVER_ALIAS_COMPAT = CompatibilityMethodCaller<Array<ResolveResult>>()
+            .withCandidate(ES6ImportExportSpecifier::class.java, "resolveOverAliases", HashSet::class.java) {
+                // IJ >= 2026.1 uses a HashSet argument
+                it.invoke(it.parameters[0], HashSet<ES6ImportExportSpecifier>())
+            }
+            .withCandidate(ES6ImportExportSpecifier::class.java, "resolveOverAliases") {
+                // IJ < 2026.1 uses no arguments
+                it.invoke(it.parameters[0])
+            }
+    }
 
     private val m_nodeElementFactory = IdeaNodeElementFactory(this)
     private val m_mainFile = FinalValue<VirtualFile>()
@@ -97,8 +111,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
         val allElements = LinkedHashMap<NodeElementSpi, Set<String>>(exportedElements.size + notExportedElements.size)
         notExportedElements.asSequence()
             .mapNotNull { createSpiForPsi(it) }
-            .map { it to emptySet<String>() }
-            .toMap(allElements)
+            .associateWithTo(allElements) { emptySet() }
         exportedElements.entries.asSequence()
             .mapNotNull { createSpiForPsi(it.key)?.let { spi -> spi to it.value } }
             .toMap(allElements)
@@ -164,7 +177,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
             // Returns all elements exported in the target file
             return exportDeclaration.fromClause
                 ?.resolveReferencedElements()
-                ?.mapNotNull { it as? JSFile }
+                ?.filterIsInstance<JSFile>()
                 ?.flatMap { findAllExportedElements(it) }
                 ?.mapNotNull { psi -> psi.name?.let { psi to it } }
                 ?: emptyList()
@@ -174,7 +187,7 @@ class IdeaNodeModule(val moduleInventory: IdeaNodeModules, internal val nodeModu
         // exports the referenced elements with their alias (if present)
         return exportDeclaration.exportSpecifiers
             .flatMap { specifier ->
-                specifier.resolveOverAliases()
+                RESOLVE_OVER_ALIAS_COMPAT.invoke(specifier)
                     .filter { it.isValidResult }
                     .mapNotNull { it.element }
                     .flatMap { resolveExportTarget(it) }
