@@ -305,6 +305,7 @@ public final class ScoutProjectNewHelper {
       return true; // accept versions with only one number (should not exist)
     }
     return candidate[1] != 1 // it's an X.2 release (LTS) -> always accept
-        || (candidate[0] == newestStableMajorMinor[0] && candidate[1] == newestStableMajorMinor[1]); // it's the newest release (which might be an X.1) -> always accept
+        || (candidate[0] == newestStableMajorMinor[0] && candidate[1] == newestStableMajorMinor[1]) // it's the newest release (which might be an X.1) -> always accept
+        || candidate[0] >= newestStableMajorMinor[0]; // it's newer than the newest release (e.g. X.2 is the newest stable, than X+1.1-beta.0 needs to be accepted)
   }
 }

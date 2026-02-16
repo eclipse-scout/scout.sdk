@@ -62,6 +62,7 @@ public class ScoutProjectNewHelperTest {
 
   @Test
   public void testLimitToLtsOrNewest() {
+    // X.1 is latest stable -> X.2-beta need to be preserved as well
     assertEquals(List.of(ApiVersion.parse("25.2.0-beta.1").orElseThrow(),
         ApiVersion.parse("25.2.0-beta.0").orElseThrow(),  // X.2 are LTS and therefore always preserved
         ApiVersion.parse("25.1.15").orElseThrow(), // newest stable is always preserved (even if X.1)
@@ -72,6 +73,25 @@ public class ScoutProjectNewHelperTest {
         ApiVersion.parse("25.2.0-beta.0").orElseThrow(),
         ApiVersion.parse("25.1.15").orElseThrow(),
         ApiVersion.parse("25.1.12").orElseThrow(),
+        ApiVersion.parse("24.2.16").orElseThrow(),
+        ApiVersion.parse("24.2.2").orElseThrow(),
+        ApiVersion.parse("24.1.4").orElseThrow(),
+        ApiVersion.parse("24.1.0-beta.1").orElseThrow()
+    )).toList());
+
+    // X.2 is latest stable -> X+1.1-beta need to be preserved as well
+    assertEquals(List.of(ApiVersion.parse("26.1.0-beta.1").orElseThrow(), // newest is always preserved (even if X.1)
+        ApiVersion.parse("26.1.0-beta.0").orElseThrow(),  // newest is always preserved (even if X.1)
+        ApiVersion.parse("25.2.15").orElseThrow(), // X.2 are LTS and therefore always preserved
+        ApiVersion.parse("25.2.12").orElseThrow(), // X.2 are LTS and therefore always preserved
+        ApiVersion.parse("25.2.0-beta.0").orElseThrow(), // X.2 are LTS and therefore always preserved
+        ApiVersion.parse("24.2.16").orElseThrow(), // X.2 are LTS and therefore always preserved
+        ApiVersion.parse("24.2.2").orElseThrow()  // X.2 are LTS and therefore always preserved
+    ), limitToLtsOrNewest(List.of(ApiVersion.parse("26.1.0-beta.1").orElseThrow(),
+        ApiVersion.parse("26.1.0-beta.0").orElseThrow(),
+        ApiVersion.parse("25.2.15").orElseThrow(),
+        ApiVersion.parse("25.2.12").orElseThrow(),
+        ApiVersion.parse("25.2.0-beta.0").orElseThrow(),
         ApiVersion.parse("24.2.16").orElseThrow(),
         ApiVersion.parse("24.2.2").orElseThrow(),
         ApiVersion.parse("24.1.4").orElseThrow(),
