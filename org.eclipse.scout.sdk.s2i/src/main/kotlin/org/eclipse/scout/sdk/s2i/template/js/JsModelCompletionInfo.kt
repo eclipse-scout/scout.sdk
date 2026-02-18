@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -55,7 +55,7 @@ data class JsModelCompletionInfo(
             .orElse(null)
     }
 
-    private fun declaringScoutObjectByObjectType() = m_objectTypeScoutObject.computeIfAbsentAndGet {
+    fun declaringScoutObjectByObjectType() = m_objectTypeScoutObject.computeIfAbsentAndGet {
         val referencedClass = findReferencedClass() ?: return@computeIfAbsentAndGet null
         val objectTypeModel = objectTypeModel() ?: return@computeIfAbsentAndGet null
         objectTypeModel

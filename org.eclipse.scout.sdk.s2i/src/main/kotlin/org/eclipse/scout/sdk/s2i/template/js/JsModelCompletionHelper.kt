@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -120,11 +120,10 @@ object JsModelCompletionHelper {
     }
 
     private fun createLookupElement(modelElement: ScoutJsModelLookupElement, completionInfo: JsModelCompletionInfo): LookupElementBuilder {
-        val name = modelElement.name()
         val presentableName = modelElement.presentableName()
         val lookupString = createLookupString(modelElement, completionInfo)
 
-        var result = LookupElementBuilder.create(name, lookupString)
+        var result = LookupElementBuilder.create(modelElement, lookupString)
             .withLookupString(presentableName)
             .withCaseSensitivity(true)
             .withPresentableText(presentableName)
