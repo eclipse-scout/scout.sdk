@@ -68,6 +68,7 @@ public class ScoutApiTest {
     assertEquals("3.40.0", ScoutApi.create("25.1").ecjVersion());
     assertEquals("3.40.0", ScoutApi.create("25.2").ecjVersion());
     assertEquals("3.43.0", ScoutApi.create("26.1").ecjVersion());
+    assertEquals("3.45.0", ScoutApi.create("26.2").ecjVersion());
   }
 
   @Test
