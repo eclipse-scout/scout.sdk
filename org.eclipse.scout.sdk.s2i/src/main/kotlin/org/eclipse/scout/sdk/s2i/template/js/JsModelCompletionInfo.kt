@@ -9,20 +9,22 @@
  */
 package org.eclipse.scout.sdk.s2i.template.js
 
+import com.intellij.lang.javascript.psi.JSExpression
 import com.intellij.lang.javascript.psi.JSLiteralExpression
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
 import com.intellij.lang.javascript.psi.JSProperty
-import com.intellij.lang.javascript.psi.JSReferenceExpression
 import com.intellij.openapi.module.Module
 import com.intellij.psi.util.PsiTreeUtil
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsCoreConstants
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModels
 import org.eclipse.scout.sdk.core.s.model.js.objects.IScoutJsObject
+import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsCoreDataTypesUnwrapVisitor
 import org.eclipse.scout.sdk.core.s.model.js.prop.ScoutJsProperty
 import org.eclipse.scout.sdk.core.typescript.model.api.IES6Class
 import org.eclipse.scout.sdk.core.typescript.model.spi.ES6ClassSpi
 import org.eclipse.scout.sdk.core.util.FinalValue
+import org.eclipse.scout.sdk.core.util.visitor.TreeVisitResult
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModule
 
 data class JsModelCompletionInfo(
@@ -37,9 +39,12 @@ data class JsModelCompletionInfo(
 
     fun availableProperties() = m_properties.computeIfAbsentAndGet {
         val scoutObject = declaringScoutObjectByObjectType()
-        if (scoutObject != null) return@computeIfAbsentAndGet scoutObject.findProperties()
-            .withSupers(true)
-            .stream().toList()
+        if (scoutObject != null) {
+            return@computeIfAbsentAndGet scoutObject.findProperties()
+                .withSupers(true)
+                .stream()
+                .toList()
+        }
 
         val parentProperty = parentScoutProperty() ?: return@computeIfAbsentAndGet emptyList()
         return@computeIfAbsentAndGet parentProperty.type().possibleChildProperties().toList()
@@ -68,16 +73,32 @@ data class JsModelCompletionInfo(
     private fun objectTypeModel() = m_objectTypeModel.computeIfAbsentAndGet { findReferencedClass()?.containingModule().let { ScoutJsModels.create(it).orElse(null) } }
 
     private fun findReferencedClass(): IES6Class? = m_referencedClass.computeIfAbsentAndGet {
-        val ref = objectLiteral.findProperty(ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE)?.value ?: return@computeIfAbsentAndGet null
-        if (ref is JSReferenceExpression) {
-            val ideaNodeModule = scoutJsModel.nodeModule().spi() as IdeaNodeModule
-            val referencedClass = ideaNodeModule.resolveReferencedElement(ref) as? ES6ClassSpi ?: return@computeIfAbsentAndGet null
-            return@computeIfAbsentAndGet referencedClass.api()
+        val objectType = objectLiteral.findProperty(ScoutJsCoreConstants.PROPERTY_NAME_OBJECT_TYPE)?.value?.let { resolveObjectTypeClass(it) }
+        if (objectType != null) {
+            // object type is declared directly in the current objectLiteral
+            return@computeIfAbsentAndGet objectType
         }
 
-        if (ref is JSLiteralExpression) {
-            val objectType = ref.takeIf { it.isStringLiteral }?.stringValue ?: return@computeIfAbsentAndGet null
-            return@computeIfAbsentAndGet scoutJsModel.findScoutObjects()
+        // the current objectLiteral has no own objectType. Try to resolve the type based on the parent property data type
+        val propertyTypeAsDeclaredInParent = parentScoutProperty()?.type()?.dataType()?.orElse(null) ?: return@computeIfAbsentAndGet null
+        val collector = HashSet<IES6Class>()
+        propertyTypeAsDeclaredInParent.visit(ScoutJsCoreDataTypesUnwrapVisitor { childType, _, _ ->
+            if (childType is IES6Class) {
+                collector.add(childType)
+            }
+            return@ScoutJsCoreDataTypesUnwrapVisitor TreeVisitResult.CONTINUE
+        })
+
+        // the data type of the parent property might declare multiple classes
+        // for now: if it is unique, use it as data type of the current object literal
+        return@computeIfAbsentAndGet if (collector.size == 1) collector.first() else null
+    }
+
+    private fun resolveObjectTypeClass(objectTypeExpression: JSExpression): IES6Class? {
+        if (objectTypeExpression is JSLiteralExpression) {
+            val objectType = objectTypeExpression.takeIf { it.isStringLiteral }?.stringValue ?: return null
+            // object type as string
+            return scoutJsModel.findScoutObjects()
                 .withObjectType(objectType)
                 .withIncludeDependencies(true)
                 .first()
@@ -87,6 +108,10 @@ data class JsModelCompletionInfo(
                     it.declaringClass()
                 }.orElse(null)
         }
-        return@computeIfAbsentAndGet null
+
+        // object type as class reference (may contain generics!)
+        val ideaNodeModule = scoutJsModel.nodeModule().spi() as IdeaNodeModule
+        val referencedClass = ideaNodeModule.resolveReferencedElement(objectTypeExpression) as? ES6ClassSpi
+        return referencedClass?.api()
     }
 }
