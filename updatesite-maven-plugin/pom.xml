@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2026 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -28,7 +28,7 @@
     <scout.base.version>14.0.0</scout.base.version>
     <base.version>${scout.base.version}</base.version>
     <maven.model.dependency.version>3.9.11</maven.model.dependency.version>
-    <junit.version>5.14.2</junit.version>
+    <junit.version>5.14.3</junit.version>
   </properties>
 
   <dependencyManagement>
