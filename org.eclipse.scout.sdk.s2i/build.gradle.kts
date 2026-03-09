@@ -22,7 +22,7 @@ import java.util.*
 
 val scoutSdkVersion = "14.0.0-SNAPSHOT"
 val scoutSdkPluginVersion = "14.0.0.".plus(timestamp())
-val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "26.1-SNAPSHOT")
+val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "26.2-SNAPSHOT")
 
 plugins {
     id("java")

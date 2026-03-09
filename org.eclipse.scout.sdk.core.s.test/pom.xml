@@ -259,7 +259,7 @@
       <id>add-datamodel.client-dependency-for-default-build</id>
       <activation>
         <property>
-          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (26.1) -->
+          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (26.2) -->
           <name>!org.eclipse.scout.rt_version</name>
         </property>
       </activation>
@@ -331,7 +331,7 @@
       <id>add-nls.source-dependency-for-default-build</id>
       <activation>
         <property>
-          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (26.1) -->
+          <!-- add dependency if the property is not defined: for the scout version currently used in the pom (26.2) -->
           <name>!org.eclipse.scout.rt_version</name>
         </property>
       </activation>
