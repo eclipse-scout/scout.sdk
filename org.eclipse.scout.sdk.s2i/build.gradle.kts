@@ -50,7 +50,7 @@ dependencies {
     api("org.eclipse.scout.sdk:org.eclipse.scout.sdk.core.s:$scoutSdkVersion")
     api("org.eclipse.scout.sdk:org.eclipse.scout.sdk.core.java.ecj:$scoutSdkVersion")
     implementation("org.apache.poi:poi-ooxml:5.5.1")
-    testImplementation("org.mockito:mockito-core:5.21.0")
+    testImplementation("org.mockito:mockito-core:5.22.0")
     testImplementation("junit:junit:4.13.2")
     testRuntimeOnly("org.eclipse.scout.rt:org.eclipse.scout.rt.client:$scoutRtVersion") {
         // conflicts with the older version shipped with IJ. Exclude the Scout version to ensure the version is compatible with IJ.
