@@ -13,6 +13,7 @@ import java.util.function.BiConsumer;
 
 import org.eclipse.scout.sdk.core.java.model.api.IClasspathEntry;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.log.SdkLog;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
@@ -171,7 +172,10 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
     op.setFormDataSourceFolder(getSharedGeneratedSourceFolder() != null ? getSharedGeneratedSourceFolder() : getSharedSourceFolder());
 
     if (getServerSourceFolder() != null) {
-      op.setServerSession(getServerSourceFolder().javaEnvironment().requireApi(IScoutApi.class).IServerSession().fqn());
+      getServerSourceFolder().javaEnvironment()
+          .findTypeFrom(IScoutApi.class, IScoutApi::IServerSession)
+          .map(IType::name)
+          .ifPresent(op::setServerSession);
     }
     op.setServerSourceFolder(getServerSourceFolder());
     op.setServerTestSourceFolder(getServerTestSourceFolder());
@@ -218,7 +222,10 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
     op.setPageDataSourceFolder(getSharedGeneratedSourceFolder() != null ? getSharedGeneratedSourceFolder() : getSharedSourceFolder());
 
     if (getServerSourceFolder() != null) {
-      op.setServerSession(getServerSourceFolder().javaEnvironment().requireApi(IScoutApi.class).IServerSession().fqn());
+      getServerSourceFolder().javaEnvironment()
+          .findTypeFrom(IScoutApi.class, IScoutApi::IServerSession)
+          .map(IType::name)
+          .ifPresent(op::setServerSession);
     }
     op.setServerSourceFolder(getServerSourceFolder());
     op.setTestSourceFolder(getServerTestSourceFolder());
@@ -265,7 +272,10 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
     op.setTestSourceFolder(getServerTestSourceFolder());
     if (getServerSourceFolder() != null) {
-      op.setServerSession(getServerSourceFolder().javaEnvironment().requireApi(IScoutApi.class).IServerSession().fqn());
+      getServerSourceFolder().javaEnvironment()
+          .findTypeFrom(IScoutApi.class, IScoutApi::IServerSession)
+          .map(IType::name)
+          .ifPresent(op::setServerSession);
     }
     op.setCreateTest(getServerTestSourceFolder() != null);
 

@@ -78,9 +78,10 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                 sourceFolderHelper.sourceFolder(ScoutTier.Client)?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
                     op.superType = it.AbstractForm().fqn()
                 }
-                sourceFolderHelper.sourceFolder(ScoutTier.Server)?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
-                    op.serverSession = it.IServerSession().fqn()
-                }
+                sourceFolderHelper.sourceFolder(ScoutTier.Server)?.javaEnvironment()
+                    ?.findTypeFrom(IScoutApi::class.java, IScoutApi::IServerSession)
+                    ?.map { it.name() }
+                    ?.ifPresent { op.serverSession = it }
 
                 op.isCreateFormData = sourceFolderHelper.sourceFolder(ScoutTier.Shared) != null
                 op.isCreatePermissions = sourceFolderHelper.sourceFolder(ScoutTier.Shared) != null
@@ -109,9 +110,10 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                 sourceFolderHelper.sourceFolder(ScoutTier.Client)?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
                     op.superType = it.AbstractPageWithTable().fqn()
                 }
-                sourceFolderHelper.sourceFolder(ScoutTier.Server)?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
-                    op.serverSession = it.IServerSession().fqn()
-                }
+                sourceFolderHelper.sourceFolder(ScoutTier.Server)?.javaEnvironment()
+                    ?.findTypeFrom(IScoutApi::class.java, IScoutApi::IServerSession)
+                    ?.map { it.name() }
+                    ?.ifPresent { op.serverSession = it }
 
                 op.isCreateAbstractPage = false
             })
@@ -137,9 +139,10 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                     op.superType = it.LookupCall().fqn()
                     op.lookupServiceSuperType = it.AbstractLookupService().fqn()
                 }
-                sourceFolderHelper.sourceFolder(ScoutTier.Server)?.javaEnvironment()?.api(IScoutApi::class.java)?.ifPresent {
-                    op.serverSession = it.IServerSession().fqn()
-                }
+                sourceFolderHelper.sourceFolder(ScoutTier.Server)?.javaEnvironment()
+                    ?.findTypeFrom(IScoutApi::class.java, IScoutApi::IServerSession)
+                    ?.map { it.name() }
+                    ?.ifPresent { op.serverSession = it }
             })
         })
     }

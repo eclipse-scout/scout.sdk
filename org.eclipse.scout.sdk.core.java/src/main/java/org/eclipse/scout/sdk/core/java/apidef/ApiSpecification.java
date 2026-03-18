@@ -172,6 +172,9 @@ public class ApiSpecification implements InvocationHandler, IApiSpecification {
     var result = new FinalValue<A>();
     doInChain(invocationHandler -> {
       var candidate = invocationHandler.apiImplementation();
+      if (candidate instanceof IChainedApiComputationAbortSupport abortSupport && abortSupport.abortChainedApiComputation(apiDefinition)) {
+        return false;
+      }
       if (apiDefinition.isInstance(candidate)) {
         result.set((A) candidate);
         return false;

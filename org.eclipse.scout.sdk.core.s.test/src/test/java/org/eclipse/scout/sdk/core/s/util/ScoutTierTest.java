@@ -98,19 +98,19 @@ public class ScoutTierTest {
     assertFalse(ScoutTier.Server.test(mock));
     assertFalse(ScoutTier.HtmlUi.test(mock));
 
-    when(p.exists(scoutApi.ISession().fqn())).thenReturn(Boolean.TRUE);
+    when(p.exists(scoutApi.LookupCall().fqn())).thenReturn(Boolean.TRUE);
     assertTrue(ScoutTier.Shared.test(mock));
     assertFalse(ScoutTier.Client.test(mock));
     assertFalse(ScoutTier.Server.test(mock));
     assertFalse(ScoutTier.HtmlUi.test(mock));
-    when(p.exists(scoutApi.ISession().fqn())).thenReturn(Boolean.FALSE);
+    when(p.exists(scoutApi.LookupCall().fqn())).thenReturn(Boolean.FALSE);
 
-    when(p.exists(scoutApi.IServerSession().fqn())).thenReturn(Boolean.TRUE);
+    when(p.exists(scoutApi.AbstractLookupService().fqn())).thenReturn(Boolean.TRUE);
     assertTrue(ScoutTier.Shared.test(mock));
     assertFalse(ScoutTier.Client.test(mock));
     assertTrue(ScoutTier.Server.test(mock));
     assertFalse(ScoutTier.HtmlUi.test(mock));
-    when(p.exists(scoutApi.IServerSession().fqn())).thenReturn(Boolean.FALSE);
+    when(p.exists(scoutApi.AbstractLookupService().fqn())).thenReturn(Boolean.FALSE);
 
     when(p.exists(scoutApi.IClientSession().fqn())).thenReturn(Boolean.TRUE);
     assertTrue(ScoutTier.Shared.test(mock));

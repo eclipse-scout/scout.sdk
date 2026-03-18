@@ -18,4 +18,52 @@ public interface Scout262Api extends IScoutApi, IScout242Api, IScoutChartApi, IS
   default String ecjVersion() {
     return "3.45.0";
   }
+
+  IScoutInterfaceApi.ISession I_SESSION = new Scout262Api.ISession();
+
+  @Override
+  default IScoutInterfaceApi.ISession ISession() {
+    return I_SESSION;
+  }
+
+  class ISession implements IScoutInterfaceApi.ISession {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.shared.session.ISession";
+    }
+  }
+
+  IScoutAnnotationApi.RunWithServerSession RUN_WITH_SERVER_SESSION_ANNOTATION = new Scout262Api.RunWithServerSession();
+
+  @Override
+  default IScoutAnnotationApi.RunWithServerSession RunWithServerSession() {
+    return RUN_WITH_SERVER_SESSION_ANNOTATION;
+  }
+
+  class RunWithServerSession implements IScoutAnnotationApi.RunWithServerSession {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.testing.server.session.runner.RunWithServerSession";
+    }
+
+    @Override
+    public String valueElementName() {
+      return "value";
+    }
+  }
+
+  IScoutInterfaceApi.IServerSession I_SERVER_SESSION = new Scout262Api.IServerSession();
+
+  @Override
+  default IScoutInterfaceApi.IServerSession IServerSession() {
+    return I_SERVER_SESSION;
+  }
+
+  class IServerSession implements IScoutInterfaceApi.IServerSession {
+    @Override
+    public String fqn() {
+      return "org.eclipse.scout.rt.server.session.IServerSession";
+    }
+  }
+
 }

@@ -30,12 +30,12 @@ public enum ScoutTier implements ITier<IScoutApi> {
   /**
    * Scout Shared Tier
    */
-  Shared("shared", api -> api.ISession().fqn()),
+  Shared("shared", api -> api.LookupCall().fqn()),
 
   /**
    * Scout Server Tier
    */
-  Server("server", api -> api.IServerSession().fqn()),
+  Server("server", api -> api.AbstractLookupService().fqn()),
 
   /**
    * Scout HTML UI Tier
