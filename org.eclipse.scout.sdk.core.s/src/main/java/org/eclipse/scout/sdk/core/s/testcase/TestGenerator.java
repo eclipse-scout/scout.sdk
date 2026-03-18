@@ -84,7 +84,7 @@ public class TestGenerator<TYPE extends TestGenerator<TYPE>> extends PrimaryType
   }
 
   public TYPE withSession(CharSequence session) {
-    return withSessionFrom(null, api -> ITypeNameSupplier.of(session));
+    return withSessionFrom(null, session != null ? api -> ITypeNameSupplier.of(session) : null);
   }
 
   public <API extends IApiSpecification> TYPE withSessionFrom(Class<API> apiSpec, Function<API, ITypeNameSupplier> sessionFunction) {

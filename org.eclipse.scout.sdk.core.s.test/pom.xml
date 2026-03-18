@@ -345,6 +345,26 @@
         </dependency>
       </dependencies>
     </profile>
+
+    <profile>
+      <id>add-session-dependency-for-default-build</id>
+      <activation>
+        <property>
+          <!-- add dependency for the default scout version (26.2) -->
+          <name>!org.eclipse.scout.rt_version</name>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.scout.rt</groupId>
+          <artifactId>org.eclipse.scout.rt.server.session</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.scout.rt</groupId>
+          <artifactId>org.eclipse.scout.rt.server.session.test</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
   </profiles>
 
   <build>

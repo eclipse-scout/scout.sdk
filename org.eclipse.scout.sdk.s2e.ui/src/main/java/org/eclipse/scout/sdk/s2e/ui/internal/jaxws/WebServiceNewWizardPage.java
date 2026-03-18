@@ -475,7 +475,7 @@ public class WebServiceNewWizardPage extends AbstractWizardPage {
     try {
       var scoutApi = ApiHelper.scoutApiFor(jp);
       return scoutApi.isPresent()
-          && JdtUtils.exists(jp.findType(scoutApi.orElseThrow().IServerSession().fqn()))
+          && JdtUtils.exists(jp.findType(scoutApi.orElseThrow().AbstractLookupService().fqn()))
           && !jp.getProject().getFolder(IScoutSourceFolders.WEBAPP_RESOURCE_FOLDER + "/WEB-INF").exists()
           && !Files.exists(AbstractWebServiceNewOperation.getWsdlRootFolder(jp.getProject().getLocation().toFile().toPath()));
     }
