@@ -162,7 +162,7 @@
     <org.osgi.service.event>1.4.1</org.osgi.service.event>
 
     <icu4j>78.2</icu4j>
-    <ecj>3.44.0</ecj>
+    <ecj>3.45.0</ecj>
     <junit.version>5.14.3</junit.version>
 
     <!-- versions to dependencies uploaded by scout -->
