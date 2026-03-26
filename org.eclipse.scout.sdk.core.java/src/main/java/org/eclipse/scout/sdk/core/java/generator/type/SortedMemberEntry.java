@@ -16,8 +16,8 @@ import static org.eclipse.scout.sdk.core.java.model.api.Flags.isStatic;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.eclipse.scout.sdk.core.java.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.java.generator.field.IFieldGenerator;
+import org.eclipse.scout.sdk.core.java.generator.field.SerialVersionUidFieldGenerator;
 import org.eclipse.scout.sdk.core.java.generator.member.IMemberGenerator;
 import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaElement;
@@ -127,7 +127,7 @@ public class SortedMemberEntry implements Comparable<SortedMemberEntry> {
     var flags = generator.flags();
     var isFinal = isFinal(flags);
     var isConstant = isStatic(flags) && isFinal;
-    var isSerialVersionUid = isConstant && isPrivate(flags) && FieldGenerator.SERIAL_VERSION_UID.equals(generator.elementName().orElse(null));
+    var isSerialVersionUid = isConstant && isPrivate(flags) && SerialVersionUidFieldGenerator.SERIAL_VERSION_UID.equals(generator.elementName().orElse(null));
 
     int pos;
     if (isSerialVersionUid) {

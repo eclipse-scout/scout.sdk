@@ -10,8 +10,6 @@
 package org.eclipse.scout.sdk.core.s.dto;
 
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertAnnotation;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldExist;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperInterfaces;
@@ -24,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class ReplaceFormFieldTest {
@@ -57,9 +56,7 @@ public class ReplaceFormFieldTest {
 
     // fields of BaseFormData
     assertEquals(1, baseFormData.fields().stream().count(), "field count of 'BaseFormData'");
-    var serialVersionUID = assertFieldExist(baseFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
-    assertFieldType(serialVersionUID, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(baseFormData);
 
     assertEquals(6, baseFormData.methods().stream().count(), "method count of 'BaseFormData'");
     var getLookup = assertMethodExist(baseFormData, "getLookup");
@@ -83,9 +80,7 @@ public class ReplaceFormFieldTest {
 
     // fields of Lookup
     assertEquals(1, lookup.fields().stream().count(), "field count of 'Lookup'");
-    var serialVersionUID1 = assertFieldExist(lookup, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
-    assertFieldType(serialVersionUID1, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(lookup);
 
     assertEquals(0, lookup.methods().stream().count(), "method count of 'Lookup'");
 
@@ -97,9 +92,7 @@ public class ReplaceFormFieldTest {
 
     // fields of Name
     assertEquals(1, name.fields().stream().count(), "field count of 'Name'");
-    var serialVersionUID2 = assertFieldExist(name, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, 26);
-    assertFieldType(serialVersionUID2, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(name);
 
     assertEquals(0, name.methods().stream().count(), "method count of 'Name'");
 
@@ -111,9 +104,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreate
     assertEquals(1, sdkCommandCreate.fields().stream().count(), "field count of 'SdkCommandCreate'");
-    var serialVersionUID3 = assertFieldExist(sdkCommandCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID3, 26);
-    assertFieldType(serialVersionUID3, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreate);
 
     assertEquals(0, sdkCommandCreate.methods().stream().count(), "method count of 'SdkCommandCreate'");
 
@@ -125,9 +116,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNone
     assertEquals(1, sdkCommandNone.fields().stream().count(), "field count of 'SdkCommandNone'");
-    var serialVersionUID4 = assertFieldExist(sdkCommandNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID4, 26);
-    assertFieldType(serialVersionUID4, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNone);
 
     assertEquals(0, sdkCommandNone.methods().stream().count(), "method count of 'SdkCommandNone'");
 
@@ -139,9 +128,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUse
     assertEquals(1, sdkCommandUse.fields().stream().count(), "field count of 'SdkCommandUse'");
-    var serialVersionUID5 = assertFieldExist(sdkCommandUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID5, 26);
-    assertFieldType(serialVersionUID5, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUse);
 
     assertEquals(0, sdkCommandUse.methods().stream().count(), "method count of 'SdkCommandUse'");
 
@@ -153,9 +140,7 @@ public class ReplaceFormFieldTest {
 
     // fields of Smart
     assertEquals(1, smart.fields().stream().count(), "field count of 'Smart'");
-    var serialVersionUID6 = assertFieldExist(smart, "serialVersionUID");
-    assertHasFlags(serialVersionUID6, 26);
-    assertFieldType(serialVersionUID6, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(smart);
 
     assertEquals(0, smart.methods().stream().count(), "method count of 'Smart'");
 
@@ -172,9 +157,7 @@ public class ReplaceFormFieldTest {
 
     // fields of ExtendedFormData
     assertEquals(1, extendedFormData.fields().stream().count(), "field count of 'ExtendedFormData'");
-    var serialVersionUID = assertFieldExist(extendedFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
-    assertFieldType(serialVersionUID, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(extendedFormData);
 
     assertEquals(19, extendedFormData.methods().stream().count(), "method count of 'ExtendedFormData'");
     var getFirstName = assertMethodExist(extendedFormData, "getFirstName");
@@ -224,9 +207,7 @@ public class ReplaceFormFieldTest {
 
     // fields of FirstName
     assertEquals(1, firstName.fields().stream().count(), "field count of 'FirstName'");
-    var serialVersionUID1 = assertFieldExist(firstName, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
-    assertFieldType(serialVersionUID1, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(firstName);
 
     assertEquals(0, firstName.methods().stream().count(), "method count of 'FirstName'");
 
@@ -239,9 +220,7 @@ public class ReplaceFormFieldTest {
 
     // fields of IgnoringGroupBoxExCreate
     assertEquals(1, ignoringGroupBoxExCreate.fields().stream().count(), "field count of 'IgnoringGroupBoxExCreate'");
-    var serialVersionUID2 = assertFieldExist(ignoringGroupBoxExCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, 26);
-    assertFieldType(serialVersionUID2, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(ignoringGroupBoxExCreate);
 
     assertEquals(0, ignoringGroupBoxExCreate.methods().stream().count(), "method count of 'IgnoringGroupBoxExCreate'");
 
@@ -254,9 +233,7 @@ public class ReplaceFormFieldTest {
 
     // fields of IgnoringGroupBoxExUse
     assertEquals(1, ignoringGroupBoxExUse.fields().stream().count(), "field count of 'IgnoringGroupBoxExUse'");
-    var serialVersionUID3 = assertFieldExist(ignoringGroupBoxExUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID3, 26);
-    assertFieldType(serialVersionUID3, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(ignoringGroupBoxExUse);
 
     assertEquals(0, ignoringGroupBoxExUse.methods().stream().count(), "method count of 'IgnoringGroupBoxExUse'");
 
@@ -269,9 +246,7 @@ public class ReplaceFormFieldTest {
 
     // fields of NameEx
     assertEquals(1, nameEx.fields().stream().count(), "field count of 'NameEx'");
-    var serialVersionUID4 = assertFieldExist(nameEx, "serialVersionUID");
-    assertHasFlags(serialVersionUID4, 26);
-    assertFieldType(serialVersionUID4, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(nameEx);
 
     assertEquals(0, nameEx.methods().stream().count(), "method count of 'NameEx'");
 
@@ -284,9 +259,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateCreate
     assertEquals(1, sdkCommandCreateCreate.fields().stream().count(), "field count of 'SdkCommandCreateCreate'");
-    var serialVersionUID5 = assertFieldExist(sdkCommandCreateCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID5, 26);
-    assertFieldType(serialVersionUID5, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateCreate);
 
     assertEquals(0, sdkCommandCreateCreate.methods().stream().count(), "method count of 'SdkCommandCreateCreate'");
 
@@ -299,9 +272,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateIgnore
     assertEquals(1, sdkCommandCreateIgnore.fields().stream().count(), "field count of 'SdkCommandCreateIgnore'");
-    var serialVersionUID6 = assertFieldExist(sdkCommandCreateIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID6, 26);
-    assertFieldType(serialVersionUID6, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateIgnore);
 
     assertEquals(0, sdkCommandCreateIgnore.methods().stream().count(), "method count of 'SdkCommandCreateIgnore'");
 
@@ -314,9 +285,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateNone
     assertEquals(1, sdkCommandCreateNone.fields().stream().count(), "field count of 'SdkCommandCreateNone'");
-    var serialVersionUID7 = assertFieldExist(sdkCommandCreateNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID7, 26);
-    assertFieldType(serialVersionUID7, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateNone);
 
     assertEquals(0, sdkCommandCreateNone.methods().stream().count(), "method count of 'SdkCommandCreateNone'");
 
@@ -329,9 +298,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateUse
     assertEquals(1, sdkCommandCreateUse.fields().stream().count(), "field count of 'SdkCommandCreateUse'");
-    var serialVersionUID8 = assertFieldExist(sdkCommandCreateUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID8, 26);
-    assertFieldType(serialVersionUID8, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateUse);
 
     assertEquals(0, sdkCommandCreateUse.methods().stream().count(), "method count of 'SdkCommandCreateUse'");
 
@@ -344,9 +311,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreCreate
     assertEquals(1, sdkCommandIgnoreCreate.fields().stream().count(), "field count of 'SdkCommandIgnoreCreate'");
-    var serialVersionUID9 = assertFieldExist(sdkCommandIgnoreCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID9, 26);
-    assertFieldType(serialVersionUID9, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreCreate);
 
     assertEquals(0, sdkCommandIgnoreCreate.methods().stream().count(), "method count of 'SdkCommandIgnoreCreate'");
 
@@ -359,9 +324,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreUse
     assertEquals(1, sdkCommandIgnoreUse.fields().stream().count(), "field count of 'SdkCommandIgnoreUse'");
-    var serialVersionUID10 = assertFieldExist(sdkCommandIgnoreUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID10, 26);
-    assertFieldType(serialVersionUID10, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreUse);
 
     assertEquals(0, sdkCommandIgnoreUse.methods().stream().count(), "method count of 'SdkCommandIgnoreUse'");
 
@@ -374,9 +337,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneCreate
     assertEquals(1, sdkCommandNoneCreate.fields().stream().count(), "field count of 'SdkCommandNoneCreate'");
-    var serialVersionUID11 = assertFieldExist(sdkCommandNoneCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID11, 26);
-    assertFieldType(serialVersionUID11, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneCreate);
 
     assertEquals(0, sdkCommandNoneCreate.methods().stream().count(), "method count of 'SdkCommandNoneCreate'");
 
@@ -389,9 +350,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneIgnore
     assertEquals(1, sdkCommandNoneIgnore.fields().stream().count(), "field count of 'SdkCommandNoneIgnore'");
-    var serialVersionUID12 = assertFieldExist(sdkCommandNoneIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID12, 26);
-    assertFieldType(serialVersionUID12, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneIgnore);
 
     assertEquals(0, sdkCommandNoneIgnore.methods().stream().count(), "method count of 'SdkCommandNoneIgnore'");
 
@@ -404,9 +363,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneNone
     assertEquals(1, sdkCommandNoneNone.fields().stream().count(), "field count of 'SdkCommandNoneNone'");
-    var serialVersionUID13 = assertFieldExist(sdkCommandNoneNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID13, 26);
-    assertFieldType(serialVersionUID13, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneNone);
 
     assertEquals(0, sdkCommandNoneNone.methods().stream().count(), "method count of 'SdkCommandNoneNone'");
 
@@ -419,9 +376,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneUse
     assertEquals(1, sdkCommandNoneUse.fields().stream().count(), "field count of 'SdkCommandNoneUse'");
-    var serialVersionUID14 = assertFieldExist(sdkCommandNoneUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID14, 26);
-    assertFieldType(serialVersionUID14, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneUse);
 
     assertEquals(0, sdkCommandNoneUse.methods().stream().count(), "method count of 'SdkCommandNoneUse'");
 
@@ -434,9 +389,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseCreate
     assertEquals(1, sdkCommandUseCreate.fields().stream().count(), "field count of 'SdkCommandUseCreate'");
-    var serialVersionUID15 = assertFieldExist(sdkCommandUseCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID15, 26);
-    assertFieldType(serialVersionUID15, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseCreate);
 
     assertEquals(0, sdkCommandUseCreate.methods().stream().count(), "method count of 'SdkCommandUseCreate'");
 
@@ -449,9 +402,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseIgnore
     assertEquals(1, sdkCommandUseIgnore.fields().stream().count(), "field count of 'SdkCommandUseIgnore'");
-    var serialVersionUID16 = assertFieldExist(sdkCommandUseIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID16, 26);
-    assertFieldType(serialVersionUID16, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseIgnore);
 
     assertEquals(0, sdkCommandUseIgnore.methods().stream().count(), "method count of 'SdkCommandUseIgnore'");
 
@@ -464,9 +415,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseNone
     assertEquals(1, sdkCommandUseNone.fields().stream().count(), "field count of 'SdkCommandUseNone'");
-    var serialVersionUID17 = assertFieldExist(sdkCommandUseNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID17, 26);
-    assertFieldType(serialVersionUID17, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseNone);
 
     assertEquals(0, sdkCommandUseNone.methods().stream().count(), "method count of 'SdkCommandUseNone'");
 
@@ -479,9 +428,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseUse
     assertEquals(1, sdkCommandUseUse.fields().stream().count(), "field count of 'SdkCommandUseUse'");
-    var serialVersionUID18 = assertFieldExist(sdkCommandUseUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID18, 26);
-    assertFieldType(serialVersionUID18, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseUse);
 
     assertEquals(0, sdkCommandUseUse.methods().stream().count(), "method count of 'SdkCommandUseUse'");
 
@@ -494,9 +441,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SmartEx
     assertEquals(1, smartEx.fields().stream().count(), "field count of 'SmartEx'");
-    var serialVersionUID19 = assertFieldExist(smartEx, "serialVersionUID");
-    assertHasFlags(serialVersionUID19, 26);
-    assertFieldType(serialVersionUID19, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(smartEx);
 
     assertEquals(0, smartEx.methods().stream().count(), "method count of 'SmartEx'");
 
@@ -516,10 +461,7 @@ public class ReplaceFormFieldTest {
 
     // fields of ExtendedExtendedFormData
     assertEquals(1, extendedExtendedFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData'");
-    var serialVersionUID = assertFieldExist(extendedExtendedFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(extendedExtendedFormData);
 
     assertEquals(63, extendedExtendedFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData'");
     var getIgnoringGroupBoxExCreateNone = assertMethodExist(extendedExtendedFormData, "getIgnoringGroupBoxExCreateNone");
@@ -722,10 +664,7 @@ public class ReplaceFormFieldTest {
 
     // fields of IgnoringGroupBoxExCreateNone
     assertEquals(1, ignoringGroupBoxExCreateNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$IgnoringGroupBoxExCreateNone'");
-    var serialVersionUID1 = assertFieldExist(ignoringGroupBoxExCreateNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(ignoringGroupBoxExCreateNone);
 
     assertEquals(0, ignoringGroupBoxExCreateNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$IgnoringGroupBoxExCreateNone'");
 
@@ -739,10 +678,7 @@ public class ReplaceFormFieldTest {
 
     // fields of IgnoringGroupBoxExNoneCreate
     assertEquals(1, ignoringGroupBoxExNoneCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$IgnoringGroupBoxExNoneCreate'");
-    var serialVersionUID2 = assertFieldExist(ignoringGroupBoxExNoneCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID2, "long");
-    assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(ignoringGroupBoxExNoneCreate);
 
     assertEquals(0, ignoringGroupBoxExNoneCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$IgnoringGroupBoxExNoneCreate'");
 
@@ -756,10 +692,7 @@ public class ReplaceFormFieldTest {
 
     // fields of NameExEx
     assertEquals(1, nameExEx.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$NameExEx'");
-    var serialVersionUID3 = assertFieldExist(nameExEx, "serialVersionUID");
-    assertHasFlags(serialVersionUID3, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID3, "long");
-    assertEquals(0, serialVersionUID3.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(nameExEx);
 
     assertEquals(3, nameExEx.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$NameExEx'");
     var getStringProperty = assertMethodExist(nameExEx, "getStringProperty");
@@ -781,10 +714,7 @@ public class ReplaceFormFieldTest {
 
     // fields of StringPropertyProperty
     assertEquals(1, stringPropertyProperty.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$NameExEx$StringPropertyProperty'");
-    var serialVersionUID4 = assertFieldExist(stringPropertyProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID4, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID4, "long");
-    assertEquals(0, serialVersionUID4.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(stringPropertyProperty);
 
     assertEquals(0, stringPropertyProperty.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$NameExEx$StringPropertyProperty'");
 
@@ -798,10 +728,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateCreateCreate
     assertEquals(1, sdkCommandCreateCreateCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateCreateCreate'");
-    var serialVersionUID5 = assertFieldExist(sdkCommandCreateCreateCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID5, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID5, "long");
-    assertEquals(0, serialVersionUID5.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateCreateCreate);
 
     assertEquals(0, sdkCommandCreateCreateCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateCreateCreate'");
 
@@ -815,10 +742,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateCreateIgnore
     assertEquals(1, sdkCommandCreateCreateIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateCreateIgnore'");
-    var serialVersionUID6 = assertFieldExist(sdkCommandCreateCreateIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID6, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID6, "long");
-    assertEquals(0, serialVersionUID6.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateCreateIgnore);
 
     assertEquals(0, sdkCommandCreateCreateIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateCreateIgnore'");
 
@@ -832,10 +756,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateCreateNone
     assertEquals(1, sdkCommandCreateCreateNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateCreateNone'");
-    var serialVersionUID7 = assertFieldExist(sdkCommandCreateCreateNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID7, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID7, "long");
-    assertEquals(0, serialVersionUID7.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateCreateNone);
 
     assertEquals(0, sdkCommandCreateCreateNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateCreateNone'");
 
@@ -849,10 +770,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateCreateUse
     assertEquals(1, sdkCommandCreateCreateUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateCreateUse'");
-    var serialVersionUID8 = assertFieldExist(sdkCommandCreateCreateUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID8, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID8, "long");
-    assertEquals(0, serialVersionUID8.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateCreateUse);
 
     assertEquals(0, sdkCommandCreateCreateUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateCreateUse'");
 
@@ -866,10 +784,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateIgnoreCreate
     assertEquals(1, sdkCommandCreateIgnoreCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateIgnoreCreate'");
-    var serialVersionUID9 = assertFieldExist(sdkCommandCreateIgnoreCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID9, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID9, "long");
-    assertEquals(0, serialVersionUID9.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateIgnoreCreate);
 
     assertEquals(0, sdkCommandCreateIgnoreCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateIgnoreCreate'");
 
@@ -883,10 +798,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateIgnoreIgnore
     assertEquals(1, sdkCommandCreateIgnoreIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateIgnoreIgnore'");
-    var serialVersionUID10 = assertFieldExist(sdkCommandCreateIgnoreIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID10, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID10, "long");
-    assertEquals(0, serialVersionUID10.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateIgnoreIgnore);
 
     assertEquals(0, sdkCommandCreateIgnoreIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateIgnoreIgnore'");
 
@@ -900,10 +812,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateIgnoreNone
     assertEquals(1, sdkCommandCreateIgnoreNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateIgnoreNone'");
-    var serialVersionUID11 = assertFieldExist(sdkCommandCreateIgnoreNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID11, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID11, "long");
-    assertEquals(0, serialVersionUID11.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateIgnoreNone);
 
     assertEquals(0, sdkCommandCreateIgnoreNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateIgnoreNone'");
 
@@ -917,10 +826,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateIgnoreUse
     assertEquals(1, sdkCommandCreateIgnoreUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateIgnoreUse'");
-    var serialVersionUID12 = assertFieldExist(sdkCommandCreateIgnoreUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID12, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID12, "long");
-    assertEquals(0, serialVersionUID12.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateIgnoreUse);
 
     assertEquals(0, sdkCommandCreateIgnoreUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateIgnoreUse'");
 
@@ -934,10 +840,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateNoneCreate
     assertEquals(1, sdkCommandCreateNoneCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateNoneCreate'");
-    var serialVersionUID13 = assertFieldExist(sdkCommandCreateNoneCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID13, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID13, "long");
-    assertEquals(0, serialVersionUID13.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateNoneCreate);
 
     assertEquals(0, sdkCommandCreateNoneCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateNoneCreate'");
 
@@ -951,10 +854,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateNoneIgnore
     assertEquals(1, sdkCommandCreateNoneIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateNoneIgnore'");
-    var serialVersionUID14 = assertFieldExist(sdkCommandCreateNoneIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID14, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID14, "long");
-    assertEquals(0, serialVersionUID14.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateNoneIgnore);
 
     assertEquals(0, sdkCommandCreateNoneIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateNoneIgnore'");
 
@@ -968,10 +868,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateNoneNone
     assertEquals(1, sdkCommandCreateNoneNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateNoneNone'");
-    var serialVersionUID15 = assertFieldExist(sdkCommandCreateNoneNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID15, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID15, "long");
-    assertEquals(0, serialVersionUID15.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateNoneNone);
 
     assertEquals(0, sdkCommandCreateNoneNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateNoneNone'");
 
@@ -985,10 +882,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateNoneUse
     assertEquals(1, sdkCommandCreateNoneUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateNoneUse'");
-    var serialVersionUID16 = assertFieldExist(sdkCommandCreateNoneUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID16, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID16, "long");
-    assertEquals(0, serialVersionUID16.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateNoneUse);
 
     assertEquals(0, sdkCommandCreateNoneUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateNoneUse'");
 
@@ -1002,10 +896,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateUseCreate
     assertEquals(1, sdkCommandCreateUseCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateUseCreate'");
-    var serialVersionUID17 = assertFieldExist(sdkCommandCreateUseCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID17, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID17, "long");
-    assertEquals(0, serialVersionUID17.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateUseCreate);
 
     assertEquals(0, sdkCommandCreateUseCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateUseCreate'");
 
@@ -1019,10 +910,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateUseIgnore
     assertEquals(1, sdkCommandCreateUseIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateUseIgnore'");
-    var serialVersionUID18 = assertFieldExist(sdkCommandCreateUseIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID18, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID18, "long");
-    assertEquals(0, serialVersionUID18.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateUseIgnore);
 
     assertEquals(0, sdkCommandCreateUseIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateUseIgnore'");
 
@@ -1036,10 +924,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateUseNone
     assertEquals(1, sdkCommandCreateUseNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateUseNone'");
-    var serialVersionUID19 = assertFieldExist(sdkCommandCreateUseNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID19, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID19, "long");
-    assertEquals(0, serialVersionUID19.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateUseNone);
 
     assertEquals(0, sdkCommandCreateUseNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateUseNone'");
 
@@ -1053,10 +938,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandCreateUseUse
     assertEquals(1, sdkCommandCreateUseUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateUseUse'");
-    var serialVersionUID20 = assertFieldExist(sdkCommandCreateUseUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID20, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID20, "long");
-    assertEquals(0, serialVersionUID20.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandCreateUseUse);
 
     assertEquals(0, sdkCommandCreateUseUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandCreateUseUse'");
 
@@ -1070,10 +952,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreCreateCreate
     assertEquals(1, sdkCommandIgnoreCreateCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreCreateCreate'");
-    var serialVersionUID21 = assertFieldExist(sdkCommandIgnoreCreateCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID21, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID21, "long");
-    assertEquals(0, serialVersionUID21.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreCreateCreate);
 
     assertEquals(0, sdkCommandIgnoreCreateCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreCreateCreate'");
 
@@ -1087,10 +966,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreCreateIgnore
     assertEquals(1, sdkCommandIgnoreCreateIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreCreateIgnore'");
-    var serialVersionUID22 = assertFieldExist(sdkCommandIgnoreCreateIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID22, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID22, "long");
-    assertEquals(0, serialVersionUID22.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreCreateIgnore);
 
     assertEquals(0, sdkCommandIgnoreCreateIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreCreateIgnore'");
 
@@ -1104,10 +980,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreCreateNone
     assertEquals(1, sdkCommandIgnoreCreateNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreCreateNone'");
-    var serialVersionUID23 = assertFieldExist(sdkCommandIgnoreCreateNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID23, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID23, "long");
-    assertEquals(0, serialVersionUID23.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreCreateNone);
 
     assertEquals(0, sdkCommandIgnoreCreateNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreCreateNone'");
 
@@ -1121,10 +994,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreCreateUse
     assertEquals(1, sdkCommandIgnoreCreateUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreCreateUse'");
-    var serialVersionUID24 = assertFieldExist(sdkCommandIgnoreCreateUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID24, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID24, "long");
-    assertEquals(0, serialVersionUID24.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreCreateUse);
 
     assertEquals(0, sdkCommandIgnoreCreateUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreCreateUse'");
 
@@ -1138,10 +1008,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreIgnoreCreate
     assertEquals(1, sdkCommandIgnoreIgnoreCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreIgnoreCreate'");
-    var serialVersionUID25 = assertFieldExist(sdkCommandIgnoreIgnoreCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID25, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID25, "long");
-    assertEquals(0, serialVersionUID25.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreIgnoreCreate);
 
     assertEquals(0, sdkCommandIgnoreIgnoreCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreIgnoreCreate'");
 
@@ -1155,10 +1022,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreIgnoreUse
     assertEquals(1, sdkCommandIgnoreIgnoreUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreIgnoreUse'");
-    var serialVersionUID26 = assertFieldExist(sdkCommandIgnoreIgnoreUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID26, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID26, "long");
-    assertEquals(0, serialVersionUID26.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreIgnoreUse);
 
     assertEquals(0, sdkCommandIgnoreIgnoreUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreIgnoreUse'");
 
@@ -1172,10 +1036,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreNoneCreate
     assertEquals(1, sdkCommandIgnoreNoneCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreNoneCreate'");
-    var serialVersionUID27 = assertFieldExist(sdkCommandIgnoreNoneCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID27, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID27, "long");
-    assertEquals(0, serialVersionUID27.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreNoneCreate);
 
     assertEquals(0, sdkCommandIgnoreNoneCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreNoneCreate'");
 
@@ -1189,10 +1050,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreNoneUse
     assertEquals(1, sdkCommandIgnoreNoneUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreNoneUse'");
-    var serialVersionUID28 = assertFieldExist(sdkCommandIgnoreNoneUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID28, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID28, "long");
-    assertEquals(0, serialVersionUID28.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreNoneUse);
 
     assertEquals(0, sdkCommandIgnoreNoneUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreNoneUse'");
 
@@ -1206,10 +1064,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreUseCreate
     assertEquals(1, sdkCommandIgnoreUseCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreUseCreate'");
-    var serialVersionUID29 = assertFieldExist(sdkCommandIgnoreUseCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID29, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID29, "long");
-    assertEquals(0, serialVersionUID29.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreUseCreate);
 
     assertEquals(0, sdkCommandIgnoreUseCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreUseCreate'");
 
@@ -1223,10 +1078,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreUseIgnore
     assertEquals(1, sdkCommandIgnoreUseIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreUseIgnore'");
-    var serialVersionUID30 = assertFieldExist(sdkCommandIgnoreUseIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID30, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID30, "long");
-    assertEquals(0, serialVersionUID30.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreUseIgnore);
 
     assertEquals(0, sdkCommandIgnoreUseIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreUseIgnore'");
 
@@ -1240,10 +1092,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreUseNone
     assertEquals(1, sdkCommandIgnoreUseNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreUseNone'");
-    var serialVersionUID31 = assertFieldExist(sdkCommandIgnoreUseNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID31, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID31, "long");
-    assertEquals(0, serialVersionUID31.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreUseNone);
 
     assertEquals(0, sdkCommandIgnoreUseNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreUseNone'");
 
@@ -1257,10 +1106,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandIgnoreUseUse
     assertEquals(1, sdkCommandIgnoreUseUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreUseUse'");
-    var serialVersionUID32 = assertFieldExist(sdkCommandIgnoreUseUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID32, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID32, "long");
-    assertEquals(0, serialVersionUID32.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandIgnoreUseUse);
 
     assertEquals(0, sdkCommandIgnoreUseUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandIgnoreUseUse'");
 
@@ -1274,10 +1120,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneCreateCreate
     assertEquals(1, sdkCommandNoneCreateCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneCreateCreate'");
-    var serialVersionUID33 = assertFieldExist(sdkCommandNoneCreateCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID33, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID33, "long");
-    assertEquals(0, serialVersionUID33.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneCreateCreate);
 
     assertEquals(0, sdkCommandNoneCreateCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneCreateCreate'");
 
@@ -1291,10 +1134,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneCreateIgnore
     assertEquals(1, sdkCommandNoneCreateIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneCreateIgnore'");
-    var serialVersionUID34 = assertFieldExist(sdkCommandNoneCreateIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID34, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID34, "long");
-    assertEquals(0, serialVersionUID34.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneCreateIgnore);
 
     assertEquals(0, sdkCommandNoneCreateIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneCreateIgnore'");
 
@@ -1308,10 +1148,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneCreateNone
     assertEquals(1, sdkCommandNoneCreateNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneCreateNone'");
-    var serialVersionUID35 = assertFieldExist(sdkCommandNoneCreateNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID35, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID35, "long");
-    assertEquals(0, serialVersionUID35.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneCreateNone);
 
     assertEquals(0, sdkCommandNoneCreateNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneCreateNone'");
 
@@ -1325,10 +1162,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneCreateUse
     assertEquals(1, sdkCommandNoneCreateUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneCreateUse'");
-    var serialVersionUID36 = assertFieldExist(sdkCommandNoneCreateUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID36, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID36, "long");
-    assertEquals(0, serialVersionUID36.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneCreateUse);
 
     assertEquals(0, sdkCommandNoneCreateUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneCreateUse'");
 
@@ -1342,10 +1176,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneIgnoreCreate
     assertEquals(1, sdkCommandNoneIgnoreCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneIgnoreCreate'");
-    var serialVersionUID37 = assertFieldExist(sdkCommandNoneIgnoreCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID37, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID37, "long");
-    assertEquals(0, serialVersionUID37.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneIgnoreCreate);
 
     assertEquals(0, sdkCommandNoneIgnoreCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneIgnoreCreate'");
 
@@ -1359,10 +1190,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneIgnoreIgnore
     assertEquals(1, sdkCommandNoneIgnoreIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneIgnoreIgnore'");
-    var serialVersionUID38 = assertFieldExist(sdkCommandNoneIgnoreIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID38, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID38, "long");
-    assertEquals(0, serialVersionUID38.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneIgnoreIgnore);
 
     assertEquals(0, sdkCommandNoneIgnoreIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneIgnoreIgnore'");
 
@@ -1376,10 +1204,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneIgnoreNone
     assertEquals(1, sdkCommandNoneIgnoreNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneIgnoreNone'");
-    var serialVersionUID39 = assertFieldExist(sdkCommandNoneIgnoreNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID39, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID39, "long");
-    assertEquals(0, serialVersionUID39.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneIgnoreNone);
 
     assertEquals(0, sdkCommandNoneIgnoreNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneIgnoreNone'");
 
@@ -1393,10 +1218,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneIgnoreUse
     assertEquals(1, sdkCommandNoneIgnoreUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneIgnoreUse'");
-    var serialVersionUID40 = assertFieldExist(sdkCommandNoneIgnoreUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID40, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID40, "long");
-    assertEquals(0, serialVersionUID40.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneIgnoreUse);
 
     assertEquals(0, sdkCommandNoneIgnoreUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneIgnoreUse'");
 
@@ -1411,10 +1233,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneNoneCreate
     assertEquals(1, sdkCommandNoneNoneCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneNoneCreate'");
-    var serialVersionUID41 = assertFieldExist(sdkCommandNoneNoneCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID41, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID41, "long");
-    assertEquals(0, serialVersionUID41.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneNoneCreate);
 
     assertEquals(0, sdkCommandNoneNoneCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneNoneCreate'");
 
@@ -1428,10 +1247,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneNoneIgnore
     assertEquals(1, sdkCommandNoneNoneIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneNoneIgnore'");
-    var serialVersionUID42 = assertFieldExist(sdkCommandNoneNoneIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID42, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID42, "long");
-    assertEquals(0, serialVersionUID42.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneNoneIgnore);
 
     assertEquals(0, sdkCommandNoneNoneIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneNoneIgnore'");
 
@@ -1445,10 +1261,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneNoneNone
     assertEquals(1, sdkCommandNoneNoneNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneNoneNone'");
-    var serialVersionUID43 = assertFieldExist(sdkCommandNoneNoneNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID43, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID43, "long");
-    assertEquals(0, serialVersionUID43.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneNoneNone);
 
     assertEquals(0, sdkCommandNoneNoneNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneNoneNone'");
 
@@ -1462,10 +1275,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneNoneUse
     assertEquals(1, sdkCommandNoneNoneUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneNoneUse'");
-    var serialVersionUID44 = assertFieldExist(sdkCommandNoneNoneUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID44, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID44, "long");
-    assertEquals(0, serialVersionUID44.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneNoneUse);
 
     assertEquals(0, sdkCommandNoneNoneUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneNoneUse'");
 
@@ -1479,10 +1289,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneUseCreate
     assertEquals(1, sdkCommandNoneUseCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneUseCreate'");
-    var serialVersionUID45 = assertFieldExist(sdkCommandNoneUseCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID45, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID45, "long");
-    assertEquals(0, serialVersionUID45.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneUseCreate);
 
     assertEquals(0, sdkCommandNoneUseCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneUseCreate'");
 
@@ -1496,10 +1303,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneUseIgnore
     assertEquals(1, sdkCommandNoneUseIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneUseIgnore'");
-    var serialVersionUID46 = assertFieldExist(sdkCommandNoneUseIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID46, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID46, "long");
-    assertEquals(0, serialVersionUID46.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneUseIgnore);
 
     assertEquals(0, sdkCommandNoneUseIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneUseIgnore'");
 
@@ -1513,10 +1317,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneUseNone
     assertEquals(1, sdkCommandNoneUseNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneUseNone'");
-    var serialVersionUID47 = assertFieldExist(sdkCommandNoneUseNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID47, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID47, "long");
-    assertEquals(0, serialVersionUID47.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneUseNone);
 
     assertEquals(0, sdkCommandNoneUseNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneUseNone'");
 
@@ -1530,10 +1331,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandNoneUseUse
     assertEquals(1, sdkCommandNoneUseUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneUseUse'");
-    var serialVersionUID48 = assertFieldExist(sdkCommandNoneUseUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID48, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID48, "long");
-    assertEquals(0, serialVersionUID48.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandNoneUseUse);
 
     assertEquals(0, sdkCommandNoneUseUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandNoneUseUse'");
 
@@ -1547,10 +1345,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseCreateCreate
     assertEquals(1, sdkCommandUseCreateCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseCreateCreate'");
-    var serialVersionUID49 = assertFieldExist(sdkCommandUseCreateCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID49, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID49, "long");
-    assertEquals(0, serialVersionUID49.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseCreateCreate);
 
     assertEquals(0, sdkCommandUseCreateCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseCreateCreate'");
 
@@ -1564,10 +1359,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseCreateIgnore
     assertEquals(1, sdkCommandUseCreateIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseCreateIgnore'");
-    var serialVersionUID50 = assertFieldExist(sdkCommandUseCreateIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID50, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID50, "long");
-    assertEquals(0, serialVersionUID50.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseCreateIgnore);
 
     assertEquals(0, sdkCommandUseCreateIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseCreateIgnore'");
 
@@ -1581,10 +1373,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseCreateNone
     assertEquals(1, sdkCommandUseCreateNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseCreateNone'");
-    var serialVersionUID51 = assertFieldExist(sdkCommandUseCreateNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID51, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID51, "long");
-    assertEquals(0, serialVersionUID51.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseCreateNone);
 
     assertEquals(0, sdkCommandUseCreateNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseCreateNone'");
 
@@ -1598,10 +1387,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseCreateUse
     assertEquals(1, sdkCommandUseCreateUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseCreateUse'");
-    var serialVersionUID52 = assertFieldExist(sdkCommandUseCreateUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID52, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID52, "long");
-    assertEquals(0, serialVersionUID52.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseCreateUse);
 
     assertEquals(0, sdkCommandUseCreateUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseCreateUse'");
 
@@ -1615,10 +1401,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseIgnoreCreate
     assertEquals(1, sdkCommandUseIgnoreCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseIgnoreCreate'");
-    var serialVersionUID53 = assertFieldExist(sdkCommandUseIgnoreCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID53, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID53, "long");
-    assertEquals(0, serialVersionUID53.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseIgnoreCreate);
 
     assertEquals(0, sdkCommandUseIgnoreCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseIgnoreCreate'");
 
@@ -1632,10 +1415,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseIgnoreIgnore
     assertEquals(1, sdkCommandUseIgnoreIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseIgnoreIgnore'");
-    var serialVersionUID54 = assertFieldExist(sdkCommandUseIgnoreIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID54, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID54, "long");
-    assertEquals(0, serialVersionUID54.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseIgnoreIgnore);
 
     assertEquals(0, sdkCommandUseIgnoreIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseIgnoreIgnore'");
 
@@ -1649,10 +1429,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseIgnoreNone
     assertEquals(1, sdkCommandUseIgnoreNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseIgnoreNone'");
-    var serialVersionUID55 = assertFieldExist(sdkCommandUseIgnoreNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID55, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID55, "long");
-    assertEquals(0, serialVersionUID55.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseIgnoreNone);
 
     assertEquals(0, sdkCommandUseIgnoreNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseIgnoreNone'");
 
@@ -1666,10 +1443,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseIgnoreUse
     assertEquals(1, sdkCommandUseIgnoreUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseIgnoreUse'");
-    var serialVersionUID56 = assertFieldExist(sdkCommandUseIgnoreUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID56, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID56, "long");
-    assertEquals(0, serialVersionUID56.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseIgnoreUse);
 
     assertEquals(0, sdkCommandUseIgnoreUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseIgnoreUse'");
 
@@ -1683,10 +1457,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseNoneCreate
     assertEquals(1, sdkCommandUseNoneCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseNoneCreate'");
-    var serialVersionUID57 = assertFieldExist(sdkCommandUseNoneCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID57, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID57, "long");
-    assertEquals(0, serialVersionUID57.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseNoneCreate);
 
     assertEquals(0, sdkCommandUseNoneCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseNoneCreate'");
 
@@ -1700,10 +1471,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseNoneIgnore
     assertEquals(1, sdkCommandUseNoneIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseNoneIgnore'");
-    var serialVersionUID58 = assertFieldExist(sdkCommandUseNoneIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID58, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID58, "long");
-    assertEquals(0, serialVersionUID58.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseNoneIgnore);
 
     assertEquals(0, sdkCommandUseNoneIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseNoneIgnore'");
 
@@ -1717,10 +1485,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseNoneNone
     assertEquals(1, sdkCommandUseNoneNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseNoneNone'");
-    var serialVersionUID59 = assertFieldExist(sdkCommandUseNoneNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID59, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID59, "long");
-    assertEquals(0, serialVersionUID59.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseNoneNone);
 
     assertEquals(0, sdkCommandUseNoneNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseNoneNone'");
 
@@ -1734,10 +1499,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseNoneUse
     assertEquals(1, sdkCommandUseNoneUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseNoneUse'");
-    var serialVersionUID60 = assertFieldExist(sdkCommandUseNoneUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID60, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID60, "long");
-    assertEquals(0, serialVersionUID60.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseNoneUse);
 
     assertEquals(0, sdkCommandUseNoneUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseNoneUse'");
 
@@ -1751,10 +1513,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseUseCreate
     assertEquals(1, sdkCommandUseUseCreate.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseUseCreate'");
-    var serialVersionUID61 = assertFieldExist(sdkCommandUseUseCreate, "serialVersionUID");
-    assertHasFlags(serialVersionUID61, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID61, "long");
-    assertEquals(0, serialVersionUID61.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseUseCreate);
 
     assertEquals(0, sdkCommandUseUseCreate.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseUseCreate'");
 
@@ -1768,10 +1527,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseUseIgnore
     assertEquals(1, sdkCommandUseUseIgnore.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseUseIgnore'");
-    var serialVersionUID62 = assertFieldExist(sdkCommandUseUseIgnore, "serialVersionUID");
-    assertHasFlags(serialVersionUID62, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID62, "long");
-    assertEquals(0, serialVersionUID62.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseUseIgnore);
 
     assertEquals(0, sdkCommandUseUseIgnore.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseUseIgnore'");
 
@@ -1785,10 +1541,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseUseNone
     assertEquals(1, sdkCommandUseUseNone.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseUseNone'");
-    var serialVersionUID63 = assertFieldExist(sdkCommandUseUseNone, "serialVersionUID");
-    assertHasFlags(serialVersionUID63, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID63, "long");
-    assertEquals(0, serialVersionUID63.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseUseNone);
 
     assertEquals(0, sdkCommandUseUseNone.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseUseNone'");
 
@@ -1802,10 +1555,7 @@ public class ReplaceFormFieldTest {
 
     // fields of SdkCommandUseUseUse
     assertEquals(1, sdkCommandUseUseUse.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseUseUse'");
-    var serialVersionUID64 = assertFieldExist(sdkCommandUseUseUse, "serialVersionUID");
-    assertHasFlags(serialVersionUID64, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID64, "long");
-    assertEquals(0, serialVersionUID64.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sdkCommandUseUseUse);
 
     assertEquals(0, sdkCommandUseUseUse.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.ExtendedExtendedFormData$SdkCommandUseUseUse'");
 

@@ -20,6 +20,13 @@ import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.Optional;
 
+import jakarta.json.Json;
+import jakarta.json.JsonNumber;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
+import jakarta.json.JsonValue.ValueType;
+
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement;
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement.ExportType;
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson;
@@ -31,13 +38,6 @@ import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi;
 import org.eclipse.scout.sdk.core.typescript.model.spi.PackageJsonSpi;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.FinalValue;
-
-import jakarta.json.Json;
-import jakarta.json.JsonNumber;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonString;
-import jakarta.json.JsonValue;
-import jakarta.json.JsonValue.ValueType;
 
 public class TestingPackageJsonSpi extends AbstractNodeElementSpi<IPackageJson> implements PackageJsonSpi {
 

@@ -16,6 +16,7 @@ import static org.eclipse.scout.sdk.core.generator.ISourceGenerator.raw;
 import static org.eclipse.scout.sdk.core.java.transformer.IWorkingCopyTransformer.transformAnnotationElement;
 import static org.eclipse.scout.sdk.core.util.Ensure.newFail;
 
+import java.io.Serial;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -84,14 +85,14 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
    * <b>Example:</b> See {@link IWorkingCopyTransformer}.
    *
    * @param annotation
-   *          The {@link IAnnotation} that should be converted to an {@link IAnnotationGenerator}. Must not be
-   *          {@code null}.
+   *     The {@link IAnnotation} that should be converted to an {@link IAnnotationGenerator}. Must not be
+   *     {@code null}.
    * @param transformer
-   *          An optional {@link IWorkingCopyTransformer} callback that is responsible for transforming the annotation
-   *          to a working copy. May be {@code null} if no custom transformation is required and the annotation should
-   *          be converted into a working copy without any modification.
+   *     An optional {@link IWorkingCopyTransformer} callback that is responsible for transforming the annotation
+   *     to a working copy. May be {@code null} if no custom transformation is required and the annotation should
+   *     be converted into a working copy without any modification.
    * @return A new {@link IAnnotationGenerator} initialized to generate source that is structurally similar to the one
-   *         from the given {@link IAnnotation}.
+   * from the given {@link IAnnotation}.
    * @see DefaultWorkingCopyTransformer
    * @see SimpleWorkingCopyTransformerBuilder
    */
@@ -117,13 +118,21 @@ public class AnnotationGenerator<TYPE extends IAnnotationGenerator<TYPE>> extend
 
   /**
    * @param values
-   *          The tokens to suppress. May not be {@code null}.
+   *     The tokens to suppress. May not be {@code null}.
    * @return A new {@link SuppressWarnings} {@link IAnnotationGenerator} with the specified suppression values.
    */
   public static IAnnotationGenerator<?> createSuppressWarnings(CharSequence... values) {
     return new AnnotationGenerator<>()
         .withElementName(SuppressWarnings.class.getName())
         .withElement("value", b -> b.stringLiteralArray(values, false, true));
+  }
+
+  /**
+   * @return A new {@link Serial} {@link IAnnotationGenerator}.
+   */
+  public static IAnnotationGenerator<?> createSerial() {
+    return new AnnotationGenerator<>()
+        .withElementName(Serial.class.getName());
   }
 
   @Override

@@ -17,12 +17,14 @@ import java.lang.reflect.Method;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -71,11 +73,11 @@ public final class Api {
 
   /**
    * @param apiDefinition
-   *          The API definition class for which the {@link IApiProvider} should be returned. Must not be {@code null}.
+   *     The API definition class for which the {@link IApiProvider} should be returned. Must not be {@code null}.
    * @return The {@link IApiProvider} in this registry for the API definition given.
    * @throws IllegalArgumentException
-   *           if the API definition is {@code null} or no provider for the given definition could be found in the
-   *           registry.
+   *     if the API definition is {@code null} or no provider for the given definition could be found in the
+   *     registry.
    */
   public static IApiProvider getProvider(Class<? extends IApiSpecification> apiDefinition) {
     Ensure.notNull(apiDefinition);
@@ -87,13 +89,13 @@ public final class Api {
 
   /**
    * Registers the given {@link IApiProvider} in this registry.
-   * 
+   *
    * @param apiDefinition
-   *          The API definition class the given provider can handle. Must not be {@code null}.
+   *     The API definition class the given provider can handle. Must not be {@code null}.
    * @param provider
-   *          The provider. Must not be {@code null}.
+   *     The provider. Must not be {@code null}.
    * @return {@code false} if this was the first provider for this class. {@code true} if there was already a provider
-   *         for that class which was replaced.
+   * for that class which was replaced.
    */
   public static boolean registerProvider(Class<? extends IApiSpecification> apiDefinition, IApiProvider provider) {
     synchronized (REGISTRY) {
@@ -104,9 +106,9 @@ public final class Api {
 
   /**
    * Removes the {@link IApiProvider} registration for the given API definition class.
-   * 
+   *
    * @param apiDefinition
-   *          The API definition class to remove.
+   *     The API definition class to remove.
    * @return {@code true} if a mapping was removed, {@code false} if there was already no mapping for this class.
    */
   public static boolean unregisterProvider(Class<? extends IApiSpecification> apiDefinition) {
@@ -131,9 +133,9 @@ public final class Api {
 
   /**
    * Gets the latest (newest) major version that is supported for the given API definition class.
-   * 
+   *
    * @param api
-   *          The API definition to check. Must not be {@code null}.
+   *     The API definition to check. Must not be {@code null}.
    * @return The newest supported major version for the given API.
    */
   public static int latestMajorVersion(Class<? extends IApiSpecification> api) {
@@ -144,7 +146,7 @@ public final class Api {
    * Gets the latest (newest) API version that is supported for the given API definition class.
    *
    * @param api
-   *          The API definition for which the newest version should be returned. Must not be {@code null}.
+   *     The API definition for which the newest version should be returned. Must not be {@code null}.
    * @return The newest supported version for the given API.
    */
   public static <API extends IApiSpecification> API latest(Class<API> api) {
@@ -153,15 +155,15 @@ public final class Api {
 
   /**
    * Gets the {@link ApiVersion version} of the given API in the context of the given {@link IJavaElement}.
-   * 
+   *
    * @param api
-   *          The API definition for which the version should be returned. Must not be {@code null}.
+   *     The API definition for which the version should be returned. Must not be {@code null}.
    * @param context
-   *          The {@link IJavaElement} in which the API should be searched.
+   *     The {@link IJavaElement} in which the API should be searched.
    * @return The {@link ApiVersion} of the given API in the context of the given {@link IJavaElement} or an empty
-   *         {@link Optional} if the given context is {@code null} or the API could not be found in the context.
+   * {@link Optional} if the given context is {@code null} or the API could not be found in the context.
    * @throws IllegalArgumentException
-   *           if the API type is {@code null} or no {@link IApiProvider} could be found for that type
+   *     if the API type is {@code null} or no {@link IApiProvider} could be found for that type
    */
   public static Optional<ApiVersion> version(Class<? extends IApiSpecification> api, IJavaElement context) {
     return Optional.ofNullable(context)
@@ -173,13 +175,13 @@ public final class Api {
    * Gets the {@link ApiVersion version} of the given API in the context of the given {@link IJavaEnvironment}.
    *
    * @param api
-   *          The API definition for which the version should be returned. Must not be {@code null}.
+   *     The API definition for which the version should be returned. Must not be {@code null}.
    * @param context
-   *          The {@link IJavaEnvironment} in which the API should be searched.
+   *     The {@link IJavaEnvironment} in which the API should be searched.
    * @return The {@link ApiVersion} of the given API in the context of the given {@link IJavaEnvironment} or an empty
-   *         {@link Optional} if the given context is {@code null} or the API could not be found in the context.
+   * {@link Optional} if the given context is {@code null} or the API could not be found in the context.
    * @throws IllegalArgumentException
-   *           if the API type is {@code null} or no {@link IApiProvider} could be found for that type
+   *     if the API type is {@code null} or no {@link IApiProvider} could be found for that type
    */
   public static Optional<ApiVersion> version(Class<? extends IApiSpecification> api, IJavaEnvironment context) {
     return Optional.ofNullable(context).flatMap(ctx -> getProvider(api).version(ctx));
@@ -188,18 +190,18 @@ public final class Api {
   /**
    * Creates an API instance of the given type having the version as found in the context of the given
    * {@link IJavaElement}.
-   * 
+   *
    * @param api
-   *          The API definition type to return. Must not be {@code null}.
+   *     The API definition type to return. Must not be {@code null}.
    * @param context
-   *          The {@link IJavaElement} in which the API should be searched.
+   *     The {@link IJavaElement} in which the API should be searched.
    * @param <API>
-   *          The API type.
+   *     The API type.
    * @return The API instance of the given type having the version found in the given context or an empty
-   *         {@link Optional} if the given context is {@code null} or the given API could not be found in the context.
+   * {@link Optional} if the given context is {@code null} or the given API could not be found in the context.
    * @throws IllegalArgumentException
-   *           if the API type is {@code null}, no {@link IApiProvider} could be found for that type or the API version
-   *           found in the context is not supported (version found in the context is too old).
+   *     if the API type is {@code null}, no {@link IApiProvider} could be found for that type or the API version
+   *     found in the context is not supported (version found in the context is too old).
    */
   public static <API extends IApiSpecification> Optional<API> create(Class<API> api, IJavaElement context) {
     return create(api, context == null ? null : context.javaEnvironment());
@@ -210,16 +212,16 @@ public final class Api {
    * {@link IJavaEnvironment}.
    *
    * @param api
-   *          The API definition type to return. Must not be {@code null}.
+   *     The API definition type to return. Must not be {@code null}.
    * @param context
-   *          The {@link IJavaEnvironment} in which the API should be searched.
+   *     The {@link IJavaEnvironment} in which the API should be searched.
    * @param <API>
-   *          The API type.
+   *     The API type.
    * @return The API instance of the given type having the version found in the given context or an empty
-   *         {@link Optional} if the given context is {@code null} or the given API could not be found in the context.
+   * {@link Optional} if the given context is {@code null} or the given API could not be found in the context.
    * @throws IllegalArgumentException
-   *           if the API type is {@code null}, no {@link IApiProvider} could be found for that type or the API version
-   *           found in the context is not supported (version found in the context is too old).
+   *     if the API type is {@code null}, no {@link IApiProvider} could be found for that type or the API version
+   *     found in the context is not supported (version found in the context is too old).
    */
   public static <API extends IApiSpecification> Optional<API> create(Class<API> api, IJavaEnvironment context) {
     return version(api, context)
@@ -230,16 +232,16 @@ public final class Api {
    * Creates an API instance of the given type having the given version.
    *
    * @param api
-   *          The API definition type to return. Must not be {@code null}.
+   *     The API definition type to return. Must not be {@code null}.
    * @param version
-   *          The {@link ApiVersion} for which the compatible API should be retrieved. If {@code null} or
-   *          {@link ApiVersion#LATEST} the latest (newest) API of that type is returned.
+   *     The {@link ApiVersion} for which the compatible API should be retrieved. If {@code null} or
+   *     {@link ApiVersion#LATEST} the latest (newest) API of that type is returned.
    * @param <API>
-   *          The API type.
+   *     The API type.
    * @return The API instance of the given type supporting the given version
    * @throws IllegalArgumentException
-   *           if the API type is {@code null}, no {@link IApiProvider} could be found for that type or the API version
-   *           is not supported (version found in the context is too old).
+   *     if the API type is {@code null}, no {@link IApiProvider} could be found for that type or the API version
+   *     is not supported (version found in the context is too old).
    */
   public static <API extends IApiSpecification> API create(Class<API> api, ApiVersion version) {
     Entry<Class<? extends IApiSpecification>, ApiVersion> key = new SimpleImmutableEntry<>(api, version);
@@ -262,13 +264,13 @@ public final class Api {
 
   /**
    * Gets all known (supported) API version for the given API type.
-   * 
+   *
    * @param api
-   *          The API definition type to return. Must not be {@code null}.
+   *     The API definition type to return. Must not be {@code null}.
    * @param <API>
-   *          The API type.
+   *     The API type.
    * @return A {@link Stream} with all known (supported) versions of the given API. The {@link Stream} is sorted having
-   *         the latest (newest) API first.
+   * the latest (newest) API first.
    */
   public static <API extends IApiSpecification> Stream<API> allKnown(Class<API> api) {
     return getProvider(api)
@@ -279,10 +281,21 @@ public final class Api {
   }
 
   /**
+   * Gets all known (supported) API types.
+   *
+   * @return An immutable set of all known (supported) API types.
+   */
+  public static Set<Class<? extends IApiSpecification>> allKnownTypes() {
+    synchronized (REGISTRY) {
+      return Collections.unmodifiableSet(REGISTRY.keySet());
+    }
+  }
+
+  /**
    * Dumps the given {@link IApiSpecification} into a {@link Map} data structure.
    *
    * @param api
-   *          The {@link IApiSpecification} to dump. Must not be {@code null}.
+   *     The {@link IApiSpecification} to dump. Must not be {@code null}.
    * @return The dump
    * @see #dump(ITypeNameSupplier)
    */
@@ -297,7 +310,7 @@ public final class Api {
    * Collects all {@link ITypeNameSupplier}s of the given {@link IApiSpecification}.
    *
    * @param api
-   *          The {@link IApiSpecification} to collect {@link ITypeNameSupplier}s from. Must not be {@code null}.
+   *     The {@link IApiSpecification} to collect {@link ITypeNameSupplier}s from. Must not be {@code null}.
    * @return A stream of all method names returning an {@link ITypeNameSupplier} and the corresponding result.
    */
   public static Stream<Entry<String, ITypeNameSupplier>> collectTypeNameSuppliers(IApiSpecification api) {
@@ -311,10 +324,10 @@ public final class Api {
    * Dumps the given {@link ITypeNameSupplier} into an {@link Entry} data structure.
    *
    * @param cns
-   *          The {@link ITypeNameSupplier} to dump. Must not be {@code null}.
+   *     The {@link ITypeNameSupplier} to dump. Must not be {@code null}.
    * @return An {@link Entry} for the given {@link ITypeNameSupplier} having the fully qualified name as key and a
-   *         {@link Map} of all methods in the given {@link ITypeNameSupplier} and its values grouped by
-   *         {@link ChildElementType}.
+   * {@link Map} of all methods in the given {@link ITypeNameSupplier} and its values grouped by
+   * {@link ChildElementType}.
    */
   public static Entry<String /* fqn of the ITypeNameSupplier */, Map<ChildElementType, Map<String /* method name in the ITypeNameSupplier */, String /* method value */>>> dump(ITypeNameSupplier cns) {
     var supplierClass = Ensure.notNull(cns).getClass();

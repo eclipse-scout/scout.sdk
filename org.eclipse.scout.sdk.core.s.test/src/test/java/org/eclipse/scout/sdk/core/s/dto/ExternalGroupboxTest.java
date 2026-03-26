@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.sdk.core.s.dto;
 
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldExist;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodExist;
@@ -20,6 +18,7 @@ import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createForm
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class ExternalGroupboxTest {
@@ -39,9 +38,7 @@ public class ExternalGroupboxTest {
 
     // fields of AbstractExternalGroupBoxData
     assertEquals(1, abstractExternalGroupBoxData.fields().stream().count(), "field count of 'AbstractExternalGroupBoxData'");
-    var serialVersionUID = assertFieldExist(abstractExternalGroupBoxData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
-    assertFieldType(serialVersionUID, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(abstractExternalGroupBoxData);
 
     assertEquals(1, abstractExternalGroupBoxData.methods().stream().count(), "method count of 'AbstractExternalGroupBoxData'");
     var getExternalString = assertMethodExist(abstractExternalGroupBoxData, "getExternalString");
@@ -55,9 +52,7 @@ public class ExternalGroupboxTest {
 
     // fields of ExternalString
     assertEquals(1, externalString.fields().stream().count(), "field count of 'ExternalString'");
-    var serialVersionUID1 = assertFieldExist(externalString, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
-    assertFieldType(serialVersionUID1, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(externalString);
 
     assertEquals(0, externalString.methods().stream().count(), "method count of 'ExternalString'");
 

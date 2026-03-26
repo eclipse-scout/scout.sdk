@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.sdk.core.s.dto;
 
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldExist;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodExist;
@@ -20,6 +18,7 @@ import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createForm
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class FormPropertiesTest {
@@ -39,9 +38,7 @@ public class FormPropertiesTest {
 
     // fields of PropertyTestFormData
     assertEquals(1, propertyTestFormData.fields().stream().count(), "field count of 'PropertyTestFormData'");
-    var serialVersionUID = assertFieldExist(propertyTestFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
-    assertFieldType(serialVersionUID, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(propertyTestFormData);
 
     assertEquals(34, propertyTestFormData.methods().stream().count(), "method count of 'PropertyTestFormData'");
     var getBoolObject = assertMethodExist(propertyTestFormData, "getBoolObject");
@@ -121,9 +118,7 @@ public class FormPropertiesTest {
 
     // fields of BoolObjectProperty
     assertEquals(1, boolObjectProperty.fields().stream().count(), "field count of 'BoolObjectProperty'");
-    var serialVersionUID1 = assertFieldExist(boolObjectProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
-    assertFieldType(serialVersionUID1, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(boolObjectProperty);
 
     assertEquals(0, boolObjectProperty.methods().stream().count(), "method count of 'BoolObjectProperty'");
 
@@ -135,9 +130,7 @@ public class FormPropertiesTest {
 
     // fields of BoolPrimitiveProperty
     assertEquals(1, boolPrimitiveProperty.fields().stream().count(), "field count of 'BoolPrimitiveProperty'");
-    var serialVersionUID2 = assertFieldExist(boolPrimitiveProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, 26);
-    assertFieldType(serialVersionUID2, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(boolPrimitiveProperty);
 
     assertEquals(0, boolPrimitiveProperty.methods().stream().count(), "method count of 'BoolPrimitiveProperty'");
 
@@ -149,9 +142,7 @@ public class FormPropertiesTest {
 
     // fields of ByteArrayProperty
     assertEquals(1, byteArrayProperty.fields().stream().count(), "field count of 'ByteArrayProperty'");
-    var serialVersionUID3 = assertFieldExist(byteArrayProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID3, 26);
-    assertFieldType(serialVersionUID3, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(byteArrayProperty);
 
     assertEquals(0, byteArrayProperty.methods().stream().count(), "method count of 'ByteArrayProperty'");
 
@@ -163,9 +154,7 @@ public class FormPropertiesTest {
 
     // fields of ComplexArrayProperty
     assertEquals(1, complexArrayProperty.fields().stream().count(), "field count of 'ComplexArrayProperty'");
-    var serialVersionUID4 = assertFieldExist(complexArrayProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID4, 26);
-    assertFieldType(serialVersionUID4, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(complexArrayProperty);
 
     assertEquals(0, complexArrayProperty.methods().stream().count(), "method count of 'ComplexArrayProperty'");
 
@@ -177,9 +166,7 @@ public class FormPropertiesTest {
 
     // fields of ComplexInnerArrayProperty
     assertEquals(1, complexInnerArrayProperty.fields().stream().count(), "field count of 'ComplexInnerArrayProperty'");
-    var serialVersionUID5 = assertFieldExist(complexInnerArrayProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID5, 26);
-    assertFieldType(serialVersionUID5, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(complexInnerArrayProperty);
 
     assertEquals(0, complexInnerArrayProperty.methods().stream().count(), "method count of 'ComplexInnerArrayProperty'");
 
@@ -191,9 +178,7 @@ public class FormPropertiesTest {
 
     // fields of DoubleArrayPropertyProperty
     assertEquals(1, doubleArrayPropertyProperty.fields().stream().count(), "field count of 'DoubleArrayPropertyProperty'");
-    var serialVersionUID6 = assertFieldExist(doubleArrayPropertyProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID6, 26);
-    assertFieldType(serialVersionUID6, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(doubleArrayPropertyProperty);
 
     assertEquals(0, doubleArrayPropertyProperty.methods().stream().count(), "method count of 'DoubleArrayPropertyProperty'");
 
@@ -205,9 +190,7 @@ public class FormPropertiesTest {
 
     // fields of IntPrimitiveProperty
     assertEquals(1, intPrimitiveProperty.fields().stream().count(), "field count of 'IntPrimitiveProperty'");
-    var serialVersionUID7 = assertFieldExist(intPrimitiveProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID7, 26);
-    assertFieldType(serialVersionUID7, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(intPrimitiveProperty);
 
     assertEquals(0, intPrimitiveProperty.methods().stream().count(), "method count of 'IntPrimitiveProperty'");
 
@@ -219,9 +202,7 @@ public class FormPropertiesTest {
 
     // fields of Name
     assertEquals(1, name.fields().stream().count(), "field count of 'Name'");
-    var serialVersionUID8 = assertFieldExist(name, "serialVersionUID");
-    assertHasFlags(serialVersionUID8, 26);
-    assertFieldType(serialVersionUID8, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(name);
 
     assertEquals(3, name.methods().stream().count(), "method count of 'Name'");
     var getIntProperty = assertMethodExist(name, "getIntProperty");
@@ -239,9 +220,7 @@ public class FormPropertiesTest {
 
     // fields of IntPropertyProperty
     assertEquals(1, intPropertyProperty.fields().stream().count(), "field count of 'IntPropertyProperty'");
-    var serialVersionUID9 = assertFieldExist(intPropertyProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID9, 26);
-    assertFieldType(serialVersionUID9, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(intPropertyProperty);
 
     assertEquals(0, intPropertyProperty.methods().stream().count(), "method count of 'IntPropertyProperty'");
 
@@ -253,9 +232,7 @@ public class FormPropertiesTest {
 
     // fields of ObjectPropertyProperty
     assertEquals(1, objectPropertyProperty.fields().stream().count(), "field count of 'ObjectPropertyProperty'");
-    var serialVersionUID10 = assertFieldExist(objectPropertyProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID10, 26);
-    assertFieldType(serialVersionUID10, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(objectPropertyProperty);
 
     assertEquals(0, objectPropertyProperty.methods().stream().count(), "method count of 'ObjectPropertyProperty'");
 
@@ -267,9 +244,7 @@ public class FormPropertiesTest {
 
     // fields of PropertyTestNrProperty
     assertEquals(1, propertyTestNrProperty.fields().stream().count(), "field count of 'PropertyTestNrProperty'");
-    var serialVersionUID11 = assertFieldExist(propertyTestNrProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID11, 26);
-    assertFieldType(serialVersionUID11, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(propertyTestNrProperty);
 
     assertEquals(0, propertyTestNrProperty.methods().stream().count(), "method count of 'PropertyTestNrProperty'");
 
@@ -281,9 +256,7 @@ public class FormPropertiesTest {
 
     // fields of SingleArrayPropertyProperty
     assertEquals(1, singleArrayPropertyProperty.fields().stream().count(), "field count of 'SingleArrayPropertyProperty'");
-    var serialVersionUID12 = assertFieldExist(singleArrayPropertyProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID12, 26);
-    assertFieldType(serialVersionUID12, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(singleArrayPropertyProperty);
 
     assertEquals(0, singleArrayPropertyProperty.methods().stream().count(), "method count of 'SingleArrayPropertyProperty'");
 
@@ -295,9 +268,7 @@ public class FormPropertiesTest {
 
     // fields of WizardsProperty
     assertEquals(1, wizardsProperty.fields().stream().count(), "field count of 'WizardsProperty'");
-    var serialVersionUID13 = assertFieldExist(wizardsProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID13, 26);
-    assertFieldType(serialVersionUID13, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(wizardsProperty);
 
     assertEquals(0, wizardsProperty.methods().stream().count(), "method count of 'WizardsProperty'");
 

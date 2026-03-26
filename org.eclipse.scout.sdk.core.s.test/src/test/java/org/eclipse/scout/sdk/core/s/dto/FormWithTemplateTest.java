@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.sdk.core.s.dto;
 
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldExist;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodExist;
@@ -20,6 +18,7 @@ import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createForm
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class FormWithTemplateTest {
@@ -39,9 +38,7 @@ public class FormWithTemplateTest {
 
     // fields of UsingTemplateFormData
     assertEquals(1, usingTemplateFormData.fields().stream().count(), "field count of 'UsingTemplateFormData'");
-    var serialVersionUID = assertFieldExist(usingTemplateFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
-    assertFieldType(serialVersionUID, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(usingTemplateFormData);
 
     assertEquals(4, usingTemplateFormData.methods().stream().count(), "method count of 'UsingTemplateFormData'");
     var getExternalGroupBox = assertMethodExist(usingTemplateFormData, "getExternalGroupBox");
@@ -61,9 +58,7 @@ public class FormWithTemplateTest {
 
     // fields of ExternalGroupBox
     assertEquals(1, externalGroupBox.fields().stream().count(), "field count of 'ExternalGroupBox'");
-    var serialVersionUID1 = assertFieldExist(externalGroupBox, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
-    assertFieldType(serialVersionUID1, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(externalGroupBox);
 
     assertEquals(0, externalGroupBox.methods().stream().count(), "method count of 'ExternalGroupBox'");
 
@@ -75,9 +70,7 @@ public class FormWithTemplateTest {
 
     // fields of InternalHtml
     assertEquals(1, internalHtml.fields().stream().count(), "field count of 'InternalHtml'");
-    var serialVersionUID2 = assertFieldExist(internalHtml, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, 26);
-    assertFieldType(serialVersionUID2, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(internalHtml);
 
     assertEquals(0, internalHtml.methods().stream().count(), "method count of 'InternalHtml'");
 
@@ -89,9 +82,7 @@ public class FormWithTemplateTest {
 
     // fields of TestCheckbox
     assertEquals(1, testCheckbox.fields().stream().count(), "field count of 'TestCheckbox'");
-    var serialVersionUID3 = assertFieldExist(testCheckbox, "serialVersionUID");
-    assertHasFlags(serialVersionUID3, 26);
-    assertFieldType(serialVersionUID3, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(testCheckbox);
 
     assertEquals(0, testCheckbox.methods().stream().count(), "method count of 'TestCheckbox'");
 
@@ -103,9 +94,7 @@ public class FormWithTemplateTest {
 
     // fields of TestLimitedString
     assertEquals(1, testLimitedString.fields().stream().count(), "field count of 'TestLimitedString'");
-    var serialVersionUID4 = assertFieldExist(testLimitedString, "serialVersionUID");
-    assertHasFlags(serialVersionUID4, 26);
-    assertFieldType(serialVersionUID4, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(testLimitedString);
 
     assertEquals(0, testLimitedString.methods().stream().count(), "method count of 'TestLimitedString'");
 

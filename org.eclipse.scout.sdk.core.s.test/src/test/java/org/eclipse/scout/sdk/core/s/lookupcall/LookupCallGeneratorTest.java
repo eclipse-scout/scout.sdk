@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.core.s.lookupcall;
 
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertEqualsRefFile;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertEqualsVersionedRefFile;
 
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator;
@@ -53,7 +54,7 @@ public class LookupCallGeneratorTest {
         .withKeyType(String.class.getName())
         .withLookupServiceInterface(createdLookupSvcIfc.name());
 
-    assertEqualsRefFile(env, REF_FILE_FOLDER + "LookupCall2.txt", lookupCallGenerator);
+    assertEqualsVersionedRefFile(env, REF_FILE_FOLDER, "LookupCall2.txt", lookupCallGenerator);
     assertNoCompileErrors(env, lookupCallGenerator);
   }
 }

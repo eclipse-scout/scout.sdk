@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.MetaValueType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -59,10 +60,7 @@ public class TableFieldExtensionTest {
 
     // fields of ExtensionToAbstractTableFieldTemplateData
     assertEquals(1, extensionToAbstractTableFieldTemplateData.fields().stream().count(), "field count of 'formdata.shared.extension.ExtensionToAbstractTableFieldTemplateData'");
-    var serialVersionUID = assertFieldExist(extensionToAbstractTableFieldTemplateData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(extensionToAbstractTableFieldTemplateData);
 
     assertEquals(0, extensionToAbstractTableFieldTemplateData.methods().stream().count(), "method count of 'formdata.shared.extension.ExtensionToAbstractTableFieldTemplateData'");
 
@@ -81,10 +79,7 @@ public class TableFieldExtensionTest {
     // fields of CustomAbstractAdvisorTableFieldTableExtensionRowData
     assertEquals(3, customAbstractAdvisorTableFieldTableExtensionRowData.fields().stream().count(),
         "field count of 'formdata.shared.extension.ExtensionToAbstractTableFieldTemplateData$CustomAbstractAdvisorTableFieldTableExtensionRowData'");
-    var serialVersionUID1 = assertFieldExist(customAbstractAdvisorTableFieldTableExtensionRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(customAbstractAdvisorTableFieldTableExtensionRowData);
     var added = assertFieldExist(customAbstractAdvisorTableFieldTableExtensionRowData, "added");
     assertHasFlags(added, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(added, "java.lang.String");
@@ -120,10 +115,7 @@ public class TableFieldExtensionTest {
 
     // fields of SimpleTableFormExtensionWithTableData
     assertEquals(1, simpleTableFormExtensionWithTableData.fields().stream().count(), "field count of 'formdata.shared.extension.SimpleTableFormExtensionWithTableData'");
-    var serialVersionUID = assertFieldExist(simpleTableFormExtensionWithTableData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(simpleTableFormExtensionWithTableData);
 
     assertEquals(0, simpleTableFormExtensionWithTableData.methods().stream().count(), "method count of 'formdata.shared.extension.SimpleTableFormExtensionWithTableData'");
 
@@ -141,10 +133,7 @@ public class TableFieldExtensionTest {
 
     // fields of TestTableFieldExtensionRowData
     assertEquals(3, testTableFieldExtensionRowData.fields().stream().count(), "field count of 'formdata.shared.extension.SimpleTableFormExtensionWithTableData$TestTableFieldExtensionRowData'");
-    var serialVersionUID1 = assertFieldExist(testTableFieldExtensionRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(testTableFieldExtensionRowData);
     var contributed = assertFieldExist(testTableFieldExtensionRowData, "contributed");
     assertHasFlags(contributed, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(contributed, "java.lang.String");

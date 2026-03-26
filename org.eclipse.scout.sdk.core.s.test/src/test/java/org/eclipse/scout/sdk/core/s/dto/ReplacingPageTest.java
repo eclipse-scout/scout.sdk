@@ -10,8 +10,6 @@
 package org.eclipse.scout.sdk.core.s.dto;
 
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertAnnotation;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldExist;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodExist;
@@ -23,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -50,10 +49,7 @@ public class ReplacingPageTest {
 
     // fields of ReplacingPageData
     assertEquals(1, replacingPageData.fields().stream().count(), "field count of 'formdata.shared.services.pages.ReplacingPageData'");
-    var serialVersionUID = assertFieldExist(replacingPageData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(replacingPageData);
 
     assertEquals(7, replacingPageData.methods().stream().count(), "method count of 'formdata.shared.services.pages.ReplacingPageData'");
     var addRow = assertMethodExist(replacingPageData, "addRow");
@@ -93,10 +89,7 @@ public class ReplacingPageTest {
 
     // fields of ReplacingRowData
     assertEquals(1, replacingRowData.fields().stream().count(), "field count of 'formdata.shared.services.pages.ReplacingPageData$ReplacingRowData'");
-    var serialVersionUID1 = assertFieldExist(replacingRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(replacingRowData);
 
     assertEquals(0, replacingRowData.methods().stream().count(), "method count of 'formdata.shared.services.pages.ReplacingPageData$ReplacingRowData'");
 

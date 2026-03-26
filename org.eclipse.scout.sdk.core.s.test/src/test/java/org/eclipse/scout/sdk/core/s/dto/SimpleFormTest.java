@@ -10,8 +10,6 @@
 package org.eclipse.scout.sdk.core.s.dto;
 
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertAnnotation;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldExist;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperInterfaces;
@@ -26,6 +24,7 @@ import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class SimpleFormTest {
@@ -52,10 +51,7 @@ public class SimpleFormTest {
 
     // fields of SimpleFormData
     assertEquals(1, simpleFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData'");
-    var serialVersionUID = assertFieldExist(simpleFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(simpleFormData);
 
     assertEquals(10, simpleFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData'");
     var getDate = assertMethodExist(simpleFormData, "getDate");
@@ -102,10 +98,7 @@ public class SimpleFormTest {
 
     // fields of Date
     assertEquals(1, date.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$Date'");
-    var serialVersionUID1 = assertFieldExist(date, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(date);
 
     assertEquals(0, date.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$Date'");
 
@@ -121,10 +114,7 @@ public class SimpleFormTest {
 
     // fields of Double
     assertEquals(1, double1.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$Double'");
-    var serialVersionUID2 = assertFieldExist(double1, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID2, "long");
-    assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(double1);
 
     assertEquals(0, double1.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$Double'");
 
@@ -140,10 +130,7 @@ public class SimpleFormTest {
 
     // fields of MultiTypeArgsBox
     assertEquals(1, multiTypeArgsBox.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$MultiTypeArgsBox'");
-    var serialVersionUID3 = assertFieldExist(multiTypeArgsBox, "serialVersionUID");
-    assertHasFlags(serialVersionUID3, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID3, "long");
-    assertEquals(0, serialVersionUID3.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(multiTypeArgsBox);
 
     assertEquals(0, multiTypeArgsBox.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$MultiTypeArgsBox'");
 
@@ -159,10 +146,7 @@ public class SimpleFormTest {
 
     // fields of SampleComposer
     assertEquals(1, sampleComposer.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SampleComposer'");
-    var serialVersionUID4 = assertFieldExist(sampleComposer, "serialVersionUID");
-    assertHasFlags(serialVersionUID4, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID4, "long");
-    assertEquals(0, serialVersionUID4.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sampleComposer);
 
     assertEquals(0, sampleComposer.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SampleComposer'");
 
@@ -178,10 +162,7 @@ public class SimpleFormTest {
 
     // fields of SampleDate
     assertEquals(1, sampleDate.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SampleDate'");
-    var serialVersionUID5 = assertFieldExist(sampleDate, "serialVersionUID");
-    assertHasFlags(serialVersionUID5, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID5, "long");
-    assertEquals(0, serialVersionUID5.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sampleDate);
 
     assertEquals(0, sampleDate.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SampleDate'");
 
@@ -197,10 +178,7 @@ public class SimpleFormTest {
 
     // fields of SampleSmart
     assertEquals(1, sampleSmart.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SampleSmart'");
-    var serialVersionUID6 = assertFieldExist(sampleSmart, "serialVersionUID");
-    assertHasFlags(serialVersionUID6, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID6, "long");
-    assertEquals(0, serialVersionUID6.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sampleSmart);
 
     assertEquals(0, sampleSmart.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SampleSmart'");
 
@@ -216,10 +194,7 @@ public class SimpleFormTest {
 
     // fields of SampleString
     assertEquals(1, sampleString.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SampleString'");
-    var serialVersionUID7 = assertFieldExist(sampleString, "serialVersionUID");
-    assertHasFlags(serialVersionUID7, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID7, "long");
-    assertEquals(0, serialVersionUID7.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(sampleString);
 
     assertEquals(0, sampleString.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SampleString'");
 
@@ -232,10 +207,7 @@ public class SimpleFormTest {
 
     // fields of SimpleNrProperty
     assertEquals(1, simpleNrProperty.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SimpleNrProperty'");
-    var serialVersionUID8 = assertFieldExist(simpleNrProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID8, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID8, "long");
-    assertEquals(0, serialVersionUID8.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(simpleNrProperty);
 
     assertEquals(0, simpleNrProperty.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SimpleNrProperty'");
 

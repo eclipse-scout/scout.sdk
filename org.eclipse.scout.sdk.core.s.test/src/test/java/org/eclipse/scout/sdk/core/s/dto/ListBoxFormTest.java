@@ -10,8 +10,6 @@
 package org.eclipse.scout.sdk.core.s.dto;
 
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertAnnotation;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldExist;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodExist;
@@ -23,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class ListBoxFormTest {
@@ -45,10 +44,7 @@ public class ListBoxFormTest {
 
     // fields of ListBoxFormData
     assertEquals(1, listBoxFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.ListBoxFormData'");
-    var serialVersionUID = assertFieldExist(listBoxFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(listBoxFormData);
 
     assertEquals(1, listBoxFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.ListBoxFormData'");
     var getListBox = assertMethodExist(listBoxFormData, "getListBox");
@@ -64,10 +60,7 @@ public class ListBoxFormTest {
 
     // fields of ListBox
     assertEquals(1, listBox.fields().stream().count(), "field count of 'formdata.shared.services.process.ListBoxFormData$ListBox'");
-    var serialVersionUID1 = assertFieldExist(listBox, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(listBox);
 
     assertEquals(0, listBox.methods().stream().count(), "method count of 'formdata.shared.services.process.ListBoxFormData$ListBox'");
 

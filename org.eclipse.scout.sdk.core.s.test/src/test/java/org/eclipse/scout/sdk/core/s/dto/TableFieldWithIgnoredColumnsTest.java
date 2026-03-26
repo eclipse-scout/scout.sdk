@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -70,10 +71,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableFieldWithIgnoredColumnsDefaultExFormData
     assertEquals(1, tableFieldWithIgnoredColumnsDefaultExFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultExFormData'");
-    var serialVersionUID = assertFieldExist(tableFieldWithIgnoredColumnsDefaultExFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldWithIgnoredColumnsDefaultExFormData);
 
     assertEquals(1, tableFieldWithIgnoredColumnsDefaultExFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultExFormData'");
     var getTableDefaultEx = assertMethodExist(tableFieldWithIgnoredColumnsDefaultExFormData, "getTableDefaultEx");
@@ -90,10 +88,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableDefaultEx
     assertEquals(1, tableDefaultEx.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultExFormData$TableDefaultEx'");
-    var serialVersionUID1 = assertFieldExist(tableDefaultEx, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableDefaultEx);
 
     assertEquals(7, tableDefaultEx.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultExFormData$TableDefaultEx'");
     var addRow = assertMethodExist(tableDefaultEx, "addRow");
@@ -133,10 +128,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableDefaultExRowData
     assertEquals(1, tableDefaultExRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultExFormData$TableDefaultEx$TableDefaultExRowData'");
-    var serialVersionUID2 = assertFieldExist(tableDefaultExRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID2, "long");
-    assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableDefaultExRowData);
 
     assertEquals(0, tableDefaultExRowData.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultExFormData$TableDefaultEx$TableDefaultExRowData'");
 
@@ -156,10 +148,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableFieldWithIgnoredColumnsBaseFormData
     assertEquals(1, tableFieldWithIgnoredColumnsBaseFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsBaseFormData'");
-    var serialVersionUID = assertFieldExist(tableFieldWithIgnoredColumnsBaseFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldWithIgnoredColumnsBaseFormData);
 
     assertEquals(1, tableFieldWithIgnoredColumnsBaseFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsBaseFormData'");
     var getTableBase = assertMethodExist(tableFieldWithIgnoredColumnsBaseFormData, "getTableBase");
@@ -175,10 +164,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableBase
     assertEquals(1, tableBase.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsBaseFormData$TableBase'");
-    var serialVersionUID1 = assertFieldExist(tableBase, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableBase);
 
     assertEquals(7, tableBase.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsBaseFormData$TableBase'");
     var addRow = assertMethodExist(tableBase, "addRow");
@@ -218,10 +204,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableBaseRowData
     assertEquals(5, tableBaseRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsBaseFormData$TableBase$TableBaseRowData'");
-    var serialVersionUID2 = assertFieldExist(tableBaseRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID2, "long");
-    assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableBaseRowData);
     var default_ = assertFieldExist(tableBaseRowData, "default_");
     assertHasFlags(default_, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(default_, "java.lang.String");
@@ -269,10 +252,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableFieldWithIgnoredColumnsIgnoreExFormData
     assertEquals(1, tableFieldWithIgnoredColumnsIgnoreExFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsIgnoreExFormData'");
-    var serialVersionUID = assertFieldExist(tableFieldWithIgnoredColumnsIgnoreExFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldWithIgnoredColumnsIgnoreExFormData);
 
     assertEquals(1, tableFieldWithIgnoredColumnsIgnoreExFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsIgnoreExFormData'");
     var getTableIgnoreEx = assertMethodExist(tableFieldWithIgnoredColumnsIgnoreExFormData, "getTableIgnoreEx");
@@ -289,10 +269,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableIgnoreEx
     assertEquals(1, tableIgnoreEx.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsIgnoreExFormData$TableIgnoreEx'");
-    var serialVersionUID1 = assertFieldExist(tableIgnoreEx, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableIgnoreEx);
 
     assertEquals(7, tableIgnoreEx.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsIgnoreExFormData$TableIgnoreEx'");
     var addRow = assertMethodExist(tableIgnoreEx, "addRow");
@@ -332,10 +309,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableIgnoreExRowData
     assertEquals(1, tableIgnoreExRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsIgnoreExFormData$TableIgnoreEx$TableIgnoreExRowData'");
-    var serialVersionUID2 = assertFieldExist(tableIgnoreExRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID2, "long");
-    assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableIgnoreExRowData);
 
     assertEquals(0, tableIgnoreExRowData.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsIgnoreExFormData$TableIgnoreEx$TableIgnoreExRowData'");
 
@@ -355,10 +329,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableFieldWithIgnoredColumnsDefaultCreateExFormData
     assertEquals(1, tableFieldWithIgnoredColumnsDefaultCreateExFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultCreateExFormData'");
-    var serialVersionUID = assertFieldExist(tableFieldWithIgnoredColumnsDefaultCreateExFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldWithIgnoredColumnsDefaultCreateExFormData);
 
     assertEquals(1, tableFieldWithIgnoredColumnsDefaultCreateExFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultCreateExFormData'");
     var getTableDefaultCreateEx = assertMethodExist(tableFieldWithIgnoredColumnsDefaultCreateExFormData, "getTableDefaultCreateEx");
@@ -375,10 +346,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableDefaultCreateEx
     assertEquals(1, tableDefaultCreateEx.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultCreateExFormData$TableDefaultCreateEx'");
-    var serialVersionUID1 = assertFieldExist(tableDefaultCreateEx, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableDefaultCreateEx);
 
     assertEquals(7, tableDefaultCreateEx.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultCreateExFormData$TableDefaultCreateEx'");
     var addRow = assertMethodExist(tableDefaultCreateEx, "addRow");
@@ -418,10 +386,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableDefaultCreateExRowData
     assertEquals(3, tableDefaultCreateExRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsDefaultCreateExFormData$TableDefaultCreateEx$TableDefaultCreateExRowData'");
-    var serialVersionUID2 = assertFieldExist(tableDefaultCreateExRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID2, "long");
-    assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableDefaultCreateExRowData);
     var ignoreDefaultCreate = assertFieldExist(tableDefaultCreateExRowData, "ignoreDefaultCreate");
     assertHasFlags(ignoreDefaultCreate, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(ignoreDefaultCreate, "java.lang.String");
@@ -455,10 +420,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableFieldWithIgnoredColumnsCreateExFormData
     assertEquals(1, tableFieldWithIgnoredColumnsCreateExFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsCreateExFormData'");
-    var serialVersionUID = assertFieldExist(tableFieldWithIgnoredColumnsCreateExFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldWithIgnoredColumnsCreateExFormData);
 
     assertEquals(1, tableFieldWithIgnoredColumnsCreateExFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsCreateExFormData'");
     var getTableCreateEx = assertMethodExist(tableFieldWithIgnoredColumnsCreateExFormData, "getTableCreateEx");
@@ -475,10 +437,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableCreateEx
     assertEquals(1, tableCreateEx.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsCreateExFormData$TableCreateEx'");
-    var serialVersionUID1 = assertFieldExist(tableCreateEx, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableCreateEx);
 
     assertEquals(7, tableCreateEx.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsCreateExFormData$TableCreateEx'");
     var addRow = assertMethodExist(tableCreateEx, "addRow");
@@ -518,10 +477,7 @@ public class TableFieldWithIgnoredColumnsTest {
 
     // fields of TableCreateExRowData
     assertEquals(3, tableCreateExRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TableFieldWithIgnoredColumnsCreateExFormData$TableCreateEx$TableCreateExRowData'");
-    var serialVersionUID2 = assertFieldExist(tableCreateExRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID2, "long");
-    assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableCreateExRowData);
     var ignoreCreate = assertFieldExist(tableCreateExRowData, "ignoreCreate");
     assertHasFlags(ignoreCreate, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(ignoreCreate, "java.lang.String");

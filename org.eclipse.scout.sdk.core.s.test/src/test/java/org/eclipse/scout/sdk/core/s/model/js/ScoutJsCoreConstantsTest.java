@@ -33,6 +33,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
 import org.eclipse.scout.sdk.core.java.JavaUtils;
@@ -45,9 +48,6 @@ import org.eclipse.scout.sdk.core.util.Resources;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
 
 @Tag("IntegrationTest")
 public class ScoutJsCoreConstantsTest {

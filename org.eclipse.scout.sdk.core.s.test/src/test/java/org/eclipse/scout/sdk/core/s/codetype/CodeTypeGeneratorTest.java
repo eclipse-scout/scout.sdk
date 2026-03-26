@@ -9,8 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.s.codetype;
 
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertEqualsRefFile;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertEqualsVersionedRefFile;
 
 import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Test;
 @ExtendWithJavaEnvironmentFactory(ScoutSharedJavaEnvironmentFactory.class)
 public class CodeTypeGeneratorTest {
 
+  private static final String REF_FILE_FOLDER = "org/eclipse/scout/sdk/core/s/generator/codetype/";
+
   @Test
   public void testCodeTypeAllParams(IJavaEnvironment env) {
     var ctg = new CodeTypeGenerator<>()
@@ -37,7 +39,7 @@ public class CodeTypeGeneratorTest {
         .withIdValueBuilder(b -> b.stringLiteral("id_value"))
         .withSuperClassFrom(IScoutApi.class, CodeTypeGeneratorTest::buildSuperClass);
 
-    assertEqualsRefFile(env, "org/eclipse/scout/sdk/core/s/generator/codetype/CodeTypeTest1.txt", ctg);
+    assertEqualsVersionedRefFile(env, REF_FILE_FOLDER, "CodeTypeTest1.txt", ctg);
     assertNoCompileErrors(env, ctg);
   }
 

@@ -10,11 +10,16 @@
 package org.eclipse.scout.sdk.core.s.testing;
 
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.versionedResourcesFolders;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
+import org.eclipse.scout.sdk.core.java.apidef.ISerialApi;
+import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.testing.SdkAssertions;
 
 public final class ScoutSdkAssertions {
@@ -28,14 +33,14 @@ public final class ScoutSdkAssertions {
    * api of the given {@link IJavaEnvironment}.
    *
    * @param env
-   *          The {@link IJavaEnvironment} in which the specified {@link ISourceGenerator} should be executed and the
-   *          api version is detected. Must not be {@code null}.
+   *     The {@link IJavaEnvironment} in which the specified {@link ISourceGenerator} should be executed and the
+   *     api version is detected. Must not be {@code null}.
    * @param versionedPath
-   *          The absolute path on where the versioned resource folders can be found.
+   *     The absolute path on where the versioned resource folders can be found.
    * @param fileName
-   *          The name of the file inside the versioned resource folder.
+   *     The name of the file inside the versioned resource folder.
    * @param generator
-   *          The {@link ISourceGenerator} to use. Must not be {@code null}.
+   *     The {@link ISourceGenerator} to use. Must not be {@code null}.
    */
   public static void assertEqualsVersionedRefFile(IJavaEnvironment env, String versionedPath, String fileName, ISourceGenerator<ISourceBuilder<?>> generator) {
     SdkJavaAssertions.assertEqualsRefFile(env, versionedResourcesFolders(versionedPath, env).findFirst().orElseThrow() + fileName, generator);
@@ -47,15 +52,31 @@ public final class ScoutSdkAssertions {
    * {@link IJavaEnvironment}.
    *
    * @param env
-   *          The {@link IJavaEnvironment} in which the api version is detected. Must not be {@code null}.
+   *     The {@link IJavaEnvironment} in which the api version is detected. Must not be {@code null}.
    * @param versionedPath
-   *          The absolute path on where the versioned resource folders can be found.
+   *     The absolute path on where the versioned resource folders can be found.
    * @param fileName
-   *          The name of the file inside the versioned resource folder.
+   *     The name of the file inside the versioned resource folder.
    * @param actualContent
-   *          The actual content to compare against.
+   *     The actual content to compare against.
    */
   public static void assertEqualsVersionedRefFile(IJavaEnvironment env, String versionedPath, String fileName, CharSequence actualContent) {
     SdkAssertions.assertEqualsRefFile(versionedResourcesFolders(versionedPath, env).findFirst().orElseThrow() + fileName, actualContent);
+  }
+
+  /**
+   * Asserts that the given type contains a {@code serialVersionUID} field.
+   */
+  public static void assertSerialVersionUidField(IType type) {
+    var serialVersionUID = SdkJavaAssertions.assertFieldExist(type, "serialVersionUID");
+    SdkJavaAssertions.assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
+    SdkJavaAssertions.assertFieldType(serialVersionUID, "long");
+    if (serialVersionUID.javaEnvironment().requireApi(IScoutApi.class).api(ISerialApi.class).map(ISerialApi::isSerialAnnotationEnabled).orElse(false)) {
+      assertEquals(1, serialVersionUID.annotations().stream().count(), "annotation count");
+      SdkJavaAssertions.assertAnnotation(serialVersionUID, "java.io.Serial");
+    }
+    else {
+      assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    }
   }
 }

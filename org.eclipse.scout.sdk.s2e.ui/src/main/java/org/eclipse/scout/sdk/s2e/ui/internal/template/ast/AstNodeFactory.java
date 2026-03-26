@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.sdk.s2e.ui.internal.template.ast;
 
+import java.io.Serial;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -39,7 +40,8 @@ import org.eclipse.jdt.internal.corext.codemanipulation.ContextSensitiveImportRe
 import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
 import org.eclipse.jdt.ui.CodeStyleConfiguration;
 import org.eclipse.scout.sdk.core.java.JavaTypes;
-import org.eclipse.scout.sdk.core.java.generator.field.FieldGenerator;
+import org.eclipse.scout.sdk.core.java.apidef.ISerialApi;
+import org.eclipse.scout.sdk.core.java.generator.field.SerialVersionUidFieldGenerator;
 import org.eclipse.scout.sdk.core.s.classid.ClassIds;
 import org.eclipse.scout.sdk.core.s.java.annotation.FormDataAnnotation.SdkCommand;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
@@ -369,7 +371,7 @@ public class AstNodeFactory {
     var sdkCommand = getAst().newMemberValuePair();
     sdkCommand.setName(getAst().newSimpleName(getScoutApi().FormData().sdkCommandElementName()));
     sdkCommand.setValue(getAst().newQualifiedName(getAst().newQualifiedName(getAst().newSimpleName(formDataRef),
-        getAst().newSimpleName(SdkCommand.class.getSimpleName())),
+            getAst().newSimpleName(SdkCommand.class.getSimpleName())),
         getAst().newSimpleName(SdkCommand.IGNORE.toString())));
 
     formData.values().add(sdkCommand);
@@ -434,8 +436,8 @@ public class AstNodeFactory {
    * </ul>
    *
    * @param elementsToCombine
-   *          Elements to pass to the combineKeyStrokes method. Elements with length=1 are considered to be string
-   *          literals, all other elements are inserted as references to IKeyStroke
+   *     Elements to pass to the combineKeyStrokes method. Elements with length=1 are considered to be string
+   *     literals, all other elements are inserted as references to IKeyStroke
    * @return The created {@link MethodInvocation}
    */
   @SuppressWarnings("unchecked")
@@ -527,7 +529,7 @@ public class AstNodeFactory {
   public FieldDeclaration newSerialVersionUid() {
     var ast = getAst();
     var fragment = ast.newVariableDeclarationFragment();
-    fragment.setName(ast.newSimpleName(FieldGenerator.SERIAL_VERSION_UID));
+    fragment.setName(ast.newSimpleName(SerialVersionUidFieldGenerator.SERIAL_VERSION_UID));
     fragment.setInitializer(ast.newNumberLiteral("1L"));
 
     var declaration = ast.newFieldDeclaration(fragment);
@@ -535,7 +537,17 @@ public class AstNodeFactory {
     declaration.modifiers().add(ast.newModifier(ModifierKeyword.PRIVATE_KEYWORD));
     declaration.modifiers().add(ast.newModifier(ModifierKeyword.STATIC_KEYWORD));
     declaration.modifiers().add(ast.newModifier(ModifierKeyword.FINAL_KEYWORD));
+    if (getScoutApi().api(ISerialApi.class).map(ISerialApi::isSerialAnnotationEnabled).orElse(false)) {
+      AstUtils.addAnnotationTo(newSerialAnnotation(), declaration);
+    }
     return declaration;
+  }
+
+  public MarkerAnnotation newSerialAnnotation() {
+    var serialRef = getImportRewrite().addImport(Serial.class.getName(), getContext());
+    var marker = getAst().newMarkerAnnotation();
+    marker.setTypeName(getAst().newName(serialRef));
+    return marker;
   }
 
   public MarkerAnnotation newOverrideAnnotation() {
