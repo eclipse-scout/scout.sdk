@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.sdk.core.s.dto;
 
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldExist;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodExist;
@@ -20,6 +18,7 @@ import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createForm
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class IgnoredFieldsFormTest {
@@ -39,9 +38,7 @@ public class IgnoredFieldsFormTest {
 
     // fields of IgnoredFieldsFormData
     assertEquals(1, ignoredFieldsFormData.fields().stream().count(), "field count of 'IgnoredFieldsFormData'");
-    var serialVersionUID = assertFieldExist(ignoredFieldsFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
-    assertFieldType(serialVersionUID, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(ignoredFieldsFormData);
 
     assertEquals(1, ignoredFieldsFormData.methods().stream().count(), "method count of 'IgnoredFieldsFormData'");
     var getNotIgnored = assertMethodExist(ignoredFieldsFormData, "getNotIgnored");
@@ -55,9 +52,7 @@ public class IgnoredFieldsFormTest {
 
     // fields of NotIgnored
     assertEquals(1, notIgnored.fields().stream().count(), "field count of 'NotIgnored'");
-    var serialVersionUID1 = assertFieldExist(notIgnored, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
-    assertFieldType(serialVersionUID1, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(notIgnored);
 
     assertEquals(0, notIgnored.methods().stream().count(), "method count of 'NotIgnored'");
 

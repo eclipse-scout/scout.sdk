@@ -9,14 +9,13 @@
  */
 package org.eclipse.scout.sdk.core.s.dto;
 
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldExist;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class ExternalCheckboxFieldTest {
@@ -36,9 +35,7 @@ public class ExternalCheckboxFieldTest {
 
     // fields of AbstractTestCheckboxFieldData
     assertEquals(1, abstractTestCheckboxFieldData.fields().stream().count(), "field count of 'AbstractTestCheckboxFieldData'");
-    var serialVersionUID = assertFieldExist(abstractTestCheckboxFieldData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
-    assertFieldType(serialVersionUID, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(abstractTestCheckboxFieldData);
 
     assertEquals(0, abstractTestCheckboxFieldData.methods().stream().count(), "method count of 'AbstractTestCheckboxFieldData'");
 

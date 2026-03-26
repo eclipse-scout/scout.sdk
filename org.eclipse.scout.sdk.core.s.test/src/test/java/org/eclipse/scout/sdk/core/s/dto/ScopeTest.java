@@ -10,8 +10,6 @@
 package org.eclipse.scout.sdk.core.s.dto;
 
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertAnnotation;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldExist;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodExist;
@@ -23,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -57,10 +56,7 @@ public class ScopeTest {
 
     // fields of AbstractScopeTestGroupBoxData
     assertEquals(1, abstractScopeTestGroupBoxData.fields().stream().count(), "field count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData'");
-    var serialVersionUID = assertFieldExist(abstractScopeTestGroupBoxData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(abstractScopeTestGroupBoxData);
 
     assertEquals(1, abstractScopeTestGroupBoxData.methods().stream().count(), "method count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData'");
     var getProcess = assertMethodExist(abstractScopeTestGroupBoxData, "getProcess");
@@ -76,10 +72,7 @@ public class ScopeTest {
 
     // fields of Process
     assertEquals(1, process.fields().stream().count(), "field count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData$Process'");
-    var serialVersionUID1 = assertFieldExist(process, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(process);
 
     assertEquals(0, process.methods().stream().count(), "method count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData$Process'");
 
@@ -99,10 +92,7 @@ public class ScopeTest {
 
     // fields of ScopeTestFormData
     assertEquals(1, scopeTestFormData.fields().stream().count(), "field count of 'formdata.shared.scope.orig.ScopeTestFormData'");
-    var serialVersionUID = assertFieldExist(scopeTestFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(scopeTestFormData);
 
     assertEquals(1, scopeTestFormData.methods().stream().count(), "method count of 'formdata.shared.scope.orig.ScopeTestFormData'");
     var getProcessesBox = assertMethodExist(scopeTestFormData, "getProcessesBox");
@@ -118,10 +108,7 @@ public class ScopeTest {
 
     // fields of ProcessesBox
     assertEquals(1, processesBox.fields().stream().count(), "field count of 'formdata.shared.scope.orig.ScopeTestFormData$ProcessesBox'");
-    var serialVersionUID1 = assertFieldExist(processesBox, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(processesBox);
 
     assertEquals(0, processesBox.methods().stream().count(), "method count of 'formdata.shared.scope.orig.ScopeTestFormData$ProcessesBox'");
 
@@ -142,10 +129,7 @@ public class ScopeTest {
 
     // fields of ExtendedScopeTestFormData
     assertEquals(1, extendedScopeTestFormData.fields().stream().count(), "field count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData'");
-    var serialVersionUID = assertFieldExist(extendedScopeTestFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(extendedScopeTestFormData);
 
     assertEquals(2, extendedScopeTestFormData.methods().stream().count(), "method count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData'");
     var getAnliegenBox = assertMethodExist(extendedScopeTestFormData, "getAnliegenBox");
@@ -165,10 +149,7 @@ public class ScopeTest {
 
     // fields of AnliegenBox
     assertEquals(1, anliegenBox.fields().stream().count(), "field count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData$AnliegenBox'");
-    var serialVersionUID1 = assertFieldExist(anliegenBox, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(anliegenBox);
 
     assertEquals(0, anliegenBox.methods().stream().count(), "method count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData$AnliegenBox'");
 
@@ -182,10 +163,7 @@ public class ScopeTest {
 
     // fields of ExtendedProcess
     assertEquals(1, extendedProcess.fields().stream().count(), "field count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData$ExtendedProcess'");
-    var serialVersionUID2 = assertFieldExist(extendedProcess, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID2, "long");
-    assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(extendedProcess);
 
     assertEquals(0, extendedProcess.methods().stream().count(), "method count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData$ExtendedProcess'");
 

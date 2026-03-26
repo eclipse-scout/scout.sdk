@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class ExternalTableFieldTest {
@@ -45,10 +46,7 @@ public class ExternalTableFieldTest {
 
     // fields of AbstractCompanyTableFieldData
     assertEquals(1, abstractCompanyTableFieldData.fields().stream().count(), "field count of 'formdata.shared.services.process.AbstractCompanyTableFieldData'");
-    var serialVersionUID = assertFieldExist(abstractCompanyTableFieldData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(abstractCompanyTableFieldData);
 
     assertEquals(7, abstractCompanyTableFieldData.methods().stream().count(), "method count of 'formdata.shared.services.process.AbstractCompanyTableFieldData'");
     var addRow = assertMethodExist(abstractCompanyTableFieldData, "addRow");
@@ -88,10 +86,7 @@ public class ExternalTableFieldTest {
 
     // fields of AbstractCompanyTableRowData
     assertEquals(3, abstractCompanyTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData'");
-    var serialVersionUID1 = assertFieldExist(abstractCompanyTableRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(abstractCompanyTableRowData);
     var name = assertFieldExist(abstractCompanyTableRowData, "name");
     assertHasFlags(name, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(name, "java.lang.String");

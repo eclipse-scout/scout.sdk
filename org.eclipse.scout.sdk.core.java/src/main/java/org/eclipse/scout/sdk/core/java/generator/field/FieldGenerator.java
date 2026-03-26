@@ -16,7 +16,6 @@ import java.util.function.Function;
 
 import org.eclipse.scout.sdk.core.builder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
-import org.eclipse.scout.sdk.core.java.JavaTypes;
 import org.eclipse.scout.sdk.core.java.apidef.ApiFunction;
 import org.eclipse.scout.sdk.core.java.apidef.IApiSpecification;
 import org.eclipse.scout.sdk.core.java.builder.IJavaBuilderContext;
@@ -45,7 +44,6 @@ import org.eclipse.scout.sdk.core.util.Strings;
  */
 public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends AbstractMemberGenerator<TYPE> implements IFieldGenerator<TYPE> {
 
-  public static final String SERIAL_VERSION_UID = "serialVersionUID";
   private JavaBuilderContextFunction<String> m_dataType;
   private ISourceGenerator<IExpressionBuilder<?>> m_valueGenerator;
 
@@ -76,13 +74,13 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
    * <b>Example:</b> See {@link IWorkingCopyTransformer}.
    *
    * @param field
-   *          The {@link IField} that should be converted to an {@link IFieldGenerator}. Must not be {@code null}.
+   *     The {@link IField} that should be converted to an {@link IFieldGenerator}. Must not be {@code null}.
    * @param transformer
-   *          An optional {@link IWorkingCopyTransformer} callback that is responsible for transforming the field to a
-   *          working copy. May be {@code null} if no custom transformation is required and the field should be
-   *          converted into a working copy without any modification.
+   *     An optional {@link IWorkingCopyTransformer} callback that is responsible for transforming the field to a
+   *     working copy. May be {@code null} if no custom transformation is required and the field should be
+   *     converted into a working copy without any modification.
    * @return A new {@link IFieldGenerator} initialized to generate source that is structurally similar to the one from
-   *         the given {@link IField}.
+   * the given {@link IField}.
    * @see DefaultWorkingCopyTransformer
    * @see SimpleWorkingCopyTransformerBuilder
    */
@@ -98,13 +96,7 @@ public class FieldGenerator<TYPE extends IFieldGenerator<TYPE>> extends Abstract
   }
 
   public static IFieldGenerator<?> createSerialVersionUid(long value) {
-    return create()
-        .withElementName(SERIAL_VERSION_UID)
-        .withDataType(JavaTypes._long)
-        .asPrivate()
-        .asStatic()
-        .asFinal()
-        .withValue(ISourceGenerator.raw(value + "L"));
+    return new SerialVersionUidFieldGenerator(value);
   }
 
   @Override

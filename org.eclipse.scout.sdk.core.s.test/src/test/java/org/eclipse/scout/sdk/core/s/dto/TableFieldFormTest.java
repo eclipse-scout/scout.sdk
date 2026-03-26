@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class TableFieldFormTest {
@@ -45,10 +46,7 @@ public class TableFieldFormTest {
 
     // fields of TableFieldFormData
     assertEquals(1, tableFieldFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData'");
-    var serialVersionUID = assertFieldExist(tableFieldFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldFormData);
 
     assertEquals(4, tableFieldFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData'");
     var getCompanyTable = assertMethodExist(tableFieldFormData, "getCompanyTable");
@@ -73,10 +71,7 @@ public class TableFieldFormTest {
 
     // fields of CompanyTable
     assertEquals(1, companyTable.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable'");
-    var serialVersionUID1 = assertFieldExist(companyTable, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(companyTable);
 
     assertEquals(7, companyTable.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable'");
     var addRow = assertMethodExist(companyTable, "addRow");
@@ -116,10 +111,7 @@ public class TableFieldFormTest {
 
     // fields of CompanyTableRowData
     assertEquals(1, companyTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData'");
-    var serialVersionUID2 = assertFieldExist(companyTableRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID2, "long");
-    assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(companyTableRowData);
 
     assertEquals(0, companyTableRowData.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData'");
 
@@ -132,10 +124,7 @@ public class TableFieldFormTest {
 
     // fields of ConcreteTable
     assertEquals(1, concreteTable.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable'");
-    var serialVersionUID3 = assertFieldExist(concreteTable, "serialVersionUID");
-    assertHasFlags(serialVersionUID3, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID3, "long");
-    assertEquals(0, serialVersionUID3.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(concreteTable);
 
     assertEquals(7, concreteTable.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable'");
     var addRow2 = assertMethodExist(concreteTable, "addRow");
@@ -175,10 +164,7 @@ public class TableFieldFormTest {
 
     // fields of ConcreteTableRowData
     assertEquals(5, concreteTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable$ConcreteTableRowData'");
-    var serialVersionUID4 = assertFieldExist(concreteTableRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID4, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID4, "long");
-    assertEquals(0, serialVersionUID4.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(concreteTableRowData);
     var name = assertFieldExist(concreteTableRowData, "name");
     assertHasFlags(name, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(name, "java.lang.String");
@@ -219,10 +205,7 @@ public class TableFieldFormTest {
 
     // fields of PersonTable
     assertEquals(1, personTable.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$PersonTable'");
-    var serialVersionUID5 = assertFieldExist(personTable, "serialVersionUID");
-    assertHasFlags(serialVersionUID5, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID5, "long");
-    assertEquals(0, serialVersionUID5.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(personTable);
 
     assertEquals(7, personTable.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$PersonTable'");
     var addRow4 = assertMethodExist(personTable, "addRow");
@@ -262,10 +245,7 @@ public class TableFieldFormTest {
 
     // fields of PersonTableRowData
     assertEquals(11, personTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$PersonTable$PersonTableRowData'");
-    var serialVersionUID6 = assertFieldExist(personTableRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID6, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID6, "long");
-    assertEquals(0, serialVersionUID6.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(personTableRowData);
     var personNr = assertFieldExist(personTableRowData, "personNr");
     assertHasFlags(personNr, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(personNr, "java.lang.String");
@@ -348,10 +328,7 @@ public class TableFieldFormTest {
 
     // fields of TableFieldWithExternalTable
     assertEquals(1, tableFieldWithExternalTable.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable'");
-    var serialVersionUID7 = assertFieldExist(tableFieldWithExternalTable, "serialVersionUID");
-    assertHasFlags(serialVersionUID7, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID7, "long");
-    assertEquals(0, serialVersionUID7.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldWithExternalTable);
 
     assertEquals(7, tableFieldWithExternalTable.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable'");
     var addRow6 = assertMethodExist(tableFieldWithExternalTable, "addRow");
@@ -391,10 +368,7 @@ public class TableFieldFormTest {
 
     // fields of TableFieldWithExternalTableRowData
     assertEquals(7, tableFieldWithExternalTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable$TableFieldWithExternalTableRowData'");
-    var serialVersionUID8 = assertFieldExist(tableFieldWithExternalTableRowData, "serialVersionUID");
-    assertHasFlags(serialVersionUID8, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID8, "long");
-    assertEquals(0, serialVersionUID8.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldWithExternalTableRowData);
     var aa = assertFieldExist(tableFieldWithExternalTableRowData, "aa");
     assertHasFlags(aa, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(aa, "java.lang.String");

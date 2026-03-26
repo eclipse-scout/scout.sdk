@@ -11,8 +11,8 @@ package org.eclipse.scout.sdk.doc;
 
 import org.eclipse.scout.sdk.core.generator.ISourceGenerator;
 import org.eclipse.scout.sdk.core.java.ecj.JavaEnvironmentFactories.EmptyJavaEnvironmentFactory;
-import org.eclipse.scout.sdk.core.java.generator.field.FieldGenerator;
 import org.eclipse.scout.sdk.core.java.generator.field.IFieldGenerator;
+import org.eclipse.scout.sdk.core.java.generator.field.SerialVersionUidFieldGenerator;
 import org.eclipse.scout.sdk.core.java.generator.method.IMethodGenerator;
 import org.eclipse.scout.sdk.core.java.generator.method.MethodOverrideGenerator;
 import org.eclipse.scout.sdk.core.java.generator.type.PrimaryTypeGenerator;
@@ -50,7 +50,7 @@ public class WorkingCopyTransformerSample {
 
   protected IFieldGenerator<?> transformFields(ITransformInput<IField, IFieldGenerator<?>> input) {
     var defaultGenerator = input.requestDefaultWorkingCopy(); // <4>
-    if (FieldGenerator.SERIAL_VERSION_UID.equals(defaultGenerator.elementName().orElse(""))) {
+    if (SerialVersionUidFieldGenerator.SERIAL_VERSION_UID.equals(defaultGenerator.elementName().orElse(""))) {
       // modify value of serialVersionUID field
       defaultGenerator.withValue(ISourceGenerator.raw("42L")); // <5>
     }

@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.sdk.core.s.dto;
 
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldExist;
-import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertFieldType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodExist;
@@ -20,6 +18,7 @@ import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createForm
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -43,9 +42,7 @@ public class MasterFieldFormDataTest {
 
     // fields of MasterFieldTestFormData
     assertEquals(1, masterFieldTestFormData.fields().stream().count(), "field count of 'MasterFieldTestFormData'");
-    var serialVersionUID = assertFieldExist(masterFieldTestFormData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, 26);
-    assertFieldType(serialVersionUID, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(masterFieldTestFormData);
 
     assertEquals(2, masterFieldTestFormData.methods().stream().count(), "method count of 'MasterFieldTestFormData'");
     var getMyMaster = assertMethodExist(masterFieldTestFormData, "getMyMaster");
@@ -61,9 +58,7 @@ public class MasterFieldFormDataTest {
 
     // fields of MyMaster
     assertEquals(1, myMaster.fields().stream().count(), "field count of 'MyMaster'");
-    var serialVersionUID1 = assertFieldExist(myMaster, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, 26);
-    assertFieldType(serialVersionUID1, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(myMaster);
 
     assertEquals(0, myMaster.methods().stream().count(), "method count of 'MyMaster'");
 
@@ -75,9 +70,7 @@ public class MasterFieldFormDataTest {
 
     // fields of MySlave
     assertEquals(1, mySlave.fields().stream().count(), "field count of 'MySlave'");
-    var serialVersionUID2 = assertFieldExist(mySlave, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, 26);
-    assertFieldType(serialVersionUID2, "long");
+    ScoutSdkAssertions.assertSerialVersionUidField(mySlave);
 
     assertEquals(0, mySlave.methods().stream().count(), "method count of 'MySlave'");
 

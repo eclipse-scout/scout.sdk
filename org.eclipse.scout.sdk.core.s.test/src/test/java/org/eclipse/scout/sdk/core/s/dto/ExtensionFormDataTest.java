@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.annotation.ExtendsAnnotation;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -81,10 +82,7 @@ public class ExtensionFormDataTest {
 
     // fields of SimpleTableFormExtensionData
     assertEquals(3, simpleTableFormExtensionData.fields().stream().count(), "field count of 'formdata.shared.extension.SimpleTableFormExtensionData'");
-    var serialVersionUID = assertFieldExist(simpleTableFormExtensionData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(simpleTableFormExtensionData);
     var myExtension = assertFieldExist(simpleTableFormExtensionData, "myExtension");
     assertHasFlags(myExtension, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(myExtension, "java.lang.String");
@@ -120,10 +118,7 @@ public class ExtensionFormDataTest {
 
     // fields of MultiColumnExtensionData
     assertEquals(5, multiColumnExtensionData.fields().stream().count(), "field count of 'formdata.shared.extension.MultiColumnExtensionData'");
-    var serialVersionUID = assertFieldExist(multiColumnExtensionData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(multiColumnExtensionData);
     var thirdLong = assertFieldExist(multiColumnExtensionData, "thirdLong");
     assertHasFlags(thirdLong, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(thirdLong, "java.lang.String");
@@ -172,10 +167,7 @@ public class ExtensionFormDataTest {
 
     // fields of PropertyExtensionData
     assertEquals(1, propertyExtensionData.fields().stream().count(), "field count of 'formdata.shared.extension.PropertyExtensionData'");
-    var serialVersionUID = assertFieldExist(propertyExtensionData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(propertyExtensionData);
 
     assertEquals(3, propertyExtensionData.methods().stream().count(), "method count of 'formdata.shared.extension.PropertyExtensionData'");
     var getLongValue = assertMethodExist(propertyExtensionData, "getLongValue");
@@ -197,10 +189,7 @@ public class ExtensionFormDataTest {
 
     // fields of LongValueProperty
     assertEquals(1, longValueProperty.fields().stream().count(), "field count of 'formdata.shared.extension.PropertyExtensionData$LongValueProperty'");
-    var serialVersionUID1 = assertFieldExist(longValueProperty, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(longValueProperty);
 
     assertEquals(0, longValueProperty.methods().stream().count(), "method count of 'formdata.shared.extension.PropertyExtensionData$LongValueProperty'");
 
@@ -222,10 +211,7 @@ public class ExtensionFormDataTest {
 
     // fields of ThirdIntegerColumnData
     assertEquals(3, thirdIntegerColumnData.fields().stream().count(), "field count of 'formdata.shared.extension.ThirdIntegerColumnData'");
-    var serialVersionUID = assertFieldExist(thirdIntegerColumnData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(thirdIntegerColumnData);
     var thirdInteger = assertFieldExist(thirdIntegerColumnData, "thirdInteger");
     assertHasFlags(thirdInteger, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(thirdInteger, "java.lang.String");
@@ -260,10 +246,7 @@ public class ExtensionFormDataTest {
 
     // fields of MultipleExtGroupBoxExtensionData
     assertEquals(1, multipleExtGroupBoxExtensionData.fields().stream().count(), "field count of 'formdata.shared.extension.MultipleExtGroupBoxExtensionData'");
-    var serialVersionUID = assertFieldExist(multipleExtGroupBoxExtensionData, "serialVersionUID");
-    assertHasFlags(serialVersionUID, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID, "long");
-    assertEquals(0, serialVersionUID.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(multipleExtGroupBoxExtensionData);
 
     assertEquals(2, multipleExtGroupBoxExtensionData.methods().stream().count(), "method count of 'formdata.shared.extension.MultipleExtGroupBoxExtensionData'");
     var getSecondDouble = assertMethodExist(multipleExtGroupBoxExtensionData, "getSecondDouble");
@@ -282,10 +265,7 @@ public class ExtensionFormDataTest {
 
     // fields of SecondDouble
     assertEquals(1, secondDouble.fields().stream().count(), "field count of 'formdata.shared.extension.MultipleExtGroupBoxExtensionData$SecondDouble'");
-    var serialVersionUID1 = assertFieldExist(secondDouble, "serialVersionUID");
-    assertHasFlags(serialVersionUID1, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID1, "long");
-    assertEquals(0, serialVersionUID1.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(secondDouble);
 
     assertEquals(0, secondDouble.methods().stream().count(), "method count of 'formdata.shared.extension.MultipleExtGroupBoxExtensionData$SecondDouble'");
 
@@ -298,10 +278,7 @@ public class ExtensionFormDataTest {
 
     // fields of ThirdDate
     assertEquals(1, thirdDate.fields().stream().count(), "field count of 'formdata.shared.extension.MultipleExtGroupBoxExtensionData$ThirdDate'");
-    var serialVersionUID2 = assertFieldExist(thirdDate, "serialVersionUID");
-    assertHasFlags(serialVersionUID2, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    assertFieldType(serialVersionUID2, "long");
-    assertEquals(0, serialVersionUID2.annotations().stream().count(), "annotation count");
+    ScoutSdkAssertions.assertSerialVersionUidField(thirdDate);
 
     assertEquals(0, thirdDate.methods().stream().count(), "method count of 'formdata.shared.extension.MultipleExtGroupBoxExtensionData$ThirdDate'");
 

@@ -1,4 +1,7 @@
 public static class ${dollar}name${dollar}Code extends ${dollar}super${dollar}<${dollar}declaringTypeArg(${ICodeType}, ${ICodeType_codeIdTypeParamIndex}, box)${dollar}> {
+  #if( $serialAnnotationEnabled )
+  @java.io.Serial
+  #end
   private static final long serialVersionUID = 1L;
   public static final ${dollar}declaringTypeArg(${ICodeType}, ${ICodeType_codeIdTypeParamIndex}, unbox)${dollar} ID = ${dollar}declaringTypeArg(${ICodeType}, ${ICodeType_codeIdTypeParamIndex}, default)${dollar};
 

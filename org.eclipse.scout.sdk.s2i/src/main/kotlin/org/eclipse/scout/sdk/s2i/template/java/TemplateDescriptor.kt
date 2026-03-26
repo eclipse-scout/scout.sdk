@@ -32,6 +32,7 @@ class TemplateDescriptor(val id: String, private val m_resourceLoader: ClassLoad
 
         const val PREDEFINED_CONSTANT_IN_EXTENSION = "inExtension"
         const val PREDEFINED_CONSTANT_MENU_SUPPORTED = "menuSupported"
+        const val PREDEFINED_CONSTANT_SERIAL_ANNOTATION_ENABLED = "serialAnnotationEnabled"
     }
 
     private var m_name: String? = null

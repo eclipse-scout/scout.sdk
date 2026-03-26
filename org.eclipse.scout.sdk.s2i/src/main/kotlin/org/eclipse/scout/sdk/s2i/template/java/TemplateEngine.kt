@@ -14,6 +14,7 @@ import com.intellij.psi.PsiClass
 import org.eclipse.scout.sdk.core.java.JavaTypes
 import org.eclipse.scout.sdk.core.java.JavaUtils
 import org.eclipse.scout.sdk.core.java.apidef.Api
+import org.eclipse.scout.sdk.core.java.apidef.ISerialApi
 import org.eclipse.scout.sdk.core.s.classid.ClassIds
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
 import org.eclipse.scout.sdk.core.s.uniqueid.UniqueIds
@@ -54,6 +55,7 @@ class TemplateEngine(val templateDescriptor: TemplateDescriptor, val context: Te
             .withProperties(buildScoutRtConstants())
             .withProperty(TemplateDescriptor.PREDEFINED_CONSTANT_IN_EXTENSION, context.declaringClass.isInstanceOf(context.scoutApi.IExtension()))
             .withProperty(TemplateDescriptor.PREDEFINED_CONSTANT_MENU_SUPPORTED, menuTypes.isNotEmpty())
+            .withProperty(TemplateDescriptor.PREDEFINED_CONSTANT_SERIAL_ANNOTATION_ENABLED, context.scoutApi.api(ISerialApi::class.java).map { it.isSerialAnnotationEnabled }.orElse(false))
             .withPostProcessor(DECLARING_TYPE_ARG_REGEX, this::resolveDeclaringTypeArgument)
             .withPostProcessor(UNIQUE_ID_REGEX) { UniqueIds.next(it.group(1)) }
             .withPostProcessor(ENCLOSING_INSTANCE_FQN_REGEX, this::resolveEnclosingInstanceFqn)
