@@ -396,19 +396,9 @@ public interface IScoutInterfaceApi {
   interface ISequenceBox extends ITypeNameSupplier {
   }
 
-  IServerSession IServerSession();
-
-  interface IServerSession extends ITypeNameSupplier {
-  }
-
   IService IService();
 
   interface IService extends ITypeNameSupplier {
-  }
-
-  ISession ISession();
-
-  interface ISession extends ITypeNameSupplier {
   }
 
   ISmartField ISmartField();

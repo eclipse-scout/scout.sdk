@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.core.util.Strings;
 
 @MaxApiLevel(10)
 @SuppressWarnings({"squid:S2176", "squid:S00118", "squid:S00100", "findbugs:NM_METHOD_NAMING_CONVENTION", "squid:S2166"}) // naming conventions
-public interface Scout10Api extends IScoutApi {
+public interface Scout10Api extends IScoutApi, IScoutSessionApi {
 
   @Override
   default String ecjVersion() {
@@ -373,14 +373,14 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IScoutAnnotationApi.RunWithServerSession RUN_WITH_SERVER_SESSION_ANNOTATION = new RunWithServerSession();
+  IScoutSessionApi.RunWithServerSession RUN_WITH_SERVER_SESSION_ANNOTATION = new RunWithServerSession();
 
   @Override
-  default IScoutAnnotationApi.RunWithServerSession RunWithServerSession() {
+  default IScoutSessionApi.RunWithServerSession RunWithServerSession() {
     return RUN_WITH_SERVER_SESSION_ANNOTATION;
   }
 
-  class RunWithServerSession implements IScoutAnnotationApi.RunWithServerSession {
+  class RunWithServerSession implements IScoutSessionApi.RunWithServerSession {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.testing.server.runner.RunWithServerSession";
@@ -1524,14 +1524,14 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IScoutInterfaceApi.IServerSession I_SERVER_SESSION = new IServerSession();
+  IScoutSessionApi.IServerSession I_SERVER_SESSION = new IServerSession();
 
   @Override
-  default IScoutInterfaceApi.IServerSession IServerSession() {
+  default IScoutSessionApi.IServerSession IServerSession() {
     return I_SERVER_SESSION;
   }
 
-  class IServerSession implements IScoutInterfaceApi.IServerSession {
+  class IServerSession implements IScoutSessionApi.IServerSession {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.server.IServerSession";
@@ -1552,14 +1552,14 @@ public interface Scout10Api extends IScoutApi {
     }
   }
 
-  IScoutInterfaceApi.ISession I_SESSION = new ISession();
+  IScoutSessionApi.ISession I_SESSION = new ISession();
 
   @Override
-  default IScoutInterfaceApi.ISession ISession() {
+  default IScoutSessionApi.ISession ISession() {
     return I_SESSION;
   }
 
-  class ISession implements IScoutInterfaceApi.ISession {
+  class ISession implements IScoutSessionApi.ISession {
     @Override
     public String fqn() {
       return "org.eclipse.scout.rt.shared.ISession";

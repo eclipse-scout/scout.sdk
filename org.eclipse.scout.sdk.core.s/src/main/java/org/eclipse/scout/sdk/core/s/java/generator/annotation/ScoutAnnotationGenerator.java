@@ -26,6 +26,8 @@ import org.eclipse.scout.sdk.core.s.java.annotation.FormDataAnnotation.DefaultSu
 import org.eclipse.scout.sdk.core.s.java.annotation.FormDataAnnotation.SdkCommand;
 import org.eclipse.scout.sdk.core.s.java.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutSessionApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutSessionApi.RunWithServerSession;
 import org.eclipse.scout.sdk.core.util.Ensure;
 import org.eclipse.scout.sdk.core.util.Strings;
 
@@ -181,8 +183,8 @@ public class ScoutAnnotationGenerator<TYPE extends ScoutAnnotationGenerator<TYPE
   public static <API extends IApiSpecification> IAnnotationGenerator<?> createRunWithServerSession(Class<API> apiSpec, Function<API, ITypeNameSupplier> serverSessionProvider) {
     Ensure.notNull(serverSessionProvider);
     return create()
-        .withAnnotationNameFrom(IScoutApi.class, IScoutApi::RunWithServerSession)
-        .withElementFrom(IScoutApi.class, api -> api.RunWithServerSession().valueElementName(), b -> b.classLiteralFrom(apiSpec, serverSessionProvider));
+        .withAnnotationNameFrom(IScoutApi.class, api -> api.api(IScoutSessionApi.class).map(IScoutSessionApi::RunWithServerSession).orElse(null))
+        .withElementFrom(IScoutApi.class, api -> api.api(IScoutSessionApi.class).map(IScoutSessionApi::RunWithServerSession).map(RunWithServerSession::valueElementName).orElse(null), b -> b.classLiteralFrom(apiSpec, serverSessionProvider));
   }
 
   public static IAnnotationGenerator<?> createRunWith(CharSequence runner) {

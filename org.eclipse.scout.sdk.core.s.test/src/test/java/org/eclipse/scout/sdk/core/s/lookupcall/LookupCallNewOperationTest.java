@@ -12,9 +12,11 @@ package org.eclipse.scout.sdk.core.s.lookupcall;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.scout.sdk.core.java.JavaTypes;
+import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.java.testing.context.ExtendWithJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.ISdkConstants;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutSessionApi;
 import org.eclipse.scout.sdk.core.s.testing.AbstractBooleanPermutationArgumentsProvider;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutServerJavaEnvironmentFactory;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.ScoutSharedJavaEnvironmentFactory;
@@ -55,7 +57,7 @@ public class LookupCallNewOperationTest {
     if (testSourceFolder) {
       op.setTestSourceFolder(env.primarySourceFolder());
     }
-    op.setServerSession(scoutApi.IServerSession().fqn());
+    op.setServerSession(scoutApi.api(IScoutSessionApi.class).map(IScoutSessionApi::IServerSession).map(ITypeNameSupplier::fqn).orElse(null));
 
     env.run(op);
 
