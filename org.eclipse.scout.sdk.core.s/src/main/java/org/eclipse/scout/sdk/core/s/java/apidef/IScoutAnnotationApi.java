@@ -48,8 +48,6 @@ public interface IScoutAnnotationApi {
 
   RunWithClientSession RunWithClientSession();
 
-  RunWithServerSession RunWithServerSession();
-
   RunWithSubject RunWithSubject();
 
   Test Test();
@@ -148,10 +146,6 @@ public interface IScoutAnnotationApi {
   }
 
   interface RunWithClientSession extends ITypeNameSupplier {
-    String valueElementName();
-  }
-
-  interface RunWithServerSession extends ITypeNameSupplier {
     String valueElementName();
   }
 

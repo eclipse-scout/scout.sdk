@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.core.s.environment.IEnvironment;
 import org.eclipse.scout.sdk.core.s.environment.IProgress;
 import org.eclipse.scout.sdk.core.s.form.FormNewOperation;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutSessionApi;
 import org.eclipse.scout.sdk.core.s.page.PageNewOperation;
 import org.eclipse.scout.sdk.core.s.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
@@ -173,7 +174,7 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
     if (getServerSourceFolder() != null) {
       getServerSourceFolder().javaEnvironment()
-          .findTypeFrom(IScoutApi.class, IScoutApi::IServerSession)
+          .findTypeFrom(IScoutApi.class, api -> api.api(IScoutSessionApi.class).map(IScoutSessionApi::IServerSession).orElse(null))
           .map(IType::name)
           .ifPresent(op::setServerSession);
     }
@@ -223,7 +224,7 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
 
     if (getServerSourceFolder() != null) {
       getServerSourceFolder().javaEnvironment()
-          .findTypeFrom(IScoutApi.class, IScoutApi::IServerSession)
+          .findTypeFrom(IScoutApi.class, api -> api.api(IScoutSessionApi.class).map(IScoutSessionApi::IServerSession).orElse(null))
           .map(IType::name)
           .ifPresent(op::setServerSession);
     }
@@ -273,7 +274,7 @@ public class EntityNewOperation implements BiConsumer<IEnvironment, IProgress> {
     op.setTestSourceFolder(getServerTestSourceFolder());
     if (getServerSourceFolder() != null) {
       getServerSourceFolder().javaEnvironment()
-          .findTypeFrom(IScoutApi.class, IScoutApi::IServerSession)
+          .findTypeFrom(IScoutApi.class, api -> api.api(IScoutSessionApi.class).map(IScoutSessionApi::IServerSession).orElse(null))
           .map(IType::name)
           .ifPresent(op::setServerSession);
     }

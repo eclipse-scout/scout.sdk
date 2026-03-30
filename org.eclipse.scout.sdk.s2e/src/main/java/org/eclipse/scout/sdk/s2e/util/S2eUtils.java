@@ -48,8 +48,10 @@ import org.eclipse.m2e.core.internal.MavenPluginActivator;
 import org.eclipse.m2e.core.internal.project.ProjectConfigurationManager;
 import org.eclipse.m2e.core.project.MavenUpdateRequest;
 import org.eclipse.scout.sdk.core.builder.IBuilderContext;
+import org.eclipse.scout.sdk.core.java.apidef.ITypeNameSupplier;
 import org.eclipse.scout.sdk.core.java.model.api.internal.JavaEnvironmentImplementor;
 import org.eclipse.scout.sdk.core.s.IScoutSourceFolders;
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutSessionApi;
 import org.eclipse.scout.sdk.core.s.util.ScoutTier;
 import org.eclipse.scout.sdk.core.s.util.maven.IMavenConstants;
 import org.eclipse.scout.sdk.core.util.PropertySupport;
@@ -342,10 +344,13 @@ public final class S2eUtils {
     }
 
     var sessionToFind = switch (tier) {
-      case Server -> scoutApi.orElseThrow().IServerSession().fqn();
+      case Server -> scoutApi.flatMap(api -> api.api(IScoutSessionApi.class)).map(IScoutSessionApi::IServerSession).map(ITypeNameSupplier::fqn).orElse(null);
       case Client, HtmlUi -> scoutApi.orElseThrow().IClientSession().fqn();
-      default -> scoutApi.orElseThrow().ISession().fqn();
+      default -> scoutApi.flatMap(api -> api.api(IScoutSessionApi.class)).map(IScoutSessionApi::ISession).map(ITypeNameSupplier::fqn).orElse(null);
     };
+    if (sessionToFind == null) {
+      return Optional.empty();
+    }
     var sessions = JdtUtils.findTypesInStrictHierarchy(project, sessionToFind, monitor, filter);
 
     if (sessions.isEmpty()) {

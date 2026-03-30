@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.core.s.codetype.CodeTypeNewOperation
 import org.eclipse.scout.sdk.core.s.entity.EntityNewOperation
 import org.eclipse.scout.sdk.core.s.form.FormNewOperation
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi
+import org.eclipse.scout.sdk.core.s.java.apidef.IScoutSessionApi
 import org.eclipse.scout.sdk.core.s.lookupcall.LookupCallNewOperation
 import org.eclipse.scout.sdk.core.s.page.PageNewOperation
 import org.eclipse.scout.sdk.core.s.util.ScoutTier
@@ -79,7 +80,7 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                     op.superType = it.AbstractForm().fqn()
                 }
                 sourceFolderHelper.sourceFolder(ScoutTier.Server)?.javaEnvironment()
-                    ?.findTypeFrom(IScoutApi::class.java, IScoutApi::IServerSession)
+                    ?.findTypeFrom(IScoutApi::class.java) { it.api(IScoutSessionApi::class.java).map(IScoutSessionApi::IServerSession).orElse(null) }
                     ?.map { it.name() }
                     ?.ifPresent { op.serverSession = it }
 
@@ -111,7 +112,7 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                     op.superType = it.AbstractPageWithTable().fqn()
                 }
                 sourceFolderHelper.sourceFolder(ScoutTier.Server)?.javaEnvironment()
-                    ?.findTypeFrom(IScoutApi::class.java, IScoutApi::IServerSession)
+                    ?.findTypeFrom(IScoutApi::class.java) { it.api(IScoutSessionApi::class.java).map(IScoutSessionApi::IServerSession).orElse(null) }
                     ?.map { it.name() }
                     ?.ifPresent { op.serverSession = it }
 
@@ -140,7 +141,7 @@ class ElementCreationManagerImplementor : ElementCreationManager {
                     op.lookupServiceSuperType = it.AbstractLookupService().fqn()
                 }
                 sourceFolderHelper.sourceFolder(ScoutTier.Server)?.javaEnvironment()
-                    ?.findTypeFrom(IScoutApi::class.java, IScoutApi::IServerSession)
+                    ?.findTypeFrom(IScoutApi::class.java) { it.api(IScoutSessionApi::class.java).map(IScoutSessionApi::IServerSession).orElse(null) }
                     ?.map { it.name() }
                     ?.ifPresent { op.serverSession = it }
             })
