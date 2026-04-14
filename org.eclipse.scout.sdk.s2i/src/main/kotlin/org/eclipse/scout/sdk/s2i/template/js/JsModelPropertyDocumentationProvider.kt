@@ -22,14 +22,14 @@ class JsModelPropertyDocumentationProvider : AbstractDocumentationProvider() {
 
     override fun getCustomDocumentationElement(editor: Editor, file: PsiFile, contextElement: PsiElement?, targetOffset: Int): PsiElement? {
         val element = contextElement ?: return null
-        val info = JsModelCompletionHelper.getPropertyValueInfo(element, "") ?: return contextElement
-        val scoutObject = info.declaringScoutObjectByObjectType() ?: return contextElement
+        val info = JsModelCompletionHelper.getPropertyValueInfo(element, "") ?: return null
+        val scoutObject = info.declaringScoutObjectByObjectType() ?: return null
         val property = scoutObject
             .findProperties()
             .withSupers(true)
             .withName(info.propertyName)
-            .first().orElse(null) ?: return contextElement
-        return propertyToPsi(property) ?: contextElement
+            .first().orElse(null) ?: return null
+        return propertyToPsi(property)
     }
 
     override fun getDocumentationElementForLookupItem(psiManager: PsiManager, lookupObject: Any?, elementUnderCursor: PsiElement?): PsiElement? {
