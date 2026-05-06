@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,12 +18,12 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class TableFieldFormTest {
@@ -46,7 +46,7 @@ public class TableFieldFormTest {
 
     // fields of TableFieldFormData
     assertEquals(1, tableFieldFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldFormData);
+    assertSerialVersionUidField(tableFieldFormData);
 
     assertEquals(4, tableFieldFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData'");
     var getCompanyTable = assertMethodExist(tableFieldFormData, "getCompanyTable");
@@ -71,7 +71,7 @@ public class TableFieldFormTest {
 
     // fields of CompanyTable
     assertEquals(1, companyTable.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(companyTable);
+    assertSerialVersionUidField(companyTable);
 
     assertEquals(7, companyTable.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable'");
     var addRow = assertMethodExist(companyTable, "addRow");
@@ -111,7 +111,7 @@ public class TableFieldFormTest {
 
     // fields of CompanyTableRowData
     assertEquals(1, companyTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(companyTableRowData);
+    assertSerialVersionUidField(companyTableRowData);
 
     assertEquals(0, companyTableRowData.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData'");
 
@@ -124,7 +124,7 @@ public class TableFieldFormTest {
 
     // fields of ConcreteTable
     assertEquals(1, concreteTable.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(concreteTable);
+    assertSerialVersionUidField(concreteTable);
 
     assertEquals(7, concreteTable.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable'");
     var addRow2 = assertMethodExist(concreteTable, "addRow");
@@ -164,7 +164,7 @@ public class TableFieldFormTest {
 
     // fields of ConcreteTableRowData
     assertEquals(5, concreteTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable$ConcreteTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(concreteTableRowData);
+    assertSerialVersionUidField(concreteTableRowData);
     var name = assertFieldExist(concreteTableRowData, "name");
     assertHasFlags(name, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(name, "java.lang.String");
@@ -205,7 +205,7 @@ public class TableFieldFormTest {
 
     // fields of PersonTable
     assertEquals(1, personTable.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$PersonTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(personTable);
+    assertSerialVersionUidField(personTable);
 
     assertEquals(7, personTable.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$PersonTable'");
     var addRow4 = assertMethodExist(personTable, "addRow");
@@ -245,7 +245,7 @@ public class TableFieldFormTest {
 
     // fields of PersonTableRowData
     assertEquals(11, personTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$PersonTable$PersonTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(personTableRowData);
+    assertSerialVersionUidField(personTableRowData);
     var personNr = assertFieldExist(personTableRowData, "personNr");
     assertHasFlags(personNr, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(personNr, "java.lang.String");
@@ -328,7 +328,7 @@ public class TableFieldFormTest {
 
     // fields of TableFieldWithExternalTable
     assertEquals(1, tableFieldWithExternalTable.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldWithExternalTable);
+    assertSerialVersionUidField(tableFieldWithExternalTable);
 
     assertEquals(7, tableFieldWithExternalTable.methods().stream().count(), "method count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable'");
     var addRow6 = assertMethodExist(tableFieldWithExternalTable, "addRow");
@@ -368,7 +368,7 @@ public class TableFieldFormTest {
 
     // fields of TableFieldWithExternalTableRowData
     assertEquals(7, tableFieldWithExternalTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable$TableFieldWithExternalTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldWithExternalTableRowData);
+    assertSerialVersionUidField(tableFieldWithExternalTableRowData);
     var aa = assertFieldExist(tableFieldWithExternalTableRowData, "aa");
     assertHasFlags(aa, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(aa, "java.lang.String");

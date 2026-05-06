@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,10 +15,10 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,7 +42,7 @@ public class MasterFieldFormDataTest {
 
     // fields of MasterFieldTestFormData
     assertEquals(1, masterFieldTestFormData.fields().stream().count(), "field count of 'MasterFieldTestFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(masterFieldTestFormData);
+    assertSerialVersionUidField(masterFieldTestFormData);
 
     assertEquals(2, masterFieldTestFormData.methods().stream().count(), "method count of 'MasterFieldTestFormData'");
     var getMyMaster = assertMethodExist(masterFieldTestFormData, "getMyMaster");
@@ -58,7 +58,7 @@ public class MasterFieldFormDataTest {
 
     // fields of MyMaster
     assertEquals(1, myMaster.fields().stream().count(), "field count of 'MyMaster'");
-    ScoutSdkAssertions.assertSerialVersionUidField(myMaster);
+    assertSerialVersionUidField(myMaster);
 
     assertEquals(0, myMaster.methods().stream().count(), "method count of 'MyMaster'");
 
@@ -70,7 +70,7 @@ public class MasterFieldFormDataTest {
 
     // fields of MySlave
     assertEquals(1, mySlave.fields().stream().count(), "field count of 'MySlave'");
-    ScoutSdkAssertions.assertSerialVersionUidField(mySlave);
+    assertSerialVersionUidField(mySlave);
 
     assertEquals(0, mySlave.methods().stream().count(), "method count of 'MySlave'");
 

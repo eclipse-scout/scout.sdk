@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,12 +18,12 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -77,7 +77,7 @@ public class TableFieldBeanTest {
 
     // fields of AbstractAddressTableFieldData
     assertEquals(1, abstractAddressTableFieldData.fields().stream().count(), "field count of 'AbstractAddressTableFieldData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(abstractAddressTableFieldData);
+    assertSerialVersionUidField(abstractAddressTableFieldData);
 
     assertEquals(7, abstractAddressTableFieldData.methods().stream().count(), "method count of 'AbstractAddressTableFieldData'");
     var addRow = assertMethodExist(abstractAddressTableFieldData, "addRow");
@@ -109,7 +109,7 @@ public class TableFieldBeanTest {
 
     // fields of AbstractAddressTableRowData
     assertEquals(7, abstractAddressTableRowData.fields().stream().count(), "field count of 'AbstractAddressTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(abstractAddressTableRowData);
+    assertSerialVersionUidField(abstractAddressTableRowData);
     var addressId = assertFieldExist(abstractAddressTableRowData, "addressId");
     assertHasFlags(addressId, 25);
     assertFieldType(addressId, String.class.getName());
@@ -156,7 +156,7 @@ public class TableFieldBeanTest {
 
     // fields of TableFieldBaseFormData
     assertEquals(1, tableFieldBaseFormData.fields().stream().count(), "field count of 'TableFieldBaseFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldBaseFormData);
+    assertSerialVersionUidField(tableFieldBaseFormData);
 
     assertEquals(5, tableFieldBaseFormData.methods().stream().count(), "method count of 'TableFieldBaseFormData'");
     var getAddressTable = assertMethodExist(tableFieldBaseFormData, "getAddressTable");
@@ -178,7 +178,7 @@ public class TableFieldBeanTest {
 
     // fields of AddressTable
     assertEquals(1, addressTable.fields().stream().count(), "field count of 'AddressTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(addressTable);
+    assertSerialVersionUidField(addressTable);
 
     assertEquals(7, addressTable.methods().stream().count(), "method count of 'AddressTable'");
     var addRow = assertMethodExist(addressTable, "addRow");
@@ -210,7 +210,7 @@ public class TableFieldBeanTest {
 
     // fields of AddressTableRowData
     assertEquals(3, addressTableRowData.fields().stream().count(), "field count of 'AddressTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(addressTableRowData);
+    assertSerialVersionUidField(addressTableRowData);
     var city = assertFieldExist(addressTableRowData, "city");
     assertHasFlags(city, 25);
     assertFieldType(city, String.class.getName());
@@ -232,7 +232,7 @@ public class TableFieldBeanTest {
 
     // fields of EmptyTable
     assertEquals(1, emptyTable.fields().stream().count(), "field count of 'EmptyTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(emptyTable);
+    assertSerialVersionUidField(emptyTable);
 
     assertEquals(7, emptyTable.methods().stream().count(), "method count of 'EmptyTable'");
     var addRow2 = assertMethodExist(emptyTable, "addRow");
@@ -264,7 +264,7 @@ public class TableFieldBeanTest {
 
     // fields of EmptyTableRowData
     assertEquals(1, emptyTableRowData.fields().stream().count(), "field count of 'EmptyTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(emptyTableRowData);
+    assertSerialVersionUidField(emptyTableRowData);
 
     assertEquals(0, emptyTableRowData.methods().stream().count(), "method count of 'EmptyTableRowData'");
 
@@ -276,7 +276,7 @@ public class TableFieldBeanTest {
 
     // fields of NoTable
     assertEquals(1, noTable.fields().stream().count(), "field count of 'NoTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(noTable);
+    assertSerialVersionUidField(noTable);
 
     assertEquals(2, noTable.methods().stream().count(), "method count of 'NoTable'");
     var createRow2 = assertMethodExist(noTable, "createRow");
@@ -294,7 +294,7 @@ public class TableFieldBeanTest {
 
     // fields of PersonTable
     assertEquals(1, personTable.fields().stream().count(), "field count of 'PersonTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(personTable);
+    assertSerialVersionUidField(personTable);
 
     assertEquals(7, personTable.methods().stream().count(), "method count of 'PersonTable'");
     var addRow4 = assertMethodExist(personTable, "addRow");
@@ -326,7 +326,7 @@ public class TableFieldBeanTest {
 
     // fields of PersonTableRowData
     assertEquals(1, personTableRowData.fields().stream().count(), "field count of 'PersonTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(personTableRowData);
+    assertSerialVersionUidField(personTableRowData);
 
     assertEquals(0, personTableRowData.methods().stream().count(), "method count of 'PersonTableRowData'");
 
@@ -338,7 +338,7 @@ public class TableFieldBeanTest {
 
     // fields of Table
     assertEquals(1, table.fields().stream().count(), "field count of 'Table'");
-    ScoutSdkAssertions.assertSerialVersionUidField(table);
+    assertSerialVersionUidField(table);
 
     assertEquals(7, table.methods().stream().count(), "method count of 'Table'");
     var addRow6 = assertMethodExist(table, "addRow");
@@ -370,7 +370,7 @@ public class TableFieldBeanTest {
 
     // fields of TableRowData
     assertEquals(5, tableRowData.fields().stream().count(), "field count of 'TableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(tableRowData);
+    assertSerialVersionUidField(tableRowData);
     var first = assertFieldExist(tableRowData, "first");
     assertHasFlags(first, 25);
     assertFieldType(first, String.class.getName());
@@ -407,7 +407,7 @@ public class TableFieldBeanTest {
 
     // fields of TableFieldExFormData
     assertEquals(1, tableFieldExFormData.fields().stream().count(), "field count of 'TableFieldExFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(tableFieldExFormData);
+    assertSerialVersionUidField(tableFieldExFormData);
 
     assertEquals(5, tableFieldExFormData.methods().stream().count(), "method count of 'TableFieldExFormData'");
     var getEmptyTableExtended = assertMethodExist(tableFieldExFormData, "getEmptyTableExtended");
@@ -430,7 +430,7 @@ public class TableFieldBeanTest {
 
     // fields of EmptyTableExtended
     assertEquals(1, emptyTableExtended.fields().stream().count(), "field count of 'EmptyTableExtended'");
-    ScoutSdkAssertions.assertSerialVersionUidField(emptyTableExtended);
+    assertSerialVersionUidField(emptyTableExtended);
 
     assertEquals(7, emptyTableExtended.methods().stream().count(), "method count of 'EmptyTableExtended'");
     var addRow = assertMethodExist(emptyTableExtended, "addRow");
@@ -462,7 +462,7 @@ public class TableFieldBeanTest {
 
     // fields of EmptyTableExtendedRowData
     assertEquals(3, emptyTableExtendedRowData.fields().stream().count(), "field count of 'EmptyTableExtendedRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(emptyTableExtendedRowData);
+    assertSerialVersionUidField(emptyTableExtendedRowData);
     var single = assertFieldExist(emptyTableExtendedRowData, "single");
     assertHasFlags(single, 25);
     assertFieldType(single, String.class.getName());
@@ -485,7 +485,7 @@ public class TableFieldBeanTest {
 
     // fields of ExtendedAddress
     assertEquals(1, extendedAddress.fields().stream().count(), "field count of 'ExtendedAddress'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extendedAddress);
+    assertSerialVersionUidField(extendedAddress);
 
     assertEquals(7, extendedAddress.methods().stream().count(), "method count of 'ExtendedAddress'");
     var addRow2 = assertMethodExist(extendedAddress, "addRow");
@@ -517,7 +517,7 @@ public class TableFieldBeanTest {
 
     // fields of ExtendedAddressRowData
     assertEquals(3, extendedAddressRowData.fields().stream().count(), "field count of 'ExtendedAddressRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extendedAddressRowData);
+    assertSerialVersionUidField(extendedAddressRowData);
     var state = assertFieldExist(extendedAddressRowData, "state");
     assertHasFlags(state, 25);
     assertFieldType(state, String.class.getName());
@@ -540,7 +540,7 @@ public class TableFieldBeanTest {
 
     // fields of ExtendedPersonTable
     assertEquals(1, extendedPersonTable.fields().stream().count(), "field count of 'ExtendedPersonTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extendedPersonTable);
+    assertSerialVersionUidField(extendedPersonTable);
 
     assertEquals(7, extendedPersonTable.methods().stream().count(), "method count of 'ExtendedPersonTable'");
     var addRow4 = assertMethodExist(extendedPersonTable, "addRow");
@@ -572,7 +572,7 @@ public class TableFieldBeanTest {
 
     // fields of ExtendedPersonTableRowData
     assertEquals(3, extendedPersonTableRowData.fields().stream().count(), "field count of 'ExtendedPersonTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extendedPersonTableRowData);
+    assertSerialVersionUidField(extendedPersonTableRowData);
     var lastName = assertFieldExist(extendedPersonTableRowData, "lastName");
     assertHasFlags(lastName, 25);
     assertFieldType(lastName, String.class.getName());
@@ -595,7 +595,7 @@ public class TableFieldBeanTest {
 
     // fields of NoTableExtended
     assertEquals(1, noTableExtended.fields().stream().count(), "field count of 'NoTableExtended'");
-    ScoutSdkAssertions.assertSerialVersionUidField(noTableExtended);
+    assertSerialVersionUidField(noTableExtended);
 
     assertEquals(7, noTableExtended.methods().stream().count(), "method count of 'NoTableExtended'");
     var addRow6 = assertMethodExist(noTableExtended, "addRow");
@@ -627,7 +627,7 @@ public class TableFieldBeanTest {
 
     // fields of NoTableExtendedRowData
     assertEquals(3, noTableExtendedRowData.fields().stream().count(), "field count of 'NoTableExtendedRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(noTableExtendedRowData);
+    assertSerialVersionUidField(noTableExtendedRowData);
     var new_ = assertFieldExist(noTableExtendedRowData, "new_");
     assertHasFlags(new_, 25);
     assertFieldType(new_, String.class.getName());
@@ -650,7 +650,7 @@ public class TableFieldBeanTest {
 
     // fields of TableExtended
     assertEquals(1, tableExtended.fields().stream().count(), "field count of 'TableExtended'");
-    ScoutSdkAssertions.assertSerialVersionUidField(tableExtended);
+    assertSerialVersionUidField(tableExtended);
 
     assertEquals(7, tableExtended.methods().stream().count(), "method count of 'TableExtended'");
     var addRow8 = assertMethodExist(tableExtended, "addRow");
@@ -682,7 +682,7 @@ public class TableFieldBeanTest {
 
     // fields of TableExtendedRowData
     assertEquals(3, tableExtendedRowData.fields().stream().count(), "field count of 'TableExtendedRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(tableExtendedRowData);
+    assertSerialVersionUidField(tableExtendedRowData);
     var boolean_ = assertFieldExist(tableExtendedRowData, "boolean_");
     assertHasFlags(boolean_, 25);
     assertFieldType(boolean_, String.class.getName());
@@ -709,7 +709,7 @@ public class TableFieldBeanTest {
 
     // fields of BaseWithExtendedTableFormData
     assertEquals(1, baseWithExtendedTableFormData.fields().stream().count(), "field count of 'BaseWithExtendedTableFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(baseWithExtendedTableFormData);
+    assertSerialVersionUidField(baseWithExtendedTableFormData);
 
     assertEquals(1, baseWithExtendedTableFormData.methods().stream().count(), "method count of 'BaseWithExtendedTableFormData'");
     var getTableInForm = assertMethodExist(baseWithExtendedTableFormData, "getTableInForm");
@@ -723,7 +723,7 @@ public class TableFieldBeanTest {
 
     // fields of TableInForm
     assertEquals(1, tableInForm.fields().stream().count(), "field count of 'TableInForm'");
-    ScoutSdkAssertions.assertSerialVersionUidField(tableInForm);
+    assertSerialVersionUidField(tableInForm);
 
     assertEquals(7, tableInForm.methods().stream().count(), "method count of 'TableInForm'");
     var addRow = assertMethodExist(tableInForm, "addRow");
@@ -755,7 +755,7 @@ public class TableFieldBeanTest {
 
     // fields of TableInFormRowData
     assertEquals(5, tableInFormRowData.fields().stream().count(), "field count of 'TableInFormRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(tableInFormRowData);
+    assertSerialVersionUidField(tableInFormRowData);
     var colInAbstractTable = assertFieldExist(tableInFormRowData, "colInAbstractTable");
     assertHasFlags(colInAbstractTable, 25);
     assertFieldType(colInAbstractTable, String.class.getName());
@@ -792,7 +792,7 @@ public class TableFieldBeanTest {
 
     // fields of ChildWithExtendedTableFormData
     assertEquals(1, childWithExtendedTableFormData.fields().stream().count(), "field count of 'ChildWithExtendedTableFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(childWithExtendedTableFormData);
+    assertSerialVersionUidField(childWithExtendedTableFormData);
 
     assertEquals(1, childWithExtendedTableFormData.methods().stream().count(), "method count of 'ChildWithExtendedTableFormData'");
     var getChildTable = assertMethodExist(childWithExtendedTableFormData, "getChildTable");
@@ -806,7 +806,7 @@ public class TableFieldBeanTest {
 
     // fields of ChildTable
     assertEquals(1, childTable.fields().stream().count(), "field count of 'ChildTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(childTable);
+    assertSerialVersionUidField(childTable);
 
     assertEquals(7, childTable.methods().stream().count(), "method count of 'ChildTable'");
     var addRow = assertMethodExist(childTable, "addRow");
@@ -838,7 +838,7 @@ public class TableFieldBeanTest {
 
     // fields of ChildTableRowData
     assertEquals(7, childTableRowData.fields().stream().count(), "field count of 'ChildTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(childTableRowData);
+    assertSerialVersionUidField(childTableRowData);
     var col1InChildForm = assertFieldExist(childTableRowData, "col1InChildForm");
     assertHasFlags(col1InChildForm, 25);
     assertFieldType(col1InChildForm, String.class.getName());
@@ -888,7 +888,7 @@ public class TableFieldBeanTest {
 
     // fields of ColumnWithoutTypeFormData
     assertEquals(1, columnWithoutTypeFormData.fields().stream().count(), "field count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(columnWithoutTypeFormData);
+    assertSerialVersionUidField(columnWithoutTypeFormData);
 
     assertEquals(1, columnWithoutTypeFormData.methods().stream().count(), "method count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData'");
     var getMyTable = assertMethodExist(columnWithoutTypeFormData, "getMyTable");
@@ -904,7 +904,7 @@ public class TableFieldBeanTest {
 
     // fields of MyTable
     assertEquals(1, myTable.fields().stream().count(), "field count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(myTable);
+    assertSerialVersionUidField(myTable);
 
     assertEquals(7, myTable.methods().stream().count(), "method count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable'");
     var addRow = assertMethodExist(myTable, "addRow");
@@ -944,7 +944,7 @@ public class TableFieldBeanTest {
 
     // fields of MyTableRowData
     assertEquals(3, myTableRowData.fields().stream().count(), "field count of 'formdata.shared.ui.forms.ColumnWithoutTypeFormData$MyTable$MyTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(myTableRowData);
+    assertSerialVersionUidField(myTableRowData);
     var my = assertFieldExist(myTableRowData, "my");
     assertHasFlags(my, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(my, "java.lang.String");

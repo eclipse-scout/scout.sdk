@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,12 +18,12 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -64,7 +64,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of AbstractTemplateForReplaceBoxData
     assertEquals(1, abstractTemplateForReplaceBoxData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(abstractTemplateForReplaceBoxData);
+    assertSerialVersionUidField(abstractTemplateForReplaceBoxData);
 
     assertEquals(3, abstractTemplateForReplaceBoxData.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData'");
     var getTemplateBoxString = assertMethodExist(abstractTemplateForReplaceBoxData, "getTemplateBoxString");
@@ -86,7 +86,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of TemplateBoxString
     assertEquals(1, templateBoxString.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateBoxString'");
-    ScoutSdkAssertions.assertSerialVersionUidField(templateBoxString);
+    assertSerialVersionUidField(templateBoxString);
 
     assertEquals(0, templateBoxString.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateBoxString'");
 
@@ -99,7 +99,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of TemplateString
     assertEquals(1, templateString.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateString'");
-    ScoutSdkAssertions.assertSerialVersionUidField(templateString);
+    assertSerialVersionUidField(templateString);
 
     assertEquals(0, templateString.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateString'");
 
@@ -112,7 +112,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of TemplateTable
     assertEquals(1, templateTable.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(templateTable);
+    assertSerialVersionUidField(templateTable);
 
     assertEquals(7, templateTable.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateTable'");
     var addRow = assertMethodExist(templateTable, "addRow");
@@ -152,7 +152,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of TemplateTableRowData
     assertEquals(5, templateTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.AbstractTemplateForReplaceBoxData$TemplateTable$TemplateTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(templateTableRowData);
+    assertSerialVersionUidField(templateTableRowData);
     var first = assertFieldExist(templateTableRowData, "first");
     assertHasFlags(first, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(first, "java.lang.String");
@@ -200,7 +200,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of TemplateBasedFormData
     assertEquals(1, templateBasedFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TemplateBasedFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(templateBasedFormData);
+    assertSerialVersionUidField(templateBasedFormData);
 
     assertEquals(3, templateBasedFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TemplateBasedFormData'");
     var getUsageOneBox = assertMethodExist(templateBasedFormData, "getUsageOneBox");
@@ -222,7 +222,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of UsageOneBox
     assertEquals(1, usageOneBox.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TemplateBasedFormData$UsageOneBox'");
-    ScoutSdkAssertions.assertSerialVersionUidField(usageOneBox);
+    assertSerialVersionUidField(usageOneBox);
 
     assertEquals(1, usageOneBox.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TemplateBasedFormData$UsageOneBox'");
     var getUsageOneString = assertMethodExist(usageOneBox, "getUsageOneString");
@@ -238,7 +238,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of UsageOneString
     assertEquals(1, usageOneString.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TemplateBasedFormData$UsageOneBox$UsageOneString'");
-    ScoutSdkAssertions.assertSerialVersionUidField(usageOneString);
+    assertSerialVersionUidField(usageOneString);
 
     assertEquals(0, usageOneString.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TemplateBasedFormData$UsageOneBox$UsageOneString'");
 
@@ -251,7 +251,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of UsageTwoBox
     assertEquals(1, usageTwoBox.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TemplateBasedFormData$UsageTwoBox'");
-    ScoutSdkAssertions.assertSerialVersionUidField(usageTwoBox);
+    assertSerialVersionUidField(usageTwoBox);
 
     assertEquals(1, usageTwoBox.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TemplateBasedFormData$UsageTwoBox'");
     var getUsageTwoTemplateTable = assertMethodExist(usageTwoBox, "getUsageTwoTemplateTable");
@@ -268,7 +268,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of UsageTwoTemplateTable
     assertEquals(1, usageTwoTemplateTable.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TemplateBasedFormData$UsageTwoBox$UsageTwoTemplateTable'");
-    ScoutSdkAssertions.assertSerialVersionUidField(usageTwoTemplateTable);
+    assertSerialVersionUidField(usageTwoTemplateTable);
 
     assertEquals(7, usageTwoTemplateTable.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TemplateBasedFormData$UsageTwoBox$UsageTwoTemplateTable'");
     var addRow = assertMethodExist(usageTwoTemplateTable, "addRow");
@@ -308,7 +308,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of UsageTwoTemplateTableRowData
     assertEquals(3, usageTwoTemplateTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TemplateBasedFormData$UsageTwoBox$UsageTwoTemplateTable$UsageTwoTemplateTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(usageTwoTemplateTableRowData);
+    assertSerialVersionUidField(usageTwoTemplateTableRowData);
     var third = assertFieldExist(usageTwoTemplateTableRowData, "third");
     assertHasFlags(third, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(third, "java.lang.String");
@@ -335,7 +335,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of UsualString
     assertEquals(1, usualString.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.TemplateBasedFormData$UsualString'");
-    ScoutSdkAssertions.assertSerialVersionUidField(usualString);
+    assertSerialVersionUidField(usualString);
 
     assertEquals(0, usualString.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.TemplateBasedFormData$UsualString'");
 
@@ -355,7 +355,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of AbstractRadioButtonGroupWithFieldsData
     assertEquals(1, abstractRadioButtonGroupWithFieldsData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.AbstractRadioButtonGroupWithFieldsData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(abstractRadioButtonGroupWithFieldsData);
+    assertSerialVersionUidField(abstractRadioButtonGroupWithFieldsData);
 
     assertEquals(1, abstractRadioButtonGroupWithFieldsData.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.AbstractRadioButtonGroupWithFieldsData'");
     var getInputString = assertMethodExist(abstractRadioButtonGroupWithFieldsData, "getInputString");
@@ -371,7 +371,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of InputString
     assertEquals(1, inputString.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.AbstractRadioButtonGroupWithFieldsData$InputString'");
-    ScoutSdkAssertions.assertSerialVersionUidField(inputString);
+    assertSerialVersionUidField(inputString);
 
     assertEquals(0, inputString.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.AbstractRadioButtonGroupWithFieldsData$InputString'");
 
@@ -391,7 +391,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of RadioButtonFormData
     assertEquals(1, radioButtonFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.RadioButtonFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(radioButtonFormData);
+    assertSerialVersionUidField(radioButtonFormData);
 
     assertEquals(5, radioButtonFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.RadioButtonFormData'");
     var getInputExString = assertMethodExist(radioButtonFormData, "getInputExString");
@@ -420,7 +420,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of InputExString
     assertEquals(1, inputExString.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.RadioButtonFormData$InputExString'");
-    ScoutSdkAssertions.assertSerialVersionUidField(inputExString);
+    assertSerialVersionUidField(inputExString);
 
     assertEquals(0, inputExString.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.RadioButtonFormData$InputExString'");
 
@@ -433,7 +433,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of UsageOneUsualString
     assertEquals(1, usageOneUsualString.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.RadioButtonFormData$UsageOneUsualString'");
-    ScoutSdkAssertions.assertSerialVersionUidField(usageOneUsualString);
+    assertSerialVersionUidField(usageOneUsualString);
 
     assertEquals(0, usageOneUsualString.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.RadioButtonFormData$UsageOneUsualString'");
 
@@ -446,7 +446,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of UsedRadioButtonGroup
     assertEquals(1, usedRadioButtonGroup.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.RadioButtonFormData$UsedRadioButtonGroup'");
-    ScoutSdkAssertions.assertSerialVersionUidField(usedRadioButtonGroup);
+    assertSerialVersionUidField(usedRadioButtonGroup);
 
     assertEquals(0, usedRadioButtonGroup.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.RadioButtonFormData$UsedRadioButtonGroup'");
 
@@ -459,7 +459,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of UsualRadioButtonGroup
     assertEquals(1, usualRadioButtonGroup.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.RadioButtonFormData$UsualRadioButtonGroup'");
-    ScoutSdkAssertions.assertSerialVersionUidField(usualRadioButtonGroup);
+    assertSerialVersionUidField(usualRadioButtonGroup);
 
     assertEquals(0, usualRadioButtonGroup.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.RadioButtonFormData$UsualRadioButtonGroup'");
 
@@ -472,7 +472,7 @@ public class ReplaceWithTemplatesTest {
 
     // fields of UsualString
     assertEquals(1, usualString.fields().stream().count(), "field count of 'formdata.shared.services.process.replace.RadioButtonFormData$UsualString'");
-    ScoutSdkAssertions.assertSerialVersionUidField(usualString);
+    assertSerialVersionUidField(usualString);
 
     assertEquals(0, usualString.methods().stream().count(), "method count of 'formdata.shared.services.process.replace.RadioButtonFormData$UsualString'");
 

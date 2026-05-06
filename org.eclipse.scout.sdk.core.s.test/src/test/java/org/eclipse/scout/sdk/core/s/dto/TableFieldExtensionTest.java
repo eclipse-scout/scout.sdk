@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,7 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
@@ -26,7 +27,6 @@ import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.java.model.api.MetaValueType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -60,7 +60,7 @@ public class TableFieldExtensionTest {
 
     // fields of ExtensionToAbstractTableFieldTemplateData
     assertEquals(1, extensionToAbstractTableFieldTemplateData.fields().stream().count(), "field count of 'formdata.shared.extension.ExtensionToAbstractTableFieldTemplateData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extensionToAbstractTableFieldTemplateData);
+    assertSerialVersionUidField(extensionToAbstractTableFieldTemplateData);
 
     assertEquals(0, extensionToAbstractTableFieldTemplateData.methods().stream().count(), "method count of 'formdata.shared.extension.ExtensionToAbstractTableFieldTemplateData'");
 
@@ -79,7 +79,7 @@ public class TableFieldExtensionTest {
     // fields of CustomAbstractAdvisorTableFieldTableExtensionRowData
     assertEquals(3, customAbstractAdvisorTableFieldTableExtensionRowData.fields().stream().count(),
         "field count of 'formdata.shared.extension.ExtensionToAbstractTableFieldTemplateData$CustomAbstractAdvisorTableFieldTableExtensionRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(customAbstractAdvisorTableFieldTableExtensionRowData);
+    assertSerialVersionUidField(customAbstractAdvisorTableFieldTableExtensionRowData);
     var added = assertFieldExist(customAbstractAdvisorTableFieldTableExtensionRowData, "added");
     assertHasFlags(added, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(added, "java.lang.String");
@@ -115,7 +115,7 @@ public class TableFieldExtensionTest {
 
     // fields of SimpleTableFormExtensionWithTableData
     assertEquals(1, simpleTableFormExtensionWithTableData.fields().stream().count(), "field count of 'formdata.shared.extension.SimpleTableFormExtensionWithTableData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(simpleTableFormExtensionWithTableData);
+    assertSerialVersionUidField(simpleTableFormExtensionWithTableData);
 
     assertEquals(0, simpleTableFormExtensionWithTableData.methods().stream().count(), "method count of 'formdata.shared.extension.SimpleTableFormExtensionWithTableData'");
 
@@ -133,7 +133,7 @@ public class TableFieldExtensionTest {
 
     // fields of TestTableFieldExtensionRowData
     assertEquals(3, testTableFieldExtensionRowData.fields().stream().count(), "field count of 'formdata.shared.extension.SimpleTableFormExtensionWithTableData$TestTableFieldExtensionRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(testTableFieldExtensionRowData);
+    assertSerialVersionUidField(testTableFieldExtensionRowData);
     var contributed = assertFieldExist(testTableFieldExtensionRowData, "contributed");
     assertHasFlags(contributed, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(contributed, "java.lang.String");

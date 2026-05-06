@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,10 +15,10 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 
@@ -39,7 +39,7 @@ public class FormWithGroupboxesTest {
 
     // fields of FormWithGroupBoxesFormData
     assertEquals(1, formWithGroupBoxesFormData.fields().stream().count(), "field count of 'FormWithGroupBoxesFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(formWithGroupBoxesFormData);
+    assertSerialVersionUidField(formWithGroupBoxesFormData);
 
     assertEquals(2, formWithGroupBoxesFormData.methods().stream().count(), "method count of 'FormWithGroupBoxesFormData'");
     var getFlatString = assertMethodExist(formWithGroupBoxesFormData, "getFlatString");
@@ -55,7 +55,7 @@ public class FormWithGroupboxesTest {
 
     // fields of FlatString
     assertEquals(1, flatString.fields().stream().count(), "field count of 'FlatString'");
-    ScoutSdkAssertions.assertSerialVersionUidField(flatString);
+    assertSerialVersionUidField(flatString);
 
     assertEquals(0, flatString.methods().stream().count(), "method count of 'FlatString'");
 
@@ -67,7 +67,7 @@ public class FormWithGroupboxesTest {
 
     // fields of InnerInteger
     assertEquals(1, innerInteger.fields().stream().count(), "field count of 'InnerInteger'");
-    ScoutSdkAssertions.assertSerialVersionUidField(innerInteger);
+    assertSerialVersionUidField(innerInteger);
 
     assertEquals(0, innerInteger.methods().stream().count(), "method count of 'InnerInteger'");
 

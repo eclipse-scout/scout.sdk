@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,10 +12,10 @@ package org.eclipse.scout.sdk.core.s.dto;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasFlags;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertHasSuperClass;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class ExternalCheckboxFieldTest {
@@ -35,7 +35,7 @@ public class ExternalCheckboxFieldTest {
 
     // fields of AbstractTestCheckboxFieldData
     assertEquals(1, abstractTestCheckboxFieldData.fields().stream().count(), "field count of 'AbstractTestCheckboxFieldData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(abstractTestCheckboxFieldData);
+    assertSerialVersionUidField(abstractTestCheckboxFieldData);
 
     assertEquals(0, abstractTestCheckboxFieldData.methods().stream().count(), "method count of 'AbstractTestCheckboxFieldData'");
 

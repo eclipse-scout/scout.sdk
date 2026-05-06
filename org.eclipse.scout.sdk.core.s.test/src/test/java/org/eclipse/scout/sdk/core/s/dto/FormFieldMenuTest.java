@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,12 +16,12 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -47,7 +47,7 @@ public class FormFieldMenuTest {
 
     // fields of FormFieldMenuTestFormData
     assertEquals(1, formFieldMenuTestFormData.fields().stream().count(), "field count of 'formdata.shared.ui.forms.formfieldmenu.FormFieldMenuTestFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(formFieldMenuTestFormData);
+    assertSerialVersionUidField(formFieldMenuTestFormData);
 
     assertEquals(1, formFieldMenuTestFormData.methods().stream().count(), "method count of 'formdata.shared.ui.forms.formfieldmenu.FormFieldMenuTestFormData'");
     var getTestBoolean = assertMethodExist(formFieldMenuTestFormData, "getTestBoolean");
@@ -63,7 +63,7 @@ public class FormFieldMenuTest {
 
     // fields of TestBoolean
     assertEquals(1, testBoolean.fields().stream().count(), "field count of 'formdata.shared.ui.forms.formfieldmenu.FormFieldMenuTestFormData$TestBoolean'");
-    ScoutSdkAssertions.assertSerialVersionUidField(testBoolean);
+    assertSerialVersionUidField(testBoolean);
 
     assertEquals(0, testBoolean.methods().stream().count(), "method count of 'formdata.shared.ui.forms.formfieldmenu.FormFieldMenuTestFormData$TestBoolean'");
 

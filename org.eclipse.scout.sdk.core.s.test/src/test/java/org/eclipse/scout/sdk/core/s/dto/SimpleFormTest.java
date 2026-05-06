@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,7 +25,6 @@ import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class SimpleFormTest {
@@ -51,7 +51,7 @@ public class SimpleFormTest {
 
     // fields of SimpleFormData
     assertEquals(1, simpleFormData.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(simpleFormData);
+    assertSerialVersionUidField(simpleFormData);
 
     assertEquals(10, simpleFormData.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData'");
     var getDate = assertMethodExist(simpleFormData, "getDate");
@@ -98,7 +98,7 @@ public class SimpleFormTest {
 
     // fields of Date
     assertEquals(1, date.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$Date'");
-    ScoutSdkAssertions.assertSerialVersionUidField(date);
+    assertSerialVersionUidField(date);
 
     assertEquals(0, date.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$Date'");
 
@@ -114,7 +114,7 @@ public class SimpleFormTest {
 
     // fields of Double
     assertEquals(1, double1.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$Double'");
-    ScoutSdkAssertions.assertSerialVersionUidField(double1);
+    assertSerialVersionUidField(double1);
 
     assertEquals(0, double1.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$Double'");
 
@@ -130,7 +130,7 @@ public class SimpleFormTest {
 
     // fields of MultiTypeArgsBox
     assertEquals(1, multiTypeArgsBox.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$MultiTypeArgsBox'");
-    ScoutSdkAssertions.assertSerialVersionUidField(multiTypeArgsBox);
+    assertSerialVersionUidField(multiTypeArgsBox);
 
     assertEquals(0, multiTypeArgsBox.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$MultiTypeArgsBox'");
 
@@ -146,7 +146,7 @@ public class SimpleFormTest {
 
     // fields of SampleComposer
     assertEquals(1, sampleComposer.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SampleComposer'");
-    ScoutSdkAssertions.assertSerialVersionUidField(sampleComposer);
+    assertSerialVersionUidField(sampleComposer);
 
     assertEquals(0, sampleComposer.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SampleComposer'");
 
@@ -162,7 +162,7 @@ public class SimpleFormTest {
 
     // fields of SampleDate
     assertEquals(1, sampleDate.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SampleDate'");
-    ScoutSdkAssertions.assertSerialVersionUidField(sampleDate);
+    assertSerialVersionUidField(sampleDate);
 
     assertEquals(0, sampleDate.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SampleDate'");
 
@@ -178,7 +178,7 @@ public class SimpleFormTest {
 
     // fields of SampleSmart
     assertEquals(1, sampleSmart.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SampleSmart'");
-    ScoutSdkAssertions.assertSerialVersionUidField(sampleSmart);
+    assertSerialVersionUidField(sampleSmart);
 
     assertEquals(0, sampleSmart.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SampleSmart'");
 
@@ -194,7 +194,7 @@ public class SimpleFormTest {
 
     // fields of SampleString
     assertEquals(1, sampleString.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SampleString'");
-    ScoutSdkAssertions.assertSerialVersionUidField(sampleString);
+    assertSerialVersionUidField(sampleString);
 
     assertEquals(0, sampleString.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SampleString'");
 
@@ -207,7 +207,7 @@ public class SimpleFormTest {
 
     // fields of SimpleNrProperty
     assertEquals(1, simpleNrProperty.fields().stream().count(), "field count of 'formdata.shared.services.process.SimpleFormData$SimpleNrProperty'");
-    ScoutSdkAssertions.assertSerialVersionUidField(simpleNrProperty);
+    assertSerialVersionUidField(simpleNrProperty);
 
     assertEquals(0, simpleNrProperty.methods().stream().count(), "method count of 'formdata.shared.services.process.SimpleFormData$SimpleNrProperty'");
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,12 +16,12 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -56,7 +56,7 @@ public class ScopeTest {
 
     // fields of AbstractScopeTestGroupBoxData
     assertEquals(1, abstractScopeTestGroupBoxData.fields().stream().count(), "field count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(abstractScopeTestGroupBoxData);
+    assertSerialVersionUidField(abstractScopeTestGroupBoxData);
 
     assertEquals(1, abstractScopeTestGroupBoxData.methods().stream().count(), "method count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData'");
     var getProcess = assertMethodExist(abstractScopeTestGroupBoxData, "getProcess");
@@ -72,7 +72,7 @@ public class ScopeTest {
 
     // fields of Process
     assertEquals(1, process.fields().stream().count(), "field count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData$Process'");
-    ScoutSdkAssertions.assertSerialVersionUidField(process);
+    assertSerialVersionUidField(process);
 
     assertEquals(0, process.methods().stream().count(), "method count of 'formdata.shared.scope.field.AbstractScopeTestGroupBoxData$Process'");
 
@@ -92,7 +92,7 @@ public class ScopeTest {
 
     // fields of ScopeTestFormData
     assertEquals(1, scopeTestFormData.fields().stream().count(), "field count of 'formdata.shared.scope.orig.ScopeTestFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(scopeTestFormData);
+    assertSerialVersionUidField(scopeTestFormData);
 
     assertEquals(1, scopeTestFormData.methods().stream().count(), "method count of 'formdata.shared.scope.orig.ScopeTestFormData'");
     var getProcessesBox = assertMethodExist(scopeTestFormData, "getProcessesBox");
@@ -108,7 +108,7 @@ public class ScopeTest {
 
     // fields of ProcessesBox
     assertEquals(1, processesBox.fields().stream().count(), "field count of 'formdata.shared.scope.orig.ScopeTestFormData$ProcessesBox'");
-    ScoutSdkAssertions.assertSerialVersionUidField(processesBox);
+    assertSerialVersionUidField(processesBox);
 
     assertEquals(0, processesBox.methods().stream().count(), "method count of 'formdata.shared.scope.orig.ScopeTestFormData$ProcessesBox'");
 
@@ -129,7 +129,7 @@ public class ScopeTest {
 
     // fields of ExtendedScopeTestFormData
     assertEquals(1, extendedScopeTestFormData.fields().stream().count(), "field count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extendedScopeTestFormData);
+    assertSerialVersionUidField(extendedScopeTestFormData);
 
     assertEquals(2, extendedScopeTestFormData.methods().stream().count(), "method count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData'");
     var getAnliegenBox = assertMethodExist(extendedScopeTestFormData, "getAnliegenBox");
@@ -149,7 +149,7 @@ public class ScopeTest {
 
     // fields of AnliegenBox
     assertEquals(1, anliegenBox.fields().stream().count(), "field count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData$AnliegenBox'");
-    ScoutSdkAssertions.assertSerialVersionUidField(anliegenBox);
+    assertSerialVersionUidField(anliegenBox);
 
     assertEquals(0, anliegenBox.methods().stream().count(), "method count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData$AnliegenBox'");
 
@@ -163,7 +163,7 @@ public class ScopeTest {
 
     // fields of ExtendedProcess
     assertEquals(1, extendedProcess.fields().stream().count(), "field count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData$ExtendedProcess'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extendedProcess);
+    assertSerialVersionUidField(extendedProcess);
 
     assertEquals(0, extendedProcess.methods().stream().count(), "method count of 'formdata.shared.scope.extended.ExtendedScopeTestFormData$ExtendedProcess'");
 

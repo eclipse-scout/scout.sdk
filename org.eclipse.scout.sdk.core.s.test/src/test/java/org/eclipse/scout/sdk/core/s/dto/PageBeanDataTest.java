@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,12 +20,12 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createPageDataAssertNoCompileErrors;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createRowDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -75,7 +75,7 @@ public class PageBeanDataTest {
 
     // fields of BaseTablePageData
     assertEquals(1, baseTablePageData.fields().stream().count(), "field count of 'BaseTablePageData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(baseTablePageData);
+    assertSerialVersionUidField(baseTablePageData);
 
     assertEquals(7, baseTablePageData.methods().stream().count(), "method count of 'BaseTablePageData'");
     var addRow = assertMethodExist(baseTablePageData, "addRow");
@@ -107,7 +107,7 @@ public class PageBeanDataTest {
 
     // fields of BaseTableRowData
     assertEquals(5, baseTableRowData.fields().stream().count(), "field count of 'BaseTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(baseTableRowData);
+    assertSerialVersionUidField(baseTableRowData);
     var first = assertFieldExist(baseTableRowData, "first");
     assertHasFlags(first, 25);
     assertFieldType(first, String.class.getName());
@@ -147,7 +147,7 @@ public class PageBeanDataTest {
 
     // fields of ExtendedTablePageData
     assertEquals(1, extendedTablePageData.fields().stream().count(), "field count of 'formdata.shared.services.pages.ExtendedTablePageData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extendedTablePageData);
+    assertSerialVersionUidField(extendedTablePageData);
 
     assertEquals(7, extendedTablePageData.methods().stream().count(), "method count of 'formdata.shared.services.pages.ExtendedTablePageData'");
     var addRow = assertMethodExist(extendedTablePageData, "addRow");
@@ -187,7 +187,7 @@ public class PageBeanDataTest {
 
     // fields of ExtendedTableRowData
     assertEquals(5, extendedTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.pages.ExtendedTablePageData$ExtendedTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extendedTableRowData);
+    assertSerialVersionUidField(extendedTableRowData);
     var intermediate = assertFieldExist(extendedTableRowData, "intermediate");
     assertHasFlags(intermediate, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(intermediate, "java.lang.String");
@@ -232,7 +232,7 @@ public class PageBeanDataTest {
 
     // fields of ExtendedTablePageWithoutExtendedTableData
     assertEquals(1, extendedTablePageWithoutExtendedTableData.fields().stream().count(), "field count of 'ExtendedTablePageWithoutExtendedTableData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extendedTablePageWithoutExtendedTableData);
+    assertSerialVersionUidField(extendedTablePageWithoutExtendedTableData);
 
     assertEquals(7, extendedTablePageWithoutExtendedTableData.methods().stream().count(), "method count of 'ExtendedTablePageWithoutExtendedTableData'");
     var addRow = assertMethodExist(extendedTablePageWithoutExtendedTableData, "addRow");
@@ -265,7 +265,7 @@ public class PageBeanDataTest {
 
     // fields of ExtendedTablePageWithoutExtendedTableRowData
     assertEquals(1, extendedTablePageWithoutExtendedTableRowData.fields().stream().count(), "field count of 'ExtendedTablePageWithoutExtendedTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extendedTablePageWithoutExtendedTableRowData);
+    assertSerialVersionUidField(extendedTablePageWithoutExtendedTableRowData);
 
     assertEquals(0, extendedTablePageWithoutExtendedTableRowData.methods().stream().count(), "method count of 'ExtendedTablePageWithoutExtendedTableRowData'");
 
@@ -282,7 +282,7 @@ public class PageBeanDataTest {
 
     // fields of BaseWithExtendedTableTablePageData
     assertEquals(1, baseWithExtendedTableTablePageData.fields().stream().count(), "field count of 'BaseWithExtendedTableTablePageData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(baseWithExtendedTableTablePageData);
+    assertSerialVersionUidField(baseWithExtendedTableTablePageData);
 
     assertEquals(7, baseWithExtendedTableTablePageData.methods().stream().count(), "method count of 'BaseWithExtendedTableTablePageData'");
     var addRow = assertMethodExist(baseWithExtendedTableTablePageData, "addRow");
@@ -314,7 +314,7 @@ public class PageBeanDataTest {
 
     // fields of BaseWithExtendedTableTableRowData
     assertEquals(5, baseWithExtendedTableTableRowData.fields().stream().count(), "field count of 'BaseWithExtendedTableTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(baseWithExtendedTableTableRowData);
+    assertSerialVersionUidField(baseWithExtendedTableTableRowData);
     var colInAbstractTable = assertFieldExist(baseWithExtendedTableTableRowData, "colInAbstractTable");
     assertHasFlags(colInAbstractTable, 25);
     assertFieldType(colInAbstractTable, String.class.getName());
@@ -351,7 +351,7 @@ public class PageBeanDataTest {
 
     // fields of ExtendedExtendedTablePageWithExtendedTableData
     assertEquals(1, extendedExtendedTablePageWithExtendedTableData.fields().stream().count(), "field count of 'ExtendedExtendedTablePageWithExtendedTableData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extendedExtendedTablePageWithExtendedTableData);
+    assertSerialVersionUidField(extendedExtendedTablePageWithExtendedTableData);
 
     assertEquals(7, extendedExtendedTablePageWithExtendedTableData.methods().stream().count(), "method count of 'ExtendedExtendedTablePageWithExtendedTableData'");
     var addRow = assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "addRow");
@@ -384,7 +384,7 @@ public class PageBeanDataTest {
 
     // fields of ExtendedExtendedTablePageWithExtendedTableRowData
     assertEquals(3, extendedExtendedTablePageWithExtendedTableRowData.fields().stream().count(), "field count of 'ExtendedExtendedTablePageWithExtendedTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(extendedExtendedTablePageWithExtendedTableRowData);
+    assertSerialVersionUidField(extendedExtendedTablePageWithExtendedTableRowData);
     var boolean_ = assertFieldExist(extendedExtendedTablePageWithExtendedTableRowData, "boolean_");
     assertHasFlags(boolean_, 25);
     assertFieldType(boolean_, String.class.getName());
@@ -416,7 +416,7 @@ public class PageBeanDataTest {
 
     // fields of PageWithTableExtensionData
     assertEquals(3, pageWithTableExtensionData.fields().stream().count(), "field count of 'formdata.shared.services.pages.PageWithTableExtensionData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(pageWithTableExtensionData);
+    assertSerialVersionUidField(pageWithTableExtensionData);
     var bigDecimalTest = assertFieldExist(pageWithTableExtensionData, "bigDecimalTest");
     assertHasFlags(bigDecimalTest, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(bigDecimalTest, "java.lang.String");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,12 +18,12 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class ExternalTableFieldTest {
@@ -46,7 +46,7 @@ public class ExternalTableFieldTest {
 
     // fields of AbstractCompanyTableFieldData
     assertEquals(1, abstractCompanyTableFieldData.fields().stream().count(), "field count of 'formdata.shared.services.process.AbstractCompanyTableFieldData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(abstractCompanyTableFieldData);
+    assertSerialVersionUidField(abstractCompanyTableFieldData);
 
     assertEquals(7, abstractCompanyTableFieldData.methods().stream().count(), "method count of 'formdata.shared.services.process.AbstractCompanyTableFieldData'");
     var addRow = assertMethodExist(abstractCompanyTableFieldData, "addRow");
@@ -86,7 +86,7 @@ public class ExternalTableFieldTest {
 
     // fields of AbstractCompanyTableRowData
     assertEquals(3, abstractCompanyTableRowData.fields().stream().count(), "field count of 'formdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(abstractCompanyTableRowData);
+    assertSerialVersionUidField(abstractCompanyTableRowData);
     var name = assertFieldExist(abstractCompanyTableRowData, "name");
     assertHasFlags(name, Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     assertFieldType(name, "java.lang.String");

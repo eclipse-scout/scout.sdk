@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,10 +15,10 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class IgnoredFieldsFormTest {
@@ -38,7 +38,7 @@ public class IgnoredFieldsFormTest {
 
     // fields of IgnoredFieldsFormData
     assertEquals(1, ignoredFieldsFormData.fields().stream().count(), "field count of 'IgnoredFieldsFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(ignoredFieldsFormData);
+    assertSerialVersionUidField(ignoredFieldsFormData);
 
     assertEquals(1, ignoredFieldsFormData.methods().stream().count(), "method count of 'IgnoredFieldsFormData'");
     var getNotIgnored = assertMethodExist(ignoredFieldsFormData, "getNotIgnored");
@@ -52,7 +52,7 @@ public class IgnoredFieldsFormTest {
 
     // fields of NotIgnored
     assertEquals(1, notIgnored.fields().stream().count(), "field count of 'NotIgnored'");
-    ScoutSdkAssertions.assertSerialVersionUidField(notIgnored);
+    assertSerialVersionUidField(notIgnored);
 
     assertEquals(0, notIgnored.methods().stream().count(), "method count of 'NotIgnored'");
 

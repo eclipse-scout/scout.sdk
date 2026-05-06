@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,10 +15,10 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.eclipse.scout.sdk.core.java.model.api.IType;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class FormWithTemplateTest {
@@ -38,7 +38,7 @@ public class FormWithTemplateTest {
 
     // fields of UsingTemplateFormData
     assertEquals(1, usingTemplateFormData.fields().stream().count(), "field count of 'UsingTemplateFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(usingTemplateFormData);
+    assertSerialVersionUidField(usingTemplateFormData);
 
     assertEquals(4, usingTemplateFormData.methods().stream().count(), "method count of 'UsingTemplateFormData'");
     var getExternalGroupBox = assertMethodExist(usingTemplateFormData, "getExternalGroupBox");
@@ -58,7 +58,7 @@ public class FormWithTemplateTest {
 
     // fields of ExternalGroupBox
     assertEquals(1, externalGroupBox.fields().stream().count(), "field count of 'ExternalGroupBox'");
-    ScoutSdkAssertions.assertSerialVersionUidField(externalGroupBox);
+    assertSerialVersionUidField(externalGroupBox);
 
     assertEquals(0, externalGroupBox.methods().stream().count(), "method count of 'ExternalGroupBox'");
 
@@ -70,7 +70,7 @@ public class FormWithTemplateTest {
 
     // fields of InternalHtml
     assertEquals(1, internalHtml.fields().stream().count(), "field count of 'InternalHtml'");
-    ScoutSdkAssertions.assertSerialVersionUidField(internalHtml);
+    assertSerialVersionUidField(internalHtml);
 
     assertEquals(0, internalHtml.methods().stream().count(), "method count of 'InternalHtml'");
 
@@ -82,7 +82,7 @@ public class FormWithTemplateTest {
 
     // fields of TestCheckbox
     assertEquals(1, testCheckbox.fields().stream().count(), "field count of 'TestCheckbox'");
-    ScoutSdkAssertions.assertSerialVersionUidField(testCheckbox);
+    assertSerialVersionUidField(testCheckbox);
 
     assertEquals(0, testCheckbox.methods().stream().count(), "method count of 'TestCheckbox'");
 
@@ -94,7 +94,7 @@ public class FormWithTemplateTest {
 
     // fields of TestLimitedString
     assertEquals(1, testLimitedString.fields().stream().count(), "field count of 'TestLimitedString'");
-    ScoutSdkAssertions.assertSerialVersionUidField(testLimitedString);
+    assertSerialVersionUidField(testLimitedString);
 
     assertEquals(0, testLimitedString.methods().stream().count(), "method count of 'TestLimitedString'");
 

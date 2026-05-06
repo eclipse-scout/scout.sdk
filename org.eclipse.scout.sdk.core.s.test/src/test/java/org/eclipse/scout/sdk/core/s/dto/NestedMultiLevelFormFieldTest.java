@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,7 @@ import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMe
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertMethodReturnType;
 import static org.eclipse.scout.sdk.core.java.testing.SdkJavaAssertions.assertTypeExists;
 import static org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper.createFormDataAssertNoCompileErrors;
+import static org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions.assertSerialVersionUidField;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -23,7 +24,6 @@ import org.eclipse.scout.sdk.core.java.model.api.Flags;
 import org.eclipse.scout.sdk.core.java.model.api.IType;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.testing.ScoutFixtureHelper;
-import org.eclipse.scout.sdk.core.s.testing.ScoutSdkAssertions;
 import org.junit.jupiter.api.Test;
 
 public class NestedMultiLevelFormFieldTest {
@@ -77,7 +77,7 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of AbstractMainBoxData
     assertEquals(1, abstractMainBoxData.fields().stream().count(), "field count of 'formdata.shared.ui.template.formfield.replace.levels.AbstractMainBoxData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(abstractMainBoxData);
+    assertSerialVersionUidField(abstractMainBoxData);
 
     assertEquals(1, abstractMainBoxData.methods().stream().count(), "method count of 'formdata.shared.ui.template.formfield.replace.levels.AbstractMainBoxData'");
     var getFirstLevel = assertMethodExist(abstractMainBoxData, "getFirstLevel");
@@ -93,7 +93,7 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of FirstLevel
     assertEquals(1, firstLevel.fields().stream().count(), "field count of 'formdata.shared.ui.template.formfield.replace.levels.AbstractMainBoxData$FirstLevel'");
-    ScoutSdkAssertions.assertSerialVersionUidField(firstLevel);
+    assertSerialVersionUidField(firstLevel);
 
     assertEquals(0, firstLevel.methods().stream().count(), "method count of 'formdata.shared.ui.template.formfield.replace.levels.AbstractMainBoxData$FirstLevel'");
 
@@ -113,7 +113,7 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of AbstractTemplateFieldData
     assertEquals(1, abstractTemplateFieldData.fields().stream().count(), "field count of 'formdata.shared.ui.template.formfield.replace.levels.AbstractTemplateFieldData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(abstractTemplateFieldData);
+    assertSerialVersionUidField(abstractTemplateFieldData);
 
     assertEquals(0, abstractTemplateFieldData.methods().stream().count(), "method count of 'formdata.shared.ui.template.formfield.replace.levels.AbstractTemplateFieldData'");
 
@@ -133,7 +133,7 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of FirstLevelFormData
     assertEquals(1, firstLevelFormData.fields().stream().count(), "field count of 'formdata.shared.ui.template.formfield.replace.levels.FirstLevelFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(firstLevelFormData);
+    assertSerialVersionUidField(firstLevelFormData);
 
     assertEquals(1, firstLevelFormData.methods().stream().count(), "method count of 'formdata.shared.ui.template.formfield.replace.levels.FirstLevelFormData'");
     var getFirstInnerBox = assertMethodExist(firstLevelFormData, "getFirstInnerBox");
@@ -149,7 +149,7 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of FirstInnerBox
     assertEquals(1, firstInnerBox.fields().stream().count(), "field count of 'formdata.shared.ui.template.formfield.replace.levels.FirstLevelFormData$FirstInnerBox'");
-    ScoutSdkAssertions.assertSerialVersionUidField(firstInnerBox);
+    assertSerialVersionUidField(firstInnerBox);
 
     assertEquals(0, firstInnerBox.methods().stream().count(), "method count of 'formdata.shared.ui.template.formfield.replace.levels.FirstLevelFormData$FirstInnerBox'");
 
@@ -169,7 +169,7 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of SecondLevelFormData
     assertEquals(1, secondLevelFormData.fields().stream().count(), "field count of 'formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(secondLevelFormData);
+    assertSerialVersionUidField(secondLevelFormData);
 
     assertEquals(1, secondLevelFormData.methods().stream().count(), "method count of 'formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData'");
     var getSecondInnerBox = assertMethodExist(secondLevelFormData, "getSecondInnerBox");
@@ -186,7 +186,7 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of SecondInnerBox
     assertEquals(1, secondInnerBox.fields().stream().count(), "field count of 'formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData$SecondInnerBox'");
-    ScoutSdkAssertions.assertSerialVersionUidField(secondInnerBox);
+    assertSerialVersionUidField(secondInnerBox);
 
     assertEquals(1, secondInnerBox.methods().stream().count(), "method count of 'formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData$SecondInnerBox'");
     var getSecondLevel = assertMethodExist(secondInnerBox, "getSecondLevel");
@@ -203,7 +203,7 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of SecondLevel
     assertEquals(1, secondLevel.fields().stream().count(), "field count of 'formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData$SecondInnerBox$SecondLevel'");
-    ScoutSdkAssertions.assertSerialVersionUidField(secondLevel);
+    assertSerialVersionUidField(secondLevel);
 
     assertEquals(0, secondLevel.methods().stream().count(), "method count of 'formdata.shared.ui.template.formfield.replace.levels.SecondLevelFormData$SecondInnerBox$SecondLevel'");
 
@@ -223,7 +223,7 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of ThirdLevelFormData
     assertEquals(1, thirdLevelFormData.fields().stream().count(), "field count of 'formdata.shared.ui.template.formfield.replace.levels.ThirdLevelFormData'");
-    ScoutSdkAssertions.assertSerialVersionUidField(thirdLevelFormData);
+    assertSerialVersionUidField(thirdLevelFormData);
 
     assertEquals(1, thirdLevelFormData.methods().stream().count(), "method count of 'formdata.shared.ui.template.formfield.replace.levels.ThirdLevelFormData'");
     var getThirdInnerBox = assertMethodExist(thirdLevelFormData, "getThirdInnerBox");
@@ -240,7 +240,7 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of ThirdInnerBox
     assertEquals(1, thirdInnerBox.fields().stream().count(), "field count of 'formdata.shared.ui.template.formfield.replace.levels.ThirdLevelFormData$ThirdInnerBox'");
-    ScoutSdkAssertions.assertSerialVersionUidField(thirdInnerBox);
+    assertSerialVersionUidField(thirdInnerBox);
 
     assertEquals(1, thirdInnerBox.methods().stream().count(), "method count of 'formdata.shared.ui.template.formfield.replace.levels.ThirdLevelFormData$ThirdInnerBox'");
     var getThirdLevel = assertMethodExist(thirdInnerBox, "getThirdLevel");
@@ -257,7 +257,7 @@ public class NestedMultiLevelFormFieldTest {
 
     // fields of ThirdLevel
     assertEquals(1, thirdLevel.fields().stream().count(), "field count of 'formdata.shared.ui.template.formfield.replace.levels.ThirdLevelFormData$ThirdInnerBox$ThirdLevel'");
-    ScoutSdkAssertions.assertSerialVersionUidField(thirdLevel);
+    assertSerialVersionUidField(thirdLevel);
 
     assertEquals(0, thirdLevel.methods().stream().count(), "method count of 'formdata.shared.ui.template.formfield.replace.levels.ThirdLevelFormData$ThirdInnerBox$ThirdLevel'");
 
