@@ -163,7 +163,7 @@
 
     <icu4j>78.2</icu4j>
     <ecj>3.45.0</ecj>
-    <junit.version>5.14.3</junit.version>
+    <junit.version>5.14.4</junit.version>
 
     <!-- versions to dependencies uploaded by scout -->
     <org.eclipse.m2e.core>2.7.600.20251121-1832</org.eclipse.m2e.core>
@@ -854,23 +854,23 @@
       <dependency>
         <groupId>org.apache.ant</groupId>
         <artifactId>ant</artifactId>
-        <version>${master_plugin_ant_version}</version>
+        <version>1.10.17</version>
       </dependency>
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.21.0</version>
+        <version>1.22.0</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <scope>test</scope>
-        <version>33.5.0-jre</version>
+        <version>33.6.0-jre</version>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>5.22.0</version>
+        <version>5.23.0</version>
       </dependency>
       <dependency>
         <groupId>xml-apis</groupId>
