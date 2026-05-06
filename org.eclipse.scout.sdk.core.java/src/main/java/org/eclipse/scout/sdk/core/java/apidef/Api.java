@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,7 @@
 package org.eclipse.scout.sdk.core.java.apidef;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
@@ -17,10 +18,10 @@ import java.lang.reflect.Method;
 import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -287,7 +288,7 @@ public final class Api {
    */
   public static Set<Class<? extends IApiSpecification>> allKnownTypes() {
     synchronized (REGISTRY) {
-      return Collections.unmodifiableSet(REGISTRY.keySet());
+      return unmodifiableSet(new HashSet<>(REGISTRY.keySet()));
     }
   }
 
