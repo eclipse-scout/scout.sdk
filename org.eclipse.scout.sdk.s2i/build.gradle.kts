@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import com.google.inject.util.Types.listOf
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.extensions.intellijPlatform
@@ -96,13 +97,13 @@ intellijPlatform {
             select {
                 types = listOf(IntelliJPlatformType.IntellijIdea)
                 channels = listOf(ProductRelease.Channel.RELEASE)
-                sinceBuild = "2025.1"
+                sinceBuild = "251"
             }
-//            select {
-//                types = listOf(IntelliJPlatformType.IntellijIdea)
-//                channels = listOf(ProductRelease.Channel.EAP)
-//                sinceBuild = "262"
-//            }
+            select {
+                types = listOf(IntelliJPlatformType.IntellijIdea)
+                channels = listOf(ProductRelease.Channel.EAP)
+                sinceBuild = "262"
+            }
         }
     }
 }
