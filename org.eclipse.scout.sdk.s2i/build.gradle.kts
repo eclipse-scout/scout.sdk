@@ -8,7 +8,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import com.google.inject.util.Types.listOf
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.extensions.intellijPlatform
@@ -24,13 +23,14 @@ import java.util.*
 val scoutSdkVersion = "14.0.0-SNAPSHOT"
 val scoutSdkPluginVersion = "14.0.0.".plus(timestamp())
 val scoutRtVersion = projectPropertyOr("org.eclipse.scout.rt_version", "26.2-SNAPSHOT")
+val targetJavaVersion = 21
 
 plugins {
     id("java")
     id("maven-publish")
 
     // See https://github.com/JetBrains/intellij-platform-gradle-plugin
-    id("org.jetbrains.intellij.platform") version "2.11.0"
+    id("org.jetbrains.intellij.platform") version "2.16.0"
 
     kotlin("jvm") version "2.1.21"
     id("io.github.rmanibus.maven-settings") version "0.8" // for maven settings
@@ -76,8 +76,8 @@ dependencies {
 
 allprojects {
     java {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.toVersion(targetJavaVersion)
+        targetCompatibility = JavaVersion.toVersion(targetJavaVersion)
     }
 }
 
@@ -110,14 +110,15 @@ intellijPlatform {
 
 kotlin {
     compilerOptions {
-        jvmTarget = JvmTarget.JVM_21
+        jvmTarget = JvmTarget.fromTarget(targetJavaVersion.toString())
     }
 }
 
 tasks {
     withType<JavaCompile>().configureEach {
-        sourceCompatibility = JavaVersion.VERSION_21.toString()
-        targetCompatibility = JavaVersion.VERSION_21.toString()
+        sourceCompatibility = targetJavaVersion.toString()
+        targetCompatibility = targetJavaVersion.toString()
+        options.release.set(targetJavaVersion)
     }
 
     withType<VerifyPluginTask> {

@@ -8,3 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 rootProject.name = "org.eclipse.scout.sdk.s2i"
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0" // for automatic toolchain resolve
+}
