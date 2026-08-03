@@ -9,6 +9,9 @@
  */
 package org.eclipse.scout.sdk.core.java.ecj;
 
+import java.io.IOException;
+import java.nio.file.InvalidPathException;
+import java.nio.file.NoSuchFileException;
 import java.util.Set;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
@@ -27,8 +30,47 @@ public class FileSystemWithOverride extends FileSystem {
   private final CompilationUnitOverrideSupport m_overrideSupport;
   private final Set<ClasspathEntry> m_cpEntries;
 
+  /**
+   * @noinspection AssignmentToSuperclassField
+   */
   protected FileSystemWithOverride(ClasspathBuilder cp) {
-    super(cp.fullClasspath().toArray(new Classpath[0]), null, false);
+    super(new String[0], null, null);
+
+    var paths = cp.fullClasspath().toArray(new Classpath[0]);
+    var length = paths.length;
+    var counter = 0;
+    this.classpaths = new FileSystem.Classpath[length];
+    for (var classpath : paths) {
+      try {
+        classpath.initialize();
+        for (var moduleName : classpath.getModuleNames(null)) {
+          this.moduleLocations.put(moduleName, classpath);
+        }
+        this.classpaths[counter++] = classpath;
+      }
+      catch (InvalidPathException exception) {
+        // JRE 9 could throw an IAE if the linked JAR paths have invalid chars, such as ":"
+        // ignore
+      }
+      catch (NoSuchFileException e) {
+        // we don't warn about in-existing jars (javac does the same as us)
+        // see org.eclipse.jdt.core.tests.compiler.regression.BatchCompilerTest.test017b()
+      }
+      catch (IOException e) {
+        throw new IllegalStateException("Failed to init " + classpath, e);
+      }
+    }
+    if (counter != length) {
+      // should not happen
+      System.arraycopy(this.classpaths, 0, (this.classpaths = new FileSystem.Classpath[counter]), 0, counter);
+    }
+    for (var c : this.classpaths) {
+      for (var moduleName : c.getModuleNames(null)) {
+        this.moduleLocations.put(moduleName, c);
+      }
+    }
+    this.annotationsFromClasspath = false;
+
     m_jreInfo = cp.jreInfo();
     m_cpEntries = cp.userClasspathEntries();
     m_overrideSupport = new CompilationUnitOverrideSupport();
