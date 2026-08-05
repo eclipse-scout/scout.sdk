@@ -14,7 +14,6 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static java.util.stream.Collectors.toList;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -77,13 +76,13 @@ public final class Xml {
    * Reads the content of the specified xml file into an XML {@link Document}.
    *
    * @param xmlFile
-   *          A {@link Path} pointing to the xml file. Must not be {@code null}.
+   *     A {@link Path} pointing to the xml file. Must not be {@code null}.
    * @return A {@link Document} with the content of the xml file.
    * @throws IOException
-   *           if there is an exception reading the file into the document.
+   *     if there is an exception reading the file into the document.
    */
   public static Document get(Path xmlFile) throws IOException {
-    try (var in = new BufferedInputStream(Files.newInputStream(Ensure.notNull(xmlFile), StandardOpenOption.READ))) {
+    try (var in = Files.newInputStream(Ensure.notNull(xmlFile), StandardOpenOption.READ)) {
       return get(in);
     }
   }
@@ -92,10 +91,10 @@ public final class Xml {
    * Reads the content of the specified {@link URL} into an XML {@link Document}.
    *
    * @param url
-   *          The {@link URL} from where the content should be read. Must not be {@code null}.
+   *     The {@link URL} from where the content should be read. Must not be {@code null}.
    * @return A {@link Document} with the XML content of the url.
    * @throws IOException
-   *           if there is an exception reading the file into the document.
+   *     if there is an exception reading the file into the document.
    */
   public static Document get(URL url) throws IOException {
     try {
@@ -110,10 +109,10 @@ public final class Xml {
    * Reads the content of the specified {@link URI} into an XML {@link Document}.
    *
    * @param uri
-   *          The {@link URI} from where the content should be read. Must not be {@code null}.
+   *     The {@link URI} from where the content should be read. Must not be {@code null}.
    * @return A {@link Document} with the XML content of the url.
    * @throws IOException
-   *           if there is an exception reading the file into the document.
+   *     if there is an exception reading the file into the document.
    */
   public static Document get(URI uri) throws IOException {
     // use document builder to download the stream content because it correctly handles the xml encoding as specified in the xml declaration.
@@ -126,10 +125,10 @@ public final class Xml {
    * Converts the specified {@link String} into an XML {@link Document}.
    *
    * @param rawXmlAsString
-   *          The {@link String} holding the XML content. Must not be blank (see {@link Strings#isBlank(CharSequence)}).
+   *     The {@link String} holding the XML content. Must not be blank (see {@link Strings#isBlank(CharSequence)}).
    * @return A {@link Document} with the XML content of the specified {@link String}.
    * @throws IOException
-   *           if there is an exception converting the {@link String}.
+   *     if there is an exception converting the {@link String}.
    */
   public static Document get(String rawXmlAsString) throws IOException {
     try (Reader r = new StringReader(Ensure.notBlank(rawXmlAsString))) {
@@ -154,9 +153,9 @@ public final class Xml {
    * (ignoring namespaces).
    *
    * @param parent
-   *          The parent {@link Element}
+   *     The parent {@link Element}
    * @param tagName
-   *          The local tag name (see {@link Node#getLocalName()}
+   *     The local tag name (see {@link Node#getLocalName()}
    * @return The first Element with this tag name or {@code null} if no such {@link Element} exists.
    */
   public static Optional<Element> firstChildElement(Node parent, String tagName) {
@@ -197,12 +196,12 @@ public final class Xml {
    * Evaluates the specified xPath string on the specified {@link Document}.
    *
    * @param xPath
-   *          The xPath expression
+   *     The xPath expression
    * @param applyToDocument
-   *          The {@link Document} to apply the xPath to.
+   *     The {@link Document} to apply the xPath to.
    * @return All {@link Element}s that match the specified xPath expression.
    * @throws XPathExpressionException
-   *           if there is an error during XPath evaluation
+   *     if there is an error during XPath evaluation
    */
   public static List<Element> evaluateXPath(String xPath, Node applyToDocument) throws XPathExpressionException {
     return evaluateXPath(xPath, applyToDocument, null);
@@ -212,16 +211,16 @@ public final class Xml {
    * Evaluates the specified xPath string on the specified {@link Document}.
    *
    * @param xPath
-   *          The xPath expression
+   *     The xPath expression
    * @param applyToDocument
-   *          The {@link Document} to apply the xPath to.
+   *     The {@link Document} to apply the xPath to.
    * @param prefix
-   *          The single namespace prefix that was used in the specified xPath expression
+   *     The single namespace prefix that was used in the specified xPath expression
    * @param namespace
-   *          The namespace the specified prefix maps to.
+   *     The namespace the specified prefix maps to.
    * @return All {@link Element}s that match the specified xPath expression.
    * @throws XPathExpressionException
-   *           if there is an error during XPath evaluation
+   *     if there is an error during XPath evaluation
    */
   public static List<Element> evaluateXPath(String xPath, Node applyToDocument, String prefix, String namespace) throws XPathExpressionException {
     return evaluateXPath(xPath, applyToDocument, singletonMap(prefix, namespace));
@@ -231,15 +230,15 @@ public final class Xml {
    * Evaluates the specified xPath string on the specified {@link Document}.
    *
    * @param xPath
-   *          The xPath expression
+   *     The xPath expression
    * @param applyToDocument
-   *          The {@link Document} to apply the xPath to.
+   *     The {@link Document} to apply the xPath to.
    * @param usedPrefixToNamespaceMap
-   *          A {@link Map} defining all namespace prefixes used in the specified xPath and their corresponding
-   *          namespace.
+   *     A {@link Map} defining all namespace prefixes used in the specified xPath and their corresponding
+   *     namespace.
    * @return All {@link Element}s that match the specified xPath expression.
    * @throws XPathExpressionException
-   *           if there is an error during XPath evaluation
+   *     if there is an error during XPath evaluation
    */
   public static List<Element> evaluateXPath(String xPath, Node applyToDocument, Map<String, String> usedPrefixToNamespaceMap) throws XPathExpressionException {
     var result = doEvaluateXPath(xPath, applyToDocument, usedPrefixToNamespaceMap);
@@ -345,7 +344,7 @@ public final class Xml {
    *
    * @return The created builder. All external entities are disabled to prevent XXE.
    * @throws ParserConfigurationException
-   *           if a {@link DocumentBuilder} cannot be created which satisfies the configuration requested.
+   *     if a {@link DocumentBuilder} cannot be created which satisfies the configuration requested.
    */
   public static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
     return createDocumentBuilderFactory().newDocumentBuilder();
@@ -355,12 +354,12 @@ public final class Xml {
    * Transforms the specified {@link Document} into a {@link StringBuffer}.
    *
    * @param document
-   *          The document to transform. Must not be {@code null}.
+   *     The document to transform. Must not be {@code null}.
    * @param format
-   *          If the document should be formatted ({@code true}) or not ({@code false}).
+   *     If the document should be formatted ({@code true}) or not ({@code false}).
    * @return The specified {@link Document} as {@link StringBuffer} optionally formatted.
    * @throws TransformerException
-   *           if there is an error writing or transforming the document
+   *     if there is an error writing or transforming the document
    */
   public static StringBuffer writeDocument(Document document, boolean format) throws TransformerException {
     try (var out = new StringWriter()) {
@@ -374,15 +373,15 @@ public final class Xml {
 
   /**
    * Writes the {@link Document} specified into the target file.
-   * 
+   *
    * @param document
-   *          The {@link Document} to transform. Must not be {@code null}.
+   *     The {@link Document} to transform. Must not be {@code null}.
    * @param format
-   *          Specifies if the document should be formatted when writing. Please note: this also removes empty lines.
+   *     Specifies if the document should be formatted when writing. Please note: this also removes empty lines.
    * @param targetFile
-   *          The file in which the {@link Document} should be written. Must not be {@code null}.
+   *     The file in which the {@link Document} should be written. Must not be {@code null}.
    * @throws TransformerException
-   *           if there is an error writing or transforming the document
+   *     if there is an error writing or transforming the document
    */
   public static void writeDocument(Document document, boolean format, Path targetFile) throws TransformerException {
     try (var out = Files.newOutputStream(targetFile, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE)) {
@@ -395,15 +394,15 @@ public final class Xml {
 
   /**
    * Writes the {@link Document} specified into the given {@link Writer}.
-   * 
+   *
    * @param document
-   *          The {@link Document} to transform. Must not be {@code null}.
+   *     The {@link Document} to transform. Must not be {@code null}.
    * @param format
-   *          Specifies if the document should be formatted when writing. Please note: this also removes empty lines.
+   *     Specifies if the document should be formatted when writing. Please note: this also removes empty lines.
    * @param out
-   *          The {@link Writer} in which the {@link Document} should be written. Must not be {@code null}.
+   *     The {@link Writer} in which the {@link Document} should be written. Must not be {@code null}.
    * @throws TransformerException
-   *           if there is an error writing or transforming the document
+   *     if there is an error writing or transforming the document
    */
   public static void writeDocument(Document document, boolean format, Writer out) throws TransformerException {
     doWriteDocument(document, format, new StreamResult(out));
@@ -411,15 +410,15 @@ public final class Xml {
 
   /**
    * Writes the {@link Document} specified into the given {@link OutputStream}.
-   * 
+   *
    * @param document
-   *          The {@link Document} to transform. Must not be {@code null}.
+   *     The {@link Document} to transform. Must not be {@code null}.
    * @param format
-   *          Specifies if the document should be formatted when writing. Please note: this also removes empty lines.
+   *     Specifies if the document should be formatted when writing. Please note: this also removes empty lines.
    * @param out
-   *          The {@link OutputStream} in which the {@link Document} should be written. Must not be {@code null}.
+   *     The {@link OutputStream} in which the {@link Document} should be written. Must not be {@code null}.
    * @throws TransformerException
-   *           if there is an error writing or transforming the document
+   *     if there is an error writing or transforming the document
    */
   public static void writeDocument(Document document, boolean format, OutputStream out) throws TransformerException {
     doWriteDocument(document, format, new StreamResult(out));
@@ -450,10 +449,10 @@ public final class Xml {
    * document.
    *
    * @param format
-   *          {@code true} to have the document formatted (indent) during transformation. {@code false} otherwise.
+   *     {@code true} to have the document formatted (indent) during transformation. {@code false} otherwise.
    * @return The created {@link Transformer}. All external entities are disabled to prevent XXE.
    * @throws TransformerConfigurationException
-   *           When it is not possible to create a Transformer instance.
+   *     When it is not possible to create a Transformer instance.
    */
   @SuppressWarnings("HttpUrlsUsage")
   public static Transformer createTransformer(boolean format) throws TransformerConfigurationException {

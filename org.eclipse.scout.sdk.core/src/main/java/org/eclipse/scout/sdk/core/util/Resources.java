@@ -9,10 +9,8 @@
  */
 package org.eclipse.scout.sdk.core.util;
 
-import static java.net.http.HttpResponse.BodyHandlers.buffering;
 import static java.net.http.HttpResponse.BodyHandlers.ofInputStream;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
@@ -27,6 +25,11 @@ import java.net.http.HttpClient.Redirect;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpTimeoutException;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.zip.GZIPInputStream;
 
@@ -48,8 +51,6 @@ public final class Resources {
   public static final String ENCODING_GZIP = "gzip";
 
   public static final FinalValue<HttpClient> SHARED_HTTP_CLIENT = new FinalValue<>();
-
-  private static final int BUFFER_SIZE = 8192;
 
   private Resources() {
   }
@@ -105,11 +106,7 @@ public final class Resources {
     if (PROTOCOL_HTTPS.equalsIgnoreCase(scheme) || PROTOCOL_HTTP.equalsIgnoreCase(scheme)) {
       return httpGet(uri);
     }
-    var stream = uri.toURL().openStream();
-    if (stream instanceof BufferedInputStream) {
-      return stream;
-    }
-    return new BufferedInputStream(stream, BUFFER_SIZE);
+    return uri.toURL().openStream();
   }
 
   /**
@@ -144,6 +141,25 @@ public final class Resources {
     }
     catch (URISyntaxException e) {
       throw new SdkException("Invalid URI: '{}'.", uri, e);
+    }
+  }
+
+  /**
+   * Downloads the resource at the given uri into the given target file.
+   *
+   * @param uri
+   *     The uri to get. Must be a valid {@link URI} and must not be {@code null}.
+   * @param target
+   *     The target file. If the file or its parent directories do not exist, they are created as needed. Existing files are overwritten. Must not be {@code null}.
+   * @throws IOException
+   *     if the file cannot be downloaded or there is an error writing to the file.
+   * @throws SdkException
+   *     if the uri is invalid or the thread is interrupted while waiting for the response.
+   */
+  public static void download(String uri, Path target) throws IOException {
+    Files.createDirectories(target.getParent());
+    try (var out = FileChannel.open(target, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE); var in = Channels.newChannel(httpGet(uri))) {
+      out.transferFrom(in, 0, Long.MAX_VALUE);
     }
   }
 
@@ -206,10 +222,8 @@ public final class Resources {
         .setHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP) // support gzip compression
         .GET()
         .build();
-    var handler = buffering(ofInputStream(), BUFFER_SIZE);
-
     var httpClient = getSharedHttpClient();
-    var response = httpClient.send(request, handler);
+    var response = httpClient.send(request, ofInputStream());
     var statusCode = response.statusCode();
     if (statusCode < 200 || statusCode > 299) {
       throw new IOException("HTTP status code " + statusCode + " received from " + toSimple(uri));

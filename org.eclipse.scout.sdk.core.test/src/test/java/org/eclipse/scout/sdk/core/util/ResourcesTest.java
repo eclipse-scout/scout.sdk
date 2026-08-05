@@ -69,6 +69,20 @@ public class ResourcesTest {
   }
 
   @Test
+  public void testDownload() throws IOException {
+    var dir = Files.createTempDirectory("scout-download-test");
+    try {
+      var target = dir.resolve("subdir/sub2dir/test-file.tmp");
+      Resources.download("https://eclipse.dev/scout/", target);
+      assertTrue(Files.isRegularFile(target));
+      assertTrue(Files.readAllBytes(target).length > 0);
+    }
+    finally {
+      CoreUtils.deleteDirectory(dir);
+    }
+  }
+
+  @Test
   public void testFailure() {
     // not existing host (connect exception)
     assertThrows(IOException.class, () -> {
