@@ -227,7 +227,7 @@ public final class JavaTypes {
     return JAVA_KEYWORDS.computeIfAbsentAndGet(() -> Stream
         .of("abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", EXTENDS, "final", "finally", "float", "for",
             "goto", "if", IMPLEMENTS, "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", SUPER, "switch", "synchronized", "this",
-            "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true", "yield", "var", "_", "record", "sealed", "permits", "non-sealed")
+            "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true", "yield", "var", "_", "record", "sealed", "permits", "non-sealed", "when")
         .collect(toUnmodifiableSet()));
   }
 
