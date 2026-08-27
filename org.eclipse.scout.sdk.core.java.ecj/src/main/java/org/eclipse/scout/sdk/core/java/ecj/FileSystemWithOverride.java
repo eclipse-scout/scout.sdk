@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.lookup.ModuleBinding;
+import org.eclipse.scout.sdk.core.log.SdkLog;
 
 /**
  * <h3>{@link FileSystemWithOverride}</h3>
@@ -57,7 +58,8 @@ public class FileSystemWithOverride extends FileSystem {
         // see org.eclipse.jdt.core.tests.compiler.regression.BatchCompilerTest.test017b()
       }
       catch (IOException e) {
-        throw new IllegalStateException("Failed to init " + classpath, e);
+        // log invalid classpath entries only
+        SdkLog.debug("Failed to init classpath '{}'.", classpath, e);
       }
     }
     if (counter != length) {
