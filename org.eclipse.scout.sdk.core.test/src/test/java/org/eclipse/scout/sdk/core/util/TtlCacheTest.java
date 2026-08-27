@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,7 @@ package org.eclipse.scout.sdk.core.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -18,6 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.scout.sdk.core.util.TtlCache.TtlCacheEntry;
 import org.junit.jupiter.api.Test;
 
 public class TtlCacheTest {
@@ -91,43 +93,32 @@ public class TtlCacheTest {
       var cache = new TtlCache<String, Long>(10, TimeUnit.MILLISECONDS, scheduledExecutorService) {
         @Override
         protected Void afterScheduledCacheCleanup(Map<String, TtlCacheEntry<Long>> c) {
+          super.afterScheduledCacheCleanup(c);
           cacheCleanupExecuted.countDown();
-          return super.afterScheduledCacheCleanup(c);
+          return null;
         }
       };
       var key = "a";
       cache.put(key, 1L);
-      cacheCleanupExecuted.await(1, TimeUnit.MINUTES);
+      assertTrue(cacheCleanupExecuted.await(1, TimeUnit.MINUTES));
+      assertEquals(0, getInnerMap(cache).size());
       assertNull(cache.get(key));
     }
     finally {
       scheduledExecutorService.shutdown();
-      scheduledExecutorService.awaitTermination(1, TimeUnit.MINUTES);
+      assertTrue(scheduledExecutorService.awaitTermination(1, TimeUnit.MINUTES));
     }
   }
 
-  @Test
-  public void testObsoleteAsyncCleanupFuturesAreCancelled() throws InterruptedException {
-    var scheduledExecutorService = Executors.newScheduledThreadPool(5);
-    var cleanupCounter = new AtomicInteger();
+  @SuppressWarnings("unchecked")
+  private static <K, V> Map<K, TtlCacheEntry<V>> getInnerMap(TtlCache<K, V> ttlCache) {
     try {
-      var cache = new TtlCache<String, Long>(100, TimeUnit.MILLISECONDS, scheduledExecutorService) {
-        @Override
-        protected Void afterScheduledCacheCleanup(Map<String, TtlCacheEntry<Long>> c) {
-          cleanupCounter.incrementAndGet();
-          return super.afterScheduledCacheCleanup(c);
-        }
-      };
-
-      var key = "a";
-      cache.put(key, 1L);
-      cache.put(key, 2L);
+      var mCache = TtlCache.class.getDeclaredField("m_cache");
+      mCache.setAccessible(true);
+      return (Map<K, TtlCacheEntry<V>>) mCache.get(ttlCache);
     }
-    finally {
-      scheduledExecutorService.shutdown();
-      scheduledExecutorService.awaitTermination(1, TimeUnit.MINUTES);
+    catch (ReflectiveOperationException e) {
+      throw new RuntimeException(e);
     }
-
-    assertEquals(1, cleanupCounter.get());
   }
 }

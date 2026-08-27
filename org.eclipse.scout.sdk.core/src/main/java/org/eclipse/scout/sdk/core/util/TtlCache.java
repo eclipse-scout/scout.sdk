@@ -27,11 +27,11 @@ import org.eclipse.scout.sdk.core.log.SdkLog;
  * The cache allows {@code null} for keys and values.
  * <p>
  * This class is thread safe.
- * 
+ *
  * @param <K>
- *          The key type
+ *     The key type
  * @param <V>
- *          The value type
+ *     The value type
  */
 public class TtlCache<K, V> {
 
@@ -45,10 +45,10 @@ public class TtlCache<K, V> {
    * Creates a new cache instance.
    *
    * @param ttl
-   *          The ttl (time-to-live) for cached items. A ttl <= 0 means the items will stay in the cache forever (no
-   *          ttl).
+   *     The ttl (time-to-live) for cached items. A ttl <= 0 means the items will stay in the cache forever (no
+   *     ttl).
    * @param timeUnit
-   *          The {@link TimeUnit} of the ttl. Must not be {@code null}.
+   *     The {@link TimeUnit} of the ttl. Must not be {@code null}.
    */
   public TtlCache(long ttl, TimeUnit timeUnit) {
     this(ttl, timeUnit, null);
@@ -56,15 +56,15 @@ public class TtlCache<K, V> {
 
   /**
    * Creates a new cache instance.
-   * 
+   *
    * @param ttl
-   *          The ttl (time-to-live) for cached items. A ttl <= 0 means the items will stay in the cache forever (no
-   *          ttl).
+   *     The ttl (time-to-live) for cached items. A ttl <= 0 means the items will stay in the cache forever (no
+   *     ttl).
    * @param timeUnit
-   *          The {@link TimeUnit} of the ttl. Must not be {@code null}.
+   *     The {@link TimeUnit} of the ttl. Must not be {@code null}.
    * @param executorService
-   *          An optional {@link ScheduledExecutorService}. If provided it is used to asynchronously remove items whose
-   *          ttl has elapsed. May be {@code null}. In that case old items are only removed on next cache access.
+   *     An optional {@link ScheduledExecutorService}. If provided it is used to asynchronously remove items whose
+   *     ttl has elapsed. May be {@code null}. In that case old items are only removed on next cache access.
    */
   public TtlCache(long ttl, TimeUnit timeUnit, ScheduledExecutorService executorService) {
     m_timeUnit = Ensure.notNull(timeUnit);
@@ -81,9 +81,9 @@ public class TtlCache<K, V> {
    * Gets the item with given key from the cache.
    *
    * @param key
-   *          The key of the item to retrieve. May be {@code null}.
+   *     The key of the item to retrieve. May be {@code null}.
    * @return The cached item for the given key or {@code null} if there is no such item for which the ttl has not
-   *         elapsed yet.
+   * elapsed yet.
    */
   public V get(K key) {
     var element = withCacheExec(it -> it.get(key));
@@ -102,13 +102,13 @@ public class TtlCache<K, V> {
    * The mapping function should not modify this cache during computation.
    *
    * @param key
-   *          The key of the item to retrieve. May be {@code null}.
+   *     The key of the item to retrieve. May be {@code null}.
    * @param mappingFunction
-   *          the mapping function to compute a value. Must not be {@code null}.
+   *     the mapping function to compute a value. Must not be {@code null}.
    * @return the current (existing or computed) value associated with the specified key, or {@code null} if the computed
-   *         value is {@code null}.
+   * value is {@code null}.
    * @throws IllegalArgumentException
-   *           if the mappingFunction is {@code null}.
+   *     if the mappingFunction is {@code null}.
    */
   public V computeIfAbsent(K key, Function<? super K, ? extends V> mappingFunction) {
     Ensure.notNull(mappingFunction);
@@ -120,9 +120,9 @@ public class TtlCache<K, V> {
    * key.
    *
    * @param key
-   *          The key of the item to store. May be {@code null}.
+   *     The key of the item to store. May be {@code null}.
    * @param value
-   *          The value of the item to store. May be {@code null}.
+   *     The value of the item to store. May be {@code null}.
    * @return the previous value associated with key, or {@code null} if there was no mapping for key.
    */
   public V put(K key, V value) {
@@ -175,15 +175,14 @@ public class TtlCache<K, V> {
       return;
     }
 
-    var cleanupFuture = m_cleanupFuture;
-    if (cleanupFuture != null) {
-      cleanupFuture.cancel(false);
+    if (m_cleanupFuture == null) {
+      m_cleanupFuture = m_executorService.schedule(() -> withCacheExec(this::afterScheduledCacheCleanup),
+          getTimeUnit().toMillis(getTtl()) + 1, TimeUnit.MILLISECONDS);
     }
-    m_cleanupFuture = m_executorService.schedule(() -> withCacheExec(this::afterScheduledCacheCleanup),
-        getTimeUnit().toMillis(getTtl()) + 1, TimeUnit.MILLISECONDS);
   }
 
   protected Void afterScheduledCacheCleanup(Map<K, TtlCacheEntry<V>> cache) {
+    m_cleanupFuture = null;
     SdkLog.debug("{} cleanup executed after {} {}. Remaining cached items: {}.",
         getClass().getSimpleName(), getTtl(), getTimeUnit().toString().toLowerCase(Locale.US), cache.size());
     return null;

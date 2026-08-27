@@ -13,18 +13,25 @@ import com.intellij.lang.ASTNode
 import com.intellij.lang.folding.FoldingBuilderEx
 import com.intellij.lang.folding.FoldingDescriptor
 import com.intellij.openapi.editor.Document
+import com.intellij.openapi.module.Module
 import com.intellij.psi.CommonClassNames
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiMethodCallExpression
 import com.intellij.psi.PsiType
 import com.intellij.psi.search.GlobalSearchScope.allScope
+import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.nls.Language
+import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
+import org.eclipse.scout.sdk.core.util.SdkException
+import org.eclipse.scout.sdk.s2i.EclipseScoutBundle.translationStoreManagerCache
 import org.eclipse.scout.sdk.s2i.containingModule
+import org.eclipse.scout.sdk.s2i.moduleDirPath
 import org.eclipse.scout.sdk.s2i.nls.TranslationLanguageSpec.Companion.translationDependencyScope
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader
 import org.eclipse.scout.sdk.s2i.settings.ScoutSettingsHelper
+import java.util.concurrent.*
 import java.util.regex.Pattern
 
 abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
@@ -55,12 +62,36 @@ abstract class AbstractNlsFoldingBuilder : FoldingBuilderEx() {
         val scope = root.translationDependencyScope() ?: return emptyArray()
         val module = root.containingModule() ?: return emptyArray()
         val project = root.project
-        val manager = TranslationManagerLoader.createManager(module, scope, true) ?: return emptyArray()
+        val manager = getOrCreateManager(module, scope) ?: return emptyArray()
         m_javaLangStringType = PsiType.getTypeByName(CommonClassNames.JAVA_LANG_STRING, project, allScope(project))
         m_requestedLanguage = ScoutSettingsHelper.getTranslationLanguage(project)
         val result = buildFoldRegions(root, manager).toTypedArray()
         SdkLog.debug("Folding region creation took {}ms.", System.currentTimeMillis() - start)
         return result
+    }
+
+    protected fun getOrCreateManager(module: Module, scope: DependencyScope): TranslationManager? {
+        val cache = translationStoreManagerCache(module.project)
+        val manager = cache.get(module.moduleDirPath(), scope)
+        return manager ?: createManagerAsync(module, scope)
+    }
+
+    protected fun createManagerAsync(module: Module, scope: DependencyScope): TranslationManager? {
+        val future = AppExecutorUtil.getAppScheduledExecutorService().schedule(Callable {
+            TranslationManagerLoader.createManager(module, scope, true)
+        }, 0, TimeUnit.MILLISECONDS)
+
+        return try {
+            future.get(2, TimeUnit.SECONDS)
+        } catch (e: ExecutionException) {
+            throw SdkException("Error loading translations for module '{}'.", module.name, e)
+        } catch (e: CancellationException) {
+            null
+        } catch (e: InterruptedException) {
+            null
+        } catch (e: TimeoutException) {
+            null
+        }
     }
 
     abstract fun buildFoldRegions(root: PsiElement, manager: TranslationManager): List<FoldingDescriptor>

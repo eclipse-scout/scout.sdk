@@ -39,7 +39,7 @@ class TranslationManagerCache(val project: Project) : Disposable {
 
     }
 
-    private val m_cache = TtlCache<Pair<Path, DependencyScope?>, TranslationManager>(1, TimeUnit.HOURS, AppExecutorUtil.getAppScheduledExecutorService())
+    private val m_cache = TtlCache<Pair<Path, DependencyScope?>, TranslationManager>(2, TimeUnit.HOURS, AppExecutorUtil.getAppScheduledExecutorService())
     private var m_busConnection: MessageBusConnection? = null
 
     init {
@@ -52,10 +52,19 @@ class TranslationManagerCache(val project: Project) : Disposable {
      * @param scope An optional [DependencyScope] for which the cache should be created. If it is null, [DependencyScope.ALL] is used.
      * @return The [TranslationManager] for the module and scope given or null if no manager can be created for the module given (e.g. if it is no Scout module).
      */
-    fun getOrCreateManager(modulePath: Path, scope: DependencyScope?): TranslationManager? =
-        m_cache.computeIfAbsent(createCacheKey(modulePath, scope)) {
-            createManager(project, modulePath, scope, false)
-        }
+    fun getOrCreateManager(modulePath: Path, scope: DependencyScope?): TranslationManager? = m_cache.computeIfAbsent(createCacheKey(modulePath, scope)) {
+        createManager(project, modulePath, scope, false)
+    }
+
+    /**
+     * @param modulePath The [Path] to the root of the module (the directory where the pom.xml of the module can be found).
+     * @param scope An optional [DependencyScope] for which the cache should be created. If it is null, [DependencyScope.ALL] is used.
+     * @return The [TranslationManager] for the module and scope given or null if no manager exists in this cache yet.
+     */
+    fun get(modulePath: Path, scope: DependencyScope?): TranslationManager? {
+        val key = createCacheKey(modulePath, scope)
+        return m_cache.get(key)
+    }
 
     /**
      * Puts the manager given into the cache. An existing entry may be replaced.
