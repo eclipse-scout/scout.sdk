@@ -63,7 +63,7 @@ object EclipseScoutBundle : AbstractBundle(RESOURCE_BUNDLE) {
     fun scoutIcon(size: Int) = IconUtil.scale(ScoutIcon, null, size / ScoutIcon.iconWidth.toFloat())
 
     fun isRunningInSandbox(): Boolean {
-        val sandbox = "-sandbox"
+        val sandbox = "sandbox"
         return Strings.indexOf(sandbox, PathManager.getPluginsPath()) > 0
                 || Strings.indexOf(sandbox, PathManager.getConfigPath()) > 0
                 || Strings.indexOf(sandbox, PathManager.getSystemPath()) > 0
