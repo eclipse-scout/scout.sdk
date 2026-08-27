@@ -30,7 +30,7 @@ plugins {
     id("maven-publish")
 
     // See https://github.com/JetBrains/intellij-platform-gradle-plugin
-    id("org.jetbrains.intellij.platform") version "2.16.0"
+    id("org.jetbrains.intellij.platform") version "2.18.1"
 
     kotlin("jvm") version "2.1.21"
     id("io.github.rmanibus.maven-settings") version "0.8" // for maven settings
@@ -98,11 +98,6 @@ intellijPlatform {
                 types = listOf(IntelliJPlatformType.IntellijIdea)
                 channels = listOf(ProductRelease.Channel.RELEASE)
                 sinceBuild = "251"
-            }
-            select {
-                types = listOf(IntelliJPlatformType.IntellijIdea)
-                channels = listOf(ProductRelease.Channel.EAP)
-                sinceBuild = "262"
             }
         }
     }
