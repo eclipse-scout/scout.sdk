@@ -48,16 +48,8 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
         fun getOrCreateScoutJsModel(module: Module) = moduleDir(module)?.let {
             try {
                 ScoutJsModels.create(it, module.project).orElse(null)
-            } catch (e: InvalidVirtualFileAccessException) {
-                SdkLog.info("Error creating Scout JS model for module '{}'.", module.name, e)
-                null
-            } catch (e: Exception) {
-                SdkLog.warning("Error creating Scout JS model for module '{}'.", module.name, e)
-                null
-            } catch (e: AssertionError) {
-                // Might be thrown if a VCS update is changing files while creating the ScoutJsModel
-                // E.g. thrown from ResolveScopeManagerImpl.getDefaultResolveScope when the old file gets invalid.
-                SdkLog.info("Error creating Scout JS model for module '{}'.", module.name, e)
+            } catch (e: Throwable) {
+                handleJsModelLoadError(e, module.name)
                 null
             }
         }
@@ -65,9 +57,22 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
         fun getOrCreateNodeModule(module: Module) = moduleDir(module)?.let {
             try {
                 NodeModulesProvider.createNodeModule(it, module.project).orElse(null)?.api()
-            } catch (e: Exception) {
-                SdkLog.warning("Error creating NodeModule for module '{}'.", module.name, e)
+            } catch (e: Throwable) {
+                handleJsModelLoadError(e, module.name)
                 null
+            }
+        }
+
+        fun handleJsModelLoadError(t: Throwable, moduleName: String) {
+            val msg = "Error creating Scout JS model for module '{}'."
+            when (t) {
+                is InvalidVirtualFileAccessException -> SdkLog.info(msg, moduleName, t)
+
+                // Might be thrown if a VCS update is changing files while creating the ScoutJsModel
+                // E.g. thrown from ResolveScopeManagerImpl.getDefaultResolveScope when the old file gets invalid.
+                is AssertionError -> SdkLog.info(msg, moduleName, t)
+
+                else -> SdkLog.warning(msg, moduleName, t)
             }
         }
 
@@ -121,18 +126,11 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
         private fun processFileEvents(events: List<PsiFile>) {
             if (!m_project.isInitialized || events.isEmpty()) return
             val changedPaths = computeInReadAction(m_project) { // PsiElement.isValid may require read-action
-                events
-                    .asSequence()
-                    .filter { it.isPhysical && !it.isDirectory && it.isValid }
-                    .map { it.virtualFile }
-                    .filter { it.isValid && it.isInLocalFileSystem }
-                    .distinct() // events for the same file: only process once
-                    .mapNotNull { it.resolveLocalPath() }
-                    .toList()
+                events.asSequence().filter { it.isPhysical && !it.isDirectory && it.isValid }.map { it.virtualFile }.filter { it.isValid && it.isInLocalFileSystem }.distinct() // events for the same file: only process once
+                    .mapNotNull { it.resolveLocalPath() }.toList()
             }
             return changedPaths.forEach {
-                NodeModulesProvider.removeNodeModule(it)
-                    .forEach { removedModule -> SdkLog.debug("NodeModule cache entry for '{}' removed.", removedModule.api()) }
+                NodeModulesProvider.removeNodeModule(it).forEach { removedModule -> SdkLog.debug("NodeModule cache entry for '{}' removed.", removedModule.api()) }
             }
         }
     }

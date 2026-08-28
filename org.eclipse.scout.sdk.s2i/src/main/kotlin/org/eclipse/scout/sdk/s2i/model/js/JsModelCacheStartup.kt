@@ -11,7 +11,6 @@ package org.eclipse.scout.sdk.s2i.model.js
 
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.module.ModuleManager
-import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.guessModuleDir
 import com.intellij.openapi.startup.ProjectActivity
@@ -20,7 +19,7 @@ import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModel
 import org.eclipse.scout.sdk.core.typescript.model.api.IPackageJson
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment
 
-class JsModelCacheStartup : ProjectActivity, DumbAware {
+class JsModelCacheStartup : ProjectActivity {
     override suspend fun execute(project: Project) {
         // enforce service creation to ensure the psi listener is active
         project.getService(JsModelManager::class.java)
@@ -37,24 +36,26 @@ class JsModelCacheStartup : ProjectActivity, DumbAware {
     private fun preloadCache(project: Project) {
         val start = System.currentTimeMillis()
         val modules = ModuleManager.getInstance(project).modules
-        modules
+        val scoutJsModel = modules
             .filter { it.name.contains(".ui") }
             .filter { containsPackageJson(it) }
             .ifEmpty { modules.filter { containsPackageJson(it) } }
             .sortedBy { it.name }
-            .firstNotNullOfOrNull { JsModelManager.getOrCreateScoutJsModel(it) }
-            ?.let {
-                preloadModel(it)
-                SdkLog.info("Scout JS model cache preloaded for module '{}' took {}ms.", it.nodeModule().name(), System.currentTimeMillis() - start)
-            }
+            .firstNotNullOfOrNull { JsModelManager.getOrCreateScoutJsModel(it) } ?: return
+        preloadModel(scoutJsModel)
+        SdkLog.info("Scout JS model cache preloaded for module '{}' took {}ms.", scoutJsModel.nodeModule().name(), System.currentTimeMillis() - start)
     }
 
     private fun preloadModel(model: ScoutJsModel) {
-        model
-            .findScoutObjects()
-            .withIncludeDependencies(true)
-            .stream()
-            .forEach { it.declaringClass().supers().stream().toList() }
+        try {
+            model
+                .findScoutObjects()
+                .withIncludeDependencies(true)
+                .stream()
+                .forEach { it.declaringClass().supers().stream().toList() }
+        } catch (e: Throwable) {
+            JsModelManager.handleJsModelLoadError(e, model.nodeModule().name())
+        }
     }
 
     private fun containsPackageJson(module: Module): Boolean {
