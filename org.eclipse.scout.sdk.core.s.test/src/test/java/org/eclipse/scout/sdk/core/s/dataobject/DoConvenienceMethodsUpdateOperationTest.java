@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -61,6 +61,7 @@ public class DoConvenienceMethodsUpdateOperationTest {
 
     var generatedSampleDo = assertNoCompileErrors(sampleDo);
     var scoutApi = javaEnvironment.requireApi(IScoutApi.class);
+
     testApiOfSampleDo(generatedSampleDo);
     if (scoutApi.maxLevel().major() >= 22) {
       // check that the primitive boolean getter uses the nvl method
@@ -68,6 +69,14 @@ public class DoConvenienceMethodsUpdateOperationTest {
       var isEnabledBodySource = generatedSampleDo.methods().withName("isEnabled").first().orElseThrow().sourceOfBody().orElseThrow().asCharSequence().toString();
       assertTrue(isEnabledBodySource.indexOf(nvlMethodName + "(getEnabled())") > 0);
     }
+
+    // validate the Collection<Object> is emitted as Collection<?>
+    assertEquals("Collection<?> keys", sampleDo
+        .methods()
+        .withMethodIdentifier("withKeys(java.util.Collection)").first().orElseThrow()
+        .parameters().first().orElseThrow()
+        .source().orElseThrow()
+        .toString());
 
     // validate that the "withEnabled" method has a JavaDoc pointing to the original JavaDoc of the attribute
     assertEquals("/**\n* See {@link #enabled()}.\n*/", childDo.methods().withName("withEnabled").first().orElseThrow()
@@ -166,7 +175,7 @@ public class DoConvenienceMethodsUpdateOperationTest {
     assertEquals(0, sampleDo.fields().stream().count(), "field count of 'dataobject.SampleDo'");
 
     // --> manual modification
-    assertEquals(scoutApiVersionMin22 ? 12 : 11, sampleDo.methods().stream().count(), "method count of 'dataobject.SampleDo'");
+    assertEquals(scoutApiVersionMin22 ? 16 : 15, sampleDo.methods().stream().count(), "method count of 'dataobject.SampleDo'");
     // <-- manual modification
     var enabled = assertMethodExist(sampleDo, "enabled");
     assertMethodReturnType(enabled, "org.eclipse.scout.rt.dataobject.DoValue<java.lang.Boolean>");
@@ -181,6 +190,9 @@ public class DoConvenienceMethodsUpdateOperationTest {
     var versions = assertMethodExist(sampleDo, "versions");
     assertMethodReturnType(versions, "org.eclipse.scout.rt.dataobject.DoList<java.lang.Long>");
     assertEquals(0, versions.annotations().stream().count(), "annotation count");
+    var keys = assertMethodExist(sampleDo, "keys");
+    assertMethodReturnType(keys, "org.eclipse.scout.rt.dataobject.DoList<java.lang.Object>");
+    assertEquals(0, keys.annotations().stream().count(), "annotation count");
     var ignored = assertMethodExist(sampleDo, "ignored");
     assertMethodReturnType(ignored, "org.eclipse.scout.rt.dataobject.DoValue<java.lang.Long>");
     assertEquals(1, ignored.annotations().stream().count(), "annotation count");
@@ -228,9 +240,22 @@ public class DoConvenienceMethodsUpdateOperationTest {
     assertEquals(2, getVersions.annotations().stream().count(), "annotation count");
     assertAnnotation(getVersions, "java.lang.Override");
     assertAnnotation(getVersions, scoutApi.Generated());
+    var withKeys = assertMethodExist(sampleDo, "withKeys", new String[]{"java.util.Collection<?>"});
+    assertMethodReturnType(withKeys, "dataobject.SampleDo");
+    assertEquals(1, withKeys.annotations().stream().count(), "annotation count");
+    assertAnnotation(withKeys, scoutApi.Generated());
+    var withKeys1 = assertMethodExist(sampleDo, "withKeys", new String[]{"java.lang.Object[]"});
+    assertMethodReturnType(withKeys1, "dataobject.SampleDo");
+    assertEquals(1, withKeys1.annotations().stream().count(), "annotation count");
+    assertAnnotation(withKeys1, scoutApi.Generated());
+    var getKeys = assertMethodExist(sampleDo, "getKeys");
+    assertMethodReturnType(getKeys, "java.util.List<java.lang.Object>");
+    assertEquals(1, getKeys.annotations().stream().count(), "annotation count");
+    assertAnnotation(getKeys, scoutApi.Generated());
 
     assertEquals(0, sampleDo.innerTypes().stream().count(), "inner types count of 'SampleDo'");
   }
+
 
   /**
    * @Generated with org.eclipse.scout.sdk.core.java.testing.ApiTestGenerator

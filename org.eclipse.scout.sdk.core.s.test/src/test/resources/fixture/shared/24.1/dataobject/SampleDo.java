@@ -38,6 +38,10 @@ public class SampleDo extends DoEntity implements DataObjectTestInterface {
     return doList("versions");
   }
 
+  public DoList<Object> keys() {
+    return doList("keys");
+  }
+
   @IgnoreConvenienceMethodGeneration
   public DoValue<Long> ignored() {
     return doValue("ignored");
@@ -56,8 +60,14 @@ public class SampleDo extends DoEntity implements DataObjectTestInterface {
 
   @Deprecated
   @Generated("DoConvenienceMethodsGenerator")
-  public Boolean isEnabled() {
+  public Boolean getEnabled() {
     return enabled().get();
+  }
+
+  @Deprecated
+  @Generated("DoConvenienceMethodsGenerator")
+  public boolean isEnabled() {
+    return nvl(getEnabled());
   }
 
   @Generated("DoConvenienceMethodsGenerator")
@@ -88,5 +98,22 @@ public class SampleDo extends DoEntity implements DataObjectTestInterface {
   @Generated("DoConvenienceMethodsGenerator")
   public List<Long> getVersions() {
     return versions().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public SampleDo withKeys(Collection<?> keys) {
+    keys().updateAll(keys);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public SampleDo withKeys(Object... keys) {
+    keys().updateAll(keys);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public List<Object> getKeys() {
+    return keys().get();
   }
 }

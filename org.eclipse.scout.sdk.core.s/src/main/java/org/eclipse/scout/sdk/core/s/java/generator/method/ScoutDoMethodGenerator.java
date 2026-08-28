@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.core.s.dataobject.DataObjectNode.DataObjectNodeKind
 import org.eclipse.scout.sdk.core.s.java.apidef.IScout22DoApi;
 import org.eclipse.scout.sdk.core.s.java.apidef.IScoutApi;
 import org.eclipse.scout.sdk.core.s.java.builder.body.IScoutMethodBodyBuilder;
+import org.eclipse.scout.sdk.core.util.Strings;
 
 /**
  * Provides data object related method factory functions.
@@ -55,21 +56,21 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
 
   /**
    * Creates a new data object node (data object attribute) of the form (example for {@link DataObjectNodeKind#VALUE}:
-   * 
+   *
    * <pre>
    * public DoValue&#60;dataType&#62; name() {
    *   return doValue("name");
    * }
    * </pre>
-   * 
+   *
    * @param name
-   *          The name of the node. Must not be {@code null} or blank.
+   *     The name of the node. Must not be {@code null} or blank.
    * @param kind
-   *          The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
+   *     The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
    * @param dataType
-   *          The datatype of the DoNode. If the kind is {@link DataObjectNodeKind#LIST}, {@link DataObjectNodeKind#SET}
-   *          or {@link DataObjectNodeKind#COLLECTION} the datatype always describes the type of element without the
-   *          collection type itself. Must not be {@code null} or blank.
+   *     The datatype of the DoNode. If the kind is {@link DataObjectNodeKind#LIST}, {@link DataObjectNodeKind#SET}
+   *     or {@link DataObjectNodeKind#COLLECTION} the datatype always describes the type of element without the
+   *     collection type itself. Must not be {@code null} or blank.
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static IScoutMethodGenerator<?, ?> createDoNode(String name, DataObjectNodeKind kind, String dataType) {
@@ -78,22 +79,22 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
 
   /**
    * Creates a new data object node (data object attribute) of the form (example for {@link DataObjectNodeKind#VALUE}:
-   * 
+   *
    * <pre>
    * public DoValue&#60;dataType&#62; name() {
    *   return doValue("name");
    * }
    * </pre>
-   * 
+   *
    * @param name
-   *          The name of the node. Must not be {@code null} or blank.
+   *     The name of the node. Must not be {@code null} or blank.
    * @param kind
-   *          The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
+   *     The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
    * @param api
-   *          The {@link IApiSpecification} that defines the datatype of the data object node. May be {@code null} in
-   *          case the dataType function can handle a {@code null} input.
+   *     The {@link IApiSpecification} that defines the datatype of the data object node. May be {@code null} in
+   *     case the dataType function can handle a {@code null} input.
    * @param dataType
-   *          A function returning the data type of the data object node. Must not be {@code null}.
+   *     A function returning the data type of the data object node. Must not be {@code null}.
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static <API extends IApiSpecification> IScoutMethodGenerator<?, ?> createDoNodeFrom(String name, DataObjectNodeKind kind, Class<API> api, Function<API, String> dataType) {
@@ -102,19 +103,19 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
 
   /**
    * Creates a new data object node (data object attribute) of the form (example for {@link DataObjectNodeKind#VALUE}:
-   * 
+   *
    * <pre>
    * public DoValue&#60;dataType&#62; name() {
    *   return doValue("name");
    * }
    * </pre>
-   * 
+   *
    * @param name
-   *          The name of the node. Must not be {@code null} or blank.
+   *     The name of the node. Must not be {@code null} or blank.
    * @param kind
-   *          The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
+   *     The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
    * @param dataType
-   *          A function returning the data type of the data object node. Must not be {@code null}.
+   *     A function returning the data type of the data object node. Must not be {@code null}.
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static IScoutMethodGenerator<?, ?> createDoNodeFunc(String name, DataObjectNodeKind kind, Function<IJavaBuilderContext, String> dataType) {
@@ -156,15 +157,15 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
    *   return this;
    * }
    * </pre>
-   *
+   * <p>
    * An {@link Override} annotation is added automatically if required.
    *
    * @param name
-   *          The DoNode name used for the method name without the "with" prefix.
+   *     The DoNode name used for the method name without the "with" prefix.
    * @param dataTypeReference
-   *          The data type reference of the DoNode.
+   *     The data type reference of the DoNode.
    * @param owner
-   *          The {@link IType} in which the method will be added.
+   *     The {@link IType} in which the method will be added.
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static IScoutMethodGenerator<?, ?> createDoValueSetter(String name, String dataTypeReference, IType owner) {
@@ -184,11 +185,11 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
    * </pre>
    *
    * @param name
-   *          The DoNode name used for the method name without the "with" prefix.
+   *     The DoNode name used for the method name without the "with" prefix.
    * @param dataTypeReference
-   *          The data type reference of the DoNode.
+   *     The data type reference of the DoNode.
    * @param returnTypeReference
-   *          The data type reference of the method return type.
+   *     The data type reference of the method return type.
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static IScoutMethodGenerator<?, ?> createDoValueSetter(String name, String dataTypeReference, String returnTypeReference) {
@@ -207,14 +208,14 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
    * </pre>
    *
    * @param name
-   *          The DoNode name used for the method name without the "with" prefix.
+   *     The DoNode name used for the method name without the "with" prefix.
    * @param api
-   *          The {@link IApiSpecification} that defines the datatype of the setter. May be {@code null} in case the
-   *          dataTypeFunc can handle a {@code null} input.
+   *     The {@link IApiSpecification} that defines the datatype of the setter. May be {@code null} in case the
+   *     dataTypeFunc can handle a {@code null} input.
    * @param dataTypeFunc
-   *          A function returning the data type of the setter. Must not be {@code null}.
+   *     A function returning the data type of the setter. Must not be {@code null}.
    * @param returnTypeReference
-   *          The data type reference of the method return type.
+   *     The data type reference of the method return type.
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static <API extends IApiSpecification> IScoutMethodGenerator<?, ?> createDoValueSetterFrom(String name, Class<API> api, Function<API, String> dataTypeFunc, String returnTypeReference) {
@@ -239,15 +240,15 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
    *   return this;
    * }
    * </pre>
-   *
+   * <p>
    * An {@link Override} annotation is added automatically if required.
    *
    * @param name
-   *          The DoNode name used for the method name without the "with" prefix.
+   *     The DoNode name used for the method name without the "with" prefix.
    * @param dataTypeReference
-   *          The data type reference of a single collection DO element.
+   *     The data type reference of a single collection DO element.
    * @param owner
-   *          The {@link IType} in which the method will be added.
+   *     The {@link IType} in which the method will be added.
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static IScoutMethodGenerator<?, ?> createDoCollectionSetterCollection(String name, CharSequence dataTypeReference, IType owner) {
@@ -272,20 +273,22 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
         .flatMap(st -> st.methods().withMethodIdentifier(methodId).stream())
         .findAny();
 
-    // inherit parameter signature from parent (sometimes it is Collection<? extends Xyz> and sometimes only implemented as Collection<Xyz>).
-    var needsExtends = parentMethod
-        .map(IMethod::parameters)
-        .flatMap(AbstractQuery::first)
-        .map(IMethodParameter::dataType)
-        .map(IType::reference)
-        .map(ref -> ref.contains(JavaTypes.EXTENDS))
-        .orElse(true);
-
     var collectionDataTypeRef = new StringBuilder(Collection.class.getName()).append(JavaTypes.C_GENERIC_START);
-    if (needsExtends) {
-      collectionDataTypeRef.append(JavaTypes.C_QUESTION_MARK).append(' ').append(JavaTypes.EXTENDS).append(' ').append(dataTypeReference);
+    if (Strings.equals(Object.class.getName(), dataTypeReference)) {
+      collectionDataTypeRef.append(JavaTypes.C_QUESTION_MARK);
     }
     else {
+      // inherit parameter signature from parent (sometimes it is Collection<? extends Xyz> and sometimes only implemented as Collection<Xyz>).
+      var needsExtends = parentMethod
+          .map(IMethod::parameters)
+          .flatMap(AbstractQuery::first)
+          .map(IMethodParameter::dataType)
+          .map(IType::reference)
+          .map(ref -> ref.contains(JavaTypes.EXTENDS))
+          .orElse(true);
+      if (needsExtends) {
+        collectionDataTypeRef.append(JavaTypes.C_QUESTION_MARK).append(' ').append(JavaTypes.EXTENDS).append(' ');
+      }
       collectionDataTypeRef.append(dataTypeReference);
     }
     collectionDataTypeRef.append(JavaTypes.C_GENERIC_END);
@@ -302,15 +305,15 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
    *   return this;
    * }
    * </pre>
-   *
+   * <p>
    * An {@link Override} annotation is added automatically if required.
    *
    * @param name
-   *          The DoNode name used for the method name without the "with" prefix.
+   *     The DoNode name used for the method name without the "with" prefix.
    * @param dataTypeReference
-   *          The data type reference of a single collection DO element.
+   *     The data type reference of a single collection DO element.
    * @param owner
-   *          The {@link IType} in which the method will be added.
+   *     The {@link IType} in which the method will be added.
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static IScoutMethodGenerator<?, ?> createDoCollectionSetterVarargs(String name, String dataTypeReference, IType owner) {
@@ -328,15 +331,15 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
    *   return name().get();
    * }
    * </pre>
-   *
+   * <p>
    * An {@link Override} annotation is added automatically if required.
    *
    * @param name
-   *          The DoNode name used for the method name without the "get" or "is" prefix.
+   *     The DoNode name used for the method name without the "get" or "is" prefix.
    * @param returnTypeReference
-   *          The data type of the DoNode (the return type of the method).
+   *     The data type of the DoNode (the return type of the method).
    * @param owner
-   *          The {@link IType} in which the method will be added.
+   *     The {@link IType} in which the method will be added.
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static IScoutMethodGenerator<?, ?> createDoNodeGetter(CharSequence name, String returnTypeReference, IType owner) {
@@ -355,9 +358,9 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
    * </pre>
    *
    * @param name
-   *          The DoNode name used for the method name without the "get" or "is" prefix.
+   *     The DoNode name used for the method name without the "get" or "is" prefix.
    * @param returnTypeReference
-   *          The data type of the DoNode (the return type of the method).
+   *     The data type of the DoNode (the return type of the method).
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static IScoutMethodGenerator<?, ?> createDoNodeGetter(CharSequence name, String returnTypeReference) {
@@ -375,12 +378,12 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
    * </pre>
    *
    * @param name
-   *          The DoNode name used for the method name without the "get" or "is" prefix.
+   *     The DoNode name used for the method name without the "get" or "is" prefix.
    * @param api
-   *          The {@link IApiSpecification} that defines the datatype of the getter. May be {@code null} in case the
-   *          returnTypeFunction can handle a {@code null} input.
+   *     The {@link IApiSpecification} that defines the datatype of the getter. May be {@code null} in case the
+   *     returnTypeFunction can handle a {@code null} input.
    * @param returnTypeFunction
-   *          A function returning the data type of the getter. Must not be {@code null}.
+   *     A function returning the data type of the getter. Must not be {@code null}.
    * @return The created {@link IScoutMethodGenerator}.
    */
   public static <API extends IApiSpecification> IScoutMethodGenerator<?, ?> createDoNodeGetterFrom(CharSequence name, Class<API> api, Function<API, String> returnTypeFunction) {
@@ -430,26 +433,26 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
 
   /**
    * Creates the convenience methods for a data object node having the properties given.
-   * 
+   *
    * @param name
-   *          The name of the node. Must not be {@code null} or blank.
+   *     The name of the node. Must not be {@code null} or blank.
    * @param kind
-   *          The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
+   *     The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
    * @param dataTypeRef
-   *          The datatype of the DoNode. If the kind is {@link DataObjectNodeKind#LIST}, {@link DataObjectNodeKind#SET}
-   *          or {@link DataObjectNodeKind#COLLECTION} the datatype always describes the type of element without the
-   *          collection type itself. Must not be {@code null} or blank.
+   *     The datatype of the DoNode. If the kind is {@link DataObjectNodeKind#LIST}, {@link DataObjectNodeKind#SET}
+   *     or {@link DataObjectNodeKind#COLLECTION} the datatype always describes the type of element without the
+   *     collection type itself. Must not be {@code null} or blank.
    * @param isInherited
-   *          {@code true} if the node is inherited from a super class (see {@link DataObjectNode#isInherited()}).
+   *     {@code true} if the node is inherited from a super class (see {@link DataObjectNode#isInherited()}).
    * @param declaringType
-   *          The {@link ITypeGenerator} in which the node exists. Must not be {@code null}.
+   *     The {@link ITypeGenerator} in which the node exists. Must not be {@code null}.
    * @param context
-   *          The {@link IJavaBuilderContext} for which the convenience methods should be generated.
+   *     The {@link IJavaBuilderContext} for which the convenience methods should be generated.
    * @return The convenience {@link IScoutMethodGenerator method generators} for a data object node with given
-   *         properties.
+   * properties.
    */
   public static Stream<IScoutMethodGenerator<?, ?>> createConvenienceMethods(String name, DataObjectNodeKind kind, String dataTypeRef, boolean isInherited,
-      ITypeGenerator<?> declaringType, IJavaBuilderContext context) {
+                                                                             ITypeGenerator<?> declaringType, IJavaBuilderContext context) {
     var declaringClassFqn = declaringType.fullyQualifiedName();
     var hierarchyType = declaringType.getHierarchyType(context);
     return createConvenienceMethods(name, kind, dataTypeRef, isInherited, hierarchyType)
@@ -463,21 +466,21 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
 
   /**
    * Creates the convenience methods for a data object node having the properties given.
-   * 
+   *
    * @param name
-   *          The name of the node. Must not be {@code null} or blank.
+   *     The name of the node. Must not be {@code null} or blank.
    * @param kind
-   *          The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
+   *     The {@link DataObjectNodeKind} of the node. Must not be {@code null}.
    * @param dataTypeRef
-   *          The datatype of the DoNode. If the kind is {@link DataObjectNodeKind#LIST}, {@link DataObjectNodeKind#SET}
-   *          or {@link DataObjectNodeKind#COLLECTION} the datatype always describes the type of element without the
-   *          collection type itself. Must not be {@code null} or blank.
+   *     The datatype of the DoNode. If the kind is {@link DataObjectNodeKind#LIST}, {@link DataObjectNodeKind#SET}
+   *     or {@link DataObjectNodeKind#COLLECTION} the datatype always describes the type of element without the
+   *     collection type itself. Must not be {@code null} or blank.
    * @param isInherited
-   *          {@code true} if the node is inherited from a super class (see {@link DataObjectNode#isInherited()}).
+   *     {@code true} if the node is inherited from a super class (see {@link DataObjectNode#isInherited()}).
    * @param declaringType
-   *          The {@link IType} in which the node exists. Must not be {@code null}.
+   *     The {@link IType} in which the node exists. Must not be {@code null}.
    * @return The convenience {@link IScoutMethodGenerator method generators} for a data object node with given
-   *         properties.
+   * properties.
    */
   public static Stream<IScoutMethodGenerator<?, ?>> createConvenienceMethods(String name, DataObjectNodeKind kind, String dataTypeRef, boolean isInherited, IType declaringType) {
     if (kind == DataObjectNodeKind.VALUE) {
@@ -537,9 +540,9 @@ public final class ScoutDoMethodGenerator extends ScoutMethodGenerator<ScoutDoMe
 
   /**
    * The complete convenience methods marker comment
-   * 
+   *
    * @param nl
-   *          The new line delimiter to use
+   *     The new line delimiter to use
    * @return The raw comment source.
    */
   public static String convenienceMethodsMarkerComment(String nl) {
