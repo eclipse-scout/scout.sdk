@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.core.s.nls.Translations.DependencyScope
 import org.eclipse.scout.sdk.core.s.nls.manager.TranslationManager
 import org.eclipse.scout.sdk.core.s.nls.properties.AbstractTranslationPropertiesFile
 import org.eclipse.scout.sdk.core.util.TtlCache
+import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.nls.TranslationManagerLoader.createManager
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
@@ -52,8 +53,10 @@ class TranslationManagerCache(val project: Project) : Disposable {
      * @param scope An optional [DependencyScope] for which the cache should be created. If it is null, [DependencyScope.ALL] is used.
      * @return The [TranslationManager] for the module and scope given or null if no manager can be created for the module given (e.g. if it is no Scout module).
      */
-    fun getOrCreateManager(modulePath: Path, scope: DependencyScope?): TranslationManager? = m_cache.computeIfAbsent(createCacheKey(modulePath, scope)) {
-        createManager(project, modulePath, scope, false)
+    fun getOrCreateManager(modulePath: Path, scope: DependencyScope?): TranslationManager? = computeInReadAction(project) {
+        m_cache.computeIfAbsent(createCacheKey(modulePath, scope)) {
+            createManager(project, modulePath, scope, false)
+        }
     }
 
     /**
