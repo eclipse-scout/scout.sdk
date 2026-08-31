@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.core.typescript.model.api.INodeElement
 import org.eclipse.scout.sdk.core.typescript.model.api.INodeModule
 import org.eclipse.scout.sdk.core.util.Strings
 import org.eclipse.scout.sdk.s2i.resolveLocalPath
+import java.nio.file.Paths
 import java.util.*
 
 object ES6ImportUtils {
@@ -59,22 +60,17 @@ object ES6ImportUtils {
     fun createOrUpdateImport(importName: String, alias: String?, isDefaultImport: Boolean, importFrom: String, context: PsiElement) {
         val psiFile = context.containingFile
         val imports = importsInFileOf(psiFile)
-        val importFromClean = importFrom.removeSuffix(IWebConstants.TS_FILE_SUFFIX).removeSuffix(IWebConstants.JS_FILE_SUFFIX)
-        val existingImport = imports.firstOrNull { Strings.withoutQuotes(it.fromClause?.referenceText).removeSuffix(IWebConstants.TS_FILE_SUFFIX).removeSuffix(IWebConstants.JS_FILE_SUFFIX) == importFromClean }
         val addToBindings = isDefaultImport && alias == null
         val referenceName = if (isDefaultImport && alias != null) "default" else importName
+        if (alreadyImported(imports, addToBindings, referenceName, importName)) return
+
+        val importFromClean = normalizeImportFrom(importFrom)
+        val existingImport = imports.firstOrNull { normalizeImportFrom(it.fromClause?.referenceText) == importFromClean }
         val newImportExpression = if (alias == null) importName else "$referenceName as $alias"
         if (existingImport != null) {
-            // check if already imported
-            val existingSpecifiers = existingImport.importSpecifiers
-            if (!addToBindings && existingSpecifiers.any { it.referenceName == referenceName }) return // specifier import already exists
-            val existingBindings = existingImport.importedBindings
-            if (addToBindings && (existingBindings.any { it.declaredName == importName }
-                        || existingSpecifiers.any { it.referenceName == "default" && it.alias?.name == importName })) return // binding import already exists
-
             // add new specifier to existing import declaration
-            val specifiers = existingSpecifiers.map { it.text }.toMutableList()
-            val bindings = existingBindings.map { it.text }.toMutableList()
+            val specifiers = existingImport.importSpecifiers.map { it.text }.toMutableList()
+            val bindings = existingImport.importedBindings.map { it.text }.toMutableList()
             if (addToBindings) bindings.add(newImportExpression) else specifiers.add(newImportExpression)
             var newSpecifiers = ""
             if (specifiers.isNotEmpty()) {
@@ -102,5 +98,31 @@ object ES6ImportUtils {
         } else {
             imports.last().addSiblingAfter(importToAdd)
         }
+    }
+
+    private fun alreadyImported(imports: List<ES6ImportDeclaration>, addToBindings: Boolean, referenceName: String, importName: String): Boolean {
+        for (existingImport in imports) {
+            val existingSpecifiers = existingImport.importSpecifiers
+            if (addToBindings) {
+                if (existingImport.importedBindings.any { it.declaredName == importName }) {
+                    return true
+                }
+                if (existingSpecifiers.any { it.referenceName == "default" && it.alias?.name == importName }) {
+                    return true
+                }
+            } else if (existingSpecifiers.any { it.referenceName == referenceName }) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun normalizeImportFrom(importFrom: String?): String? {
+        val from = importFrom ?: return null
+        val clean = Strings.withoutQuotes(from)
+            .removeSuffix(IWebConstants.TS_FILE_SUFFIX)
+            .removeSuffix(IWebConstants.JS_FILE_SUFFIX)
+            .toString()
+        return Paths.get(clean).normalize().toString() // handle leading './'
     }
 }
