@@ -24,6 +24,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiDocumentManager
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.log.SdkLog.onTrace
+import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.CoreUtils.callInContext
 import org.eclipse.scout.sdk.core.util.Ensure
 import org.eclipse.scout.sdk.core.util.FinalValue
@@ -150,7 +151,7 @@ class TransactionManager(val project: Project, val transactionName: String? = nu
                         callable()
                     }
                 } catch (e: RuntimeException) {
-                    val rootException = unwrap(e)
+                    val rootException = CoreUtils.getRootCause(e)
                     if (rootException is IndexNotReadyException) {
                         SdkLog.debug("Project entered dumb mode unexpectedly. Retrying task.", onTrace(e))
                         if (readAccessAllowed) {
@@ -162,14 +163,6 @@ class TransactionManager(val project: Project, val transactionName: String? = nu
                     }
                 }
             }
-        }
-
-        internal fun unwrap(throwable: Throwable): Throwable {
-            var t = throwable
-            while (t.cause != null && t.cause != t) {
-                t = t.cause!!
-            }
-            return t
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -55,13 +55,6 @@ class TransactionManagerTest : TestCase() {
         mgr.register(member3)
         mgr.register(member4)
         assertEquals(4, mgr.size())
-    }
-
-    fun testUnwrap() {
-        val exWithoutCause = RuntimeException()
-        val exWithCause = RuntimeException(exWithoutCause)
-        assertSame(exWithoutCause, TransactionManager.unwrap(exWithoutCause))
-        assertSame(exWithoutCause, TransactionManager.unwrap(exWithCause))
     }
 
     private class TestingMember(val file: Path, val replaces: Boolean = true) : TransactionMember {

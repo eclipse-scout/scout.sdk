@@ -63,10 +63,27 @@ public final class CoreUtils {
   }
 
   /**
+   * @return Root cause {@link Throwable} for given {@link Throwable} or {@code null} if the input is {@code null}.
+   */
+  public static Throwable getRootCause(Throwable throwable) {
+    if (throwable == null) {
+      return null;
+    }
+
+    var parent = throwable;
+    var cause = throwable.getCause();
+    while (cause != null && cause != parent) {
+      parent = cause;
+      cause = cause.getCause();
+    }
+    return parent;
+  }
+
+  /**
    * Sets the username that should be returned by {@link CoreUtils#getUsername()} for the current thread.
    *
    * @param newUsernameForCurrentThread
-   *          the new username
+   *     the new username
    */
   public static void setUsernameForThread(String newUsernameForCurrentThread) {
     setThreadLocal(CURRENT_USER_NAME, newUsernameForCurrentThread);
@@ -78,9 +95,9 @@ public final class CoreUtils {
    * In case the given {@link Path} does not exist this method does nothing.
    *
    * @param toDelete
-   *          The file or folder to delete. Must not be {@code null}
+   *     The file or folder to delete. Must not be {@code null}
    * @throws IOException
-   *           if there is an error deleting the directory
+   *     if there is an error deleting the directory
    */
   public static void deleteDirectory(Path toDelete) throws IOException {
     if (!Files.exists(Ensure.notNull(toDelete))) {
@@ -122,11 +139,11 @@ public final class CoreUtils {
    * does not exist anymore and the target directory contains a new folder with the name of the source and its content.
    *
    * @param sourceDir
-   *          Must be an existing directory.
+   *     Must be an existing directory.
    * @param targetDir
-   *          Must be an existing directory.
+   *     Must be an existing directory.
    * @throws IOException
-   *           if there is an error moving the directory
+   *     if there is an error moving the directory
    */
   public static void moveDirectory(Path sourceDir, Path targetDir) throws IOException {
     Ensure.isDirectory(sourceDir);
@@ -170,11 +187,11 @@ public final class CoreUtils {
    * {@link URI#relativize(URI)}.
    *
    * @param base
-   *          The base {@link URI} from which point the relative {@link URI} should be created. Must not be
-   *          {@code null}.
+   *     The base {@link URI} from which point the relative {@link URI} should be created. Must not be
+   *     {@code null}.
    * @param child
-   *          The target {@link URI} that should be relatively expressed from the point of the base {@link URI}. Must
-   *          not be {@code null}.
+   *     The target {@link URI} that should be relatively expressed from the point of the base {@link URI}. Must
+   *     not be {@code null}.
    * @return A new relative {@link URI} to get to the child {@link URI} from the base {@link URI}.
    */
   public static URI relativizeURI(URI base, URI child) {
@@ -221,9 +238,9 @@ public final class CoreUtils {
    * {@link URI}.
    *
    * @param uri
-   *          the parent path (one folder up) this {@link URI} is returned.
+   *     the parent path (one folder up) this {@link URI} is returned.
    * @return A new {@link URI} pointing to the parent of the given {@link URI} or {@code null} if the given {@link URI}
-   *         is {@code null}.
+   * is {@code null}.
    */
   public static URI getParentURI(URI uri) {
     if (uri == null) {
@@ -248,11 +265,11 @@ public final class CoreUtils {
    * </ul>
    *
    * @param d1
-   *          The first double value
+   *     The first double value
    * @param d2
-   *          The second double value
+   *     The second double value
    * @param delta
-   *          The difference between the two to be considered equal.
+   *     The difference between the two to be considered equal.
    * @return {@code false} if the difference between the two values is less or equal to the given delta.
    */
   public static boolean isDoubleDifferent(double d1, double d2, double delta) {
@@ -267,12 +284,12 @@ public final class CoreUtils {
    * Executes the specified {@link Supplier} while the specified {@link ThreadLocal} has the specified context value.
    *
    * @param threadLocal
-   *          The {@link ThreadLocal} in which the context should be stored. The initial value of the
-   *          {@link ThreadLocal} must be {@code null}!
+   *     The {@link ThreadLocal} in which the context should be stored. The initial value of the
+   *     {@link ThreadLocal} must be {@code null}!
    * @param context
-   *          The context to store. May be {@code null}.
+   *     The context to store. May be {@code null}.
    * @param callable
-   *          The {@link Supplier} to execute. Must not be {@code null}.
+   *     The {@link Supplier} to execute. Must not be {@code null}.
    */
   public static <T, R> R callInContext(ThreadLocal<T> threadLocal, T context, Supplier<R> callable) {
     var orig = threadLocal.get();
@@ -298,9 +315,9 @@ public final class CoreUtils {
    * Gets the file extension of the file path specified. This is the part after the last dot in the path given.
    *
    * @param filePath
-   *          The file path for which the extension should be returned.
+   *     The file path for which the extension should be returned.
    * @return The extension if it exists or an empty {@link String} otherwise (never returns {@code null}). The extension
-   *         is always lowercase and does not contain the dot.
+   * is always lowercase and does not contain the dot.
    */
   public static String extensionOf(String filePath) {
     if (Strings.isBlank(filePath)) {
@@ -318,9 +335,9 @@ public final class CoreUtils {
    * the given file.
    *
    * @param file
-   *          The file for which the extension should be returned.
+   *     The file for which the extension should be returned.
    * @return The extension if it exists or an empty {@link String} otherwise (never returns {@code null}). The extension
-   *         is always lowercase and does not contain the dot.
+   * is always lowercase and does not contain the dot.
    */
   public static String extensionOf(Path file) {
     if (file == null) {
@@ -338,9 +355,9 @@ public final class CoreUtils {
    * custom implementation.
    *
    * @param o
-   *          The {@link Object} for which the {@link String} representation should be returned.
+   *     The {@link Object} for which the {@link String} representation should be returned.
    * @return An {@link Optional} holding the value of {@link Object#toString()} if it has been overwritten and could be
-   *         invoked successfully. Otherwise, an empty {@link Optional} is returned.
+   * invoked successfully. Otherwise, an empty {@link Optional} is returned.
    */
   @SuppressWarnings("squid:S1181")
   public static Optional<String> toStringIfOverwritten(Object o) {
@@ -374,7 +391,7 @@ public final class CoreUtils {
    * Sets the given {@link String} into the system clipboard
    *
    * @param text
-   *          The text to set
+   *     The text to set
    * @return {@code true} if the text has been successfully set to the system clipboard.
    */
   public static boolean setTextToClipboard(String text) {
@@ -385,9 +402,9 @@ public final class CoreUtils {
    * Sets the given {@link String} into the system clipboard
    *
    * @param text
-   *          The text to set
+   *     The text to set
    * @param ownershipLostCallback
-   *          An optional callback invoked if the ownership of the clipboard is lost.
+   *     An optional callback invoked if the ownership of the clipboard is lost.
    * @return {@code true} if the text has been successfully set to the system clipboard.
    */
   public static boolean setTextToClipboard(String text, ClipboardOwner ownershipLostCallback) {
@@ -410,18 +427,18 @@ public final class CoreUtils {
 
   /**
    * Invokes a default method of an interface.
-   * 
+   *
    * @param instance
-   *          The instance on which the default method should be called.
+   *     The instance on which the default method should be called.
    * @param method
-   *          The method in the interface to call.
+   *     The method in the interface to call.
    * @param args
-   *          The arguments to pass to the method.
+   *     The arguments to pass to the method.
    * @return The result of the method call
    * @throws RuntimeException
-   *           if the called method threw a {@link RuntimeException}
+   *     if the called method threw a {@link RuntimeException}
    * @throws SdkException
-   *           wrapping the original exception if it was a checked exception.
+   *     wrapping the original exception if it was a checked exception.
    */
   public static Object invokeDefaultMethod(Object instance, Method method, Object[] args) {
     try {

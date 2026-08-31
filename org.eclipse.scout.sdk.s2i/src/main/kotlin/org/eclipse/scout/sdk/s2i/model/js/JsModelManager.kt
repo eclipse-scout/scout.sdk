@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModels
 import org.eclipse.scout.sdk.core.typescript.model.api.NodeModulesProvider
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModuleSpi
 import org.eclipse.scout.sdk.core.typescript.model.spi.NodeModulesProviderSpi
+import org.eclipse.scout.sdk.core.util.CoreUtils
 import org.eclipse.scout.sdk.core.util.DelayedBuffer
 import org.eclipse.scout.sdk.s2i.environment.IdeaEnvironment.Factory.computeInReadAction
 import org.eclipse.scout.sdk.s2i.model.typescript.IdeaNodeModules
@@ -65,7 +66,8 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
 
         fun handleJsModelLoadError(t: Throwable, moduleName: String) {
             val msg = "Error creating Scout JS model for module '{}'."
-            when (t) {
+            val root = CoreUtils.getRootCause(t)
+            when (root) {
                 is InvalidVirtualFileAccessException -> SdkLog.info(msg, moduleName, t)
 
                 // Might be thrown if a VCS update is changing files while creating the ScoutJsModel

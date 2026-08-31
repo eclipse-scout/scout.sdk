@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,12 +11,14 @@ package org.eclipse.scout.sdk.core.util;
 
 import static org.eclipse.scout.sdk.core.util.CoreUtils.extensionOf;
 import static org.eclipse.scout.sdk.core.util.CoreUtils.getParentURI;
+import static org.eclipse.scout.sdk.core.util.CoreUtils.getRootCause;
 import static org.eclipse.scout.sdk.core.util.CoreUtils.isDoubleDifferent;
 import static org.eclipse.scout.sdk.core.util.CoreUtils.relativizeURI;
 import static org.eclipse.scout.sdk.core.util.CoreUtils.toStringIfOverwritten;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -54,6 +56,35 @@ public class CoreUtilsTest {
     assertEquals(child2, relativizeURI(URI.create("http://user:pw@host:port/a/b/c/d/"), URI.create(child2)).toString());
     var child3 = "file://user:pw@host:port/a/b/c/d/sub/sub2";
     assertEquals(child3, relativizeURI(URI.create("http://user:pw@host:port/a/b/c/d/"), URI.create(child3)).toString());
+  }
+
+  @Test
+  public void testGetRootCause() throws ReflectiveOperationException {
+    assertNull(getRootCause(null));
+
+    var singleException = new RuntimeException("some exception");
+    assertSame(singleException, getRootCause(singleException));
+
+    var root = new SdkException("root");
+    var nestedException = new RuntimeException("nested some exception", new IOException("second level", root));
+    assertSame(root, getRootCause(nestedException));
+
+    /** @noinspection SerializableInnerClassWithNonSerializableOuterClass SerializableNonStaticInnerClassWithoutSerialVersionUID */
+    class LoopException extends RuntimeException {
+      LoopException() {
+        super("loop");
+      }
+
+      @Override
+      public synchronized Throwable getCause() {
+        return this;
+      }
+    }
+    var loop = new LoopException();
+    assertSame(loop, getRootCause(loop));
+
+    var nestedLoopException = new RuntimeException("nested some exception", new IOException("second level", loop));
+    assertSame(loop, getRootCause(nestedLoopException));
   }
 
   @Test
