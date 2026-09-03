@@ -99,6 +99,11 @@ intellijPlatform {
                 channels = listOf(ProductRelease.Channel.RELEASE)
                 sinceBuild = "251"
             }
+            select {
+                types = listOf(IntelliJPlatformType.IntellijIdea)
+                channels = listOf(ProductRelease.Channel.EAP)
+                sinceBuild = "263"
+            }
         }
     }
 }
