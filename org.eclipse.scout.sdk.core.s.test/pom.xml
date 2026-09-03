@@ -256,6 +256,22 @@
       </dependencies>
     </profile>
     <profile>
+      <id>add-datamodel.client-dependency-for-27.1-build</id>
+      <activation>
+        <property>
+          <!-- add dependency for the scout version 27.1 -->
+          <name>org.eclipse.scout.rt_version</name>
+          <value>27.1-SNAPSHOT</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.scout.rt</groupId>
+          <artifactId>org.eclipse.scout.rt.datamodel.client</artifactId>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
       <id>add-datamodel.client-dependency-for-default-build</id>
       <activation>
         <property>
@@ -315,6 +331,25 @@
           <!-- add dependency for the scout version 25.2 -->
           <name>org.eclipse.scout.rt_version</name>
           <value>25.2-SNAPSHOT</value>
+        </property>
+      </activation>
+      <dependencies>
+        <!-- NLS tests need sources of org.eclipse.scout.rt.nls.text.ScoutTextProviderService for Scout >= 23.2 -->
+        <dependency>
+          <groupId>org.eclipse.scout.rt</groupId>
+          <artifactId>org.eclipse.scout.rt.nls</artifactId>
+          <scope>test</scope>
+          <classifier>sources</classifier>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>add-nls.source-dependency-for-27.1-build</id>
+      <activation>
+        <property>
+          <!-- add dependency for the scout version 27.1 -->
+          <name>org.eclipse.scout.rt_version</name>
+          <value>27.1-SNAPSHOT</value>
         </property>
       </activation>
       <dependencies>
