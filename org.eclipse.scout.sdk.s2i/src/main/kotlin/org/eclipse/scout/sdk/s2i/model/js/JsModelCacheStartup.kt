@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,17 +36,18 @@ class JsModelCacheStartup : ProjectActivity {
     private fun preloadCache(project: Project) {
         val start = System.currentTimeMillis()
         val modules = ModuleManager.getInstance(project).modules
-        val scoutJsModel = modules
+        modules
             .filter { it.name.contains(".ui") }
             .filter { containsPackageJson(it) }
             .ifEmpty { modules.filter { containsPackageJson(it) } }
             .sortedBy { it.name }
-            .firstNotNullOfOrNull { JsModelManager.getOrCreateScoutJsModel(it) } ?: return
-        preloadModel(scoutJsModel)
-        SdkLog.info("Scout JS model cache preloaded for module '{}' took {}ms.", scoutJsModel.nodeModule().name(), System.currentTimeMillis() - start)
+            .mapNotNull { JsModelManager.getOrCreateScoutJsModel(it) }
+            .forEach { preloadModel(it) }
+        SdkLog.info("Scout JS model cache preload took {}ms.", System.currentTimeMillis() - start)
     }
 
     private fun preloadModel(model: ScoutJsModel) {
+        val start = System.currentTimeMillis()
         try {
             model
                 .findScoutObjects()
@@ -56,6 +57,7 @@ class JsModelCacheStartup : ProjectActivity {
         } catch (e: Throwable) {
             JsModelManager.handleJsModelLoadError(e, model.nodeModule().name())
         }
+        SdkLog.info("Scout JS model cache preloaded for module '{}' took {}ms.", model.nodeModule().name(), System.currentTimeMillis() - start)
     }
 
     private fun containsPackageJson(module: Module): Boolean {
@@ -63,5 +65,4 @@ class JsModelCacheStartup : ProjectActivity {
         val packageJson = dir.findChild(IPackageJson.FILE_NAME) ?: return false
         return packageJson.isValid && packageJson.isInLocalFileSystem
     }
-
 }
