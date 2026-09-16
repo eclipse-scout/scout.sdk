@@ -9,9 +9,12 @@
  */
 package org.eclipse.scout.sdk.s2i.model.js
 
+import com.intellij.lang.ecmascript6.psi.ES6ImportDeclaration
 import com.intellij.lang.javascript.JavascriptLanguage
 import com.intellij.lang.javascript.library.JSLibraryManager
 import com.intellij.lang.javascript.library.JSLibraryManager.JSLibraryManagerChangeListener
+import com.intellij.lang.javascript.psi.JSFunction
+import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.module.Module
@@ -20,10 +23,8 @@ import com.intellij.openapi.project.guessModuleDir
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.InvalidVirtualFileAccessException
 import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiTreeChangeAdapter
-import com.intellij.psi.PsiTreeChangeEvent
+import com.intellij.psi.*
+import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModels
@@ -119,17 +120,56 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
 
         private val m_delayedProcessor = DelayedBuffer(2, TimeUnit.SECONDS, AppExecutorUtil.getAppScheduledExecutorService(), true, this::processFileEvents)
 
-        override fun childrenChanged(event: PsiTreeChangeEvent) {
-            val file = event.file ?: return
-            if (!file.language.isKindOf(JavascriptLanguage.INSTANCE)) return
-            m_delayedProcessor.submit(file)
+        override fun childAdded(event: PsiTreeChangeEvent) {
+            if (!isRelevant(event.child)) return
+            m_delayedProcessor.submit(event.child.containingFile)
         }
 
-        private fun processFileEvents(events: List<PsiFile>) {
+        override fun childRemoved(event: PsiTreeChangeEvent) {
+            if (!isRelevant(event.child)) return
+
+            if (event.parent is PsiFileSystemItem) {
+                m_delayedProcessor.submit(event.parent as PsiFileSystemItem)
+            } else if (isRelevant(event.parent)) {
+                m_delayedProcessor.submit(event.parent.containingFile)
+            }
+        }
+
+        override fun childReplaced(event: PsiTreeChangeEvent) {
+            if (!isRelevant(event.child)) return
+            m_delayedProcessor.submit(event.child.containingFile)
+        }
+
+        override fun childMoved(event: PsiTreeChangeEvent) {
+            if (!isRelevant(event.child)) return
+            m_delayedProcessor.submit(event.child.containingFile)
+        }
+
+        private fun isRelevant(element: PsiElement): Boolean {
+            if (!element.language.isKindOf(JavascriptLanguage.INSTANCE)) return false
+            if (element is PsiWhiteSpace) return false
+
+            val insideFunction = PsiTreeUtil.getParentOfType(element, JSFunction::class.java, false) != null
+            if (insideFunction) return false
+
+            val insideObjectLiteral = PsiTreeUtil.getParentOfType(element, JSObjectLiteralExpression::class.java, false) != null
+            if (insideObjectLiteral) return false
+
+            val insideImport = PsiTreeUtil.getParentOfType(element, ES6ImportDeclaration::class.java, false) != null
+            return !insideImport
+        }
+
+        private fun processFileEvents(events: List<PsiFileSystemItem?>) {
             if (!m_project.isInitialized || events.isEmpty()) return
             val changedPaths = computeInReadAction(m_project) { // PsiElement.isValid may require read-action
-                events.asSequence().filter { it.isPhysical && !it.isDirectory && it.isValid }.map { it.virtualFile }.filter { it.isValid && it.isInLocalFileSystem }.distinct() // events for the same file: only process once
-                    .mapNotNull { it.resolveLocalPath() }.toList()
+                events.asSequence()
+                    .filterNotNull()
+                    .filter { it.isPhysical && it.isValid }
+                    .map { it.virtualFile }
+                    .filter { it.isInLocalFileSystem }
+                    .distinct() // events for the same file: only process once
+                    .mapNotNull { it.resolveLocalPath() }
+                    .toList()
             }
             return changedPaths.forEach {
                 NodeModulesProvider.removeNodeModule(it).forEach { removedModule -> SdkLog.debug("NodeModule cache entry for '{}' removed.", removedModule.api()) }
