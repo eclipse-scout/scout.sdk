@@ -123,6 +123,6 @@ object ES6ImportUtils {
             .removeSuffix(IWebConstants.TS_FILE_SUFFIX)
             .removeSuffix(IWebConstants.JS_FILE_SUFFIX)
             .toString()
-        return Paths.get(clean).normalize().toString() // handle leading './'
+        return Paths.get(clean).normalize().toString().replace('\\', '/') // handle leading './'
     }
 }
