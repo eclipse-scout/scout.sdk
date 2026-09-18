@@ -10,9 +10,10 @@
 package org.eclipse.scout.sdk.s2i.model.js
 
 import com.intellij.lang.ecmascript6.psi.ES6ImportDeclaration
-import com.intellij.lang.javascript.JavascriptLanguage
+import com.intellij.lang.javascript.JSTokenTypes
 import com.intellij.lang.javascript.library.JSLibraryManager
 import com.intellij.lang.javascript.library.JSLibraryManager.JSLibraryManagerChangeListener
+import com.intellij.lang.javascript.psi.JSElement
 import com.intellij.lang.javascript.psi.JSFunction
 import com.intellij.lang.javascript.psi.JSObjectLiteralExpression
 import com.intellij.openapi.Disposable
@@ -25,6 +26,7 @@ import com.intellij.openapi.vfs.InvalidVirtualFileAccessException
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.*
 import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.PsiUtilCore
 import com.intellij.util.concurrency.AppExecutorUtil
 import org.eclipse.scout.sdk.core.log.SdkLog
 import org.eclipse.scout.sdk.core.s.model.js.ScoutJsModels
@@ -146,17 +148,22 @@ class JsModelManager(val project: Project) : NodeModulesProviderSpi, Disposable 
         }
 
         private fun isRelevant(element: PsiElement): Boolean {
-            if (!element.language.isKindOf(JavascriptLanguage.INSTANCE)) return false
-            if (element is PsiWhiteSpace) return false
+            try {
+                // do not use element.language.isKindOf here as it mighty throw NPE for some languages (e.g. Xml)
+                if (PsiUtilCore.getElementType(element) != JSTokenTypes.IDENTIFIER && element !is JSElement) return false // skips PsiWhiteSpace, but does not skip e.g. identifiers (like class names)
 
-            val insideFunction = PsiTreeUtil.getParentOfType(element, JSFunction::class.java, false) != null
-            if (insideFunction) return false
+                val insideFunction = PsiTreeUtil.getParentOfType(element, JSFunction::class.java, false) != null
+                if (insideFunction) return false
 
-            val insideObjectLiteral = PsiTreeUtil.getParentOfType(element, JSObjectLiteralExpression::class.java, false) != null
-            if (insideObjectLiteral) return false
+                val insideObjectLiteral = PsiTreeUtil.getParentOfType(element, JSObjectLiteralExpression::class.java, false) != null
+                if (insideObjectLiteral) return false
 
-            val insideImport = PsiTreeUtil.getParentOfType(element, ES6ImportDeclaration::class.java, false) != null
-            return !insideImport
+                val insideImport = PsiTreeUtil.getParentOfType(element, ES6ImportDeclaration::class.java, false) != null
+                return !insideImport
+            } catch (e: Exception) {
+                SdkLog.warning("Failed to check element: {}", element, e)
+                return false
+            }
         }
 
         private fun processFileEvents(events: List<PsiFileSystemItem?>) {
