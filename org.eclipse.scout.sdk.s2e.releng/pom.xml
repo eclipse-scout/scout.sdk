@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2026 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -25,7 +25,7 @@
    4. In org.eclipse.scout.sdk-feature: Update the P2 update site in *.properties and feature.xml.
    5. Verify using local Maven build on org.eclipse.scout.sdk.p2/pom.xml using "mvn clean install" and fix issues.
 
-   6. In org.eclipse.scout.sdk/pom.xml adjust dependency versions in the section titled "dependencies to Eclipse artifacts". The version should match the one of the corresponding Eclipse release.
+   6. In org.eclipse.scout.sdk/pom.xml replace the dependencies in the section titled "Eclipse Platform Dependencies". Use the EclipsePlatformDependencyGeneratorTest as starting point to generate the new versions.
    7. In org.eclipse.scout.sdk/pom.xml adjust dependency versions in the section titled "versions to dependencies uploaded by scout". The version should match the one of the corresponding Eclipse release.
    8. In the child modules of this pom adjust the source P2 repository (id and url) in the "tycho-p2-extras-plugin" configuration.
    9. In the child modules of this pom adjust the version of the pom to the ones used in step 7.

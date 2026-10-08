@@ -94,7 +94,7 @@ public final class MavenSandboxClassLoaderFactory {
         "org.objectweb.asm.ClassVisitor", // asm
 
         // logging:
-        "org.slf4j.simple.SimpleLogger", // maven-slf4j-provider
+        "org.slf4j.impl.SimpleLogger", // maven-slf4j-provider
         "org.apache.commons.logging.Log", // jcl-over-slf4j
         "org.slf4j.ILoggerFactory", // slf4j-api
 
