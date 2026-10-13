@@ -282,8 +282,7 @@ public final class CoreScoutTestingUtils {
     ensureMavenRunnerCreated();
     var build = new MavenBuild()
         .withWorkingDirectory(pomDir)
-        .withProperty(MavenBuild.PROPERTY_INTERACTIVE_MODE, "false")
-        .withOption(MavenBuild.OPTION_DEBUG);
+        .withProperty(MavenBuild.PROPERTY_INTERACTIVE_MODE, "false");
     if (goals != null) {
       for (var goal : goals) {
         build.withGoal(goal);
