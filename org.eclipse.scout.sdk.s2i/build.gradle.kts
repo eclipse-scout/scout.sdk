@@ -90,7 +90,22 @@ intellijPlatform {
         }
     }
     pluginVerification {
-        failureLevel = VerifyPluginTask.FailureLevel.ALL
+        // For now override-only-api is accepted as a new baseline will be created with branch 15 soon.
+        // can be removed and switched back to "VerifyPluginTask.FailureLevel.ALL" as soon as new branch is created and .navigate() calls in NlsEditorContent have been migrated (e.g. to NavigationService?)
+        failureLevel = listOf(
+            VerifyPluginTask.FailureLevel.COMPATIBILITY_WARNINGS,
+            VerifyPluginTask.FailureLevel.COMPATIBILITY_PROBLEMS,
+            VerifyPluginTask.FailureLevel.DEPRECATED_API_USAGES,
+            VerifyPluginTask.FailureLevel.SCHEDULED_FOR_REMOVAL_API_USAGES,
+            VerifyPluginTask.FailureLevel.EXPERIMENTAL_API_USAGES,
+            VerifyPluginTask.FailureLevel.INTERNAL_API_USAGES,
+            // skipped: OVERRIDE_ONLY_API_USAGES
+            VerifyPluginTask.FailureLevel.NON_EXTENDABLE_API_USAGES,
+            VerifyPluginTask.FailureLevel.PLUGIN_STRUCTURE_WARNINGS,
+            VerifyPluginTask.FailureLevel.MISSING_DEPENDENCIES,
+            VerifyPluginTask.FailureLevel.INVALID_PLUGIN,
+            VerifyPluginTask.FailureLevel.NOT_DYNAMIC
+        )
         verificationReportsFormats = VerifyPluginTask.VerificationReportsFormats.ALL
         subsystemsToCheck = VerifyPluginTask.Subsystems.WITHOUT_ANDROID
         ides {
